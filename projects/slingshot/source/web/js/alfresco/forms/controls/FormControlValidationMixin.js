@@ -240,7 +240,7 @@ define(["dojo/_base/declare",
                   {
                      this._validationErrorMessage += ", ";
                   }
-                  this._validationErrorMessage += validationConfig.errorMessage;
+                  this._validationErrorMessage += this.message(validationConfig.errorMessage);
                }
                
                // Update the validation message...
@@ -321,6 +321,10 @@ define(["dojo/_base/declare",
             var value = this.getValue();
             var regExObj = new RegExp(regexPattern);
             isValid = regExObj.test(value);
+            if (validationConfig.invertRule === true)
+            {
+               isValid = !isValid;
+            }
          }
          else
          {

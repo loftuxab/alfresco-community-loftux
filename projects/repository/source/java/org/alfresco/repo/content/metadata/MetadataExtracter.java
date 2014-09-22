@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.api.AlfrescoPublicApi;     
 import org.alfresco.repo.content.ContentWorker;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -37,6 +38,7 @@ import org.alfresco.service.namespace.QName;
  * @author Jesper Steen Møller
  * @author Derek Hulley
  */
+@AlfrescoPublicApi
 public interface MetadataExtracter extends ContentWorker
 {
     /**
@@ -46,6 +48,7 @@ public interface MetadataExtracter extends ContentWorker
      * @author Derek Hulley
      * @author Jesper Steen Møller
      */
+    @AlfrescoPublicApi
     public enum OverwritePolicy
     {
         /**

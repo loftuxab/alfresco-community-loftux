@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -60,6 +60,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         EXPOSED_FIELDS.add(QueryConstants.FIELD_PATH);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_TEXT);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_ID);
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_SOLR4_ID);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_ISROOT);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_ISNODE);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_TX);
@@ -89,6 +90,8 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         EXPOSED_FIELDS.add(QueryConstants.FIELD_OWNERSET);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_READERSET);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_AUTHORITYSET);
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_DENIED);
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_DENYSET);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_TXID);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_ACLTXID);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_TXCOMMITTIME);
@@ -101,6 +104,12 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         EXPOSED_FIELDS.add(QueryConstants.FIELD_EXCEPTION_STACK);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_LID);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_PARENT_ASSOC_CRC);
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_SITE);
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_TAG);
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_PNAME);
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_NPATH);
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_DOC_TYPE);
+        
     }
 
     /**
@@ -330,19 +339,22 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
             }
         }
 
-        index = propertyName.indexOf('_');
-        if (index != -1)
+        if (!EXPOSED_FIELDS.contains(propertyName))
         {
-            // Try as a property, if invalid pass through
-            QName fullQName = QName.createQName(propertyName.substring(0, index), propertyName.substring(index + 1), namespacePrefixResolver);
-            QName propertyQName = stripSuffixes(fullQName);
-            if (dictionaryService.getProperty(propertyQName) != null)
+            index = propertyName.indexOf('_');
+            if (index != -1)
             {
-                return QueryConstants.PROPERTY_FIELD_PREFIX + fullQName.toString();
-            }
-            else
-            {
-                throw new FTSQueryException("Unknown property: " + fullQName.toString());
+                // Try as a property, if invalid pass through
+                QName fullQName = QName.createQName(propertyName.substring(0, index), propertyName.substring(index + 1), namespacePrefixResolver);
+                QName propertyQName = stripSuffixes(fullQName);
+                if (dictionaryService.getProperty(propertyQName) != null)
+                {
+                    return QueryConstants.PROPERTY_FIELD_PREFIX + fullQName.toString();
+                }
+                else
+                {
+                    throw new FTSQueryException("Unknown property: " + fullQName.toString());
+                }
             }
         }
 

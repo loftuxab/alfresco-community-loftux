@@ -48,6 +48,7 @@ import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchParameters.FieldFacet;
 import org.alfresco.service.cmr.search.SearchParameters.Operator;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.search.SpellCheckResult;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.util.ISO9075;
@@ -585,7 +586,11 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                 String onerror = (String)def.get("onerror");
                 String defaultField = (String)def.get("defaultField");
                 String defaultOperator = (String)def.get("defaultOperator");
-                
+                String searchTerm = (String) def.get("searchTerm");
+                Object spellCheckObject = def.get("spellCheck");
+                boolean spellCheck = (spellCheckObject == null) ? false : (boolean) spellCheckObject;
+
+
                 // extract supplied values
                 
                 // sorting columns
@@ -666,13 +671,22 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                 sp.addStore(store != null ? new StoreRef(store) : this.storeRef);
                 sp.setLanguage(language != null ? language : SearchService.LANGUAGE_LUCENE);
                 sp.setQuery(query);
+                sp.setSearchTerm(searchTerm);
+                sp.setSpellCheck(spellCheck);
                 if (defaultField != null)
                 {
                     sp.setDefaultFieldName(defaultField);
                 }
-                if (defaultOperator != null)
+                if (defaultOperator != null && defaultOperator.length() != 0)
                 {
-                    sp.setDefaultOperator(Operator.valueOf(defaultOperator.toUpperCase()));
+                    try
+                    {
+                        sp.setDefaultOperator(Operator.valueOf(defaultOperator.toUpperCase()));
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        // ignore invalid Operator and the default value will be used
+                    }
                 }
                 if (namespace != null)
                 {
@@ -978,6 +992,13 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                 }
             }// End of bucketing
             meta.put("facets", facetMeta);
+            SpellCheckResult spellCheckResult = results.getSpellCheckResult();
+            meta.put("spellcheck", new ScriptSpellCheckResult(
+                                    sp.getSearchTerm(),
+                                    spellCheckResult.getResultName(),
+                                    spellCheckResult.isSearchedFor(),
+                                    spellCheckResult.getResults(),
+                                    spellCheckResult.isSpellCheckExist()));
         }
         catch (Throwable err)
         {

@@ -71,7 +71,7 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
 
     protected final static Logger log = LoggerFactory.getLogger(AbstractQParser.class);
 
-    private static final String ALFRESCO_JSON = "ALFRESCO_JSON";
+    public static final String ALFRESCO_JSON = "ALFRESCO_JSON";
 
     private static final String AUTHORITY_FILTER_FROM_JSON = "AUTHORITY_FILTER_FROM_JSON";
 
@@ -85,47 +85,10 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
      */
     public AbstractQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
     {
-        super(qstr, localParams, fixFacetParams(params), req);
-        req.setParams(fixFacetParams(params));
+        super(qstr, localParams, params, req);
     }
 
-    /**
-     * @param params
-     * @return
-     */
-    private static SolrParams fixFacetParams(SolrParams params)
-    {
-        if(true)
-        {
-            return params;
-        }
-        
-        ModifiableSolrParams fixed = new ModifiableSolrParams();
-        for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
-        {
-            String name = it.next();
-            if(name.equals("facet.field"))
-            {
-                fixed.add(name, endProperty(params.get(name), FieldUse.FACET));
-            }
-            if(name.startsWith("f."))
-            {
-                int index = name.indexOf(".facet.", 2);
-                if(index > -1)
-                {
-                    fixed.add("f."+endProperty(name.substring(2, index), FieldUse.FACET)+name.substring(index), params.get(name));
-                }
-                else
-                {
-                    fixed.add(name, params.get(name));
-                }
-            }
-                    
-        }
-        
-        return fixed;
-    }
-
+    
     protected Pair<SearchParameters, Boolean> getSearchParameters()
     {
         SearchParameters searchParameters = new SearchParameters();
@@ -196,6 +159,7 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                         char separator = getSeparator(authorityList);
 
                         StringBuilder authQuery = new StringBuilder();
+                        StringBuilder denyQuery = new StringBuilder();
                         for (String tenant : tenantList)
                         {
                             for (String authority : authorityList)
@@ -205,11 +169,13 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                                     if (authQuery.length() > 0)
                                     {
                                         authQuery.append(" ");
+                                        denyQuery.append(" ");                                        
                                     }
                                     switch (AuthorityType.getAuthorityType(authority))
                                     {
                                     case USER:
                                         authQuery.append("|AUTHORITY:\"").append(authority).append("\"");
+                                        denyQuery.append("|DENIED:\"").append(authority).append("\"");
                                         break;
                                     case GROUP:
                                     case EVERYONE:
@@ -218,14 +184,17 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                                         {
                                             // Default tenant matches 4.0
                                             authQuery.append("|AUTHORITY:\"").append(authority).append("\"");
+                                            denyQuery.append("|DENIED:\"").append(authority).append("\"");
                                         }
                                         else
                                         {
                                             authQuery.append("|AUTHORITY:\"").append(authority).append("@").append(tenant).append("\"");
+                                            denyQuery.append("|DENIED:\"").append(authority).append("@").append(tenant).append("\"");
                                         }
                                         break;
                                     default:
                                         authQuery.append("|AUTHORITY:\"").append(authority).append("\"");
+                                        denyQuery.append("|DENIED:\"").append(authority).append("\"");
                                         break;
                                     }
                                 }
@@ -234,11 +203,13 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                                     if(authQuery.length() == 0)
                                     {
                                         authQuery.append("|AUTHSET:\"");
+                                        denyQuery.append("|DENYSET:\"");
                                     }
                                     switch (AuthorityType.getAuthorityType(authority))
                                     {
                                     case USER:
                                         authQuery.append(separator).append(authority);
+                                        denyQuery.append(separator).append(authority);
                                         break;
                                     case GROUP:
                                     case EVERYONE:
@@ -247,14 +218,17 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                                         {
                                             // Default tenant matches 4.0
                                             authQuery.append(separator).append(authority);
+                                            denyQuery.append(separator).append(authority);
                                         }
                                         else
                                         {
                                             authQuery.append(separator).append(authority).append("@").append(tenant);
+                                            denyQuery.append(separator).append(authority).append("@").append(tenant);
                                         }
                                         break;
                                     default:
                                         authQuery.append(separator).append(authority);
+                                        denyQuery.append(separator).append(authority);
                                         break;
                                     }
                                 }
@@ -264,10 +238,21 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                         if(separator != 0)
                         {
                             authQuery.append("\"");
+                            denyQuery.append("\"");
                         }
 
                         if (authQuery.length() > 0)
                         {
+                            // Default to true for safety reasons.
+                            final boolean anyDenyDenies = json.optBoolean("anyDenyDenies", true);
+                            
+                            if (anyDenyDenies)
+                            {
+                                authQuery.insert(0, "(").
+                                    append(") AND NOT (").
+                                    append(denyQuery).
+                                    append(")");
+                            }
                             searchParameters.setQuery(authQuery.toString());
                         }
                     }
@@ -482,7 +467,7 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                 {
                     if(Character.isWhitespace(c))
                     {
-                        String toAppend = endProperty(propertyBuilder.toString(), FieldUse.SORT);
+                        String toAppend = AlfrescoSolrDataModel.getInstance().mapProperty(propertyBuilder.toString(), FieldUse.SORT);
                         builder.append(toAppend);
                         builder.append(c);
                         propertyBuilder = null;
@@ -495,7 +480,7 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
             }
             if(propertyBuilder != null)
             {
-                String toAppend = endProperty(propertyBuilder.toString(), FieldUse.SORT);
+                String toAppend =  AlfrescoSolrDataModel.getInstance().mapProperty(propertyBuilder.toString(), FieldUse.SORT);
                 builder.append(toAppend);
             }
             sortStr = builder.toString();
@@ -508,87 +493,6 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
         return sort;
     }
 
-    /**
-     * @param builder
-     * @param propertyBuilder
-     * @param c
-     * @return
-     */
-    private static String  endProperty(String  potentialProperty,  FieldUse fieldUse)
-    {
-        AlfrescoFunctionEvaluationContext functionContext = new AlfrescoFunctionEvaluationContext( AlfrescoSolrDataModel.getInstance().getNamespaceDAO(),  AlfrescoSolrDataModel.getInstance().getDictionaryService(CMISStrictDictionaryService.DEFAULT), NamespaceService.CONTENT_MODEL_1_0_URI);
-
-        String luceneField =  functionContext.getLuceneFieldName(potentialProperty);
-
-        Pair<String, String> fieldNameAndEnding = QueryParserUtils.extractFieldNameAndEnding(luceneField);
-        PropertyDefinition propertyDef = QueryParserUtils.matchPropertyDefinition(NamespaceService.CONTENT_MODEL_1_0_URI, AlfrescoSolrDataModel.getInstance().getNamespaceDAO(), AlfrescoSolrDataModel.getInstance().getDictionaryService(CMISStrictDictionaryService.DEFAULT), fieldNameAndEnding.getFirst());
-        
-        String solrSortField = null;
-        if(propertyDef != null)
-        {
-
-            IndexedField fields = AlfrescoSolrDataModel.getInstance().getQueryableFields(propertyDef.getName(), getTextField(fieldNameAndEnding.getSecond()), fieldUse);
-            if(fields.getFields().size() > 0)
-            {
-                solrSortField = fields.getFields().get(0).getField();
-            }
-            else
-            {
-                solrSortField = mapNonPropertyFields(luceneField);
-            }
-        }
-        else
-        {
-            solrSortField = mapNonPropertyFields(luceneField);
-        }
-        return solrSortField;
-      
-    }
-    
-    /**
-     * @param luceneField
-     * @return
-     */
-    protected static String mapNonPropertyFields(String luceneField)
-    {
-        switch(luceneField)
-        {
-        case "ID":
-            return "LID";
-        case "EXACTTYPE":
-            return "TYPE";
-        default:
-            return luceneField;
-                  
-        }
-    }
-
-    /**
-     * @param second
-     * @param sort
-     * @return
-     */
-    protected static ContentFieldType getTextField(String ending)
-    {
-        switch(ending)
-        {
-        case FIELD_MIMETYPE_SUFFIX:
-            return ContentFieldType.MIMETYPE;
-        case FIELD_SIZE_SUFFIX:
-            return ContentFieldType.SIZE;
-        case FIELD_LOCALE_SUFFIX:
-            return ContentFieldType.LOCALE;
-        case FIELD_ENCODING_SUFFIX:
-            return ContentFieldType.ENCODING;
-        case FIELD_TRANSFORMATION_STATUS_SUFFIX:
-        case FIELD_TRANSFORMATION_TIME_SUFFIX:
-        case FIELD_TRANSFORMATION_EXCEPTION_SUFFIX:
-        default:
-            return null;
-                
-        }
-        
-    }
-    
+ 
     
 }

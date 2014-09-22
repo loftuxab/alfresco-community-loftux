@@ -5,7 +5,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
+        <version>5.0.b.LX69-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
@@ -267,7 +267,7 @@
                             <dependency>
                                 <groupId>org.postgresql</groupId>
                                 <artifactId>postgresql</artifactId>
-                                <version>9.3-1101-jdbc41</version>
+                                <version>${dependency.postgresql.version}</version>
                             </dependency>
                         </dependencies>
                     </plugin>

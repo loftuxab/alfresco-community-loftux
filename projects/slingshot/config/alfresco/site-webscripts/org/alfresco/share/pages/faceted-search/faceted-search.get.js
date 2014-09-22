@@ -34,10 +34,18 @@ var services = getHeaderServices(),
 var rootWidgetId = "FCTSRCH_";
 
 // Insert a configuration page link if the user has the appropriate permissions...
-if (_processedUserData.groups["GROUP_ALFRESCO_ADMINISTRATORS"] == true ||
+if (user.isAdmin == true ||
+    _processedUserData.groups["GROUP_ALFRESCO_ADMINISTRATORS"] == true ||
     _processedUserData.groups["GROUP_ALFRESCO_SEARCH_ADMINISTRATORS"] == true ||
     _processedUserData.isNetworkAdmin == true)
 {
+   // Make sure any site context is retained...
+   var searchManagerUrl = "dp/ws/faceted-search-config";
+   if (page.url.templateArgs.site)
+   {
+      searchManagerUrl = "site/" + page.url.templateArgs.site + "/" + searchManagerUrl;
+   }
+
    var titleMenu = widgetUtils.findObject(widgets, "id", "HEADER_TITLE_MENU");
    var searchConfigMenuItem = {
       id: "FCTSRCH_CONFIG_PAGE_LINK",
@@ -45,7 +53,7 @@ if (_processedUserData.groups["GROUP_ALFRESCO_ADMINISTRATORS"] == true ||
       config: {
          label: msg.get("faceted-search-config.label"),
          title: msg.get("faceted-search.config.link"),
-         targetUrl: "dp/ws/faceted-search-config"
+         targetUrl: searchManagerUrl
       }
    };
    titleMenu.config.widgets.splice(0, 0, searchConfigMenuItem);
@@ -103,7 +111,8 @@ var headingForResultsList = {
 // Compose the search form model
 var searchForm = {
    id: "FCTSRCH_SEARCH_FORM",
-   name: "alfresco/forms/SingleTextFieldForm",
+   name: "alfresco/forms/SingleComboBoxForm",
+   // name: "alfresco/forms/SingleTextFieldForm",
    config: {
       useHash: true,
       okButtonLabel: msg.get("faceted-search.search-form.ok-button-label"),
@@ -114,7 +123,12 @@ var searchForm = {
       textFieldName: "searchTerm",
       textBoxIconClass: "alf-search-icon",
       textBoxCssClasses: "long hiddenlabel",
-      textBoxLabel: msg.get("faceted-search.search-form.search-field-label")
+      textBoxLabel: msg.get("faceted-search.search-form.search-field-label"),
+      queryAttribute: "term",
+      optionsPublishTopic: "ALF_AUTO_SUGGEST_SEARCH",
+      optionsPublishPayload: {
+         resultsProperty: "response.suggestions"
+      }
    }
 };
 
@@ -315,15 +329,7 @@ var searchResultsMenuBar = {
             align: "left",
             config: {
                label: msg.get("faceted-search.results-menu.no"),
-               additionalCssClasses: "bold",
                subscriptionTopic: "ALF_SEARCH_RESULTS_COUNT"
-            }
-         },
-         {
-            name: "alfresco/html/Label",
-            align: "left",
-            config: {
-               label: msg.get("faceted-search.results-menu.results-found")
             }
          },
          headingForSortMenu,
@@ -381,6 +387,20 @@ var searchResultsMenuBar = {
    }
 };
 
+var widgetsForNoDataDisplay = [
+   {
+      name: "alfresco/search/NoSearchResults",
+      config: {
+         title: msg.get("faceted-search.advice.title"),
+         suggestions: [
+            "faceted-search.advice.suggestion1",
+            "faceted-search.advice.suggestion2",
+            "faceted-search.advice.suggestion3"
+         ]
+      }
+   }
+];
+
 // Build the searchDocLib model
 var searchDocLib = {
    id: "FCTSRCH_SEARCH_RESULTS_LIST",
@@ -406,17 +426,13 @@ var searchDocLib = {
       rootNode: null,
       repo: true,
       additionalControlsTarget: "FCTSRCH_RESULTS_MENU_BAR",
+      additionalViewControlVisibilityConfig: hideOnZeroResultsConfig,
       widgets: [
          {
             id: "FCTSRCH_SEARCH_ADVICE_NO_RESULTS",
             name: "alfresco/documentlibrary/views/AlfSearchListView",
             config: {
-               searchAdviceTitle: "faceted-search.advice.title",
-               searchAdvice: [
-                  "faceted-search.advice.suggestion1",
-                  "faceted-search.advice.suggestion2",
-                  "faceted-search.advice.suggestion3"
-               ],
+               widgetsForNoDataDisplay: widgetsForNoDataDisplay,
                a11yCaption: msg.get("faceted-search.results.caption"),
                a11yCaptionClass: "hiddenAccessible",
                widgetsForHeader: [
@@ -461,6 +477,7 @@ var searchDocLib = {
             config: {
                showNextLink: true,
                nextLinkLabel: msg.get("faceted-search.show-more-results.label"),
+               widgetsForNoDataDisplay: widgetsForNoDataDisplay,
                widgets: [
                   {
                      name: "alfresco/search/SearchGalleryThumbnail",
@@ -487,6 +504,111 @@ var searchDocLib = {
    }
 };
 
+// Define a widget for displaying alternative search terms should the search service report
+// that one has been used...
+var alternativeSearchLabel = {
+   id: "FCTSRCH_ALTERNATIVE_SEARCH",
+   name: "alfresco/search/AlternativeSearchLabel",
+   config: {
+      visibilityConfig: {
+         initialValue: false,
+         rules: [
+            {
+               topic: "ALF_SEARCH_REQUEST",
+               attribute: "dummy",
+               is: [""]
+            },
+            {
+               topic: "ALF_SPELL_CHECK_SEARCH_TERM",
+               attribute: "searchedFor",
+               isNot: [""]
+            }
+         ]
+      }
+   }
+};
+
+// Define a set of widgets to use to render any alternative search terms that the search
+// service might suggest as suitable alternatives to the search that was actually carried out
+var searchSuggestions = {
+   id: "FCTSRCH_SEARCH_SUGGESTIONS_STACK",
+   name: "alfresco/layout/VerticalWidgets",
+   config: {
+      visibilityConfig: {
+         initialValue: false,
+         rules: [
+            {
+               topic: "ALF_SEARCH_REQUEST",
+               attribute: "dummy",
+               is: [""]
+            },
+            {
+               topic: "ALF_SPELL_CHECK_SEARCH_SUGGESTIONS",
+               attribute: "searchSuggestions",
+               isNot: [""]
+            }
+         ]
+      },
+      widgets: [
+         {
+            id: "FCTSRCH_SEARCH_SUGGESTIONS_SPACER",
+            name: "alfresco/html/Spacer",
+            config: {
+               height: "10px"
+            }
+         },
+         {
+            id: "FCTSRCH_SEARCH_SUGGESTIONS_LABEL",
+            name: "alfresco/html/Label",
+            config: {
+               label: msg.get("faceted-search.suggestions.label"),
+               additionalCssClasses: "large de-emphasized"
+            }
+         },
+         {
+            id: "FCTSRCH_SEARCH_SUGGESTIONS_LIST",
+            name: "alfresco/documentlibrary/views/AlfDocumentListView",
+            config: {
+               subscribeToDocRequests: true,
+               documentSubscriptionTopic: "ALF_SPELL_CHECK_SEARCH_SUGGESTIONS",
+               itemsProperty: "searchSuggestions",
+               widgets: [
+                  {
+                     name: "alfresco/documentlibrary/views/layouts/Row",
+                     config: {
+                        widgets: [
+                           {
+                              name: "alfresco/documentlibrary/views/layouts/Cell",
+                              config: {
+                                 widgets: [
+                                    {
+                                       name: "alfresco/renderers/PropertyLink",
+                                       config: {
+                                          useCurrentItemAsPayload: false,
+                                          propertyToRender: "term",
+                                          renderSize: "large",
+                                          publishTopic: "ALF_NAVIGATE_TO_PAGE",
+                                          publishPayloadType: "PROCESS",
+                                          publishPayloadModifiers: ["processCurrentItemTokens"],
+                                          publishPayload: {
+                                             type: "HASH",
+                                             url: "searchTerm={term}"
+                                          }
+                                       }
+                                    }
+                                 ]
+                              }
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         }
+      ]
+   }
+};
+
 // Put all components together
 var main = {
    id: "FCTSRCH_MAIN_VERTICAL_STACK",
@@ -497,7 +619,7 @@ var main = {
          {
             name: "alfresco/html/Spacer",
             config: {
-               height: "4px"
+               height: "14px"
             }
          },
          headingForSearchForm,
@@ -540,7 +662,8 @@ var main = {
                      widthPx: 340,
                      config: {
                         visibilityConfig: hideOnZeroResultsConfig,
-                        widgets: facets
+                        widgets: facets,
+                        additionalCssClasses: "alfresco-Twister-container"
                      }
                   },
                   {
@@ -548,6 +671,8 @@ var main = {
                      config: {
                         widgets: [
                            headingForResultsList,
+                           alternativeSearchLabel,
+                           searchSuggestions,
                            searchDocLib
                         ]
                      }
@@ -669,7 +794,8 @@ services.push("alfresco/services/NavigationService",
               "alfresco/services/RatingsService",
               "alfresco/services/CrudService",
               "alfresco/services/NotificationService",
-              "alfresco/services/ContentService");
+              "alfresco/services/ContentService",
+              "alfresco/services/TagService");
 
 // Add in the search form and search doc lib...
 widgets.unshift(accessMenu);

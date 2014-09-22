@@ -56,21 +56,18 @@ define(["intern!object",
             .end()
 
          .findAllByCssSelector("#MENU_BAR_SELECT_WITH_ICON_text")
-            .then(function(result) {
-               expect(result).to.have.length(0, "Test #1c - Label for icon toggle was displayed and it shouldn't be");
+            .then(function(results) {
+               expect(results).to.have.length(0, "Test #1c - Label for icon toggle was displayed and it shouldn't be");
             })
             .end()
 
          .findByCssSelector("#MENU_BAR_TOGGLE_WITH_ICON > img.alf-sort-descending-icon")
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1d - Image for icon toggle had wrong or missing CSS class");
             })
             .end()
 
-         // Post the coverage results...
-         .then(function() {
-            TestCommon.postCoverageResults(browser);
-         });
+         .alfPostCoverageResults(browser);
 
       },
 
@@ -85,7 +82,7 @@ define(["intern!object",
             .end()
 
          .findByCssSelector(TestCommon.topicSelector("ALF_WIDGETS_READY", "publish", "last"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1a - Mouse selection of basic toggle published unexpectedly (although it has no publishTopic)");
             })
             .end()
@@ -102,13 +99,13 @@ define(["intern!object",
             .end()
 
          .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "value", "OFF"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1c - Mouse selection of custom toggle didn't publish value correctly");
             })
             .end()
 
          .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "clicked", "TOGGLE_WITH_LABEL"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1d - Mouse selection of custom toggle didn't publish id correctly");
             })
             .end()
@@ -125,27 +122,24 @@ define(["intern!object",
             .end()
 
          .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "value", "ON"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1f - Mouse selection of icon toggle didn't publish value correctly");
             })
             .end()
 
          .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "clicked", "TOGGLE_WITH_ICON"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1g - Mouse selection of icon toggle didn't publish id correctly");
             })
             .end()
 
          .findByCssSelector("#MENU_BAR_TOGGLE_WITH_ICON > img.alf-sort-ascending-icon")
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1h - Image for icon toggle had wrong or missing CSS class after update by mouse");
             })
             .end()
 
-         // Post the coverage results...
-         .then(function() {
-            TestCommon.postCoverageResults(browser);
-         });
+         .alfPostCoverageResults(browser);
 
       },
 
@@ -162,7 +156,7 @@ define(["intern!object",
             .end()
 
          .findByCssSelector(TestCommon.topicSelector("ALF_WIDGETS_READY", "publish", "last"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1a - Keyboard selection of basic toggle published unexpectedly (although it has no publishTopic)");
             })
             .end()
@@ -181,19 +175,19 @@ define(["intern!object",
          .end()
 
          .findByCssSelector(TestCommon.topicSelector("CLICK", "publish", "last"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1c - Keyboard selection of custom toggle didn't publish topic as expected");
             })
             .end()
 
          .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "value", "OFF"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1d - Keyboard selection of custom toggle didn't publish value correctly");
             })
             .end()
 
          .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "clicked", "TOGGLE_WITH_LABEL"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1e - Keyboard selection of custom toggle didn't publish id correctly");
             })
             .end()
@@ -211,33 +205,30 @@ define(["intern!object",
          .pressKeys(keys.RETURN)
 
          .findByCssSelector(TestCommon.topicSelector("CLICK", "publish", "last"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1g - Keyboard selection of icon toggle didn't publish topic as expected");
             })
             .end()
 
          .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "value", "ON"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1h - Keyboard selection of icon toggle didn't publish value correctly");
             })
             .end()
 
          .findByCssSelector(TestCommon.pubSubDataCssSelector("last", "clicked", "TOGGLE_WITH_ICON"))
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1i - Keyboard selection of icon toggle didn't publish id correctly");
             })
             .end()
 
          .findByCssSelector("#MENU_BAR_TOGGLE_WITH_ICON > img.alf-sort-ascending-icon")
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1j - Image for icon toggle had wrong or missing CSS class after keyboard toggle");
             })
             .end()
 
-         // Post the coverage results...
-         .then(function() {
-            TestCommon.postCoverageResults(browser);
-         });
+         .alfPostCoverageResults(browser);
 
       },
 
@@ -268,7 +259,7 @@ define(["intern!object",
             .end()
 
          .findByCssSelector("#MENU_BAR_TOGGLE_WITH_ICON > img.alf-sort-ascending-icon")
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1c - Image for asc icon toggle had wrong or missing CSS class");
             })
             .end()
@@ -294,15 +285,12 @@ define(["intern!object",
             .end()
 
          .findByCssSelector("#MENU_BAR_TOGGLE_WITH_ICON > img.alf-sort-descending-icon")
-            .then(null, function() {
+            .then(function(element){}, function(err) {
                assert(false, "Test #1f - Image for desc icon toggle had wrong or missing CSS class");
             })
             .end()
 
-         // Post the coverage results...
-         .then(function() {
-            TestCommon.postCoverageResults(browser);
-         });
+         .alfPostCoverageResults(browser);
       }
    });
 });

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.admin.registry.RegistryService;
+import org.alfresco.repo.module.tool.ModuleManagementToolException;
 import org.alfresco.repo.tenant.TenantAdminService;
 import org.alfresco.service.cmr.module.ModuleDetails;
 import org.alfresco.service.cmr.module.ModuleService;
@@ -32,6 +33,7 @@ import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.util.BaseAlfrescoTestCase;
 import org.alfresco.util.GUID;
 import org.alfresco.util.VersionNumber;
+import org.alfresco.repo.module.ModuleVersionNumber;
 
 /**
  * @see org.alfresco.repo.module.ModuleComponentHelper
@@ -65,18 +67,18 @@ public class ModuleComponentHelperTest extends BaseAlfrescoTestCase
         new VersionNumber("2"),
         new VersionNumber("3")
     };
-    private static final Map<VersionNumber, Integer> EXECUTION_COUNT_BY_VERSION;
+    private static final Map<ModuleVersionNumber, Integer> EXECUTION_COUNT_BY_VERSION;
     static
     {
-        EXECUTION_COUNT_BY_VERSION = new HashMap<VersionNumber, Integer>(13);
-        EXECUTION_COUNT_BY_VERSION.put(new VersionNumber("0.0"), 3);
-        EXECUTION_COUNT_BY_VERSION.put(new VersionNumber("0.5"), 3);
-        EXECUTION_COUNT_BY_VERSION.put(new VersionNumber("1.0"), 6);
-        EXECUTION_COUNT_BY_VERSION.put(new VersionNumber("1.5"), 3);
-        EXECUTION_COUNT_BY_VERSION.put(new VersionNumber("2.0"), 6);
-        EXECUTION_COUNT_BY_VERSION.put(new VersionNumber("2.5"), 3);
-        EXECUTION_COUNT_BY_VERSION.put(new VersionNumber("3.0"), 3);
-        EXECUTION_COUNT_BY_VERSION.put(new VersionNumber("3.5"), 0);
+        EXECUTION_COUNT_BY_VERSION = new HashMap<ModuleVersionNumber, Integer>(13);
+        EXECUTION_COUNT_BY_VERSION.put(new ModuleVersionNumber("0.0"), 3);
+        EXECUTION_COUNT_BY_VERSION.put(new ModuleVersionNumber("0.5"), 3);
+        EXECUTION_COUNT_BY_VERSION.put(new ModuleVersionNumber("1.0"), 6);
+        EXECUTION_COUNT_BY_VERSION.put(new ModuleVersionNumber("1.5"), 3);
+        EXECUTION_COUNT_BY_VERSION.put(new ModuleVersionNumber("2.0"), 6);
+        EXECUTION_COUNT_BY_VERSION.put(new ModuleVersionNumber("2.5"), 3);
+        EXECUTION_COUNT_BY_VERSION.put(new ModuleVersionNumber("3.0"), 3);
+        EXECUTION_COUNT_BY_VERSION.put(new ModuleVersionNumber("3.5"), 0);
     };
     
     private RegistryService registryService;
@@ -134,7 +136,7 @@ public class ModuleComponentHelperTest extends BaseAlfrescoTestCase
         // See that it all starts OK
     }
     
-    private void startComponents(VersionNumber moduleVersion)
+    private void startComponents(ModuleVersionNumber moduleVersion)
     {
         int expectedCount = (Integer) EXECUTION_COUNT_BY_VERSION.get(moduleVersion);
         // Set the current version number for all modules
@@ -149,7 +151,7 @@ public class ModuleComponentHelperTest extends BaseAlfrescoTestCase
 //        	tenantCount = tenantDeployerService.getTenants(true).size();
 //        }
 //        // Check
-//        assertEquals(
+//        assertEquals(ModuleVersionNumber
 //                "Incorrent number of executions (version " + moduleVersion + ")",
 //                expectedCount + (expectedCount * tenantCount),
 //                executed);
@@ -159,48 +161,68 @@ public class ModuleComponentHelperTest extends BaseAlfrescoTestCase
     
     public void testStartComponentsV00()
     {
-        VersionNumber moduleVersion = new VersionNumber("0.0");
+        ModuleVersionNumber moduleVersion = new ModuleVersionNumber("0.0");
         startComponents(moduleVersion);
     }
     
     public void testStartComponentsV05()
     {
-        VersionNumber moduleVersion = new VersionNumber("0.5");
+        ModuleVersionNumber moduleVersion = new ModuleVersionNumber("0.5");
         startComponents(moduleVersion);
     }
     
     public void testStartComponentsV10()
     {
-        VersionNumber moduleVersion = new VersionNumber("1.0");
+        ModuleVersionNumber moduleVersion = new ModuleVersionNumber("1.0");
         startComponents(moduleVersion);
     }
     
     public void testStartComponentsV15()
     {
-        VersionNumber moduleVersion = new VersionNumber("1.5");
+        ModuleVersionNumber moduleVersion = new ModuleVersionNumber("1.5");
         startComponents(moduleVersion);
     }
     
     public void testStartComponentsV30()
     {
-        VersionNumber moduleVersion = new VersionNumber("3.0");
+        ModuleVersionNumber moduleVersion = new ModuleVersionNumber("3.0");
         startComponents(moduleVersion);
     }
     
     public void testStartComponentsV35()
     {
-        VersionNumber moduleVersion = new VersionNumber("3.5");
+        ModuleVersionNumber moduleVersion = new ModuleVersionNumber("3.5");
         startComponents(moduleVersion);
     }
     
+	public void testgetModuleVersionNumber() {
+		ModuleVersionNumber moduleVersion = new ModuleVersionNumber("3.5");
+		VersionNumber versNumber = new VersionNumber("3.5");
+		assertEquals(moduleVersion, helper.getModuleVersionNumber(moduleVersion));
+		assertEquals(moduleVersion, helper.getModuleVersionNumber(versNumber));
+
+		try {
+			helper.getModuleVersionNumber(null);
+			assertTrue(false); //should never get here
+		} catch (ModuleManagementToolException e) {
+			//should get here
+		}
+//		try {
+//			helper.getModuleVersionNumber("any object");
+//			assertTrue(false); //should never get here
+//		} catch (ModuleManagementToolException e) {
+//			//should get here
+//		}
+//		assertTrue(true);
+	}
     /**
      * Helper bean to simulate module presences under controlled conditions.
      */
     private class DummyModuleService implements ModuleService
     {
-        private VersionNumber currentVersion;
+        private ModuleVersionNumber currentVersion;
         /** Set the current version of all the modules */
-        public void setCurrentVersion(VersionNumber currentVersion)
+        public void setCurrentVersion(ModuleVersionNumber currentVersion)
         {
             this.currentVersion = currentVersion;
         }

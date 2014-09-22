@@ -3,7 +3,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
+        <version>5.0.b.LX69-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco</artifactId>
@@ -24,16 +24,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>alfresco-remote-api</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis</groupId>
-                    <artifactId>axis-jaxrpc</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.axis</groupId>
-                    <artifactId>axis-saaj</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -60,7 +50,6 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>commons-jxpath</groupId>
@@ -127,6 +116,12 @@
             <artifactId>portlet-api</artifactId>
             <version>2.0</version>
             <scope>provided</scope>
+        </dependency>
+
+       <dependency>
+            <groupId>org.alfresco.services</groupId>
+            <artifactId>alfresco-messaging-repo</artifactId>
+            <version>1.2-SNAPSHOT</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -231,6 +226,21 @@
                             </target>
                         </configuration>
                     </execution>
+                    <!-- ACE-2318 Bring alfresco-jmxrmi.* from repository -->
+                    <execution>
+                        <id>fetch-jmxrmi-properties</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy todir="${project.build.outputDirectory}/alfresco">
+                                    <fileset dir="${basedir}/../repository/config/alfresco" includes="alfresco-jmxrmi.*" />
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -322,7 +332,7 @@
                 	</plugin>
 				</plugins>
 			</build>
-		</profile>    
+		</profile>
 	    <profile>
 			<id>run</id>
 			<build>
@@ -362,7 +372,7 @@
                                  <goal>execute</goal>
                              </goals>
                              <configuration>
-                                 <sqlCommand>drop database if exists alfresco</sqlCommand>
+                                 <sqlCommand>${db.drop.command}</sqlCommand>
                              </configuration>
                          </execution>
                          <execution>
@@ -372,7 +382,7 @@
                                  <goal>execute</goal>
                              </goals>
                              <configuration>
-                                 <sqlCommand>create database alfresco</sqlCommand>
+                                 <sqlCommand>${db.create.command}</sqlCommand>
                              </configuration>
                          </execution>
                      </executions>
@@ -411,8 +421,8 @@
 				<dependency>
 					<groupId>mysql</groupId>
 					<artifactId>mysql-connector-java</artifactId>
-				</dependency>			
+				</dependency>
 			</dependencies>
 	   </profile>
-    </profiles>   
+    </profiles>
 </project>

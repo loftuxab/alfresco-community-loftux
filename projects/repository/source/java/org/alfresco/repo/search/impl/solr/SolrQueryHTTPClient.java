@@ -116,6 +116,8 @@ public class SolrQueryHTTPClient implements BeanFactoryAware
     private boolean includeGroupsForRoleAdmin = false;
     
     private int maximumResultsFromUnlimitedQuery = Integer.MAX_VALUE;
+
+    private boolean anyDenyDenies;
 	
     public static final int DEFAULT_SAVEPOST_BUFFER = 4096;
 
@@ -206,6 +208,17 @@ public class SolrQueryHTTPClient implements BeanFactoryAware
     public void setMaximumResultsFromUnlimitedQuery(int maximumResultsFromUnlimitedQuery)
     {
         this.maximumResultsFromUnlimitedQuery = maximumResultsFromUnlimitedQuery;
+    }
+
+    /**
+     * When set, a single DENIED ACL entry for any authority will result in
+     * access being denied as a whole. See system property {@code security.anyDenyDenies}
+     * 
+     * @param anyDenyDenies
+     */
+    public void setAnyDenyDenies(boolean anyDenyDenies)
+    {
+        this.anyDenyDenies = anyDenyDenies;
     }
 
     /**
@@ -415,9 +428,19 @@ public class SolrQueryHTTPClient implements BeanFactoryAware
                     url.append("&facet.query=").append(encoder.encode("{!afts}"+facetQuery, "UTF-8"));
                 }                
             }
-            
-            // end of field factes
-            
+            // end of field facets
+
+            final String searchTerm = searchParameters.getSearchTerm();
+            String spellCheckQueryStr = null;
+            if (searchTerm != null && searchParameters.isSpellCheck())
+            {
+                StringBuilder builder = new StringBuilder();
+                builder.append("&spellcheck.q=").append(encoder.encode(searchTerm, "UTF-8"));
+                builder.append("&spellcheck=").append(encoder.encode("true", "UTF-8"));
+                spellCheckQueryStr = builder.toString();
+                url.append(spellCheckQueryStr);
+            }
+
             JSONObject body = new JSONObject();
             body.put("query", searchParameters.getQuery());
 
@@ -443,6 +466,7 @@ public class SolrQueryHTTPClient implements BeanFactoryAware
                 }
             }
             body.put("authorities", authorities);
+            body.put("anyDenyDenies", anyDenyDenies);
             
             JSONArray tenants = new JSONArray();
             tenants.put(tenantService.getCurrentUserDomain());
@@ -501,7 +525,7 @@ public class SolrQueryHTTPClient implements BeanFactoryAware
                     return new SolrJSONResultSet(json, searchParameters, nodeService, nodeDAO, limitBy, maximumResults);
                 }
                 
-            });
+            }, spellCheckQueryStr);
         }
         catch (UnsupportedEncodingException e)
         {
@@ -524,6 +548,39 @@ public class SolrQueryHTTPClient implements BeanFactoryAware
     protected JSONResult postSolrQuery(StoreRef store, String url, JSONObject body, SolrJsonProcessor<?> jsonProcessor)
                 throws UnsupportedEncodingException, IOException, HttpException, URIException,
                 JSONException
+    {
+        return postSolrQuery(store, url, body, jsonProcessor, null);
+    }
+
+    protected JSONResult postSolrQuery(StoreRef store, String url, JSONObject body, SolrJsonProcessor<?> jsonProcessor, String spellCheckParams)
+                throws UnsupportedEncodingException, IOException, HttpException, URIException,
+                JSONException
+    {
+        JSONObject json = postQuery(store, url, body);
+        if (spellCheckParams != null)
+        {
+            SpellCheckDecisionManager manager = new SpellCheckDecisionManager(json, url, body, spellCheckParams);
+            if (manager.isCollate())
+            {
+                json = postQuery(store, manager.getUrl(), body);
+            }
+            json.put("spellcheck", manager.getSpellCheckJsonValue());
+        }
+
+            JSONResult results = jsonProcessor.getResult(json);
+
+            if (s_logger.isDebugEnabled())
+            {
+                s_logger.debug("Sent :" + url);
+                s_logger.debug("   with: " + body.toString());
+                s_logger.debug("Got: " + results.getNumberFound() + " in " + results.getQueryTime() + " ms");
+            }
+            
+            return results;
+    }
+
+    protected JSONObject postQuery(StoreRef store, String url, JSONObject body) throws UnsupportedEncodingException,
+                IOException, HttpException, URIException, JSONException
     {
         PostMethod post = new PostMethod(url);
         if (body.toString().length() > DEFAULT_SAVEPOST_BUFFER)
@@ -571,17 +628,7 @@ public class SolrQueryHTTPClient implements BeanFactoryAware
                     throw new LuceneQueryParserException("SOLR side error: " + status.getString("message"));
                 }
             }
-
-            JSONResult results = jsonProcessor.getResult(json);
-
-            if (s_logger.isDebugEnabled())
-            {
-                s_logger.debug("Sent :" + url);
-                s_logger.debug("   with: " + body.toString());
-                s_logger.debug("Got: " + results.getNumberFound() + " in " + results.getQueryTime() + " ms");
-            }
-            
-            return results;
+            return json;
         }
         finally
         {

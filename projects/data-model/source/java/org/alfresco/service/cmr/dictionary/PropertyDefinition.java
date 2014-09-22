@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.alfresco.api.AlfrescoPublicApi;
+import org.alfresco.repo.dictionary.Facetable;
 import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.service.cmr.i18n.MessageLookup;
 import org.alfresco.service.namespace.QName;
@@ -61,9 +62,21 @@ public interface PropertyDefinition extends ClassAttributeDefinition
     public String getTitle(MessageLookup messageLookup);
 
     /**
+     * @return the human-readable class title in the specified Locale, if available.
+     * @since 5.0
+     */
+    public String getTitle(MessageLookup messageLookup, Locale locale);
+
+    /**
      * @return the human-readable class description
      */
     public String getDescription(MessageLookup messageLookup);
+
+    /**
+     * @return the human-readable class description in the specified Locale, if available.
+     * @since 5.0
+     */
+    public String getDescription(MessageLookup messageLookup, Locale locale);
 
     /**
      * @return the default value
@@ -120,6 +133,11 @@ public interface PropertyDefinition extends ClassAttributeDefinition
      *         stored value will not be tokenised)
      */
     public IndexTokenisationMode getIndexTokenisationMode();
+    
+    /**
+     * @return if this field shoul be faceted
+     */
+    public Facetable getFacetable();
 
     /**
      * All non atomic properties will be indexed at the same time.

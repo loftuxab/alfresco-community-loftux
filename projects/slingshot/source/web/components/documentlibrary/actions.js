@@ -1108,7 +1108,7 @@
 
       _aos_tryToLaunchOfficeByMsProtocolHandler: function dlA__aos_tryToLaunchOfficeByMsProtocolHandler(officeLauncher, protocolHandler, url)
       {
-          var protocolUrl = protocolHandler + ':ofe%7Cu%7C' + officeLauncher.encodeUrl(url);
+          var protocolUrl = protocolHandler + ':ofe%7Cu%7C' + url;
           var protocolHandlerPresent = false;
 
           var input = document.createElement('input');
@@ -1204,6 +1204,9 @@
        */
       onActionSimpleRepoAction: function dlA_onActionSimpleRepoAction(record, owner)
       {
+         //ACE-2470 : Clone: Clicking multiple times the simple Workflow approval menu item gives unexpected results.
+         if (owner.title.indexOf("_deactivated") == -1)
+         {
          // Get action params
          var params = this.getAction(record, owner).params,
             displayName = record.displayName,
@@ -1292,6 +1295,7 @@
 
          // Execute the repo action
          this.modules.actions.genericAction(config);
+         }
       },
 
       /**

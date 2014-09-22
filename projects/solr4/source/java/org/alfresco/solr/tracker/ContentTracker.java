@@ -21,16 +21,14 @@
 import java.util.List;
 import java.util.Properties;
 
+import org.alfresco.solr.AlfrescoSolrDataModel.TenantAclIdDbId;
 import org.alfresco.solr.InformationServer;
-import org.alfresco.solr.SolrInformationServer.TenantAndDbId;
 import org.alfresco.solr.client.SOLRAPIClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The tracker is triggered and then queries for docs with FTSSTATUS (Full Text Search Status) set to something other than clean.
- * States may be NONE - first time indexed; STALE - using old content for the node; OK - current; Clean - TODO
- * Then it fixes up the docs.
+ * This tracker queries for docs with unclean content, and then updates them.
  * Similar to org.alfresco.repo.search.impl.lucene.ADMLuceneIndexerImpl
  * 
  * @author Ahmed Owian
@@ -54,36 +52,32 @@ public class ContentTracker extends AbstractTracker implements Tracker
     @Override
     protected void doTrack() throws Exception
     {
+        int registeredSearcherCount = this.infoSrv.getRegisteredSearcherCount();
+        if(registeredSearcherCount >= getMaxLiveSearchers())
+        {
+            log.info(".... skipping tracking registered searcher count = " + registeredSearcherCount);
+            return;
+        }
+        
+        checkShutdown();
         final int ROWS = 300;
         int start = 0;
         long totalDocs = 0l;
-        List<TenantAndDbId> buckets = this.infoSrv.getDocsWithUncleanContent(start, ROWS);
-        while (buckets != null && !buckets.isEmpty())
+        List<TenantAclIdDbId> buckets = this.infoSrv.getDocsWithUncleanContent(start, ROWS);
+        while (!buckets.isEmpty())
         {
-            for (TenantAndDbId bucket : buckets)
+            for (TenantAclIdDbId bucket : buckets)
             {
                 // update the content
                 this.infoSrv.updateContentToIndexAndCache(bucket.dbId, bucket.tenant);
             }
             
+            this.infoSrv.commit();
             totalDocs += buckets.size();
             start += ROWS;
             buckets = this.infoSrv.getDocsWithUncleanContent(start, ROWS);
         }
         
-        if (totalDocs > 0)
-        {
-            super.infoSrv.commit();
-        }
-        
         log.info("total number of docs with content updated: " + totalDocs);
     }
-
-    @Override
-    public IndexHealthReport checkIndex(Long fromTx, Long toTx, Long fromAclTx, Long toAclTx, Long fromTime, Long toTime)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

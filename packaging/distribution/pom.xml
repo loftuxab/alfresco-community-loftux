@@ -4,7 +4,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-packaging</artifactId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
+        <version>5.0.b.LX69-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-distribution</artifactId>
@@ -30,6 +30,36 @@
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>se.loftux.alfresco</groupId>
+            <artifactId>alfresco-solr</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>se.loftux.alfresco</groupId>
+            <artifactId>alfresco-solr4</artifactId>
+            <version>${project.version}</version>
+            <classifier>ssl</classifier>
+            <type>war</type>
+        </dependency>
+
+        <!-- Solr config -->
+        <dependency>
+            <groupId>se.loftux.alfresco</groupId>
+            <artifactId>alfresco-solr</artifactId>
+            <version>${project.version}</version>
+            <classifier>config</classifier>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>se.loftux.alfresco</groupId>
+            <artifactId>alfresco-solr4</artifactId>
+            <version>${project.version}</version>
+            <classifier>config-ssl</classifier>
+            <type>zip</type>
+        </dependency>
+
         <dependency>
             <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-mmt</artifactId>
@@ -63,16 +93,6 @@
         </dependency>
 
         <!-- 3rd party libs -->
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>2.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>serializer</artifactId>
-            <version>2.7.1</version>
-        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

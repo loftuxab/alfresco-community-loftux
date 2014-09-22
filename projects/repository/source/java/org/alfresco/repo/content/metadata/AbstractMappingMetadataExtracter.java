@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -42,8 +42,10 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.alfresco.api.AlfrescoPublicApi;     
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.StreamAwareContentReaderProxy;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -107,6 +109,7 @@ import org.springframework.extensions.surf.util.ISO8601DateFormat;
  * @author Jesper Steen Møller
  * @author Derek Hulley
  */
+@AlfrescoPublicApi
 abstract public class AbstractMappingMetadataExtracter implements MetadataExtracter, MetadataEmbedder, BeanNameAware, ApplicationContextAware
 {
     public static final String NAMESPACE_PROPERTY_PREFIX = "namespace.prefix.";
@@ -1117,7 +1120,7 @@ abstract public class AbstractMappingMetadataExtracter implements MetadataExtrac
         if (!isSupported(mimetype))
         {
             throw new AlfrescoRuntimeException(
-                    "Metadata extracter does not support mimetype: \n" +
+                    "Metadata extracter does not support mimetype: " + mimetype + "\n" +
                     "   reader: " + reader + "\n" +
                     "   supported: " + supportedMimetypes + "\n" +
                     "   extracter: " + this);
@@ -2051,18 +2054,20 @@ abstract public class AbstractMappingMetadataExtracter implements MetadataExtrac
             return extractRaw(reader);
         }
         FutureTask<Map<String, Serializable>> task = null;
+        StreamAwareContentReaderProxy proxiedReader = null;
         try
         {
-            task = new FutureTask<Map<String,Serializable>>(new ExtractRawCallable(reader));
+            proxiedReader = new StreamAwareContentReaderProxy(reader);
+            task = new FutureTask<Map<String,Serializable>>(new ExtractRawCallable(proxiedReader));
             getExecutorService().execute(task);
             return task.get(limits.getTimeoutMs(), TimeUnit.MILLISECONDS);
         }
         catch (TimeoutException e)
         {
             task.cancel(true);
-            if (reader.isChannelOpen())
+            if (null != proxiedReader)
             {
-                reader.getReadableChannel().close();
+                proxiedReader.release();
             }
             throw e;
         }

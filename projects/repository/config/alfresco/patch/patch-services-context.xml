@@ -3205,32 +3205,6 @@
         </property>
     </bean>
     
-    <bean id="patch.addTagScopeAspect"
-        class="org.alfresco.repo.admin.patch.impl.AddTagScopeAspect"
-        parent="basePatch">
-        <property name="id">
-            <value>patch.addTagScopeAspect</value>
-        </property>
-        <property name="description">
-            <value>patch.addTagScopeAspect.description</value>
-        </property>
-        <property name="fixesFromSchema">
-            <value>0</value>
-        </property>
-        <property name="fixesToSchema">
-            <value>8001</value>
-        </property>
-        <property name="targetSchema">
-            <value>8002</value>
-        </property>
-        <property name="repository">
-            <ref bean="repositoryHelper"/>
-        </property>
-        <property name="taggingService">
-            <ref bean="TaggingService"/>
-        </property>
-    </bean>
-    
     <bean id="patch.siteAdministrators" class="org.alfresco.repo.admin.patch.impl.AddGroupAuthorityPatch" parent="basePatch" >
         <property name="id"><value>patch.siteAdministrators</value></property>
         <property name="description"><value>patch.siteAdministrators.description</value></property>
@@ -3391,4 +3365,25 @@
         </property>
     </bean>
 
+    <bean id="patch.db-V4.1-update-activiti-nullable-columns" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
+        <property name="id" value="patch.db-V4.1-update-activiti-nullable-columns" />
+        <property name="description" value="patch.schemaUpgradeScript.description" />
+        <property name="fixesFromSchema"><value>0</value></property>
+        <property name="fixesToSchema"><value>8005</value></property>
+        <property name="targetSchema"><value>8006</value></property>
+        <property name="scriptUrl">
+            <value>classpath:alfresco/dbscripts/upgrade/4.1/${db.script.dialect}/update-activiti-nullable-columns.sql</value>
+        </property>
+    </bean>
+
+    <bean id="patch.db-V5.0-ContentUrlEncryptionTables" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
+        <property name="id"><value>patch.db-V5.0-ContentUrlEncryptionTables</value></property>
+        <property name="description"><value>patch.schemaUpgradeScript.description</value></property>
+        <property name="fixesFromSchema"><value>0</value></property>
+        <property name="fixesToSchema"><value>8003</value></property>
+        <property name="targetSchema"><value>8004</value></property>
+        <property name="scriptUrl">
+            <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/AlfrescoCreate-ContentUrlEncryptionTables.sql</value>
+        </property>
+    </bean>
 </beans>

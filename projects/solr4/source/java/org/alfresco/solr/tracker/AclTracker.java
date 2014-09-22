@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.httpclient.AuthenticationException;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.solr.AclReport;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.BoundedDeque;
@@ -42,8 +42,6 @@ import org.alfresco.solr.client.AclReaders;
 import org.alfresco.solr.client.GetNodesParameters;
 import org.alfresco.solr.client.Node;
 import org.alfresco.solr.client.SOLRAPIClient;
-import org.alfresco.solr.client.Transaction;
-import org.alfresco.solr.client.Transactions;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -312,89 +310,98 @@ public class AclTracker extends AbstractTracker
         TrackerState state = super.getTrackerState();
 
         // Check we are tracking the correct repository
-        // Check the first TX time
         checkRepoAndIndexConsistency(state);
 
         checkShutdown();
         trackAclChangeSets();
-
-        checkShutdown();
-
-        // check index state
-        if (state.isCheck())
-        {
-            this.infoSrv.checkCache();
-        }
     }
-
-
     
+    /**
+     * Checks the first and last TX time
+     * @param state the state of this tracker
+     * @throws AuthenticationException
+     * @throws IOException
+     * @throws JSONException
+     */
     private void checkRepoAndIndexConsistency(TrackerState state) throws AuthenticationException, IOException, JSONException
     {
-        if(state.getLastGoodTxCommitTimeInIndex() == 0) 
-        {
-
-            state.setCheckedFirstTransactionTime(true);
-            log.info("No transactions found - no verification required");
-
-
-            // Fix up inital state
-            Transactions firstTransactions = client.getTransactions(null, 0L, null, 2000L, 1);
-            if(firstTransactions.getTransactions().size() > 0)
-            {
-                Transaction firstTransaction = firstTransactions.getTransactions().get(0);
-                long firstTransactionCommitTime = firstTransaction.getCommitTimeMs();
-                state.setLastGoodTxCommitTimeInIndex(firstTransactionCommitTime);
-            }
-        }
-
+        AclChangeSets firstChangeSets = null;
         if (state.getLastGoodChangeSetCommitTimeInIndex() == 0)
         {
-            AclChangeSets firstChangeSets = client.getAclChangeSets(null, 0L, null, 2000L, 1);
-            if(firstChangeSets.getAclChangeSets().size() > 0)
+            state.setCheckedLastAclTransactionTime(true);
+            state.setCheckedFirstAclTransactionTime(true);
+            log.info("No acl transactions found - no verification required");
+            
+            firstChangeSets = client.getAclChangeSets(null, 0L, null, 2000L, 1);
+            if (!firstChangeSets.getAclChangeSets().isEmpty())
             {
                 AclChangeSet firstChangeSet = firstChangeSets.getAclChangeSets().get(0);
-                long firstChangeSetCommitTimex = firstChangeSet.getCommitTimeMs();
-                state.setLastGoodChangeSetCommitTimeInIndex(firstChangeSetCommitTimex);
+                long firstChangeSetCommitTime = firstChangeSet.getCommitTimeMs();
+                state.setLastGoodChangeSetCommitTimeInIndex(firstChangeSetCommitTime);
+                setLastChangeSetIdAndCommitTimeInTrackerState(firstChangeSets, state);
             }
-
         }
-
-        if (!state.isCheckedFirstTransactionTime())
+        
+        if (!state.isCheckedFirstAclTransactionTime())
         {
-
-            // TODO: getFirstTransaction
-            Transactions firstTransactions = client.getTransactions(null, 0L, null, 2000L, 1);
-            if (firstTransactions.getTransactions().size() > 0)
+            firstChangeSets = client.getAclChangeSets(null, 0l, null, 2000L, 1);
+            if (!firstChangeSets.getAclChangeSets().isEmpty())
             {
-                Transaction firstTransaction = firstTransactions.getTransactions().get(0);
-                long firstTxId = firstTransaction.getId();
-                long firstTransactionCommitTime = firstTransaction.getCommitTimeMs();
-                int setSize = this.infoSrv.getDocSetSize(""+firstTxId, ""+firstTransactionCommitTime);
+                AclChangeSet firstAclChangeSet= firstChangeSets.getAclChangeSets().get(0);
+                long firstAclTxId = firstAclChangeSet.getId();
+                long firstAclTxCommitTime = firstAclChangeSet.getCommitTimeMs();
+                int setSize = this.infoSrv.getAclTxDocsSize(""+firstAclTxId, ""+firstAclTxCommitTime);
                 
                 if (setSize == 0)
                 {
-                    log.error("First transaction was not found with the correct timestamp.");
+                    log.error("First acl transaction was not found with the correct timestamp.");
                     log.error("SOLR has successfully connected to your repository  however the SOLR indexes and repository database do not match."); 
                     log.error("If this is a new or rebuilt database your SOLR indexes also need to be re-built to match the database."); 
                     log.error("You can also check your SOLR connection details in solrcore.properties.");
-                    throw new AlfrescoRuntimeException("Initial transaction not found with correct timestamp");
+                    throw new AlfrescoRuntimeException("Initial acl transaction not found with correct timestamp");
                 }
                 else if (setSize == 1)
                 {
                     state.setCheckedFirstTransactionTime(true);
-                    log.info("Verified first transaction and timetsamp in index");
+                    log.info("Verified first acl transaction and timestamp in index");
                 }
                 else
                 {
-                    log.warn("Duplicate initial transaction found with correct timestamp");
+                    log.warn("Duplicate initial acl transaction found with correct timestamp");
                 }
             }
+        }
 
+        // Checks that the last aclTxId in solr is <= last aclTxId in repo
+        if (!state.isCheckedLastAclTransactionTime())
+        {
+            if (firstChangeSets == null)
+            {
+                firstChangeSets = client.getAclChangeSets(null, 0l, null, 2000L, 1);
+            }
+            
+            Long maxChangeSetCommitTimeInRepo = firstChangeSets.getMaxChangeSetCommitTime();
+            Long maxChangeSetIdInRepo = firstChangeSets.getMaxChangeSetId();
+            if (maxChangeSetCommitTimeInRepo != null && maxChangeSetIdInRepo != null)
+            {
+                AclChangeSet maxAclTxInIndex = this.infoSrv.getMaxAclChangeSetIdAndCommitTimeInIndex();
+                if (maxAclTxInIndex.getId() > maxChangeSetIdInRepo 
+                            || maxAclTxInIndex.getCommitTimeMs() > maxChangeSetCommitTimeInRepo)
+                {
+                    log.error("Last acl transaction was found in index with timestamp later than that of repository.");
+                    log.error("SOLR has successfully connected to your repository  however the SOLR indexes and repository database do not match."); 
+                    log.error("If this is a new or rebuilt database your SOLR indexes also need to be re-built to match the database."); 
+                    log.error("You can also check your SOLR connection details in solrcore.properties.");
+                    throw new AlfrescoRuntimeException("Last acl transaction found in index with incorrect timestamp");
+                }
+                else
+                {
+                    state.setCheckedLastAclTransactionTime(true);
+                    log.info("Verified last acl transaction and timestamp in index less than or equal to that of repository.");
+                }
+            }
         }
     }
-
-
 
     /**
      * @param changeSetsFound
@@ -426,9 +433,9 @@ public class AclTracker extends AbstractTracker
             aclChangeSets = client.getAclChangeSets(startTime, null, startTime + actualTimeStep, null, maxResults);
             startTime += actualTimeStep;
             actualTimeStep *= 2;
-            if(actualTimeStep > 1000*60*60*24*32L)
+            if(actualTimeStep > TIME_STEP_32_DAYS_IN_MS)
             {
-                actualTimeStep = 1000*60*60*24*32L;
+                actualTimeStep = TIME_STEP_32_DAYS_IN_MS;
             }
         }
         while( ((aclChangeSets.getAclChangeSets().size() == 0)  && (startTime < endTime)) || ((aclChangeSets.getAclChangeSets().size() > 0) && alreadyFoundChangeSets(changeSetsFound, aclChangeSets)));
@@ -460,149 +467,6 @@ public class AclTracker extends AbstractTracker
             }
             return true;
         }
-
-    }
-
-
-    protected Transactions getSomeTransactions(BoundedDeque<Transaction> txnsFound, Long fromCommitTime, long timeStep, int maxResults, long endTime) throws AuthenticationException, IOException, JSONException
-    {
-        long actualTimeStep  = timeStep;
-
-        Transactions transactions;
-        // step forward in time until we find something or hit the time bound
-        // max id unbounded
-        Long startTime = fromCommitTime == null ? Long.valueOf(0L) :fromCommitTime;
-        do
-        {
-            transactions = client.getTransactions(startTime, null, startTime + actualTimeStep, null, maxResults); 
-            startTime += actualTimeStep;
-            actualTimeStep *= 2;
-            if(actualTimeStep > 1000*60*60*24*32L)
-            {
-                actualTimeStep = 1000*60*60*24*32L;
-            }
-        }
-        while( ((transactions.getTransactions().size() == 0)  && (startTime < endTime)) || ((transactions.getTransactions().size() > 0)  && alreadyFoundTransactions(txnsFound, transactions)));
-
-        return transactions;
-    }
-
-    private boolean alreadyFoundTransactions(BoundedDeque<Transaction> txnsFound, Transactions transactions)
-    {
-        if(txnsFound.size() == 0)
-        {
-            return false;
-        }
-
-        if(transactions.getTransactions().size() == 1)
-        {
-            return transactions.getTransactions().get(0).getId() == txnsFound.getLast().getId();
-        }
-        else
-        {
-            HashSet<Transaction> alreadyFound = new HashSet<Transaction>(txnsFound.getDeque());
-            for(Transaction txn : transactions.getTransactions())
-            {
-                if(!alreadyFound.contains(txn))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-    }
-
-
-
-    QName expandQName(String qName)
-    {
-        String expandedQName = qName;
-        if (qName.startsWith("@"))
-        {
-            return expandQName(qName.substring(1));
-        }
-        else if (qName.startsWith("{"))
-        {
-            expandedQName = expandQNameImpl(qName);
-        }
-        else if (qName.contains(":"))
-        {
-            expandedQName = expandQNameImpl(qName);
-        }
-        // TODO: field has gone, check correct course of action
-//        else if (AlfrescoSolrDataModel.nonDictionaryFields.get(qName) == null)
-//        {
-//            expandedQName = expandQNameImpl(qName);
-//        }
-        return QName.createQName(expandedQName);
-
-    }
-
-    String expandQNameImpl(String q)
-    {
-        String eq = q;
-        // Check for any prefixes and expand to the full uri
-        if (q.charAt(0) != '{')
-        {
-            int colonPosition = q.indexOf(':');
-            if (colonPosition == -1)
-            {
-                // use the default namespace
-                eq = "{" + this.infoSrv.getNamespaceDAO().getNamespaceURI("") + "}" + q;
-            }
-            else
-            {
-                // find the prefix
-                eq = "{" + this.infoSrv.getNamespaceDAO().getNamespaceURI(q.substring(0, colonPosition)) + "}" + q.substring(colonPosition + 1);
-            }
-        }
-        return eq;
-    }
-
-    String expandName(String qName)
-    {
-        String expandedQName = qName;
-        if (qName.startsWith("@"))
-        {
-            return expandName(qName.substring(1));
-        }
-        else if (qName.startsWith("{"))
-        {
-            expandedQName = expandQNameImpl(qName);
-        }
-        else if (qName.contains(":"))
-        {
-            expandedQName = expandQNameImpl(qName);
-        }
-     // TODO: field has gone, check correct course of action
-//        else if (AlfrescoSolrDataModel.nonDictionaryFields.get(qName) == null)
-//        {
-//            expandedQName = expandQNameImpl(qName);
-//        }
-        return expandedQName;
-
-    }
-
-    String expandNameImpl(String q)
-    {
-        String eq = q;
-        // Check for any prefixes and expand to the full uri
-        if (q.charAt(0) != '{')
-        {
-            int colonPosition = q.indexOf(':');
-            if (colonPosition == -1)
-            {
-                // use the default namespace
-                eq = "{" + this.infoSrv.getNamespaceDAO().getNamespaceURI("") + "}" + q;
-            }
-            else
-            {
-                // find the prefix
-                eq = "{" + this.infoSrv.getNamespaceDAO().getNamespaceURI(q.substring(0, colonPosition)) + "}" + q.substring(colonPosition + 1);
-            }
-        }
-        return eq;
     }
 
     /**
@@ -615,77 +479,10 @@ public class AclTracker extends AbstractTracker
         trackerStats.addAclTime(time);
     }
 
-    @Override
-    public IndexHealthReport checkIndex(Long fromTx, Long toTx, Long fromAclTx, Long toAclTx, Long fromTime, Long toTime) 
+    public IndexHealthReport checkIndex(Long toTx, Long toAclTx, Long fromTime, Long toTime) 
                 throws AuthenticationException, IOException, JSONException
-    {
-
-        IndexHealthReport indexHealthReport = new IndexHealthReport(infoSrv);
-        Long minTxId = null;
-        Long minAclTxId = null;
-
-        long firstTransactionCommitTime = 0;
-        Transactions firstTransactions = client.getTransactions(null, 0L, null, 2000L, 1);
-        if(firstTransactions.getTransactions().size() > 0)
-        {
-            Transaction firstTransaction = firstTransactions.getTransactions().get(0);
-            firstTransactionCommitTime = firstTransaction.getCommitTimeMs();
-        }
-
-        // DB TX Count
-        IOpenBitSet txIdsInDb = infoSrv.getOpenBitSetInstance();
-        Long lastTxCommitTime = Long.valueOf(firstTransactionCommitTime);
-        if (fromTime != null)
-        {
-            lastTxCommitTime = fromTime;
-        }
-        long maxTxId = 0;
-
-        Transactions transactions;
-        BoundedDeque<Transaction> txnsFound = new  BoundedDeque<Transaction>(100);
-        long endTime = System.currentTimeMillis() + infoSrv.getHoleRetention();
-        DO: do
-        {
-            transactions = getSomeTransactions(txnsFound, lastTxCommitTime, 1000*60*60L, 2000, endTime);
-            for (Transaction info : transactions.getTransactions())
-            {
-                // include
-                if (toTime != null)
-                {
-                    if (info.getCommitTimeMs() > toTime.longValue())
-                    {
-                        break DO;
-                    }
-                }
-                if (toTx != null)
-                {
-                    if (info.getId() > toTx.longValue())
-                    {
-                        break DO;
-                    }
-                }
-
-                // bounds for later loops
-                if (minTxId == null)
-                {
-                    minTxId = info.getId();
-                }
-                if (maxTxId < info.getId())
-                {
-                    maxTxId = info.getId();
-                }
-
-                lastTxCommitTime = info.getCommitTimeMs();
-                txIdsInDb.set(info.getId());
-                txnsFound.add(info);
-            }
-        }
-        while (transactions.getTransactions().size() > 0);
-
-        indexHealthReport.setDbTransactionCount(txIdsInDb.cardinality());
-
+    {   
         // DB ACL TX Count
-
         long firstChangeSetCommitTimex = 0;
         AclChangeSets firstChangeSets = client.getAclChangeSets(null, 0L, null, 2000L, 1);
         if(firstChangeSets.getAclChangeSets().size() > 0)
@@ -700,13 +497,16 @@ public class AclTracker extends AbstractTracker
         {
             lastAclTxCommitTime = fromTime;
         }
+        
         long maxAclTxId = 0;
-
+        Long minAclTxId = null;
+        long endTime = System.currentTimeMillis() + infoSrv.getHoleRetention();
         AclChangeSets aclTransactions;
         BoundedDeque<AclChangeSet> changeSetsFound = new  BoundedDeque<AclChangeSet>(100);
         DO: do
         {
-            aclTransactions = getSomeAclChangeSets(changeSetsFound, lastAclTxCommitTime, 1000*60*60L, 2000, endTime);
+            aclTransactions = getSomeAclChangeSets(changeSetsFound, lastAclTxCommitTime, TIME_STEP_1_HR_IN_MS, 2000, 
+                        endTime);
             for (AclChangeSet set : aclTransactions.getAclChangeSets())
             {
                 // include
@@ -741,12 +541,8 @@ public class AclTracker extends AbstractTracker
             }
         }
         while (aclTransactions.getAclChangeSets().size() > 0);
-
-        indexHealthReport.setDbAclTransactionCount(aclTxIdsInDb.cardinality());
-
-        // Index TX Count
-        return this.infoSrv.checkIndexTransactions(indexHealthReport, minTxId, minAclTxId, txIdsInDb, maxTxId, 
-                    aclTxIdsInDb, maxAclTxId);
+        
+        return this.infoSrv.reportAclTransactionsInIndex(minAclTxId, aclTxIdsInDb, maxAclTxId);
     }
 
 
@@ -821,15 +617,7 @@ public class AclTracker extends AbstractTracker
             List<AclReaders> readers = client.getAclReaders(Collections.singletonList(new Acl(0, aclid)));
             aclReport.setExistsInDb(readers.size() == 1);
         }
-        catch (IOException e)
-        {
-            aclReport.setExistsInDb(false);
-        }
-        catch (JSONException e)
-        {
-            aclReport.setExistsInDb(false);
-        }
-        catch (AuthenticationException e)
+        catch (IOException | JSONException | AuthenticationException e)
         {
             aclReport.setExistsInDb(false);
         }
@@ -850,27 +638,18 @@ public class AclTracker extends AbstractTracker
         boolean upToDate = false;
         AclChangeSets aclChangeSets;
         BoundedDeque<AclChangeSet> changeSetsFound = new BoundedDeque<AclChangeSet>(100);
-        HashSet<AclChangeSet> changeSetsIndexed = new HashSet<AclChangeSet>();
+        HashSet<AclChangeSet> changeSetsIndexed = new LinkedHashSet<AclChangeSet>();
         TrackerState state = super.getTrackerState();
+        long totalAclCount = 0;
         
         do
         {
             int aclCount = 0;
 
             Long fromCommitTime = getChangeSetFromCommitTime(changeSetsFound, state.getLastGoodChangeSetCommitTimeInIndex());
-            aclChangeSets = getSomeAclChangeSets(changeSetsFound, fromCommitTime, 60 * 60 * 1000L, 2000, state.getTimeToStopIndexing());
-
-            Long maxChangeSetCommitTime = aclChangeSets.getMaxChangeSetCommitTime();
-            if(maxChangeSetCommitTime != null)
-            {
-                state.setLastChangeSetCommitTimeOnServer(aclChangeSets.getMaxChangeSetCommitTime());
-            }
-
-            Long maxChangeSetId = aclChangeSets.getMaxChangeSetId();
-            if(maxChangeSetId != null)
-            {
-                state.setLastChangeSetIdOnServer(aclChangeSets.getMaxChangeSetId());
-            }
+            aclChangeSets = getSomeAclChangeSets(changeSetsFound, fromCommitTime, TIME_STEP_1_HR_IN_MS, 2000, 
+                        state.getTimeToStopIndexing());
+            setLastChangeSetIdAndCommitTimeInTrackerState(aclChangeSets, state);
             
             log.info("Scanning Acl change sets ...");
             if (aclChangeSets.getAclChangeSets().size() > 0)
@@ -886,7 +665,7 @@ public class AclTracker extends AbstractTracker
             ArrayList<AclChangeSet> changeSetBatch = new ArrayList<AclChangeSet>();
             for (AclChangeSet changeSet : aclChangeSets.getAclChangeSets())
             {
-                boolean isInIndex = this.infoSrv.isInIndex(AlfrescoSolrDataModel.getAclChangeSetDocumentId(changeSet.getId()), 0);
+                boolean isInIndex = this.infoSrv.isInIndex(AlfrescoSolrDataModel.getAclChangeSetDocumentId(changeSet.getId()));
                 if (isInIndex) 
                 {
                     changeSetsFound.add(changeSet);
@@ -939,12 +718,31 @@ public class AclTracker extends AbstractTracker
                 }
                 changeSetBatch.clear();
             }
+            
+            totalAclCount += aclCount;
         }
         while ((aclChangeSets.getAclChangeSets().size() > 0) && (upToDate == false));
 
+        log.info("total number of acls updated: " + totalAclCount);
+        
         if (indexed)
         {
             indexAclChangeSetAfterAsynchronous(changeSetsIndexed, state);
+        }
+    }
+
+    private void setLastChangeSetIdAndCommitTimeInTrackerState(AclChangeSets aclChangeSets, TrackerState state)
+    {
+        Long maxChangeSetCommitTime = aclChangeSets.getMaxChangeSetCommitTime();
+        if(maxChangeSetCommitTime != null)
+        {
+            state.setLastChangeSetCommitTimeOnServer(maxChangeSetCommitTime);
+        }
+
+        Long maxChangeSetId = aclChangeSets.getMaxChangeSetId();
+        if(maxChangeSetId != null)
+        {
+            state.setLastChangeSetIdOnServer(maxChangeSetId);
         }
     }
 
@@ -1038,7 +836,6 @@ public class AclTracker extends AbstractTracker
         try
         {
             super.close();
-           
         }
         finally
         {

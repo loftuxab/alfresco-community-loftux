@@ -5,7 +5,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
+        <version>5.0.b.LX69-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -28,7 +28,7 @@
        <dependency>
           <groupId>org.alfresco.services</groupId>
           <artifactId>alfresco-events</artifactId>
-          <version>1.1-SNAPSHOT</version>
+          <version>1.2-SNAPSHOT</version>
        </dependency>
        <dependency>
             <groupId>com.sun.mail</groupId>
@@ -225,6 +225,11 @@
             <version>3.1.6</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-driver-zip</artifactId>
             <version>7.5.5</version>
@@ -274,12 +279,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.5.11</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.11</version>
         </dependency>
         <dependency>
             <groupId>org.beanshell</groupId>
@@ -289,6 +292,7 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
+            <!-- Need to override xalan version for tests - see ACE-2803 -->
             <version>2.7.0</version>
             <scope>provided</scope>
         </dependency>
@@ -390,6 +394,10 @@
             <exclusions>
                 <exclusion>
                     <groupId>woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
                 </exclusion>
             </exclusions>
@@ -503,7 +511,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>${dependency.poi.version}</version>
+            <version>3.10-FINAL-20140916-alfresco-patched</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -807,8 +815,7 @@
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <sqlCommand>drop database if exists
-                                        alfresco</sqlCommand>
+                                    <sqlCommand>${db.drop.command}</sqlCommand>
                                 </configuration>
                             </execution>
                             <execution>
@@ -818,7 +825,7 @@
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <sqlCommand>create database alfresco</sqlCommand>
+                                    <sqlCommand>${db.create.command}</sqlCommand>
                                 </configuration>
                             </execution>
                         </executions>
@@ -874,13 +881,15 @@
     </profiles>
 
     <build>
-        <finalName>alfresco</finalName>
         <resources>
             <!-- Allow replacing variables inside version.properties -->
             <resource>
                 <directory>config</directory>
                 <excludes>
                     <exclude>alfresco/version.properties</exclude>
+                    <!-- ACE-2318 Exclude alfresco-jmxrmi.* from repository JAR -->
+                    <exclude>alfresco/alfresco-jmxrmi.access</exclude>
+                    <exclude>alfresco/alfresco-jmxrmi.password</exclude>
                 </excludes>
             </resource>
             <resource>

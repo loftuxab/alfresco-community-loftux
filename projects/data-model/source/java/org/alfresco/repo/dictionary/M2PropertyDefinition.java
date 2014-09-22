@@ -283,12 +283,19 @@ import org.springframework.util.StringUtils;
         return getTitle(staticMessageLookup);
     }
     
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.dictionary.PropertyDefinition#getTitle()
-     */
     public String getTitle(MessageLookup messageLookup)
     {
         String value = M2Label.getLabel(classDef.getModel(), messageLookup, "property", name, "title"); 
+        if (value == null)
+        {
+            value = m2Property.getTitle();
+        }
+        return value;
+    }
+    
+    public String getTitle(MessageLookup messageLookup, Locale locale)
+    {
+        String value = M2Label.getLabel(locale, classDef.getModel(), messageLookup, "property", name, "title"); 
         if (value == null)
         {
             value = m2Property.getTitle();
@@ -301,12 +308,19 @@ import org.springframework.util.StringUtils;
         return getDescription(staticMessageLookup);
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.dictionary.PropertyDefinition#getDescription()
-     */
     public String getDescription(MessageLookup messageLookup)
     {
         String value = M2Label.getLabel(classDef.getModel(), messageLookup, "property", name, "description"); 
+        if (value == null)
+        {
+            value = m2Property.getDescription();
+        }
+        return value;
+    }
+    
+    public String getDescription(MessageLookup messageLookup, Locale locale)
+    {
+        String value = M2Label.getLabel(locale, classDef.getModel(), messageLookup, "property", name, "description"); 
         if (value == null)
         {
             value = m2Property.getDescription();
@@ -441,6 +455,25 @@ import org.springframework.util.StringUtils;
         else
         {
             return m2Property.getIndexTokenisationMode();
+        }
+    }
+    
+    public Facetable getFacetable()
+    {
+        if(m2Property.isFacetable() == null)
+        {
+            return Facetable.UNSET;
+        }
+        else
+        {
+            if(m2Property.isFacetable().booleanValue())
+            {
+                return Facetable.TRUE;
+            }
+            else
+            {
+                return Facetable.FALSE;
+            }
         }
     }
 

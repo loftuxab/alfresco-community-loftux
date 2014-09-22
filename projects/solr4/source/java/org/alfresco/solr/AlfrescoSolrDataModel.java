@@ -44,17 +44,18 @@ import org.alfresco.opencmis.search.CMISQueryOptions;
 import org.alfresco.opencmis.search.CMISQueryOptions.CMISQueryMode;
 import org.alfresco.opencmis.search.CMISQueryParser;
 import org.alfresco.opencmis.search.CmisFunctionEvaluationContext;
-import org.alfresco.repo.cache.MemoryCache;
 import org.alfresco.repo.dictionary.CompiledModelsCache;
 import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.DictionaryDAOImpl;
-import org.alfresco.repo.dictionary.DictionaryRegistry;
+import org.alfresco.repo.dictionary.Facetable;
 import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2ModelDiff;
 import org.alfresco.repo.dictionary.NamespaceDAO;
 import org.alfresco.repo.i18n.StaticMessageLookup;
 import org.alfresco.repo.search.MLAnalysisMode;
+import org.alfresco.repo.search.adaptor.lucene.QueryConstants;
+import org.alfresco.repo.search.impl.QueryParserUtils;
 import org.alfresco.repo.search.impl.parsers.AlfrescoFunctionEvaluationContext;
 import org.alfresco.repo.search.impl.parsers.FTSParser;
 import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
@@ -112,7 +113,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  * @author Andy
  *
  */
-public class AlfrescoSolrDataModel
+public class AlfrescoSolrDataModel implements QueryConstants
 {
     public static enum FieldUse
     {
@@ -147,7 +148,7 @@ public class AlfrescoSolrDataModel
 
     private static final String  TX = "TX";
     
-    private static final String DEFAULT_TENANT = "_DEFAULT_";
+    public static final String DEFAULT_TENANT = "_DEFAULT_";
     
     private static ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
@@ -260,11 +261,31 @@ public class AlfrescoSolrDataModel
         return builder.toString();
     }
     
+    public static Long parseAclChangeSetId(String aclChangeSetDocumentId)
+    {
+        return parseIdFromDocumentId(aclChangeSetDocumentId);
+    }
+    
+    public static Long parseTransactionId(String transactionDocumentId)
+    {
+        return parseIdFromDocumentId(transactionDocumentId);
+    }
+    
+    private static Long parseIdFromDocumentId(String documentId)
+    {
+        String[] split = documentId.split("!");
+        if (split.length > 0)
+            return NumericEncoder.decodeLong(split[split.length - 1]);
+        else 
+            return null;
+    }
+    
     /**
-     * 
+     * Returns the Solr 4 id
      * @param tenant
      * @param aclId
-     * @return <TENANT>:<ACLID>: D-<DBID>
+     * @param dbid
+     * @return <TENANT>!<ACLID>!<DBID>
      */
     public static String getNodeDocumentId(String tenant, Long aclId, Long dbid)
     {
@@ -275,6 +296,26 @@ public class AlfrescoSolrDataModel
         builder.append("!");
         builder.append(NumericEncoder.encode(dbid));
         return builder.toString();
+    }
+    
+    public static class TenantAclIdDbId
+    {
+        public String tenant;
+        public Long alcId;
+        public Long dbId;
+    }
+    
+    public static TenantAclIdDbId decodeNodeDocumentId(String id)
+    {
+        TenantAclIdDbId ids = new TenantAclIdDbId();
+        String[] split = id.split("!");
+        if (split.length > 0)
+            ids.tenant = split[0];
+        if (split.length > 1)
+            ids.alcId = NumericEncoder.decodeLong(split[1]);
+        if (split.length > 2)
+            ids.dbId = NumericEncoder.decodeLong(split[2]);
+        return ids;
     }
     
     /**
@@ -475,7 +516,7 @@ public class AlfrescoSolrDataModel
             builder.append('@');
             // TODO wher we support multi value propertis correctly .... builder.append(propertyDefinition.isMultiValued() ? "m" : "s");
             builder.append('s');
-            builder.append(hasDocValues(propertyDefinition.getName()) ? "d" : "_");
+            builder.append("_");
             builder.append('_');
             switch (type)
             {
@@ -641,8 +682,21 @@ public class AlfrescoSolrDataModel
    
     private void addFacetSearchFields( PropertyDefinition propertyDefinition , IndexedField indexedField)
     {
+        if(propertyDefinition.getDataType().getName().equals(DataTypeDefinition.TEXT))
+        {
+            if (!isIdentifierTextProperty(propertyDefinition.getName()))
+            {
+                if(propertyDefinition.getFacetable() == Facetable.TRUE)
+                {
+                    indexedField.addField(getFieldForText(false, false, false, propertyDefinition), false, false);
+                }
+            }
+        }
+        
+        
         if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.FALSE)
-                || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH))
+                || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH)
+                || isIdentifierTextProperty(propertyDefinition.getName()))
         {
             
             indexedField.addField(getFieldForText(false, false, false, propertyDefinition), false, false);
@@ -759,7 +813,14 @@ public class AlfrescoSolrDataModel
                     {
                         indexedField.addField(getFieldForText(false, false, true, propertyDefinition), false, true);
                     }
-                }   
+                }
+                else if (!isIdentifierTextProperty(propertyDefinition.getName()))
+                {
+                    if(propertyDefinition.getFacetable() == Facetable.TRUE)
+                    {
+                        indexedField.addField(getFieldForText(false, false, false, propertyDefinition), false, false);
+                    }
+                }
             }
             
             if(dataTypeDefinition.getName().equals(DataTypeDefinition.MLTEXT))
@@ -829,18 +890,88 @@ public class AlfrescoSolrDataModel
         {
             return false;
         }
-        return propertyQName.equals(ContentModel.PROP_NAME) || propertyQName.equals(ContentModel.PROP_TITLE) || propertyQName.equals(ContentModel.PROP_DESCRIPTION);
+        return propertyQName.equals(ContentModel.PROP_NAME) 
+                || propertyQName.equals(ContentModel.PROP_TITLE) 
+                || propertyQName.equals(ContentModel.PROP_DESCRIPTION)
+                || propertyQName.equals(ContentModel.PROP_CONTENT);
     }
     
-    private boolean hasDocValues(QName propertyQName)
+    private boolean hasDocValues(PropertyDefinition propertyDefinition)
     {
-        if(propertyQName == null)
+
+        if(isTextField(propertyDefinition))
+        {
+            // We only call this if text is untokenised and localised 
+            if(propertyDefinition.getFacetable() == Facetable.FALSE)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if(propertyDefinition.getFacetable() == Facetable.FALSE)
+            {
+                return false;
+            }
+            else if(propertyDefinition.getFacetable() == Facetable.TRUE)
+            {
+                return true;
+            }
+            else
+            {
+                if(propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.TRUE)
+                {
+                    return false;
+                }
+                else
+                {
+                    return isPrimitive(propertyDefinition.getDataType());
+                }
+            }
+        }
+
+    }
+    
+    /**
+     * @param dataType
+     * @return
+     */
+    private boolean isPrimitive(DataTypeDefinition dataType)
+    {
+        if(dataType.getName().equals(DataTypeDefinition.INT))
+        {
+            return true;
+        }
+        else if(dataType.getName().equals(DataTypeDefinition.LONG))
+        {
+            return true;
+        }
+        else if(dataType.getName().equals(DataTypeDefinition.FLOAT))
+        {
+            return true;
+        }
+        else if(dataType.getName().equals(DataTypeDefinition.DOUBLE))
+        {
+            return true;
+        }
+        else if(dataType.getName().equals(DataTypeDefinition.DATE))
+        {
+            return true;
+        }
+        else if(dataType.getName().equals(DataTypeDefinition.DATETIME))
+        {
+            return true;
+        }
+        else
         {
             return false;
         }
-        return propertyQName.equals(ContentModel.PROP_CREATED) || propertyQName.equals(ContentModel.PROP_MODIFIED); 
     }
-    
+
     private String getFieldForNonText(PropertyDefinition propertyDefinition)
     {
         StringBuilder builder = new StringBuilder();
@@ -848,7 +979,7 @@ public class AlfrescoSolrDataModel
         builder.append(qName.getLocalName());
         builder.append("@");
         builder.append(propertyDefinition.isMultiValued() ? "m" : "s");
-        builder.append(hasDocValues(propertyDefinition.getName()) ? "d" : "_");
+        builder.append(hasDocValues(propertyDefinition) ? "d" : "_");
         builder.append("@");
         builder.append(propertyDefinition.getName().toString());
         return builder.toString();
@@ -873,13 +1004,13 @@ public class AlfrescoSolrDataModel
         {
             builder.append(propertyDefinition.isMultiValued() ? "m" : "s");
         }
-        if(!sort && (localised || tokenised))
+        if(sort || localised || tokenised || propertyDataTypeQName.equals(DataTypeDefinition.CONTENT) ||  propertyDataTypeQName.equals(DataTypeDefinition.MLTEXT))
         {
             builder.append('_');
         }
         else
         {
-            builder.append(hasDocValues(propertyDefinition.getName()) ? "d" : "_");
+            builder.append(hasDocValues(propertyDefinition) ? "d" : "_");
         }
         builder.append('_');
         if(!sort)
@@ -1336,7 +1467,7 @@ public class AlfrescoSolrDataModel
           if (values[slot] == null) {
             values[slot] = new BytesRef();
           }
-          termsIndex.lookupOrd(ord, values[slot]);
+          //termsIndex.lookupOrd(ord, values[slot]);
         }
         ords[slot] = ord;
         readerGen[slot] = currentReaderGen;
@@ -1887,7 +2018,7 @@ public class AlfrescoSolrDataModel
      public Solr4QueryParser getLuceneQueryParser(SearchParameters searchParameters, SolrQueryRequest req)
      {
          Analyzer analyzer =  req.getSchema().getAnalyzer();
-         Solr4QueryParser parser = new Solr4QueryParser(Version.LUCENE_48, searchParameters.getDefaultFieldName(), analyzer);
+         Solr4QueryParser parser = new Solr4QueryParser(req.getSchema(), Version.LUCENE_48, searchParameters.getDefaultFieldName(), analyzer);
 //         Operator defaultOperator;
 //         if (searchParameters.getDefaultOperator() == SearchParameters.AND)
 //         {
@@ -1968,5 +2099,94 @@ public class AlfrescoSolrDataModel
          ContextAwareQuery contextAwareQuery = new ContextAwareQuery(luceneQuery, Boolean.TRUE.equals(isFilter) ? null : searchParameters);
          return contextAwareQuery;
      }
+     
+     /**
+      * @param builder
+      * @param propertyBuilder
+      * @param c
+      * @return
+      */
+     public String  mapProperty(String  potentialProperty,  FieldUse fieldUse)
+     {
+         AlfrescoFunctionEvaluationContext functionContext = new AlfrescoFunctionEvaluationContext(getNamespaceDAO(),  getDictionaryService(CMISStrictDictionaryService.DEFAULT), NamespaceService.CONTENT_MODEL_1_0_URI);
 
+         String luceneField =  functionContext.getLuceneFieldName(potentialProperty);
+
+         Pair<String, String> fieldNameAndEnding = QueryParserUtils.extractFieldNameAndEnding(luceneField);
+         PropertyDefinition propertyDef = QueryParserUtils.matchPropertyDefinition(NamespaceService.CONTENT_MODEL_1_0_URI, getNamespaceDAO(), getDictionaryService(CMISStrictDictionaryService.DEFAULT), fieldNameAndEnding.getFirst());
+         
+         String solrSortField = null;
+         if(propertyDef != null)
+         {
+
+             IndexedField fields = AlfrescoSolrDataModel.getInstance().getQueryableFields(propertyDef.getName(), getTextField(fieldNameAndEnding.getSecond()), fieldUse);
+             if(fields.getFields().size() > 0)
+             {
+                 solrSortField = fields.getFields().get(0).getField();
+             }
+             else
+             {
+                 solrSortField = mapNonPropertyFields(luceneField);
+             }
+         }
+         else
+         {
+             solrSortField = mapNonPropertyFields(luceneField);
+         }
+         return solrSortField;
+       
+     }
+     /**
+      * @param luceneField
+      * @return
+      */
+     public String mapNonPropertyFields(String queryField)
+     {
+         switch(queryField)
+         {
+         case "ID":
+             return "LID";
+         case "EXACTTYPE":
+             return "TYPE";
+         default:
+             return queryField;
+                   
+         }
+     }
+
+     /**
+      * @param second
+      * @param sort
+      * @return
+      */
+     public ContentFieldType getTextField(String ending)
+     {
+         switch(ending)
+         {
+         case FIELD_MIMETYPE_SUFFIX:
+             return ContentFieldType.MIMETYPE;
+         case FIELD_SIZE_SUFFIX:
+             return ContentFieldType.SIZE;
+         case FIELD_LOCALE_SUFFIX:
+             return ContentFieldType.LOCALE;
+         case FIELD_ENCODING_SUFFIX:
+             return ContentFieldType.ENCODING;
+         case FIELD_TRANSFORMATION_STATUS_SUFFIX:
+         case FIELD_TRANSFORMATION_TIME_SUFFIX:
+         case FIELD_TRANSFORMATION_EXCEPTION_SUFFIX:
+         default:
+             return null;
+                 
+         }
+         
+     }
+
+     public void setCMDefaultUri()
+     {
+         if(getNamespaceDAO().getURIs().contains(NamespaceService.CONTENT_MODEL_1_0_URI))
+         {
+             getNamespaceDAO().addPrefix("", NamespaceService.CONTENT_MODEL_1_0_URI);
+         }
+     }
+     
 }

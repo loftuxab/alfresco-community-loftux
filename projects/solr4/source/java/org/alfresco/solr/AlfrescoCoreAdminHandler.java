@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -43,8 +42,10 @@ import org.alfresco.service.cmr.repository.datatype.Duration;
 import org.alfresco.solr.adapters.IOpenBitSet;
 import org.alfresco.solr.client.Node;
 import org.alfresco.solr.tracker.AclTracker;
+import org.alfresco.solr.tracker.ContentTracker;
 import org.alfresco.solr.tracker.IndexHealthReport;
 import org.alfresco.solr.tracker.MetadataTracker;
+import org.alfresco.solr.tracker.ModelTracker;
 import org.alfresco.solr.tracker.SolrTrackerScheduler;
 import org.alfresco.solr.tracker.Tracker;
 import org.alfresco.solr.tracker.TrackerRegistry;
@@ -158,15 +159,15 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         {
             if (a.equalsIgnoreCase("TEST"))
             {
-                new AlfrescoCoreAdminTester(req).runTests(req, rsp);
+                new AlfrescoCoreAdminTester(this).runTests(req, rsp);
             }
             else if (a.equalsIgnoreCase("AUTHTEST"))
             {
-                new AlfrescoCoreAdminTester(req).runAuthTest(req, rsp);
+                new AlfrescoCoreAdminTester(this).runAuthTest(req, rsp);
             }
             else if (a.equalsIgnoreCase("CMISTEST"))
             {
-                new AlfrescoCoreAdminTester(req).runCmisTests(req, rsp);
+                new AlfrescoCoreAdminTester(this).runCmisTests(req, rsp);
             }
             else if (a.equalsIgnoreCase("newCore"))
             {
@@ -486,7 +487,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     {
         // Gets Metadata health and fixes any problems
         MetadataTracker metadataTracker = trackerRegistry.getTrackerForCore(coreName, MetadataTracker.class);
-        IndexHealthReport indexHealthReport = metadataTracker.checkIndex(null, null, null, null, null, null);
+        IndexHealthReport indexHealthReport = metadataTracker.checkIndex(null, null, null, null);
         IOpenBitSet toReindex = indexHealthReport.getTxInIndexButNotInDb();
         toReindex.or(indexHealthReport.getDuplicatedTxInIndex());
         toReindex.or(indexHealthReport.getMissingTxFromIndex());
@@ -499,7 +500,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         
         // Gets the Acl health and fixes any problems
         AclTracker aclTracker = trackerRegistry.getTrackerForCore(coreName, AclTracker.class);
-        indexHealthReport = aclTracker.checkIndex(null, null, null, null, null, null);
+        indexHealthReport = aclTracker.checkIndex(null, null, null, null);
         toReindex = indexHealthReport.getAclTxInIndexButNotInDb();
         toReindex.or(indexHealthReport.getDuplicatedAclTxInIndex());
         toReindex.or(indexHealthReport.getMissingAclTxFromIndex());
@@ -562,12 +563,12 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
 
 
-    private NamedList<Object> buildAclTxReport(AclTracker tracker, Long acltxid) throws AuthenticationException,
-                IOException, JSONException
+    private NamedList<Object> buildAclTxReport(String coreName, AclTracker tracker, Long acltxid) 
+                throws AuthenticationException, IOException, JSONException
     {
         NamedList<Object> nr = new SimpleOrderedMap<Object>();
         nr.add("TXID", acltxid);
-        nr.add("transaction", buildTrackerReport(tracker, 0l, 0l, acltxid, acltxid, null, null));
+        nr.add("transaction", buildTrackerReport(coreName, 0l, 0l, acltxid, acltxid, null, null));
         NamedList<Object> nodes = new SimpleOrderedMap<Object>();
         // add node reports ....
         List<Long> dbAclIds = tracker.getAclsForDbAclTransaction(acltxid);
@@ -596,12 +597,12 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         return nr;
     }
 
-    private NamedList<Object> buildTxReport(MetadataTracker tracker, Long txid) throws AuthenticationException,
-                IOException, JSONException
+    private NamedList<Object> buildTxReport(String coreName, MetadataTracker tracker, Long txid) 
+                throws AuthenticationException, IOException, JSONException
     {
         NamedList<Object> nr = new SimpleOrderedMap<Object>();
         nr.add("TXID", txid);
-        nr.add("transaction", buildTrackerReport(tracker, txid, txid, 0l, 0l, null, null));
+        nr.add("transaction", buildTrackerReport(coreName, txid, txid, 0l, 0l, null, null));
         NamedList<Object> nodes = new SimpleOrderedMap<Object>();
         // add node reports ....
         List<Node> dbNodes = tracker.getFullNodesForDbTransaction(txid);
@@ -625,8 +626,6 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         nr.add("Node DBID", nodeReport.getDbid());
         nr.add("DB TX", nodeReport.getDbTx());
         nr.add("DB TX status", nodeReport.getDbNodeStatus().toString());
-        nr.add("Leaf doc in Index", nodeReport.getIndexLeafDoc());
-        nr.add("Aux doc in Index", nodeReport.getIndexAuxDoc());
         if (nodeReport.getIndexLeafDoc() != null)
         {
             nr.add("Leaf tx in Index", nodeReport.getIndexLeafTx());
@@ -635,6 +634,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         {
             nr.add("Aux tx in Index", nodeReport.getIndexAuxTx());
         }
+        nr.add("Indexed Node Doc Count", nodeReport.getIndexedNodeDocCount());
         return nr;
     }
 
@@ -646,8 +646,6 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         nr.add("Node DBID", nodeReport.getDbid());
         nr.add("DB TX", nodeReport.getDbTx());
         nr.add("DB TX status", nodeReport.getDbNodeStatus().toString());
-        nr.add("Leaf doc in Index", nodeReport.getIndexLeafDoc());
-        nr.add("Aux doc in Index", nodeReport.getIndexAuxDoc());
         if (nodeReport.getIndexLeafDoc() != null)
         {
             nr.add("Leaf tx in Index", nodeReport.getIndexLeafTx());
@@ -656,95 +654,103 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         {
             nr.add("Aux tx in Index", nodeReport.getIndexAuxTx());
         }
+        nr.add("Indexed Node Doc Count", nodeReport.getIndexedNodeDocCount());
         return nr;
     }
 
-    private NamedList<Object> buildTrackerReport(Tracker tracker, Long fromTx, Long toTx, Long fromAclTx, Long toAclTx,
+    private NamedList<Object> buildTrackerReport(String coreName, Long fromTx, Long toTx, Long fromAclTx, Long toAclTx,
                 Long fromTime, Long toTime) throws IOException, JSONException, AuthenticationException
     {
-        IndexHealthReport indexHealthReport = tracker.checkIndex(fromTx, toTx, fromAclTx, toAclTx, fromTime, toTime);
-
+        // ACL
+        AclTracker aclTracker = trackerRegistry.getTrackerForCore(coreName, AclTracker.class);
+        IndexHealthReport aclReport = aclTracker.checkIndex(toTx, toAclTx, fromTime, toTime);
         NamedList<Object> ihr = new SimpleOrderedMap<Object>();
-        ihr.add("Alfresco version", tracker.getAlfrescoVersion());
-        ihr.add("DB transaction count", indexHealthReport.getDbTransactionCount());
-        ihr.add("DB acl transaction count", indexHealthReport.getDbAclTransactionCount());
-        ihr.add("Count of duplicated transactions in the index", indexHealthReport.getDuplicatedTxInIndex()
+        ihr.add("Alfresco version", aclTracker.getAlfrescoVersion());
+        ihr.add("DB acl transaction count", aclReport.getDbAclTransactionCount());
+        ihr.add("Count of duplicated acl transactions in the index", aclReport.getDuplicatedAclTxInIndex()
                     .cardinality());
-        if (indexHealthReport.getDuplicatedTxInIndex().cardinality() > 0)
+        if (aclReport.getDuplicatedAclTxInIndex().cardinality() > 0)
         {
-            ihr.add("First duplicate", indexHealthReport.getDuplicatedTxInIndex().nextSetBit(0L));
+            ihr.add("First duplicate acl tx", aclReport.getDuplicatedAclTxInIndex().nextSetBit(0L));
         }
-        ihr.add("Count of duplicated acl transactions in the index", indexHealthReport.getDuplicatedAclTxInIndex()
+        ihr.add("Count of acl transactions in the index but not the DB", aclReport.getAclTxInIndexButNotInDb()
                     .cardinality());
-        if (indexHealthReport.getDuplicatedAclTxInIndex().cardinality() > 0)
+        if (aclReport.getAclTxInIndexButNotInDb().cardinality() > 0)
         {
-            ihr.add("First duplicate acl tx", indexHealthReport.getDuplicatedAclTxInIndex().nextSetBit(0L));
-        }
-        ihr.add("Count of transactions in the index but not the DB", indexHealthReport.getTxInIndexButNotInDb()
-                    .cardinality());
-        if (indexHealthReport.getTxInIndexButNotInDb().cardinality() > 0)
-        {
-            ihr.add("First transaction in the index but not the DB", indexHealthReport.getTxInIndexButNotInDb()
+            ihr.add("First acl transaction in the index but not the DB", aclReport.getAclTxInIndexButNotInDb()
                         .nextSetBit(0L));
         }
-        ihr.add("Count of acl transactions in the index but not the DB", indexHealthReport.getAclTxInIndexButNotInDb()
+        ihr.add("Count of missing acl transactions from the Index", aclReport.getMissingAclTxFromIndex()
                     .cardinality());
-        if (indexHealthReport.getAclTxInIndexButNotInDb().cardinality() > 0)
+        if (aclReport.getMissingAclTxFromIndex().cardinality() > 0)
         {
-            ihr.add("First acl transaction in the index but not the DB", indexHealthReport.getAclTxInIndexButNotInDb()
+            ihr.add("First acl transaction missing from the Index", aclReport.getMissingAclTxFromIndex()
                         .nextSetBit(0L));
         }
-        ihr.add("Count of missing transactions from the Index", indexHealthReport.getMissingTxFromIndex().cardinality());
-        if (indexHealthReport.getMissingTxFromIndex().cardinality() > 0)
+        ihr.add("Index acl transaction count", aclReport.getAclTransactionDocsInIndex());
+        ihr.add("Index unique acl transaction count", aclReport.getAclTransactionDocsInIndex());
+        TrackerState aclState = aclTracker.getTrackerState();
+        ihr.add("Last indexed change set commit time", aclState.getLastIndexedChangeSetCommitTime());
+        Date lastChangeSetDate = new Date(aclState.getLastIndexedChangeSetCommitTime());
+        ihr.add("Last indexed change set commit date", CachingDateFormat.getDateFormat().format(lastChangeSetDate));
+        ihr.add("Last changeset id before holes", aclState.getLastIndexedChangeSetIdBeforeHoles());
+
+        // Metadata
+        MetadataTracker metadataTracker = trackerRegistry.getTrackerForCore(coreName, MetadataTracker.class);
+        IndexHealthReport metaReport = metadataTracker.checkIndex(toTx, toAclTx, fromTime, toTime);
+        ihr.add("DB transaction count", metaReport.getDbTransactionCount());
+        ihr.add("Count of duplicated transactions in the index", metaReport.getDuplicatedTxInIndex()
+                    .cardinality());
+        if (metaReport.getDuplicatedTxInIndex().cardinality() > 0)
         {
-            ihr.add("First transaction missing from the Index", indexHealthReport.getMissingTxFromIndex()
+            ihr.add("First duplicate", metaReport.getDuplicatedTxInIndex().nextSetBit(0L));
+        }
+        ihr.add("Count of transactions in the index but not the DB", metaReport.getTxInIndexButNotInDb()
+                    .cardinality());
+        if (metaReport.getTxInIndexButNotInDb().cardinality() > 0)
+        {
+            ihr.add("First transaction in the index but not the DB", metaReport.getTxInIndexButNotInDb()
                         .nextSetBit(0L));
         }
-        ihr.add("Count of missing acl transactions from the Index", indexHealthReport.getMissingAclTxFromIndex()
-                    .cardinality());
-        if (indexHealthReport.getMissingAclTxFromIndex().cardinality() > 0)
+        ihr.add("Count of missing transactions from the Index", metaReport.getMissingTxFromIndex().cardinality());
+        if (metaReport.getMissingTxFromIndex().cardinality() > 0)
         {
-            ihr.add("First acl transaction missing from the Index", indexHealthReport.getMissingAclTxFromIndex()
+            ihr.add("First transaction missing from the Index", metaReport.getMissingTxFromIndex()
                         .nextSetBit(0L));
         }
-        ihr.add("Index transaction count", indexHealthReport.getTransactionDocsInIndex());
-        ihr.add("Index acl transaction count", indexHealthReport.getAclTransactionDocsInIndex());
-        ihr.add("Index unique transaction count", indexHealthReport.getTransactionDocsInIndex());
-        ihr.add("Index unique acl transaction count", indexHealthReport.getAclTransactionDocsInIndex());
-        ihr.add("Index leaf count", indexHealthReport.getLeafDocCountInIndex());
-        ihr.add("Count of duplicate leaves in the index", indexHealthReport.getDuplicatedLeafInIndex().cardinality());
-        if (indexHealthReport.getDuplicatedLeafInIndex().cardinality() > 0)
+        ihr.add("Index transaction count", metaReport.getTransactionDocsInIndex());
+        ihr.add("Index unique transaction count", metaReport.getTransactionDocsInIndex());
+        ihr.add("Index node count", metaReport.getLeafDocCountInIndex());
+        ihr.add("Count of duplicate nodes in the index", metaReport.getDuplicatedLeafInIndex().cardinality());
+        if (metaReport.getDuplicatedLeafInIndex().cardinality() > 0)
         {
-            ihr.add("First duplicate leaf in the index", "LEAF-"
-                        + indexHealthReport.getDuplicatedLeafInIndex().nextSetBit(0L));
+            ihr.add("First duplicate node id in the index", metaReport.getDuplicatedLeafInIndex().nextSetBit(0L));
         }
-        ihr.add("Index aux count", indexHealthReport.getAuxDocCountInIndex());
-        ihr.add("Count of duplicate aux docs in the index", indexHealthReport.getDuplicatedAuxInIndex().cardinality());
-        if (indexHealthReport.getDuplicatedAuxInIndex().cardinality() > 0)
-        {
-            ihr.add("First duplicate aux in the index", "AUX-"
-                        + indexHealthReport.getDuplicatedAuxInIndex().nextSetBit(0L));
-        }
-        ihr.add("Index error count", indexHealthReport.getErrorDocCountInIndex());
-        ihr.add("Count of duplicate error docs in the index", indexHealthReport.getDuplicatedErrorInIndex()
+        ihr.add("Index error count", metaReport.getErrorDocCountInIndex());
+        ihr.add("Count of duplicate error docs in the index", metaReport.getDuplicatedErrorInIndex()
                     .cardinality());
-        if (indexHealthReport.getDuplicatedErrorInIndex().cardinality() > 0)
+        if (metaReport.getDuplicatedErrorInIndex().cardinality() > 0)
         {
-            ihr.add("First duplicate error in the index", "ERROR-"
-                        + indexHealthReport.getDuplicatedErrorInIndex().nextSetBit(0L));
+            ihr.add("First duplicate error in the index", SolrInformationServer.PREFIX_ERROR
+                        + metaReport.getDuplicatedErrorInIndex().nextSetBit(0L));
         }
-        ihr.add("Index unindexed count", indexHealthReport.getUnindexedDocCountInIndex());
-        ihr.add("Count of duplicate unindexed docs in the index", indexHealthReport.getDuplicatedUnindexedInIndex()
+        ihr.add("Index unindexed count", metaReport.getUnindexedDocCountInIndex());
+        ihr.add("Count of duplicate unindexed docs in the index", metaReport.getDuplicatedUnindexedInIndex()
                     .cardinality());
-        if (indexHealthReport.getDuplicatedUnindexedInIndex().cardinality() > 0)
+        if (metaReport.getDuplicatedUnindexedInIndex().cardinality() > 0)
         {
-            ihr.add("First duplicate unindexed in the index", "UNINDEXED-"
-                        + indexHealthReport.getDuplicatedErrorInIndex().nextSetBit(0L));
+            ihr.add("First duplicate unindexed in the index", 
+                        metaReport.getDuplicatedUnindexedInIndex().nextSetBit(0L));
         }
-        ihr.add("Last index commit time", indexHealthReport.getLastIndexedCommitTime());
-        Date lastDate = new Date(indexHealthReport.getLastIndexedCommitTime());
-        ihr.add("Last Index commit date", CachingDateFormat.getDateFormat().format(lastDate));
-        ihr.add("Last TX id before holes", indexHealthReport.getLastIndexedIdBeforeHoles());
+        TrackerState metaState = metadataTracker.getTrackerState();
+        ihr.add("Last indexed transaction commit time", metaState.getLastIndexedTxCommitTime());
+        Date lastTxDate = new Date(metaState.getLastIndexedTxCommitTime());
+        ihr.add("Last indexed transaction commit date", CachingDateFormat.getDateFormat().format(lastTxDate));
+        ihr.add("Last TX id before holes", metaState.getLastIndexedTxIdBeforeHoles());
+        
+        InformationServer srv = informationServers.get(coreName);
+        srv.addFTSStatusCounts(ihr);
+        
         return ihr;
     }
     
@@ -761,7 +767,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             MetadataTracker tracker = trackerRegistry.getTrackerForCore(cname, MetadataTracker.class);
             Long txid = Long.valueOf(params.get(ARG_TXID));
             NamedList<Object> report = new SimpleOrderedMap<Object>();
-            report.add(cname, buildTxReport(tracker, txid));
+            report.add(cname, buildTxReport(cname, tracker, txid));
             rsp.add("report", report);
         }
         else
@@ -772,7 +778,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
                 MetadataTracker tracker = trackerRegistry.getTrackerForCore(cname,
                             MetadataTracker.class);
-                report.add(coreName, buildTxReport(tracker, txid));
+                report.add(coreName, buildTxReport(coreName, tracker, txid));
             }
             rsp.add("report", report);
         }
@@ -791,7 +797,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             AclTracker tracker = trackerRegistry.getTrackerForCore(cname, AclTracker.class);
             Long acltxid = Long.valueOf(params.get(ARG_ACLTXID));
             NamedList<Object> report = new SimpleOrderedMap<Object>();
-            report.add(cname, buildAclTxReport(tracker, acltxid));
+            report.add(cname, buildAclTxReport(cname, tracker, acltxid));
             rsp.add("report", report);
         }
         else
@@ -801,7 +807,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             for (String coreName : trackerRegistry.getCoreNames())
             {
                 AclTracker tracker = trackerRegistry.getTrackerForCore(coreName, AclTracker.class);
-                report.add(coreName, buildAclTxReport(tracker, acltxid));
+                report.add(coreName, buildAclTxReport(coreName, tracker, acltxid));
             }
             rsp.add("report", report);
         }
@@ -822,12 +828,8 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             NamedList<Object> report = new SimpleOrderedMap<Object>();
             if (trackerRegistry.hasTrackersForCore(cname))
             {
-                for (Tracker tracker : trackerRegistry.getTrackersForCore(cname))
-                {
-                    report.add(cname + ":" + tracker.getClass(), 
-                                buildTrackerReport(tracker, fromTx, toTx, fromAclTx, toAclTx, fromTime, toTime));
-                    rsp.add("report", report);
-                }
+                report.add(cname, buildTrackerReport(cname, fromTx, toTx, fromAclTx, toAclTx, fromTime, toTime));
+                rsp.add("report", report);
             }
             else 
             {
@@ -839,10 +841,13 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             NamedList<Object> report = new SimpleOrderedMap<Object>();
             for (String coreName : trackerRegistry.getCoreNames())
             {
-                for (Tracker tracker : trackerRegistry.getTrackersForCore(coreName))
+                if (trackerRegistry.hasTrackersForCore(coreName))
                 {
-                    report.add(coreName + ":" + tracker.getClass(),
-                            buildTrackerReport(tracker, fromTx, toTx, fromAclTx, toAclTx, fromTime, toTime));
+                    report.add(coreName, buildTrackerReport(coreName, fromTx, toTx, fromAclTx, toAclTx, fromTime, toTime));
+                }
+                else 
+                {
+                    report.add(coreName, "Core unknown");
                 }
             }
             rsp.add("report", report);
@@ -951,100 +956,114 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                 InformationServer srv, NamedList<Object> report) throws IOException
     {
         NamedList<Object> coreSummary = new SimpleOrderedMap<Object>();
-// TODO: Needs testing if the cast is ok. Used to be (Map<String, Object>)
         coreSummary.addAll((SimpleOrderedMap<Object>) srv.getCoreStats());
         
         MetadataTracker metaTrkr = trackerRegistry.getTrackerForCore(cname, MetadataTracker.class);
-        long lastIndexTxCommitTime = metaTrkr.getTrackerState().getLastIndexedTxCommitTime();
+        TrackerState metadataTrkrState = metaTrkr.getTrackerState();
+        long lastIndexTxCommitTime = metadataTrkrState.getLastIndexedTxCommitTime();
         
-////        long lastIndexedTxId = srv.getTrackerState().getLastIndexedTxId();
-////        long lastTxCommitTimeOnServer = srv.getTrackerState().getLastTxCommitTimeOnServer();
-////        long lastTxIdOnServer = srv.getTrackerState().getLastTxIdOnServer();
-////        Date lastIndexTxCommitDate = new Date(lastIndexTxCommitTime);
-////        Date lastTxOnServerDate = new Date(lastTxCommitTimeOnServer);
-////        long transactionsToDo = lastTxIdOnServer - lastIndexedTxId;
-////        if (transactionsToDo < 0)
-////        {
-////            transactionsToDo = 0;
-////        }
-////
-////        long lastIndexChangeSetCommitTime = srv.getTrackerState().getLastIndexedChangeSetCommitTime();
-////        long lastIndexedChangeSetId = srv.getTrackerState().getLastIndexedChangeSetId();
-////        long lastChangeSetCommitTimeOnServer = srv.getTrackerState().getLastChangeSetCommitTimeOnServer();
-////        long lastChangeSetIdOnServer = srv.getTrackerState().getLastChangeSetIdOnServer();
-//        Date lastIndexChangeSetCommitDate = new Date(lastIndexChangeSetCommitTime);
-//        Date lastChangeSetOnServerDate = new Date(lastChangeSetCommitTimeOnServer);
-//        long changeSetsToDo = lastChangeSetIdOnServer - lastIndexedChangeSetId;
-//        if (changeSetsToDo < 0)
-//        {
-//            changeSetsToDo = 0;
-//        }
-//
-//        long remainingTxTimeMillis = (long) (transactionsToDo * srv.getTrackerStats().getMeanDocsPerTx()
-//                    * srv.getTrackerStats().getMeanNodeIndexTime() / srv.getTrackerStats()
-//                    .getNodeIndexingThreadCount());
-//        Date now = new Date();
-//        Date end = new Date(now.getTime() + remainingTxTimeMillis);
-//        Duration remainingTx = new Duration(now, end);
-//
-//        long remainingChangeSetTimeMillis = (long) (changeSetsToDo
-//                    * srv.getTrackerStats().getMeanAclsPerChangeSet()
-//                    * srv.getTrackerStats().getMeanAclIndexTime() / srv.getTrackerStats()
-//                    .getNodeIndexingThreadCount());
-//        now = new Date();
-//        end = new Date(now.getTime() + remainingChangeSetTimeMillis);
-//        Duration remainingChangeSet = new Duration(now, end);
-//
-//        Duration txLag = new Duration(lastIndexTxCommitDate, lastTxOnServerDate);
-//        if (lastIndexTxCommitDate.compareTo(lastTxOnServerDate) > 0)
-//        {
-//            txLag = new Duration();
-//        }
-//        long txLagSeconds = (lastTxCommitTimeOnServer - lastIndexTxCommitTime) / 1000;
-//        if (txLagSeconds < 0)
-//        {
-//            txLagSeconds = 0;
-//        }
-//
-//        Duration changeSetLag = new Duration(lastIndexChangeSetCommitDate, lastChangeSetOnServerDate);
-//        if (lastIndexChangeSetCommitDate.compareTo(lastChangeSetOnServerDate) > 0)
-//        {
-//            changeSetLag = new Duration();
-//        }
-//        long changeSetLagSeconds = (lastChangeSetCommitTimeOnServer - lastIndexChangeSetCommitTime) / 1000;
-//        if (txLagSeconds < 0)
-//        {
-//            txLagSeconds = 0;
-//        }
-//
-//        coreSummary.add("Active", srv.getTrackerState().isRunning());
-//
-//        // TX
-//
-//        coreSummary.add("Last Index TX Commit Time", lastIndexTxCommitTime);
-//        coreSummary.add("Last Index TX Commit Date", lastIndexTxCommitDate);
-//        coreSummary.add("TX Lag", txLagSeconds + " s");
-//        coreSummary.add("TX Duration", txLag.toString());
-//        coreSummary.add("Timestamp for last TX on server", lastTxCommitTimeOnServer);
-//        coreSummary.add("Date for last TX on server", lastTxOnServerDate);
-//        coreSummary.add("Id for last TX on server", lastTxIdOnServer);
-//        coreSummary.add("Id for last TX in index", lastIndexedTxId);
-//        coreSummary.add("Approx transactions remaining", transactionsToDo);
-//        coreSummary.add("Approx transaction indexing time remaining", remainingTx.largestComponentformattedString());
-//
-//        // Change set
-//
-//        coreSummary.add("Last Index Change Set Commit Time", lastIndexChangeSetCommitTime);
-//        coreSummary.add("Last Index Change Set Commit Date", lastIndexChangeSetCommitDate);
-//        coreSummary.add("Change Set Lag", changeSetLagSeconds + " s");
-//        coreSummary.add("Change Set Duration", changeSetLag.toString());
-//        coreSummary.add("Timestamp for last Change Set on server", lastChangeSetCommitTimeOnServer);
-//        coreSummary.add("Date for last Change Set on server", lastChangeSetOnServerDate);
-//        coreSummary.add("Id for last Change Set on server", lastChangeSetIdOnServer);
-//        coreSummary.add("Id for last Change Set in index", lastIndexedChangeSetId);
-//        coreSummary.add("Approx change sets remaining", changeSetsToDo);
-//        coreSummary.add("Approx change set indexing time remaining",
-//                    remainingChangeSet.largestComponentformattedString());
+        long lastIndexedTxId = metadataTrkrState.getLastIndexedTxId();
+        long lastTxCommitTimeOnServer = metadataTrkrState.getLastTxCommitTimeOnServer();
+        long lastTxIdOnServer = metadataTrkrState.getLastTxIdOnServer();
+        Date lastIndexTxCommitDate = new Date(lastIndexTxCommitTime);
+        Date lastTxOnServerDate = new Date(lastTxCommitTimeOnServer);
+        long transactionsToDo = lastTxIdOnServer - lastIndexedTxId;
+        if (transactionsToDo < 0)
+        {
+            transactionsToDo = 0;
+        }
+
+        AclTracker aclTrkr = trackerRegistry.getTrackerForCore(cname, AclTracker.class);
+        TrackerState aclTrkrState = aclTrkr.getTrackerState();
+        long lastIndexChangeSetCommitTime = aclTrkrState.getLastIndexedChangeSetCommitTime();
+        long lastIndexedChangeSetId = aclTrkrState.getLastIndexedChangeSetId();
+        long lastChangeSetCommitTimeOnServer = aclTrkrState.getLastChangeSetCommitTimeOnServer();
+        long lastChangeSetIdOnServer = aclTrkrState.getLastChangeSetIdOnServer();
+        Date lastIndexChangeSetCommitDate = new Date(lastIndexChangeSetCommitTime);
+        Date lastChangeSetOnServerDate = new Date(lastChangeSetCommitTimeOnServer);
+        long changeSetsToDo = lastChangeSetIdOnServer - lastIndexedChangeSetId;
+        if (changeSetsToDo < 0)
+        {
+            changeSetsToDo = 0;
+        }
+
+        long remainingTxTimeMillis = (long) (transactionsToDo * srv.getTrackerStats().getMeanDocsPerTx()
+                    * srv.getTrackerStats().getMeanNodeIndexTime() / srv.getTrackerStats()
+                    .getNodeIndexingThreadCount());
+        Date now = new Date();
+        Date end = new Date(now.getTime() + remainingTxTimeMillis);
+        Duration remainingTx = new Duration(now, end);
+
+        long remainingChangeSetTimeMillis = (long) (changeSetsToDo
+                    * srv.getTrackerStats().getMeanAclsPerChangeSet()
+                    * srv.getTrackerStats().getMeanAclIndexTime() / srv.getTrackerStats()
+                    .getNodeIndexingThreadCount());
+        now = new Date();
+        end = new Date(now.getTime() + remainingChangeSetTimeMillis);
+        Duration remainingChangeSet = new Duration(now, end);
+
+        Duration txLag = new Duration(lastIndexTxCommitDate, lastTxOnServerDate);
+        if (lastIndexTxCommitDate.compareTo(lastTxOnServerDate) > 0)
+        {
+            txLag = new Duration();
+        }
+        long txLagSeconds = (lastTxCommitTimeOnServer - lastIndexTxCommitTime) / 1000;
+        if (txLagSeconds < 0)
+        {
+            txLagSeconds = 0;
+        }
+
+        Duration changeSetLag = new Duration(lastIndexChangeSetCommitDate, lastChangeSetOnServerDate);
+        if (lastIndexChangeSetCommitDate.compareTo(lastChangeSetOnServerDate) > 0)
+        {
+            changeSetLag = new Duration();
+        }
+        long changeSetLagSeconds = (lastChangeSetCommitTimeOnServer - lastIndexChangeSetCommitTime) / 1000;
+        if (txLagSeconds < 0)
+        {
+            txLagSeconds = 0;
+        }
+
+        ContentTracker contentTrkr = trackerRegistry.getTrackerForCore(cname, ContentTracker.class);
+        TrackerState contentTrkrState = contentTrkr.getTrackerState();
+        // Leave ModelTracker out of this check, because it is common
+        boolean aTrackerIsRunning = aclTrkrState.isRunning() || metadataTrkrState.isRunning()
+                    || contentTrkrState.isRunning();
+        coreSummary.add("Active", aTrackerIsRunning);
+        
+        ModelTracker modelTrkr = trackerRegistry.getModelTracker();
+        TrackerState modelTrkrState = modelTrkr.getTrackerState();
+        coreSummary.add("ModelTracker Active", modelTrkrState.isRunning());
+        coreSummary.add("ContentTracker Active", contentTrkrState.isRunning());
+        coreSummary.add("MetadataTracker Active", metadataTrkrState.isRunning());
+        coreSummary.add("AclTracker Active", aclTrkrState.isRunning());
+
+        // TX
+
+        coreSummary.add("Last Index TX Commit Time", lastIndexTxCommitTime);
+        coreSummary.add("Last Index TX Commit Date", lastIndexTxCommitDate);
+        coreSummary.add("TX Lag", txLagSeconds + " s");
+        coreSummary.add("TX Duration", txLag.toString());
+        coreSummary.add("Timestamp for last TX on server", lastTxCommitTimeOnServer);
+        coreSummary.add("Date for last TX on server", lastTxOnServerDate);
+        coreSummary.add("Id for last TX on server", lastTxIdOnServer);
+        coreSummary.add("Id for last TX in index", lastIndexedTxId);
+        coreSummary.add("Approx transactions remaining", transactionsToDo);
+        coreSummary.add("Approx transaction indexing time remaining", remainingTx.largestComponentformattedString());
+
+        // Change set
+
+        coreSummary.add("Last Index Change Set Commit Time", lastIndexChangeSetCommitTime);
+        coreSummary.add("Last Index Change Set Commit Date", lastIndexChangeSetCommitDate);
+        coreSummary.add("Change Set Lag", changeSetLagSeconds + " s");
+        coreSummary.add("Change Set Duration", changeSetLag.toString());
+        coreSummary.add("Timestamp for last Change Set on server", lastChangeSetCommitTimeOnServer);
+        coreSummary.add("Date for last Change Set on server", lastChangeSetOnServerDate);
+        coreSummary.add("Id for last Change Set on server", lastChangeSetIdOnServer);
+        coreSummary.add("Id for last Change Set in index", lastIndexedChangeSetId);
+        coreSummary.add("Approx change sets remaining", changeSetsToDo);
+        coreSummary.add("Approx change set indexing time remaining",
+                    remainingChangeSet.largestComponentformattedString());
 
         // Stats
 
@@ -1058,7 +1077,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         coreSummary.add("Doc Transformation time (ms)", srv.getTrackerStats().getDocTransformationTimes()
                     .getNamedList(detail, hist, values));
 
-        // Modela
+        // Model
 
         Map<String, Set<String>> modelErrors = srv.getModelErrors();
         if (modelErrors.size() > 0)

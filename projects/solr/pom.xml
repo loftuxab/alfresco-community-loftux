@@ -7,7 +7,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
+        <version>5.0.b.LX69-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
@@ -50,7 +50,7 @@
             <version>${project.version}</version>
         </dependency>
         <!-- provided dependencies -->
-            <dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
@@ -90,10 +90,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>1.5.11</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.11</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -140,6 +142,8 @@
                                 <exclude>WEB-INF/lib/commons-codec-*.jar</exclude>
                                 <exclude>WEB-INF/lib/slf4j-*.jar</exclude>
                                 <exclude>WEB-INF/lib/log4j-*.jar</exclude>
+								<!-- MNT-11746 -->
+                                <exclude>WEB-INF/classes/log4j.properties</exclude>
                             </excludes>
                         </overlay>
                     </overlays>

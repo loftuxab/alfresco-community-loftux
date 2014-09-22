@@ -28,13 +28,34 @@
  * @author Dave Draper
  */
 define(["alfresco/forms/controls/BaseFormControl",
+        "alfresco/forms/controls/utilities/UseServiceStoreMixin",
+        "alfresco/forms/controls/utilities/IconMixin",
         "dojo/_base/declare",
         "dijit/form/ComboBox",
-        "alfresco/forms/controls/utilities/ServiceStore",
         "dojo/_base/lang"], 
-        function(BaseFormControl, declare, ComboBox, ServiceStore, lang) {
+        function(BaseFormControl, UseServiceStoreMixin, IconMixin, declare, ComboBox, lang) {
 
-   return declare([BaseFormControl], {
+   return declare([BaseFormControl, UseServiceStoreMixin, IconMixin], {
+
+      /**
+       * An array of the CSS files to use with this widget.
+       * 
+       * @instance
+       * @type {object[]}
+       * @default [{cssFile:"./css/ComboBox.css"}]
+       */
+      cssRequirements: [{cssFile:"./css/ComboBox.css"}],
+
+      /**
+       * This determines whether or not the ComboBox will automatically copy the
+       * first matched item into the input field as the user is typing. Defaults
+       * to false.
+       *
+       * @instance
+       * @type {boolean}
+       * @default false
+       */
+      autoComplete: false,
 
       /**
        * @instance
@@ -56,22 +77,19 @@ define(["alfresco/forms/controls/BaseFormControl",
        * @instance
        */
       createFormControl: function alfresco_forms_controls_ComboBox__createFormControl(config, domNode) {
-         var publishTopic = lang.getObject("optionsConfig.publishTopic", false, this);
-         var publishPayload = lang.getObject("optionsConfig.publishPayload", false, this);
-         var queryAttribute = lang.getObject("optionsConfig.queryAttribute", false, this);
-         var serviceStore = new ServiceStore({
-            queryAttribute: (queryAttribute != null) ? queryAttribute : "name",
-            publishTopic: publishTopic,
-            publishPayload: publishPayload
-         });
+         var serviceStore = this.createServiceStore();
          var comboBox = new ComboBox({
             id: this.id + "_CONTROL",
             name: this.name,
             value: this.value,
             store: serviceStore,
-            searchAttr: queryAttribute,
-            queryExpr: "${0}"
+            searchAttr: serviceStore.queryAttribute,
+            labelAttribute: serviceStore.labelAttribute,
+            queryExpr: "${0}",
+            autoComplete: this.autoComplete
          });
+         this.addIcon(comboBox);
+         this.showOptionsBasedOnValue(comboBox);
          return comboBox;
       },
 

@@ -23,6 +23,7 @@ import java.io.IOException;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.FixedBitSet;
 import org.apache.solr.search.BitDocSet;
 import org.apache.solr.search.DocIterator;
@@ -42,14 +43,18 @@ public abstract class AbstractSolrCachingScorer extends Scorer
 
     FixedBitSet bitSet;
 
-    SolrIndexSearcher searcher;
     AtomicReaderContext context;
     
-    AbstractSolrCachingScorer(Weight weight, DocSet in, AtomicReaderContext context, SolrIndexSearcher searcher)
+    Bits acceptDocs;
+    
+    
+    AbstractSolrCachingScorer(Weight weight, DocSet in, AtomicReaderContext context, Bits acceptDocs, SolrIndexSearcher searcher)
     {
         super(weight);
-        // TODO: 'in' is often too small for the logic in next() to work successfully (ArrayIndexOutOfBoundsException)
-        if (false /*in instanceof BitDocSet*/)
+        this.context = context;
+        this.acceptDocs = acceptDocs;
+        
+        if (in instanceof BitDocSet)
         {
             matches = (BitDocSet) in;
         }
@@ -62,18 +67,22 @@ public abstract class AbstractSolrCachingScorer extends Scorer
             }
         }
         bitSet = matches.getBits();
-        this.searcher = searcher;
-        this.context = context;
+        
         doc = getBase() - 1;
     }
 
     
     private boolean next()
     {        
-        // TODO: this is breaking because sometimes a BitDocSet is passed in to the constructor
-        // that is smaller than searcher.maxDoc()
-        doc = bitSet.nextSetBit(doc+1);
-        return (doc != -1)  && (doc < (getBase()  + searcher.maxDoc()));
+        if(doc+1 < bitSet.length())
+        {
+            doc = bitSet.nextSetBit(doc+1);
+            return (doc != -1)  && (doc < (getBase()  + context.reader().maxDoc()));
+        }
+        else
+        {
+            return false;
+        }
     }
     
     private int getBase()
@@ -84,11 +93,14 @@ public abstract class AbstractSolrCachingScorer extends Scorer
     @Override
     public int nextDoc() throws IOException
     {
-        if (!next())
+        while (next())
         {
-            return NO_MORE_DOCS;
+            if( (acceptDocs == null) || (acceptDocs.get(docID())) )
+            {
+                return docID();
+            }
         }
-        return docID();
+        return NO_MORE_DOCS;
     }
 
     
@@ -114,10 +126,13 @@ public abstract class AbstractSolrCachingScorer extends Scorer
     {
         while (next())
         {
-            final int doc = docID();
-            if (doc >= target)
+            final int current = docID();
+            if (current >= target)
             {
-                return doc;
+                if( (acceptDocs == null) || (acceptDocs.get(current)) )
+                {
+                    return current;
+                }
             }
         }
         return NO_MORE_DOCS;
@@ -127,13 +142,13 @@ public abstract class AbstractSolrCachingScorer extends Scorer
     @Override
     public int freq() throws IOException
     {
-        throw new UnsupportedOperationException();
+        return 1;
     }
 
     // TODO: implement
     @Override
     public long cost()
     {
-        throw new UnsupportedOperationException();
+       return matches.size();
     }
 }

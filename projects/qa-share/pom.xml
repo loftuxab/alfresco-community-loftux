@@ -8,7 +8,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
+        <version>5.0.b.LX69-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
@@ -63,18 +63,18 @@
             <version>4.2.1</version>
         </dependency>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>share-po</artifactId>
             <version>${share-po.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>webdrone</artifactId>
             <version>${webdrone.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-benchmark-util</artifactId>
             <version>1.2.0</version>
             <exclusions>
@@ -83,17 +83,17 @@
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>   
+        </dependency>
         <dependency>
                 <groupId>org.alfresco.services</groupId>
 	        <artifactId>alfresco-events</artifactId>
-                <version>1.1-SNAPSHOT</version>
-        </dependency>      
+                <version>1.2-SNAPSHOT</version>
+        </dependency>
         <dependency>
 	        <groupId>org.apache.camel</groupId>
 	        <artifactId>camel-core</artifactId>
 	        <version>2.12.0</version>
-        </dependency>        
+        </dependency>
 	        <dependency>
 	            <groupId>org.apache.activemq</groupId>
 	            <artifactId>activemq-client</artifactId>
@@ -171,7 +171,7 @@
 	                </exclusion>
 	            </exclusions>
 	        </dependency>
-        
+
         <!-- Selenium -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -368,7 +368,7 @@
                             <dependency>
                                 <groupId>org.postgresql</groupId>
                                 <artifactId>postgresql</artifactId>
-                                <version>9.3-1101-jdbc41</version>
+                                <version>${dependency.postgresql.version}</version>
                             </dependency>
                         </dependencies>
                     </plugin>

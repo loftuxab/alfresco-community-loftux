@@ -1,4 +1,21 @@
-
+/*
+ * Copyright (C) 2014 Alfresco Software Limited.
+ *
+ * This file is part of Alfresco
+ *
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.alfresco.solr.tracker;
 
 import java.io.File;
@@ -15,6 +32,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.naming.NoInitialContextException;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.httpclient.AuthenticationException;
 import org.alfresco.repo.dictionary.M2Model;
@@ -24,7 +46,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.InformationServer;
-import org.alfresco.solr.adapters.IOpenBitSet;
 import org.alfresco.solr.client.AlfrescoModel;
 import org.alfresco.solr.client.AlfrescoModelDiff;
 import org.alfresco.solr.client.SOLRAPIClient;
@@ -54,7 +75,7 @@ public class ModelTracker extends AbstractTracker implements Tracker
                 InformationServer informationServer)
     {
         super(scheduler, p, client, coreName, informationServer);
-        alfrescoModelDir = new File(solrHome, "alfrescoModels");
+        alfrescoModelDir = locateModelHome(solrHome);
         log.warn("Alfresco Model dir " + alfrescoModelDir);
         if (!alfrescoModelDir.exists())
         {
@@ -144,28 +165,6 @@ public class ModelTracker extends AbstractTracker implements Tracker
 
         checkShutdown();
         trackModels(false);
-    }
-
-    @Override
-    public IndexHealthReport checkIndex(Long fromTx, Long toTx, Long fromAclTx, Long toAclTx, Long fromTime, Long toTime)
-                throws IOException, AuthenticationException, JSONException
-    {
-        IndexHealthReport indexHealthReport = new IndexHealthReport(infoSrv);
-        Long minTxId = null;
-        Long minAclTxId = null;
-
-        // DB TX Count
-        IOpenBitSet txIdsInDb = infoSrv.getOpenBitSetInstance();
-        long maxTxId = 0;
-        indexHealthReport.setDbTransactionCount(txIdsInDb.cardinality());
-        IOpenBitSet aclTxIdsInDb = infoSrv.getOpenBitSetInstance();
-        long maxAclTxId = 0;
-
-        indexHealthReport.setDbAclTransactionCount(aclTxIdsInDb.cardinality());
-
-        // Index TX Count
-        return this.infoSrv.checkIndexTransactions(indexHealthReport, minTxId, minAclTxId, txIdsInDb, maxTxId,
-                    aclTxIdsInDb, maxAclTxId);
     }
 
     public void trackModels(boolean onlyFirstTime) throws AuthenticationException, IOException, JSONException
@@ -522,4 +521,43 @@ public class ModelTracker extends AbstractTracker implements Tracker
     {
         return model.getName().replace(":", ".") + "." + model.getChecksum(XMLBindingType.DEFAULT) + ".xml";
     }
+    
+    public static File locateModelHome(String solrHome) {
+
+        String modelDir = null;
+        // Try JNDI
+        try {
+          Context c = new InitialContext();
+          modelDir = (String)c.lookup("java:comp/env/solr/model/dir");
+          log.info("Using JNDI solr.model.dir: "+modelDir );
+        } catch (NoInitialContextException e) {
+          log.info("JNDI not configured for solr (NoInitialContextEx)");
+        } catch (NamingException e) {
+          log.info("No solr/model/dir in JNDI");
+        } catch( RuntimeException ex ) {
+          log.warn("Odd RuntimeException while testing for JNDI: " + ex.getMessage());
+        } 
+        
+        // Now try system property
+        if( modelDir == null ) {
+          String prop = "solr.solr.model.dir";
+          modelDir = System.getProperty(prop);
+          if( modelDir != null ) {
+            log.info("using system property "+prop+": " + modelDir );
+          }
+        }
+        
+        // if all else fails, try 
+        if( modelDir == null ) {
+            File answer = new File(solrHome, "alfrescoModels");
+            log.info("solr home defaulted to " + answer + "(could not find system property or JNDI)");
+            return answer;
+          
+        }
+        else
+        {
+            return new File(modelDir);
+        }
+
+      }
 }

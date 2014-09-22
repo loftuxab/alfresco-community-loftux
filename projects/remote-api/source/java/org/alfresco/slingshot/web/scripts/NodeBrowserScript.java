@@ -66,8 +66,10 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
  * @author dcaruana
  * @author wabson
  */
-public class NodeBrowserScript extends DeclarativeWebScript
+public class NodeBrowserScript extends DeclarativeWebScript implements Serializable
 {
+    private static final long serialVersionUID = 48743409337475896L;
+
     private Long searchElapsedTime = null;
 
     // stores and node
@@ -90,7 +92,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
         this.transactionService = transactionService;
     }
 
-    private TransactionService getTransactionService()
+    protected TransactionService getTransactionService()
     {
         return transactionService;
     }
@@ -103,7 +105,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
         this.nodeService = nodeService;
     }
 
-    private NodeService getNodeService()
+    protected NodeService getNodeService()
     {
         return nodeService;
     }
@@ -116,7 +118,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
         this.searchService = searchService;
     }
 
-    private SearchService getSearchService()
+    protected SearchService getSearchService()
     {
         return searchService;
     }
@@ -129,7 +131,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
         this.dictionaryService = dictionaryService;
     }
 
-    private DictionaryService getDictionaryService()
+    protected DictionaryService getDictionaryService()
     {
         return dictionaryService;
     }
@@ -142,9 +144,9 @@ public class NodeBrowserScript extends DeclarativeWebScript
         this.namespaceService = namespaceService;
     }
 
-	private NamespaceService getNamespaceService()
+	protected NamespaceService getNamespaceService()
     {
-        return namespaceService;
+        return this.namespaceService;
     }
 
     /**
@@ -155,7 +157,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
         this.permissionService = permissionService;
     }
 
-    private PermissionService getPermissionService()
+    protected PermissionService getPermissionService()
     {
         return permissionService;
     }
@@ -165,7 +167,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
 		this.ownableService = ownableService;
 	}
 
-    public OwnableService getOwnableService()
+    protected OwnableService getOwnableService()
     {
 		return ownableService;
 	}
@@ -545,7 +547,6 @@ public class NodeBrowserScript extends DeclarativeWebScript
     		permissionInfo.put("entries", getPermissions(nodeRef));
     		permissionInfo.put("owner", this.getOwnableService().getOwner(nodeRef));
     		permissionInfo.put("inherit", this.getInheritPermissions(nodeRef));
-    		permissionInfo.put("entries", getPermissions(nodeRef));
     		permissionInfo.put("storePermissions", getStorePermissionMasks(nodeRef));
 
     		Map<String, Object> model = new HashMap<String, Object>();
@@ -564,8 +565,10 @@ public class NodeBrowserScript extends DeclarativeWebScript
     /**
      * Node wrapper class
      */
-    public class Node
+    public class Node implements Serializable
     {
+        private static final long serialVersionUID = 12608347204513848L;
+
         private String qnamePath;
         
         private String prefixedQNamePath;
@@ -649,6 +652,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
 		private static final long serialVersionUID = 6982292337846270774L;
 		
 		protected QName name;
+		private String prefixString = null;
 
 		public QNameBean(QName name)
 		{
@@ -664,7 +668,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
 		{
 			try
 			{
-				return name.toPrefixString(getNamespaceService());
+				return prefixString != null ? prefixString : (prefixString = name.toPrefixString(getNamespaceService()));
 			}
 			catch(NamespaceException e)
 			{
@@ -681,7 +685,7 @@ public class NodeBrowserScript extends DeclarativeWebScript
     /**
      * Aspect wrapper class
      */
-    public class Aspect extends QNameBean
+    public class Aspect extends QNameBean implements Serializable
     {
 		private static final long serialVersionUID = -6448182941386934326L;
 
@@ -694,8 +698,10 @@ public class NodeBrowserScript extends DeclarativeWebScript
     /**
      * Association wrapper class
      */
-    public class Association
+    public class Association implements Serializable
     {
+        private static final long serialVersionUID = 1078430803027004L;
+        
     	protected QNameBean name;
     	protected QNameBean typeName;
 		
@@ -721,9 +727,6 @@ public class NodeBrowserScript extends DeclarativeWebScript
      */
     public class ChildAssociation extends Association implements Serializable
     {
-    	/**
-		 * 
-		 */
 		private static final long serialVersionUID = -52439282250891063L;
 		
 		protected NodeRef childRef;
@@ -784,8 +787,10 @@ public class NodeBrowserScript extends DeclarativeWebScript
     /**
      * Peer assoc wrapper class
      */
-    public class PeerAssociation extends Association
+    public class PeerAssociation extends Association implements Serializable
     {
+        private static final long serialVersionUID = 4833278311416507L;
+        
     	protected NodeRef sourceRef;
     	protected NodeRef targetRef;
     	protected QNameBean sourceType;
@@ -831,8 +836,10 @@ public class NodeBrowserScript extends DeclarativeWebScript
     /**
      * Property wrapper class
      */
-    public class Property
+    public class Property implements Serializable
     {
+        private static final long serialVersionUID = 7755924782250077L;
+        
         private QNameBean name;
 
         private boolean isCollection = false;
@@ -953,8 +960,10 @@ public class NodeBrowserScript extends DeclarativeWebScript
         /**
          * Value wrapper
          */
-        public class Value
+        public class Value implements Serializable
         {
+            private static final long serialVersionUID = 47235536691732705L;
+            
             private Serializable value;
 
             /**
@@ -1040,11 +1049,13 @@ public class NodeBrowserScript extends DeclarativeWebScript
     /**
      * Permission bean
      */
-    public static class Permission
+    public static class Permission implements Serializable
     {
-    	private String permission;
-    	private String authority;
-    	private String accessStatus;
+        private static final long serialVersionUID = 1235536691732705L;
+        
+    	private final String permission;
+    	private final String authority;
+    	private final String accessStatus;
     	
 		public Permission(String permission, String authority, String accessStatus)
 		{
@@ -1058,45 +1069,34 @@ public class NodeBrowserScript extends DeclarativeWebScript
 			return permission;
 		}
 		
-		public void setPermission(String permission)
-		{
-			this.permission = permission;
-		}
-		
 		public String getAuthority()
 		{
 			return authority;
-		}
-		
-		public void setAuthority(String authority)
-		{
-			this.authority = authority;
 		}
 		
 		public String getAccessStatus()
 		{
 			return accessStatus;
 		}
-		
-		public void setAccessStatus(String accessStatus)
-		{
-			this.accessStatus = accessStatus;
-		}
     }
 
     /**
      * Permission representing the fact that "Read Permissions" has not been granted
      */
-    public static class NoReadPermissionGranted extends Permission
+    public static class NoReadPermissionGranted extends Permission implements Serializable
     {
+        private static final long serialVersionUID = 1236786691732705L;
+        
         public NoReadPermissionGranted()
         {
             super(PermissionService.READ_PERMISSIONS, "[Current Authority]", "Not Granted");
         }
     }
 
-    public static class NoStoreMask extends Permission
+    public static class NoStoreMask extends Permission implements Serializable
     {
+        private static final long serialVersionUID = 3125536691732705L;
+        
         public NoStoreMask()
         {
             super("All <No Mask>", "All", "Allowed");

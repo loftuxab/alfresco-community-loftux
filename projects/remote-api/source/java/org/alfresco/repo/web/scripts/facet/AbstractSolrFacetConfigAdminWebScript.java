@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,6 +34,7 @@ import org.alfresco.repo.search.impl.solr.facet.SolrFacetModel;
 import org.alfresco.repo.search.impl.solr.facet.SolrFacetProperties.CustomProperties;
 import org.alfresco.repo.search.impl.solr.facet.SolrFacetService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,7 +73,11 @@ public abstract class AbstractSolrFacetConfigAdminWebScript extends DeclarativeW
     protected static final String CUSTOM_PARAM_NAME = "name";
     protected static final String CUSTOM_PARAM_VALUE = "value";
 
+    // The pattern is equivalent to the pattern defined in the forms-runtime.js
+    protected static final Pattern FILTER_ID_PATTERN = Pattern.compile("([\"\\*\\\\\\>\\<\\?\\/\\:\\|]+)|([\\.]?[\\.]+$)");
+
     protected SolrFacetService facetService;
+    protected NamespaceService namespaceService;
 
     /**
      * @param facetService the facetService to set
@@ -78,6 +85,14 @@ public abstract class AbstractSolrFacetConfigAdminWebScript extends DeclarativeW
     public void setFacetService(SolrFacetService facetService)
     {
         this.facetService = facetService;
+    }
+
+    /**
+     * @param namespaceService the namespaceService to set
+     */
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
     }
 
     @Override
@@ -190,6 +205,16 @@ public abstract class AbstractSolrFacetConfigAdminWebScript extends DeclarativeW
 
     }
 
+    protected void validateFilterID(String filterID)
+    {
+        Matcher matcher = FILTER_ID_PATTERN.matcher(filterID);
+        if (matcher.find())
+        {
+            throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST,
+                        "Invalid Filter Id. The characters \" * \\ < > ? / : | are not allowed. The Filter Id cannot end with a dot.");
+        }
+    }
+
     private Serializable getSerializableValue(Object object) throws JSONException
     {
         if (!(object instanceof Serializable))
@@ -220,10 +245,44 @@ public abstract class AbstractSolrFacetConfigAdminWebScript extends DeclarativeW
         }
         if (logger.isDebugEnabled())
         {
-            logger.debug("Resolved facet's custom property name [" + qnameStr + "] into [" + typeQName + "]");System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQ:Resolved facet's custom property name [" + qnameStr + "] into [" + typeQName + "]");
+            logger.debug("Resolved facet's custom property name [" + qnameStr + "] into [" + typeQName + "]");
         }
         return typeQName;
     }
-
+    
+    /**
+     * Retrieves the named parameter as an integer, if the parameter is not present the default value is returned.
+     * 
+     * @param req The WebScript request
+     * @param paramName The name of parameter to look for.
+     * @param defaultValue The default value that should be returned if parameter is not present in request or is negative.
+     * @return The request parameter or default value
+     * @throws WebScriptException if the named parameter cannot be converted to int (HTTP rsp 400).
+     */
+    protected int getNonNegativeIntParameter(WebScriptRequest req, String paramName, int defaultValue)
+    {
+        final String paramString = req.getParameter(paramName);
+        
+        final int result;
+        
+        if (paramString != null)
+        {
+            try
+            {
+                final int paramInt = Integer.valueOf(paramString);
+                
+                if   (paramInt < 0) { result = defaultValue; }
+                else                { result = paramInt; }
+            }
+            catch (NumberFormatException e) 
+            {
+                throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            }
+        }
+        else { result = defaultValue; }
+        
+        return result;
+    }
+    
     abstract protected Map<String, Object> unprotectedExecuteImpl(WebScriptRequest req, Status status, Cache cache);
 }

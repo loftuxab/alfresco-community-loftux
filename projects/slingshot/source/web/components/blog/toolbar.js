@@ -138,20 +138,17 @@
             disabled: !this.options.allowCreate
          });
 
-         // Configure button
-         this.widgets.configureButton = Alfresco.util.createYUIButton(this, "configure-button", this.onConfigureBlogClick,
-         {
-            disabled: !this.options.allowConfigure
-         });
-
          // Rss Feed button
          this.widgets.rssFeedButton = Alfresco.util.createYUIButton(this, "rssFeed-button", null,
          {
             type: "link"
          });
 
-         // initialize rss feed link
-         this._generateRSSFeedUrl();
+         if (this.widgets.rssFeedButton !== null)
+         {
+            // initialize rss feed link
+            this._generateRSSFeedUrl();
+         }
       },
 
       /**
@@ -163,28 +160,6 @@
       onNewBlogClick: function BlogToolbar_onNewBlogClick(e)
       {         
          window.location.href = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/blog-postedit";
-      },
-
-      /**
-       * Action handler for the configure blog button
-       */
-      onConfigureBlogClick: function BlogToolbar_onConfigureBlogClick(e, p_obj)
-      {
-         // load the module if not yet done
-         if (!this.modules.configblog)
-         {
-            this.modules.configblog = new Alfresco.module.ConfigBlog(this.id + "-configblog");
-         }
-
-         this.modules.configblog.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId
-         });
-
-         this.modules.configblog.showDialog();
-
-         Event.preventDefault(e);
       },
 
       /**

@@ -3,6 +3,11 @@
 <import resource="classpath:/alfresco/site-webscripts/org/alfresco/share/options/faceted-search/available-facets-controls.get.js">
 <import resource="classpath:/alfresco/site-webscripts/org/alfresco/share/options/faceted-search/available-facets.get.js">
 
+// Currently we're importing a WebScript that can be used to get the list of facetable
+// properties. Because this data is used numerous times and involves post-processing of
+// the data we only want to load and process it once per facet request.
+var facetetableProperties = getAvailableFacetProperties();
+
 // Get the initial header services and widgets...
 var services = getHeaderServices(),
     widgets = getHeaderModel(msg.get("faceted-search-config.page.title"));
@@ -50,6 +55,12 @@ function getFormDefinition(canEditFilterId) {
             publishPayload: {
                url: "api/facet/facet-config"
             }
+         },
+         {
+            validation: "regex",
+            regex: "([%\"\*\\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)",
+            errorMessage: msg.get("faceted-search-config.filterId.error.invalid"),
+            invertRule: true
          }
       ];
    }
@@ -184,7 +195,7 @@ function getFormDefinition(canEditFilterId) {
             widgets: [
                {
                   id: "FORM_FACET_QNAME",
-                  name: "alfresco/forms/controls/DojoSelect",
+                  name: "alfresco/forms/controls/FilteringSelect",
                   config: {
                      fieldId: "FACET_QNAME",
                      name: "facetQName",
@@ -192,7 +203,19 @@ function getFormDefinition(canEditFilterId) {
                      label: "faceted-search-config.facetQName.label",
                      description: "faceted-search-config.facetQName.description",
                      optionsConfig: {
-                        fixed: getAvailableFacets()
+                        fixed: facetetableProperties,
+                        queryAttribute: "displayName",
+                        labelAttribute: "displayName",
+                        valueAttribute: "longqname",
+                        // publishTopic: "ALF_CRUD_GET_ALL",
+                        // publishPayload: {
+                        //    url: "api/facet/facetable-properties?maxItems=0&locale=" + locale,
+                        //    resultsProperty: "response.data.properties",
+                        //    itemsAttribute: "data.properties"
+                        // }
+                     },
+                     requirementConfig: {
+                        initialValue: true
                      }
                   }
                },
@@ -275,7 +298,7 @@ function getFormDefinition(canEditFilterId) {
                   config: {
                      fieldId: "MIN_FILTER_VALUE_LENGTH",
                      name: "minFilterValueLength",
-                     value: "10",
+                     value: "1",
                      label: "faceted-search-config.minFilterValueLength.label",
                      description: "faceted-search-config.minFilterValueLength.description",
                      min: 1,
@@ -395,6 +418,7 @@ var facetClickConfig = {
       dialogCancellationButtonTitle: msg.get("faceted-search-config.form.cancel.label"),
       formSubmissionTopic: "ALF_CRUD_UPDATE",
       widgets: getFormDefinition(false),
+      fixedWidth: true,
       formValue: "___AlfCurrentItem"
    }
 };
@@ -419,6 +443,7 @@ var createFacetButton = {
          dialogConfirmationButtonTitle: msg.get("faceted-search-config.form.save.label"),
          dialogCancellationButtonTitle: msg.get("faceted-search-config.form.cancel.label"),
          formSubmissionTopic: "ALF_CRUD_CREATE",
+         fixedWidth: true,
          widgets: getFormDefinition(true)
       }
    }
@@ -444,8 +469,7 @@ var main = {
             id: "SEARCH_CONFIG_VSPACER",
             name: "alfresco/html/Spacer",
             config: {
-               height: "20px",
-               additionalCssClasses: "top-border-beyond-gutters"
+               height: "14px"
             }
          },
          {
@@ -454,6 +478,10 @@ var main = {
             config: {
                renderFilterMethod: "ALL",
                renderFilter: [
+                  {
+                     property: "user.isAdmin",
+                     values: [false]
+                  },
                   {
                      property: "user.groups.GROUP_ALFRESCO_SEARCH_ADMINISTRATORS",
                      renderOnAbsentProperty: true,
@@ -486,6 +514,10 @@ var main = {
             config: {
                renderFilterMethod: "ANY",
                renderFilter: [
+                  {
+                     property: "user.isAdmin",
+                     values: [true]
+                  },
                   {
                      property: "user.groups.GROUP_ALFRESCO_ADMINISTRATORS",
                      values: [true]
@@ -653,6 +685,10 @@ var main = {
                                                                   name: "alfresco/renderers/InlineEditProperty",
                                                                   config: {
                                                                      propertyToRender: "displayName",
+                                                                     refreshCurrentItem: true,
+                                                                     requirementConfig: {
+                                                                        initialValue: true
+                                                                     },
                                                                      publishTopic: "ALF_CRUD_UPDATE",
                                                                      publishPayloadType: "PROCESS",
                                                                      publishPayloadModifiers: ["processCurrentItemTokens"],
@@ -679,6 +715,7 @@ var main = {
                                                                   name: "alfresco/renderers/InlineEditSelect",
                                                                   config: {
                                                                      propertyToRender: "facetQName",
+                                                                     refreshCurrentItem: true,
                                                                      publishTopic: "ALF_CRUD_UPDATE",
                                                                      publishPayloadType: "PROCESS",
                                                                      publishPayloadModifiers: ["processCurrentItemTokens"],
@@ -690,9 +727,16 @@ var main = {
                                                                         successMessage: msg.get("faceted-search-config.update.successMessage")
                                                                      },
                                                                      optionsConfig: {
-                                                                        fixed: getAvailableFacets()
+                                                                        fixed: facetetableProperties
+                                                                        // publishTopic: "ALF_GET_FORM_CONTROL_OPTIONS",
+                                                                        // publishPayload: {
+                                                                        //    url: url.context + "/proxy/alfresco/api/facet/facetable-properties",
+                                                                        //    itemsAttribute: "data.properties",
+                                                                        //    labelAttribute: "displayName",
+                                                                        //    valueAttribute: "longqname"
+                                                                        // }
                                                                      },
-                                                                     valueDisplayMap: getAvailableFacets(),
+                                                                     valueDisplayMap: facetetableProperties,
                                                                      hiddenDataRules: [
                                                                         {
                                                                            name: "customProperties",
@@ -724,6 +768,7 @@ var main = {
                                                                   name: "alfresco/renderers/InlineEditSelect",
                                                                   config: {
                                                                      propertyToRender: "displayControl",
+                                                                     refreshCurrentItem: true,
                                                                      publishTopic: "ALF_CRUD_UPDATE",
                                                                      publishPayloadType: "PROCESS",
                                                                      publishPayloadModifiers: ["processCurrentItemTokens"],
@@ -754,6 +799,7 @@ var main = {
                                                                   name: "alfresco/renderers/InlineEditSelect",
                                                                   config: {
                                                                      propertyToRender: "isEnabled",
+                                                                     refreshCurrentItem: true,
                                                                      publishTopic: "ALF_CRUD_UPDATE",
                                                                      publishPayloadType: "PROCESS",
                                                                      publishPayloadModifiers: ["processCurrentItemTokens"],

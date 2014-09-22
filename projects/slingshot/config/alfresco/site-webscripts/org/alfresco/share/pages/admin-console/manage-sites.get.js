@@ -24,12 +24,20 @@ userData.isNetworkAdmin = user.properties["isNetworkAdmin"];
 var siteServiceScope = "MANAGE_SITES_SITE_SERVICE_";
 
 model.jsonModel = {
-   services: [{
-      name: "alfresco/services/SiteService",
-      config: {
-         pubSubScope: siteServiceScope
+   services: [
+      {
+         name: "alfresco/services/SiteService",
+         config: {
+            pubSubScope: siteServiceScope
+         }
+      },
+      {
+         name: "alfresco/dialogs/AlfDialogService",
+         config: {
+            pubSubScope: siteServiceScope
+         }
       }
-   }],
+   ],
    widgets: [
       {
          id: "SET_PAGE_TITLE",
@@ -167,7 +175,7 @@ model.jsonModel = {
                                                    {
                                                       name: "alfresco/renderers/PublishingDropDownMenu",
                                                       config: {
-                                                         additionalCssClasses: "unmargined",
+                                                         additionalCssClasses: "unmargined no-title",
                                                          publishTopic: "ALF_UPDATE_SITE_DETAILS",
                                                          publishPayloadType: "BUILD",
                                                          publishPayload: {

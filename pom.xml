@@ -6,7 +6,7 @@
   <groupId>se.loftux.alfresco</groupId>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>5.0.b.LX68-SNAPSHOT</version>
+  <version>5.0.b.LX69-SNAPSHOT</version>
   <name>Alfresco</name>
 
   <url>http://www.alfresco.org/</url>
@@ -88,9 +88,7 @@
     <module>projects/system-build-test</module>
     -->
     <module>modules/sharepoint/amp</module>
-    <module>modules/wcmquickstart/wcmquickstartmodule</module>
-    <module>modules/wcmquickstart/wcmquickstartclientapi</module>
-    <module>modules/wcmquickstart/wcmquickstartwebsite</module>
+    <module>modules/wcmquickstart</module>
     <module>projects/web-editor-samples/customer-site</module>
     <module>projects/mmt</module>
     <module>projects/sdk/alfresco-platform-distribution</module>
@@ -114,6 +112,8 @@
     <db.master.url>jdbc:postgresql:template1</db.master.url>
     <db.username>alfresco</db.username>
     <db.password>alfresco</db.password>
+    <db.drop.command>drop database if exists ${db.name}</db.drop.command>
+    <db.create.command>create database ${db.name}</db.create.command>
     <test.working.dir>${project.build.directory}</test.working.dir>
     <dir.root>${test.working.dir}/alf_test_data</dir.root>
     <img.exe>convert</img.exe>
@@ -148,14 +148,16 @@
     <dependency.jibx.version>1.2.5</dependency.jibx.version>
     <dependency.tika.version>1.6-20140428-alfresco-patched</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
-    <dependency.opencmis.version>0.10.0</dependency.opencmis.version>
+    <dependency.opencmis.version>0.11.0</dependency.opencmis.version>
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
     <dependency.spring.version>3.2.10.RELEASE</dependency.spring.version>
+    <dependency.tomcat.version>7.0.53</dependency.tomcat.version>
     <dependency.activiti.version>5.16.2</dependency.activiti.version>
     <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
-    <dependency.poi.version>3.10-FINAL</dependency.poi.version>
+    <dependency.poi.version>3.10.1</dependency.poi.version>
     <dependency.dojo.version>1.8.3</dependency.dojo.version>
     <dependency.mysql.version>5.1.31</dependency.mysql.version>
+    <dependency.postgresql.version>9.3-1102-jdbc41</dependency.postgresql.version>
     <manifest.major.version>5</manifest.major.version>
     <manifest.minor.version>0</manifest.minor.version>
     <manifest.servicepack.version>0</manifest.servicepack.version>
@@ -173,12 +175,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.5.11</version>
+            <version>1.7.5</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.11</version>
+            <version>1.7.5</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -199,6 +201,11 @@
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <version>2.10.0-alfresco-patched</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.2</version>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
@@ -360,7 +367,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.3-1101-jdbc41</version>
+            <version>${dependency.postgresql.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -452,11 +459,11 @@
             </plugin>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.2</version>
             </plugin>
             <plugin>
                 <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>2.5.2</version>
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -471,7 +478,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.4.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -514,6 +521,7 @@
                         <alfresco.test.resources.dir>${basedir}/source/test-resources</alfresco.test.resources.dir>
                         <alfresco.web.resources.dir>${basedir}/source/web</alfresco.web.resources.dir>
                         <alfresco.java.sources.dir>${basedir}/source/java</alfresco.java.sources.dir>
+						<alfresco.target.dir>${project.build.directory}</alfresco.target.dir>
                         <!-- Allow FTP server unit test to run unprivileged -->
                         <ftp.port>50521</ftp.port>
                         <!-- Database related properties -->
@@ -525,7 +533,11 @@
                         <dir.root>${dir.root}</dir.root>
                         <img.exe>${img.exe}</img.exe>
                         <swf.exe>${swf.exe}</swf.exe>
+                        <!-- BDE-91 -->
+                        <alfresco.rmi.services.retries>30</alfresco.rmi.services.retries>
+                        <alfresco.rmi.services.retryInterval>2000</alfresco.rmi.services.retryInterval>
                     </systemPropertyVariables>
+                    <enableAssertions>false</enableAssertions>
                 </configuration>
             </plugin>
             <plugin>
@@ -590,7 +602,15 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>8.1.14.v20131031</version>
+                <version>8.1.15.v20140411</version>
+                <configuration>
+                    <webAppSourceDirectory>source/web</webAppSourceDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.2.2.v20140723</version>
                 <configuration>
                     <webAppSourceDirectory>source/web</webAppSourceDirectory>
                 </configuration>
@@ -653,7 +673,7 @@
                     <dependency>
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
-                        <version>9.3-1101-jdbc41</version>
+                        <version>${dependency.postgresql.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>mysql</groupId>
@@ -680,7 +700,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9</version>
+                <version>1.9.1</version>
             </plugin>
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -805,7 +825,7 @@
         </plugin>
         <plugin>
             <artifactId>maven-pmd-plugin</artifactId>
-            <version>3.1</version>
+            <version>3.2</version>
             <configuration>
                 <targetJdk>${maven.build.sourceVersion}</targetJdk>
             </configuration>
@@ -845,6 +865,7 @@
         </repositories>
         <modules>
 			<module>enterpriseprojects/repository</module>
+            <module>enterpriseprojects/repository-crypto</module>
             <module>enterpriseprojects/remote-api</module>
             <module>enterpriseprojects/overlays</module>
             <module>enterpriseprojects/spring-encryptor</module>

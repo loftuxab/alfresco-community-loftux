@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -65,11 +65,11 @@ define(["dojo/_base/declare",
        */
       setupSubscriptions: function alfrescdo_documentlibrary_AlfSearchList__setupSubscriptions() {
          this.inherited(arguments);
-         this.alfSubscribe("ALF_SET_SEARCH_TERM", lang.hitch(this, "onSearchTermRequest"));
-         this.alfSubscribe("ALF_INCLUDE_FACET", lang.hitch(this, "onIncludeFacetRequest"));
-         this.alfSubscribe("ALF_APPLY_FACET_FILTER", lang.hitch(this, "onApplyFacetFilter"));
-         this.alfSubscribe("ALF_REMOVE_FACET_FILTER", lang.hitch(this, "onRemoveFacetFilter"));
-         this.alfSubscribe("ALF_SEARCHLIST_SCOPE_SELECTION", lang.hitch(this, "onScopeSelection"));
+         this.alfSubscribe("ALF_SET_SEARCH_TERM", lang.hitch(this, this.onSearchTermRequest));
+         this.alfSubscribe("ALF_INCLUDE_FACET", lang.hitch(this, this.onIncludeFacetRequest));
+         this.alfSubscribe("ALF_APPLY_FACET_FILTER", lang.hitch(this, this.onApplyFacetFilter));
+         this.alfSubscribe("ALF_REMOVE_FACET_FILTER", lang.hitch(this, this.onRemoveFacetFilter));
+         this.alfSubscribe("ALF_SEARCHLIST_SCOPE_SELECTION", lang.hitch(this, this.onScopeSelection));
          this.alfSubscribe("ALF_ADVANCED_SEARCH", lang.hitch(this, this.onAdvancedSearch));
          this.alfSubscribe(this.reloadDataTopic, lang.hitch(this, this.reloadData));
       },
@@ -89,6 +89,15 @@ define(["dojo/_base/declare",
          this.dataFailureMessage = this.message("searchlist.data.failure.message");
       },
 
+      /** 
+       * Include spell checking in search requests.
+       *
+       * @instance
+       * @type {boolean}
+       * @default true
+       */
+      spellcheck: true,
+
       /**
        * Extends the 
        * 
@@ -96,6 +105,7 @@ define(["dojo/_base/declare",
        */
       postMixInProperties: function alfresco_documentlibrary_AlfSearchList__postMixInProperties() {
          this.inherited(arguments);
+         this._suspendSpellCheck = false;
          this._cleanResettableVars();
       },
 
@@ -146,6 +156,11 @@ define(["dojo/_base/declare",
             }
             else
             {
+               if (payload.spellcheck != null && payload.spellcheck === false)
+               {
+                  this._suspendSpellCheck = true;
+               }
+               
                // If a request is NOT in progress then we need to manually request a new search, because re-setting 
                // the hash will not trigger the changeFilter function....
                // If the current hash includes a term from the resetHashTerms array, we need to clear those terms before 
@@ -188,7 +203,6 @@ define(["dojo/_base/declare",
        * @param {object} payload The details of what to search for.
        */
       onAdvancedSearch: function alfresco_documentlibrary_AlfSearchList__onAdvancedSearch(payload) {
-         // TODO: This needs some serious work...
          this.resetResultsList();
          this.searchTerm = payload.searchTerm;
          delete payload.searchTerm;
@@ -471,59 +485,71 @@ define(["dojo/_base/declare",
                 }, true);
             }
 
-            this.alfPublish(this.requestInProgressTopic, {});
-            this.showLoadingMessage();
-
-            var filters = "";
-            for (var key in this.facetFilters)
-            {
-               filters = filters + key.replace(/\.__.u/g, "").replace(/\.__/g, "") + ",";
-            }
-            filters = filters.substring(0, filters.length - 1);
-
-            // Make sure the repo param is set appropriately...
-            // The repo instance variable trumps everything else...
-            var repo = this.repo === "true" || !(this.allSites === "true" || (this.siteId != null && this.siteId !== ""));
-
-            this.currentRequestId = this.generateUuid();
-            var searchPayload = {
-               term: this.searchTerm,
-               facetFields: this.facetFields,
-               filters: filters,
-               sortAscending: this.sortAscending,
-               sortField: this.sortField,
-               site: this.siteId,
-               rootNode: this.rootNode,
-               repo: repo,
-               requestId: this.currentRequestId
-            };
-
-            if (this.query)
-            {
-               delete this.query.alfTopic;
-
-               if(typeof this.query === "string")
-               {
-                  this.query = JSON.parse(this.query);
-               }
-
-               for (var key in this.query)
-               {
-                  searchPayload[key] = this.query[key];
-               }
-            }
-
             // InfiniteScroll uses pagination under the covers.
+            var startIndex = 0;
             if (this.useInfiniteScroll)
             {
                // Search API wants startIndex rather than page, so we need to convert here.
-               searchPayload.startIndex = (this.currentPage - 1) * this.currentPageSize;
-               searchPayload.pageSize = this.currentPageSize;
+               startIndex = (this.currentPage - 1) * this.currentPageSize;
             }
 
-            // Set a response topic that is scoped to this widget...
-            searchPayload.alfResponseTopic = this.pubSubScope + "ALF_RETRIEVE_DOCUMENTS_REQUEST";
-            this.alfPublish("ALF_SEARCH_REQUEST", searchPayload, true);
+            if (!this.useInfiniteScroll || 
+                this.currentData == null || 
+                this.currentData.totalRecordsUpper >= startIndex)
+            {
+               this.alfPublish(this.requestInProgressTopic, {});
+               this.showLoadingMessage();
+
+               var filters = "";
+               for (var key in this.facetFilters)
+               {
+                  filters = filters + key.replace(/\.__.u/g, "").replace(/\.__/g, "") + ",";
+               }
+               filters = filters.substring(0, filters.length - 1);
+
+               // Make sure the repo param is set appropriately...
+               // The repo instance variable trumps everything else...
+               var repo = this.repo === "true" || !(this.allSites === "true" || (this.siteId != null && this.siteId !== ""));
+
+               this.currentRequestId = this.generateUuid();
+               var searchPayload = {
+                  term: this.searchTerm,
+                  facetFields: this.facetFields,
+                  filters: filters,
+                  sortAscending: this.sortAscending,
+                  sortField: this.sortField,
+                  site: this.siteId,
+                  rootNode: this.rootNode,
+                  repo: repo,
+                  requestId: this.currentRequestId,
+                  pageSize: this.currentPageSize,
+                  startIndex: startIndex,
+                  spellcheck: this.spellcheck && !this._suspendSpellCheck
+               };
+
+               if (this.query)
+               {
+                  delete this.query.alfTopic;
+
+                  if(typeof this.query === "string")
+                  {
+                     this.query = JSON.parse(this.query);
+                  }
+
+                  for (var key in this.query)
+                  {
+                     searchPayload[key] = this.query[key];
+                  }
+               }
+
+               // Set a response topic that is scoped to this widget...
+               searchPayload.alfResponseTopic = this.pubSubScope + "ALF_RETRIEVE_DOCUMENTS_REQUEST";
+               this.alfPublish("ALF_SEARCH_REQUEST", searchPayload, true);
+            }
+            else
+            {
+               this.alfLog("log", "No more data to to retrieve, cancelling search request", this);
+            }
          }
       },
 
@@ -539,6 +565,9 @@ define(["dojo/_base/declare",
          
          var newData = payload.response;
          this.currentData = newData; // Some code below expects this even if the view is null.
+
+         // Reset suspending the spell check...
+         this._suspendSpellCheck = false;
 
          // Re-render the current view with the new data...
          var view = this.viewMap[this._currentlySelectedView];
@@ -574,13 +603,18 @@ define(["dojo/_base/declare",
             }
          }
 
+         // Handle any spell checking data included in the results...
+         this.handleSpellCheck(payload);
+
          var resultsCount = this.currentData.numberFound != -1 ? this.currentData.numberFound : 0;
          if (resultsCount != null)
          {
             // Publish the number of search results found...
             this.alfPublish("ALF_SEARCH_RESULTS_COUNT", {
                count: resultsCount,
-               label: resultsCount
+               label: this.message("faceted-search.results-menu.results-found", {
+                  0: resultsCount
+               })
             });
          }
 
@@ -593,6 +627,54 @@ define(["dojo/_base/declare",
 
          // Force a resize of the sidebar container to take the new height of the view into account...
          this.alfPublish("ALF_RESIZE_SIDEBAR", {});
+      },
+
+      /**
+       * This function can be called to handle spell check results. If a search term did not match to any
+       * results or similar search terms yield better results then the search API may either have carried out
+       * the alternative search or has provided some alternative suggestions to search for. This function
+       * checks the search result payload and publishes on the "ALF_SPELL_CHECK_SEARCH_TERM" and 
+       * "ALF_SPELL_CHECK_SEARCH_SUGGESTIONS" topics respectively with that data.
+       *
+       * @instance
+       * @param {object} payload The payload containing the search result data
+       */
+      handleSpellCheck: function alfresco_documentlibrary_AlfSearchList__handleSpellCheck(payload) {
+         // Check to see whether or not spell checking was applied...
+         var spellcheck = lang.getObject("response.spellcheck", false, payload);
+         if (spellcheck != null)
+         {
+            if (spellcheck.searchedFor != null)
+            {
+               // Update the local state to reflect what was actually searched for...
+               // this.searchTerm = spellcheck.searchedFor;
+
+               // This means that an alternative search term was used...
+               this.alfPublish("ALF_SPELL_CHECK_SEARCH_TERM", {
+                  searchRequest: spellcheck.searchRequest,
+                  searchedFor: spellcheck.searchedFor
+               });
+            }
+            else if (spellcheck.searchSuggestions != null)
+            {
+               // This means that an alternative search was not performed, but suggested searches
+               // are available...
+               var suggestions = [];
+               array.forEach(spellcheck.searchSuggestions, function(suggestion, i) {
+                  suggestions.push({
+                     term: suggestion
+                  });
+               });
+               this.alfPublish("ALF_SPELL_CHECK_SEARCH_SUGGESTIONS", {
+                  searchRequest: spellcheck.searchRequest,
+                  searchSuggestions: suggestions
+               });
+            }
+            else
+            {
+               // This means that the requested search term was used. No action required.
+            }
+         }
       },
 
       /**

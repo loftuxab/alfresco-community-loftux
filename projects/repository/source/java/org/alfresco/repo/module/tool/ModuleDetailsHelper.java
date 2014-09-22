@@ -75,7 +75,9 @@ public class ModuleDetailsHelper
         }
         catch (FileNotFoundException error)
         {
-            throw new ModuleManagementToolException("Unable to load module details from property file.", error);
+            error.printStackTrace(System.out);
+            throw new ModuleManagementToolException("Unable to load module details from property file. File Not Found, " + error.getMessage(), error);
+            
         }
 
         try
@@ -85,7 +87,7 @@ public class ModuleDetailsHelper
         catch (IOException exception)
         {
             throw new ModuleManagementToolException(
-                        "Unable to load module details from property file.", exception);
+                        "Unable to load module details from property file." + exception.getMessage(), exception);
         }
         finally
         {

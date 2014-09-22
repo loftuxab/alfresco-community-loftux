@@ -3,10 +3,10 @@
     <artifactId>alfresco-wcmqs-client-api</artifactId>
     <name>Alfresco WCMQS Client API</name>
     <parent>
-        <artifactId>alfresco-parent</artifactId>
+        <artifactId>alfresco-wcmqs-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
-        <relativePath>../../../pom.xml</relativePath>
+        <version>5.0.b.LX69-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
@@ -17,7 +17,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.jvnet.staxex</groupId>
-                    <artifactId>stax-ex</artifactId>        
+                    <artifactId>stax-ex</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

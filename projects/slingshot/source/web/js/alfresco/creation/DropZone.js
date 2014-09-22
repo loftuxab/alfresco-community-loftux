@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -111,7 +111,7 @@ define(["dojo/_base/declare",
 
          // Create a new UUID to pass on to the widgets that are dropped into this instance
          // this is done so that this instance can subscribe to requests from it's direct dropped items
-         this.childPubSubScope = this.generateUuid()
+         this.childPubSubScope = this.generateUuid();
          
          // Capture wrappers being selected...
          aspect.after(this.previewTarget, "onMouseDown", lang.hitch(this, "onWidgetSelected"), true);
@@ -146,7 +146,7 @@ define(["dojo/_base/declare",
             // this.previewTarget.insertNodes(false, items, false, null);
          }
 
-         if (this.value != null && this.value != "")
+         if (this.value != null && this.value !== "")
          {
             array.forEach(this.value, function(widget, i) {
                var data = {
@@ -232,7 +232,7 @@ define(["dojo/_base/declare",
             this.previewTarget.delItem(evt.target.id);
             
             // If the last item has just been deleted the add the dashed border back...
-            if (this.previewTarget.getAllNodes().length == 0)
+            if (this.previewTarget.getAllNodes().length === 0)
             {
                domClass.remove(this.previewNode, "containsItems");
             }
@@ -262,7 +262,7 @@ define(["dojo/_base/declare",
             var myNode = array.some(this.previewTarget.getAllNodes(), function(node, i) {
                return payload.node.id == node.id;
             });
-            if (myNode == true)
+            if (myNode === true)
             {
                this.alfLog("log", "Updating item", payload);
 
@@ -291,26 +291,32 @@ define(["dojo/_base/declare",
                   };
 
                   // Set the main config...
+                  var v;
                   for (var key in payload.updatedConfig.defaultConfig)
                   {
-                     var v = payload.updatedConfig.defaultConfig[key];
+                     v = payload.updatedConfig.defaultConfig[key];
                      config.widgetConfig[itemConfigKey][key] = v;
                      lang.setObject(key, v, config.updatedConfig.defaultConfig);
                   }
 
                   // Set additional config...
-                  for (var key in payload.updatedConfig.additionalConfig)
+                  for (key in payload.updatedConfig.additionalConfig)
                   {
-                     var v = payload.updatedConfig.additionalConfig[key];
+                     v = payload.updatedConfig.additionalConfig[key];
                      config.widgetConfig[key] = v;
                      lang.setObject(key, v, config.updatedConfig.additionalConfig);
                   }
 
-                  for (var i=0; i<config.widgetsForConfig.length; i++)
-                  {
-                     // clonedConfig.widgetsForConfig[i].config.value = payload.updatedConfig[clonedConfig.widgetsForConfig[i].config.name];
-                     config.widgetsForConfig[i].config.value = lang.getObject(config.widgetsForConfig[i].config.name, false, payload.updatedConfig);
-                  }
+                  array.forEach(config.widgetsForConfig, lang.hitch(this, this.updateWidgetConfig, payload.updatedConfig));
+                  // for (var i=0; i<config.widgetsForConfig.length; i++)
+                  // {
+                  //    // clonedConfig.widgetsForConfig[i].config.value = payload.updatedConfig[clonedConfig.widgetsForConfig[i].config.name];
+                  //    if (config.widgetsForConfig[i].config.name)
+                  //    {
+                  //       this.updateWidgetConfig(payload.updatedConfig, config.widgetsForConfig[i], 0);
+                  //       // config.widgetsForConfig[i].config.value = lang.getObject(config.widgetsForConfig[i].config.name, false, payload.updatedConfig);
+                  //    }
+                  // }
                }
                
                // Remove any existing widgets associated with the currently selected node,
@@ -386,7 +392,7 @@ define(["dojo/_base/declare",
          this.alfLog("log", "Creating", item, hint);
          
          var node = domConstruct.create("div");
-         if (item.module != null && item.module != "")
+         if (item.module != null && item.module !== "")
          {
             // Clone the supplied item... there are several potential possibilities for this
             // creator being called. Either an avatrar is required (should actually be handled
@@ -424,9 +430,9 @@ define(["dojo/_base/declare",
                }
 
                // Initialise widgets for display...
-               if (clonedItem.previewWidget == true || 
+               if (clonedItem.previewWidget === true || 
                    clonedItem.widgetsForDisplay == null ||
-                   clonedItem.widgetsForDisplay.length == 0)
+                   clonedItem.widgetsForDisplay.length === 0)
                {
                   widgets = [
                      {
@@ -457,33 +463,45 @@ define(["dojo/_base/declare",
                {
                   // Update the normal config values with the latest saved data...
                   array.forEach(clonedItem.originalConfigWidgets, function(widget, i) {
-                     var updatedValue = lang.getObject(widget.config.name, false, savedConfig.updatedConfig);
-                     if (updatedValue != null)
+                     if (widget.config.name)
                      {
-                        widget.config.value = updatedValue;
+                        this.updateWidgetConfig(savedConfig.updatedConfig, widget, 0);
+                        // var updatedValue = lang.getObject(widget.config.name, false, savedConfig.updatedConfig);
+                        // if (updatedValue != null)
+                        // {
+                        //    widget.config.value = updatedValue;
+                        // }
                      }
                   }, this);
 
                   // Update the additional config controls with the latest saved data...
-                  array.forEach(clonedWidgetsForNestedConfig, function(widget, i) {
-                     var updatedValue = lang.getObject(widget.config.name, false, savedConfig.updatedConfig.additionalConfig);
-                     if (updatedValue != null)
-                     {
-                        widget.config.value = updatedValue;
-                     }
-                  }, this);
+                  array.forEach(clonedWidgetsForNestedConfig, lang.hitch(this, this.updateWidgetConfig, savedConfig.updatedConfig.additionalConfig));
+                  // array.forEach(clonedWidgetsForNestedConfig, function(widget, i) {
+                  //    if (widget.config.name)
+                  //    {
+                  //       var updatedValue = lang.getObject(widget.config.name, false, savedConfig.updatedConfig.additionalConfig);
+                  //       if (updatedValue != null)
+                  //       {
+                  //          widget.config.value = updatedValue;
+                  //       }
+                  //    }
+                  // }, this);
                }
                else
                {
                   // Make sure that each of the additional widgets is set with an up-to-date value...
                   clonedItem.widgetsForConfig = clonedItem.originalConfigWidgets.concat(clonedWidgetsForNestedConfig);
-                  array.forEach(clonedItem.widgetsForConfig, function(widget, i) {
-                     var updatedValue = lang.getObject(widget.config.name, false, clonedItem);
-                     if (updatedValue != null)
-                     {
-                        widget.config.value = updatedValue;
-                     }
-                  }, this);
+                  array.forEach(clonedItem.widgetsForConfig, lang.hitch(this, this.updateWidgetConfig, clonedItem));
+                  // array.forEach(clonedItem.widgetsForConfig, function(widget, i) {
+                  //    if (widget && widget.config && widget.config.name)
+                  //    {
+                  //       var updatedValue = lang.getObject(widget.config.name, false, clonedItem);
+                  //       if (updatedValue != null)
+                  //       {
+                  //          widget.config.value = updatedValue;
+                  //       }
+                  //    }
+                  // }, this);
                }
             }
 
@@ -544,6 +562,29 @@ define(["dojo/_base/declare",
       },
       
       /**
+       *
+       *
+       * @instance
+       * @param {object} configToUpdateFrom The configuration to update the widget config from
+       * @param {object} widget The widget to update
+       * @param {number} i The index of the widget
+       */
+      updateWidgetConfig: function alfresco_creation_DropZone__updateValues(configToUpdateFrom, widget, i) {
+         if (widget.config.name)
+         {
+            var updatedValue = lang.getObject(widget.config.name, false, configToUpdateFrom);
+            if (updatedValue != null)
+            {
+               widget.config.value = updatedValue;
+            }
+         }
+         else if (widget.config.widgets)
+         {
+            array.forEach(widget.config.widgets, lang.hitch(this, this.updateWidgetConfig, configToUpdateFrom));
+         }
+      },
+
+      /**
        * 
        *
        * @instance
@@ -595,15 +636,45 @@ define(["dojo/_base/declare",
          var myUuid = this.getMyUuid();
          var myConfig = this.alfGetData(myUuid);
 
-         var items = [];
-         array.forEach(myConfig.children, function (item, index) {
-            var item = this.alfGetData(item);
-            items.push(item);
+         // It's necessary to ensure that the configuration accurately reflects the order of the
+         // widgets in the DropZone. To do this we need to build a map of the id of each dropped
+         // item to it's index in the DropZone
+         var sourceOrderMap = {};
+         var nodes = this.previewTarget.getAllNodes();
+         array.forEach(nodes, function(node, i) {
+            var item = this.previewTarget.getItem(node.id);
+            var id = lang.getObject("data.updatedConfig.defaultConfig.fieldId", false, item);
+            if (id == null)
+            {
+               id = lang.getObject("data.defaultConfig.fieldId", false, item);
+            }
+            sourceOrderMap[id] = i;
          }, this);
+
+         // We now need to build the actual data represented by the items in the DropZone...
+         // We're going to get the data from the data store and then ensure that it's order
+         // matches the current order of the nodes representing each data item...
+         var items = [];
+         var updatedChildren = [];
+         array.forEach(myConfig.children, function (item, index) {
+            var itemData = this.alfGetData(item);
+            var id = lang.getObject("updatedConfig.defaultConfig.fieldId", false, itemData);
+            if (id == null)
+            {
+               id = lang.getObject("defaultConfig.fieldId", false, itemData);
+            }
+            var targetIndex = sourceOrderMap[id];
+            items[targetIndex] = itemData;
+            updatedChildren[targetIndex] = item;
+         }, this);
+         myConfig.children = updatedChildren;
+
+         // Add the display widgets...
          myConfig.widgetsForDisplay = [
             {
                name: "alfresco/creation/DropZone",
                config: {
+                  attributeKey: (this.attributeKey != null) ? this.attributeKey : "widgets",
                   horizontal: this.horizontal,
                   widgetsForNestedConfig: this.widgetsForNestedConfig,
                   initialItems: items

@@ -15,7 +15,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
+        <version>5.0.b.LX69-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -53,13 +53,13 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>4.8.1</version>
+            <version>4.9.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>4.8.1</version>
+            <version>4.9.0</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-analysis-extras</artifactId>
-            <version>4.8.1</version>
+            <version>4.9.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -92,13 +92,29 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            </dependency>
+        </dependency>
+        <dependency>
+	    <groupId>com.spatial4j</groupId>
+	    <artifactId>spatial4j</artifactId>
+	    <version>0.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.13</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- War dependency on the Vanilla Solr WAR -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
-            <version>4.8.1</version>
+            <version>4.9.0</version>
             <type>war</type>
         </dependency>
 
@@ -204,6 +220,9 @@
         <!-- Profile to enable securecomms -->
         <profile>
             <id>solr4-ssl</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <!-- We selected the SSL enabled default Solr packaging -->
                 <solr.war.exploded.folder>${solr.ssl.war.target.folder}</solr.war.exploded.folder>
@@ -383,6 +402,8 @@
                                     <warDirectory>${solr.war.exploded.folder}</warDirectory>
                                     <systemProperties>
                                         <solr.solr.home>${solr.config.folder}</solr.solr.home>
+                                        <solr.solr.model.dir>${solr.config.folder}/alfrescoModels</solr.solr.model.dir>
+                                        <solr.solr.content.dir>@@ALFRESCO_SOLR4_CONTENT_DIR@@</solr.solr.content.dir>
                                     </systemProperties>
                                 </configuration>
                             </execution>

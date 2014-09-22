@@ -5,7 +5,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
+        <version>5.0.b.LX69-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -24,11 +24,6 @@
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
             <version>1.5.12</version>
-        </dependency>
-        <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -59,7 +54,7 @@
         <dependency>
             <groupId>org.alfresco.cmis.client</groupId>
             <artifactId>alfresco-opencmis-extension</artifactId>
-            <version>0.9</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.schema</groupId>
@@ -85,6 +80,10 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-javamail_1.4_spec</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -105,6 +104,11 @@
                     <artifactId>chemistry-opencmis-client-impl</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.chemistry.opencmis</groupId>
+            <artifactId>chemistry-opencmis-client-impl</artifactId>
+            <version>${dependency.opencmis.version}</version>
         </dependency>
         <!-- ALF-19407 chemistry-tck-atompub and junit are dependencies of CMISTestRunnerWebScript, which is not a test -->
         <dependency>
@@ -223,7 +227,7 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <sqlCommand>drop database if exists alfresco</sqlCommand>
+                            <sqlCommand>${db.drop.command}</sqlCommand>
                         </configuration>
                     </execution>
                     <execution>
@@ -233,7 +237,7 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <sqlCommand>create database alfresco</sqlCommand>
+                            <sqlCommand>${db.create.command}</sqlCommand>
                         </configuration>
                     </execution>
                 </executions>

@@ -21,6 +21,7 @@ package org.alfresco.solr.tracker;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -50,8 +51,6 @@ import org.slf4j.LoggerFactory;
 public class MetadataTracker extends AbstractTracker implements Tracker
 {
     protected final static Logger log = LoggerFactory.getLogger(MetadataTracker.class);
-    private static final long TIME_STEP_32_DAYS_IN_MS = 1000 * 60 * 60 * 24 * 32L;
-    private static final long TIME_STEP_1_HR_IN_MS = 60 * 60 * 1000L;
     private static final int DEFAULT_TRANSACTION_DOCS_BATCH_SIZE = 100;
     private static final int DEFAULT_NODE_BATCH_SIZE = 10;
     private int transactionDocsBatchSize = DEFAULT_TRANSACTION_DOCS_BATCH_SIZE;
@@ -115,22 +114,97 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         TrackerState state = this.infoSrv.getTrackerInitialState();
 
         // Check we are tracking the correct repository
-        // Check the first TX time
         checkRepoAndIndexConsistency(state);
 
         checkShutdown();
         trackTransactions();
-
-        // check index state
-        if (state.isCheck())
-        {
-            this.infoSrv.checkCache();
-        }
     }
 
+    /**
+     * Checks the first and last TX time
+     * @param state the state of this tracker
+     * @throws AuthenticationException
+     * @throws IOException
+     * @throws JSONException
+     */
     private void checkRepoAndIndexConsistency(TrackerState state) throws AuthenticationException, IOException, JSONException
     {
-        // TODO: Implement that which relates to metadata
+        Transactions firstTransactions = null;
+        if (state.getLastGoodTxCommitTimeInIndex() == 0) 
+        {
+            state.setCheckedLastTransactionTime(true);
+            state.setCheckedFirstTransactionTime(true);
+            log.info("No transactions found - no verification required");
+
+            firstTransactions = client.getTransactions(null, 0L, null, 2000L, 1);
+            if (!firstTransactions.getTransactions().isEmpty())
+            {
+                Transaction firstTransaction = firstTransactions.getTransactions().get(0);
+                long firstTransactionCommitTime = firstTransaction.getCommitTimeMs();
+                state.setLastGoodTxCommitTimeInIndex(firstTransactionCommitTime);
+                setLastTxCommitTimeAndTxIdInTrackerState(firstTransactions, state);
+            }
+        }
+        
+        if (!state.isCheckedFirstTransactionTime())
+        {
+            firstTransactions = client.getTransactions(null, 0L, null, 2000L, 1);
+            if (!firstTransactions.getTransactions().isEmpty())
+            {
+                Transaction firstTransaction = firstTransactions.getTransactions().get(0);
+                long firstTxId = firstTransaction.getId();
+                long firstTransactionCommitTime = firstTransaction.getCommitTimeMs();
+                int setSize = this.infoSrv.getTxDocsSize(""+firstTxId, ""+firstTransactionCommitTime);
+                
+                if (setSize == 0)
+                {
+                    log.error("First transaction was not found with the correct timestamp.");
+                    log.error("SOLR has successfully connected to your repository  however the SOLR indexes and repository database do not match."); 
+                    log.error("If this is a new or rebuilt database your SOLR indexes also need to be re-built to match the database."); 
+                    log.error("You can also check your SOLR connection details in solrcore.properties.");
+                    throw new AlfrescoRuntimeException("Initial transaction not found with correct timestamp");
+                }
+                else if (setSize == 1)
+                {
+                    state.setCheckedFirstTransactionTime(true);
+                    log.info("Verified first transaction and timestamp in index");
+                }
+                else
+                {
+                    log.warn("Duplicate initial transaction found with correct timestamp");
+                }
+            }
+        }
+
+        // Checks that the last TxId in solr is <= last TxId in repo
+        if (!state.isCheckedLastTransactionTime())
+        {
+            if (firstTransactions == null)
+            {
+                firstTransactions = client.getTransactions(null, 0L, null, 2000L, 1);
+            }
+            
+            Long maxTxnCommitTimeInRepo = firstTransactions.getMaxTxnCommitTime();
+            Long maxTxnIdInRepo = firstTransactions.getMaxTxnId();
+            if (maxTxnCommitTimeInRepo != null && maxTxnIdInRepo != null)
+            {
+                Transaction maxTxInIndex = this.infoSrv.getMaxTransactionIdAndCommitTimeInIndex();
+                if (maxTxInIndex.getId() > maxTxnIdInRepo 
+                            || maxTxInIndex.getCommitTimeMs() > maxTxnCommitTimeInRepo)
+                {
+                    log.error("Last transaction was found in index with timestamp later than that of repository.");
+                    log.error("SOLR has successfully connected to your repository  however the SOLR indexes and repository database do not match."); 
+                    log.error("If this is a new or rebuilt database your SOLR indexes also need to be re-built to match the database.");
+                    log.error("You can also check your SOLR connection details in solrcore.properties.");
+                    throw new AlfrescoRuntimeException("Last transaction found in index with incorrect timestamp");
+                }
+                else
+                {
+                    state.setCheckedLastTransactionTime(true);
+                    log.info("Verified last transaction and timestamp in index less than or equal to that of repository.");
+                }
+            }
+        }
     }
     
     private void indexTransactions() throws IOException, AuthenticationException, JSONException
@@ -254,7 +328,6 @@ public class MetadataTracker extends AbstractTracker implements Tracker
                     // Index the transaction doc after the node - if this is not found then a reindex will be done.
                     this.infoSrv.indexTransaction(info, true);
                     requiresCommit = true;
-
                 }
             }
 
@@ -297,7 +370,6 @@ public class MetadataTracker extends AbstractTracker implements Tracker
                 requiresCommit = true;
             }
             checkShutdown();
-
         }
 
         if(requiresCommit)
@@ -322,6 +394,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
             }
             checkShutdown();
         }
+        
         if(requiresCommit)
         {
             checkShutdown();
@@ -343,6 +416,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
             }
             checkShutdown();
         }
+        
         if(requiresCommit)
         {
             checkShutdown();
@@ -411,9 +485,10 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         boolean upToDate = false;
         Transactions transactions;
         BoundedDeque<Transaction> txnsFound = new BoundedDeque<Transaction>(100);
-        HashSet<Transaction> txsIndexed = new HashSet<>(); 
+        HashSet<Transaction> txsIndexed = new LinkedHashSet<>(); 
         TrackerState state = this.getTrackerState();
-
+        long totalUpdatedDocs = 0;
+        
         do
         {
             int docCount = 0;
@@ -422,17 +497,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
             transactions = getSomeTransactions(txnsFound, fromCommitTime, TIME_STEP_1_HR_IN_MS, 2000,
                         state.getTimeToStopIndexing());
 
-            Long maxTxnCommitTime = transactions.getMaxTxnCommitTime();
-            if (maxTxnCommitTime != null)
-            {
-                state.setLastTxCommitTimeOnServer(transactions.getMaxTxnCommitTime());
-            }
-
-            Long maxTxnId = transactions.getMaxTxnId();
-            if (maxTxnId != null)
-            {
-                state.setLastTxIdOnServer(transactions.getMaxTxnId());
-            }
+            setLastTxCommitTimeAndTxIdInTrackerState(transactions, state);
 
             log.info("Scanning transactions ...");
             if (transactions.getTransactions().size() > 0)
@@ -450,7 +515,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
             ArrayList<Transaction> txBatch = new ArrayList<>();
             for (Transaction info : transactions.getTransactions())
             {
-                boolean isInIndex = this.infoSrv.isInIndex(AlfrescoSolrDataModel.getTransactionDocumentId(info.getId()), 0);
+                boolean isInIndex = this.infoSrv.isInIndex(AlfrescoSolrDataModel.getTransactionDocumentId(info.getId()));
                 if (isInIndex)
                 {
                     txnsFound.add(info);
@@ -506,12 +571,31 @@ public class MetadataTracker extends AbstractTracker implements Tracker
                 }
                 txBatch.clear();
             }
+            
+            totalUpdatedDocs += docCount;
         }
         while ((transactions.getTransactions().size() > 0) && (upToDate == false));
 
+        log.info("total number of docs with metadata updated: " + totalUpdatedDocs);
+        
         if (indexed)
         {
             indexTransactionsAfterAsynchronous(txsIndexed, state);
+        }
+    }
+
+    private void setLastTxCommitTimeAndTxIdInTrackerState(Transactions transactions, TrackerState state)
+    {
+        Long maxTxnCommitTime = transactions.getMaxTxnCommitTime();
+        if (maxTxnCommitTime != null)
+        {
+            state.setLastTxCommitTimeOnServer(maxTxnCommitTime);
+        }
+
+        Long maxTxnId = transactions.getMaxTxnId();
+        if (maxTxnId != null)
+        {
+            state.setLastTxIdOnServer(maxTxnId);
         }
     }
 
@@ -651,8 +735,8 @@ public class MetadataTracker extends AbstractTracker implements Tracker
             nodeReport.setDbNodeStatus(SolrApiNodeStatus.UNKNOWN);
             nodeReport.setDbTx(-4l);
         }
-
-        this.infoSrv.checkNodeCommon(nodeReport);
+        
+        this.infoSrv.addCommonNodeReportInfo(nodeReport);
 
         return nodeReport;
     }
@@ -665,8 +749,8 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         nodeReport.setDbNodeStatus(node.getStatus());
         nodeReport.setDbTx(node.getTxnId());
 
-        this.infoSrv.checkNodeCommon(nodeReport);
-
+        this.infoSrv.addCommonNodeReportInfo(nodeReport);
+        
         return nodeReport;
     }
 
@@ -696,28 +780,69 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         }
     }
 
-    @Override
-    public IndexHealthReport checkIndex(Long fromTx, Long toTx, Long fromAclTx, Long toAclTx, Long fromTime, Long toTime)
+    public IndexHealthReport checkIndex(Long toTx, Long toAclTx, Long fromTime, Long toTime)
                 throws IOException, AuthenticationException, JSONException
     {
-        IndexHealthReport indexHealthReport = new IndexHealthReport(infoSrv);
-        Long minTxId = null;
-        Long minAclTxId = null;
-
         // DB TX Count
+        long firstTransactionCommitTime = 0;
+        Transactions firstTransactions = client.getTransactions(null, 0L, null, 2000L, 1);
+        if(firstTransactions.getTransactions().size() > 0)
+        {
+            Transaction firstTransaction = firstTransactions.getTransactions().get(0);
+            firstTransactionCommitTime = firstTransaction.getCommitTimeMs();
+        }
+
         IOpenBitSet txIdsInDb = infoSrv.getOpenBitSetInstance();
+        Long lastTxCommitTime = Long.valueOf(firstTransactionCommitTime);
+        if (fromTime != null)
+        {
+            lastTxCommitTime = fromTime;
+        }
         long maxTxId = 0;
+        Long minTxId = null;
 
-        indexHealthReport.setDbTransactionCount(txIdsInDb.cardinality());
+        Transactions transactions;
+        BoundedDeque<Transaction> txnsFound = new  BoundedDeque<Transaction>(100);
+        long endTime = System.currentTimeMillis() + infoSrv.getHoleRetention();
+        DO: do
+        {
+            transactions = getSomeTransactions(txnsFound, lastTxCommitTime, TIME_STEP_1_HR_IN_MS, 2000, endTime);
+            for (Transaction info : transactions.getTransactions())
+            {
+                // include
+                if (toTime != null)
+                {
+                    if (info.getCommitTimeMs() > toTime.longValue())
+                    {
+                        break DO;
+                    }
+                }
+                if (toTx != null)
+                {
+                    if (info.getId() > toTx.longValue())
+                    {
+                        break DO;
+                    }
+                }
 
-        IOpenBitSet aclTxIdsInDb = infoSrv.getOpenBitSetInstance();
-        long maxAclTxId = 0;
+                // bounds for later loops
+                if (minTxId == null)
+                {
+                    minTxId = info.getId();
+                }
+                if (maxTxId < info.getId())
+                {
+                    maxTxId = info.getId();
+                }
 
-        indexHealthReport.setDbAclTransactionCount(aclTxIdsInDb.cardinality());
+                lastTxCommitTime = info.getCommitTimeMs();
+                txIdsInDb.set(info.getId());
+                txnsFound.add(info);
+            }
+        }
+        while (transactions.getTransactions().size() > 0);
 
-        // Index TX Count
-        return this.infoSrv.checkIndexTransactions(indexHealthReport, minTxId, minAclTxId, txIdsInDb, maxTxId,
-                    aclTxIdsInDb, maxAclTxId);
+        return this.infoSrv.reportIndexTransactions(minTxId, txIdsInDb, maxTxId);
     }
 
     public void addTransactionToPurge(Long txId)

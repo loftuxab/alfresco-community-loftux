@@ -18,16 +18,20 @@ define(["./config/Suites"],
       // Note that the `build` capability will be filled in with the current commit ID from the Travis CI environment
       // automatically
       capabilities: {
-         'selenium-version': '2.42.0'
+         'selenium-version': '2.43.0'
       },
 
       // Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
       // OnDemand. Options that will be permutated are browserName, version, platform, and platformVersion; any other
       // capabilities options specified for an environment will be copied as-is
       environments: [
-         // { browserName: 'chrome' },
+         {
+            browserName: 'chrome',
+            chromeOptions: {
+               excludeSwitches: ['ignore-certificate-errors']
+            }
+         },
          { browserName: 'firefox' }
-//         ,{ browserName: 'phantomjs' }
       ],
 
       // Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service

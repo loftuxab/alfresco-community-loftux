@@ -40,8 +40,9 @@ define(["dojo/_base/declare",
         "dojo/_base/lang",
         "dojo/dom-class",
         "alfresco/renderers/XhrContextActions",
-        "alfresco/renderers/Size" ],
-        function(declare, Row, template, SearchThumbnail, SearchResultPropertyLink, PropertyLink, Property, DateLink, XhrActions, lang, domClass, XhrContextActions, Size) {
+        "alfresco/renderers/Size"],
+        function(declare, Row, template, SearchThumbnail, SearchResultPropertyLink, PropertyLink, Property,
+                 DateLink, XhrActions, lang, domClass, XhrContextActions, Size) {
 
    return declare([Row], {
 
@@ -104,14 +105,15 @@ define(["dojo/_base/declare",
             "folder-download",
             "document-copy-to",
             "document-move-to",
-            "document-upload-new-version",
             "document-locate",
+            "document-assign-workflow",
+            "document-cancel-editing"
 
-//            TODO: ContentService needs updates to work (or alfresco_services_ActionService__onActionDetailsSuccess needs to publish different payload.
-            "document-edit-properties"
+//            TODO: Needs to use forms runtime or equiv.
+//            "document-edit-properties",
 //
 //            TODO: Not implemented yet.
-//            "document-assign-workflow",
+//            "document-upload-new-version",
 //            "folder-view-details"
 //            "document-approve"
 //            "document-reject"
@@ -124,8 +126,8 @@ define(["dojo/_base/declare",
 //            "document-checkout-to-googledocs"
 //            "document-checkin-from-googledocs"
 //            "document-assign-workflow"
-//            "document-cancel-editing"
 //            "document-cancel-editing-unlock"
+
          ];
 
          // For actions other than folders and documents we want to further restrict what are displayed
@@ -148,9 +150,9 @@ define(["dojo/_base/declare",
             renderSize: "large"
          }, this.nameNode);
 
-         if (this.currentItem.title == null || this.currentItem.title == "")
+         if (this.currentItem.title == null || this.currentItem.title === "")
          {
-            domClass.add(this.titleNode, "hidden")
+            domClass.add(this.titleNode, "hidden");
          }
          else
          {
@@ -181,9 +183,9 @@ define(["dojo/_base/declare",
             }
          }, this.dateNode);
 
-         if (this.currentItem.description == null || this.currentItem.description == "")
+         if (this.currentItem.description === null || this.currentItem.description === "")
          {
-            domClass.add(this.descriptionRow, "hidden")
+            domClass.add(this.descriptionRow, "hidden");
          }
          else
          {
@@ -198,9 +200,9 @@ define(["dojo/_base/declare",
          var site = lang.getObject("site.title", false, this.currentItem),
              repo = true;
 
-         if (site == null || site == "")
+         if (site == null || site === "")
          {
-            domClass.add(this.siteRow, "hidden")
+            domClass.add(this.siteRow, "hidden");
          }
          else
          {
@@ -223,9 +225,9 @@ define(["dojo/_base/declare",
             }, this.siteNode);
          }
 
-         if (this.currentItem.path == null || this.currentItem.path == "")
+         if (this.currentItem.path == null || this.currentItem.path === "")
          {
-            domClass.add(this.pathRow, "hidden")
+            domClass.add(this.pathRow, "hidden");
          }
          else
          {
@@ -253,9 +255,9 @@ define(["dojo/_base/declare",
          }
 
          // We only show the size if it's not empty and at least one byte
-         if (this.currentItem.size == null || this.currentItem.size == "" || this.currentItem.size < 1)
+         if (this.currentItem.size == null || this.currentItem.size === "" || this.currentItem.size < 1)
          {
-            domClass.add(this.sizeRow, "hidden")
+            domClass.add(this.sizeRow, "hidden");
          }
          else
          {

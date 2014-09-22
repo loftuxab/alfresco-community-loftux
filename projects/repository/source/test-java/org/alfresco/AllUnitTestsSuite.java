@@ -11,7 +11,7 @@ public class AllUnitTestsSuite extends TestSuite
 {
     /**
      * Creates the test suite
-     * 
+     *
      * @return the test suite
      */
     public static Test suite()
@@ -42,6 +42,7 @@ public class AllUnitTestsSuite extends TestSuite
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.lock.LockUtilsTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.lock.mem.LockStoreImplTest.class));
         suite.addTestSuite(org.alfresco.repo.module.ModuleDetailsImplTest.class);
+        suite.addTestSuite(org.alfresco.repo.module.ModuleVersionNumberTest.class);
         suite.addTestSuite(org.alfresco.repo.module.tool.ModuleManagementToolTest.class);
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.module.tool.WarHelperImplTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.nodelocator.NodeLocatorServiceImplTest.class));
@@ -97,5 +98,6 @@ public class AllUnitTestsSuite extends TestSuite
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.search.impl.solr.SolrQueryHTTPClientTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.search.impl.solr.SolrStatsResultTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.search.impl.solr.facet.SolrFacetComparatorTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.util.BeanExtenderUnitTest.class));
     }
 }

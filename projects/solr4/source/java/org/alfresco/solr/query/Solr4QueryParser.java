@@ -95,11 +95,11 @@ import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Version;
+import org.apache.solr.schema.IndexSchema;
+import org.apache.solr.schema.SchemaField;
 import org.jaxen.saxpath.SAXPathException;
 import org.jaxen.saxpath.base.XPathReader;
 import org.springframework.extensions.surf.util.I18NUtil;
-
-import sun.tools.asm.SwitchData;
 
 /**
  * @author Andy
@@ -112,13 +112,16 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
      * @param f
      * @param a
      */
-    public Solr4QueryParser(Version matchVersion, String f, Analyzer a)
+    public Solr4QueryParser(IndexSchema schema, Version matchVersion, String f, Analyzer a)
     {
         super(matchVersion, f, a);
+        this.schema = schema;
         setAllowLeadingWildcard(true);
         setAnalyzeRangeTerms(true);
     }
 
+    IndexSchema schema;
+    
     @SuppressWarnings("unused")
     private static Log s_logger = LogFactory.getLog(Solr4QueryParser.class);
 
@@ -436,6 +439,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
     }
 
    
+    protected Query getFieldQuery(String field, String queryText, boolean quoted) throws ParseException
+    {
+        return getFieldQuery(field, queryText, AnalysisMode.DEFAULT, LuceneFunction.FIELD);
+    }
 
     /**
      * @param field
@@ -465,6 +472,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             else if (field.equals(FIELD_ID))
             {
                 return createIdQuery(queryText);
+            }
+            else if (field.equals(FIELD_SOLR4_ID))
+            {
+                return createSolr4IdQuery(queryText);
             }
             else if (field.equals(FIELD_DBID))
             {
@@ -497,6 +508,14 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             else if (field.equals(FIELD_AUTHORITYSET))
             {
                 return createAuthoritySetQuery(queryText);
+            }
+            else if (field.equals(FIELD_DENIED))
+            {
+                return createDeniedQuery(queryText);
+            }
+            else if (field.equals(FIELD_DENYSET))
+            {
+                return createDenySetQuery(queryText);
             }
             else if (field.equals(FIELD_ISROOT))
             {
@@ -620,6 +639,18 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             {
                 return createTagQuery(queryText);
             }
+            else if (field.equals(FIELD_SITE))
+            {
+                return createSiteQuery(queryText);
+            }
+            else if (field.equals(FIELD_PNAME))
+            {
+                return createPNameQuery(queryText);
+            }
+            else if (field.equals(FIELD_NPATH))
+            {
+                return createNPathQuery(queryText);
+            }
             else if (field.equals(FIELD_TENANT))
             {
                 return createTenantQuery(queryText);
@@ -643,6 +674,47 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             throw new ParseException("IO: " + e.getMessage());
         }
 
+    }
+
+    /**
+     * @param queryText
+     * @return
+     */
+    private org.apache.lucene.search.Query createNPathQuery(String queryText)
+    {
+        return createTermQuery(FIELD_NPATH, queryText);
+    }
+
+    /**
+     * @param queryText
+     * @return
+     */
+    private Query createPNameQuery(String queryText)
+    {
+        return createTermQuery(FIELD_PNAME, queryText);
+    }
+
+    /**
+     * @param queryText
+     * @return
+     */
+    private Query createSiteQuery(String queryText)
+    {
+        if(queryText.equals("_EVERYTHING_"))
+        {
+            return createTermQuery(FIELD_ISNODE, "T");
+        }
+        else if(queryText.equals("_ALL_SITES_"))
+        {
+            BooleanQuery invertedRepositoryQuery = new BooleanQuery();
+            invertedRepositoryQuery.add(createTermQuery(FIELD_ISNODE, "T"), Occur.MUST);
+            invertedRepositoryQuery.add(createTermQuery(FIELD_SITE, "_REPOSITORY_"), Occur.MUST_NOT);
+            return invertedRepositoryQuery;
+        }
+        else
+        {
+            return createTermQuery(FIELD_SITE, queryText);
+        }
     }
 
     private boolean isPropertyField(String field)
@@ -709,7 +781,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
      */
     protected Query createTagQuery(String tag) throws ParseException
     {
-        return getFieldQuery(FIELD_PATH, "/cm:taggable/cm:" + ISO9075.encode(tag.toLowerCase()) + "/member");
+        return createTermQuery(FIELD_TAG, tag.toLowerCase());
     }
 
    
@@ -1873,7 +1945,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                                         }
                                         else
                                         {
-                                            spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, nextSpanQuery}, gap, true);
+                                            spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, nextSpanQuery}, gap + internalSlop, internalSlop < 2);
                                         }
                                         atSamePosition = new SpanOrQuery();
                                     }
@@ -1885,7 +1957,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                                         }
                                         else
                                         {
-                                            spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, gap, true);
+                                            spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, gap + internalSlop, internalSlop < 2);
                                         }
                                         atSamePosition = new SpanOrQuery();
                                         atSamePosition.addClause(nextSpanQuery);
@@ -1898,7 +1970,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                                         }
                                         else
                                         {
-                                            spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, gap, true);
+                                            spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, gap + internalSlop, internalSlop < 2);
                                         }
                                         atSamePosition = new SpanOrQuery();
                                         atSamePosition.addClause(nextSpanQuery);
@@ -1942,7 +2014,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                             }
                             else
                             {
-                                spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, gap, true);
+                                spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, gap + internalSlop, internalSlop < 2);
                             }
                             atSamePosition = new SpanOrQuery();
                             spanOr.addClause(spanQuery);
@@ -1955,7 +2027,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                             }
                             else
                             {
-                                spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, gap, true);
+                                spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, gap + internalSlop, internalSlop < 2);
                             }
                             atSamePosition = new SpanOrQuery();
                             spanOr.addClause(spanQuery);
@@ -2000,7 +2072,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                                 }
                                 else
                                 {
-                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, nextSpanQuery}, gap, true);
+                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, nextSpanQuery}, gap + internalSlop, internalSlop < 2);
                                 }
                                 atSamePosition = new SpanOrQuery();
                             }
@@ -2012,7 +2084,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                                 }
                                 else
                                 {
-                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, gap, true);
+                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, gap + internalSlop, internalSlop < 2);
                                 }
                                 atSamePosition = new SpanOrQuery();
                                 atSamePosition.addClause(nextSpanQuery);
@@ -2025,7 +2097,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                                 }
                                 else
                                 {
-                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, gap, true);
+                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, gap + internalSlop, internalSlop < 2);
                                 }
                                 atSamePosition = new SpanOrQuery();
                                 atSamePosition.addClause(nextSpanQuery);
@@ -2068,7 +2140,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                     }
                     else
                     {
-                        spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, gap, true);
+                        spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, gap + internalSlop, internalSlop < 2);
                     }
                     return spanQuery;
                 }
@@ -2080,7 +2152,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                     }
                     else
                     {
-                        spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, gap, true);
+                        spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, gap + internalSlop, internalSlop < 2);
                     }
                     return spanQuery;
                 }
@@ -2341,13 +2413,11 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         // FIELD_TYPE uses the default
         if (isPropertyField(field))
         {
-            String fieldName = null;
-            PropertyDefinition propertyDef = QueryParserUtils.matchPropertyDefinition(searchParameters.getNamespace(), namespacePrefixResolver, dictionaryService, field.substring(1));
-            if (propertyDef == null)
-            {
-                fieldName = expandAttributeFieldName(field);
-            }
+            Pair<String, String> fieldNameAndEnding = QueryParserUtils.extractFieldNameAndEnding(field);
 
+            String expandedFieldName = null;
+            QName propertyQName;
+            PropertyDefinition propertyDef = QueryParserUtils.matchPropertyDefinition(searchParameters.getNamespace(), namespacePrefixResolver, dictionaryService, fieldNameAndEnding.getFirst());
             IndexTokenisationMode tokenisationMode = IndexTokenisationMode.TRUE;
             if (propertyDef != null)
             {
@@ -2356,8 +2426,14 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 {
                     tokenisationMode = IndexTokenisationMode.TRUE;
                 }
+                propertyQName = propertyDef.getName();
             }
-
+            else
+            {
+                expandedFieldName = expandAttributeFieldName(field);
+                propertyQName = QName.createQName(fieldNameAndEnding.getFirst());
+            }
+            
             if (propertyDef != null)
             {
                 // LOWER AND UPPER
@@ -2390,7 +2466,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                         }
                         for (Locale locale : (((expandedLocales == null) || (expandedLocales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : expandedLocales))
                         {
-                            addLocaleSpecificUntokenisedTextRangeFunction(fieldName, propertyDef, part1, part2, includeLower, includeUpper, luceneFunction, booleanQuery, mlAnalysisMode,
+                            addLocaleSpecificUntokenisedTextRangeFunction(expandedFieldName, propertyDef, part1, part2, includeLower, includeUpper, luceneFunction, booleanQuery, mlAnalysisMode,
                                     locale, tokenisationMode);
                         }
                         return booleanQuery;
@@ -2407,7 +2483,38 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 }
                 else if (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
                 {
-                    throw new UnsupportedOperationException("Range is not supported against content");
+                    if (fieldNameAndEnding.getSecond().equals(FIELD_SIZE_SUFFIX))
+                    {
+                        String solrField = AlfrescoSolrDataModel.getInstance().getQueryableFields(propertyDef.getName(), ContentFieldType.SIZE, FieldUse.ID).getFields().get(0).getField();
+                        String start = null;
+                        try
+                        {
+                            analyzeMultitermTerm(solrField, part1, null);
+                            start = part1;
+                        }
+                        catch(Exception e)
+                        {
+                            
+                        }
+                        String end = null;
+                        try
+                        {
+                            analyzeMultitermTerm(solrField, part2, null);
+                            end = part2;
+                        }
+                        catch(Exception e)
+                        {
+                            
+                        }
+                        
+                        SchemaField sf = schema.getField(solrField);
+                        return sf.getType().getRangeQuery(null, sf, start, end, includeLower, includeUpper);
+                        
+                    }
+                    else 
+                    {
+                        throw new UnsupportedOperationException("Range is not supported against content");
+                    }
                 }
                 else if (propertyDef.getDataType().getName().equals(DataTypeDefinition.TEXT))
                 {
@@ -2421,7 +2528,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                     for (Locale locale : (((expandedLocales == null) || (expandedLocales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : expandedLocales))
                     {
 
-                        addTextRange(field, propertyDef, part1, part2, includeLower, includeUpper, analysisMode, fieldName, propertyDef, tokenisationMode, booleanQuery, mlAnalysisMode, locale);
+                        addTextRange(field, propertyDef, part1, part2, includeLower, includeUpper, analysisMode, expandedFieldName, propertyDef, tokenisationMode, booleanQuery, mlAnalysisMode, locale);
 
                     }
                     return booleanQuery;
@@ -2438,7 +2545,9 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                         String start = dateAndResolution1 == null ? part1 : (includeLower ? getDateStart(dateAndResolution1) : getDateEnd(dateAndResolution1) );
                         String end = dateAndResolution2 == null ? part2 : (includeUpper ? getDateEnd(dateAndResolution2) : getDateStart(dateAndResolution2) );
 
-                        Query query =  newRangeQuery(instance.getField(), start, end, includeLower, includeUpper);
+                        SchemaField sf = schema.getField(instance.getField());
+                        
+                        Query query =  sf.getType().getRangeQuery(null, sf, start, end, includeLower, includeUpper);
                         if(query != null)
                         {
                             bQuery.add(query,Occur.SHOULD);
@@ -2449,7 +2558,30 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 else
                 {
                     String solrField = AlfrescoSolrDataModel.getInstance().getQueryableFields(propertyDef.getName(), null, FieldUse.ID).getFields().get(0).getField();
-                    return newRangeQuery(solrField, part1, part2, includeLower, includeUpper);
+                          
+                    String start = null;
+                    try
+                    {
+                        analyzeMultitermTerm(solrField, part1, null);
+                        start = part1;
+                    }
+                    catch(Exception e)
+                    {
+                        
+                    }
+                    String end = null;
+                    try
+                    {
+                        analyzeMultitermTerm(solrField, part2, null);
+                        end = part2;
+                    }
+                    catch(Exception e)
+                    {
+                        
+                    }
+                    
+                    SchemaField sf = schema.getField(solrField);
+                    return sf.getType().getRangeQuery(null, sf, start, end, includeLower, includeUpper);
                 }
             }
             else
@@ -2509,8 +2641,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         }
     }
 
-    
-   
+
     private String expandAttributeFieldName(String field)
     {
         return PROPERTY_FIELD_PREFIX + QueryParserUtils.expandQName(searchParameters.getNamespace(), namespacePrefixResolver, field.substring(1));
@@ -2612,8 +2743,20 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 return query;
             }
         }
-        else if (field.equals(FIELD_ID)
-                || field.equals(FIELD_DBID) || field.equals(FIELD_ISROOT) || field.equals(FIELD_ISCONTAINER) || field.equals(FIELD_ISNODE) || field.equals(FIELD_TX)
+        else if (field.equals(FIELD_ID))
+        {
+            boolean lowercaseExpandedTerms = getLowercaseExpandedTerms();
+            try
+            {
+                setLowercaseExpandedTerms(false);
+                return super.getPrefixQuery(FIELD_LID, termStr);
+            }
+            finally
+            {
+                setLowercaseExpandedTerms(lowercaseExpandedTerms);
+            }
+        }
+        else if (field.equals(FIELD_DBID) || field.equals(FIELD_ISROOT) || field.equals(FIELD_ISCONTAINER) || field.equals(FIELD_ISNODE) || field.equals(FIELD_TX)
                 || field.equals(FIELD_PARENT) || field.equals(FIELD_PRIMARYPARENT) || field.equals(FIELD_QNAME) || field.equals(FIELD_PRIMARYASSOCTYPEQNAME)
                 || field.equals(FIELD_ASSOCTYPEQNAME))
         {
@@ -2734,7 +2877,19 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         }
         else if (field.equals(FIELD_TAG))
         {
-            return null;
+            return super.getPrefixQuery(field, termStr);
+        }
+        else if (field.equals(FIELD_SITE))
+        {
+            return super.getPrefixQuery(field, termStr);
+        }
+        else if (field.equals(FIELD_NPATH))
+        {
+            return super.getPrefixQuery(field, termStr);
+        }
+        else if (field.equals(FIELD_PNAME))
+        {
+            return super.getPrefixQuery(field, termStr);
         }
         else
         {
@@ -2789,8 +2944,20 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 return query;
             }
         }
-        else if (field.equals(FIELD_ID)
-                || field.equals(FIELD_DBID) || field.equals(FIELD_ISROOT) || field.equals(FIELD_ISCONTAINER) || field.equals(FIELD_ISNODE) || field.equals(FIELD_TX)
+        else if (field.equals(FIELD_ID))
+        {
+            boolean lowercaseExpandedTerms = getLowercaseExpandedTerms();
+            try
+            {
+                setLowercaseExpandedTerms(false);
+                return super.getWildcardQuery(FIELD_LID, termStr);
+            }
+            finally
+            {
+                setLowercaseExpandedTerms(lowercaseExpandedTerms);
+            }
+        }
+        else if (field.equals(FIELD_DBID) || field.equals(FIELD_ISROOT) || field.equals(FIELD_ISCONTAINER) || field.equals(FIELD_ISNODE) || field.equals(FIELD_TX)
                 || field.equals(FIELD_PARENT) || field.equals(FIELD_PRIMARYPARENT) || field.equals(FIELD_QNAME) || field.equals(FIELD_PRIMARYASSOCTYPEQNAME)
                 || field.equals(FIELD_ASSOCTYPEQNAME))
         {
@@ -2911,7 +3078,19 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         }
         else if (field.equals(FIELD_TAG))
         {
-            return null;
+            return super.getWildcardQuery(field, termStr);
+        }
+        else if (field.equals(FIELD_SITE))
+        {
+            return super.getWildcardQuery(field, termStr);
+        }
+        else if (field.equals(FIELD_PNAME))
+        {
+            return super.getWildcardQuery(field, termStr);
+        }
+        else if (field.equals(FIELD_NPATH))
+        {
+            return super.getWildcardQuery(field, termStr);
         }
         else
         {
@@ -3078,7 +3257,19 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         }
         else if (field.equals(FIELD_TAG))
         {
-            throw new UnsupportedOperationException("Fuzzy Queries are not support for "+FIELD_TAG);
+            return super.getFuzzyQuery(field, termStr, minSimilarity);
+        } 
+        else if (field.equals(FIELD_SITE))
+        {
+            return super.getFuzzyQuery(field, termStr, minSimilarity);
+        } 
+        else if (field.equals(FIELD_PNAME))
+        {
+            return super.getFuzzyQuery(field, termStr, minSimilarity);
+        } 
+        else if (field.equals(FIELD_NPATH))
+        {
+            return super.getFuzzyQuery(field, termStr, minSimilarity);
         } 
         else
         {
@@ -3909,6 +4100,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         }
     }
     
+    protected Query createSolr4IdQuery(String queryText)
+    {
+        return createTermQuery(FIELD_SOLR4_ID, queryText);
+    }
     
     // Previous SOLR
     
@@ -3936,8 +4131,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         reader.parse(queryText);
         SolrPathQuery pathQuery = handler.getQuery();
         pathQuery.setRepeats(withRepeats);
-        // TODO - cache
-        return pathQuery;
+        return new SolrCachingPathQuery(pathQuery);
     }
 
     protected Query createQNameQuery(String queryText) throws SAXPathException
@@ -3949,8 +4143,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         reader.setXPathHandler(handler);
         reader.parse("//" + queryText);
         SolrPathQuery pathQuery = handler.getQuery();
-        // TODO - cache
-        return pathQuery;
+        return new SolrCachingPathQuery(pathQuery);
     }
 
     protected Query createPrimaryAssocQNameQuery(String queryText) throws SAXPathException
@@ -3963,8 +4156,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         reader.parse("//" + queryText);
         SolrPathQuery pathQuery = handler.getQuery();
         pathQuery.setPathField(FIELD_PRIMARYASSOCQNAME);
-        // TODO - cache
-        return pathQuery;
+        return new SolrCachingPathQuery(pathQuery);
     }
 
     protected Query createPrimaryAssocTypeQNameQuery(String queryText) throws SAXPathException
@@ -3977,8 +4169,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         reader.parse("//" + queryText);
         SolrPathQuery pathQuery = handler.getQuery();
         pathQuery.setPathField(FIELD_PRIMARYASSOCTYPEQNAME);
-        // TODO - cache
-        return pathQuery;
+        return new SolrCachingPathQuery(pathQuery);
     }
 
     protected Query createAssocTypeQNameQuery(String queryText) throws SAXPathException
@@ -3991,8 +4182,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         reader.parse("//" + queryText);
         SolrPathQuery pathQuery = handler.getQuery();
         pathQuery.setPathField(FIELD_ASSOCTYPEQNAME);
-        // TODO - cache
-        return pathQuery;
+        return new SolrCachingPathQuery(pathQuery);
     }
 
     /**
@@ -4010,7 +4200,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
      */
     protected Query createOwnerQuery(String queryText) throws ParseException
     {
-        return getFieldQueryImplWithIOExceptionWrapped(FIELD_OWNER, queryText, AnalysisMode.DEFAULT, LuceneFunction.FIELD);
+        return new SolrOwnerQuery(queryText);
     }
 
     /**
@@ -4019,9 +4209,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
      */
     protected Query createReaderQuery(String queryText) throws ParseException
     {
-        //return new SolrCachingReaderQuery(queryText);
-        // TODO: FIX
-        return new MatchAllDocsQuery();
+        return new SolrReaderQuery(queryText);
     }
 
     /**
@@ -4486,22 +4674,28 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
   
     protected Query createOwnerSetQuery(String queryText) throws ParseException
     {
-     // TODO: FIX
-        return new MatchAllDocsQuery();
+        return new SolrOwnerSetQuery(queryText);
     }
 
     
     protected Query createReaderSetQuery(String queryText) throws ParseException
     {
-     // TODO: FIX
-        return new MatchAllDocsQuery();
+        return new SolrReaderSetQuery(queryText);
     }
 
    
     protected Query createAuthoritySetQuery(String queryText) throws ParseException
     {
-        return new MatchAllDocsQuery();
-        //return new SolrAuthoritySetQuery(queryText);
+        return new SolrAuthoritySetQuery(queryText);
+    }
+    
+    protected Query createDeniedQuery(String queryText) throws ParseException
+    {
+        return new SolrDeniedQuery(queryText);
     }
 
+    protected Query createDenySetQuery(String queryText) throws ParseException
+    {
+        return new SolrDenySetQuery(queryText);
+    }
 }

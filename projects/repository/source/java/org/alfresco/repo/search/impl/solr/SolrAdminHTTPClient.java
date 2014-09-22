@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -42,6 +42,7 @@ import org.alfresco.service.cmr.search.SearchParameters.FieldFacetMethod;
 import org.alfresco.service.cmr.search.SearchParameters.FieldFacetSort;
 import org.alfresco.service.cmr.search.SearchParameters.SortDefinition;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.util.ParameterCheck;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -51,6 +52,7 @@ import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.logging.Log;
@@ -68,6 +70,8 @@ public class SolrAdminHTTPClient
 {
     static Log s_logger = LogFactory.getLog(SolrAdminHTTPClient.class);
 
+    private String adminUrl;
+    
     private String baseUrl;
 
     private HttpClient httpClient;
@@ -77,11 +81,19 @@ public class SolrAdminHTTPClient
     {
     }
 
+    
+    public void setBaseUrl(String baseUrl)
+    {
+        this.baseUrl = baseUrl;
+    }
+
     public void init()
     {
+        ParameterCheck.mandatory("baseUrl", baseUrl);
+        
     	StringBuilder sb = new StringBuilder();
-    	sb.append("/solr/admin/cores");
-    	this.baseUrl = sb.toString();
+    	sb.append(baseUrl + "/admin/cores");
+    	this.adminUrl = sb.toString();
 
     	httpClient = httpClientFactory.getHttpClient();
     	HttpClientParams params = httpClient.getParams();
@@ -94,19 +106,28 @@ public class SolrAdminHTTPClient
 		this.httpClientFactory = httpClientFactory;
 	}
 
-	public JSONObject execute(HashMap<String, String>args)
-    {   
+    public JSONObject execute(HashMap<String, String> args)
+    {
+        return execute(adminUrl, args);
+    }
+
+    public JSONObject execute(String relativeHandlerPath, HashMap<String, String> args)
+    {
+        ParameterCheck.mandatory("relativeHandlerPath", relativeHandlerPath);
+        ParameterCheck.mandatory("args", args);
+
+        String path = getPath(relativeHandlerPath);
         try
-        {   
+        {
             URLCodec encoder = new URLCodec();
             StringBuilder url = new StringBuilder();
-            
-            for(String key : args.keySet())
+
+            for (String key : args.keySet())
             {
                 String value = args.get(key);
-                if(url.length() == 0)
+                if (url.length() == 0)
                 {
-                    url.append(baseUrl);
+                    url.append(path);
                     url.append("?");
                     url.append(encoder.encode(key, "UTF-8"));
                     url.append("=");
@@ -117,41 +138,42 @@ public class SolrAdminHTTPClient
                     url.append("&");
                     url.append(encoder.encode(key, "UTF-8"));
                     url.append("=");
-                    url.append(encoder.encode(value, "UTF-8")); 
+                    url.append(encoder.encode(value, "UTF-8"));
                 }
-                
+
             }
-          
-            PostMethod post = new PostMethod(url.toString());
-            
+
+            // PostMethod post = new PostMethod(url.toString());
+            GetMethod get = new GetMethod(url.toString());
+
             try
             {
-                httpClient.executeMethod(post);
+                httpClient.executeMethod(get);
 
-                if(post.getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY || post.getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY)
+                if (get.getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY || get.getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY)
                 {
-	    	        Header locationHeader = post.getResponseHeader("location");
-	    	        if (locationHeader != null)
-	    	        {
-	    	            String redirectLocation = locationHeader.getValue();
-	    	            post.setURI(new URI(redirectLocation, true));
-	    	            httpClient.executeMethod(post);
-	    	        }
+                    Header locationHeader = get.getResponseHeader("location");
+                    if (locationHeader != null)
+                    {
+                        String redirectLocation = locationHeader.getValue();
+                        get.setURI(new URI(redirectLocation, true));
+                        httpClient.executeMethod(get);
+                    }
                 }
 
-                if (post.getStatusCode() != HttpServletResponse.SC_OK)
+                if (get.getStatusCode() != HttpServletResponse.SC_OK)
                 {
-                    throw new LuceneQueryParserException("Request failed " + post.getStatusCode() + " " + url.toString());
+                    throw new LuceneQueryParserException("Request failed " + get.getStatusCode() + " " + url.toString());
                 }
 
-                Reader reader = new BufferedReader(new InputStreamReader(post.getResponseBodyAsStream()));
+                Reader reader = new BufferedReader(new InputStreamReader(get.getResponseBodyAsStream()));
                 // TODO - replace with streaming-based solution e.g. SimpleJSON ContentHandler
                 JSONObject json = new JSONObject(new JSONTokener(reader));
                 return json;
             }
             finally
             {
-                post.releaseConnection();
+                get.releaseConnection();
             }
         }
         catch (UnsupportedEncodingException e)
@@ -169,6 +191,22 @@ public class SolrAdminHTTPClient
         catch (JSONException e)
         {
             throw new LuceneQueryParserException("", e);
+        }
+    }
+
+    private String getPath(String path)
+    {
+        if (path.startsWith(baseUrl))
+        {
+            return path;
+        }
+        else if (path.startsWith("/"))
+        {
+            return baseUrl + path;
+        }
+        else
+        {
+            return baseUrl + '/' + path;
         }
     }
 

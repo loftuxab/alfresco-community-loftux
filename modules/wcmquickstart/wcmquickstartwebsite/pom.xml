@@ -4,10 +4,10 @@
     <name>Alfresco WCMQS Web</name>
     <packaging>war</packaging>
     <parent>
-        <artifactId>alfresco-parent</artifactId>
+        <artifactId>alfresco-wcmqs-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
-        <relativePath>../../../pom.xml</relativePath>
+        <version>5.0.b.LX69-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>

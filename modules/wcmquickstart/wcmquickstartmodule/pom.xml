@@ -1,25 +1,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>alfresco-wcmqs</artifactId>
-    <name>Alfresco WCMQS</name>
+    <name>Alfresco WCMQS AMP</name>
     <parent>
-        <artifactId>alfresco-parent</artifactId>
+        <artifactId>alfresco-wcmqs-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX68-SNAPSHOT</version>
-        <relativePath>../../../pom.xml</relativePath>
+        <version>5.0.b.LX69-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
+    <packaging>amp</packaging>
 
     <dependencies>
         <dependency>
             <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-remote-api</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco</artifactId>
             <classifier>classes</classifier>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->
@@ -84,7 +87,20 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>source/amp</directory>
+                <targetPath>../${project.build.finalName}</targetPath>
+            </resource>
+        </resources>
+
         <plugins>
+            <plugin>
+                <groupId>org.alfresco.maven.plugin</groupId>
+                <artifactId>alfresco-maven-plugin</artifactId>
+                <extensions>true</extensions>
+            </plugin>
+
             <!-- Extract test resources, because they need to be seen as files, not in a jar -->
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -123,7 +139,7 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <sqlCommand>drop database if exists alfresco</sqlCommand>
+                            <sqlCommand>${db.drop.command}</sqlCommand>
                         </configuration>
                     </execution>
                     <execution>
@@ -133,7 +149,7 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <sqlCommand>create database alfresco</sqlCommand>
+                            <sqlCommand>${db.create.command}</sqlCommand>
                         </configuration>
                     </execution>
                 </executions>

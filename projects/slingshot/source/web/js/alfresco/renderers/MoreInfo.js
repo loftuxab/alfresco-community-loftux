@@ -51,6 +51,15 @@ define(["dojo/_base/declare",
        * @default [{cssFile:"./css/MoreInfo"}]
        */
       cssRequirements: [{cssFile:"./css/MoreInfo.css"}],
+
+      /**
+       * The array of file(s) containing internationalised strings.
+       *
+       * @instance
+       * @type {object}
+       * @default [{i18nFile: "./i18n/MoreInfo.properties"}]
+       */
+      i18nRequirements: [{i18nFile: "./i18n/MoreInfo.properties"}],
       
       /**
        * The HTML template to use for the widget.
@@ -100,9 +109,9 @@ define(["dojo/_base/declare",
          event.stop(evt);
          if (this.moreInfoDialog == null)
          {
-            if (this.xhrRequired == true)
+            if (this.xhrRequired === true)
             {
-               this.getXhrData()
+               this.getXhrData();
             }
             else
             {
@@ -219,7 +228,33 @@ define(["dojo/_base/declare",
                                              url: "api/node/{jsNode.nodeRef.uri}/formprocessor",
                                              noRefresh: false,
                                              successMessage: "moreInfo.inlineEdit.update.success"
-                                          }
+                                          },
+                                          renderFilter: [{
+                                             property: "node.permissions.user.Write",
+                                             values: [true]
+                                          }],
+                                          requirementConfig: {
+                                             initialValue: true
+                                          },
+                                          validationConfig: [
+                                             {
+                                                validation: "regex",
+                                                // NOTE: Ignore JSHint error on following line
+                                                regex: "([\"\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)",
+                                                errorMessage: "moreinfo.invalid.name",
+                                                invertRule: true
+                                             }
+                                          ]
+                                       }
+                                    },
+                                    {
+                                       name: "alfresco/renderers/Property",
+                                       config: {
+                                          propertyToRender: "node.properties.cm:name",
+                                          renderFilter: [{
+                                             property: "node.permissions.user.Write",
+                                             values: [false]
+                                          }]
                                        }
                                     },
                                     {
@@ -229,11 +264,16 @@ define(["dojo/_base/declare",
                                           postParam: "prop_cm_title",
                                           renderedValuePrefix: "(",
                                           renderedValueSuffix: ")",
+                                          renderFilterMethod: "ALL",
                                           renderFilter: [
                                              {
                                                 property: "node.properties.cm:title",
                                                 values: [""],
                                                 negate: true
+                                             },
+                                             {
+                                                property: "node.permissions.user.Write",
+                                                values: [true]
                                              }
                                           ],
                                           publishTopic: "ALF_CRUD_CREATE",
@@ -248,8 +288,27 @@ define(["dojo/_base/declare",
                                        }
                                     },
                                     {
+                                       name: "alfresco/renderers/Property",
+                                       config: {
+                                          propertyToRender: "node.properties.cm:title",
+                                          renderFilterMethod: "ALL",
+                                          renderFilter: [
+                                             {
+                                                property: "node.properties.cm:title",
+                                                values: [""],
+                                                negate: true
+                                             },
+                                             {
+                                                property: "node.permissions.user.Write",
+                                                values: [false]
+                                             }
+                                          ]
+                                       }
+                                    },
+                                    {
                                        name: "alfresco/renderers/Version",
                                        config: {
+                                          renderFilterMethod: "ALL",
                                           renderFilter: [
                                              {
                                                 property: "node.isContainer",
@@ -311,7 +370,23 @@ define(["dojo/_base/declare",
                                           publishPayload: {
                                              url: "api/node/{jsNode.nodeRef.uri}/formprocessor",
                                              noRefresh: false
-                                          }
+                                          },
+                                          renderFilter: [{
+                                             property: "node.permissions.user.Write",
+                                             values: [true]
+                                          }]
+                                       }
+                                    },
+                                    {
+                                       name: "alfresco/renderers/Property",
+                                       config: {
+                                          propertyToRender: "node.properties.cm:description",
+                                          warnIfNotAvailable: true,
+                                          warnIfNoteAvailableMessage: "no.description.message",
+                                          renderFilter: [{
+                                             property: "node.permissions.user.Write",
+                                             values: [false]
+                                          }]
                                        }
                                     }
                                  ]
@@ -364,10 +439,15 @@ define(["dojo/_base/declare",
                                     {
                                        name: "alfresco/renderers/QuickShare",
                                        config: {
+                                          renderFilterMethod: "ALL",
                                           renderFilter: [
                                              {
                                                 property: "node.isContainer",
                                                 values: [false]
+                                             },
+                                             {
+                                                property: "node.permissions.user.Write",
+                                                values: [true]
                                              }
                                           ]
                                        }
