@@ -15,8 +15,6 @@
 
 var DEFAULT_MAX_RESULTS = 5,
    SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/",
-   DOCUMENTLIBRARY_QNAME_PATH = "/cm:documentLibrary/",
-   DISCUSSIONS_QNAMEPATH = "/cm:discussions",
    DISCUSSION_QNAMEPATH = "/fm:discussion",
    COMMENT_QNAMEPATH = DISCUSSION_QNAMEPATH + "/cm:Comments",
    SURF_CONFIG_QNAMEPATH = "/cm:surf-config/",
@@ -72,55 +70,44 @@ function getDocumentItem(container, node)
 {
    // check whether this is a valid folder or a file
    var item = null;
-
-   if(node.qnamePath.indexOf(SURF_CONFIG_QNAMEPATH) > -1 ||
-   node.qnamePath.indexOf(APP_DICTIONARY_QNAMEPATH) > -1 ||
-   node.qnamePath.indexOf(DISCUSSIONS_QNAMEPATH) > -1 ||
-   node.qnamePath.indexOf(DISCUSSION_QNAMEPATH) > -1 ||
-   node.qnamePath.indexOf(COMMENT_QNAMEPATH) > -1 ) 
+   var item = null;
+      var item = null;
+   if (node.qnamePath.indexOf(SURF_CONFIG_QNAMEPATH) === -1)
    {
-      return item;
-   }
-   if(node.qnamePath.indexOf(SITES_SPACE_QNAME_PATH) > -1 &&
-   node.qnamePath.indexOf(DOCUMENTLIBRARY_QNAME_PATH) === -1 )
-   {
-      return item;
-   }
-
-   if (node.isDocument)
-   {
-      item =
+      if (node.isDocument)
       {
-         nodeRef: node.nodeRef.toString(),
-         name: node.name,
-         title: node.properties["cm:title"],
-         description: node.properties["cm:description"],
-         modifiedOn: node.properties["cm:modified"],
-         modifiedBy: node.properties["cm:modifier"],
-         createdOn: node.properties["cm:created"],
-         createdBy: node.properties["cm:creator"],
-         mimetype: node.mimetype,
-         size: node.size
-      };
-      if (container.siteId !== null)
-      {
-         item.site = getSiteData(container.siteId);
-         item.container = container.containerId;
-      }
-      if (node.hasAspect("{http://www.alfresco.org/model/content/1.0}thumbnailModification"))
-      {
-         var dates = node.properties["lastThumbnailModification"];
-         for (var i=0; i<dates.length; i++)
+         item =
          {
-            if (dates[i].indexOf("doclib") !== -1)
+            nodeRef: node.nodeRef.toString(),
+            name: node.name,
+            title: node.properties["cm:title"],
+            description: node.properties["cm:description"],
+            modifiedOn: node.properties["cm:modified"],
+            modifiedBy: node.properties["cm:modifier"],
+            createdOn: node.properties["cm:created"],
+            createdBy: node.properties["cm:creator"],
+            mimetype: node.mimetype,
+            size: node.size
+         };
+         if (container.siteId !== null)
+         {
+            item.site = getSiteData(container.siteId);
+            item.container = container.containerId;
+         }
+         if (node.hasAspect("{http://www.alfresco.org/model/content/1.0}thumbnailModification"))
+         {
+            var dates = node.properties["lastThumbnailModification"];
+            for (var i=0; i<dates.length; i++)
             {
-               item.lastThumbnailModification = dates[i];
-               break;
+               if (dates[i].indexOf("doclib") !== -1)
+               {
+                  item.lastThumbnailModification = dates[i];
+                  break;
+               }
             }
          }
       }
    }
-   
    return item;
 }
 
@@ -139,7 +126,6 @@ function splitQNamePath(node)
          containerId: null
        };
    
-   // TODO: should we do this processing here? until it is clicked...
    if (path.match("^"+SITES_SPACE_QNAME_PATH) == SITES_SPACE_QNAME_PATH)
    {
       var tmp = path.substring(SITES_SPACE_QNAME_PATH.length),
@@ -232,7 +218,8 @@ function getDocResults(params)
          skipCount: params.startIndex
       }
    };
-   var nodes = search.query(queryDef),
+   var rs = search.queryResultSet(queryDef);
+       nodes = rs.nodes,
        results = [];
    
    if (logger.isLoggingEnabled())
@@ -265,7 +252,7 @@ function getDocResults(params)
       }
    }
    
-   return buildResults(results, params, (nodes.length > params.maxResults));
+   return buildResults(results, params, rs.meta.hasMore);
 }
 
 /**
@@ -298,7 +285,7 @@ function buildResults(data, params, more)
    return {
       totalRecords: data.length,
       startIndex: params.startIndex,
-      hasMoreRecords: (more === true),
+      hasMoreRecords: more,
       items: data
    };
 }

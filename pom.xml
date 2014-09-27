@@ -40,10 +40,25 @@
   </prerequisites>
 
   <repositories>
-    <!-- Pointing to Alfresco repository group. Value is switched between community and enterprise -->
     <repository>
       <id>loftux-public</id>
       <url>http://artifacts.loftux.net/nexus/content/repositories/alfresco-public-group</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>alfresco-public-snapshots</id>
+      <url>https://artifacts.alfresco.com/nexus/content/groups/public-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -158,6 +173,13 @@
     <dependency.dojo.version>1.8.3</dependency.dojo.version>
     <dependency.mysql.version>5.1.31</dependency.mysql.version>
     <dependency.postgresql.version>9.3-1102-jdbc41</dependency.postgresql.version>
+
+    <!-- Versions of binaries packaged in the installer -->
+    <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
+    <installer.java.version>1.7.0_67</installer.java.version>
+    <installer.postgresql.version>9.3.5</installer.postgresql.version>
+    <installer.libreoffice.version>4.2.5-alfresco</installer.libreoffice.version>
+
     <manifest.major.version>5</manifest.major.version>
     <manifest.minor.version>0</manifest.minor.version>
     <manifest.servicepack.version>0</manifest.servicepack.version>
