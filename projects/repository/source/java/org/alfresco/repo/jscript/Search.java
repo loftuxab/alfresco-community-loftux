@@ -101,9 +101,9 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
     public void afterPropertiesSet() throws Exception
     {
         PropertyCheck.mandatory(this, "services", services);
-        
         this.solrFacetHelper = new SolrFacetHelper(services);
     }
+    
     /**
      * Set the default store reference
      * 
@@ -587,10 +587,8 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                 String defaultField = (String)def.get("defaultField");
                 String defaultOperator = (String)def.get("defaultOperator");
                 String searchTerm = (String) def.get("searchTerm");
-                Object spellCheckObject = def.get("spellCheck");
-                boolean spellCheck = (spellCheckObject == null) ? false : (boolean) spellCheckObject;
-
-
+                Boolean spellCheck = (Boolean) def.get("spellCheck");
+                
                 // extract supplied values
                 
                 // sorting columns
@@ -672,7 +670,7 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                 sp.setLanguage(language != null ? language : SearchService.LANGUAGE_LUCENE);
                 sp.setQuery(query);
                 sp.setSearchTerm(searchTerm);
-                sp.setSpellCheck(spellCheck);
+                sp.setSpellCheck(spellCheck != null ? spellCheck.booleanValue() : false);
                 if (defaultField != null)
                 {
                     sp.setDefaultFieldName(defaultField);
@@ -719,8 +717,18 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                 {
                     for (String field: facets)
                     {
-                        sp.addFieldFacet(new FieldFacet("@" + field));
+                        final FieldFacet fieldFacet;
+                        if (solrFacetHelper.isSpecialFacetId(field))
+                        {
+                            fieldFacet = new FieldFacet(field);
+                        }
+                        else
+                        {
+                            fieldFacet = new FieldFacet("@" + field);
+                        }
+                        sp.addFieldFacet(fieldFacet);
                     }
+                    
                     List<String> facetQueries = null;
                     // Workaround for ACE-1605
                     if (query.indexOf("created:") < 0 && query.indexOf("modified:") < 0)
@@ -1006,9 +1014,13 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
             {
                 throw new AlfrescoRuntimeException("Failed to execute search: " + sp.getQuery(), err);
             }
-            else if (logger.isDebugEnabled())
+            else
             {
-                logger.debug("Failed to execute search: " + sp.getQuery(), err);
+                if (logger.isDebugEnabled())
+                    logger.debug("Failed to execute search: " + sp.getQuery(), err);
+                // put expected values to handle case where exception occurs in search
+                meta.put("numberFound", 0);
+                meta.put("hasMore", false);
             }
         }
         finally

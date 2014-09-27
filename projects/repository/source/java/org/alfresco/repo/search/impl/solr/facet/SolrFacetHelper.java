@@ -19,6 +19,7 @@
 package org.alfresco.repo.search.impl.solr.facet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -105,7 +106,12 @@ public class SolrFacetHelper
         BUCKETED_FIELD_FACETS.add(MODIFIED_FIELD_FACET_QUERY);
         BUCKETED_FIELD_FACETS.add(CONTENT_SIZE_FIELD_FACET_QUERY);
     }
-
+    
+    /** These facet IDs are recognised by SOLR and can be used directly within facetted searches. */
+    private final List<String> specialFacetIds = Arrays.asList(new String[] {
+                                                          "SITE", "TAG", "ANCESTOR",
+                                                          "PARENT", "ASPECT", "TYPE", "OWNER" });
+    
     /** Facet value and facet query display label handlers */
     private Map<String, FacetLabelDisplayHandler> displayHandlers;
 
@@ -287,6 +293,15 @@ public class SolrFacetHelper
     public Set<String> getBucketedFieldFacets()
     {
         return Collections.unmodifiableSet(BUCKETED_FIELD_FACETS);
+    }
+    
+    /**
+     * Is the specified facet ID part of the list of "specials" which are
+     * handled by our SOLR service as is?
+     */
+    public boolean isSpecialFacetId(String facetId)
+    {
+        return specialFacetIds.contains(facetId);
     }
 
     /**
