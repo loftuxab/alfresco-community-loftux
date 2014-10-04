@@ -30,11 +30,10 @@ define(["dojo/_base/declare",
         "alfresco/search/FacetFilter",
         "dojo/_base/lang",
         "dojo/_base/array",
-        "dojo/dom-construct",
         "dojo/dom-class",
         "dojo/on",
         "dijit/registry"], 
-        function(declare, AlfDocumentFilters, FacetFilter, lang, array, domConstruct, domClass, on, registry) {
+        function(declare, AlfDocumentFilters, FacetFilter, lang, array, domClass, on, registry) {
 
    return declare([AlfDocumentFilters], {
       
@@ -194,6 +193,7 @@ define(["dojo/_base/declare",
 
          // Sort the filters...
          filters = this.sortFacetFilters(filters);
+         filters = array.filter(filters, lang.hitch(this, this.filterFacetFilters));
 
          // Set a count of the filters to add...
          var filtersToAdd = this.maxFilters;
@@ -252,6 +252,18 @@ define(["dojo/_base/declare",
       },
 
       /**
+       * Filters out any filter values that do not meet the hits or value length requirements.
+       *
+       * @instance
+       * @param {object} filter The filter to test
+       * @param {number} index The index of the filter
+       */
+      filterFacetFilters: function alfresco_search_FacetFilters__filterFacetFilters(filter, index) {
+         return ((this.hitThreshold == null || this.hitThreshold <= filter.hits) &&
+                 (this.minFilterValueLength == null || filter.value.length > this.minFilterValueLength));
+      },
+
+      /**
        * Sorts the filter values based on the sortBy attribute.
        *
        * @instance
@@ -259,7 +271,15 @@ define(["dojo/_base/declare",
        * @returns {array} The sorted filters
        */
       sortFacetFilters: function alfresco_search_FacetFilters__sortFacetFilters(filters) {
-         if (this.sortBy == null || lang.trim(this.sortBy) === "ALPHABETICALLY")
+         // Hard-coded to take facet queries into account. Should we stop using facet queries
+         // then this first if block will need to be removed...
+         if (this.facetQName === "{http://www.alfresco.org/model/content/1.0}content.size" || 
+             this.facetQName === "{http://www.alfresco.org/model/content/1.0}modified" ||
+             this.facetQName === "{http://www.alfresco.org/model/content/1.0}created")
+         {
+            return filters.sort(this._indexSort);
+         }
+         else if (this.sortBy == null || lang.trim(this.sortBy) === "ALPHABETICALLY")
          {
             return filters.sort(this._alphaSort);
          }

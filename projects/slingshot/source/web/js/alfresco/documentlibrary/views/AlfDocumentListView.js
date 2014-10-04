@@ -139,14 +139,12 @@ define(["dojo/_base/declare",
             this.noItemsMessage = this.message(this.noItemsMessage);
          }
 
+         // Call DND upload mixin functions to add support for uploading behaviour...
+         this.subscribeToCurrentNodeChanges(this.domNode);
          this.addUploadDragAndDrop(this.domNode);
 
          if (this.subscribeToDocRequests)
          {
-            if (this.useHash === true)
-            {
-               this.alfSubscribe(this.hashChangeTopic, lang.hitch(this, this.onFilterChange));
-            }
             this.alfSubscribe(this.documentSubscriptionTopic, lang.hitch(this, this.onDocumentsLoaded));
          }
          if (this.currentData != null)
@@ -213,24 +211,25 @@ define(["dojo/_base/declare",
          }
       },
 
-      /**
-       * Handles changes to the current filter and removes drag-and-drop capabilities for all bar the
-       * "path" filter types (this is because only the path defines an actual location for uploading
-       * files to).
-       *
-       * @instance onClick
-       * @param {object} payload
-       */
-      onFilterChange: function alfresco_documentlibrary_views_AlfDocumentListView__onFilterChange(payload) {
-         if (payload != null && payload.filterId == "path")
-         {
-            this.addUploadDragAndDrop(this.domNode);
-         }
-         else
-         {
-            this.removeUploadDragAndDrop(this.domNode);
-         }
-      },
+      // /**
+      //  * Handles changes to the current filter and removes drag-and-drop capabilities for all bar the
+      //  * "path" filter types (this is because only the path defines an actual location for uploading
+      //  * files to).
+      //  *
+      //  * @instance onClick
+      //  * @param {object} payload
+      //  */
+      // onFilterChange: function alfresco_documentlibrary_views_AlfDocumentListView__onFilterChange(payload) {
+      //    var path = lang.getObject("path", false, payload);
+      //    if (path == null)
+      //    {
+      //       this.removeUploadDragAndDrop(this.dragAndDropNode);
+      //    }
+      //    else
+      //    {
+      //       this.addUploadDragAndDrop(this.dragAndDropNode);
+      //    }
+      // },
 
       /**
        * The configuration for view selection menu items. This needs to be either configured or defined in an
@@ -334,7 +333,7 @@ define(["dojo/_base/declare",
                this.docListRenderer.renderData();
 
                // Check to see if any rows were rendered (allows for renderFilters on widgets. If they weren't, render no Data Display.
-               if (query("tr", this.tableNode).length === 0)
+               if (query(this.renderFilterSelectorQuery, this.tableNode).length === 0)
                {
                   this.renderNoDataDisplay();
                }
@@ -351,6 +350,19 @@ define(["dojo/_base/declare",
             this.renderNoDataDisplay();
          }
       },
+
+      /**
+       * This is the default CSS selector query to use to check whether any data has actually been rendered.
+       * It's used from within the [renderView]{@link module:alfresco/documentlibrary/views/AlfDocumentListView#renderView}
+       * function to check that data is actually rendered (because even though renderable items might exist it's possible
+       * for them to be filtered out so that they're not displayed). This needs to be overriden by views that don't
+       * render a DOM that matches the query.
+       *
+       * @instance
+       * @type {string}
+       * @default "tr"
+       */
+      renderFilterSelectorQuery: "tr",
 
       /**
        * Creates a new [DocumentListRenderer]{@link module:alfresco/documentlibrary/views/DocumentListRenderer}

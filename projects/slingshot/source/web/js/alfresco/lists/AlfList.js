@@ -271,7 +271,11 @@ define(["dojo/_base/declare",
          // Process the array of widgets. Only views should be included as widgets of the DocumentList.
          if (this.widgets)
          {
-            this.processWidgets(lang.clone(this.widgets));
+            // Opting to NOT clone the widgets for performance here, but leaving the code commented out
+            // for hasty re-insertion if necessary. It *shouldn't* be necessary to clone here because
+            // the views will clone as necessary...
+            // this.processWidgets(JSON.parse(JSON.stringify(this.widgets)));
+            this.processWidgets(this.widgets);
          }
       },
 
@@ -765,11 +769,28 @@ define(["dojo/_base/declare",
          else
          {
             var items = lang.getObject(this.itemsProperty, false, payload.response);
+            if (items == null)
+            {
+               // As a fallback we're going to check the actual payload object...
+               // It would be reasonable to ask why we don't just look in payload initially and
+               // expect the "itemsProperty" to include "response", however that is not the most common
+               // scenario and this approach catches the edge cases...
+               items = lang.getObject(this.itemsProperty, false, payload);
+            }
+
             if (items)
             {
                this.currentData = {};
                this.currentData.items = items;
                foundItems = true;
+
+               // We lose metaData unless we store that as well.
+               var metadata = lang.getObject("metadata", false, payload.response);
+               if (metadata)
+               {
+                  this.currentData.metadata = metadata;
+               }
+
             }
             else
             {

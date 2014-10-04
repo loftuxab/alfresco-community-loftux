@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.alfresco.po.share.dashlet;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
@@ -12,6 +27,13 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+/**
+ * 
+ * Represents Adhoc Report Dashlet
+ * 
+ * @author jcule
+ *
+ */
 public class AdhocAnalyzerDashlet extends AbstractDashlet implements Dashlet
 {
 
@@ -20,7 +42,8 @@ public class AdhocAnalyzerDashlet extends AbstractDashlet implements Dashlet
     private static final String DASHLET = "div[id*='DASHLET']";
     private static final String DASHLET_TITLE = "div[class='alfresco-dashlets-Dashlet--title title']";
     private static final String DASHLET_OPEN_DROPDOWN = "//span[text()='Open...']";
-    private static final String DASHLET_MESSAGE = "//div[text()='Click the menu to display an analysis you have previously created.']";
+    private static final String DASHLET_MESSAGE = "//div[text()='Click the menu to display a report you have previously created.']";
+    private static final String SITE_DASHLET_MESSAGE = "//div[text()='Click the menu to display an site report you have previously created.']";
     protected final static String THERE_ARE_NO_ANALYSES = "//td[text()='(There are no analyses)']";
     
     protected AdhocAnalyzerDashlet(WebDrone drone)
@@ -44,7 +67,7 @@ public class AdhocAnalyzerDashlet extends AbstractDashlet implements Dashlet
     @SuppressWarnings("unchecked")
     public AdhocAnalyzerDashlet render(RenderTime timer)
     {
-        elementRender(timer, getVisibleRenderElement(By.cssSelector(DASHLET)));
+        elementRender(timer, getVisibleRenderElement(By.cssSelector(DASHLET_TITLE)));
         return this;
     }
 
@@ -107,6 +130,28 @@ public class AdhocAnalyzerDashlet extends AbstractDashlet implements Dashlet
             throw new PageException("Unable to find 'Click the menu to display an analysis you have previously created.' in Adhoc Analyzer dashlet.", nse);
         }
     } 
+    
+    
+    /**
+     * Checks if "Click the menu to display an analysis you have previously created."
+     * is displayed in Adhoc Analyzer dashlet
+     * 
+     * @return
+     */
+    public boolean isSiteDashletMessageDisplayed()
+    {
+        try
+        {
+            WebElement siteDashletMessage = drone.find(By.xpath(SITE_DASHLET_MESSAGE));
+            return siteDashletMessage.isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+            logger.error("No 'Click the menu to display an site report you have previously created.' message in Adhoc Analyzer site dashboard dashlet " + nse);
+            throw new PageException("Unable to find 'Click the menu to display an site report you have previously created.' in Adhoc Analyzer site dashboard dashlet.", nse);
+        }
+    } 
+    
     
     /**
      * Checks if (There are no analyses) message is displayed

@@ -4,7 +4,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-packaging</artifactId>
-        <version>5.0.b.LX69-SNAPSHOT</version>
+        <version>5.0.b</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-installer</artifactId>
@@ -13,7 +13,7 @@
 
     <properties>
         <binaries.folder>${user.home}/binaries</binaries.folder>
-        <bitrock.folder>${binaries.folder}/bitrock/bitrock-9.0.2</bitrock.folder>
+        <bitrock.folder>${binaries.folder}/bitrock/bitrock-9.5.0</bitrock.folder>
         <signing.key.location>${binaries.folder}/build-classpath/alfresco-code-sign</signing.key.location>
         <bitrock.arguments>
            --license
@@ -38,7 +38,14 @@
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat</artifactId>
             <version>${installer.tomcat.version}</version>
-            <classifier>unix</classifier>
+            <classifier>linux</classifier>
+            <type>tgz</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat</artifactId>
+            <version>${installer.tomcat.version}</version>
+            <classifier>osx</classifier>
             <type>tgz</type>
         </dependency>
         <dependency>

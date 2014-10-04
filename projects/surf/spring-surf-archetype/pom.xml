@@ -4,13 +4,13 @@
   <parent>
 	 <groupId>org.springframework.extensions.surf</groupId>
 	 <artifactId>spring-surf-parent</artifactId>
-	 <version>5.0.b.LX69-SNAPSHOT</version>
+	 <version>5.0.b</version>
 	 <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>spring-surf-archetype</artifactId>
   <packaging>maven-archetype</packaging>
   <name>spring-surf-archetype</name>
-  
+
   <build>
     <extensions>
       <extension>
@@ -29,5 +29,25 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <!-- Allows to set the Alfresco version in the pom of the archetype -->
+    <plugins>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <useDefaultDelimiters>false</useDefaultDelimiters>
+          <delimiters>
+            <delimiter>@</delimiter>
+          </delimiters>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
   </build>
 </project>

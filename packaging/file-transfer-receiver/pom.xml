@@ -5,10 +5,14 @@
     <parent>
         <artifactId>alfresco-packaging</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX69-SNAPSHOT</version>
+        <version>5.0.b</version>
     </parent>
 
     <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
