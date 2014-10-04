@@ -37,7 +37,7 @@ public class SolrFacetTestSuite extends TestSuite
     public static Test suite()
     {
         TestSuite suite = new TestSuite();
-        suite.addTest(new JUnit4TestAdapter(SolrFacetHelperTest.class));
+        suite.addTest(new JUnit4TestAdapter(SolrFacetQueriesDisplayHandlersTest.class));
         suite.addTest(new JUnit4TestAdapter(SolrFacetServiceImplTest.class));
         suite.addTest(new JUnit4TestAdapter(SolrFacetConfigTest.class));
 

@@ -116,6 +116,7 @@ define(["dojo/_base/declare",
             textContent: payload.textContent,
             widgetsContent: payload.widgetsContent,
             widgetsButtons: payload.widgetsButtons,
+            additionalCssClasses: payload.additionalCssClasses ? payload.additionalCssClasses : "",
             contentWidth: payload.contentWidth ? payload.contentWidth : null,
             contentHeight: payload.contentHeight ? payload.contentHeight : null,
             handleOverflow: (payload.handleOverflow != null) ? payload.handleOverflow: true,
@@ -224,6 +225,7 @@ define(["dojo/_base/declare",
             handleOverflow: (config.handleOverflow != null) ? config.handleOverflow: true,
             fixedWidth: (config.fixedWidth != null) ? config.fixedWidth: false,
             parentPubSubScope: config.parentPubSubScope,
+            additionalCssClasses: config.additionalCssClasses ? config.additionalCssClasses : "",
             widgetsContent: [formConfig],
             widgetsButtons: [
                   {
@@ -233,7 +235,8 @@ define(["dojo/_base/declare",
                         disableOnInvalidControls: true,
                         publishTopic: this._formConfirmationTopic,
                         publishPayload: {
-                           formSubmissionTopic: config.formSubmissionTopic
+                           formSubmissionTopic: config.formSubmissionTopic,
+                           formSubmissionPayloadMixin: config.formSubmissionPayloadMixin
                         }
                      }
                   },
@@ -303,6 +306,12 @@ define(["dojo/_base/declare",
             if (payload.dialogReference != null)
             {
                payload.dialogReference.destroyRecursive();
+            }
+
+            // Mixin in any additional payload information...
+            if (payload.formSubmissionPayloadMixin != null)
+            {
+               lang.mixin(data, payload.formSubmissionPayloadMixin);
             }
 
             // Publish the topic requested for complete...
