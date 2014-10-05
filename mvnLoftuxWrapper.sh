@@ -3,7 +3,7 @@
 
 #Set the name and build number
 versionedition="Community by Loftux AB"
-buildnumber="5.0.b"
+buildnumber="5.0.b.LX69"
 
 # SCM Revision number -Fetch automatically
 
