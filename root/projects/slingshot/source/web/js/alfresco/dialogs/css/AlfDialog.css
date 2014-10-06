@@ -1,0 +1,73 @@
+.alfresco-dialog-AlfDialog.dijitDialog {
+   border: @standard-border;
+   border-radius: 6px 6px 6px 6px;
+   box-shadow: @standard-box-shadow;
+   font-family: @standard-font;
+   font-size: @normal-font-size;
+}
+
+/*
+ * This resets anchors in a dialog. This is required because the dialog appears outside 
+ * of the main body element.
+ */
+.alfresco-dialog-AlfDialog.dijitDialog a {
+   color: @general-font-color;
+   text-decoration: none;
+}
+
+/*
+ * This resets input elements in a dialog
+ */
+.alfresco-dialog-AlfDialog.dijitDialog input {
+   border: @standard-border;
+   font-weight: normal;
+}
+
+.alfresco-dialog-AlfDialog .dialog-body {
+   padding: 10px;
+   overflow: hidden;
+}
+
+.alfresco-dialog-AlfDialog.no-padding .dialog-body {
+   padding: 0px;
+}
+
+.alfresco-dialog-AlfDialog .dijitDialogPaneContent {
+   border-top: @standard-border;
+   padding: 0;
+   overflow: hidden !important; /* Wouldn't normally use !important but has to override direct element setting! */
+}
+
+.alfresco-dialog-AlfDialog.handleOverflow .dijitDialogPaneContent {
+   overflow: auto !important; /* Wouldn't normally use !important but has to override direct element setting! */
+}
+
+.alfresco-dialog-AlfDialog .dijitDialogTitleBar {
+   background-color: @primary-theme-color;
+   background-image: none;
+   border: none;
+   text-align: center;
+}
+
+.alfresco-dialog-AlfDialog .dijitDialogTitleBar .dijitDialogTitle {
+   font-family: @standard-font;
+   font-size: @title-font-size;
+   line-height: 1em;
+   padding: 0.25em;
+   color: @general-font-color;
+}
+
+.alfresco-dialog-AlfDialog .footer {
+   background-color: @primary-theme-color;
+   background-image: none;
+   border: none;
+   border-top: @standard-border;
+   text-align: center;
+   padding: 5px 0;
+   width: 100%;
+}
+
+.alfresco-dialog-AlfDialog.no-padding .footer {
+   position: absolute;
+   bottom: 0px;
+}
