@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -32,8 +32,9 @@ define(["dojo/_base/declare",
         "alfresco/core/Core",
         "alfresco/core/CoreWidgetProcessing",
         "dojo/_base/lang",
-        "dojo/_base/array"],
-        function(declare, _WidgetBase, _TemplatedMixin, template, AlfCore, CoreWidgetProcessing, lang, array) {
+        "dojo/_base/array",
+        "alfresco/core/NodeUtils"],
+        function(declare, _WidgetBase, _TemplatedMixin, template, AlfCore, CoreWidgetProcessing, lang, array, NodeUtils) {
 
    return declare([_WidgetBase, _TemplatedMixin, AlfCore, CoreWidgetProcessing], {
 
@@ -68,7 +69,6 @@ define(["dojo/_base/declare",
        * @instance
        */
       postCreate: function alfresco_pickers_SingleItemPicker__postCreate() {
-
          if (this.requestItemsTopic != null)
          {
             var pubSubScope = this.generateUuid();
@@ -116,7 +116,6 @@ define(["dojo/_base/declare",
                   }
                }
             ];
-
             this.processWidgets(config, this.itemsNode);
          }
       },
@@ -135,8 +134,7 @@ define(["dojo/_base/declare",
        * @todo Hard coded to site data. See comment in method description about generalising code.
        */
       addItemWidgetConfig: function alfresco_pickers_SingleItemPicker__addItemWidgetConfig(widgets, item, index) {
-
-         var siteNodeRef = item.node.substring(item.node.indexOf("workspace"));
+         var siteNodeRef = NodeUtils.processNodeRef(item.node.substring(item.node.indexOf("workspace"))).nodeRef;
          var config = {
             name: "alfresco/menus/AlfMenuBarItem",
             config: {
@@ -148,6 +146,7 @@ define(["dojo/_base/declare",
                   picker: {
                      name: this.subPicker,
                      config: {
+                        siteMode: true,
                         libraryRoot: siteNodeRef,
                         nodeRef: siteNodeRef,
                         path: "/"

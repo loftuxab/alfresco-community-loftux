@@ -125,13 +125,12 @@ import org.springframework.util.FileCopyUtils;
 /**
  * This is the Solr4 implementation of the information server (index).
  * @author Ahmed Owian
+ * @since 5.0
  */
 public class SolrInformationServer implements InformationServer
 {
-    /**
-     * 
-     */
     private static final String NO_SITE = "_REPOSITORY_";
+    private static final String SHARED_FILES = "_SHARED_FILES_";
     public static final String AND = " AND ";
     public static final String OR = " OR ";
     public static final String REQUEST_HANDLER_ALFRESCO_FULL_TEXT_SEARCH = "/afts";
@@ -153,6 +152,8 @@ public class SolrInformationServer implements InformationServer
  
     private static final Pattern CAPTURE_SITE = Pattern.compile("^/\\{http\\://www\\.alfresco\\.org/model/application/1\\.0\\}company\\_home/\\{http\\://www\\.alfresco\\.org/model/site/1\\.0\\}sites/\\{http\\://www\\.alfresco\\.org/model/content/1\\.0}([^/]*)/.*" ); 
     private static final Pattern CAPTURE_TAG = Pattern.compile("^/\\{http\\://www\\.alfresco\\.org/model/content/1\\.0\\}taggable/\\{http\\://www\\.alfresco\\.org/model/content/1\\.0\\}([^/]*)/\\{\\}member");
+    private static final Pattern CAPTURE_SHARED_FILES = Pattern.compile("^/\\{http\\://www\\.alfresco\\.org/model/application/1\\.0\\}company\\_home/\\{http\\://www\\.alfresco\\.org/model/application/1\\.0\\}shared/.*" ); 
+
     
     /* 4096 is 2 to the power of (6*2), and we do this because the precision step for the long is 6, 
      * and the transactions are long
@@ -551,7 +552,9 @@ public class SolrInformationServer implements InformationServer
             params.set("q", query)
                 .set("fl", FIELD_SOLR4_ID)
                 .set("rows", rows)
-                .set("start", start);
+                .set("start", start)
+                .set("sort", "_docid_ asc");
+                // no scoring !!
             List<TenantAclIdDbId> docIds = new ArrayList<>();
             SolrDocumentList docList = cloud.getSolrDocumentList(selectRequestHandler, request, params);
             if (docList != null)
@@ -1327,7 +1330,10 @@ public class SolrInformationServer implements InformationServer
                     }
                     
                     // Make sure any unindexed or error doc is removed.
-                    log.debug(".. deleting node " + node.getId());
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug(".. deleting node " + node.getId());
+                    }
                     deleteNode(processor, request, node);
                     
                     SolrInputDocument doc = createNewDoc(nodeMetaData, DOC_TYPE_NODE);
@@ -1472,7 +1478,10 @@ public class SolrInformationServer implements InformationServer
                     updateDescendantDocs(nodeMetaData, overwrite, request, processor, stack);
                 }
                 
-                log.debug("... cascade update child doc " + childId);
+                if (log.isDebugEnabled())
+                {
+                    log.debug("... cascade update child doc " + childId);
+                }
                 // Gets the document that we have from the content store and updates it 
                 String fixedTenantDomain = AlfrescoSolrDataModel.getTenantId(nodeMetaData.getTenantDomain());
                 SolrInputDocument cachedDoc = retrieveDocFromSolrContentStore(fixedTenantDomain, nodeMetaData.getId());
@@ -1503,7 +1512,10 @@ public class SolrInformationServer implements InformationServer
                 }
                 else
                 {
-                    log.debug("... no child doc found to update " + childId);
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("... no child doc found to update " + childId);
+                    }
                 }
             }
         }
@@ -1672,7 +1684,10 @@ public class SolrInformationServer implements InformationServer
                     }
                     
                     // Make sure any unindexed or error doc is removed.
-                    log.debug(".. deleting node " + node.getId());
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug(".. deleting node " + node.getId());
+                    }
                     deleteNode(processor, request, node);
                     
                     SolrInputDocument doc = createNewDoc(nodeMetaData, DOC_TYPE_NODE);
@@ -1715,7 +1730,7 @@ public class SolrInformationServer implements InformationServer
         addPropertiesToDoc(properties, isContentIndexedForNode, newDoc, cachedDoc, transformContent);
         if (isContentIndexedForNode)
         {
-            // Now that the new doc is fully updated and is about to go to the Solr index, cache it.
+            // Now that the new doc is fully updated and ready to go to the Solr index, cache it.
             storeDocOnSolrContentStore(fixedTenantDomain, nodeMetaData.getId(), newDoc);
         }
     }
@@ -1738,33 +1753,38 @@ public class SolrInformationServer implements InformationServer
                
         doc.addField(FIELD_TENANT, AlfrescoSolrDataModel.getTenantId(nodeMetaData.getTenantDomain()));
 
-        boolean addedRepo = false;
+        boolean repoOnly = true;
         for (Pair<String, QName> path : nodeMetaData.getPaths())
         {
-            boolean wasSiteOrTag = false;
-            
             doc.addField(FIELD_PATH, path.getFirst());
+            
             Matcher matcher = CAPTURE_SITE.matcher(path.getFirst());
             if(matcher.find())
             {
-                wasSiteOrTag = true;
+                repoOnly = false;
                 doc.addField(FIELD_SITE, matcher.group(1));
+            }
+            
+            matcher = CAPTURE_SHARED_FILES.matcher(path.getFirst());
+            if(matcher.find())
+            {
+                repoOnly = false;
+                doc.addField(FIELD_SITE, SHARED_FILES);
             }
             
             matcher = CAPTURE_TAG.matcher(path.getFirst());
             if(matcher.find())
             {
-                wasSiteOrTag = true;
                 String tag = matcher.group(1);
                 doc.addField(FIELD_TAG, tag);
                 doc.addField(FIELD_SUGGEST, tag);
             }
-            
-            if(!addedRepo && !wasSiteOrTag)
-            {
-                addedRepo = true;
-                doc.addField(FIELD_SITE, NO_SITE);
-            }
+           
+        }
+        
+        if(repoOnly)
+        {
+            doc.addField(FIELD_SITE, NO_SITE);
         }
 
         for(List<String> namePath : nodeMetaData.getNamePaths())
@@ -2123,27 +2143,28 @@ public class SolrInformationServer implements InformationServer
             request = getLocalSolrQueryRequest();
             processor = this.core.getUpdateProcessingChain(null).createProcessor(request, new SolrQueryResponse()); 
 
-            SolrInputDocument cachedDoc = retrieveDocFromSolrContentStore(tenant, dbId);
-            if (cachedDoc != null)
-            {
-                addContentToCachedDoc(cachedDoc, dbId);
-                // Marks as clean since the doc's content is now up to date
-                markFTSStatus(cachedDoc, FTSStatus.Clean);
-                storeDocOnSolrContentStore(tenant, dbId, cachedDoc);
-
-                // Add to index
-                AddUpdateCommand addDocCmd = new AddUpdateCommand(request);
-                addDocCmd.overwrite = true;
-                addDocCmd.solrDoc = cachedDoc;
-                processor.processAdd(addDocCmd);
-            }
-            else
+            SolrInputDocument doc = retrieveDocFromSolrContentStore(tenant, dbId);
+            if (doc == null)
             {
                 log.warn("There is no cached doc in the Solr content store with tenant [" + tenant + "] and dbId ["
                         + dbId + "].");
                 log.warn("This should only happen if the content has been removed from the Solr content store.");
                 log.warn("Attempting to recreate ... ");
-                // TODO recreate cachedDoc ACE-2896
+                doc = recreateSolrDoc(dbId, tenant);
+            }
+
+            if (doc != null)
+            {
+                addContentToDoc(doc, dbId);
+                // Marks as clean since the doc's content is now up to date
+                markFTSStatus(doc, FTSStatus.Clean);
+                storeDocOnSolrContentStore(tenant, dbId, doc);
+
+                // Add to index
+                AddUpdateCommand addDocCmd = new AddUpdateCommand(request);
+                addDocCmd.overwrite = true;
+                addDocCmd.solrDoc = doc;
+                processor.processAdd(addDocCmd);
             }
         }
         finally
@@ -2153,29 +2174,56 @@ public class SolrInformationServer implements InformationServer
         }
     }
 
+    private SolrInputDocument recreateSolrDoc(long dbId, String tenant) throws AuthenticationException, IOException,
+            JSONException
+    {
+        NodeMetaDataParameters nmdp = new NodeMetaDataParameters();
+        nmdp.setFromNodeId(dbId);
+        nmdp.setToNodeId(dbId);
+        List<NodeMetaData> nodeMetaDatas = repositoryClient.getNodesMetaData(nmdp, Integer.MAX_VALUE);
+        SolrInputDocument newDoc = null;
+        if (!nodeMetaDatas.isEmpty())
+        {
+            NodeMetaData nodeMetaData = nodeMetaDatas.get(0);
+            newDoc = createNewDoc(nodeMetaData, DOC_TYPE_NODE);
+            addFieldsToDoc(nodeMetaData, newDoc);
+            boolean isContentIndexedForNode = isContentIndexedForNode(nodeMetaData.getProperties());
+            Map<QName, PropertyValue> properties = nodeMetaData.getProperties();
+            // Cached doc is null for this method because it is a recreate after a cache miss.
+            addPropertiesToDoc(properties, isContentIndexedForNode, newDoc, null, transformContent);
+        }
+        else
+        {
+            log.error("Failed to recreate Solr doc with tenant [" + tenant + "] and dbId [" + dbId + "], "
+                    + "because node not found in repository.");
+        }
+        return newDoc;
+    }
+
     private static void markFTSStatus(SolrInputDocument doc, FTSStatus status)
     {
         doc.removeField(FIELD_FTSSTATUS);
         doc.addField(FIELD_FTSSTATUS, status.toString());
     }
     
-    private void addContentToCachedDoc(SolrInputDocument cachedDoc, long dbId) throws UnsupportedEncodingException, AuthenticationException, IOException
+    private void addContentToDoc(SolrInputDocument doc, long dbId) throws UnsupportedEncodingException,
+            AuthenticationException, IOException
     {
-        Collection<String> fieldNames = cachedDoc.deepCopy().getFieldNames(); 
+        Collection<String> fieldNames = doc.deepCopy().getFieldNames();
         for (String fieldName : fieldNames)
         {
             if (fieldName.startsWith(AlfrescoSolrDataModel.CONTENT_S_LOCALE_PREFIX))
             {
-                String locale = String.valueOf(cachedDoc.getFieldValue(fieldName));
+                String locale = String.valueOf(doc.getFieldValue(fieldName));
                 String qNamePart = fieldName.substring(AlfrescoSolrDataModel.CONTENT_S_LOCALE_PREFIX.length());
                 QName propertyQName = QName.createQName(qNamePart);
-                addContentPropertyToDocUsingAlfrescoRepository(cachedDoc, propertyQName, dbId, locale);
+                addContentPropertyToDocUsingAlfrescoRepository(doc, propertyQName, dbId, locale);
             }
             // Could update multi content but it is broken ....
         }
     }
     
-    private void addContentPropertyToDocUsingAlfrescoRepository(SolrInputDocument cachedDoc, 
+    private void addContentPropertyToDocUsingAlfrescoRepository(SolrInputDocument doc,
                 QName propertyQName, long dbId, String locale) 
                             throws AuthenticationException, IOException, UnsupportedEncodingException
     {
@@ -2184,9 +2232,12 @@ public class SolrInformationServer implements InformationServer
         // Expensive call to be done with ContentTracker
         GetTextContentResponse response = repositoryClient.getTextContent(dbId, propertyQName, null);
         
-        addContentPropertyMetadata(cachedDoc, propertyQName, AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_STATUS, response);
-        addContentPropertyMetadata(cachedDoc, propertyQName, AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_EXCEPTION, response);
-        addContentPropertyMetadata(cachedDoc, propertyQName, AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_TIME, response);
+        addContentPropertyMetadata(doc, propertyQName, AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_STATUS,
+                response);
+        addContentPropertyMetadata(doc, propertyQName, AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_EXCEPTION,
+                response);
+        addContentPropertyMetadata(doc, propertyQName, AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_TIME,
+                response);
 
         InputStream ris = response.getContent();
         String textContent = "";
@@ -2214,31 +2265,29 @@ public class SolrInformationServer implements InformationServer
 
         for (FieldInstance  field : AlfrescoSolrDataModel.getInstance().getIndexedFieldNamesForProperty(propertyQName).getFields())
         {
-            cachedDoc.removeField(field.getField());
+            doc.removeField(field.getField());
             if(field.isLocalised())
             {
-                cachedDoc.addField(field.getField(), builder.toString());
+                doc.addField(field.getField(), builder.toString());
             }
             else
             {
-                cachedDoc.addField(field.getField(), textContent);
+                doc.addField(field.getField(), textContent);
             }
-            addFieldIfNotSet(cachedDoc, field);
+            addFieldIfNotSet(doc, field);
         }
     }
 
     private void removeDocFromContentStore(NodeMetaData nodeMetaData)
     {
         String fixedTenantDomain = AlfrescoSolrDataModel.getTenantId(nodeMetaData.getTenantDomain());
-        ContentContext contentContext = SolrContentUrlBuilder
+        String contentUrl = SolrContentUrlBuilder
                     .start()
                     .add(SolrContentUrlBuilder.KEY_TENANT, fixedTenantDomain)
                     .add(SolrContentUrlBuilder.KEY_DB_ID, String.valueOf(nodeMetaData.getId()))
-                    .getContentContext();
-        if (this.solrContentStore.exists(contentContext.getContentUrl()))
-        {
-            this.solrContentStore.delete(contentContext.getContentUrl());
-        }
+                    .getContentContext()
+                    .getContentUrl();
+        this.solrContentStore.delete(contentUrl);
     }
 
     private void storeDocOnSolrContentStore(NodeMetaData nodeMetaData, SolrInputDocument doc) throws IOException
@@ -2254,11 +2303,7 @@ public class SolrInformationServer implements InformationServer
                     .add(SolrContentUrlBuilder.KEY_TENANT, tenant)
                     .add(SolrContentUrlBuilder.KEY_DB_ID, String.valueOf(dbId))
                     .getContentContext();
-        if (this.solrContentStore.exists(contentContext.getContentUrl()))
-        {
-            this.solrContentStore.delete(contentContext.getContentUrl());
-        }
-      
+        this.solrContentStore.delete(contentContext.getContentUrl());
         ContentWriter writer = this.solrContentStore.getWriter(contentContext);
         try (
                     OutputStream contentOutputStream = writer.getContentOutputStream();
@@ -2269,6 +2314,11 @@ public class SolrInformationServer implements InformationServer
             JavaBinCodec codec = new JavaBinCodec(resolver);
             codec.marshal(doc, gzip);
         }
+        catch (Exception e)
+        {
+            // A failure to write to the store is acceptable as long as it's logged
+            log.error("Failed to write to to store using URL: " + contentContext.getContentUrl(), e);
+        }
     }
 
     private SolrInputDocument retrieveDocFromSolrContentStore(String tenant, long dbId) throws IOException
@@ -2278,23 +2328,25 @@ public class SolrInformationServer implements InformationServer
                     .add(SolrContentUrlBuilder.KEY_TENANT, tenant)
                     .add(SolrContentUrlBuilder.KEY_DB_ID, String.valueOf(dbId))
                     .get();
-        if (!this.solrContentStore.exists(contentUrl))
-        {
-            return null;
-        }
         ContentReader reader = this.solrContentStore.getReader(contentUrl);
         SolrInputDocument cachedDoc = null;
-        if(reader.exists())
+        if (reader.exists())
         {
             // try-with-resources statement closes all these InputStreams
             try (
                     InputStream contentInputStream = reader.getContentInputStream();
                     // Uncompresses the document
                     GZIPInputStream gzip = new GZIPInputStream(contentInputStream);
-                    )
-                    { 
+                )
+            {
                 cachedDoc = (SolrInputDocument) new JavaBinCodec(resolver).unmarshal(gzip);
-                    }
+            }
+            catch (Exception e)
+            {
+                // Don't fail for this
+                log.error("Failed to get doc from store using URL: " + contentUrl, e);
+                return null;
+            }
         }
         return cachedDoc;
     }
