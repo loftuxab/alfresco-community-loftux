@@ -473,7 +473,7 @@ function getSiteNavigationWidgets() {
                label: (pages[i].sitePageTitle) ? pages[i].sitePageTitle : pages[i].title,
                pageId: pages[i].pageId,
                targetUrl: targetUrl,
-               selected: ((page.url.url.startsWith(page.url.servletContext + "/" + targetUrl)) || 
+               selected: ((page.url.url.startsWith(page.url.servletContext + "/" + targetUrl)) ||
                           (pages[i].pageId == "documentlibrary" && page.url.url.startsWith(page.url.servletContext + "/site/" + page.url.templateArgs.site + "/document-details")) ||
                           (pages[i].pageId == "wiki-page" && (page.url.url.startsWith(page.url.servletContext + "/site/" + page.url.templateArgs.site + "/wiki"))) ||
                           (pages[i].pageId == "blog-postlist" && (page.url.url.startsWith(page.url.servletContext + "/site/" + page.url.templateArgs.site + "/blog"))) ||
@@ -551,7 +551,7 @@ function getSubNavigationWidgets() {
                  "&sa=" + (args["a"] != null ? encodeURIComponent(args["a"]) : "") +
                  "&sr=" + (args["r"] != null ? encodeURIComponent(args["r"]) : "") +
                  "&sq=" + (args["q"] != null ? encodeURIComponent(args["q"]) : "");
-         
+
       }
       var advancedSearchUrl = "advsearch?" + query;
       if (page.url.templateArgs.site == null)
@@ -575,10 +575,10 @@ function getSubNavigationWidgets() {
                selected: false
             }
          });
-         
+
          advancedSearchUrl = "site/" + page.url.templateArgs.site + "/" + advancedSearchUrl;
       }
-      
+
       // Add the advanced search link...
       navigationWidgets.push({
          id: "HEADER_ADVANCED_SEARCH",
@@ -605,7 +605,7 @@ function getSubNavigationWidgets() {
                      "&r=" + (args["sr"] != null ? encodeURIComponent(args["sr"]) : "") +
                      "&q=" + (args["sq"] != null ? encodeURIComponent(args["sq"]) : "");
          model.backlink = query;
-         
+
          var searchUrl = "search?" + query;
          if (page.url.templateArgs.site == null)
          {
@@ -615,7 +615,7 @@ function getSubNavigationWidgets() {
          {
             searchUrl = "site/" + page.url.templateArgs.site + "/" + searchUrl;
          }
-         
+
          navigationWidgets.push({
             id: "HEADER_SEARCH_BACK_TO_RESULTS",
             name: "alfresco/menus/AlfMenuBarItem",
@@ -628,7 +628,7 @@ function getSubNavigationWidgets() {
             }
          });
       }
-      
+
       if (page.url.templateArgs.site == null)
       {
          // We're on the basic search page
@@ -778,7 +778,7 @@ function generateAppItems() {
             id: "HEADER_TASKS",
             label: "header.menu.tasks.label",
             widgets: [
-               {   
+               {
                   name: "alfresco/menus/AlfMenuGroup",
                   config: {
                      widgets: [
@@ -843,7 +843,7 @@ function generateAppItems() {
             targetUrl: "console/admin-console/application"
          }
       });
-   } 
+   }
    else
    {
       appItems.push({
@@ -1474,7 +1474,7 @@ function getHeaderModel(pageTitle) {
       };
       headerMenus.appItems.push(loggingWidget);
    }
-    
+
    // Get the user and group data and generate a "currentItem" for it so that render filtering
    // can be applied based on group membership...
    var userGroupData = getUserGroupData();
@@ -1512,7 +1512,7 @@ function getHeaderModel(pageTitle) {
                config: {
                   id: "HEADER_SEARCH_BOX",
                   site: page.url.templateArgs.site,
-                  linkToFacetedSearch: false,
+                  linkToFacetedSearch: true,
                   repository: (page.id == "repository" || page.id == "myfiles" || page.id == "sharedfiles")
                }
             }
