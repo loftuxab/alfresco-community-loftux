@@ -10,3 +10,5 @@ projects/solr/source/solr/instance/lib/
 .idea
 projects/solr4/overlays
 projects/solr/overlays
+projects/mmt/dependency-reduced-pom.xml
+projects/web-client/source/web/META-INF/MANIFEST.MF
