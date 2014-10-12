@@ -71,7 +71,7 @@
   <distributionManagement>
       <!-- For now internal releases repositories -->
       <repository>
-          <id>loftux</id>
+          <id>loftux-releases</id>
           <url>${maven.distributionManagement.url}</url>
       </repository>
       <!-- For now internal snapshot repositories -->
