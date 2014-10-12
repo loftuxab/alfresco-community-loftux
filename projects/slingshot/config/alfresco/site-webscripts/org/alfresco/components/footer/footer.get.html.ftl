@@ -21,7 +21,7 @@
             <#if licenseHolder != "" && licenseHolder != "UNKNOWN">
                <span class="licenseHolder">${msg("label.licensedTo")} ${licenseHolder}</span><br>
             </#if>
-            <span>${msg(fc.getChildValue("label")!"label.copyright")}</span>
+            <span>${msg(fc.getChildValue("label")!"label.copyright.byloftux")}</span>
          </span>
       </div>
    </@>

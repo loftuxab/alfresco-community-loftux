@@ -60,6 +60,9 @@
 .footer-com .copyright span
 {
    display: inline-block;
+   text-align: left;
+   margin-top: 10px;
+   line-height: 1.5em;
 }
 
 .footer-ent .copyright span

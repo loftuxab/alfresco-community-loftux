@@ -24,17 +24,17 @@
       <I18N>
          <tiny-mce-supported-locales>en,de,es,fr,it,ja,nl,zh_CN,ru,nb,pt_BR</tiny-mce-supported-locales>
       </I18N>
-      
+
       <header>
-      
+
          <!-- The number of sites to display in the recent history group of the sites menu -->
          <max-recent-sites>5</max-recent-sites>
-         
+
          <!--  The number of sites page links (e.g. "Dashboard", "Document Library", "Calendar", etc
                that will be displayed on any site page for navigation. All other site pages will be
                displayed under a "More" drop down menu. The current site page will always be displayed -->
          <max-displayed-site-pages>5</max-displayed-site-pages>
-         
+
       </header>
    </config>
 
@@ -56,7 +56,7 @@
          <logo>alfresco-share-logo.png</logo>
          <alt-text>Alfresco Share</alt-text>
          <css-class>footer-com</css-class>
-         <label>label.copyright</label>
+         <label>label.copyright.byloftux</label>
       </footer>
       <about>
          <css-class>logo-com</css-class>
@@ -88,7 +88,7 @@
          <uri-template id="consoletoolpage">/console/{pageid}/{toolid}</uri-template>
          <uri-template id="consolepage">/console/{pageid}</uri-template>
          <uri-template id="share-page">/{pageid}/ws/{webscript}</uri-template>
-         
+
       </uri-templates>
    </config>
 
@@ -110,8 +110,8 @@
          <username-min-length>2</username-min-length>
          <password-min-length>3</password-min-length>
       </users>
-   </config>   
-   
+   </config>
+
    <config evaluator="string-compare" condition="Notifications">
       <settings>
          <!-- Should user opt in for Email notifications.
@@ -128,7 +128,7 @@
       </dashboard>
    </config>
 
-   
+
    <config evaluator="string-compare" condition="Console">
       <groups>
          <!-- maximum number of groups & users to return in the column browser for each page -->
@@ -140,12 +140,12 @@
       <search>
          <!-- default minimum length for search terms -->
          <min-search-term-length>1</min-search-term-length>
-         
+
          <!-- default maximum number of results for a search -->
          <max-search-results>250</max-search-results>
-         
+
          <!-- Repository search configuration option -->
-         <!-- 
+         <!--
               The 'repository-search' config element value can be one of:
               none - disable repository wide search option
               context - search depending on current context, including repository, all sites, current site (default)
@@ -154,7 +154,7 @@
          -->
          <repository-search>always-options</repository-search>
       </search>
-      
+
       <!-- sorting fields and labels -->
       <!--
          The 'sort' config element contains the name of the content model field
@@ -164,7 +164,7 @@
           . Any other valid sortable fts-alfresco special field e.g. "TYPE"
          The field can be optionally followed by |true or |false to indicate sort direction,
          where true = ascending, false = descending
-         
+
          The element supports the following optional attributes:
             label = label text to display
             labelId = I18N message id of label text to display
@@ -185,7 +185,7 @@
          <sort labelId="search.sort.type" isSortable="true">TYPE</sort>
       </sorting>
    </config>
-   
+
    <config evaluator="string-compare" condition="AdvancedSearch">
       <advanced-search>
          <!-- Forms for the advanced search type list -->
@@ -193,7 +193,7 @@
             <!--
                The 'form' config element contains the name of the model type
                of the form to display.
-               
+
                The element supports the following optional attributes:
                   id = form id, the id of "search" will be assumed if not set
                   label = label text to display - defaults to model type if not set
@@ -282,7 +282,7 @@
       </linkshare>
 
    </config>
-   
+
    <!-- Remote section - use Surf RequestCachingConnector to improve remoting performance -->
    <config evaluator="string-compare" condition="Remote">
       <remote>

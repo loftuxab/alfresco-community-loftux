@@ -16,11 +16,11 @@
    <@uniqueIdDiv>
       <#assign el=args.htmlid?html>
       <div id="${el}-body" class="theme-overlay login hidden">
-      
+
       <@markup id="header">
          <div class="theme-company-logo"></div>
       </@markup>
-      
+
       <#if errorDisplay == "container">
       <@markup id="error">
          <#if error>
@@ -37,7 +37,7 @@
          </#if>
       </@markup>
       </#if>
-      
+
       <@markup id="form">
          <form id="${el}-form" accept-charset="UTF-8" method="post" action="${loginUrl}" class="form-fields login ${edition}">
             <@markup id="fields">
@@ -59,14 +59,14 @@
             </@markup>
          </form>
       </@markup>
-      
+
       <@markup id="footer">
-         <div class="copy">${msg("label.copyright")}</div>
+         <div class="copy">${msg("label.copyright.byloftux")}</div>
       </@markup>
-      
+
       <@markup id="preloader">
          <script type="text/javascript">//<![CDATA[
-            window.onload = function() 
+            window.onload = function()
             {
                 setTimeout(function()
                 {
