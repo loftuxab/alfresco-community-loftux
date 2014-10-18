@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -41,8 +41,29 @@ public class ActivitiPriorityPropertyHandler extends ActivitiTaskPropertyHandler
     @Override
     protected Object handleTaskProperty(Task task, TypeDefinition type, QName key, Serializable value)
     {
-        checkType(key, value, Integer.class);
-        task.setPriority((Integer) value);
+        int priority;
+        // ACE-3121: Workflow Admin Console: Cannot change priority for activiti
+        // It could be a String that converts to an int, like when coming from WorkflowInterpreter.java
+        if (value instanceof String)
+        {
+            try
+            {
+                priority = Integer.parseInt((String) value);
+            }
+            catch (NumberFormatException e)
+            {
+                throw getInvalidPropertyValueException(key, value);
+            }
+        }
+        else
+        {
+            checkType(key, value, Integer.class);
+            priority = (Integer) value;
+        }
+
+        // Priority value validation not performed to allow for future model changes
+        task.setPriority(priority);
+
         return DO_NOT_ADD;
     }
 

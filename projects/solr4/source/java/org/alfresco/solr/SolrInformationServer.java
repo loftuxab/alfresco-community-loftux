@@ -1774,7 +1774,7 @@ public class SolrInformationServer implements InformationServer
             if(matcher.find())
             {
                 repoOnly = false;
-                doc.addField(FIELD_SITE, matcher.group(1));
+                doc.addField(FIELD_SITE, ISO9075.decode(matcher.group(1)));
             }
             
             matcher = CAPTURE_SHARED_FILES.matcher(path.getFirst());
@@ -1787,7 +1787,7 @@ public class SolrInformationServer implements InformationServer
             matcher = CAPTURE_TAG.matcher(path.getFirst());
             if(matcher.find())
             {
-                String tag = matcher.group(1);
+                String tag = ISO9075.decode(matcher.group(1));
                 doc.addField(FIELD_TAG, tag);
                 doc.addField(FIELD_SUGGEST, tag);
             }
@@ -1935,6 +1935,11 @@ public class SolrInformationServer implements InformationServer
                         }
                     }
                 }
+            }
+            else
+            {
+                // NULL property
+                newDoc.addField(FIELD_NULLPROPERTIES, propertyQName.toString());
             }
         }
     }

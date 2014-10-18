@@ -528,7 +528,7 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                 c = sortStr.charAt(i);
                 if(propertyBuilder == null)
                 {
-                    if(!Character.isWhitespace(c))
+                    if(!Character.isWhitespace(c) && (c != ','))
                     {
                         propertyBuilder = new StringBuilder();
                         propertyBuilder.append(c);
@@ -540,9 +540,9 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                 }
                 else
                 {
-                    if(Character.isWhitespace(c))
+                    if(Character.isWhitespace(c) || (c == ','))
                     {
-                        String toAppend = AlfrescoSolrDataModel.getInstance().mapProperty(propertyBuilder.toString(), FieldUse.SORT);
+                        String toAppend = AlfrescoSolrDataModel.getInstance().mapProperty(propertyBuilder.toString(), FieldUse.SORT, getReq());
                         builder.append(toAppend);
                         builder.append(c);
                         propertyBuilder = null;
@@ -555,7 +555,7 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
             }
             if(propertyBuilder != null)
             {
-                String toAppend =  AlfrescoSolrDataModel.getInstance().mapProperty(propertyBuilder.toString(), FieldUse.SORT);
+                String toAppend =  AlfrescoSolrDataModel.getInstance().mapProperty(propertyBuilder.toString(), FieldUse.SORT, getReq());
                 builder.append(toAppend);
             }
             sortStr = builder.toString();

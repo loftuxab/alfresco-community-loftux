@@ -104,6 +104,7 @@ import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.Version;
 import org.apache.solr.core.CoreDescriptorDecorator;
 import org.apache.solr.request.SolrQueryRequest;
+import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.search.SyntaxError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2050,7 +2051,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
          Boolean isFilter = searchParametersAndFilter.getSecond();
 
          QueryModelFactory factory = new LuceneQueryModelFactory<Query, Sort, SyntaxError>();
-         AlfrescoFunctionEvaluationContext functionContext = new AlfrescoFunctionEvaluationContext(namespaceDAO, getDictionaryService(CMISStrictDictionaryService.DEFAULT), NamespaceService.CONTENT_MODEL_1_0_URI);
+         AlfrescoFunctionEvaluationContext functionContext = new AlfrescoSolr4FunctionEvaluationContext(namespaceDAO, getDictionaryService(CMISStrictDictionaryService.DEFAULT), NamespaceService.CONTENT_MODEL_1_0_URI, req.getSchema());
 
          FTSParser.Mode mode;
 
@@ -2103,14 +2104,19 @@ public class AlfrescoSolrDataModel implements QueryConstants
       * @param c
       * @return
       */
-     public String  mapProperty(String  potentialProperty,  FieldUse fieldUse)
+     public String  mapProperty(String  potentialProperty,  FieldUse fieldUse, SolrQueryRequest req)
      {
-         if(potentialProperty.equals("asc") || potentialProperty.equals("desc") || potentialProperty.equals("_docid_") || potentialProperty.equals("score"))
+         if(potentialProperty.equals("asc") || potentialProperty.equals("desc") || potentialProperty.equals("_docid_"))
          {
              return potentialProperty;
          }
          
-         AlfrescoFunctionEvaluationContext functionContext = new AlfrescoFunctionEvaluationContext(getNamespaceDAO(),  getDictionaryService(CMISStrictDictionaryService.DEFAULT), NamespaceService.CONTENT_MODEL_1_0_URI);
+         if(potentialProperty.equalsIgnoreCase("score") || potentialProperty.equalsIgnoreCase("SEARCH_SCORE"))
+         {
+             return "score";
+         }
+         
+         AlfrescoFunctionEvaluationContext functionContext = new AlfrescoSolr4FunctionEvaluationContext(getNamespaceDAO(),  getDictionaryService(CMISStrictDictionaryService.DEFAULT), NamespaceService.CONTENT_MODEL_1_0_URI, req.getSchema());
 
          Pair<String, String> fieldNameAndEnding = QueryParserUtils.extractFieldNameAndEnding(potentialProperty);
          String luceneField =  functionContext.getLuceneFieldName(fieldNameAndEnding.getFirst());
