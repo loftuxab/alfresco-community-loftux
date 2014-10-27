@@ -71,8 +71,7 @@ public abstract class AbstractTracker implements Tracker
     {
     }
     
-    protected AbstractTracker(SolrTrackerScheduler scheduler, Properties p, SOLRAPIClient client, 
-                String coreName, InformationServer informationServer)
+    protected AbstractTracker(Properties p, SOLRAPIClient client, String coreName, InformationServer informationServer)
     {
         this.props = p;
         this.client = client;
@@ -85,9 +84,7 @@ public abstract class AbstractTracker implements Tracker
         isSlave =  Boolean.parseBoolean(p.getProperty("enable.slave", "false"));
         isMaster =  Boolean.parseBoolean(p.getProperty("enable.master", "true"));
 
-        this.trackerStats = new TrackerStats(this.infoSrv);
-        
-        scheduler.schedule(this, coreName, p);
+        this.trackerStats = this.infoSrv.getTrackerStats();
 
         alfrescoVersion = p.getProperty("alfresco.version", "5.0.0");
         log.info("Solr built for Alfresco version: " + alfrescoVersion);

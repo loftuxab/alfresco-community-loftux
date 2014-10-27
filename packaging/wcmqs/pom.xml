@@ -4,7 +4,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-packaging</artifactId>
-        <version>5.0.b.LX71</version>
+        <version>5.0.b.LX72-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-wcmqs-distribution</artifactId>
@@ -12,7 +12,7 @@
     <name>Alfresco WCMQS Distribution Zip</name>
 
     <build>
-        <finalName>alfresco-enterprise-wcmqs-${project.version}</finalName>
+        <finalName>alfresco-wcmqs-${project.version}</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>

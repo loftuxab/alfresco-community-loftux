@@ -3,12 +3,12 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>5.0.b.LX71</version>
+        <version>5.0.b.LX72-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco</artifactId>
     <packaging>war</packaging>
-    <name>Alfresco Web Client</name>
+    <name>Alfresco Repository WAR Community</name>
     <description>Alfresco Web Client</description>
 
     <properties>
@@ -121,7 +121,7 @@
        <dependency>
             <groupId>org.alfresco.services</groupId>
             <artifactId>alfresco-messaging-repo</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <version>1.2</version>
         </dependency>
 
         <!-- Test dependencies -->

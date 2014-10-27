@@ -4,7 +4,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>5.0.b.LX71</version>
+        <version>5.0.b.LX72-SNAPSHOT</version>
     </parent>
     <artifactId>alfresco-packaging</artifactId>
     <packaging>pom</packaging>
@@ -13,6 +13,7 @@
     <modules>
         <module>file-transfer-receiver</module>
         <module>wcmqs</module>
+        <module>webeditor</module>
         <module>solr1</module>
         <module>distribution</module>
         <module>installer</module>

@@ -5766,6 +5766,7 @@ public class AlfrescoCoreAdminTester
         testQueryByHandler(report, core, "/afts", "lazy -dog", 16, null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/afts", "TEXT:\"lazy\"", 1, null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/afts", "cm_content:\"lazy\"", 1, null, null, null, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "d:content:\"lazy\"", 1, null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/afts", "=cm_content:\"lazy\"", 1, null, null, null, null, null,
                     (String) null);
         testQueryByHandler(report, core, "/afts", "~cm_content:\"lazy\"", 1, null, null, null, null, null,
@@ -6629,10 +6630,16 @@ public class AlfrescoCoreAdminTester
                         "TYPE:\"" + testSuperType.toPrefixString(dataModel.getNamespaceDAO()) + "\"", 13);
             testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"" + ContentModel.TYPE_CONTENT.toString() + "\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"cm:content\"", 1);
+            testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"cm:content0\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"cm:CONTENT\"", 1);
+            testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"cm:CONTENT1\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"CM:CONTENT\"", 1);
+            testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"CM:CONTENT1\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"CONTENT\"", 1);
+            testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"CONTENT1\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"content\"", 1);
+            testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"content0\"", 0);
+            testQuery(dataModel, report, solrIndexSearcher, "ASPECT:\"flubber\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"" + ContentModel.TYPE_THUMBNAIL.toString() + "\"",
                         1);
             testQuery(dataModel, report, solrIndexSearcher, "TYPE:\"" + ContentModel.TYPE_THUMBNAIL.toString()
@@ -6670,6 +6677,7 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher,
                         "TEXT:fox AND TYPE:\"" + ContentModel.PROP_CONTENT.toString() + "\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:fox @cm\\:name:fox", 1);
+            testQuery(dataModel, report, solrIndexSearcher, "d\\:content:fox d\\:text:fox", 1);
             testQuery(dataModel, report, solrIndexSearcher,
                         "TEXT:fo AND TYPE:\"" + ContentModel.PROP_CONTENT.toString() + "\"", 0);
 
@@ -7783,6 +7791,9 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher,
                         "\\@" + SearchLanguageConversion.escapeLuceneQuery(qname.toString()) + ":{5.6 TO A}", 0);
 
+            testQuery(dataModel, report, solrIndexSearcher,
+                    "\\@" + SearchLanguageConversion.escapeLuceneQuery("My-funny&MissingProperty:woof"), 0);
+            
             Date date = new Date();
             for (SimpleDateFormatAndResolution df : CachingDateFormat.getLenientFormatters())
             {

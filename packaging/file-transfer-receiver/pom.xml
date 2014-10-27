@@ -5,21 +5,8 @@
     <parent>
         <artifactId>alfresco-packaging</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>5.0.b.LX71</version>
+        <version>5.0.b.LX72-SNAPSHOT</version>
     </parent>
-
-    <!-- Switch artifactId to extract version.properties from -->
-    <properties>
-        <alfresco.war.artifactId>alfresco</alfresco.war.artifactId>
-    </properties>
-    <profiles>
-        <profile>
-            <id>enterprise</id>
-            <properties>
-                <alfresco.war.artifactId>alfresco-enterprise</alfresco.war.artifactId>
-            </properties>
-        </profile>
-    </profiles>
 
     <dependencies>
         <dependency>
@@ -74,7 +61,7 @@
     </dependencies>
 
     <build>
-        <finalName>alfresco-file-transfer-receiver-${project.version}</finalName>
+        <finalName>alfresco-community-file-transfer-receiver-${project.version}</finalName>
         <plugins>
             <!-- Build Launcher jar -->
             <plugin>
@@ -106,7 +93,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>se.loftux.alfresco</groupId>
-                                    <artifactId>${alfresco.war.artifactId}</artifactId>
+                                    <artifactId>alfresco</artifactId>
                                     <version>${project.version}</version>
                                     <type>war</type>
                                     <includes>WEB-INF/classes/alfresco/version.properties</includes>

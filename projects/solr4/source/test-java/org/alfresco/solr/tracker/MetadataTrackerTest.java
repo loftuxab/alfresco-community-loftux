@@ -53,20 +53,21 @@ public class MetadataTrackerTest
     private MetadataTracker metadataTracker;
 
     @Mock
-    private SolrTrackerScheduler scheduler;
-    @Mock
     private SOLRAPIClient repositoryClient;
     private String coreName = "theCoreName";
     @Mock
     private InformationServer srv;
     @Spy
     private Properties props;
+    @Mock
+    private TrackerStats trackerStats;
 
     @Before
     public void setUp() throws Exception
     {
         doReturn("workspace://SpacesStore").when(props).getProperty("alfresco.stores");
-        this.metadataTracker = spy(new MetadataTracker(scheduler, props, repositoryClient, coreName, srv));
+        when(srv.getTrackerStats()).thenReturn(trackerStats);
+        this.metadataTracker = spy(new MetadataTracker(props, repositoryClient, coreName, srv));
     }
 
     @Test

@@ -585,7 +585,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 ClassDefinition target = QueryParserUtils.matchClassDefinition(searchParameters.getNamespace(), namespacePrefixResolver, dictionaryService,queryText);
                 if (target == null)
                 {
-                    throw new ParseException("Invalid type: " + queryText);
+                    return new TermQuery(new Term(FIELD_TYPE, "_unknown_"));
                 }
                 return getFieldQuery(target.isAspect() ? FIELD_ASPECT : FIELD_TYPE, queryText, analysisMode, luceneFunction);
             }
@@ -1010,8 +1010,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         AspectDefinition target = QueryParserUtils.matchAspectDefinition(searchParameters.getNamespace(), namespacePrefixResolver, dictionaryService, queryText);
         if (target == null)
         {
-            // failed to find the aspect in the dictionary
-            throw new AlfrescoRuntimeException("Unknown aspect specified in query: " + queryText);
+            return new TermQuery(new Term(FIELD_ASPECT, "_unknown_"));
         }
 
         if (exactOnly)
@@ -1048,7 +1047,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         TypeDefinition target = QueryParserUtils.matchTypeDefinition(searchParameters.getNamespace(), namespacePrefixResolver, dictionaryService, queryText);
         if (target == null)
         {
-            throw new ParseException("Invalid type: " + queryText);
+            return new TermQuery(new Term(FIELD_TYPE, "_unknown_"));
         }
         if (exactOnly)
         {
@@ -1166,6 +1165,12 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
     @SuppressWarnings("unchecked")
     protected Query getFieldQueryImpl(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException, IOException
     {
+        // make sure the field exists or return a dummy query so we have no error ....ACE-3231
+        if(schema.getFieldOrNull(field) == null)
+        {
+            return new TermQuery(new Term("_dummy_", "_miss_"));
+        }
+        
         // Use the analyzer to get all the tokens, and then build a TermQuery,
         // PhraseQuery, or noth
 
@@ -4415,6 +4420,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                         }
                     }
                 }
+                break;
             case TRUE:
                 if(locale.toString().length() == 0)
                 {
@@ -4438,8 +4444,9 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                         }
                     }
                 }
+                break;
             }
-
+            return new FieldInstance("_dummy_", false, false);
             
         }
 

@@ -6,6 +6,21 @@
     <show>1</show>
     <folderList>
       <folder>
+          <description>//War Files</description>
+          <name>solr4warfile</name>
+          <destination>${installdiralfresco}</destination>
+          <distributionFileList>
+              <distributionFile origin="${alfresco_war_source_directory}/solr4.war" />
+          </distributionFileList>
+      </folder>
+
+      <folder>
+          <description>//alf_data</description>
+          <name>solr4alfdata</name>
+          <destination>${alfresco_data_directory}/solr4</destination>
+      </folder>
+
+      <folder>
           <name>solr4</name>
           <destination>${installdir}/solr4</destination>
           <distributionFileList>
@@ -41,6 +56,7 @@
         </folder>
     </folderList>
     <postInstallationActionList>
+       <alfrescoSetProperty property="index.subsystem.name" value="solr4" />
        <alfrescoConfigure alfrescoFiles="${installdir}/solr4/archive-SpacesStore/conf/solrcore.properties;${installdir}/solr4/workspace-SpacesStore/conf/solrcore.properties;${tomcat_server_directory}/conf/Catalina/localhost/solr4.xml" />
       <substitute>
           <files>${installdir}/solr4/archive-SpacesStore/conf/solrcore.properties;${installdir}/solr4/workspace-SpacesStore/conf/solrcore.properties</files>
@@ -67,4 +83,7 @@
           </substitutionList>
       </substitute>
     </postInstallationActionList>
+    <postUninstallationActionList>
+        <deleteFile path="${alfresco_data_directory}/solr4" />
+    </postUninstallationActionList>
 </component>

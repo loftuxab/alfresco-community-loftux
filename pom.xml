@@ -6,7 +6,7 @@
   <groupId>se.loftux.alfresco</groupId>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>5.0.b.LX71</version>
+  <version>5.0.b.LX72-SNAPSHOT</version>
   <name>Alfresco</name>
 
   <url>http://www.alfresco.org/</url>
@@ -168,7 +168,7 @@
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
     <dependency.spring.version>3.2.10.RELEASE</dependency.spring.version>
     <dependency.tomcat.version>7.0.53</dependency.tomcat.version>
-    <dependency.activiti.version>5.16.2</dependency.activiti.version>
+    <dependency.activiti.version>5.16.4</dependency.activiti.version>
     <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
     <dependency.poi.version>3.10.1</dependency.poi.version>
     <dependency.dojo.version>1.8.3</dependency.dojo.version>
@@ -355,6 +355,16 @@
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+            <version>1.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <version>1.2.7</version>
         </dependency>
         <dependency>
             <groupId>org.tuckey</groupId>
@@ -547,6 +557,9 @@
 						<alfresco.target.dir>${project.build.directory}</alfresco.target.dir>
                         <!-- Allow FTP server unit test to run unprivileged -->
                         <ftp.port>50521</ftp.port>
+                        <!-- ACE-2704 turned off the ftp and transfer service receiver which must be enabled for integration test -->
+                        <ftp.enabled>true</ftp.enabled>
+                        <transferservice.receiver.enabled>true</transferservice.receiver.enabled>
                         <!-- Database related properties -->
                         <db.url>${db.url}</db.url>
                         <db.driver>${db.driver}</db.driver>

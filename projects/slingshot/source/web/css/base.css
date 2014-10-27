@@ -430,13 +430,13 @@ span.navigation-separator-alt
 
 .rich-content ul > li
 {
-   list-style-type: disc;
+   list-style-type: inherit;
    list-style-position: inside;
 }
 
 .rich-content ol > li
 {
-   list-style-type: decimal;
+   list-style-type: inherit;
    list-style-position: inside;
 }
 
@@ -1151,7 +1151,7 @@ span.item-modifier
 }
 .quickshare-action-menu
 {
-   z-index: 9999 !important; 
+   z-index: 2147483647 !important; /* This needs to be the maximum value to cope with full screen display */
 }
 .quickshare-action-menu .bd
 {
