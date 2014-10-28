@@ -185,18 +185,26 @@ public class SolrInformationServer implements InformationServer
     private ConcurrentLRUCache<String, Boolean> isIdIndexCache = new ConcurrentLRUCache<String, Boolean>(60*60*100, 60*60*50);
     
     // write a BytesRef as a byte array
-    JavaBinCodec.ObjectResolver resolver = new JavaBinCodec.ObjectResolver() {
-      @Override
-      public Object resolve(Object o, JavaBinCodec codec) throws IOException {
-        if (o instanceof BytesRef) {
-          BytesRef br = (BytesRef)o;
-          codec.writeByteArray(br.bytes, br.offset, br.length);
-          return null;
+    JavaBinCodec.ObjectResolver resolver = new JavaBinCodec.ObjectResolver()
+    {
+        @Override
+        public Object resolve(Object o, JavaBinCodec codec) throws IOException
+        {
+            if (o instanceof BytesRef)
+            {
+                BytesRef br = (BytesRef) o;
+                codec.writeByteArray(br.bytes, br.offset, br.length);
+                return null;
+            }
+            return o;
         }
-        return o;
-      }
     };
     
+    @Override
+    public AlfrescoCoreAdminHandler getAdminHandler()
+    {
+        return this.adminHandler;
+    }
 
     public SolrInformationServer(AlfrescoCoreAdminHandler adminHandler, SolrCore core, SOLRAPIClient repositoryClient,
                 SolrContentStore solrContentStore)
@@ -1615,7 +1623,6 @@ public class SolrInformationServer implements InformationServer
         {
             request = getLocalSolrQueryRequest();
             processor = this.core.getUpdateProcessingChain(null).createProcessor(request, new SolrQueryResponse());
-            long start = System.nanoTime();
             
             Map<Long, Node> nodeIdsToNodes = new HashMap<>();
             EnumMap<SolrApiNodeStatus, List<Long>> nodeStatusToNodeIds = new EnumMap<SolrApiNodeStatus, List<Long>>(SolrApiNodeStatus.class);
@@ -1681,6 +1688,8 @@ public class SolrInformationServer implements InformationServer
 
                 for (NodeMetaData nodeMetaData : nodeMetaDatas)
                 {
+                    long start = System.nanoTime();
+                
                     AddUpdateCommand addDocCmd = new AddUpdateCommand(request);
                     addDocCmd.overwrite = overwrite;
                     
@@ -1732,10 +1741,12 @@ public class SolrInformationServer implements InformationServer
                     addToNewDocAndCache(nodeMetaData, doc);
                     addDocCmd.solrDoc = doc;
                     processor.processAdd(addDocCmd);
+                    
+                    long end = System.nanoTime();
+                    this.trackerStats.addNodeTime(end - start);
                 } // Ends iteration over nodeMetadatas
             } // Ends checking for the existence of updated or unknown node ids 
-            long end = System.nanoTime();
-            this.trackerStats.addNodeTime(end - start);
+           
         }
         catch (Exception e)
         {
@@ -2315,7 +2326,7 @@ public class SolrInformationServer implements InformationServer
             {
                 // Get and copy content
                 byte[] bytes = FileCopyUtils.copyToByteArray(ris);
-                textContent = new String( bytes, "UTF8");
+                textContent = new String(bytes, "UTF8");
             }
         }
         finally
@@ -2327,16 +2338,17 @@ public class SolrInformationServer implements InformationServer
         long end = System.nanoTime();
         this.getTrackerStats().addDocTransformationTime(end - start);
         
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(textContent.length() + 16);
         builder.append("\u0000").append(locale).append("\u0000");
         builder.append(textContent);
+        String localisedText = builder.toString();
 
-        for (FieldInstance  field : AlfrescoSolrDataModel.getInstance().getIndexedFieldNamesForProperty(propertyQName).getFields())
+        for (FieldInstance field : AlfrescoSolrDataModel.getInstance().getIndexedFieldNamesForProperty(propertyQName).getFields())
         {
             doc.removeField(field.getField());
             if(field.isLocalised())
             {
-                doc.addField(field.getField(), builder.toString());
+                doc.addField(field.getField(), localisedText);
             }
             else
             {
@@ -2427,17 +2439,17 @@ public class SolrInformationServer implements InformationServer
     {   
         if(field.isLocalised())
         {
-            StringBuilder sort = new StringBuilder();
+            StringBuilder sort = new StringBuilder(128);
             for (Locale locale : mlTextPropertyValue.getLocales())
             {
+                final String propValue = mlTextPropertyValue.getValue(locale);
                 if(log.isDebugEnabled())
                 {
-                    log.debug("ML "+field.getField() + " in "+ locale+ " of "+mlTextPropertyValue.getValue(locale));
+                    log.debug("ML "+field.getField() + " in "+ locale+ " of "+propValue);
                 }
                 
-                StringBuilder builder = new StringBuilder();
-                builder.append("\u0000").append(locale.toString()).append("\u0000")
-                .append(mlTextPropertyValue.getValue(locale));
+                StringBuilder builder = new StringBuilder(propValue.length() + 16);
+                builder.append("\u0000").append(locale.toString()).append("\u0000").append(propValue);
        
                 if(!field.isSort())
                 {

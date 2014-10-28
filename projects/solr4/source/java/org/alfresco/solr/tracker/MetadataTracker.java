@@ -70,7 +70,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
 
         transactionDocsBatchSize = Integer.parseInt(p.getProperty("alfresco.transactionDocsBatchSize", "100"));
         nodeBatchSize = Integer.parseInt(p.getProperty("alfresco.nodeBatchSize", "10"));
-        threadHandler = new ThreadHandler(p, coreName);
+        threadHandler = new ThreadHandler(p, coreName, "MetadataTracker");
     }
     
     MetadataTracker()
@@ -81,16 +81,21 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     @Override
     protected void doTrack() throws AuthenticationException, IOException, JSONException
     {
-        purgeTransactions();
-        purgeNodes();
+        // MetadataTracker must wait until ModelTracker has run
+        ModelTracker modelTracker = this.infoSrv.getAdminHandler().getTrackerRegistry().getModelTracker();
+        if (modelTracker != null && modelTracker.hasModels())
+        {
+            purgeTransactions();
+            purgeNodes();
 
-        reindexTransactions();
-        reindexNodes();
+            reindexTransactions();
+            reindexNodes();
 
-        indexTransactions();
-        indexNodes();
-        
-        trackRepository();
+            indexTransactions();
+            indexNodes();
+
+            trackRepository();
+        }
     }
 
 

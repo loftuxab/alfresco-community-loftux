@@ -269,8 +269,7 @@ public class ProcessJsonModelDirective extends JavaScriptDependencyDirective
             }
         }
         
-        // Create string of the the JavaScript object literal data encoding any tokens that have been used (e.g. to 
-        // allow access to request parameters, etc)...
+        // Create string of JSON data encoding any tokens that have been used (e.g. to allow access to request parameters, etc)
         servicesJSONStr = UriUtils.replaceTokens(JSONWriter.encodeToJSON(services), getRequestContext(), pattern, 1, "");
         widgetsJSONStr = UriUtils.replaceTokens(JSONWriter.encodeToJSON(widgets), getRequestContext(), pattern, 1, "");
         publishOnLoadJSONStr = UriUtils.replaceTokens(JSONWriter.encodeToJSON(publishOnLoad), getRequestContext(), pattern, 1, "");
