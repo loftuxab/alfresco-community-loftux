@@ -64,6 +64,39 @@ define(["dojo/_base/declare",
          singleItemMode: false,
 
          /**
+          * If true, allow zero items to be selected
+          *
+          * @instance
+          * @type {Boolean}
+          * @default false
+          */
+         allowNone: false,
+
+         /**
+          * Topic published when picker is valid
+          *
+          * @instance
+          * @type {string}
+          * @default "ALF_PICKER_VALID"
+          */
+         validTopic: "ALF_PICKER_VALID",
+
+
+         /**
+          * Topic published when picker is invalid
+          *
+          * @instance
+          * @type {string}
+          * @default "ALF_PICKER_INVALID"
+          */
+         invalidTopic: "ALF_PICKER_INVALID",
+
+         /**
+          * Should picker validity be published globally?
+          */
+         publishValidityGlobally: true,
+
+         /**
           * Implements the widget life-cycle method to add drag-and-drop upload capabilities to the root DOM node.
           * This allows files to be dragged and dropped from the operating system directly into the browser
           * and uploaded to the location represented by the document list.
@@ -87,6 +120,7 @@ define(["dojo/_base/declare",
                items: (this.value != null) ? this.value : []
             };
             this.renderView();
+            this.isValid();
          },
 
          /**
@@ -132,8 +166,12 @@ define(["dojo/_base/declare",
                   }
                   else {
                      this.currentData.items.push(payload);
+                     array.forEach(this.currentData.items, function(item, index) {
+                        item.index = index;
+                     });
                      this.renderView(false);
                   }
+
                   // Publish the data about the items currently selected...
                   this.alfPublish("ALF_ITEMS_SELECTED", {
                      pickedItems: this.currentData.items
@@ -143,6 +181,7 @@ define(["dojo/_base/declare",
                {
                   this.alfLog("log", "Item is already picked - it will not be added a second time", payload, this);
                }
+               this.isValid();
             }
          },
 
@@ -166,10 +205,14 @@ define(["dojo/_base/declare",
                   var key = lang.getObject(this.itemKey, false, item);
                   return key != keyToRemove;
                }, this);
+               array.forEach(this.currentData.items, function(item, index) {
+                  item.index = index;
+               });
                this.renderView(false);
                this.alfPublish("ALF_ITEMS_SELECTED", {
                   pickedItems: this.currentData.items
                });
+               this.isValid();
             }
          },
 
@@ -197,7 +240,6 @@ define(["dojo/_base/declare",
             return target;
          },
 
-
          /**
           * Handles requests to set the picked items via a publication.
           *
@@ -222,12 +264,16 @@ define(["dojo/_base/declare",
             if (items != null)
             {
                this.currentData.items = items;
+               array.forEach(this.currentData.items, function(item, index) {
+                  item.index = index;
+               });
             }
             else
             {
                this.alfLog("warn", "No items supplied to 'setPickedItems' function", items, this);
             }
             this.renderView();
+            this.isValid();
          },
 
          /**
@@ -247,7 +293,7 @@ define(["dojo/_base/declare",
                   var currKey = lang.getObject(this.itemKey, false, currItem);
                   if (currKey === targetKey)
                   {
-                     targetIndex = index; 
+                     targetIndex = index;
                   }
                   return currKey === targetKey;
                }, this);
@@ -270,6 +316,24 @@ define(["dojo/_base/declare",
                }
             }
          },
+
+         /**
+          * Called to determine if this control is valid or not & send the appropriate flags if it isn't.
+          *
+          * @instance
+          */
+         isValid: function alfresco_pickers_PickedItems_isValid() {
+            // This control is valid if there are one or more items selected, or allowNone is true.
+            if (this.allowNone || this.currentData.items.length > 0)
+            {
+               this.alfPublish(this.validTopic, {name: this.id}, this.publishValidityGlobally);
+            }
+            else
+            {
+               this.alfPublish(this.invalidTopic, {name: this.id}, this.publishValidityGlobally);
+            }
+         },
+
 
          /**
           * The widgets to be processed to generate each item in the rendered view.

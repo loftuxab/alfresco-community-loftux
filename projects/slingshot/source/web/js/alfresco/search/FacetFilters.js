@@ -271,17 +271,13 @@ define(["dojo/_base/declare",
        * @returns {array} The sorted filters
        */
       sortFacetFilters: function alfresco_search_FacetFilters__sortFacetFilters(filters) {
-         // Hard-coded to take facet queries into account. Should we stop using facet queries
-         // then this first if block will need to be removed...
-         if (this.facetQName === "{http://www.alfresco.org/model/content/1.0}content.size" || 
-             this.facetQName === "{http://www.alfresco.org/model/content/1.0}modified" ||
-             this.facetQName === "{http://www.alfresco.org/model/content/1.0}created")
-         {
-            return filters.sort(this._indexSort);
-         }
-         else if (this.sortBy == null || lang.trim(this.sortBy) === "ALPHABETICALLY")
+         if (this.sortBy == null || lang.trim(this.sortBy) === "ALPHABETICALLY")
          {
             return filters.sort(this._alphaSort);
+         }
+         else if (lang.trim(this.sortBy) === "REVERSE_ALPHABETICALLY")
+         {
+            return filters.sort(this._reverseAlphaSort);
          }
          else if (lang.trim(this.sortBy) === "ASCENDING")
          {
@@ -318,6 +314,22 @@ define(["dojo/_base/declare",
       },
 
       /**
+       * A function for sorting the facet filter values into reverse alphabetical order (from z-a)
+       * 
+       * @instance
+       * @param {object} a The first filter value object
+       * @param {object} b The second filter value object
+       * @returns {number} -1, 0 or 1 according to standard array sorting conventions
+       */
+      _reverseAlphaSort: function alfresco_search_FacetFilters___reverseAlphaSort(a, b) {
+         var alc = a.label.toLowerCase();
+         var blc = b.label.toLowerCase();
+         if(alc > blc) return -1;
+         if(alc < blc) return 1;
+         return 0;
+      },
+
+      /**
        * A function for sorting the facet filter values hits from low to high
        *
        * @instance
@@ -326,7 +338,7 @@ define(["dojo/_base/declare",
        * @returns {number} -1, 0 or 1 according to standard array sorting conventions
        */
       _ascSort: function alfresco_search_FacetFilters___ascSort(a, b) {
-         return a.hits - b.hits;
+         return b.hits - a.hits;
       },
 
       /**
@@ -338,7 +350,7 @@ define(["dojo/_base/declare",
        * @returns {number} -1, 0 or 1 according to standard array sorting conventions
        */
       _descSort: function alfresco_search_FacetFilter___descSort(a, b) {
-         return b.hits - a.hits;
+         return a.hits - b.hits;
       },
 
       /**
@@ -352,7 +364,14 @@ define(["dojo/_base/declare",
        * @returns {number} -1, 0 or 1 according to standard array sorting conventions
        */
       _indexSort: function alfresco_search_FacetFilter___indexSort(a, b) {
-         return a.index - b.index;
+         if (a.index != null && b.index != null)
+         {
+            return a.index - b.index;
+         }
+         else
+         {
+            return 0;
+         }
       }
    });
 });

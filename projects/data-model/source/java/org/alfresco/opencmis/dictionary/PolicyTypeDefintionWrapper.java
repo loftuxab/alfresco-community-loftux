@@ -45,10 +45,12 @@ public class PolicyTypeDefintionWrapper extends AbstractTypeDefinitionWrapper
 
     private PolicyTypeDefinitionImpl typeDef;
     private PolicyTypeDefinitionImpl typeDefInclProperties;
+    private DictionaryService dictionaryService;
 
     public PolicyTypeDefintionWrapper(CMISMapping cmisMapping, PropertyAccessorMapping propertyAccessorMapping, 
             PropertyLuceneBuilderMapping luceneBuilderMapping, String typeId, DictionaryService dictionaryService, ClassDefinition cmisClassDef)
     {
+        this.dictionaryService = dictionaryService;
         alfrescoName = cmisClassDef.getName();
         alfrescoClass = cmisMapping.getAlfrescoClass(alfrescoName);
 
@@ -235,5 +237,19 @@ public class PolicyTypeDefintionWrapper extends AbstractTypeDefinitionWrapper
         {
             super.updateDefinition(dictionaryService);
         }
+    }
+    
+    @Override
+    public PropertyDefinitionWrapper getPropertyById(String propertyId)
+    {
+        updateProperty(dictionaryService, propertiesById.get(propertyId));
+        return propertiesById.get(propertyId);
+    }
+
+    @Override
+    public Collection<PropertyDefinitionWrapper> getProperties()
+    {
+        updateProperties(dictionaryService);
+        return propertiesById.values();
     }
 }

@@ -215,6 +215,31 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
         setTypeDefDescription(description);
     }
 
+    public void updateProperties(DictionaryService dictionaryService)
+    {
+        for (PropertyDefinitionWrapper propertyDefWrap : propertiesById.values())
+        {
+            updateProperty(dictionaryService, propertyDefWrap);
+        }
+    }
+    
+    public void updateProperty(DictionaryService dictionaryService, PropertyDefinitionWrapper propertyDefWrap)
+    {
+        AbstractPropertyDefinition<?> property = (AbstractPropertyDefinition<?>) propertyDefWrap.getPropertyDefinition();
+        if (property != null && property.getDisplayName() == null)
+        {
+            org.alfresco.service.cmr.dictionary.PropertyDefinition propDef = dictionaryService
+                    .getProperty(QName.createQName(property.getLocalNamespace(), property.getLocalName()));
+            if (propDef != null)
+            {
+                String displayName = propDef.getTitle(dictionaryService);
+                String description = propDef.getDescription(dictionaryService);
+                property.setDisplayName(displayName == null ? property.getId() : displayName);
+                property.setDescription(description == null ? property.getDisplayName() : description);
+            }
+        }
+    }
+
     public void setTypeDefDisplayName(String name)
     {
         lock.writeLock().lock();
@@ -418,8 +443,8 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
         result.setId(id);
         result.setLocalName(alfrescoPropName.getLocalName());
         result.setLocalNamespace(alfrescoPropName.getNamespaceURI());
-        result.setDisplayName(id);
-        result.setDescription(result.getDisplayName());
+        result.setDisplayName(null);
+        result.setDescription(null);
         result.setPropertyType(datatype);
         result.setCardinality(propDef.isMultiValued() ? Cardinality.MULTI : Cardinality.SINGLE);
         result.setIsInherited(inherited);

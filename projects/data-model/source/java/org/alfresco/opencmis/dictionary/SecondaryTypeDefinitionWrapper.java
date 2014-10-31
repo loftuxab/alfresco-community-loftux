@@ -45,10 +45,12 @@ public class SecondaryTypeDefinitionWrapper extends AbstractTypeDefinitionWrappe
 
     private SecondaryTypeDefinitionImpl typeDef;
     private SecondaryTypeDefinitionImpl typeDefInclProperties;
+    private DictionaryService dictionaryService;
 
     public SecondaryTypeDefinitionWrapper(CMISMapping cmisMapping, PropertyAccessorMapping propertyAccessorMapping, 
             PropertyLuceneBuilderMapping luceneBuilderMapping, String typeId, DictionaryService dictionaryService, ClassDefinition cmisClassDef)
     {
+        this.dictionaryService = dictionaryService;
         alfrescoName = cmisClassDef.getName();
         alfrescoClass = cmisMapping.getAlfrescoClass(alfrescoName);
 
@@ -230,5 +232,19 @@ public class SecondaryTypeDefinitionWrapper extends AbstractTypeDefinitionWrappe
         {
             super.updateDefinition(dictionaryService);
         }
+    }
+    
+    @Override
+    public PropertyDefinitionWrapper getPropertyById(String propertyId)
+    {
+        updateProperty(dictionaryService, propertiesById.get(propertyId));
+        return propertiesById.get(propertyId);
+    }
+
+    @Override
+    public Collection<PropertyDefinitionWrapper> getProperties()
+    {
+        updateProperties(dictionaryService);
+        return propertiesById.values();
     }
 }

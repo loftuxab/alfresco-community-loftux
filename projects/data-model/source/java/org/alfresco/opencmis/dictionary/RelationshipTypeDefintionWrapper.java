@@ -19,6 +19,7 @@
 package org.alfresco.opencmis.dictionary;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,10 +41,12 @@ public class RelationshipTypeDefintionWrapper extends AbstractTypeDefinitionWrap
 
     private RelationshipTypeDefinitionImpl typeDef;
     private RelationshipTypeDefinitionImpl typeDefInclProperties;
+    private DictionaryService dictionaryService;
 
     public RelationshipTypeDefintionWrapper(CMISMapping cmisMapping, PropertyAccessorMapping accessorMapping,
             PropertyLuceneBuilderMapping luceneBuilderMapping, String typeId, DictionaryService dictionaryService, ClassDefinition cmisClassDef)
     {
+        this.dictionaryService = dictionaryService;
         alfrescoName = cmisClassDef.getName();
         alfrescoClass = cmisMapping.getAlfrescoClass(alfrescoName);
 
@@ -86,6 +89,7 @@ public class RelationshipTypeDefintionWrapper extends AbstractTypeDefinitionWrap
     public RelationshipTypeDefintionWrapper(CMISMapping cmisMapping, PropertyAccessorMapping accessorMapping,
             PropertyLuceneBuilderMapping luceneBuilderMapping, String typeId, DictionaryService dictionaryService, AssociationDefinition cmisAssocDef)
     {
+        this.dictionaryService = dictionaryService;
         alfrescoName = cmisAssocDef.getName();
         alfrescoClass = cmisMapping.getAlfrescoClass(alfrescoName);
 
@@ -228,5 +232,19 @@ public class RelationshipTypeDefintionWrapper extends AbstractTypeDefinitionWrap
         {
             super.updateDefinition(dictionaryService);
         }
+    }
+    
+    @Override
+    public PropertyDefinitionWrapper getPropertyById(String propertyId)
+    {
+        updateProperty(dictionaryService, propertiesById.get(propertyId));
+        return propertiesById.get(propertyId);
+    }
+
+    @Override
+    public Collection<PropertyDefinitionWrapper> getProperties()
+    {
+        updateProperties(dictionaryService);
+        return propertiesById.values();
     }
 }
