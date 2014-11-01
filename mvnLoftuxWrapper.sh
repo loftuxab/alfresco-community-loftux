@@ -24,3 +24,6 @@ read KEY
 echo "Starting build..."
 
 mvn clean source:jar javadoc:jar $1 -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath"
+
+echo "Restore file deleted by build"
+git checkout HEAD projects/surf/spring-surf-tests/spring-surf-fvt-app/src/main/webapp/WEB-INF/presetConstructs/default-persisted-extension.xml
