@@ -16,33 +16,41 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.alfresco.repo.cache;
 
-package org.alfresco.repo.search.impl.solr.facet;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.extensions.surf.util.ParameterCheck;
+import org.alfresco.repo.cache.TransactionStats.OpType;
 
 /**
- * A simple bean class to provide facet fields.
+ * A do-nothing implementation of {@link CacheStatistics}. Used
+ * by the {@link TransactionalCache} if it is not explicitly
+ * injected with an implementation.
  * 
- * @author Jamal Kaabi-Mofrad
  * @since 5.0
+ * @author Matt Ward
  */
-public class FacetFieldBean
+public class NoOpCacheStatistics implements CacheStatistics
 {
-    private final Set<String> fields;
-
-    public FacetFieldBean(Set<String> fields)
+    @Override
+    public void add(String cacheName, TransactionStats stats)
     {
-        ParameterCheck.mandatory("fields", fields);
-        this.fields = new HashSet<>(fields);
+        // Does nothing
     }
 
-    public Set<String> getFields()
+    @Override
+    public long count(String cacheName, OpType opType)
     {
-        return Collections.unmodifiableSet(this.fields);
+        return 0;
+    }
+
+    @Override
+    public double meanTime(String cacheName, OpType opType)
+    {
+        return Double.NaN;
+    }
+
+    @Override
+    public double hitMissRatio(String cacheName)
+    {
+        return Double.NaN;
     }
 }

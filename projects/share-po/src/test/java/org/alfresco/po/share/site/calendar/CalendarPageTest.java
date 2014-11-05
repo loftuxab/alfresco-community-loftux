@@ -132,13 +132,13 @@ public class CalendarPageTest extends AbstractSiteDashletTest
         calendarPage = calendarPage.chooseAgendaTab().render();
         assertNotNull(calendarPage, "Calendar page agenda tab isn't opened");
         Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.AGENDA_TAB_SINGLE_EVENT, event1), "The " + event1
-                + " isn't correctly displayed on the agenda tab");   
-        
+                + " isn't correctly displayed on the agenda tab");
+
         int nrEvents = calendarPage.getTheNumOfEvents(ActionEventVia.AGENDA_TAB);
         Assert.assertTrue(nrEvents > 1);
-        
+
     }
-    
+
     @Test(dependsOnMethods = "testChooseAgendaTab", timeOut = 60000)
     public void testShowWorkingHours()
     {
@@ -228,9 +228,9 @@ public class CalendarPageTest extends AbstractSiteDashletTest
 
         Assert.assertTrue(starDate.contains(String.valueOf(todayDate)));
         Assert.assertTrue(endDate.contains(String.valueOf(todayDate)));
-        
+
         Assert.assertFalse(eventInfo.isRecurrencePresent());
-        
+
         String recurrence = eventInfo.getRecurrenceDetail();
         Assert.assertTrue(recurrence.isEmpty());
     }
@@ -254,32 +254,24 @@ public class CalendarPageTest extends AbstractSiteDashletTest
         calendarPage = siteDashBoard.getSiteNav().selectCalendarPage();
 
         Calendar calendar = Calendar.getInstance();
+
         int currentMonth = calendar.get(Calendar.MONTH);
-        int nextMonth = currentMonth + 2;
-        int currentYear = calendar.get(Calendar.YEAR);
-
         String startMonth = monthValues.get(currentMonth);
-        String endMonth = monthValues.get(nextMonth);
 
-        int lastDate = calendar.getActualMaximum(Calendar.DATE);
+        int currentYear = calendar.get(Calendar.YEAR);
         int todayDate = calendar.get(Calendar.DATE);
 
-        // Create any event
-        int anotherDate;
-        if (lastDate <= todayDate+3)
-        {
-            anotherDate = todayDate - 1;
-            calendarPage = calendarPage.createEvent(CalendarPage.ActionEventVia.MONTH_TAB, event_month, event_month, event_month, String.valueOf(currentYear),
-                    String.valueOf(startMonth), String.valueOf(anotherDate), "7:00 AM", String.valueOf(currentYear), String.valueOf(endMonth),
-                    String.valueOf(todayDate), "9:00 AM", null, false);
-        }
-        else
-        {
-            anotherDate = todayDate + 3;
-            calendarPage = calendarPage.createEvent(CalendarPage.ActionEventVia.MONTH_TAB, event_month, event_month, event_month, String.valueOf(currentYear),
-                    String.valueOf(startMonth), String.valueOf(todayDate), "7:00 AM", String.valueOf(currentYear), String.valueOf(endMonth),
-                    String.valueOf(anotherDate), "9:00 AM", null, false);
-        }
+        calendar.add(Calendar.MONTH, 2);
+
+        int nextMonth = calendar.get(Calendar.MONTH);
+        int nextMonthsYear = calendar.get(Calendar.YEAR);
+
+        String endMonth = monthValues.get(nextMonth);
+        int lastDate = calendar.getActualMaximum(Calendar.DATE);
+
+        calendarPage = calendarPage.createEvent(CalendarPage.ActionEventVia.MONTH_TAB, event_month, event_month, event_month, String.valueOf(currentYear),
+                String.valueOf(startMonth), String.valueOf(todayDate), "7:00 AM", String.valueOf(nextMonthsYear), String.valueOf(endMonth),
+                String.valueOf(lastDate), "9:00 AM", null, false);
 
         // verify event is present
         Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, event_month), "The " + event_month
