@@ -4,7 +4,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-packaging</artifactId>
-        <version>5.0.b.LX72-SNAPSHOT</version>
+        <version>LX72</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-installer</artifactId>
