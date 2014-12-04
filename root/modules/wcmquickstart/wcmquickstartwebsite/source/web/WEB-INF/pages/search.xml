@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page> 
+   <id>search</id>
+   <title>title.search</title>
+   <template-instance>two-block</template-instance>
+   <authentication>none</authentication>
+   <components>
+      <component>
+         <region-id>left1</region-id>
+         <url>/search/results</url>
+      </component>
+   </components>
+</page>

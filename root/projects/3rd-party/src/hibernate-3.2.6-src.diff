@@ -1,0 +1,798 @@
+diff -wrN src-orig/org/hibernate/action/AmalgamatedCleanupAction.java src/org/hibernate/action/AmalgamatedCleanupAction.java
+0a1,139
+> package org.hibernate.action;
+> 
+> import java.io.Serializable;
+> import java.util.ArrayList;
+> import java.util.HashSet;
+> import java.util.Iterator;
+> import java.util.List;
+> import java.util.Set;
+> 
+> import org.hibernate.HibernateException;
+> import org.hibernate.engine.SessionImplementor;
+> 
+> public class AmalgamatedCleanupAction implements Executable, Serializable
+> {
+>     private final SessionImplementor session;
+> 
+>     private final Set affectedEntityNames = new HashSet();
+> 
+>     private final Set affectedCollectionRoles = new HashSet();
+> 
+>     private final Set spaces = new HashSet();
+> 
+>     public AmalgamatedCleanupAction(SessionImplementor session)
+>     {
+>         super();
+>         this.session = session;
+>     }
+> 
+>     public void addExecutable(Executable executable)
+>     {
+>         if (executable instanceof EntityAction)
+>         {
+>             EntityAction entityAction = (EntityAction) executable;
+>             String entityName = entityAction.getEntityName();
+>             if (!affectedEntityNames.contains(entityName))
+>             {
+>                 affectedEntityNames.add(entityName);
+>                 Serializable[] toAdd = entityAction.getPropertySpaces();
+>                 for(int i = 0; i < toAdd.length; i++)
+>                 {
+>                     spaces.add(toAdd[i]);
+>                 }
+>             }
+>         }
+>         else if (executable instanceof CollectionAction)
+>         {
+>             CollectionAction collectionAction = (CollectionAction) executable;
+>             String collectionRole = collectionAction.getCollectionRole();
+>             if(!affectedCollectionRoles.contains(collectionRole))
+>             {
+>                 affectedCollectionRoles.add(collectionRole);
+>                 Serializable[] toAdd = collectionAction.getPropertySpaces();
+>                 for(int i = 0; i < toAdd.length; i++)
+>                 {
+>                     spaces.add(toAdd[i]);
+>                 }
+>             }
+>         }
+>         else
+>         {
+>             // Invalid or ignore ??
+>         }
+>     }
+> 
+>     public void afterTransactionCompletion(boolean success) throws HibernateException
+>     {
+>         evictEntityRegions();
+>         evictCollectionRegions();
+>     }
+> 
+>     public void beforeExecutions() throws HibernateException
+>     {
+>         // nothing to do
+>     }
+> 
+>     public void execute() throws HibernateException
+>     {
+>         // nothing to do
+>     }
+> 
+>     public Serializable[] getPropertySpaces()
+>     {
+>         Serializable[] answer = new Serializable[spaces.size()];
+>         int position = 0;
+>         for(Iterator it = spaces.iterator(); it.hasNext(); /**/)
+>         {
+>             Serializable s = (Serializable) it.next();
+>             answer[position++] = s;
+>         }
+>         return answer;
+>         
+>     }
+> 
+>     public boolean hasAfterTransactionCompletion()
+>     {
+>         return true;
+>     }
+> 
+>     public boolean hasCache()
+>     {
+>         return true;
+>     }
+> 
+>     public boolean hasPostCommitEventListeners()
+>     {
+>         return false;
+>     }
+> 
+>     public boolean isBulkAction()
+>     {
+>         return true;
+>     }
+> 
+>     private void evictEntityRegions()
+>     {
+>         if (affectedEntityNames != null)
+>         {
+>             Iterator itr = affectedEntityNames.iterator();
+>             while (itr.hasNext())
+>             {
+>                 final String entityName = (String) itr.next();
+>                 session.getFactory().evictEntity(entityName);
+>             }
+>         }
+>     }
+> 
+>     private void evictCollectionRegions()
+>     {
+>         if (affectedCollectionRoles != null)
+>         {
+>             Iterator itr = affectedCollectionRoles.iterator();
+>             while (itr.hasNext())
+>             {
+>                 final String roleName = (String) itr.next();
+>                 session.getFactory().evictCollection(roleName);
+>             }
+>         }
+>     }
+> }
+diff -wrN src-orig/org/hibernate/action/BulkOperationCleanupAction.java src/org/hibernate/action/BulkOperationCleanupAction.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+150a157,172
+> 
+>     public boolean hasCache()
+>     {
+>         return true;
+>     }
+> 
+>     public boolean hasPostCommitEventListeners()
+>     {
+>         return false;
+>     }
+>     
+>     public boolean isBulkAction()
+>     {
+>         return true;
+>     }
+>     
+diff -wrN src-orig/org/hibernate/action/CollectionAction.java src/org/hibernate/action/CollectionAction.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+69a76,85
+>     public boolean hasCache()
+>     {
+>         return persister.hasCache();
+>     }
+>     
+>     public boolean hasPostCommitEventListeners()
+>     {
+>         return false;
+>     }
+> 
+144a161,170
+>     
+>     public boolean isBulkAction()
+>     {
+>         return false;
+>     }
+>     
+>     public String getCollectionRole()
+>     {
+>         return collectionRole;
+>     }
+diff -wrN src-orig/org/hibernate/action/EntityAction.java src/org/hibernate/action/EntityAction.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+45c51,56
+< 	protected abstract boolean hasPostCommitEventListeners();
+---
+>         public boolean hasCache()
+>         {
+>             return persister.hasCache();
+>         }
+>      
+>  	public abstract boolean hasPostCommitEventListeners();
+134a146,151
+> 
+>  	public boolean isBulkAction()
+>      	{
+>        		return false;
+>      	}
+>      
+diff -wrN src-orig/org/hibernate/action/EntityDeleteAction.java src/org/hibernate/action/EntityDeleteAction.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+166c172
+< 	protected boolean hasPostCommitEventListeners() {
+---
+> 	public boolean hasPostCommitEventListeners() {
+diff -wrN src-orig/org/hibernate/action/EntityIdentityInsertAction.java src/org/hibernate/action/EntityIdentityInsertAction.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+144c150
+< 	protected boolean hasPostCommitEventListeners() {
+---
+> 	public boolean hasPostCommitEventListeners() {
+diff -wrN src-orig/org/hibernate/action/EntityInsertAction.java src/org/hibernate/action/EntityInsertAction.java
+187c187
+< 	protected boolean hasPostCommitEventListeners() {
+---
+> 	public boolean hasPostCommitEventListeners() {
+diff -wrN src-orig/org/hibernate/action/EntityUpdateAction.java src/org/hibernate/action/EntityUpdateAction.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+254c260
+< 	protected boolean hasPostCommitEventListeners() {
+---
+> 	public boolean hasPostCommitEventListeners() {
+diff -wrN src-orig/org/hibernate/action/Executable.java src/org/hibernate/action/Executable.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+9,10c15
+<  * An operation which may be scheduled for later execution.
+<  * Usually, the operation is a database insert/update/delete,
+---
+>  * An operation which may be scheduled for later execution. Usually, the operation is a database insert/update/delete,
+15c20,21
+< public interface Executable {
+---
+> public interface Executable
+> {
+19a26
+> 
+23a31
+> 
+25,28c33,35
+< 	 * Do we need to retain this instance until after the
+< 	 * transaction completes?
+< 	 * @return false if this class defines a no-op
+< 	 * <tt>hasAfterTransactionCompletion()</tt>
+---
+>      * Do we need to retain this instance until after the transaction completes?
+>      * 
+>      * @return false if this class defines a no-op <tt>hasAfterTransactionCompletion()</tt>
+30a38
+> 
+34a43
+> 
+38a48,53
+> 
+>     public boolean hasCache();
+> 
+>     public boolean hasPostCommitEventListeners();
+>     
+>     public boolean isBulkAction();
+diff -wrN src-orig/org/hibernate/cache/ReadWriteCache.java src/org/hibernate/cache/ReadWriteCache.java
+5a6
+> import java.util.concurrent.locks.ReentrantReadWriteLock;
+31a33
+> 	private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+73,74c75,78
+< 	public synchronized Object get(Object key, long txTimestamp) throws CacheException {
+< 
+---
+> 	public Object get(Object key, long txTimestamp) throws CacheException {
+> 	    readWriteLock.readLock().lock();
+> 	    try
+> 	    {
+103a108,112
+> 	    finally
+> 	    {
+> 	        readWriteLock.readLock().unlock();
+> 	    }
+> 	}
+112c121,124
+< 	public synchronized SoftLock lock(Object key, Object version) throws CacheException {
+---
+> 	public SoftLock lock(Object key, Object version) throws CacheException {
+> 	    readWriteLock.writeLock().lock();
+> 	    try
+> 	    {
+128a141,145
+> 	    }
+> 	    finally
+> 	    {
+> 	        readWriteLock.writeLock().unlock();
+> 	    }
+140c157
+< 	public synchronized boolean put(
+---
+> 	public boolean put(
+147a165,167
+> 	    readWriteLock.writeLock().lock();
+> 	    try
+> 	    {
+178a199,202
+> 	    finally {
+> 	        readWriteLock.writeLock().unlock();
+> 	    }
+> 	}
+194c218,221
+< 	public synchronized void release(Object key, SoftLock clientLock) throws CacheException {
+---
+> 	public void release(Object key, SoftLock clientLock) throws CacheException {
+> 	    readWriteLock.writeLock().lock();
+> 	    try
+> 	    {
+211a239,243
+> 	    finally
+> 	    {
+> 	        readWriteLock.writeLock().unlock();
+> 	    }
+> 	}
+243c275
+< 	public synchronized boolean afterUpdate(Object key, Object value, Object version, SoftLock clientLock) 
+---
+> 	public boolean afterUpdate(Object key, Object value, Object version, SoftLock clientLock) 
+245c277,279
+< 		
+---
+> 		readWriteLock.writeLock().lock();
+> 		try
+> 		{
+276a311,315
+> 		finally
+> 		{
+> 		    readWriteLock.writeLock().unlock();
+> 		}
+> 	}
+282c321
+< 	public synchronized boolean afterInsert(Object key, Object value, Object version) 
+---
+> 	public boolean afterInsert(Object key, Object value, Object version) 
+284a324,326
+> 	    readWriteLock.writeLock().lock();
+> 	    try
+> 	    {
+302a345,349
+> 	    finally
+> 	    {
+> 	        readWriteLock.writeLock().unlock();
+> 	    }
+> 	}
+diff -wrN src-orig/org/hibernate/cfg/Configuration.java src/org/hibernate/cfg/Configuration.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+999,1000c1005,1006
+< 						table.getSchema(),
+< 						table.getCatalog(),
+---
+> 						( table.getSchema() == null ) ? defaultSchema : table.getSchema(),
+> 						( table.getCatalog() == null ) ? defaultCatalog : table.getCatalog(),
+diff -wrN src-orig/org/hibernate/dialect/DialectFactory.java src/org/hibernate/dialect/DialectFactory.java
+0a1,6
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+> 
+9a16
+> import org.hibernate.dialect.Dialect;
+15a23
+>  * @author Alfresco
+38c46
+< 		if ( dialectName == null ) {
+---
+>         if ( dialectName == null || dialectName.length() == 0) {
+41a50,51
+>             // Push the dialect onto the system properties
+>             System.setProperty(Environment.DIALECT, dialectName);
+65a76,77
+>         // Push the dialect onto the system properties
+>         System.setProperty(Environment.DIALECT, dialectName);
+133d144
+< 		// thanks goodness for "universal" databases...
+140a152,170
+>         MAPPERS.put( "DB2",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/NT",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/NT64",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2 UDP",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/LINUX",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/LINUX390",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/LINUXZ64",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/400 SQL",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/6000",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2 UDB iSeries",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/AIX64",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/HPUX",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/HP64",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/SUN",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/SUN64",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/PTX",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/2",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+>         MAPPERS.put( "DB2/LINUXX8664",new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ));
+142,154c172,178
+< 		MAPPERS.put(
+< 		        "Oracle",
+< 		        new DatabaseDialectMapper() {
+< 			        public String getDialectClass(int majorVersion) {
+< 						switch ( majorVersion ) {
+< 							case 8: return Oracle8iDialect.class.getName();
+< 							case 9: return Oracle9iDialect.class.getName();
+< 							case 10: return Oracle10gDialect.class.getName();
+< 							default: throw new HibernateException( "unknown Oracle major version [" + majorVersion + "]" );
+< 						}
+< 			        }
+< 		        }
+< 		);
+---
+>         MAPPERS.put( "MySQL", new VersionInsensitiveMapper( "org.hibernate.dialect.MySQLInnoDBDialect" ) );
+>         MAPPERS.put( "DB2/NT64", new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ) );
+>         MAPPERS.put( "DB2/LINUX", new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ) );
+>         MAPPERS.put( "Microsoft SQL Server Database", new VersionInsensitiveMapper( "org.alfresco.repo.domain.hibernate.dialect.AlfrescoSQLServerDialect" ) );
+>         MAPPERS.put( "Microsoft SQL Server", new VersionInsensitiveMapper( "org.alfresco.repo.domain.hibernate.dialect.AlfrescoSQLServerDialect" ) );
+>         MAPPERS.put( "Sybase SQL Server", new VersionInsensitiveMapper( "org.alfresco.repo.domain.hibernate.dialect.AlfrescoSybaseAnywhereDialect" ) );
+>         MAPPERS.put( "Oracle", new VersionInsensitiveMapper( "org.alfresco.repo.domain.hibernate.dialect.AlfrescoOracle9Dialect" ) );
+diff -wrN src-orig/org/hibernate/engine/ActionQueue.java src/org/hibernate/engine/ActionQueue.java
+23a24,26
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+42a46
+> import org.hibernate.action.AmalgamatedCleanupAction;
+64a69,70
+>         private static volatile int MAX_EXECUTIONS_SIZE = 20000;
+> 
+86a93,94
+>         AmalgamatedCleanupAction finalExecutable = null;
+> 
+96a105,114
+>         public static int getMAX_EXECUTIONS_SIZE()
+>         {
+>                 return MAX_EXECUTIONS_SIZE;
+>         }
+> 
+>         public static void setMAX_EXECUTIONS_SIZE(int max_executions_size)
+>         {
+>                 MAX_EXECUTIONS_SIZE = max_executions_size;
+>         }
+> 
+149c167
+< 		executions.add( cleanupAction );
+---
+> 		addExecution(cleanupAction);
+214a233,260
+> 
+> 		if (finalExecutable != null)
+>                	{
+>             		try
+>             		{
+>                 		try
+>                 		{
+>                     			finalExecutable.afterTransactionCompletion(success);
+>                 		}
+>                 		finally
+>                 		{
+>                     			if (invalidateQueryCache)
+>                     			{
+>                         			session.getFactory().getUpdateTimestampsCache().invalidate(finalExecutable.getPropertySpaces());
+>                     			}
+>                     			finalExecutable = null;
+>                 		}
+>             		}
+>             		catch (CacheException ce)
+>             		{
+>                 		log.error("could not release a cache lock", ce);
+>                 		// continue loop
+>             		}
+>             		catch (Exception e)
+>             		{
+>                 		throw new AssertionFailure("Exception releasing cache locks", e);
+>             		}
+>         	}
+272c318
+< 			executions.add( executable );
+---
+> 			addExecution(executable);
+281a328,367
+>         private void addExecution(Executable executable)
+>     	{
+>         	if (finalExecutable == null)
+>         	{
+>             		executions.add(executable);
+>             		if (executions.size() > MAX_EXECUTIONS_SIZE)
+>             		{
+>                 		// Merge as much as possible into a bulk action
+>                 		finalExecutable = new AmalgamatedCleanupAction(session);
+>                 		ArrayList newExecutions = new ArrayList(executions.size());
+>                 		for (int i = 0; i < executions.size(); i++)
+>                 		{
+>                     			Executable current = (Executable) executions.get(i);
+>                     			if (current.isBulkAction() || current.hasPostCommitEventListeners())
+>                     			{
+>                         			newExecutions.add(current);
+>                     			}
+>                     			else
+>                     			{
+>                         			finalExecutable.addExecutable(current);
+>                     			}
+>                 		}
+>                 		executions = newExecutions;
+>             		}
+>         	}
+>         	else
+>         	{
+>             		if (executable.hasPostCommitEventListeners())
+>             		{
+>                 		executions.add(executable);
+>             		}
+>             		else
+>             		{
+>                 		finalExecutable.addExecutable(executable);
+>             		}
+>         	}
+> 
+>     	}
+> 
+> 
+diff -wrN src-orig/org/hibernate/jdbc/BorrowedConnectionProxy.java src/org/hibernate/jdbc/BorrowedConnectionProxy.java
+1c1,5
+< package org.hibernate.jdbc;
+---
+> /*
+>  * 2010 - Alfresco Software, Ltd.
+>  * Alfresco Software has modified source of this file
+>  * The details of changes as svn diff can be found in svn at location root/projects/3rd-party/src 
+>  */
+3c7
+< import org.hibernate.HibernateException;
+---
+> package org.hibernate.jdbc;
+5a10
+> import java.lang.reflect.InvocationTargetException;
+8d12
+< import java.lang.reflect.InvocationTargetException;
+9a14,20
+> import java.sql.Time;
+> import java.text.SimpleDateFormat;
+> import java.util.Date;
+> 
+> import org.apache.commons.logging.Log;
+> import org.apache.commons.logging.LogFactory;
+> import org.hibernate.HibernateException;
+24a36,58
+> 	private static final Log log = LogFactory.getLog(BorrowedConnectionProxy.class);
+>     private static volatile boolean isCallStackTraced = false;
+>     static
+>     {
+>         if (log.isDebugEnabled())
+>         {
+>             isCallStackTraced = true;
+>             log.warn("Logging of call stack is enforced and will affect performance.");
+>         }
+>     }
+>     public static boolean isCallStackTraced()
+>     {
+>         return isCallStackTraced;
+>     }
+>     /** Keep track of the call stack constructing the instance */
+>     private final StackTraceElement[] constructorCallStack;
+>     private final long constructorCallTime;
+>     private final String constructorCallThread;
+>     /** Keep track of the call stack disabling the instance */
+>     private StackTraceElement[] disablingCallStack;
+>     private long disablingCallTime;
+>     private String disablingCallThread;
+> 	
+28c62,63
+< 	public BorrowedConnectionProxy(ConnectionManager connectionManager) {
+---
+> 	public BorrowedConnectionProxy(ConnectionManager connectionManager)
+> 	{
+29a65,80
+> 		
+> 		// Record who created this instance, if required
+> 		if (BorrowedConnectionProxy.isCallStackTraced)
+> 		{
+> 		    Exception e = new BorrowedConnectionProxyTraceConstructorException();
+> 		    e.fillInStackTrace();
+> 		    constructorCallStack = e.getStackTrace();
+> 		    constructorCallTime = System.currentTimeMillis();
+> 		    constructorCallThread = Thread.currentThread().getName();
+> 		}
+> 		else
+> 		{
+> 		    constructorCallStack = null;
+> 		    constructorCallTime = 0L;
+> 		    constructorCallThread = null;
+> 		}
+41c92,141
+< 		if ( !useable ) {
+---
+> 		if ( !useable )
+> 		{
+> 		    if (BorrowedConnectionProxy.isCallStackTraced)
+> 		    {
+> 		        // The proxy has been used after having been explicitly closed.
+> 		        // Since this object has probably been through thread pools and thread locals,
+> 		        // it is almost impossible to find out who didn't throw it away when it
+> 		        // should have been.
+> 		        log.error("Unusable connection proxy encountered: " + this);
+> 		        if (constructorCallStack == null)
+> 		        {
+> 		            log.error("Constructor was called before call stack logging was enabled: " + this);
+> 		        }
+> 		        else
+> 		        {
+> 		            // Log the full stack for the constructor
+>                     StringBuilder sb = new StringBuilder(1024);
+>                     StackTraceUtil.buildStackTrace(
+>                             "Unusable connection proxy was constructed at " + formatDateTime(constructorCallTime) +
+>                                     " on thread '" + constructorCallThread + "': " + this,
+>                             constructorCallStack,
+>                             sb,
+>                             -1);
+>                     log.error(sb);
+> 		        }
+> 		        if (disablingCallStack == null)
+> 		        {
+> 		            log.error("renderUnusable was called before call stack logging was enabled: " + this);
+> 		        }
+> 		        else
+> 		        {
+> 		            // Log the full stack for the disabler
+>                     StringBuilder sb = new StringBuilder(1024);
+>                     StackTraceUtil.buildStackTrace(
+>                             "Unusable connection proxy was rendered unusable at " + formatDateTime(disablingCallTime) +
+>                                     " on thread '" + disablingCallThread + "': " + this,
+>                             disablingCallStack,
+>                             sb,
+>                             -1);
+>                     log.error(sb);
+> 		        }
+> 		    }
+> 		    else
+> 		    {
+> 		        // Switch on the tracing
+> 		        log.error("Unusable connection proxy encountered: " + this);
+> 		        log.error("Logging of call stack is enforced and will affect performance.");
+> 		        BorrowedConnectionProxy.isCallStackTraced = true;     // It is volatile
+> 		    }
+> 		    // Now throw the exception
+68c168
+< 				getProxyClassLoader(),
+---
+> 				BorrowedConnectionProxy.class.getClassLoader(),
+82,83c182,195
+< 			if ( BorrowedConnectionProxy.class.isAssignableFrom( handler.getClass() ) ) {
+< 				( ( BorrowedConnectionProxy ) handler ).useable = false;
+---
+> 			if ( BorrowedConnectionProxy.class.isAssignableFrom( handler.getClass() ) )
+> 			{
+> 			    BorrowedConnectionProxy proxy = (BorrowedConnectionProxy) handler;
+> 				proxy.useable = false;
+> 				// Alfresco
+> 				// At this point, if tracing is on, record the call stack rendering the instance unusable
+> 				if (BorrowedConnectionProxy.isCallStackTraced)
+> 				{
+> 				    Exception e = new BorrowedConnectionProxyTraceRenderUnusableException();
+> 				    e.fillInStackTrace();
+> 				    proxy.disablingCallStack = e.getStackTrace();
+> 				    proxy.disablingCallTime = System.currentTimeMillis();
+> 				    proxy.disablingCallThread = Thread.currentThread().getName();
+> 				}
+116a229,306
+> 	
+> 	private static String formatDateTime(long time)
+> 	{
+> 	    Date date = new Date(time);
+> 	    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+> 	    return format.format(date);
+> 	}
+> 
+> 	/**
+> 	 * An explicit type of exception to add to traceability during profiling
+> 	 * @author Derek Hulley
+> 	 * 
+> 	 * @since Alfresco 4.1.3.N
+> 	 */
+> 	public static class BorrowedConnectionProxyTraceConstructorException extends Exception
+> 	{
+> 	}
+> 
+>     /**
+>      * An explicit type of exception to add to traceability during profiling
+>      * @author Derek Hulley
+>      * 
+>      * @since Alfresco 4.1.3.N
+>      */
+>     public static class BorrowedConnectionProxyTraceRenderUnusableException extends Exception
+>     {
+>     }
+> 
+> 	/**
+> 	 * Copied from *org.alfresco.error.StackTraceUtil*.
+> 	 * 
+> 	 * Helper class around outputting stack traces.
+> 	 * 
+> 	 * @author Derek Hulley
+> 	 * @since Alfresco 4.1.3.N
+> 	 */
+> 	private static class StackTraceUtil
+> 	{
+> 	    /**
+> 	     * Builds a message with the stack trace of the form:
+> 	     * <pre>
+> 	     *    SOME MESSAGE:
+> 	     *       Started at:
+> 	     *          com.package...
+> 	     *          com.package...
+> 	     *          ...
+> 	     * </pre>
+> 	     * 
+> 	     * @param msg the initial error message
+> 	     * @param stackTraceElements the stack trace elements
+> 	     * @param sb the buffer to append to
+> 	     * @param maxDepth the maximum number of trace elements to output.  0 or less means output all.
+> 	     */
+> 	    public static void buildStackTrace(
+> 	            String msg,
+> 	            StackTraceElement[] stackTraceElements,
+> 	            StringBuilder sb,
+> 	            int maxDepth)
+> 	    {
+> 	        String lineEnding = System.getProperty("line.separator", "\n");
+> 
+> 	        sb.append(msg).append(" ").append(lineEnding)
+> 	          .append("   Started at: ").append(lineEnding);
+> 	        for (int i = 0; i < stackTraceElements.length; i++)
+> 	        {
+> 	            if (i > maxDepth && maxDepth > 0)
+> 	            {
+> 	                sb.append("      ...");
+> 	                break;
+> 	            }
+> 	            sb.append("      ").append(stackTraceElements[i]);
+> 	            if (i < stackTraceElements.length - 1)
+> 	            {
+> 	                sb.append(lineEnding);
+> 	            }
+> 	        }
+> 	    }
+> 	}
