@@ -566,6 +566,30 @@
       },
 
       /**
+       * Returns text custom datacell formatter
+       *
+       * @method fnRenderCellText
+       */
+      fnRenderPermissionCellText: function Permissions_fnRenderPermissionCellText()
+      {
+         var scope = this;
+
+         /**
+          * Text custom datacell formatter.
+          *
+          * @method renderPermissionCellText
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         return function Permissions_renderPermissionCellText(elCell, oRecord, oColumn, oData)
+         {
+            elCell.innerHTML = $html(oData);
+         };
+      },
+
+      /**
        * Converts a role name into a localised role name.
        *
        * @method _i18nRole
@@ -802,7 +826,7 @@
          var columnDefinitions =
          [
             { key: "icon", label: "", sortable: false, formatter: this.fnRenderCellAuthorityIcon(), width: 32 },
-            { key: "displayName", label: authlabel, sortable: false },
+            { key: "displayName", label: authlabel, sortable: false, formatter: this.fnRenderPermissionCellText() },
             { key: "role", label: this.msg("column.role"), sortable: false, formatter: this.fnRenderCellRoleText(), width: 240 }
          ];
          
@@ -818,7 +842,7 @@
          columnDefinitions =
          [
             { key: "icon", label: "", sortable: false, formatter: this.fnRenderCellAuthorityIcon(), width: 32 },
-            { key: "displayName", label: authlabel, sortable: false },
+            { key: "displayName", label: authlabel, sortable: false, formatter: this.fnRenderPermissionCellText() },
             { key: "role", label: this.msg("column.role"), sortable: false, formatter: this.fnRenderCellRole(), width: 240 },
             { key: "actions", label: this.msg("column.actions"), sortable: false, formatter: this.fnRenderCellActions(), width: 120 }
          ];
