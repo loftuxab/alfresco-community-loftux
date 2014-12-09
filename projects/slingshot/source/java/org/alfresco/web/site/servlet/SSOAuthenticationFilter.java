@@ -1291,7 +1291,8 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                        
                        // Set the external auth flag so the UI knows we are using SSO etc.
                        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
-                       
+
+                       onSuccess(req, res, session, userName);
 
                    } else if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode()) {
                        if (logger.isDebugEnabled())
