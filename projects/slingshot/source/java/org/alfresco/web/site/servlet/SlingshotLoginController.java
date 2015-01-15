@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.alfresco.web.site.SlingshotPageView;
 import org.alfresco.web.site.SlingshotUser;
 import org.alfresco.web.site.SlingshotUserFactory;
 import org.json.simple.JSONObject;
@@ -134,6 +135,9 @@ public class SlingshotLoginController extends LoginController
             throw new Exception("Error creating remote connector to request user group data");
         }
 
-        super.onSuccess(request, response);
+        if (request.getSession().getAttribute(SlingshotPageView.REDIRECT_URI) == null)
+        {
+            super.onSuccess(request, response);
+        }
     }
 }
