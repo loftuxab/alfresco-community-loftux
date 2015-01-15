@@ -8,7 +8,7 @@ buildnumber="LX72"
 # SCM Revision number -Fetch automatically
 
 scmpath=`git config --get remote.origin.url`
-scmrevision=`git describe --tags --always HEAD`
+scmrevision=`git log --pretty=format:'%h' -n 1`
 echo
 echo "Loftux Maven Wrapper. Helper script for building Alfresco with maven."
 echo
