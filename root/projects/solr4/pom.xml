@@ -130,6 +130,7 @@
         </dependency>
 
         <!-- War dependency on the Vanilla Solr WAR -->
+        <!-- source/web/js/scripts/plugins.js is patched v.4.9.1. See MNT-13130 -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
