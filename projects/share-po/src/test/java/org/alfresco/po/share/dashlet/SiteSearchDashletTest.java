@@ -103,7 +103,7 @@ public class SiteSearchDashletTest extends AbstractSiteDashletTest
         Assert.assertEquals(searchDashlet.getSearchText(), searchText);
     }
     
-    @Test(dependsOnMethods="search")
+    @Test(dependsOnMethods="search", groups="TestBug")
     public void getSearchItems()
     {
         searchDashlet.search(fileName).render();
@@ -115,7 +115,7 @@ public class SiteSearchDashletTest extends AbstractSiteDashletTest
         Assert.assertNotNull(items.get(0).getThumbnail());
     }
 
-    @Test(dependsOnMethods="getSearchItems")
+    @Test(dependsOnMethods="getSearchItems", groups="TestBug")
     public void searchWithSearchLimit()
     {
         searchDashlet.search(fileName, SearchLimit.TWENTY_FIVE).render();
