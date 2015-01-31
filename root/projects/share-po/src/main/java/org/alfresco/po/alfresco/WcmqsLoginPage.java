@@ -5,7 +5,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 import org.alfresco.po.share.SharePage;
-import org.alfresco.webdrone.ElementState;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.logging.Log;
@@ -82,7 +81,7 @@ public class WcmqsLoginPage extends SharePage
 
     public void clickLoginButton()
     {
-        submit(LOGIN_BUTTON, ElementState.INVISIBLE);
+        drone.findAndWait(LOGIN_BUTTON).click();
     }
 
     /**
@@ -92,7 +91,7 @@ public class WcmqsLoginPage extends SharePage
      * @param password
      * @return My Alfresco Page
      */
-    public WcmqsHomePage login(String userName, String password)
+    public void login(String userName, String password)
     {
         try
         {
@@ -100,7 +99,6 @@ public class WcmqsLoginPage extends SharePage
             inputUserName(userName);
             inputPassword(password);
             clickLoginButton();
-            return new WcmqsHomePage(drone);
 
         }
         catch (UnsupportedOperationException uso)
@@ -108,4 +106,5 @@ public class WcmqsLoginPage extends SharePage
             throw new UnsupportedOperationException("Can not navigate to Wcmqs Home Page");
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package org.alfresco.po.alfresco;
 
+
 /**
  * Representation of Article Details that can be used while create/edit the content of an article.
  * 

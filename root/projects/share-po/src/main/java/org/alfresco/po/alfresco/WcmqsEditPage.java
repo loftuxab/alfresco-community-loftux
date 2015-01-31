@@ -104,19 +104,17 @@ public class WcmqsEditPage extends SharePage
         drone.findAndWait(TEMPLATENAME_INPUT, SECONDS.convert(maxPageLoadingTime, MILLISECONDS)).sendKeys(newTemplateName);
     }
 
-    public WcmqsHomePage clickSubmitButton()
+    public void clickSubmitButton()
     {
         drone.findAndWait(SUBMIT_BUTTON).click();
-        return new WcmqsHomePage(drone);
     }
 
-    public WcmqsHomePage clickCancelButton()
+    public void clickCancelButton()
     {
         drone.findAndWait(CANCEL_BUTTON).click();
-        return new WcmqsHomePage(drone);
     }
 
-    public WcmqsHomePage editArticle(WcmqsArticleDetails articleDetails)
+    public void editArticle(WcmqsArticleDetails articleDetails)
     {
         logger.info("Edit and save the asticle");
         if (articleDetails == null || StringUtils.isEmpty(articleDetails.getName()))
@@ -129,16 +127,16 @@ public class WcmqsEditPage extends SharePage
         editTitle(articleDetails.getTitle());
         editTemplateName(articleDetails.getTemplateName());
         insertTextInContent(articleDetails.getContent());
-        return clickSubmitButton();
+        clickSubmitButton();
     }
-    
+
     public WcmqsArticleDetails getArticleDetails()
     {
-        String name=drone.findAndWait(NAME_INPUT).getAttribute("value");
-        String title=drone.findAndWait(TITLE_INPUT).getAttribute("value");
-        String description= drone.findAndWait(DESCRIPTION_INPUT).getText();
-        String content=getContentTinyMCEEditor().getText();
-        String templateName=drone.findAndWait(TEMPLATENAME_INPUT).getAttribute("value");
+        String name = drone.findAndWait(NAME_INPUT).getAttribute("value");
+        String title = drone.findAndWait(TITLE_INPUT).getAttribute("value");
+        String description = drone.findAndWait(DESCRIPTION_INPUT).getText();
+        String content = getContentTinyMCEEditor().getText();
+        String templateName = drone.findAndWait(TEMPLATENAME_INPUT).getAttribute("value");
         return new WcmqsArticleDetails(name, title, description, content, templateName);
     }
 
