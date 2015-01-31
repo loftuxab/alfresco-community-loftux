@@ -10,7 +10,7 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <test name="CreateRuleSetPropertyTest">
+    <test name="FolderTemplateCreationTest">
         <classes>
             <class name="org.alfresco.share.site.document.FolderTemplateCreationTest"/>
         </classes>

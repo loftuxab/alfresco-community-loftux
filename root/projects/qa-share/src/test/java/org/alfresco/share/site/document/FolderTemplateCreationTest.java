@@ -40,22 +40,10 @@ public class FolderTemplateCreationTest extends AbstractUtils
     private String folderName = "Folder" + "template";
     private String[] folderPath = { "Data Dictionary", "Space Templates" };
 
-
-    @Override
-    @BeforeClass(alwaysRun = true)
-    public void setup() throws Exception
+    private void deleteTemplates ()
     {
 
-        super.setup();
-        testName = this.getClass().getSimpleName();
-        logger.info("Starting Tests: " + testName);
-    }
 
-    private void deleteTemplates () throws Exception
-    {
-
-        try
-        {
 
             ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
             ShareUserRepositoryPage.openRepository(drone);
@@ -69,15 +57,19 @@ public class FolderTemplateCreationTest extends AbstractUtils
                 repositoryPage.deleteItem(1);
                 drone.getCurrentPage();
             }
-        }
-
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
-        }
-
-
     }
+
+
+    @Override
+    @BeforeClass(alwaysRun = true)
+    public void setup() throws Exception
+    {
+
+        super.setup();
+        testName = this.getClass().getSimpleName();
+        logger.info("Starting Tests: " + testName);
+    }
+
 
     @AfterMethod(groups = { "EnterpriseOnly" })
     public void quit() throws Exception
