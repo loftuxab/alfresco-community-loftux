@@ -27,6 +27,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
@@ -44,9 +47,12 @@ public class SetPropertyValuePage extends ShareDialogue
     private final By propertyFoldersListCss = By.cssSelector("span[class$='ygtvlabel']");
     private final By setValueOkButtonCss = By
             .cssSelector("span[id$='selectSetPropertyDialog-ok-button']>span>button");
+    private final By valuesListCss = By.cssSelector("tbody[class='yui-dt-data'] div[class*='yui-dt-liner']");
 
-    private final  String DATE_BUTTON = "//table[contains(@class,'calendar')]//a[text()='%s']";
+    private final String DATE_BUTTON = "//table[contains(@class,'calendar')]//a[text()='%s']";
     private final By CALENDAR_BUTTON = By.cssSelector(".datepicker-icon");
+    private final By SET_PROPERTY_VALUE_SELECT = By.cssSelector("span[class*='set-property-value'] button");
+
 
     private final By getValueXpath (String valueName)
     {
@@ -128,6 +134,7 @@ public class SetPropertyValuePage extends ShareDialogue
                     {
                         folder.click();
                         drone.waitForElement(propertyFoldersListCss, SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+
                         return new SetPropertyValuePage(drone);
                     }
                 }
@@ -201,7 +208,7 @@ public class SetPropertyValuePage extends ShareDialogue
     }
 
     /**
-     * This method finds the clicks on calendar icon
+     * This method finds and clicks on calendar icon
      *
      */
     public void clickCalendarButton()
@@ -217,6 +224,49 @@ public class SetPropertyValuePage extends ShareDialogue
         }
     }
 
+    /**
+     * This method finds the list of values and return those as list of
+     * string values.
+     *
+     * @return List<String>
+     */
+    public List<String> getValues()
+    {
+        List<String> values = new LinkedList<String>();
+        try
+        {
+            for (WebElement value : drone.findAndWaitForElements(valuesListCss))
+            {
+                values.add(value.getText());
+            }
+        }
+        catch (TimeoutException e)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Unable to get the list of values : ", e);
+            }
+        }
+        return values;
+    }
 
+    /**
+     * This method finds and clicks on select button
+     * @return SetPropertyValuePage
+     */
+    public SetPropertyValuePage clickSelectButton()
+    {
+
+        try
+        {
+            drone.findAndWait(SET_PROPERTY_VALUE_SELECT).click();
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Unable to find a select button : ", e);
+            throw new PageException("Unable to find the select button.");
+        }
+        return new SetPropertyValuePage(drone);
+    }
 
 }

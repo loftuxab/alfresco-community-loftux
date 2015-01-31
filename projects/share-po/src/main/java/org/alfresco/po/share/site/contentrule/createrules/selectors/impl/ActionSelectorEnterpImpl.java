@@ -202,10 +202,17 @@ public class ActionSelectorEnterpImpl extends AbstractActionSelector
 
     public void selectSetPropertyValue(String folderName,String value)
     {
-        super.selectAction(PerformActions.SET_PROPERTY_VALUE.numberPosition);
+//        super.selectAction(PerformActions.SET_PROPERTY_VALUE.numberPosition);
+        selectSetPropertyValue();
         super.selectPropertyValue(folderName, value);
         SetPropertyValuePage selectValuePage = new SetPropertyValuePage(getDrone());
         selectValuePage.selectOkButton();
 
     }
+
+    public void selectSetPropertyValue()
+    {
+        super.selectAction(PerformActions.SET_PROPERTY_VALUE.numberPosition);
+    }
+
 }
