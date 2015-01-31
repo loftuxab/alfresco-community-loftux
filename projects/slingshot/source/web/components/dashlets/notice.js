@@ -160,6 +160,8 @@
                Dom.setStyle(p_args[1].panel.element, "z-index", -1);
                // Remove listener for TinyMCE dialog focus handling
                Event.removeListener(document, "focusin");
+               // remove all editable selections
+               this.editor.getEditor().getBody().contentEditable = false;
             }
             YAHOO.Bubbling.subscribe("hidePanel", hidePanel, this.configDialog);
          }
@@ -174,6 +176,11 @@
          Event.on(document, "focusin", function(e) {
             Event.stopEvent(e);
          });
+         if (this.configDialog.editor && YAHOO.env.ua.ie > 0)
+         {
+             // set back contentEditable
+             this.configDialog.editor.getEditor().getBody().contentEditable = true;
+         }
          this.configDialog.show();
       },
       
