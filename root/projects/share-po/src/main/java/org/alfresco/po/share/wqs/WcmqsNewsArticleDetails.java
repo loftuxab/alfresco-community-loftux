@@ -9,12 +9,9 @@ import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 
-public class WcmqsNewsArticleDetails extends SharePage
+public class WcmqsNewsArticleDetails extends WcmqsAbstractArticlePage
 {
     private final By ARTICLE_BODY = By.cssSelector("div.article-body");
-    private final By EDIT_LINK = By.cssSelector("a.alfresco-content-edit");
-    private final By CREATE_LINK = By.cssSelector("a.alfresco-content-new");
-    private final By DELETE_LINK = By.cssSelector("alfresco-content-delete");
     private final By TITLE_LINK = By.cssSelector("div.interior-content>h2");
     private final By DETAILS_LINK = By.cssSelector("div.interior-content span.ih-date");
 
@@ -50,43 +47,6 @@ public class WcmqsNewsArticleDetails extends SharePage
         WcmqsNewsArticleDetails currentPage = new WcmqsNewsArticleDetails(drone);
         currentPage.render();
         return currentPage;
-    }
-
-    public WcmqsEditPage clickEditButton()
-    {
-        try
-        {
-            drone.findAndWait(EDIT_LINK).click();
-            return new WcmqsEditPage(drone);
-        }
-        catch (TimeoutException e)
-        {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
-        }
-    }
-
-    public void clickCreateButton()
-    {
-        try
-        {
-            drone.findAndWait(CREATE_LINK).click();
-        }
-        catch (TimeoutException e)
-        {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
-        }
-    }
-
-    public void clickDeleteButton()
-    {
-        try
-        {
-            drone.findAndWait(DELETE_LINK).click();
-        }
-        catch (TimeoutException e)
-        {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
-        }
     }
 
     public String getTitleOfNewsArticle()
