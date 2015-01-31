@@ -54,7 +54,7 @@ import org.testng.annotations.Test;
 public class WorkflowOptionsTests extends AbstractWorkflow
 {
     private String testDomain;
-    private String invitedDomain1 = "invited1.test";
+    private String invitedDomain1;
 
     String cloudCollaboratorSite = null;
     String cloudContributorSite = null;
@@ -67,6 +67,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         super.setup();
         testName = this.getClass().getSimpleName();
         testDomain = DOMAIN_HYBRID;
+        invitedDomain1 = DOMAIN_HYBRID + "inv";
 
     }
 
