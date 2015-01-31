@@ -54,7 +54,6 @@ public class UploadFilePage extends ShareDialogue
         uploadField = isHtml5 ? By.cssSelector("input.dnd-file-selection-button") : By.cssSelector("input[id$='default-filedata-file']");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UploadFilePage render(RenderTime timer)
     {
@@ -63,14 +62,12 @@ public class UploadFilePage extends ShareDialogue
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UploadFilePage render()
     {
         return render(new RenderTime(maxPageLoadingTime));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public UploadFilePage render(final long time)
     {
