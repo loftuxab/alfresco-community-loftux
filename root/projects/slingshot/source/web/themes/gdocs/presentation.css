@@ -593,7 +593,8 @@ span.mce_alfresco-linklibrary
    border-color: #999;
 }
 
-.yui-skin-gdocs div.flat-button span.yui-button-hover span.first-child
+.yui-skin-gdocs div.flat-button span.yui-button-hover span.first-child,
+.yui-skin-gdocs div.flat-button span.yui-button-focus span.first-child
 {
    border-color: #999;
 }
@@ -616,7 +617,8 @@ span.mce_alfresco-linklibrary
 
 /* Ensure hover state can be activated */
 
-.yui-skin-gdocs .no-check-bg div.flat-button span.yui-button-hover
+.yui-skin-gdocs .no-check-bg div.flat-button span.yui-button-hover,
+.yui-skin-gdocs .no-check-bg div.flat-button span.yui-button-focus
 {
    background: transparent url(images/sprite.png) repeat-x scroll 0 0;
    border-color: #999;

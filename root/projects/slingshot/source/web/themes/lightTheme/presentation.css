@@ -238,7 +238,8 @@ h4 .lighter
    border-color: #ccc;
 }
 
-.yui-skin-lightTheme div.flat-button span.yui-button-hover span.first-child
+.yui-skin-lightTheme div.flat-button span.yui-button-hover span.first-child,
+.yui-skin-lightTheme div.flat-button span.yui-button-focus span.first-child
 {
    border-color: #ccc;
 }
@@ -748,7 +749,8 @@ span.mce_alfresco-linklibrary
 
 /* Ensure hover state can be activated */
 
-.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-button-hover
+.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-button-hover,
+.yui-skin-lightTheme .no-check-bg div.flat-button span.yui-button-focus
 {
    background: none;
    border-color: #ccc;
