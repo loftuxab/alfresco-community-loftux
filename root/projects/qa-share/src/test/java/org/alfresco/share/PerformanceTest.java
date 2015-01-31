@@ -164,12 +164,13 @@ public class PerformanceTest extends CmisUtils
             {
                 RandomAccessFile f = new RandomAccessFile(bigDataFile, "rw");
                 f.setLength(1024 * 1024 * 1024 * 2l);
+                logger.info("2 GB file created! File[" + bigDataFile.getAbsolutePath() + "]=" + (bigDataFile.length() / 1024 / 1024 / 1024) + " gb.");
             }
             catch (Exception e)
             {
                 fail("File with BigData don't created.");
             }
-            FtpUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, bigDataFile, "Alfresco/Sites/" + siteName + "/documentLibrary/");
+            assertTrue(FtpUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, bigDataFile, "Alfresco/Sites/" + siteName + "/documentLibrary/"), " File[" + bigDataFile.getAbsolutePath() + "] don't upload via FTP.");
         }
         finally
         {
