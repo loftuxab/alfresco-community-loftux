@@ -9,6 +9,7 @@ import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePage;
+import org.alfresco.po.share.site.blog.BlogPageTest;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.apache.log4j.Logger;
@@ -19,17 +20,16 @@ import org.testng.annotations.Test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 /**
- * Created by rdorobantu on 12/8/2014.
+ * Created by rdorobantu on 1/21/2015.
  */
-public class WcmqsHomePageTest extends AbstractTest
+public class WcmqsBlogPageTest extends AbstractTest
 {
-    private static final Logger logger = Logger.getLogger(WcmqsHomePageTest.class);
+    private static final Logger logger = Logger.getLogger(WcmqsBlogPageTest.class);
+    DashBoardPage dashBoard;
     private String wqsURL;
     private String siteName;
     private String ipAddress;
-    DashBoardPage dashBoard;
 
     @BeforeClass(alwaysRun = true)
     public void prepare() throws Exception
@@ -48,7 +48,6 @@ public class WcmqsHomePageTest extends AbstractTest
             logger.error("Ip address from Alfresco server could not be obtained");
         }
 
-        ;
         wqsURL = siteName + ":8080/wcmqs";
         logger.info(" wcmqs url : " + wqsURL);
         logger.info("Start Tests from: " + testName);
@@ -97,85 +96,76 @@ public class WcmqsHomePageTest extends AbstractTest
     }
 
     @Test
-    public void testMouseOverMenu()
+    public void testOpenBlogPost()
     {
         drone.navigateTo(wqsURL);
+        String blogMenu = "blog";
         WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        String menuName = "Publications";
-        wqsPage.mouseOverMenu(menuName);
-        Assert.assertTrue(wqsPage.isResearchReportsDisplayed(), "Research Reports are not displayed.");
-    }
-
-    @Test
-    public void testIsWhitePapersDisplayed()
-    {
-        drone.navigateTo(wqsURL);
-        WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        String menuName = "Publications";
-        wqsPage.mouseOverMenu(menuName);
-        Assert.assertTrue(wqsPage.isWhitePapersDisplayed(), "White Papers are not displayed.");
+        wqsPage.selectMenu(blogMenu);
+        WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+        String blogTitle = "Ethical funds";
+        blogPage.openBlogPost(blogTitle);
+        WcmqsBlogPostPage blogPostPage = new WcmqsBlogPostPage(drone);
+        Assert.assertEquals(blogPostPage.getTitle(), blogTitle);
 
     }
 
     @Test
-    public void testIsSlideReadMoreButtonDisplayed()
+    public void testIsBlogDisplayed()
     {
         drone.navigateTo(wqsURL);
+        String blogMenu = "blog";
         WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        Assert.assertTrue(wqsPage.isSlideReadMoreButtonDisplayed(), "Slide Read More button is not displayed.");
-
+        wqsPage.selectMenu(blogMenu);
+        WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+        String blogTitle = "Ethical funds";
+        Assert.assertTrue(blogPage.isBlogDisplayed(blogTitle), "Blog is not displayed.");
     }
 
     @Test
-    public void testSelectFirstArticleFromLeftPanel()
+    public void testIsBlogPostDateDisplayed()
     {
         drone.navigateTo(wqsURL);
+        String blogMenu = "blog";
         WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        wqsPage.selectFirstArticleFromLeftPanel();
-        String pageTitle = drone.getTitle();
-        Assert.assertTrue(pageTitle.contains("FTSE"));
+        wqsPage.selectMenu(blogMenu);
+        WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+        Assert.assertTrue(blogPage.isBlogPostDateDisplayed(), "Date is not displayed.");
     }
 
     @Test
-    public void testIsNewsAndAnalysisSectionDisplayed()
+    public void testIsBlogPostCreatorDisplayed()
     {
         drone.navigateTo(wqsURL);
+        String blogMenu = "blog";
         WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        Assert.assertTrue(wqsPage.isNewsAndAnalysisSectionDisplayed(), "News and Analysis section is not displayed.");
+        wqsPage.selectMenu(blogMenu);
+        WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+        Assert.assertTrue(blogPage.isBlogPostCreatorDisplayed(), "Creator of the blog is not displayed.");
     }
 
     @Test
-    public void testIsFeaturedSectionDisplayed()
+    public void testIsBlogPostCommentsLinkDisplayed()
     {
         drone.navigateTo(wqsURL);
+        String blogMenu = "blog";
         WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        Assert.assertTrue(wqsPage.isFeaturedSectionDisplayed(), "Featured section is not displayed.");
+        wqsPage.selectMenu(blogMenu);
+        WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+        Assert.assertTrue(blogPage.isBlogPostCommentsLinkDisplayed(), "Blog comments are not displayed.");
     }
 
     @Test
-    public void testIsExampleFeatureSectionDisplayed()
+    public void testClickReadMoreByBlog()
     {
         drone.navigateTo(wqsURL);
+        String blogMenu = "blog";
         WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        Assert.assertTrue(wqsPage.isExampleFeatureSectionDisplayed(), "Example Feature Section is not displayed.");
-    }
-
-    @Test
-    public void testIsLatestBlogArticlesDisplayed()
-    {
-        drone.navigateTo(wqsURL);
-        WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        Assert.assertTrue(wqsPage.isLatestBlogArticlesDisplayed(), "Latest blog article is not displayed.");
-    }
-
-    @Test
-    public void testClickOnSlideShowReadme()
-    {
-        drone.navigateTo(wqsURL);
-        WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-        wqsPage.clickOnSlideShowReadme(3);
-        WcmqsNewsArticleDetails newsArticleDetails = new WcmqsNewsArticleDetails(drone);
-        String newsArticleTitle = "Credit card interest rates rise";
-        Assert.assertEquals(newsArticleDetails.getTitleOfNewsArticle(), newsArticleTitle);
+        wqsPage.selectMenu(blogMenu);
+        WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+        String blogTitle = "Ethical funds";
+        blogPage.clickReadMoreByBlog(blogTitle);
+        WcmqsBlogPostPage blogPostPage = new WcmqsBlogPostPage(drone);
+        Assert.assertEquals(blogPostPage.getTitle(), blogTitle);
     }
 }
