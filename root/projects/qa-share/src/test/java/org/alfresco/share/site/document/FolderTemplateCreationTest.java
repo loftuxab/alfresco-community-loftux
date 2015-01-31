@@ -553,45 +553,46 @@ public class FolderTemplateCreationTest extends AbstractUtils
         Assert.assertEquals(role, UserRole.COLLABORATOR, "The permissions aren't set for the created folder");
     }
 
-//    @Test(groups = { "DataPrepEnterpriseOnly" })
-//    public void dataPrep_AONE_15044() throws Exception
-//    {
-//
-//        String testName = getTestName();
-//        String testUser = getUserNameFreeDomain(testName);
-//        String siteName = getSiteName(testName);
-//
-//        // Create user
-//        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
-//
-//        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-//        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-//
-//    }
-//
-//    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15041", alwaysRun = true)
-//    public void AONE_15044() throws Exception
-//    {
-//        String testName = getTestName();
-//        String testUser = getUserNameFreeDomain(testName);
-//        String siteName = getSiteName(testName);
-//        String notification = "The value cannot be empty.";
-//
-//
-//        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-//        openSiteDashboard(drone, siteName);
-//        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
-//
-//        // Select any template. Leave name field empty
-//        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName + 0).render();
-//        drone.getCurrentPage().render();
-//        newFolder.type("");
-//        newFolder.typeDescription("kkkk");
-//        newFolder.type("");
-//
-//        assertEquals(newFolder.getMessage(NewFolderPage.Fields.NAME), notification, "Friendly notification isn't present");
-//
-//    }
+    @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_15044() throws Exception
+    {
+
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+
+        // Create user
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+
+    }
+
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15041", alwaysRun = true)
+    public void AONE_15044() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+        String notification = "The value cannot be empty.";
+        String description = getRandomString(5);
+
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        openSiteDashboard(drone, siteName);
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
+
+        // Select any template. Leave name field empty
+        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName + 0).render();
+        drone.getCurrentPage().render();
+        newFolder.type("");
+        newFolder.typeDescription(description);
+        newFolder.type("");
+
+        assertEquals(newFolder.getMessage(NewFolderPage.Fields.NAME), notification, "Friendly notification isn't present");
+
+    }
 
     @Test(groups = { "DataPrepEnterpriseOnly" })
     public void dataPrep_AONE_15045() throws Exception
@@ -609,7 +610,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15041", alwaysRun = true)
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15044", alwaysRun = true)
     public void AONE_15045() throws Exception
     {
         String testName = getTestName();
@@ -719,8 +720,9 @@ public class FolderTemplateCreationTest extends AbstractUtils
         newFolder.typeName(folder);
         newFolder.selectSubmitButton();
         drone.getCurrentPage().render();
-        WebElement notifMessage = drone.findAndWait(By.cssSelector("div[style*='visible']>div>div>span.message"));
-        String notification = notifMessage.getText();
+//        WebElement notifMessage = drone.findAndWait(By.cssSelector("div[style*='visible']>div>div>span.message"));
+//        String notification = notifMessage.getText();
+        String notification = newFolder.getNotificationMessage();
         assertTrue(notification.contains("Duplicate folder name"), "Friendly notification isn't present");
 
     }
@@ -790,7 +792,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         docLib.selectCreateFolderFromTemplateHover();
         WebElement template = documentLibraryPage.getTemplate(folderName + 5);
         template.click();
-        drone.getCurrentPage().render();
+        NewFolderPage newFolder = drone.getCurrentPage().render();
 
         // Navigate to Data Dictionary/Space Templates and delete the Template
         drone.createNewTab();
@@ -800,10 +802,10 @@ public class FolderTemplateCreationTest extends AbstractUtils
         repositoryPage.deleteItem(folderName + 5).render();
         drone.closeTab();
 
-        WebElement okButton = drone.findAndWait(By.cssSelector("button[id$='default-createFolder-form-submit-button']"));
-        okButton.click();
-        WebElement notifMessage = drone.findAndWait(By.cssSelector("div[style*='visible']>div>div>span.message"));
-        String notification = notifMessage.getText();
+        newFolder.selectSubmitButton();
+//        WebElement notifMessage = drone.findAndWait(By.cssSelector("div[style*='visible']>div>div>span.message"));
+//        String notification = notifMessage.getText();
+        String notification = newFolder.getNotificationMessage();
         assertTrue(notification.contains("Duplicate folder name"), "Friendly notification isn't present");
 
     }
