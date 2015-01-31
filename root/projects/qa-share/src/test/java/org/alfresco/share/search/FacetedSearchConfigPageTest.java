@@ -736,22 +736,6 @@ public class FacetedSearchConfigPageTest extends AbstractUtils
         trace("Createfilter_5 complete");
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.share.util.AbstractUtils#tearDown()
-     */
-    @AfterClass(alwaysRun = true)
-    public void tearDown()
-    {
-        trace("Starting tearDown");
-
-        // Logout
-        ShareUser.logout(drone);
-
-        super.tearDown();
-
-        trace("TearDown complete");
-    }
 
     private void doretrySearch(String searchTerm)
     {
