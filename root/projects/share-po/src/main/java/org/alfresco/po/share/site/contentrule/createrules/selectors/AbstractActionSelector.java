@@ -1,5 +1,6 @@
 package org.alfresco.po.share.site.contentrule.createrules.selectors;
 
+import org.alfresco.po.share.site.contentrule.SetPropertyValuePage;
 import org.alfresco.po.share.site.document.CopyOrMoveContentRulesPage;
 import org.alfresco.webdrone.WebDrone;
 import org.openqa.selenium.By;
@@ -20,6 +21,8 @@ public abstract class AbstractActionSelector
     private static final By SELECT_DESTINATION_BUTTON = By.cssSelector("span[class*='destination-dialog-button'] button");
     private static final By MIMETYPE_SELECT = By.cssSelector("select[title='Mimetype']");
     private static final By RUN_SCRIPTS_SELECT = By.xpath("//select[@class='suppress-validation']");
+    private static final By SET_PROPERTY_VALUE_SELECT = By.cssSelector("span[class*='set-property-value'] button");
+
 
     protected AbstractActionSelector(WebDrone drone)
     {
@@ -82,6 +85,16 @@ public abstract class AbstractActionSelector
     protected WebDrone getDrone()
     {
         return drone;
+    }
+
+    protected SetPropertyValuePage selectPropertyValue(final String folderName, final String value)
+    {
+        List<WebElement> selectSetPropertyValueButtons = drone.findAndWaitForElements(SET_PROPERTY_VALUE_SELECT);
+        selectSetPropertyValueButtons.get(selectSetPropertyValueButtons.size() - 1).click();
+        SetPropertyValuePage setValuePage = new SetPropertyValuePage(drone);
+        setValuePage.selectPropertyTypeFolder(folderName);
+        setValuePage.selectValueFromList(value);
+        return new SetPropertyValuePage (drone);
     }
 
 }

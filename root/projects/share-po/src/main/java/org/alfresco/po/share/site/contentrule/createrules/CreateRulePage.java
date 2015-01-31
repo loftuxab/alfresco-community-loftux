@@ -42,6 +42,7 @@ public class CreateRulePage extends SitePage
     // textField
     private static final By NAME_FIELD = By.cssSelector("input[name='title']");
     private static final By DESCRIPTION_FIELD = By.cssSelector("textarea[name='description']");
+    private static final By SET_VALUE_FIELD = By.cssSelector("span[class*='paramtype_arca_set-property-value'] input");
 
     // CheckBoxes
     private static final By CHECK_BOX_DISABLE = By.cssSelector("div[class='form-field disabled'] input[title='Disable rule']");
@@ -176,6 +177,13 @@ public class CreateRulePage extends SitePage
             inputField.sendKeys(text);
         }
     }
+
+    public void fillSetValueField(final String text)
+    {
+        fillField(SET_VALUE_FIELD, text);
+    }
+
+
 
     /**
      * Clicks on the checkbox to apply rule for subfolders
