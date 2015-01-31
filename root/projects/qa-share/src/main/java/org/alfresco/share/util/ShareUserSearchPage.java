@@ -46,7 +46,7 @@ public class ShareUserSearchPage extends AbstractUtils
         // faceted search replace
         SearchBox searchBox = sharePage.getSearch();
         FacetedSearchPage facetedSearchPage =  searchBox.search(searchTerm).render();
-        facetedSearchPage.render(refreshDuration);
+        facetedSearchPage.render();
 
         // Get Results
         return facetedSearchPage.getResults();
