@@ -422,11 +422,11 @@ public class BlogClusterTest extends AbstractUtils
         BlogPage blogPage = ShareUser.openSiteDashboard(drone, siteName).getSiteNav().selectBlogPage().render();
         PostViewPage postViewPage = blogPage.createPostInternally(blogNameInternal, postText, tagName);
         postViewPage.clickBackLink().render();
-        //blogPage.configureExternalBlog(WORDPRESS, blogNameExternal, blogNameExternal, blogUrl, blogUsername, blogPassword);
+        // blogPage.configureExternalBlog(WORDPRESS, blogNameExternal, blogNameExternal, blogUrl, blogUsername, blogPassword);
 
         // create at least one Published Externally post
-        //postViewPage = blogPage.createPostExternally(blogNameExternal, postText, null);
-        postViewPage.clickBackLink().render();
+        // postViewPage = blogPage.createPostExternally(blogNameExternal, postText, null);
+        // postViewPage.clickBackLink().render();
 
         // create At least one Draft post
         postViewPage = blogPage.saveAsDraft(blogNameDraft, postText, null).render();
@@ -438,7 +438,7 @@ public class BlogClusterTest extends AbstractUtils
         // Check that all posts presented
         assertTrue(blogPage.isPostPresented(blogNameDraft), "Post (Draft) with name '" + blogNameDraft + "' is not presented. Server A");
         assertTrue(blogPage.isPostPresented(blogNameInternal), "Post (Internal) with name '" + blogNameInternal + "' is not presented. Server A");
-        assertTrue(blogPage.isPostPresented(blogNameExternal), "Post (External) with name '" + blogNameExternal + "' is not presented. Server A");
+        // assertTrue(blogPage.isPostPresented(blogNameExternal), "Post (External) with name '" + blogNameExternal + "' is not presented. Server A");
 
         // Delete Draft post
         blogPage.openBlogPost(blogNameDraft);
@@ -456,13 +456,13 @@ public class BlogClusterTest extends AbstractUtils
         // Check deletion
         assertFalse(blogPage.isPostPresented(blogNameInternal), "Post (Internal) with name '" + blogNameInternal + "' is presented. Server A");
 
-        // Delete External post
-        blogPage.openBlogPost(blogNameExternal);
-        blogPage = postViewPage.deleteBlogPostWithConfirm().render();
-        blogTreeMenuNavigation.selectListNode(ALL).render();
-
-        // Check deletion
-        assertFalse(blogPage.isPostPresented(blogNameExternal), "Post (External) with name '" + blogNameExternal + "' is presented. Server A");
+        // // Delete External post
+        // blogPage.openBlogPost(blogNameExternal);
+        // blogPage = postViewPage.deleteBlogPostWithConfirm().render();
+        // blogTreeMenuNavigation.selectListNode(ALL).render();
+        //
+        // // Check deletion
+        // assertFalse(blogPage.isPostPresented(blogNameExternal), "Post (External) with name '" + blogNameExternal + "' is presented. Server A");
 
         ShareUser.logout(drone);
 
@@ -479,7 +479,7 @@ public class BlogClusterTest extends AbstractUtils
         // All blog posts created in previously are missing on server B
         assertFalse(blogPage.isPostPresented(blogNameDraft), "Post (Draft) with name '" + blogNameDraft + "' is presented. Server B");
         assertFalse(blogPage.isPostPresented(blogNameInternal), "Post (Internal) with name '" + blogNameInternal + "' is presented. Server B");
-        assertFalse(blogPage.isPostPresented(blogNameExternal), "Post (External) with name '" + blogNameExternal + "' is presented. Server B");
+        // assertFalse(blogPage.isPostPresented(blogNameExternal), "Post (External) with name '" + blogNameExternal + "' is presented. Server B");
 
         ShareUser.logout(drone);
     }
@@ -493,7 +493,7 @@ public class BlogClusterTest extends AbstractUtils
      * <li>At least one blog post is created</li>
      * <li>Blog's details page for created blog is opened</li>
      * <li>Enter any text in 'Add comment' section</li>
-     * <li>Click 'Create Comment'  button</li>
+     * <li>Click 'Create Comment' button</li>
      * <li>Comment is added</li>
      * <li>Go to server B to the current site</li>
      * <li>verify Blog's details page for created blog</li>
@@ -528,10 +528,10 @@ public class BlogClusterTest extends AbstractUtils
         // The new post appears and is published to the internal blog
         assertTrue(postViewPage.verifyPostExists(blogName), "Post name '" + blogName + "' is not displayed at blog detail page. Server A.");
 
-        //Click 'Create Comment'  button
+        // Click 'Create Comment' button
         assertTrue(postViewPage.isAddCommentDisplayed());
         postViewPage.createBlogComment(commentText).render();
-        assertTrue(postViewPage.isCommentCorrect(commentText),"Comment isn't added. Server A");
+        assertTrue(postViewPage.isCommentCorrect(commentText), "Comment isn't added. Server A");
 
         ShareUser.logout(drone);
 
@@ -550,7 +550,7 @@ public class BlogClusterTest extends AbstractUtils
 
         // Verify New comment is displayed on Details page on server B
         assertTrue(postViewPage.verifyPostExists(blogName), "Post name '" + blogName + "' is not displayed at blog detail page. Server B.");
-        assertTrue(postViewPage.isCommentCorrect(commentText),"Comment isn't added. Server B");
+        assertTrue(postViewPage.isCommentCorrect(commentText), "Comment isn't added. Server B");
 
         ShareUser.logout(drone);
     }
