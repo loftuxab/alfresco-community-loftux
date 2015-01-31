@@ -100,11 +100,54 @@ public class WcmqsAllPublicationsPageTest extends AbstractTest
         public void testIsPublicationTitleDisplay()
         {
                 drone.navigateTo(wqsURL);
+                String folderName = "research reports";
                 WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.openPublicationsPageFolder(folderName);
                 WcmqsAllPublicationsPage publicationPage = new WcmqsAllPublicationsPage(drone);
-                homePage.openPublicationsPageFolder("research reports");
-                Assert.assertEquals(publicationPage.isPublicationTitleDisplay(), "test");
+                Assert.assertTrue(publicationPage.isPublicationTitleDisplay(), "Publication title is not displayed.");
 
         }
 
+        @Test
+        public void testIsPublicationPreviewDisplay()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                String folderName = "White Papers";
+                homePage.openPublicationsPageFolder(folderName);
+                WcmqsAllPublicationsPage publicationPage = new WcmqsAllPublicationsPage(drone);
+                Assert.assertTrue(publicationPage.isPublicationPreviewDisplay(), "Publication preview is not displayed.");
+        }
+
+        @Test
+        public void testIsPublicationDateAndAuthorDisplay()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.openPublicationsPageFolder("White Papers");
+                WcmqsAllPublicationsPage publicationPage = new WcmqsAllPublicationsPage(drone);
+                Assert.assertTrue(publicationPage.isPublicationDateAndAuthorDisplay(), "Date and Author are not displayed.");
+        }
+
+        @Test
+        public void testIsPublicationDescriptionDisplay()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                String folderName = "White Papers";
+                homePage.openPublicationsPageFolder(folderName);
+                WcmqsAllPublicationsPage publicationPage = new WcmqsAllPublicationsPage(drone);
+                Assert.assertTrue(publicationPage.isPublicationDescriptionDisplay(), "Publication description is not displayed.");
+        }
+
+        @Test
+        public void testIsPublicationTagDisplay()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                String folderName = "White Papers";
+                homePage.openPublicationsPageFolder(folderName);
+                WcmqsAllPublicationsPage publicationPage = new WcmqsAllPublicationsPage(drone);
+                Assert.assertTrue(publicationPage.isPublicationTagDisplay(), "Publication tag is not displayed.");
+        }
 }

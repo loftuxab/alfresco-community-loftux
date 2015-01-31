@@ -23,9 +23,9 @@ import java.net.UnknownHostException;
 /**
  * Created by rdorobantu on 12/5/2014.
  */
-public class WcmqsMainPageTest extends AbstractTest
+public class WcmqsAbstractPageTest extends AbstractTest
 {
-        private static final Logger logger = Logger.getLogger(WcmqsMainPageTest.class);
+        private static final Logger logger = Logger.getLogger(WcmqsAbstractPageTest.class);
         private String wqsURL;
         private String siteName;
         private String ipAddress;
@@ -100,79 +100,39 @@ public class WcmqsMainPageTest extends AbstractTest
         public void testIsAlfrescoLogoDisplay() throws Exception
         {
                 drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertTrue(wqsPage.isAlfrescoLogoDisplay());
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isAlfrescoLogoDisplay(), "Alfresco Logo is not displayed.");
         }
 
         @Test
         public void testIsBottomUrlDisplayed() throws Exception
         {
                 drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isBottomUrlDisplayed());
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isBottomUrlDisplayed(), "Bottom URL is not displayed.");
         }
 
         @Test
         public void testIsSearchFieldWithButtonDisplay() throws Exception
         {
                 drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isSearchFieldWithButtonDisplay());
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isSearchFieldWithButtonDisplay(), "Search field with button is not displayed.");
         }
 
         @Test
         public void testIsContactLinkDisplay() throws Exception
         {
                 drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isContactLinkDisplay());
-        }
-
-        @Test
-        public void testIsSlideReadMoreButtonDisplayed()
-        {
-                drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertTrue(wqsPage.isSlideReadMoreButtonDisplayed());
-        }
-
-        @Test
-        public void testIsNewsAndAnalysisSectionDisplayed()
-        {
-                drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isNewsAndAnalysisSectionDisplayed());
-        }
-
-        @Test
-        public void testIsFeaturedSectionDisplayed()
-        {
-                drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isFeaturedSectionDisplayed());
-        }
-
-        @Test
-        public void testIsExampleFeatureSectionDisplayed()
-        {
-                drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isExampleFeatureSectionDisplayed());
-        }
-
-        @Test
-        public void testIsLatestBlogArticlesDisplayed()
-        {
-                drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isLatestBlogArticlesDisplayed());
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isContactLinkDisplay(), "Contact link is not displayed.");
         }
 
         @Test
         public void testClickAlfrescoLink()
         {
                 drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
                 wqsPage.clickAlfrescoLink();
                 String pageTitle = drone.getTitle();
                 Assert.assertTrue(pageTitle.contains("Alfresco"));
@@ -183,7 +143,7 @@ public class WcmqsMainPageTest extends AbstractTest
         public void testClickContactLink()
         {
                 drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
                 wqsPage.clickContactLink();
                 String pageTitle = drone.getTitle();
                 Assert.assertTrue(pageTitle.contains("Contact"));
@@ -193,9 +153,49 @@ public class WcmqsMainPageTest extends AbstractTest
         public void testClickWebQuickStartLogo()
         {
                 drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
                 wqsPage.clickWebQuickStartLogo();
                 String pageTitle = drone.getTitle();
                 Assert.assertTrue(pageTitle.contains("Home"));
         }
+
+        @Test
+        public void testInputTextInSearchField() throws Exception
+        {
+                drone.navigateTo(wqsURL);
+                String inputText = "Global car industry";
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
+                wqsPage.inputTextInSearchField(inputText);
+                Assert.assertEquals(wqsPage.getTextFromSearchField(), "Global car industry");
+        }
+
+        @Test
+        public void testSearchText() throws Exception
+        {
+                drone.navigateTo(wqsURL);
+                String newsName = "Fresh flight to Swiss franc as Europe's bond strains return";
+                String searchedText = "Fresh flight";
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
+                wqsPage.searchText(searchedText);
+                WcmqsNewsPage newsPage = new WcmqsNewsPage(drone);
+                Assert.assertEquals(newsPage.getNewsTitle(newsName), newsName);
+        }
+
+        @Test
+        public void testIsImageLinkForTitleDisplayed() throws Exception
+        {
+                drone.navigateTo(wqsURL);
+                String title = "Global car industry";
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isImageLinkForTitleDisplayed(title), "Image for title is not displayed.");
+        }
+
+        @Test
+        public void testIsPageMenuDisplay() throws Exception
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsAbstractPage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isPageMenuDisplay(), "Page menu is not displayed.");
+        }
+
 }

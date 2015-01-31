@@ -97,29 +97,32 @@ public class WcmqsHomePageTest extends AbstractTest
         }
 
         @Test
-        public void testIsResearchReportsDisplayed() throws Exception
+        public void testMouseOverMenu()
         {
                 drone.navigateTo(wqsURL);
                 WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isResearchReportsDisplayed());
+                String menuName = "Publications";
+                wqsPage.mouseOverMenu(menuName);
+                Assert.assertTrue(wqsPage.isResearchReportsDisplayed(), "Research Reports are not displayed.");
+        }
+
+        @Test
+        public void testIsWhitePapersDisplayed()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                String menuName = "Publications";
+                wqsPage.mouseOverMenu(menuName);
+                Assert.assertTrue(wqsPage.isWhitePapersDisplayed(), "White Papers are not displayed.");
 
         }
 
         @Test
-        public void testIsWhitePapersDisplayed() throws Exception
+        public void testIsSlideReadMoreButtonDisplayed()
         {
                 drone.navigateTo(wqsURL);
                 WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isWhitePapersDisplayed());
-
-        }
-
-        @Test
-        public void testIsSlideReadMoreButtonDisplayed() throws Exception
-        {
-                drone.navigateTo(wqsURL);
-                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
-                Assert.assertNotNull(wqsPage.isSlideReadMoreButtonDisplayed());
+                Assert.assertTrue(wqsPage.isSlideReadMoreButtonDisplayed(), "Slide Read More button is not displayed.");
 
         }
 
@@ -133,4 +136,46 @@ public class WcmqsHomePageTest extends AbstractTest
                 Assert.assertTrue(pageTitle.contains("FTSE"));
         }
 
+        @Test
+        public void testIsNewsAndAnalysisSectionDisplayed()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isNewsAndAnalysisSectionDisplayed(), "News and Analysis section is not displayed.");
+        }
+
+
+        @Test
+        public void testIsFeaturedSectionDisplayed()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isFeaturedSectionDisplayed(), "Featured section is not displayed.");
+        }
+
+        @Test
+        public void testIsExampleFeatureSectionDisplayed()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isExampleFeatureSectionDisplayed(), "Example Feature Section is not displayed.");
+        }
+
+        @Test
+        public void testIsLatestBlogArticlesDisplayed()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                Assert.assertTrue(wqsPage.isLatestBlogArticlesDisplayed(), "Latest blog article is not displayed.");
+        }
+
+        @Test
+        public void testClickOnSlideShowReadme()
+        {
+                drone.navigateTo(wqsURL);
+                WcmqsHomePage wqsPage = new WcmqsHomePage(drone);
+                wqsPage.clickOnSlideShowReadme(3);
+                String pageTitle = drone.getTitle();
+                Assert.assertTrue(pageTitle.contains("slide3.html"));
+        }
 }
