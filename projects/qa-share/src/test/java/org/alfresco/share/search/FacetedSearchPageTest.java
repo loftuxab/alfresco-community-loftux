@@ -32,6 +32,7 @@ import java.util.List;
  * @author Richard Smith
  */
 @SuppressWarnings({ "rawtypes", "serial" })
+@Test(groups = { "TestBug" })
 public class FacetedSearchPageTest extends AbstractUtils
 {
 
