@@ -1697,7 +1697,12 @@ public abstract class AbstractUtils
      */
     public String getVTIDocumentLibraryFilePath(String sitename, String filename)
     {
-        return pathSharepoint + sitename + "/" + DOCLIB_CONTAINER + "/" + filename;
+        return getVTIDocumentLibraryPath(sitename) + "/" + filename;
+    }
+
+    public String getVTIDocumentLibraryPath(String sitename)
+    {
+        return pathSharepoint + sitename + "/" + DOCLIB_CONTAINER;
     }
 
     /**
