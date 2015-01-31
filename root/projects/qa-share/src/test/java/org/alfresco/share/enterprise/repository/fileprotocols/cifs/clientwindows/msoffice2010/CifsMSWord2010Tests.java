@@ -85,7 +85,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:admin admin";
 
         Runtime.getRuntime().exec(mapConnect);
-        if (checkDirOrFileExists(15, 200, networkDrive + cifsPath))
+        if (CifsUtil.checkDirOrFileExists(15, 200, networkDrive + cifsPath))
         {
             logger.info("----------Mapping succesfull " + testUser);
         }
@@ -127,7 +127,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
 
         Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
 
-        if (checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
+        if (CifsUtil.checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
         {
             logger.info("--------Unmapping succesfull " + testUser);
         }
@@ -286,7 +286,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         ldtp.waitTime(2);
         word.exitOfficeApplication(ldtp, docFileName_6265);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -334,7 +334,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         ldtp.waitTime(2);
         word.exitOfficeApplication(ldtp, docFileName_6265);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 9 ----
         // ---- Step Action -----
@@ -381,7 +381,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         ldtp.waitTime(2);
         word.exitOfficeApplication(ldtp, docFileName_6265);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 14 ----
         // ---- Step Action -----
@@ -457,7 +457,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Add any data.
         // Expected Result
         // The data is entered.
-        uploadImageInOffice(image_1);
+        CifsUtil.uploadImageInOffice(image_1);
         word.editOffice(ldtp, " " + first_modification + " ");
 
         // ---- Step 3 ----
@@ -470,7 +470,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         ldtp.waitTime(5);
         word.exitOfficeApplication(ldtp, docFileName_6266);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -507,7 +507,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Add any data.
         // Expected Result
         // The data is entered.
-        uploadImageInOffice(image_2);
+        CifsUtil.uploadImageInOffice(image_2);
         word.editOffice(ldtp, " " + second_modification + " ");
 
         // ---- Step 8 ----
@@ -519,7 +519,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         ldtp.waitTime(5);
         word.exitOfficeApplication(ldtp, docFileName_6266);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 9 ----
         // ---- Step Action -----
@@ -555,7 +555,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Add any data.
         // Expected Result
         // The data is entered.
-        uploadImageInOffice(image_3);
+        CifsUtil.uploadImageInOffice(image_3);
         word.editOffice(ldtp, " " + last_modification + " ");
 
         // ---- Step 13 ----
@@ -567,7 +567,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         ldtp.waitTime(5);
         word.exitOfficeApplication(ldtp, docFileName_6266);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // ---- Step 14 ----
         // ---- Step Action -----
         // Verify the document's metadata and version history in the Share.
@@ -622,7 +622,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6269);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6269);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 2 ---
         // --- Step action ---
         // Verify the document's content.
@@ -689,7 +689,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6269);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -741,7 +741,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6269);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -797,7 +797,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6270);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 2 ---
         // --- Step action ---
         // Verify the document's content.
@@ -853,7 +853,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // --- Expected results --
         // The data is entered.
-        uploadImageInOffice(image_1);
+        CifsUtil.uploadImageInOffice(image_1);
         word.editOffice(l1, " " + edit2 + " ");
 
         // --- Step 6 ---
@@ -865,7 +865,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6270);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -905,7 +905,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // --- Expected results --
         // The data is entered.
-        uploadImageInOffice(image_2);
+        CifsUtil.uploadImageInOffice(image_2);
         word.editOffice(l1, " " + edit3 + " ");
 
         // --- Step 11 ---
@@ -918,7 +918,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6270);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -996,7 +996,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6267);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // ---- Step 5 ----
         // ---- Step Action -----
         // Verify the document's content.
@@ -1062,7 +1062,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6267);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 10 ---
         // --- Step action ---
         // Specify the document's metadata, e.g. title, description and so on,
@@ -1112,7 +1112,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6267);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 15 ---
         // --- Step action ---
         // Specify the document's metadata, e.g. title, description and so on,
@@ -1181,7 +1181,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // ---- Expected Result -----
         // The data is entered.
-        uploadImageInOffice(image_1);
+        CifsUtil.uploadImageInOffice(image_1);
         word.editOffice(l1, " " + edit1 + " ");
 
         // --- Step 4 ---
@@ -1193,7 +1193,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6268);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // ---- Step 5 ----
         // ---- Step Action -----
         // Verify the document's content.
@@ -1247,7 +1247,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // ---- Expected Result -----
         // The data is entered.
-        uploadImageInOffice(image_2);
+        CifsUtil.uploadImageInOffice(image_2);
         word.editOffice(l1, " " + edit2 + " ");
 
         // --- Step 9 ---
@@ -1259,7 +1259,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6268);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 10 ---
         // --- Step action ---
         // Specify the document's metadata, e.g. title, description and so on,
@@ -1298,7 +1298,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // ---- Expected Result -----
         // The data is entered.
-        uploadImageInOffice(image_3);
+        CifsUtil.uploadImageInOffice(image_3);
         word.editOffice(l1, " " + edit3 + " ");
 
         // --- Step 14 ---
@@ -1310,7 +1310,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveOffice(l1);
         l1.waitTime(2);
         word.exitOfficeApplication(l1, docxFileName_6268);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 15 ---
         // --- Step action ---
         // Specify the document's metadata, e.g. title, description and so on,
@@ -1337,115 +1337,6 @@ public class CifsMSWord2010Tests extends AbstractUtils
         body = detailsPage.getDocumentBody();
         Assert.assertTrue(body.contains(edit3));
 
-    }
-
-    private Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
-    {
-        long counter = 0;
-        boolean existence = false;
-        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
-        {
-            File test = new File(path);
-            if (test.exists())
-            {
-                existence = true;
-                break;
-            }
-            else
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + pollingTimeMILISECONDS;
-            }
-        }
-        return existence;
-    }
-
-    private Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
-    {
-        long counter = 0;
-        boolean existence = false;
-        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
-        {
-            File test = new File(path);
-            if (test.exists())
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + pollingTimeMILISECONDS;
-
-            }
-            else
-            {
-                existence = true;
-                break;
-            }
-        }
-        return existence;
-    }
-
-    private Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
-    {
-        long counter = 0;
-        boolean check = false;
-        boolean existence = true;
-        while (counter < TimeUnit.SECONDS.toMillis(timeout))
-        {
-            File test = new File(path);
-            for (File element : test.listFiles())
-            {
-                if (element.isHidden() && element.getName().contains(extension))
-                {
-                    existence = false;
-                    break;
-                }
-            }
-            if (existence)
-            {
-                check = true;
-                break;
-            }
-            else
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(200);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + 200;
-                existence = true;
-            }
-        }
-        return check;
-    }
-
-    private void uploadImageInOffice(String image) throws AWTException
-    {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        ImageIcon icon = new ImageIcon(image);
-        CifsUtil clipboardImage = new CifsUtil(icon.getImage());
-        clipboard.setContents(clipboardImage, clipboardImage);
-
-        Robot r = new Robot();
-        r.keyPress(KeyEvent.VK_CONTROL);
-        r.keyPress(KeyEvent.VK_V);
-        r.keyRelease(KeyEvent.VK_CONTROL);
-        r.keyRelease(KeyEvent.VK_V);
     }
 
 }

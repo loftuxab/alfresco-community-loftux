@@ -1,16 +1,9 @@
 package org.alfresco.share.enterprise.repository.fileprotocols.cifs.clientwindows.msoffice2013;
 
 import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.ImageIcon;
 
 import org.alfresco.application.util.Application;
 import org.alfresco.explorer.WindowsExplorer;
@@ -98,7 +91,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         }
         mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:admin admin";
         Runtime.getRuntime().exec(mapConnect);
-        if (checkDirOrFileExists(10, 200, networkDrive + cifsPath))
+        if (CifsUtil.checkDirOrFileExists(10, 200, networkDrive + cifsPath))
         {
             logger.info("----------Mapping succesfull " + testUser);
         }
@@ -133,7 +126,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
 
         Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
 
-        if (checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
+        if (CifsUtil.checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
         {
             logger.info("--------Unmapping succesfull " + testUser);
         }
@@ -206,7 +199,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.exitOfficeApplication(ldtp, fileName_6289);
         // ldtp.waitTime(3);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -253,7 +246,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp, fileName_6289);
         // ldtp.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // ---- Step 9 ----
         // ---- Step Action -----
         // Verify the document's metadata and version history in the Share.
@@ -298,7 +291,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp);
         ldtp.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // ---- Step 14 ----
         // ---- Step Action -----
         // Verify the document's metadata and version history in the Share.
@@ -372,7 +365,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Add any data.
         // Expected Result
         // The data is entered.
-        uploadImageInOffice(image_1);
+        CifsUtil.uploadImageInOffice(image_1);
         excel.editOffice(ldtp, " " + first_modification + " ");
 
         // ---- Step 3 ----
@@ -384,7 +377,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         ldtp.waitTime(3);
         excel.exitOfficeApplication(ldtp);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -420,7 +413,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Add any data.
         // Expected Result
         // The data is entered.
-        uploadImageInOffice(image_2);
+        CifsUtil.uploadImageInOffice(image_2);
         excel.editOffice(ldtp, " " + second_modification + " ");
 
         // ---- Step 8 ----
@@ -432,7 +425,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp);
         ldtp.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 9 ----
         // ---- Step Action -----
@@ -467,7 +460,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Add any data.
         // Expected Result
         // The data is entered.
-        uploadImageInOffice(image_3);
+        CifsUtil.uploadImageInOffice(image_3);
         excel.editOffice(ldtp, " " + last_modification + " ");
 
         // ---- Step 13 ----
@@ -479,7 +472,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp);
         ldtp.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 14 ----
         // ---- Step Action -----
@@ -638,7 +631,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.saveOffice(l1);
 
         excel.exitOfficeApplication(l1);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -707,7 +700,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -760,7 +753,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -830,7 +823,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // ---- Expected Result -----
         // The data is entered.
-        uploadImageInOffice(image_1);
+        CifsUtil.uploadImageInOffice(image_1);
         excel.editOffice(l1, " " + edit1 + " ");
 
         // --- Step 4 ---
@@ -842,7 +835,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -899,7 +892,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // ---- Expected Result -----
         // The data is entered.
-        uploadImageInOffice(image_2);
+        CifsUtil.uploadImageInOffice(image_2);
         excel.editOffice(l1, " " + edit2 + " ");
 
         // --- Step 9 ---
@@ -912,7 +905,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -953,7 +946,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // ---- Expected Result -----
         // The data is entered.
-        uploadImageInOffice(image_3);
+        CifsUtil.uploadImageInOffice(image_3);
         excel.editOffice(l1, " " + edit3 + " ");
 
         // --- Step 14 ---
@@ -966,7 +959,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -1025,7 +1018,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
 
         excel.exitOfficeApplication(l1);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -1094,7 +1087,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 7 ---
         // --- Step action ---
@@ -1148,7 +1141,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 12 ---
         // --- Step action ---
@@ -1204,7 +1197,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
 
         excel.exitOfficeApplication(l1);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -1262,7 +1255,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // --- Expected results --
         // The data is entered.
-        uploadImageInOffice(image_1);
+        CifsUtil.uploadImageInOffice(image_1);
         excel.editOffice(l1, " " + edit2 + " ");
 
         // --- Step 6 ---
@@ -1275,7 +1268,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(5);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1316,7 +1309,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Add any data (5-10 mb).
         // --- Expected results --
         // The data is entered.
-        uploadImageInOffice(image_2);
+        CifsUtil.uploadImageInOffice(image_2);
         excel.editOffice(l1, " " + edit3 + " ");
 
         // --- Step 11 ---
@@ -1330,7 +1323,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1354,115 +1347,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         String body3 = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body3.contains(edit3));
-    }
-
-    private void uploadImageInOffice(String image) throws AWTException
-    {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        ImageIcon icon = new ImageIcon(image);
-        CifsUtil clipboardImage = new CifsUtil(icon.getImage());
-        clipboard.setContents(clipboardImage, clipboardImage);
-
-        Robot r = new Robot();
-        r.keyPress(KeyEvent.VK_CONTROL);
-        r.keyPress(KeyEvent.VK_V);
-        r.keyRelease(KeyEvent.VK_CONTROL);
-        r.keyRelease(KeyEvent.VK_V);
-    }
-
-    private Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
-    {
-        long counter = 0;
-        boolean existence = false;
-        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
-        {
-            File test = new File(path);
-            if (test.exists())
-            {
-                existence = true;
-                break;
-            }
-            else
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + pollingTimeMILISECONDS;
-            }
-        }
-        return existence;
-    }
-
-    private Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
-    {
-        long counter = 0;
-        boolean existence = false;
-        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
-        {
-            File test = new File(path);
-            if (test.exists())
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + pollingTimeMILISECONDS;
-
-            }
-            else
-            {
-                existence = true;
-                break;
-            }
-        }
-        return existence;
-    }
-
-    private Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
-    {
-        long counter = 0;
-        boolean check = false;
-        boolean existence = true;
-        while (counter < TimeUnit.SECONDS.toMillis(timeout))
-        {
-            File test = new File(path);
-            for (File element : test.listFiles())
-            {
-                if (element.isHidden() && element.getName().contains(extension))
-                {
-                    existence = false;
-                    break;
-                }
-            }
-            if (existence)
-            {
-                check = true;
-                break;
-            }
-            else
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(200);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + 200;
-                existence = true;
-            }
-        }
-        return check;
     }
 
 }
