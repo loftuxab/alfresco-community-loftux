@@ -21,6 +21,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.List;
 
 
 /**
@@ -191,6 +192,81 @@ public class CreateRuleSetPropertyTest extends AbstractUtils
     }
 
     @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_14868() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String folderName = getFolderName(testName);
+        String siteName = getSiteName(testName);
+
+
+        // Create User
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        ShareUser.logout(drone);
+
+        // Login as user
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
+        ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create Folder
+        ShareUserSitePage.createFolder(drone, folderName, null);
+        ShareUser.logout(drone);
+
+
+    }
+
+    @Test(groups = { "EnterpriseOnly" })
+    public void AONE_14868() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String folderName = getFolderName(testName);
+        String siteName = getSiteName(testName);
+        String ruleName = "Rule " + getRandomString(5);
+        String allFolder = "All";
+        String [] setValues = {"cm:description", "audio:sampleRate", "sys:node-dbid", "my:width", "my:height",
+                "audio:releaseDate", "app:editInline", "my:resolution"};
+
+        // Login
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create the rule for folder
+        FolderRulesPage folderRulesPage = docLibPage.getFileDirectoryInfo(folderName).selectManageRules().render();
+        Assert.assertTrue(folderRulesPage.isPageCorrect(folderName), "Rule page isn't correct");
+
+        // Fill "Name" field with correct data
+        CreateRulePage createRulePage = folderRulesPage.openCreateRulePage().render();
+        createRulePage.fillNameField(ruleName);
+
+        // Select any type, e.g. "Items are created or enter this folder" value from "When" drop-down
+        WhenSelectorImpl whenSelectorIml = createRulePage.getWhenOptionObj();
+        whenSelectorIml.selectInbound();
+
+        // Select 'All items' from "If" drop-down select control
+        AbstractIfSelector ifSelector = createRulePage.getIfOptionObj();
+        ifSelector.selectIFOption(0);
+
+        //
+        ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
+        actionSelectorEnterpImpl.selectSetPropertyValue();
+        SetPropertyValuePage setValuePage = new SetPropertyValuePage(drone);
+        setValuePage.clickSelectButton();
+        setValuePage.selectPropertyTypeFolder(allFolder).render();
+
+        for (String value : setValues)
+        {
+            List<String> values = setValuePage.getValues();
+            Assert.assertTrue(values.contains(value), value + " isn't present");
+        }
+
+    }
+
+    @Test(groups = { "DataPrepEnterpriseOnly" })
     public void dataPrep_AONE_14869() throws Exception
     {
         String testName = getTestName();
@@ -227,7 +303,7 @@ public class CreateRuleSetPropertyTest extends AbstractUtils
         String folderName = getFolderName(testName);
         String ruleName = "Rule " + getRandomString(5);
         String allFolder = "All";
-        String value = "download:done";
+        String value = "cm:modelAuthor";
         String toText = getRandomString(5);
 
         // Login
@@ -408,37 +484,12 @@ public class CreateRuleSetPropertyTest extends AbstractUtils
     {
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
-        String file1 = "exampleModel.xml";
-        String file2 = "web-client-config-custom.xml";
-
-        File modelFile = new File(DATA_FOLDER + "content-rules" + SLASH, file1).getAbsoluteFile();
-        File configFile = new File(DATA_FOLDER + "content-rules" + SLASH, file2).getAbsoluteFile();
 
         // Create User
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-
-        // Add model file to Company Home > Data Dictionary > Models
-        ShareUserRepositoryPage.openRepositoryDetailedView(drone);
-        ShareUserRepositoryPage.navigateToFolderInRepository(drone,
-                REPO + SLASH + DATA_DICTIONARY_FOLDER + SLASH + "Models");
-        ShareUserRepositoryPage.uploadFileInRepository(drone, modelFile);
-
-        // Add config file to Company Home > Data Dictionary > Web Client Extension
-        ShareUserRepositoryPage.openRepositoryDetailedView(drone);
-        ShareUserRepositoryPage.navigateToFolderInRepository(drone,
-                REPO + SLASH + DATA_DICTIONARY_FOLDER + SLASH + "Web Client Extension");
-        ShareUserRepositoryPage.uploadFileInRepository(drone, configFile);
-
-        RepositoryPage repoPage = ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + DATA_DICTIONARY_FOLDER + SLASH + "Models");
-        EditDocumentPropertiesPage editDocPropsPage = repoPage.getFileDirectoryInfo(file1).selectEditProperties().render();
-        editDocPropsPage.setModelActive();
-        editDocPropsPage.clickSave();
-
         ShareUser.logout(drone);
-
     }
 
     @Test(groups = { "EnterpriseOnly" })
@@ -621,10 +672,34 @@ public class CreateRuleSetPropertyTest extends AbstractUtils
     {
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
+        String file1 = "exampleModel.xml";
+        String file2 = "web-client-config-custom.xml";
+
+        File modelFile = new File(DATA_FOLDER + "content-rules" + SLASH, file1).getAbsoluteFile();
+        File configFile = new File(DATA_FOLDER + "content-rules" + SLASH, file2).getAbsoluteFile();
 
         // Create User
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+
+        // Add model file to Company Home > Data Dictionary > Models
+        ShareUserRepositoryPage.openRepositoryDetailedView(drone);
+        ShareUserRepositoryPage.navigateToFolderInRepository(drone,
+                REPO + SLASH + DATA_DICTIONARY_FOLDER + SLASH + "Models");
+        ShareUserRepositoryPage.uploadFileInRepository(drone, modelFile);
+
+        // Add config file to Company Home > Data Dictionary > Web Client Extension
+        ShareUserRepositoryPage.openRepositoryDetailedView(drone);
+        ShareUserRepositoryPage.navigateToFolderInRepository(drone,
+                REPO + SLASH + DATA_DICTIONARY_FOLDER + SLASH + "Web Client Extension");
+        ShareUserRepositoryPage.uploadFileInRepository(drone, configFile);
+
+        RepositoryPage repoPage = ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + DATA_DICTIONARY_FOLDER + SLASH + "Models");
+        EditDocumentPropertiesPage editDocPropsPage = repoPage.getFileDirectoryInfo(file1).selectEditProperties().render();
+        editDocPropsPage.setModelActive();
+        editDocPropsPage.clickSave();
 
         ShareUser.logout(drone);
 
