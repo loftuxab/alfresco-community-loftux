@@ -17,6 +17,7 @@ import org.alfresco.po.share.task.TaskItem;
 import org.alfresco.po.share.task.TaskStatus;
 import org.alfresco.po.share.workflow.AssignmentPage;
 import org.alfresco.po.share.workflow.CloudTaskOrReviewPage;
+import org.alfresco.po.share.workflow.CurrentTaskType;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.po.share.workflow.KeepContentStrategy;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
@@ -125,7 +126,6 @@ public class CreateSimpleCloudTaskTests extends AbstractWorkflow
         // Any site is created
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD).render();
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC).render();
-        // ShareUserSitePage.createFolder(drone, folderName, folderName).render(maxWaitTime);
         ShareUser.logout(drone);
     }
 
@@ -298,7 +298,7 @@ public class CreateSimpleCloudTaskTests extends AbstractWorkflow
         // --- Step 2 ---
         // --- Step action ---
         // Test case Enterprise40x-15146 is executed.
-        MyWorkFlowsPage myForkflows = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
+        MyWorkFlowsPage myForkflows = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone).render();
 
         WorkFlowDetailsPage workflowDetails = myForkflows.selectWorkFlow(workflowName_15608).render();
         Assert.assertEquals(workflowDetails.getPageHeader(), "Details: " + workflowName_15608 + " (Start a task or review on Alfresco Cloud)");
@@ -346,6 +346,7 @@ public class CreateSimpleCloudTaskTests extends AbstractWorkflow
         Assert.assertTrue(workflowGeneralInfo.getStartedBy().contains(opUser));
         Assert.assertEquals(workflowGeneralInfo.getDueDateString(), NONE);
         Assert.assertEquals(workflowGeneralInfo.getCompleted(), "<in progress>");
+        Assert.assertEquals(getLocalDate(workflowGeneralInfo.getStartDate()), getToDaysLocalDate());
         Assert.assertEquals(workflowGeneralInfo.getPriority(), Priority.MEDIUM);
         Assert.assertEquals(workflowGeneralInfo.getStatus(), WorkFlowStatus.WORKFLOW_IN_PROGRESS);
         Assert.assertEquals(workflowGeneralInfo.getMessage(), workflowName_15607);
@@ -364,6 +365,7 @@ public class CreateSimpleCloudTaskTests extends AbstractWorkflow
         Assert.assertEquals(workflowMoreInfo.getType(), TaskType.SIMPLE_CLOUD_TASK);
         Assert.assertEquals(workflowMoreInfo.getDestination(), testDomain);
         Assert.assertEquals(workflowMoreInfo.getAfterCompletion(), KeepContentStrategy.DELETECONTENT);
+        Assert.assertFalse(workflowMoreInfo.isLockOnPremise());
         Assert.assertEquals(workflowMoreInfo.getAssignmentList().size(), 1);
         Assert.assertEquals(workflowMoreInfo.getAssignmentList().get(0), getUserFullNameWithEmail(cloudUser, cloudUser));
 
@@ -394,6 +396,7 @@ public class CreateSimpleCloudTaskTests extends AbstractWorkflow
         Assert.assertEquals(workflowHistoryList.size(), 1);
         Assert.assertEquals(workflowHistoryList.get(0).getType(), WorkFlowHistoryType.START_TASK_OR_REVIEW_ON_CLOUD);
         Assert.assertEquals(workflowHistoryList.get(0).getCompletedBy(), getUserFullName(opUser));
+        Assert.assertEquals(getLocalDate(workflowHistoryList.get(0).getCompletedDate()), getToDaysLocalDate());
         Assert.assertEquals(workflowHistoryList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE);
         Assert.assertTrue(workflowHistoryList.get(0).getComment().isEmpty(), "Comments are present in the History section");
 
@@ -438,6 +441,7 @@ public class CreateSimpleCloudTaskTests extends AbstractWorkflow
         Assert.assertTrue(workflowGeneralInfo.getStartedBy().contains(cloudUser));
         Assert.assertEquals(workflowGeneralInfo.getDueDateString(), NONE);
         Assert.assertEquals(workflowGeneralInfo.getCompleted(), "<in progress>");
+        Assert.assertEquals(getLocalDate(workflowGeneralInfo.getStartDate()), getToDaysLocalDate());
         Assert.assertEquals(workflowGeneralInfo.getPriority(), Priority.MEDIUM);
         Assert.assertEquals(workflowGeneralInfo.getStatus(), WorkFlowStatus.TASK_IN_PROGRESS);
         Assert.assertEquals(workflowGeneralInfo.getMessage(), workflowName_15608);
@@ -469,6 +473,7 @@ public class CreateSimpleCloudTaskTests extends AbstractWorkflow
         // Task Administrator admin (None) Not Yet Started
         List<WorkFlowDetailsCurrentTask> workflowTasksList = workflowDetails.getCurrentTasksList();
         Assert.assertEquals(workflowTasksList.size(), 1);
+        Assert.assertEquals(workflowTasksList.get(0).getTaskType(), CurrentTaskType.TASK);
         Assert.assertEquals(workflowTasksList.get(0).getAssignedTo(), getUserFullName(cloudUser));
         Assert.assertEquals(workflowTasksList.get(0).getDueDateString(), NONE);
         Assert.assertEquals(workflowTasksList.get(0).getTaskStatus(), TaskStatus.NOTYETSTARTED);
@@ -483,6 +488,7 @@ public class CreateSimpleCloudTaskTests extends AbstractWorkflow
         Assert.assertEquals(workflowHistoryList.size(), 1);
         Assert.assertEquals(workflowHistoryList.get(0).getType(), WorkFlowHistoryType.TASK);
         Assert.assertEquals(workflowHistoryList.get(0).getCompletedBy(), getUserFullName(cloudUser));
+        Assert.assertEquals(getLocalDate(workflowHistoryList.get(0).getCompletedDate()), getToDaysLocalDate());
         Assert.assertEquals(workflowHistoryList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE);
         Assert.assertTrue(workflowHistoryList.get(0).getComment().isEmpty(), "Comments are present in the History section");
 
