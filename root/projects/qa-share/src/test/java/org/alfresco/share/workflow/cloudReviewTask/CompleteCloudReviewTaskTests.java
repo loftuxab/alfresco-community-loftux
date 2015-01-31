@@ -71,12 +71,12 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
         opUser = getUserNameForDomain(testName + "opUser", testDomain);
         cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
 
-        cloudSite = getSiteName(testName + "CL4");
-        opSite = getSiteName(testName + "OP4");
+        cloudSite = getSiteName(testName + "CL" + "D1");
+        opSite = getSiteName(testName + "OP" + "D1");
 
     }
 
-//    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods = "setup")
+    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods = "setup")
     public void dataPrep_createUsers() throws Exception
     {
 
@@ -620,7 +620,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
 
             ShareUser.login(drone, opUser, DEFAULT_PASSWORD).render();
             myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).render(4000);
-            findTasks(drone);
+            findTasks(drone, workFlowName);
 
             assertTrue(myTasksPage.isTaskPresent(workFlowName));
 
@@ -935,7 +935,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
 
             myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).render();
-            findTasks(drone);
+            findTasks(drone, workFlowName);
 
             TaskDetailsPage taskDetailsPage = myTasksPage.selectViewTasks(workFlowName);
 
@@ -1092,19 +1092,23 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
         formDetails.setApprovalPercentage(100);
         formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
 
-        DocumentLibraryPage documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
-//        documentLibraryPage.getFileDirectoryInfo(fileName).selectRequestSync().render();
+        cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+
 
         ShareUser.logout(drone);
 
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
-        EditTaskPage editTaskPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).navigateToEditTaskPage(workFlowName).render();
+        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+        
+        findTasks(hybridDrone, workFlowName);
+        
+        EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
 
         editTaskPage.enterComment("test comment");
         editTaskPage.selectStatusDropDown(TaskStatus.INPROGRESS);
 
-        MyTasksPage myTasksPage = editTaskPage.selectSaveButton().render();
+        myTasksPage = editTaskPage.selectSaveButton().render();
         TaskDetailsPage taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
 
         assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.INPROGRESS);
@@ -1369,7 +1373,8 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
 
         // edit task with comment an
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
-        findTasks(hybridDrone);
+        findTasks(hybridDrone, workFlowName);
+      
         EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
 
         editTaskPage.enterComment("test comment");
@@ -1415,7 +1420,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             // The button is pressed. Edit Task page is opened.
 
             MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).render();
-            findTasks(drone);
+            findTasks(drone, workFlowName);
             EditTaskPage editTaskPage = myTasksPage.selectViewTasks(workFlowName).selectEditButton().render();
             assertTrue(editTaskPage.isBrowserTitle("Edit Task"));
 
@@ -1539,7 +1544,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
 
         // edit task with comment an
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
-        findTasks(hybridDrone);
+        findTasks(hybridDrone, workFlowName);
         EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
 
         editTaskPage.enterComment("test comment");
@@ -1585,7 +1590,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             // The button is pressed. Edit Task page is opened.
 
             MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).render();
-            findTasks(drone);
+            findTasks(drone, workFlowName);
             EditTaskPage editTaskPage = myTasksPage.selectViewTasks(workFlowName).selectEditButton().render();
             assertTrue(editTaskPage.isBrowserTitle("Edit Task"));
 
@@ -1682,10 +1687,10 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
 
     }
 
-    private void findTasks(WebDrone driver)
+    private void findTasks(WebDrone driver, String workFlowName)
     {
 
-        assertTrue(driver.findAndWaitWithRefresh(By.cssSelector("h3 a")).isDisplayed());
-    }
-
+        assertTrue(driver.findAndWaitWithRefresh(By.xpath(String.format("//a[text()='%s']", workFlowName))).isDisplayed());
+        
+   }
 }
