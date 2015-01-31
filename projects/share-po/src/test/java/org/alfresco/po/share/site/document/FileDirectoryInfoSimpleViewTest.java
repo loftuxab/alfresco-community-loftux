@@ -258,7 +258,7 @@ public class FileDirectoryInfoSimpleViewTest extends AbstractDocumentTest
         thisRow.addTag(tagName2);
     }
 
-    @Test(groups={"alfresco-one"}, priority=8)
+    @Test(expectedExceptions = UnsupportedOperationException.class, groups={"alfresco-one"}, priority=8)
     public void test108SelectDownloadForFolderWithExpection() throws Exception
     {
         // Get folder
