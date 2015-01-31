@@ -182,13 +182,6 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
         {
             successful = false;
         }
-        finally
-        {
-            if (file.exists())
-            {
-                file.delete();
-            }
-        }
 
         return successful;
     }

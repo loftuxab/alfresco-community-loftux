@@ -24,9 +24,4 @@
             <class name="org.alfresco.share.repository.RepositoryWebDavTests"/>
         </classes>
     </test>-->
-    <test name="RepositoryCifsTests">
-        <classes>
-            <class name="org.alfresco.share.repository.RepositoryCifsTests"/>
-        </classes>
-    </test>
 </suite>
