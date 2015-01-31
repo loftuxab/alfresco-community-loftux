@@ -32,6 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * My tasks page object, holds all element of the html page relating to share's
  * my tasks page.
- *
+ * 
  * @author Michael Suzuki
  * @since 1.0
  */
@@ -64,7 +65,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Constructor.
-     *
+     * 
      * @param drone WebDriver to access page
      */
     public MyTasksPage(WebDrone drone)
@@ -102,7 +103,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Verify if people finder title is present on the page
-     *
+     * 
      * @return true if exists
      */
     protected boolean isTitlePresent()
@@ -112,7 +113,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Method to select the task and click edit task button
-     *
+     * 
      * @param searchParams, first item should be taskName, second is optional user first name
      */
     public EditTaskPage navigateToEditTaskPage(String... searchParams)
@@ -158,7 +159,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Clicks on Start workflow button.
-     *
+     * 
      * @return {@link StartWorkFlowPage}
      */
     public StartWorkFlowPage selectStartWorkflowButton()
@@ -177,7 +178,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Method to get the page subtitle (Active Tasks, Completed Tasks etc)
-     *
+     * 
      * @return
      */
     public String getSubTitle()
@@ -194,7 +195,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Clicks on Active tasks link.
-     *
+     * 
      * @return {@link MyTasksPage}
      */
     public MyTasksPage selectActiveTasks()
@@ -206,7 +207,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Clicks on Completed tasks link.
-     *
+     * 
      * @return {@link MyTasksPage}
      */
     public MyTasksPage selectCompletedTasks()
@@ -219,7 +220,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Clicks on view workflow for single task.
-     *
+     * 
      * @return {@link MyTasksPage}
      */
     public TaskDetailsPage selectViewTasks(String taskName)
@@ -231,7 +232,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Clicks on view workflow for single task.
-     *
+     * 
      * @return {@link MyTasksPage}
      */
     public ViewWorkflowPage selectViewWorkflow(String taskName)
@@ -265,7 +266,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Method to find given task row
-     *
+     * 
      * @param taskName
      * @return
      */
@@ -302,7 +303,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Method to get the Task Details. If more than one task found, the first task details will be returned.
-     *
+     * 
      * @param taskName
      * @return {@link TaskDetails}
      */
@@ -329,6 +330,15 @@ public class MyTasksPage extends SharePage
                 taskDetails.setDescription(taskRow.findElement(By.cssSelector("div.description>span")).getText());
                 taskDetails.setStartedBy(taskRow.findElement(By.cssSelector("div.initiator>span")).getText());
 
+                List<String> labels = new ArrayList<String>();
+                List<WebElement> webElements = drone.findAll(By.cssSelector("div > label"));
+                for (WebElement label : webElements)
+                {
+                    labels.add(label.getText());
+                }
+                
+                taskDetails.setTaskLabels(labels);
+
                 drone.mouseOverOnElement(taskRow);
                 taskDetails.setEditTaskDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'task-edit')]/a/span")).isDisplayed());
                 taskDetails.setViewTaskDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'task-view')]/a/span")).isDisplayed());
@@ -354,10 +364,55 @@ public class MyTasksPage extends SharePage
         }
         return taskDetails;
     }
+    
+    /**
+     * Method to get the Task Details. If more than one task found, the first task details will be returned.
+     * 
+     * @param taskName
+     * @return {@link TaskDetails}
+     */
+    public TaskDetails getTaskLabels(String taskName)
+    {
+        if (StringUtils.isEmpty(taskName))
+        {
+            throw new IllegalArgumentException("Workflow Name cannot be null");
+        }
+
+        WebElement taskRow = findTaskRow(taskName);
+
+        TaskDetails taskDetails = new TaskDetails();
+        try
+        {
+            if (taskRow != null)
+            {
+                List<String> labels = new ArrayList<String>();
+                List<WebElement> webElements = drone.findAll(By.cssSelector("div > label"));
+                for (WebElement label : webElements)
+                {
+                    labels.add(label.getText());
+                }
+                
+                taskDetails.setTaskLabels(labels);
+            }
+            else
+            {
+                throw new PageOperationException("Unable to find task: " + taskName);
+            }
+        }
+        catch (NoSuchElementException nse)
+        {
+
+        }
+        catch (StaleElementReferenceException e)
+        {
+            return getTaskDetails(taskName);
+        }
+        return taskDetails;
+    }
 
     /**
      * Method to check if a given task is displayed in MyTasksPage page
-     *
+     * 
      * @param taskName
      * @return True if Task exists
      */
@@ -368,7 +423,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Clicks on TaskHistory link on mytasks page.
-     *
+     * 
      * @return {@link TaskHistoryPage}
      */
     public TaskHistoryPage selectTaskHistory(String taskName)
@@ -380,11 +435,11 @@ public class MyTasksPage extends SharePage
     /**
      * Returns <code>true</code> if the Task edit button is present and enabled,
      * otherwise returns <code>false</code>.
-     *
+     * 
      * @param taskName
      * @return
      */
-    public boolean isTaskViewButtonEnabled (String taskName)
+    public boolean isTaskViewButtonEnabled(String taskName)
     {
         WebElement task = findTaskRow(taskName);
         if (task != null)
@@ -404,11 +459,11 @@ public class MyTasksPage extends SharePage
     /**
      * Returns <code>true</code> if the Task view button is present and enabled,
      * otherwise returns <code>false</code>.
-     *
+     * 
      * @param taskName
      * @return
      */
-    public boolean isTaskWorkflowButtonEnabled (String taskName)
+    public boolean isTaskWorkflowButtonEnabled(String taskName)
     {
         WebElement task = findTaskRow(taskName);
         if (task != null)
@@ -428,11 +483,11 @@ public class MyTasksPage extends SharePage
     /**
      * Returns <code>true</code> if the Task workflow view button is present and
      * enabled, otherwise returns <code>false</code>.
-     *
+     * 
      * @param taskName
      * @return
      */
-    public boolean isTaskEditButtonEnabled (String taskName)
+    public boolean isTaskEditButtonEnabled(String taskName)
     {
         WebElement task = findTaskRow(taskName);
         if (task != null)
@@ -451,7 +506,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Return Object for interacting with left filter panel.
-     *
+     * 
      * @return
      */
     public TaskFilters getTaskFilters()
@@ -461,7 +516,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Return count of task on page.
-     *
+     * 
      * @return
      */
     public int getTasksCount()
@@ -478,7 +533,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Return true if filter title text displayed.
-     *
+     * 
      * @param titleText
      * @return
      */
@@ -491,7 +546,7 @@ public class MyTasksPage extends SharePage
 
     /**
      * Return count workFlows with same taskName.
-     *
+     * 
      * @param taskName
      * @return
      */

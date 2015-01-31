@@ -34,6 +34,7 @@ import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.task.EditTaskPage;
+import org.alfresco.po.share.task.TaskDetails;
 import org.alfresco.po.share.util.FailedTestListener;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -62,6 +63,16 @@ public class ViewWorkflowPageTest extends AbstractTest
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails(siteName, message, reviewers);
         myTasksPage = newWorkflowPage.startWorkflow(formDetails).render();
         myTasksPage.render(10000);
+        
+        TaskDetails taskLabels = myTasksPage.getTaskLabels(message);
+        List<String> labels = taskLabels.getTaskLabels();
+        assertTrue(labels.contains("Due:"));
+        assertTrue(labels.contains("Started:"));
+        assertTrue(labels.contains("Status:"));
+        assertTrue(labels.contains("Type:"));
+        assertTrue(labels.contains("Description:"));
+        assertTrue(labels.contains("Started by:"));
+        
         EditTaskPage taskPage = myTasksPage.navigateToEditTaskPage(message).render();
         taskPage.enterComment(message);
         taskPage.selectSaveButton().render();
