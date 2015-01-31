@@ -3799,7 +3799,7 @@
             var filter = Alfresco.util.cleanBubblingObject(obj),
                strFilter = window.escape(obj.filterId) +
                   (typeof obj.filterData !== "undefined" ?
-                     "|" + obj.filterData + (typeof obj.filterDisplay !== "undefined" ? "|" + obj.filterDisplay : "") :
+                     "|" + window.escape(obj.filterData) + (typeof obj.filterDisplay !== "undefined" ? "|" + window.escape(obj.filterDisplay) : "") :
                      "");
 
             Alfresco.logger.debug("DL_onChangeFilter: ", filter);
