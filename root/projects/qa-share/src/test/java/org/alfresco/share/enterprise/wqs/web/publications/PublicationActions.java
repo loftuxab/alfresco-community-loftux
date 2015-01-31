@@ -345,7 +345,8 @@ public class PublicationActions extends AbstractUtils
                 wcmqsPublicationPage.clickDocumentTag("tag1");
                 WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
                 wcmqsSearchPage.render();
-                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().contains("0510"), "Tag search did not return Microsoft  Word - OEM 0510 v2");
+                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Microsoft Word - OEM 0510 v2"),
+                        "Tag search did not return Microsoft  Word - OEM 0510 v2");
 
                 // ---- Step 4 ----
                 // ---- Step action ----
@@ -362,8 +363,8 @@ public class PublicationActions extends AbstractUtils
                 // ---- Expected results ----
                 //  Microsoft  Word - OEM 0510 v2 details page is opened;
 
-                wcmqsPublicationPage = new WcmqsPublicationPage(drone);
-                wcmqsPublicationPage.clickDocumentByTitle("Microsoft Word - OEM 0510 v2");
+                WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+                wcmqsAllPublicationsPage.clickDocumentByTitle("Microsoft Word - OEM 0510 v2");
 
                 // ---- Step 6 ----
                 // ---- Step action ----
@@ -375,7 +376,7 @@ public class PublicationActions extends AbstractUtils
                 wcmqsPublicationPage.clickDocumentTag("tag1");
                 wcmqsSearchPage = new WcmqsSearchPage(drone);
                 wcmqsSearchPage.render();
-                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().contains("0510"), "Tag search did not return Microsoft  Word - OEM 0510 v2");
+                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("0510"), "Tag search did not return Microsoft  Word - OEM 0510 v2");
 
                 // ---- Step 7 ----
                 // ---- Step action ----
@@ -396,8 +397,9 @@ public class PublicationActions extends AbstractUtils
                 wcmqsPublicationPage.clickDocumentTag("tag2");
                 wcmqsSearchPage = new WcmqsSearchPage(drone);
                 wcmqsSearchPage.render();
-                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().contains("Enterprise Network"), "Tag search did not return Enterprise Network");
-                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().contains("Alfresco WCM"), "Tag search did not return Alfresco WCM");
+                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Enterprise Network"),
+                        "Tag search did not return Enterprise Network");
+                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Alfresco WCM"), "Tag search did not return Alfresco WCM");
 
                 // ---- Step 9 ----
                 // ---- Step action ----
@@ -414,8 +416,8 @@ public class PublicationActions extends AbstractUtils
                 // ---- Expected results ----
                 //  Enterprise  Network details page is opened;
 
-                wcmqsPublicationPage = new WcmqsPublicationPage(drone);
-                wcmqsPublicationPage.clickDocumentByTitle("Enterprise Network");
+                wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+                wcmqsAllPublicationsPage.clickDocumentByTitle("Enterprise Network");
 
                 // ---- Step 11 ----
                 // ---- Step action ----
@@ -427,9 +429,259 @@ public class PublicationActions extends AbstractUtils
                 wcmqsPublicationPage.clickDocumentTag("tag2");
                 wcmqsSearchPage = new WcmqsSearchPage(drone);
                 wcmqsSearchPage.render();
-                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().contains("Enterprise Network"), "Tag search did not return Enterprise Network");
-                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().contains("Alfresco WCM"), "Tag search did not return Alfresco WCM");
+                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Enterprise Network"),
+                        "Tag search did not return Enterprise Network");
+                Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Alfresco WCM"), "Tag search did not return Alfresco WCM");
 
         }
 
+        /**
+         * AONE-5667:Publications page
+         */
+        @Test(groups = "WQS")
+        public void AONE_5667() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Verify Research reports page;
+                // ---- Expected results ----
+                // The following items are displayed: *Research reports section(some text in it)
+                // Publications section (Publication's name link, Publication's preview, Publications date and author, Publication's description);
+                // Tags section;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                wcmqsHomePage.render();
+                wcmqsHomePage.mouseOverMenu("publications");
+                wcmqsHomePage.openPublicationsPageFolder("research reports");
+                WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+                wcmqsAllPublicationsPage.render();
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationDescriptionDisplay());
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationPreviewDisplay());
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationDateAndAuthorDisplay());
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationTagDisplay());
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationTitleDisplay());
+        }
+
+        /**
+         * AONE-5668:Publications page
+         */
+        @Test(groups = "WQS")
+        public void AONE_5668() throws Exception
+        {
+                drone.navigateTo(wqsURL);
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Click Enterprise network publication link;
+                // ---- Expected results ----
+                // Publication is opened successfully, the following items are displayed: Publication name, Publication date, Publication preview, Tags section, Publication details section;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                wcmqsHomePage.render();
+                wcmqsHomePage.mouseOverMenu("publications");
+                wcmqsHomePage.openPublicationsPageFolder("research reports");
+                WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+
+                wcmqsAllPublicationsPage.clickDocumentByTitle("Enterprise Network");
+
+                WcmqsPublicationPage wcmqsPublicationPage = new WcmqsPublicationPage(drone);
+                wcmqsPublicationPage.render();
+
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationNameDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationPreviewDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationTagsDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationPublishDateDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationDetailsDisplay());
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Return to Research reports page and click Enterprise network publication preview;
+                // ---- Expected results ----
+                // Publication is opened successfully;
+                wcmqsHomePage.mouseOverMenu("publications");
+                wcmqsHomePage.openPublicationsPageFolder("research reports");
+                wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+
+                wcmqsAllPublicationsPage.clickDocumentImage("Enterprise Network");
+                wcmqsPublicationPage = new WcmqsPublicationPage(drone);
+                wcmqsPublicationPage.render();
+
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationNameDisplay());
+
+        }
+
+        /**
+         * AONE-5669:Publications page
+         */
+        @Test(groups = "WQS")
+        public void AONE_5669() throws Exception
+        {
+                drone.navigateTo(wqsURL);
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Click Enterprise network publication link;
+                // ---- Expected results ----
+                // Publications page is opened;
+
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                wcmqsHomePage.render();
+                wcmqsHomePage.mouseOverMenu("publications");
+                wcmqsHomePage.openPublicationsPageFolder("research reports");
+                WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+
+                wcmqsAllPublicationsPage.clickDocumentByTitle("Enterprise Network");
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Verify publication details;
+                // ---- Expected results ----
+                // Publication page details contains: Publication description, fields(Author, Published, Size, Mime Type, Download);
+
+                WcmqsPublicationPage wcmqsPublicationPage = new WcmqsPublicationPage(drone);
+                wcmqsPublicationPage.render();
+
+                //Verify Publication page details contains: Publication description, fields(Author, Published, Size, Mime Type, Download)
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationDescriptionDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationAuthorDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationPublishDateDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationSizeDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationMimeDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationDownloadDisplay());
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Click link in Download field;
+                // ---- Expected results ----
+                // Publication is downloaded;
+
+                File testFile = wcmqsPublicationPage.downloadFiles();
+                Assert.assertTrue(testFile.length() > 0);
+        }
+
+        /**
+         * AONE-5670:Publications - white papers
+         */
+        @Test(groups = "WQS")
+        public void AONE_5670() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Verify Research reports page;
+                // ---- Expected results ----
+                // The following items are displayed: *white papers section(some text in it)
+                // Publications section (Publication's name link, Publication's preview, Publications date and author, Publication's description);
+                // Tags section;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+
+                wcmqsHomePage.mouseOverMenu("publications");
+                wcmqsHomePage.openPublicationsPageFolder("white papers");
+                WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+                wcmqsAllPublicationsPage.render();
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationDescriptionDisplay());
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationPreviewDisplay());
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationDateAndAuthorDisplay());
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationTagDisplay());
+                Assert.assertTrue(wcmqsAllPublicationsPage.isPublicationTitleDisplay());
+        }
+
+        /**
+         * AONE-5671:Publications - white papers publications
+         */
+        @Test(groups = "WQS")
+        public void AONE_5671() throws Exception
+        {
+                drone.navigateTo(wqsURL);
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Click Enterprise network publication link;
+                // ---- Expected results ----
+                // Publication is opened successfully, the following items are displayed: Publication name, Publication date, Publication preview, Tags section, Publication details section;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                wcmqsHomePage.render();
+                wcmqsHomePage.mouseOverMenu("publications");
+                wcmqsHomePage.openPublicationsPageFolder("white papers");
+                WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+
+                wcmqsAllPublicationsPage.clickDocumentByTitle("Records Management Datasheet");
+
+                WcmqsPublicationPage wcmqsPublicationPage = new WcmqsPublicationPage(drone);
+                wcmqsPublicationPage.render();
+
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationNameDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationPreviewDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationTagsDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationPublishDateDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationDetailsDisplay());
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Return to Research reports page and click Enterprise network publication preview;
+                // ---- Expected results ----
+                // Publication is opened successfully;
+                wcmqsHomePage.mouseOverMenu("publications");
+                wcmqsHomePage.openPublicationsPageFolder("white papers");
+                wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+
+                wcmqsAllPublicationsPage.clickDocumentImage("Records Management Datasheet");
+                wcmqsPublicationPage = new WcmqsPublicationPage(drone);
+                wcmqsPublicationPage.render();
+
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationNameDisplay());
+
+        }
+
+        /**
+         * AONE-5672:Publications - white papers publications details
+         */
+        @Test(groups = "WQS")
+        public void AONE_5672() throws Exception
+        {
+                drone.navigateTo(wqsURL);
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Click Enterprise network publication link;
+                // ---- Expected results ----
+                // Publications page is opened;
+
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                wcmqsHomePage.render();
+                wcmqsHomePage.mouseOverMenu("publications");
+                wcmqsHomePage.openPublicationsPageFolder("white papers");
+                WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
+
+                wcmqsAllPublicationsPage.clickDocumentByTitle("Records Management Datasheet");
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Verify publication details;
+                // ---- Expected results ----
+                // Publication page details contains: Publication description, fields(Author, Published, Size, Mime Type, Download);
+
+                WcmqsPublicationPage wcmqsPublicationPage = new WcmqsPublicationPage(drone);
+                wcmqsPublicationPage.render();
+
+                //Verify Publication page details contains: Publication description, fields(Author, Published, Size, Mime Type, Download)
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationDescriptionDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationAuthorDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationPublishDateDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationSizeDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationMimeDisplay());
+                Assert.assertTrue(wcmqsPublicationPage.isPublicationDownloadDisplay());
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Click link in Download field;
+                // ---- Expected results ----
+                // Publication is downloaded;
+
+                File testFile = wcmqsPublicationPage.downloadFiles();
+                Assert.assertTrue(testFile.length() > 0);
+        }
 }
