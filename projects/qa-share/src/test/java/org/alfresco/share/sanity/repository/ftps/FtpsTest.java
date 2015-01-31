@@ -62,6 +62,7 @@ public class FtpsTest extends FtpsUtil
         folderNames = new String[] { folderName + "_coord", folderName + "_coll", folderName + "_contr", folderName + "_ed", folderName + "_cons" };
         userRoles = new UserRole[] { COORDINATOR, COLLABORATOR, CONTRIBUTOR, EDITOR, CONSUMER };
         newFile = newFile(DATA_FOLDER + "ftps" + SLASH + newFileName, testUser);
+        server = shareUrl;
         logger.info("Start Tests in: " + testName);
         super.setup();
 
@@ -75,7 +76,7 @@ public class FtpsTest extends FtpsUtil
 
             for (String theFolder : folderNames)
             {
-                /*String folderPath = REPO + SLASH + theFolder;
+                String folderPath = REPO + SLASH + theFolder;
                 String[] fileInfo = { fileName, folderPath, testUser };
                 ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
                 ShareUserRepositoryPage.openRepositoryDetailedView(drone).render();
@@ -86,7 +87,7 @@ public class FtpsTest extends FtpsUtil
                 ManagePermissionsPage.UserSearchPage userSearchPage = managePermissionsPage.selectAddUser().render();
                 managePermissionsPage = userSearchPage.searchAndSelectUser(profile).render();
                 managePermissionsPage.setAccessType(profile, userRoles[Arrays.asList(folderNames).indexOf(theFolder)]);
-                managePermissionsPage.selectSave();*/
+                managePermissionsPage.selectSave();
             }
             /*SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
@@ -98,7 +99,7 @@ public class FtpsTest extends FtpsUtil
             {
                 server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
             }*/
-            server = shareUrl;
+
             FtpsUtil.setCustomFtpPort(drone, ftpPort);
             if (!keystorePath.isEmpty())
             {
