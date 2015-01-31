@@ -1091,7 +1091,7 @@ public class RepositoryCifsTests extends AbstractUtils
         for (i = 1; i < 201; i++)
         {
             assertTrue(CifsUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, remotePath, new File(dataPath + SLASH + String.format(fileName, i))),
-                    "Can rename " + siteName + " site");
+                    "Can upload " + String.format(fileName, i) + " site");
         }
 
         // Via UI try to open document library
