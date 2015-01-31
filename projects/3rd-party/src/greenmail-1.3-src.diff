@@ -492,7 +492,7 @@ Index: src/java/com/icegreen/greenmail/imap/commands/StatusCommand.java
  
 Index: src/java/com/icegreen/greenmail/imap/ImapConstants.java
 ===================================================================
---- src/java/com/icegreen/greenmail/imap/ImapConstants.java	(revision 48)
+--- src/java/com/icegreen/greenmail/imap/ImapConstants.java	(revision 6)
 +++ src/java/com/icegreen/greenmail/imap/ImapConstants.java	(working copy)
 @@ -3,6 +3,10 @@
   * This software is released under the LGPL which is available at http://www.gnu.org/copyleft/lesser.html
@@ -505,7 +505,12 @@ Index: src/java/com/icegreen/greenmail/imap/ImapConstants.java
   */
  package com.icegreen.greenmail.imap;
  
-@@ -20,10 +24,12 @@
+@@ -16,14 +20,16 @@
+ 
+     String SP = " ";
+     String VERSION = "IMAP4rev1";
+-    String CAPABILITIES = "LITERAL+";
++    String CAPABILITIES = "LITERAL+ UIDPLUS";
  
      String USER_NAMESPACE = "#mail";
  
@@ -754,7 +759,7 @@ Index: src/java/com/icegreen/greenmail/imap/ImapServer.java
                  } catch (IOException ignored) {
 Index: src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java
 ===================================================================
---- src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java	(revision 48)
+--- src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java	(revision 6)
 +++ src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java	(working copy)
 @@ -3,6 +3,10 @@
   * This software is released under the LGPL which is available at http://www.gnu.org/copyleft/lesser.html
@@ -807,7 +812,26 @@ Index: src/java/com/icegreen/greenmail/imap/ImapSessionFolder.java
          return _folder.appendMessage(message, flags, internalDate);
      }
  
-@@ -227,7 +230,8 @@
+@@ -199,12 +202,16 @@
+         _folder.expunge();
+     }
+ 
++    public void expunge(long uid) throws FolderException {
++        _folder.expunge(uid);
++    }
++
+     public long[] search(SearchTerm searchTerm) {
+         return _folder.search(searchTerm);
+     }
+ 
+-    public void copyMessage(long uid, MailFolder toFolder) throws FolderException {
+-        _folder.copyMessage(uid, toFolder);
++    public long copyMessage(long uid, MailFolder toFolder) throws FolderException {
++        return _folder.copyMessage(uid, toFolder);
+     }
+ 
+     public void addListener(FolderListener listener) {
+@@ -227,7 +234,8 @@
          _folder.replaceFlags(flags, uid, silentListener, addUid);
      }
  
@@ -834,7 +858,7 @@ Index: src/java/com/icegreen/greenmail/store/InMemoryStore.java
              isSelectable = selectable;
 Index: src/java/com/icegreen/greenmail/store/MailFolder.java
 ===================================================================
---- src/java/com/icegreen/greenmail/store/MailFolder.java	(revision 48)
+--- src/java/com/icegreen/greenmail/store/MailFolder.java	(revision 6)
 +++ src/java/com/icegreen/greenmail/store/MailFolder.java	(working copy)
 @@ -3,6 +3,10 @@
   * This software is released under the LGPL which is available at http://www.gnu.org/copyleft/lesser.html
@@ -847,7 +871,7 @@ Index: src/java/com/icegreen/greenmail/store/MailFolder.java
   */
  package com.icegreen.greenmail.store;
  
-@@ -44,12 +48,14 @@
+@@ -44,15 +48,19 @@
      int getUnseenCount();
  
      boolean isSelectable();
@@ -864,6 +888,20 @@ Index: src/java/com/icegreen/greenmail/store/MailFolder.java
  
      void expunge() throws FolderException;
  
++    void expunge(long uid) throws FolderException;
++
+     void addListener(FolderListener listener);
+ 
+     void removeListener(FolderListener listener);
+@@ -66,7 +74,7 @@
+ 
+     long[] search(SearchTerm searchTerm);
+ 
+-    void copyMessage(long uid, MailFolder toFolder)
++    long copyMessage(long uid, MailFolder toFolder)
+             throws FolderException;
+ 
+     void setFlags(Flags flags, boolean value, long uid, FolderListener silentListener, boolean addUid) throws FolderException;
 Index: src/java/com/icegreen/greenmail/store/SimpleMessageAttributes.java
 ===================================================================
 --- src/java/com/icegreen/greenmail/store/SimpleMessageAttributes.java	(revision 48)
@@ -938,9 +976,9 @@ Index: src/java/com/icegreen/greenmail/store/SimpleMessageAttributes.java
                  buf.append(Q + mailAddr.getHost() + Q);
 Index: src/java/com/icegreen/greenmail/util/GreenMailUtil.java
 ===================================================================
---- src/java/com/icegreen/greenmail/util/GreenMailUtil.java	(revision 48)
+--- src/java/com/icegreen/greenmail/util/GreenMailUtil.java	(revision 6)
 +++ src/java/com/icegreen/greenmail/util/GreenMailUtil.java	(working copy)
-@@ -2,10 +2,22 @@
+@@ -2,10 +2,25 @@
  * Copyright (c) 2006 Wael Chatila / Icegreen Technologies. All Rights Reserved.
  * This software is released under the LGPL which is available at http://www.gnu.org/copyleft/lesser.html
  *
@@ -961,14 +999,18 @@ Index: src/java/com/icegreen/greenmail/util/GreenMailUtil.java
 +import java.io.StringReader;
 +import java.io.UnsupportedEncodingException;
 +import java.nio.charset.Charset;
++import java.util.Collections;
++import java.util.LinkedList;
++import java.util.List;
  import java.util.Properties;
  import java.util.Random;
  
-@@ -22,10 +34,12 @@
+@@ -22,10 +37,13 @@
  import javax.mail.internet.MimeMessage;
  import javax.mail.internet.MimeMultipart;
  
 +import com.icegreen.greenmail.imap.ImapConstants;
++import com.icegreen.greenmail.imap.commands.IdRange;
 +
  /**
   * @author Wael Chatila
@@ -978,7 +1020,7 @@ Index: src/java/com/icegreen/greenmail/util/GreenMailUtil.java
   */
  public class GreenMailUtil {
      /**
-@@ -74,13 +88,15 @@
+@@ -74,13 +92,15 @@
       *
       * @throws MessagingException
       */
@@ -998,7 +1040,7 @@ Index: src/java/com/icegreen/greenmail/util/GreenMailUtil.java
      }
  
      public static boolean hasNonTextAttachments(Part m) {
-@@ -144,19 +160,31 @@
+@@ -144,7 +164,11 @@
          try {
              ByteArrayOutputStream bodyOut = new ByteArrayOutputStream();
              msg.writeTo(bodyOut);
@@ -1011,6 +1053,7 @@ Index: src/java/com/icegreen/greenmail/util/GreenMailUtil.java
          } catch (Exception e) {
              throw new RuntimeException(e);
          }
+@@ -151,12 +175,20 @@
      }
  
      public static byte[] getBodyAsBytes(Part msg) {
@@ -1031,9 +1074,338 @@ Index: src/java/com/icegreen/greenmail/util/GreenMailUtil.java
  
      /**
       * @return same as {@link #getWholeMessage(javax.mail.Part)} }
-@@ -296,4 +324,5 @@
+@@ -296,4 +328,67 @@
          mimeMessage.setContent(multiPart);
          Transport.send(mimeMessage, tos);
      }
 +
++    public static IdRange[] convertUidsToIdRangeArray(List<Long> uids)
++    {
++        if (uids == null || uids.size() == 0)
++        {
++            return new IdRange[0];
++        }
++
++        List<Long> uidsLocal = new LinkedList<Long>(uids);
++        Collections.sort(uidsLocal);
++
++        List<IdRange> ids = new LinkedList<IdRange>();
++
++        IdRange currentIdRange = new IdRange(uidsLocal.get(0));
++        for (Long uid : uidsLocal)
++        {
++            if (uid == currentIdRange.getHighVal())
++            {
++            }
++            else if (uid > currentIdRange.getHighVal() && (uid == currentIdRange.getHighVal() + 1))
++            {
++                currentIdRange = new IdRange(currentIdRange.getLowVal(), uid);
++            }
++            else
++            {
++                ids.add(currentIdRange);
++                currentIdRange = new IdRange(uid);
++            }
++        }
++
++        if (!ids.contains(currentIdRange))
++        {
++            ids.add(currentIdRange);
++        }
++
++        return ids.toArray(new IdRange[ids.size()]);
++    }
++
++    public static String uidsToRangeString(List<Long> uids)
++    {
++        return idRangesToString(convertUidsToIdRangeArray(uids));
++    }
++
++    public static String idRangeToString(IdRange idRange)
++    {
++        return idRange.getHighVal() == idRange.getLowVal() ? "" + idRange.getLowVal() : idRange.getLowVal() + ":" + idRange.getHighVal();
++    }
++
++    public static String idRangesToString(IdRange[] idRanges)
++    {
++        StringBuilder sb = new StringBuilder();
++
++        for (IdRange idRange : idRanges)
++        {
++            if (sb.length() > 0)
++            {
++                sb.append(",");
++            }
++            sb.append(idRangeToString(idRange));
++        }
++
++        return sb.toString();
++    }
  }
+Index: source/java/com/icegreen/greenmail/imap/commands/SearchCommand.java
+===================================================================
+--- source/java/com/icegreen/greenmail/imap/commands/SearchCommand.java	(revision 88821)
++++ source/java/com/icegreen/greenmail/imap/commands/SearchCommand.java	(working copy)
+@@ -13,7 +13,10 @@
+ import com.icegreen.greenmail.store.FolderException;
+ import com.icegreen.greenmail.store.MailFolder;
+ 
++import javax.mail.Flags;
++import javax.mail.Flags.Flag;
+ import javax.mail.Message;
++import javax.mail.search.FlagTerm;
+ import javax.mail.search.SearchTerm;
+ 
+ /**
+@@ -25,6 +28,8 @@
+ class SearchCommand extends SelectedStateCommand implements UidEnabledCommand {
+     public static final String NAME = "SEARCH";
+     public static final String ARGS = "<search term>";
++    
++    public static final String FLAG_DELETED = "DELETED";
+ 
+     private SearchCommandParser parser = new SearchCommandParser();
+ 
+@@ -94,18 +99,30 @@
+                 throws ProtocolException {
+             // Dummy implementation
+             // Consume to the end of the line.
++            StringBuilder sb = new StringBuilder();
+             char next = request.nextChar();
+             while (next != '\n') {
++                sb.append(next);
+                 request.consume();
+                 next = request.nextChar();
+             }
+ 
+-            // Return a search term that matches everything.
+-            return new SearchTerm() {
+-                public boolean match(Message message) {
+-                    return true;
+-                }
+-            };
++            String searchCriteria = sb.toString().trim();
++            // MNT-12585 workaround, handle UID SEARCH DELETED correctly
++            if (FLAG_DELETED.equals(searchCriteria))
++            {
++                Flags flags = new Flags(Flags.Flag.DELETED);
++                return new FlagTerm(flags, true);
++            }
++            else if (searchCriteria.toLowerCase().contains("HEADER Message-ID".toLowerCase()))
++            {
++                String[] headersCriteria = searchCriteria.split("\"");
++                String messageId = headersCriteria[headersCriteria.length - 1];
++                
++                return new MessageIDTerm(messageId);
++            }
++            else
++            {
++                // Return a search term that matches everything.
++                return new SearchTerm() {
++                    public boolean match(Message message) {
++                        return true;
++                    }
++                };
++            }
+         }
+ 
+     }
+Index: src/java/com/icegreen/greenmail/imap/commands/CopyCommand.java
+===================================================================
+--- src/java/com/icegreen/greenmail/imap/commands/CopyCommand.java	(revision 6)
++++ src/java/com/icegreen/greenmail/imap/commands/CopyCommand.java	(working copy)
+@@ -6,9 +6,13 @@
+  */
+ package com.icegreen.greenmail.imap.commands;
+ 
++import java.util.ArrayList;
++import java.util.List;
++
+ import com.icegreen.greenmail.imap.*;
+ import com.icegreen.greenmail.store.FolderException;
+ import com.icegreen.greenmail.store.MailFolder;
++import com.icegreen.greenmail.util.GreenMailUtil;
+ 
+ /**
+  * Handles processeing for the COPY imap command.
+@@ -19,6 +23,7 @@
+ class CopyCommand extends SelectedStateCommand implements UidEnabledCommand {
+     public static final String NAME = "COPY";
+     public static final String ARGS = "<message-set> <mailbox>";
++    public static final String COPYUID = "COPYUID";
+ 
+     /**
+      * @see CommandTemplate#doProcess
+@@ -52,6 +57,10 @@
+ //            idSet = currentMailbox.toUidSet(idSet);
+ //        }
+ //        currentMailbox.copyMessages(toMailbox, idSet);
++
++        List<Long> copiedUidsOld = new ArrayList<Long>();
++        List<Long> copiedUidsNew = new ArrayList<Long>();
++
+         long[] uids = currentMailbox.getMessageUids();
+         for (int i = 0; i < uids.length; i++) {
+             long uid = uids[i];
+@@ -64,15 +73,38 @@
+             }
+ 
+             if (inSet) {
+-                currentMailbox.copyMessage(uid, toFolder);
++                long copiedUid = currentMailbox.copyMessage(uid, toFolder);
++                
++                copiedUidsOld.add(uid);
++                copiedUidsNew.add(copiedUid);
+             }
+         }
+ 
+         session.unsolicitedResponses(response);
+-        response.commandComplete(this);
++
++        response.commandComplete(this, genereteCopyuidResponseCode(currentMailbox, copiedUidsOld, copiedUidsNew));
+     }
+ 
+     /**
++     * Generates <b>COPYUID</b> response code (see <a href="http://tools.ietf.org/html/rfc2359#page-4">http://tools.ietf.org/html/rfc2359</a>)
++     * using format : <i>COPYUID UIDVALIDITY SOURCE-UIDS TARGET-UIDS</i>. For example <i>COPYUID 38505 304,319,320 3956,3957,3958</i>
++     * 
++     * @param currentMailbox imap folder which is target of copy command
++     * @param copiedUidsFrom List of source uids which was successfully copied
++     * @param copiedUidsTo List of message uids which was successfully copied
++     * @return
++     */
++    private String genereteCopyuidResponseCode(ImapSessionFolder currentMailbox, List<Long> copiedUidsFrom, List<Long> copiedUidsTo)
++    {
++        StringBuilder copyuidResponseCode = new StringBuilder(COPYUID).append(SP).
++                append(currentMailbox.getUidValidity()).append(SP).
++                append(GreenMailUtil.uidsToRangeString(copiedUidsFrom)).append(SP).
++                append(GreenMailUtil.uidsToRangeString(copiedUidsTo));
++        
++        return copyuidResponseCode.toString(); 
++    }
++
++    /**
+      * @see ImapCommand#getName
+      */
+     public String getName() {
+Index: src/java/com/icegreen/greenmail/imap/commands/ExpungeCommand.java
+===================================================================
+--- src/java/com/icegreen/greenmail/imap/commands/ExpungeCommand.java	(revision 6)
++++ src/java/com/icegreen/greenmail/imap/commands/ExpungeCommand.java	(working copy)
+@@ -19,7 +19,8 @@
+  * @author Darrell DeBoer <darrell@apache.org>
+  * @version $Revision: 109034 $
+  */
+-class ExpungeCommand extends SelectedStateCommand {
++class ExpungeCommand extends SelectedStateCommand implements UidEnabledCommand
++{
+     public static final String NAME = "EXPUNGE";
+     public static final String ARGS = null;
+ 
+@@ -29,7 +30,33 @@
+     protected void doProcess(ImapRequestLineReader request,
+                              ImapResponse response,
+                              ImapSession session)
+-            throws ProtocolException, FolderException {
++            throws ProtocolException, FolderException 
++    {
++        doProcessInternal(request, response, session, false);
++    }
++    
++    /**
++     * @see UidEnabledCommand#doProcess
++     */
++    public void doProcess(ImapRequestLineReader request,
++                          ImapResponse response,
++                          ImapSession session,
++                          boolean useUids)
++     throws ProtocolException, FolderException
++    {
++        doProcessInternal(request, response, session, useUids);
++    }
++    
++    private void doProcessInternal(ImapRequestLineReader request,
++            ImapResponse response,
++            ImapSession session,
++            boolean useUids) throws ProtocolException, FolderException
++    { 
++        IdRange[] idSet = new IdRange[0];
++        if (useUids)
++        {
++            idSet = parser.parseIdRange(request);
++        }
+         parser.endLine(request);
+ 
+         if (session.getSelected().isReadonly()) {
+@@ -37,10 +64,23 @@
+         }
+ 
+         MailFolder folder = session.getSelected();
+-        folder.expunge();
++        if (useUids)
++        {
++            for (long uid : folder.getMessageUids())
++            {
++                if (includes(idSet, uid))
++                {
++                    response.expungeResponse(folder.getMsn(uid));
++                    folder.expunge(uid);
++                }
++            }
++        }
++        else
++        {
++            folder.expunge();
++        }
+ 
+         session.unsolicitedResponses(response);
+-        response.commandComplete(this);
++        response.commandComplete(this);    	
+     }
+ 
+     /**
+Index: src/java/com/icegreen/greenmail/imap/commands/AppendCommand.java
+===================================================================
+--- src/java/com/icegreen/greenmail/imap/commands/AppendCommand.java	(revision 6)
++++ src/java/com/icegreen/greenmail/imap/commands/AppendCommand.java	(working copy)
+@@ -30,6 +30,7 @@
+ class AppendCommand extends AuthenticatedStateCommand {
+     public static final String NAME = "APPEND";
+     public static final String ARGS = "<mailbox> [<flag_list>] [<date_time>] literal";
++    public static final String APPENDUID = "APPENDUID";
+ 
+     private AppendCommandParser parser = new AppendCommandParser();
+ 
+@@ -60,13 +61,29 @@
+             throw e;
+         }
+ 
+-        folder.appendMessage(message, flags, datetime);
++        long uid = folder.appendMessage(message, flags, datetime);
+ 
+         session.unsolicitedResponses(response);
+-        response.commandComplete(this);
++        
++        // APPENDUID response code, fix for MNT-12584
++        // response.commandComplete(this, generateAppenduidResponseCode(folder, uid));
++        response.commandComplete(this);
+     }
+ 
+     /**
++     * Generates <b>APPENDUID</b> response code (see <a href="http://tools.ietf.org/html/rfc2359#page-3">http://tools.ietf.org/html/rfc2359</a>)
++     * using format : <i>APPENDUID UIDVALIDITY MESSAGE-UID</i>. For example <i>APPENDUID 38505 3955</i>
++     * 
++     * @param currentMailbox imap folder which is target of copy command
++     * @param copiedUidsFrom List of source uids which was successfully copied
++     * @param copiedUidsTo List of message uids which was successfully copied
++     * @return
++     */
++    private String generateAppenduidResponseCode(MailFolder mailbox, long uid)
++    {
++        return APPENDUID + SP + mailbox.getUidValidity() + SP + uid;
++    }
++
++    /**
+      * @see ImapCommand#getName
+      */
+     public String getName() {
