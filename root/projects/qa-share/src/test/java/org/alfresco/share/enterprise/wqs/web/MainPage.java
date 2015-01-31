@@ -24,6 +24,9 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 /**
  * Created by Lucian Tuca on 12/02/2014.
  */
@@ -251,6 +254,180 @@ public class MainPage extends AbstractUtils
         }
 
         /*
+        * AONE-5658 Opening articles from main page
+        */
+        @Test(groups = { "WQS" }) public void AONE_5658() throws Exception
+        {
+
+                navigateTo(wqsURL);
+                WcmqsHomePage mainPage = new WcmqsHomePage(drone).render();
+
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Click Media  Consult new site coming out in September link in News and Analysis section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickLinkByTitle(WcmqsNewsPage.FTSE_1000, WcmqsHomePage.SECTION_NEWSLIST);
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.FTSE_1000));
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Return to Main page and click picture preview for Media  Consult new site coming out in September article;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickImageLink(WcmqsNewsPage.FTSE_1000);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.FTSE_1000));
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Return to Main page and click China  eyes shake-up of bank holdings link in News and Analysis section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY, WcmqsHomePage.SECTION_NEWSLIST);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY));
+
+                // ---- Step 4 ----
+                // ---- Step action ----
+                // Return to Main page and click picture preview for China  eyes shake-up of bank holdings article;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickImageLink(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY));
+
+                // ---- Step 5 ----
+                // ---- Step action ----
+                // Return to Main page and click Minicards  are now available link in News and Analysis section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS, WcmqsHomePage.SECTION_NEWSLIST);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS));
+
+                // ---- Step 6 ----
+                // ---- Step action ----
+                // Return to Main page and click picture preview for Minicards  are now available article;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickImageLink(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS));
+
+                // ---- Step 7 ----
+                // ---- Step action ----
+                // Return to Main page and click Ethical funds link in Featured section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS, WcmqsHomePage.SECTION_SERVICES);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsBlogPage.ETHICAL_FUNDS));
+
+                // ---- Step 8 ----
+                // ---- Step action ----
+                // Return to Main page and click Minicards  are now available link in Featured section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS, WcmqsHomePage.SECTION_SERVICES);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS));
+
+                // ---- Step 9 ----
+                // ---- Step action ----
+                // Return to Main page and click Alfresco  Datasheet - Social Computing link in Featured section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle(WcmqsPublicationPage.PUBLICATION_PAGES.get(2), WcmqsHomePage.SECTION_SERVICES);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString("Datasheet_Social_Computing.pdf"));
+                navigateTo(wqsURL);
+
+                // ---- Step 10 ----
+                // ---- Step action ----
+                // Return to Main page and click Read more button for Example Feature section;
+                // ---- Expected results ----
+                // Page is reloaded or jumps up;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle("read more", WcmqsHomePage.SECTION_ADDRESSBOX);
+                assertThat("Verify that page navigation url now has # suffix ", mainPage.getDrone().getCurrentUrl(),
+                        containsString("http://mainpage:8080/wcmqs/#"));
+
+                // ---- Step 11 ----
+                // ---- Step action ----
+                // Return to Main page and click Ethical funds link in Latest Blog Articles section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS, WcmqsHomePage.SECTION_LATESTNEWS);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsBlogPage.ETHICAL_FUNDS));
+
+                // ---- Step 12 ----
+                // ---- Step action ----
+                // Return to Main page and click Company  organises workshop link in Latest Blog  Articles section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP, WcmqsHomePage.SECTION_LATESTNEWS);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP));
+
+                // ---- Step 13 ----
+                // ---- Step action ----
+                // Return to Main page and click Our top  analyst's latest thoughts link in Latest Blog  Articles section;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickLinkByTitle(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS, WcmqsHomePage.SECTION_LATESTNEWS);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS));
+
+                // ---- Step 14 ----
+                // ---- Step action ----
+                // Return to Main page and click Read More button on animated banner when First Slide article is displayed;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickOnSlideShowReadme(1);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.FTSE_1000));
+
+                // ---- Step 15 ----
+                // ---- Step action ----
+                // Return to Main page and click Read More button on animated banner when  Second Slide article is displayed;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickOnSlideShowReadme(2);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.EXPERTS_WEIGHT_STOCKS));
+
+                // ---- Step 16 ----
+                // ---- Step action ----
+                // Return to Main page and click Read More button on animated banner when  Third Slide article is displayed;
+                // ---- Expected results ----
+                // Article is opened successfully and displayed correctly;
+
+                mainPage.clickWebQuickStartLogo().render();
+                mainPage.clickOnSlideShowReadme(3);
+                assertThat("Verify if the correct page opened ", mainPage.getTitle(), containsString(WcmqsNewsPage.CREDIT_CARDS));
+
+        }
+
+        /*
         * AONE-5660 Adding new section in wcmqs site
         */
         @Test(groups = { "WQS" })
@@ -300,8 +477,6 @@ public class MainPage extends AbstractUtils
 
                 waitAndOpenNewSection(homePage, ACCOUNTING, 4);
                 String pageTitle = drone.getTitle();
-
-                // TODO 4: Add your code here for step 4.
 
         }
 

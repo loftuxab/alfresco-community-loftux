@@ -368,7 +368,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.GLOBAL);
 
-                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
+                wcmqsNewsPage.clickLinkByTitle(WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
                 //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
                 //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
@@ -447,7 +447,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.GLOBAL);
 
-                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.FTSE_1000);
+                wcmqsNewsPage.clickLinkByTitle(WcmqsNewsPage.FTSE_1000);
                 //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
                 //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
@@ -526,7 +526,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.COMPANIES);
 
-                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
+                wcmqsNewsPage.clickLinkByTitle(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
                 //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
                 //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
@@ -604,7 +604,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.COMPANIES);
 
-                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
+                wcmqsNewsPage.clickLinkByTitle(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
                 //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
                 //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
@@ -683,7 +683,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.MARKETS);
 
-                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.INVESTORS_FEAR);
+                wcmqsNewsPage.clickLinkByTitle(WcmqsNewsPage.INVESTORS_FEAR);
                 //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
                 //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
@@ -762,7 +762,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.MARKETS);
 
-                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.HOUSE_PRICES);
+                wcmqsNewsPage.clickLinkByTitle(WcmqsNewsPage.HOUSE_PRICES);
                 //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
                 //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 

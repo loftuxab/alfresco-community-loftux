@@ -365,7 +365,7 @@ public class PublicationActions extends AbstractUtils
                 //  Microsoft  Word - OEM 0510 v2 details page is opened;
 
                 WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
-                wcmqsAllPublicationsPage.clickDocumentByTitle("Microsoft Word - OEM 0510 v2");
+                wcmqsAllPublicationsPage.clickLinkByTitle("Microsoft Word - OEM 0510 v2");
 
                 // ---- Step 6 ----
                 // ---- Step action ----
@@ -418,7 +418,7 @@ public class PublicationActions extends AbstractUtils
                 //  Enterprise  Network details page is opened;
 
                 wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
-                wcmqsAllPublicationsPage.clickDocumentByTitle("Enterprise Network");
+                wcmqsAllPublicationsPage.clickLinkByTitle("Enterprise Network");
 
                 // ---- Step 11 ----
                 // ---- Step action ----
@@ -487,7 +487,7 @@ public class PublicationActions extends AbstractUtils
                 wcmqsHomePage.openPublicationsPageFolder("research reports");
                 WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
 
-                wcmqsAllPublicationsPage.clickDocumentByTitle("Enterprise Network");
+                wcmqsAllPublicationsPage.clickLinkByTitle("Enterprise Network");
 
                 WcmqsPublicationPage wcmqsPublicationPage = new WcmqsPublicationPage(drone);
                 wcmqsPublicationPage.render();
@@ -533,7 +533,7 @@ public class PublicationActions extends AbstractUtils
                 wcmqsHomePage.openPublicationsPageFolder("research reports");
                 WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
 
-                wcmqsAllPublicationsPage.clickDocumentByTitle("Enterprise Network");
+                wcmqsAllPublicationsPage.clickLinkByTitle("Enterprise Network");
                 // ---- Step 2 ----
                 // ---- Step action ----
                 // Verify publication details;
@@ -612,7 +612,7 @@ public class PublicationActions extends AbstractUtils
                 wcmqsHomePage.openPublicationsPageFolder("white papers");
                 WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
 
-                wcmqsAllPublicationsPage.clickDocumentByTitle("Records Management Datasheet");
+                wcmqsAllPublicationsPage.clickLinkByTitle("Records Management Datasheet");
 
                 WcmqsPublicationPage wcmqsPublicationPage = new WcmqsPublicationPage(drone);
                 wcmqsPublicationPage.render();
@@ -658,7 +658,7 @@ public class PublicationActions extends AbstractUtils
                 wcmqsHomePage.openPublicationsPageFolder("white papers");
                 WcmqsAllPublicationsPage wcmqsAllPublicationsPage = new WcmqsAllPublicationsPage(drone);
 
-                wcmqsAllPublicationsPage.clickDocumentByTitle("Records Management Datasheet");
+                wcmqsAllPublicationsPage.clickLinkByTitle("Records Management Datasheet");
                 // ---- Step 2 ----
                 // ---- Step action ----
                 // Verify publication details;
