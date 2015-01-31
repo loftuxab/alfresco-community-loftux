@@ -79,7 +79,6 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName);
         cifsPath = power.getCIFSPath();
-
         networkDrive = power.getMapDriver();
         networkPath = power.getMapPath();
 
@@ -104,7 +103,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         fileName_6299 = "AONE-6299";
         fileName_6300 = "AONE-6300";
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:admin admin";
         Runtime.getRuntime().exec(mapConnect);
         if (checkDirOrFileExists(7, 200, networkDrive + cifsPath))
         {
@@ -233,7 +232,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(first_modification));
 
         // ---- Step 6 ----
@@ -282,7 +281,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Expected Result
         // All changes are present and displayed correctly.
         detailsPage.render();
-        String body2 = detailsPage.getDocumentBody();
+        String body2 = detailsPage.getDocumentBody().replaceAll("\\n", "");
 
         Assert.assertTrue(body2.contains(second_modification));
 
@@ -330,7 +329,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        String body3 = detailsPage.getDocumentBody();
+        String body3 = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body3.contains(last_modification));
 
     }
@@ -427,7 +426,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(first_modification));
 
         // ---- Step 6 ----
@@ -480,7 +479,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(second_modification));
 
         // ---- Step 11 ----
@@ -534,7 +533,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(last_modification));
 
     }
@@ -690,7 +689,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6297 + pptxFileType));
         editPropertiesPage.clickCancel();
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit1));
 
         // --- Step 6 ---
@@ -768,7 +767,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit2));
 
         // ---- Step 12 ----
@@ -820,7 +819,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit3));
 
     }
@@ -892,7 +891,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6298 + pptxFileType));
         editPropertiesPage.clickCancel();
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit1));
 
         // --- Step 6 ---
@@ -974,7 +973,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit2));
 
         // ---- Step 12 ----
@@ -1032,7 +1031,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit3));
 
     }
@@ -1158,7 +1157,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // --- Expected results --
         // All changes are present and displayed correctly.
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit2));
 
         // --- Step 9 ---
@@ -1214,7 +1213,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // --- Expected results --
         // All changes are present and displayed correctly.
-        String body3 = detailsPage.getDocumentBody();
+        String body3 = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body3.contains(edit3));
     }
 
@@ -1349,7 +1348,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // --- Expected results --
         // All changes are present and displayed correctly.
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit2));
 
         // --- Step 9 ---
@@ -1408,7 +1407,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Verify the document's content.
         // --- Expected results --
         // All changes are present and displayed correctly.
-        String body3 = detailsPage.getDocumentBody();
+        String body3 = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body3.contains(edit3));
     }
 
