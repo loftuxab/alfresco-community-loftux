@@ -667,6 +667,30 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.jibx</groupId>
+                <artifactId>maven-jibx-plugin</artifactId>
+                <version>${dependency.jibx.version}</version>
+                <!-- ACE-3667: Workaround for JIBX-515 -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jibx</groupId>
+                        <artifactId>jibx-bind</artifactId>
+                        <version>${dependency.jibx.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <artifactId>bcel</artifactId>
+                                <groupId>bcel</groupId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.bcel</groupId>
+                        <artifactId>bcel</artifactId>
+                        <version>6.0-RC3</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
                 <groupId>org.alfresco.maven.plugin</groupId>
                 <artifactId>alfresco-maven-plugin</artifactId>
                 <version>1.1.1</version>
