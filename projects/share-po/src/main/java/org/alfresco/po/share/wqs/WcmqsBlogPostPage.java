@@ -16,7 +16,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 /**
  * Created by Lucian Tuca on 11/18/2014.
  */
-public class WcmqsBlogPostPage extends SharePage
+public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 {
         public static final By CREATE_ARTICLE = By.cssSelector("a[id='yui-gen5']");
         public static final By TITLE = By.xpath(".//div/h2");

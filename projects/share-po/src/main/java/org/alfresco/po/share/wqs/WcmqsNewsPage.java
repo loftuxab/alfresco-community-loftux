@@ -54,6 +54,7 @@ public class WcmqsNewsPage extends SharePage
     public static final String ARTICLE_5 = "article5.html";
 
     protected static String TITLES_NEWS = "//div[@id='left']//div[@class='interior-content']//a//.././/./.././a";
+    protected static By RIGHT_TITLES_NEWS =By.cssSelector("div[id='right'] ul");
 
     @RenderWebElement
     private final By PAGE_LOGO = By.cssSelector("#logo>a");
@@ -200,7 +201,7 @@ public class WcmqsNewsPage extends SharePage
     /**
      * Method to click a news title
      * 
-     * @param newsName - the of the news declared in share!
+     * @param newsName - the title of the news declared in share!
      * @return
      */
     public void clickNewsByName(String newsName)
@@ -219,7 +220,7 @@ public class WcmqsNewsPage extends SharePage
     /**
      * Method to click a news title
      *
-     * @param newsTitle - the of the news declared in share!
+     * @param newsTitle - the title of the news in wcmqs site
      * @return
      */
     public void clickNewsByTitle(String newsTitle)
@@ -353,5 +354,46 @@ public class WcmqsNewsPage extends SharePage
             throw new PageOperationException("Exceeded time to find delete button. " + e.toString());
         }
     }
+    
+    /**
+     * Method to get the headline titles from right side of news Page
+     * 
+     * @return List<ShareLink>
+     */
+    public List<ShareLink> getRightHeadlineTitleNews()
+    {
+        List<ShareLink> titles = new ArrayList<ShareLink>();
+        try
+        {
+            List<WebElement> links = drone.findAll(RIGHT_TITLES_NEWS);
+            for (WebElement div : links)
+            {
+                titles.add(new ShareLink(div, drone));
+            }
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageException("Unable to access news site data", nse);
+        }
+
+        return titles;
+    }
+    
+//    public boolean checkIfNewsExists(String title)
+//    {
+//        boolean check = false;
+//        try
+//        {
+//            drone.waitForElement(By.xpath(String.format("//h2[contains(text(),\"%s\")]", title)),
+//                    SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+//            check = true;
+//        }
+//        catch (NoSuchElementException nse)
+//        {
+//            return false;
+//        }
+//
+//        return check;
+//    }
 
 }
