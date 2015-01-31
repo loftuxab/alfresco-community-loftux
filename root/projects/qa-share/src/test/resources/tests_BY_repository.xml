@@ -25,5 +25,10 @@
             <class name="org.alfresco.share.repository.RepositoryFtpTest"/>
         </classes>
     </test>
+    <test name="RepositoryFtpsTest">
+        <classes>
+            <class name="org.alfresco.share.repository.RepositoryFtpsTest"/>
+        </classes>
+    </test>
 
 </suite>

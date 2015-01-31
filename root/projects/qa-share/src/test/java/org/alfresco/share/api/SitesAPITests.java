@@ -22,6 +22,7 @@ import org.alfresco.po.share.dashlet.MySitesDashlet;
 import org.alfresco.po.share.dashlet.SiteMembersDashlet;
 import org.alfresco.po.share.enums.DataLists;
 import org.alfresco.po.share.enums.UserRole;
+import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.blog.BlogPage;
@@ -120,13 +121,18 @@ public class SitesAPITests extends SitesAPI
 
         ShareUser.login(drone, testUser);
 
-        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC, true);
+        SiteDashboardPage siteDashBoard = ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC, true);
+        CustomizeSitePage customizeSitePage = siteDashBoard.getSiteNav().selectCustomizeSite().render();
+        List<SitePageType> addPageTypes = new ArrayList<>();
+        addPageTypes.add(SitePageType.BLOG);
+        //addPageTypes.add(SitePageType.WIKI);
+        customizeSitePage.addPages(addPageTypes);
 
-        ShareUserDashboard.addPageToSite(drone, siteName, SitePageType.WIKI, SitePageType.BLOG);
+        //ShareUserDashboard.addPageToSite(drone, siteName, SitePageType.WIKI, SitePageType.BLOG);
 
         SiteDashboardPage siteDashPage = ShareUser.openSiteDashboard(drone, siteName);
         WikiPage wikiPage = siteDashPage.getSiteNav().selectSiteWikiPage().render();
-        List<String> textLines = new ArrayList<String>();
+        List<String> textLines = new ArrayList<>();
         textLines.add("This is a new Wiki text!");
         wikiPage.createWikiPage("Wiki Page " + Math.random(), textLines);
         ShareUser.openSiteDashboard(drone, siteName).render();
@@ -144,11 +150,10 @@ public class SitesAPITests extends SitesAPI
         }
     }
 
-
     @Test
     public void AONE_14271() throws Exception
     {
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put(SKIP_COUNT, "0");
         params.put(MAX_ITEMS, "6");
         ListResponse<Site> response = getSites(testUser, DOMAIN, params);
@@ -166,7 +171,7 @@ public class SitesAPITests extends SitesAPI
 
         try
         {
-            response = getSites(testUserInvalid, DOMAIN, params);
+            getSites(testUserInvalid, DOMAIN, params);
             Assert.fail(String.format("AONE_14271: , %s, Expected Result: %s", "Test should fail as invalid username - " + testUserInvalid, 401));
         }
         catch (PublicApiException e)
