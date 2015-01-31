@@ -307,11 +307,11 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
         //https://issues.alfresco.com/jira/browse/CLOUD-2229
         //assertTrue(checkIfContentIsSynced(hybridDrone, newFiles[2]) && checkIfContentIsSynced(hybridDrone, newFiles[3]), "Files were not synced");
         syncInf3 = docLibCl.getFileDirectoryInfo(newFiles[2]).clickOnViewCloudSyncInfo().render();
-        assertTrue(syncInf3.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " + newFiles[2]);
+        assertTrue(syncInf3.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " + newFiles[2] + " in Cloud");
         syncInf3.clickOnCloseButton();
 
         syncInf4 = docLibCl.getFileDirectoryInfo(newFiles[3]).clickOnViewCloudSyncInfo().render();
-        assertTrue(syncInf4.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " + newFiles[3]);
+        assertTrue(syncInf4.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " + newFiles[3] + " in Cloud");
         syncInf4.clickOnCloseButton();
 
         //The new files are added in Cloud and are indirectly synced to On-premise. For indirectly synced content the 'synced indirectly' icon is displayed.
