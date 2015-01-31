@@ -24,6 +24,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.alfresco.api.AlfrescoPublicApi;
+
 /**
  * Specifically indicate that a method is not to be audited.
  * This is a marker annotation.
@@ -33,6 +35,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@AlfrescoPublicApi
 public @interface NotAuditable
 {
 
