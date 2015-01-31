@@ -226,7 +226,7 @@ public class WcmqsNewsPage extends SharePage
     {
         try
         {
-            drone.findAndWait(By.xpath(String.format("//a[text()='%s']", newsTitle))).click();
+            drone.findAndWait(By.xpath(String.format("//a[text()=\"%s\"]", newsTitle))).click();
         }
         catch (TimeoutException e)
         {
@@ -276,12 +276,12 @@ public class WcmqsNewsPage extends SharePage
         return check;
     }
 
-    public boolean checkIfBlogExists(String title)
+    public boolean checkIfNewsExists(String title)
     {
         boolean check = false;
         try
         {
-            drone.waitForElement(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
+            drone.waitForElement(By.xpath(String.format("//h2[contains(text(),\"%s\")]", title)),
                     SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
             check = true;
         }
@@ -321,7 +321,6 @@ public class WcmqsNewsPage extends SharePage
         {
 
             drone.waitForElement(DELETE_CONFIRM_WINDOW, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
-            WebElement importMessage = drone.find(By.id("prompt_c"));
             check = true;
         }
         catch (NoSuchElementException nse)
