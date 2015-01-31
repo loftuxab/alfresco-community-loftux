@@ -8,9 +8,11 @@ import org.alfresco.po.share.dashlet.AddOnsRssFeedDashlet;
 import org.alfresco.po.share.dashlet.RssFeedUrlBoxPage;
 import org.alfresco.po.share.dashlet.RssFeedUrlBoxPage.NrItems;
 import org.alfresco.po.share.enums.Dashlets;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
+import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
@@ -140,7 +142,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2905() throws Exception
     {
-        String testName = getTestName() + "18";
+        String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -157,7 +159,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2905() throws Exception
     {
-        String testName = getTestName() + "18";
+        String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
         String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
 
@@ -213,7 +215,23 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         List<ShareLink> links = rssDashlet.getHeadlineLinksFromDashlet();
         links.get(0).openLink();
 
-        drone.waitForPageLoad(5);
+        drone.waitForPageLoad(7);
+        
+        int counter = 1;
+        int retryRefreshCount = 20;
+        while (counter <= retryRefreshCount)
+        {      
+           
+            if (!drone.getTitle().contains("User Dashboard"))
+            {
+                break;
+            }
+            else
+            {
+                logger.info("Wait for the page to open");
+                counter++;
+            }
+        }
         
         Set<String> windowHandles = drone.getWindowHandles();
         Assert.assertEquals(windowHandles.size(), 2);
