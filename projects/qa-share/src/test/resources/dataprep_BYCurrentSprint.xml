@@ -153,16 +153,16 @@
 <exclude name=".*"/>
 </methods>
 </class>
-    <!--class name="org.alfresco.share.dashlet.SiteSearchDashletTest">
+    <class name="org.alfresco.share.dashlet.SiteSearchDashletTest">
         <methods>
-            <include name="dataPrep_AONE_14774"/>
+            <!--include name="dataPrep_AONE_14774"/>
             <include name="dataPrep_AONE_14775"/>
-            <include name="dataPrep_AONE_14776"/>
+            <include name="dataPrep_AONE_14776"/-->
             <include name="dataPrep_AONE_14777"/>
             <include name="dataPrep_AONE_14778"/>
             <include name="dataPrep_AONE_14779"/>
             <include name="dataPrep_AONE_14780"/>
-            <include name="dataPrep_AONE_14781"/>
+            <!--include name="dataPrep_AONE_14781"/>
             <include name="dataPrep_AONE_14782"/>
             <include name="dataPrep_AONE_14783"/>
             <include name="dataPrep_AONE_14784"/>
@@ -194,7 +194,7 @@
             <include name="dataPrep_AONE_14812"/>
             <include name="dataPrep_AONE_14813"/>
             <include name="dataPrep_AONE_14814"/>
-            <include name="dataPrep_AONE_14815"/>
+            <include name="dataPrep_AONE_14815"/-->
             <exclude name=".*"/>
         </methods>
     </class>
