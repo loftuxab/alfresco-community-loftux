@@ -122,6 +122,17 @@ public class CloudTaskOrReviewPageTest extends AbstractTest
         Assert.assertTrue(cloudTaskOrReviewPage.isAfterCompletionSelected(KeepContentStrategy.KEEPCONTENT));
         Assert.assertTrue(cloudTaskOrReviewPage.isRemoveAllButtonPresent());
         
+        List<String> formLabels = cloudTaskOrReviewPage.getAllLabels();
+        Assert.assertTrue(formLabels.contains("Message:"));
+        Assert.assertTrue(formLabels.contains("Type:"));
+        Assert.assertTrue(formLabels.contains("Due:"));
+        Assert.assertTrue(formLabels.contains("Priority:"));
+        Assert.assertTrue(formLabels.contains("Reviewers:*"));
+        Assert.assertTrue(formLabels.contains("Required approval percentage:*"));
+        Assert.assertTrue(formLabels.contains("After completion:*"));
+        Assert.assertTrue(formLabels.contains("Lock on-premise content"));
+        Assert.assertTrue(formLabels.contains("Items:*"));
+        
         // assertFalse(isButtonSubmitted());
         WorkFlowFormDetails formDetails = createWorkflowForm();
         // Fill form Detail
@@ -172,7 +183,7 @@ public class CloudTaskOrReviewPageTest extends AbstractTest
         reviewers.add(cloudUserName);
         formDetails.setReviewers(reviewers);
         formDetails.setMessage(siteName);
-        formDetails.setDueDate("01/10/2015");
+        formDetails.setDueDate("01/10/2016");
         formDetails.setLockOnPremise(false);
         formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
         formDetails.setTaskPriority(Priority.HIGH);

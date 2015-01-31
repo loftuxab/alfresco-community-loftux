@@ -101,6 +101,9 @@ public class CloudTaskOrReviewPage extends WorkFlowPage
     private static final RenderElement PRIORITY_DROPDOWN_ELEMENT = getVisibleRenderElement(PRIORITY_DROPDOWN);
     private static final RenderElement DUE_DATE_ELEMENT = getVisibleRenderElement(DUE_DATE);
     private static final long TIME_LEFT = 1000;
+    
+    private static final By ALL_FIELD_LABELS = By.cssSelector(".form-field>label");
+    
 
     private final Log logger = LogFactory.getLog(this.getClass());
 
@@ -968,5 +971,32 @@ public class CloudTaskOrReviewPage extends WorkFlowPage
     {
         String description = getDetailsForFile(fileName, ITEM_DATE);
         return description;
+    }
+    
+    /**
+     * Method to get All labels from Workflow Form
+     * 
+     * @return
+     */
+    public List<String> getAllLabels()
+    {
+        List<String> labels = new ArrayList<String>();
+        try
+        {
+            List<WebElement> webElements = drone.findAll(ALL_FIELD_LABELS);
+            for (WebElement label : webElements)
+            {
+                labels.add(label.getText());
+            }
+            return labels;
+        }
+        catch (NoSuchElementException nse)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("No labels found", nse);
+            }
+        }
+        return labels;
     }
 }
