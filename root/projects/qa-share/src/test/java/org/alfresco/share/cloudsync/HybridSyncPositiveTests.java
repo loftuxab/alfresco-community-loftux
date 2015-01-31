@@ -1283,5 +1283,912 @@ public class HybridSyncPositiveTests extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
- 
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15431() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+        String folderName = getFolderName(testName) + getTestName();
+
+        String opSiteName = getTestName() + "-OP" + "A7";
+        String cloudSiteName = getTestName() + "-CL" + "A7";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        // sync to the Cloud
+        ShareUserSitePage.createFolder(drone, folderName, "").render();
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(folderName).selectSyncToCloud().render();
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectSubmitButtonToSync().render();
+
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15431:Sync a folder. Cloud location
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15431() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String opSiteName = getTestName() + "-OP" + "A7";
+        String cloudSiteName = getTestName() + "-CL" + "A7";
+        String folderName = getFolderName(testName) + getTestName();
+        String syncLocation = testDomain + ">" + cloudSiteName + ">" + "Documents" + ">" + folderName;
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Go to the Document Library of created in preconditions in Alfresco Share (On-premise) site
+        // --- Expected results ---
+        // Document Library page is opened and all information is displayed correctly on it
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertTrue(documentLibraryPage.isBrowserTitle("Alfresco » Document Library"));
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Click cloud icon near the folder which is synced
+        // --- Expected results ---
+        // Pop up dialogue with sync info appears. Cloud location info is displayed
+
+        SyncInfoPage syncInfoPage = documentLibraryPage.getFileDirectoryInfo(folderName).clickOnViewCloudSyncInfo().render();
+        Assert.assertTrue(syncInfoPage.getCloudSyncStatus().contains("Synced"));
+        Assert.assertEquals(syncInfoPage.getCloudSyncLocation(), syncLocation);
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15432() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String fileName1 = getTestName() + "1" + ".txt";
+        String[] fileInfo1 = new String[] { fileName1, DOCLIB };
+        String fileName2 = getTestName() + "2" + ".txt";
+        String[] fileInfo2 = new String[] { fileName2, DOCLIB };
+
+        String opSiteName = getTestName() + "-OP" + "A4";
+        String cloudSiteName = getTestName() + "-CL" + "A4";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+
+        ShareUser.uploadFileInFolder(drone, fileInfo1).render();
+        ShareUser.uploadFileInFolder(drone, fileInfo2).render();
+
+        // fileName1 sync to the Cloud
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(fileName1).selectSyncToCloud().render();
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectSubmitButtonToSync().render(5000);
+
+        // fileName2 sync to the Cloud
+        destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(fileName2).selectSyncToCloud().render();
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectSubmitButtonToSync().render();
+
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15432:Sync multiple files. Cloud location
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15432() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String opSiteName = getTestName() + "-OP" + "A4";
+        String cloudSiteName = getTestName() + "-CL" + "A4";
+        String fileName1 = getTestName() + "1" + ".txt";
+        String fileName2 = getTestName() + "2" + ".txt";
+        String syncLocation = testDomain + ">" + cloudSiteName + ">" + "Documents";
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Go to the Document Library of created in preconditions in Alfresco Share (On-premise) site
+        // --- Expected results ---
+        // Document Library page is opened and all information is displayed correctly on it
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        logger.info("Title  --- " + documentLibraryPage.getTitle());
+        Assert.assertTrue(documentLibraryPage.isBrowserTitle("Alfresco » Document Library"));
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Click on cloud icon for each file and verify cloud location
+        // --- Expected results ---
+        // Cloud location is displayed correctly for each file
+
+        SyncInfoPage syncInfoPage = documentLibraryPage.getFileDirectoryInfo(fileName1).clickOnViewCloudSyncInfo().render();
+        Assert.assertTrue(syncInfoPage.getCloudSyncStatus().contains("Synced"));
+        Assert.assertEquals(syncInfoPage.getCloudSyncLocation(), syncLocation);
+
+        syncInfoPage = documentLibraryPage.getFileDirectoryInfo(fileName2).clickOnViewCloudSyncInfo().render();
+        Assert.assertTrue(syncInfoPage.getCloudSyncStatus().contains("Synced"));
+        Assert.assertEquals(syncInfoPage.getCloudSyncLocation(), syncLocation);
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15434() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String fileName = getTestName() + ".txt";
+        String[] fileInfo = new String[] { fileName, DOCLIB };
+
+        String opSiteName = getTestName() + "-OP" + "A7";
+        String cloudSiteName = getTestName() + "-CL" + "A7";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo).render();
+
+        // sync to the Cloud
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(fileName).selectSyncToCloud().render();
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectSubmitButtonToSync().render();
+
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15434:Unsync file
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15434() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String opSiteName = getTestName() + "-OP" + "A7";
+        String cloudSiteName = getTestName() + "-CL" + "A7";
+        String fileName = getTestName() + ".txt";
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Go to the Document Library of created in preconditions in Alfresco Share (On-premise) site
+        // --- Expected results ---
+        // Document Library page is opened and all information is displayed correctly on it
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertTrue(documentLibraryPage.isBrowserTitle("Alfresco » Document Library"));
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Click cloud icon against the folder which is synced
+        // --- Expected results ---
+        // Pop up dialogue with sync info appears.
+
+        SyncInfoPage syncInfoPage = documentLibraryPage.getFileDirectoryInfo(fileName).clickOnViewCloudSyncInfo().render();
+        Assert.assertTrue(syncInfoPage.getCloudSyncStatus().contains("Synced"));
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Verify Unsync button is available on Sync info pop-up window
+        // --- Expected results ---
+        // Unsync button is available and enabled
+
+        Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
+        Assert.assertTrue(syncInfoPage.isUnsyncButtonEnabled());
+
+        // --- Step 4 ---
+        // --- Step action ---
+        // Click on Unsync button
+        // --- Expected results ---
+        // Folder unsynced notification appears
+
+        syncInfoPage.selectUnsyncRemoveContentFromCloud(true);
+
+        // --- Step 5 ---
+        // --- Step action ---
+        // Go to the target cloud location which was setin preconditions for sync
+        // --- Expected results ---
+        // Target location in Cloud (Network->Site->Document Library page) is opened. Unsynced folder removed from Cloud
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.isItemVisble(fileName));
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15435() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String folderName = getFolderName(testName) + getTestName();
+
+        String opSiteName = getTestName() + "-OP" + "A1";
+        String cloudSiteName = getTestName() + "-CL" + "A1";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+
+        DocumentLibraryPage documentLibraryPage = ShareUserSitePage.createFolder(drone, folderName, "").render();
+
+        // sync to the Cloud
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(folderName).selectSyncToCloud().render();
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectSubmitButtonToSync().render();
+
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15435:Unsync folder
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15435() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String opSiteName = getTestName() + "-OP" + "A1";
+        String cloudSiteName = getTestName() + "-CL" + "A1";
+        String folderName = getFolderName(testName) + getTestName();
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Go to the Document Library of created in preconditions in Alfresco Share (On-premise) site
+        // --- Expected results ---
+        // Document Library page is opened and all information is displayed correctly on it
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertTrue(documentLibraryPage.isBrowserTitle("Alfresco » Document Library"));
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Click cloud icon afainst the file which is synced
+        // --- Expected results ---
+        // Pop up dialogue with sync info appears.
+
+        SyncInfoPage syncInfoPage = documentLibraryPage.getFileDirectoryInfo(folderName).clickOnViewCloudSyncInfo().render();
+        Assert.assertTrue(syncInfoPage.getCloudSyncStatus().contains("Synced"));
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Verify Unsync button is available on Sync info pop-up window
+        // --- Expected results ---
+        // Unsync button is available and enabled
+
+        Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
+        Assert.assertTrue(syncInfoPage.isUnsyncButtonEnabled());
+
+        // --- Step 4 ---
+        // --- Step action ---
+        // Click on Unsync button
+        // --- Expected results ---
+        // File unsynced notification appears
+
+        syncInfoPage.selectUnsyncRemoveContentFromCloud(true);
+
+        // --- Step 5 ---
+        // --- Step action ---
+        // Go to the target cloud location which was setin preconditions for sync
+        // --- Expected results ---
+        // Target location in Cloud (Network->Site->Document Library page) is opened. Unsynced file removed from Cloud
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.isItemVisble(folderName));
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15436() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String fileName = getTestName() + ".txt";
+        String[] fileInfo = new String[] { fileName, DOCLIB };
+
+        String opSiteName = getTestName() + "-OP" + "A3";
+        String cloudSiteName = getTestName() + "-CL" + "A3";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo).render();
+
+        // sync to the Cloud
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(fileName).selectSyncToCloud().render();
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectSubmitButtonToSync().render();
+
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15436:Sync info icon for synced file in Cloud
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15436() throws Exception
+    {
+
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String cloudSiteName = getTestName() + "-CL" + "A3";
+        String fileName = getTestName() + ".txt";
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Go to Cloud location where file was synced in step6
+        // --- Expected results ---
+        // Cloud location (e.g. site->document library-> folder) is opened, synced item with sync info icon against it is displayed on the page
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertTrue(documentLibraryPage.isBrowserTitle("Alfresco » Document Library"));
+        Assert.assertTrue(documentLibraryPage.isItemVisble(fileName));
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Navigate to Sync info icon against synced file
+        // --- Expected results ---
+        // 'Click to view sync info' tooltip appears
+
+        Assert.assertEquals(documentLibraryPage.getFileDirectoryInfo(fileName).getSyncInfoToolTip(), "Click to view sync info");
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Click on Sync info icon
+        // --- Expected results ---
+        // Pop up window with information on it appears
+
+        SyncInfoPage syncInfoPage = documentLibraryPage.getFileDirectoryInfo(fileName).clickOnViewCloudSyncInfo().render();
+        Assert.assertTrue(syncInfoPage.getCloudSyncStatus().contains("Synced"));
+
+        ShareUser.logout(hybridDrone);
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15437() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+        String folderName = getFolderName(testName) + getTestName();
+
+        String opSiteName = getTestName() + "-OP" + "A2";
+        String cloudSiteName = getTestName() + "-CL" + "A2";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+        // create an empty folder
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        ShareUserSitePage.createFolder(drone, folderName, "").render();
+
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15437:Sync an empty folder to Cloud
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15437() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String opSiteName = getTestName() + "-OP" + "A2";
+        String cloudSiteName = getTestName() + "-CL" + "A2";
+        String folderName = getFolderName(testName) + getTestName();
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Set cursor to the folder and expand More+ menu
+        // --- Expected results ---
+        // List of actions is appeared for folder and 'sync to cloud' option available
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(folderName).isSyncToCloudLinkPresent());
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Choose 'Sync to Cloud' option from More+ menu or from list of folder actions on details page or click on 'Sync to Cloud' on top panel of opened
+        // folder
+        // --- Expected results ---
+        // Pop-up window to select target cloud location appears.
+
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(folderName).selectSyncToCloud().render();
+        Assert.assertTrue(destinationAndAssigneePage.getSyncToCloudTitle().contains("Sync " + folderName + " to The Cloud"));
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Choose target location in the Cloud (network->site->document library) and press OK button
+        // --- Expected results ---
+        // 'Sync created' notification appears
+
+        destinationAndAssigneePage.selectNetwork(testDomain);
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectFolder("Documents");
+        destinationAndAssigneePage.clickSyncButton();
+        Assert.assertTrue(documentLibraryPage.isSyncMessagePresent());
+
+        ShareUser.logout(drone);
+        // --- Step 4 ---
+        // --- Step action ---
+        // Go to Cloud location set in previous step
+        // --- Expected results ---
+        // Folder for which sync action was applied is displayed.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertTrue(documentLibraryPage.isItemVisble(folderName));
+
+        ShareUser.logout(hybridDrone);
+
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15438() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String folderName = getFolderName(testName) + getTestName();
+        String fileName1 = getTestName() + "1" + ".txt";
+        String[] fileInfo1 = new String[] { fileName1, folderName };
+        String fileName2 = getTestName() + "2" + ".txt";
+        String[] fileInfo2 = new String[] { fileName2, folderName };
+
+        String opSiteName = getTestName() + "-OP" + "A2";
+        String cloudSiteName = getTestName() + "-CL" + "A2";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+        // create an empty folder
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        DocumentLibraryPage documentLibraryPage = ShareUserSitePage.createFolder(drone, folderName, "").render();
+        documentLibraryPage.selectFolder(folderName).render();
+        ShareUser.uploadFileInFolder(drone, fileInfo1).render();
+        ShareUser.uploadFileInFolder(drone, fileInfo2).render();
+
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15438:Sync a non-empty folder to Cloud
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15438() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String opSiteName = getTestName() + "-OP" + "A2";
+        String cloudSiteName = getTestName() + "-CL" + "A2";
+
+        String folderName = getFolderName(testName) + getTestName();
+        String fileName1 = getTestName() + "1" + ".txt";
+        String fileName2 = getTestName() + "2" + ".txt";
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Set cursor to the folder and expand More+ menu
+        // --- Expected results ---
+        // List of actions is appeared for folder and 'sync to cloud' option available
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(folderName).isSyncToCloudLinkPresent());
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Choose 'Sync to Cloud' option from More+ menu or from list of folder actions on details page or click on 'Sync to Cloud' on top panel of opened
+        // folder
+        // --- Expected results ---
+        // Pop-up window to select target cloud location appears.
+
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(folderName).selectSyncToCloud().render();
+        Assert.assertTrue(destinationAndAssigneePage.getSyncToCloudTitle().contains("Sync " + folderName + " to The Cloud"));
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Choose target location in the Cloud (network->site->document library) and press OK button
+        // --- Expected results ---
+        // 'Sync created' notification appears
+
+        destinationAndAssigneePage.selectNetwork(testDomain);
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectFolder("Documents");
+        destinationAndAssigneePage.clickSyncButton();
+        Assert.assertTrue(documentLibraryPage.isSyncMessagePresent());
+
+        ShareUser.logout(drone);
+        // --- Step 4 ---
+        // --- Step action ---
+        // Wait for some time and go to Cloud location set in previous step
+        // --- Expected results ---
+        // Folder for which sync action was applied is displayed successfully.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertTrue(documentLibraryPage.isItemVisble(folderName));
+
+        // --- Step 5 ---
+        // --- Step action ---
+        // Open synced folder in Cloud
+        // --- Expected results ---
+        // All files uploaded in precoditions to folder are displayed on the page
+
+        documentLibraryPage.selectFolder(folderName).render();
+        Assert.assertTrue(documentLibraryPage.isItemVisble(fileName1));
+        Assert.assertTrue(documentLibraryPage.isItemVisble(fileName2));
+
+        ShareUser.logout(hybridDrone);
+
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15439() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String opFolderName = getFolderName(testName) + "OP" + getTestName();
+        String clFolderName = getFolderName(testName) + "CL" + getTestName();
+
+        String opSiteName = getTestName() + "-OP" + "A3";
+        String cloudSiteName = getTestName() + "-CL" + "A3";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        ShareUserSitePage.createFolder(hybridDrone, clFolderName, "").render();
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+        // create an empty folder
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        ShareUserSitePage.createFolder(drone, opFolderName, "").render();
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15439:Sync folder to target folder in Cloud
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15439() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String opSiteName = getTestName() + "-OP" + "A3";
+        String cloudSiteName = getTestName() + "-CL" + "A3";
+
+        String opFolderName = getFolderName(testName) + "OP" + getTestName();
+        String clFolderName = getFolderName(testName) + "CL" + getTestName();
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Set cursor to the folder and expand More+ menu
+        // --- Expected results ---
+        // List of actions is appeared for folder and 'sync to cloud' option available
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(opFolderName).isSyncToCloudLinkPresent());
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Choose 'Sync to Cloud' option from More+ menu or from list of folder actions on details page or click on 'Sync to Cloud' on top panel of opened
+        // folder
+        // --- Expected results ---
+        // Pop-up window to select target cloud location appears.
+
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(opFolderName).selectSyncToCloud().render();
+        Assert.assertTrue(destinationAndAssigneePage.getSyncToCloudTitle().contains("Sync " + opFolderName + " to The Cloud"));
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Choose target location in the Cloud (network->site->document library) and press OK button
+        // --- Expected results ---
+        // 'Sync created' notification appears
+
+        destinationAndAssigneePage.selectNetwork(testDomain);
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectFolder(clFolderName);
+        destinationAndAssigneePage.clickSyncButton();
+        Assert.assertTrue(documentLibraryPage.isSyncMessagePresent());
+
+        ShareUser.logout(drone);
+        // --- Step 4 ---
+        // --- Step action ---
+        // Go to Cloud location set in previous step
+        // --- Expected results ---
+        // Folder for which sync action was applied is displayed.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        documentLibraryPage.selectFolder(clFolderName).render();
+        Assert.assertTrue(documentLibraryPage.isItemVisble(opFolderName));
+
+        ShareUser.logout(hybridDrone);
+
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15440() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String[] userInfo1 = new String[] { opUser };
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String opFolderName = getFolderName(testName) + "OP" + getTestName();
+        String clFolderName1 = getFolderName(testName) + "CL1" + getTestName();
+        String clFolderName2 = getFolderName(testName) + "CL2" + getTestName();
+
+        String opSiteName = getTestName() + "-OP" + "A3";
+        String cloudSiteName = getTestName() + "-CL" + "A3";
+
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
+
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        ShareUserSitePage.createFolder(hybridDrone, clFolderName1, "").render();
+        documentLibraryPage.selectFolder(clFolderName1).render();
+        ShareUserSitePage.createFolder(hybridDrone, clFolderName2, "").render();
+
+        ShareUser.logout(hybridDrone);
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+        // create an empty folder
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        ShareUserSitePage.createFolder(drone, opFolderName, "").render();
+        ShareUser.logout(drone);
+
+    }
+
+    /**
+     * AONE-15440:Sync folder to target sub folder in Cloud
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15440() throws Exception
+    {
+
+        String opUser = getTestName() + getUserNameForDomain("opUser", testDomain);
+        String cloudUser = getTestName() + getUserNameForDomain("cloudUser", testDomain);
+        String opSiteName = getTestName() + "-OP" + "A3";
+        String cloudSiteName = getTestName() + "-CL" + "A3";
+
+        String opFolderName = getFolderName(testName) + "OP" + getTestName();
+        String clFolderName1 = getFolderName(testName) + "CL1" + getTestName();
+        String clFolderName2 = getFolderName(testName) + "CL2" + getTestName();
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Set cursor to the folder and expand More+ menu
+        // --- Expected results ---
+        // List of actions is appeared for folder and 'sync to cloud' option available
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(opFolderName).isSyncToCloudLinkPresent());
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Choose 'Sync to Cloud' option from More+ menu or from list of folder actions on details page or click on 'Sync to Cloud' on top panel of opened
+        // folder
+        // --- Expected results ---
+        // Pop-up window to select target cloud location appears.
+
+        DestinationAndAssigneePage destinationAndAssigneePage = documentLibraryPage.getFileDirectoryInfo(opFolderName).selectSyncToCloud().render();
+        Assert.assertTrue(destinationAndAssigneePage.getSyncToCloudTitle().contains("Sync " + opFolderName + " to The Cloud"));
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Choose target location in the Cloud (network->site->document library) and press OK button
+        // --- Expected results ---
+        // 'Sync created' notification appears
+
+        destinationAndAssigneePage.selectNetwork(testDomain);
+        destinationAndAssigneePage.selectSite(cloudSiteName);
+        destinationAndAssigneePage.selectFolder("Documents", clFolderName1, clFolderName2);
+        destinationAndAssigneePage.clickSyncButton();
+        Assert.assertTrue(documentLibraryPage.isSyncMessagePresent());
+
+        ShareUser.logout(drone);
+        // --- Step 4 ---
+        // --- Step action ---
+        // Go to Cloud location set in previous step
+        // --- Expected results ---
+        // Folder for which sync action was applied is displayed.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        documentLibraryPage.selectFolder(clFolderName1).render();
+        documentLibraryPage.selectFolder(clFolderName2).render();
+        Assert.assertTrue(documentLibraryPage.isItemVisble(opFolderName));
+
+        ShareUser.logout(hybridDrone);
+
+    }
+
 }
