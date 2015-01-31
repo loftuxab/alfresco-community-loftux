@@ -1,6 +1,7 @@
 package org.alfresco.share.site.document;
 
 import org.alfresco.po.share.RepositoryPage;
+import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.NewFolderPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPageWithRules;
@@ -37,6 +38,8 @@ public class FolderTemplateCreationTest extends AbstractUtils
 {
     private static final Logger logger = Logger.getLogger(FolderTemplateCreationTest.class);
     private String folderName = "Folder" + "template";
+    private String[] folderPath = { "Data Dictionary", "Space Templates" };
+
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -46,6 +49,33 @@ public class FolderTemplateCreationTest extends AbstractUtils
         super.setup();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
+    }
+
+    private void deleteTemplates () throws Exception
+    {
+
+        try
+        {
+
+            ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+            ShareUserRepositoryPage.openRepository(drone);
+            RepositoryPage repositoryPage = ShareUserRepositoryPage.navigateFoldersInRepositoryPage(drone, folderPath);
+            List<FileDirectoryInfo>items = repositoryPage.getFiles();
+
+            int i = items.size();
+
+            for (int k=1; k<=i; k++)
+            {
+                repositoryPage.deleteItem(1);
+            }
+        }
+
+        catch (Throwable e)
+        {
+            reportError(drone, testName, e);
+        }
+
+
     }
 
     @AfterMethod(groups = { "EnterpriseOnly" })
@@ -112,22 +142,6 @@ public class FolderTemplateCreationTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
-        String[] folderPath = { "Data Dictionary", "Space Templates" };
-
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-
-        ShareUserRepositoryPage.openRepository(drone);
-        RepositoryPage repositoryPage = ShareUserRepositoryPage.navigateFoldersInRepositoryPage(drone, folderPath);
-
-        List<FileDirectoryInfo>items = repositoryPage.getFiles();
-
-        int i = items.size();
-
-        for (int k=1; k<=i; k++)
-        {
-            repositoryPage.deleteItem(1);
-
-        }
 
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
 
@@ -143,6 +157,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         String siteName = getSiteName(testName);
         String emptyTemplate = "Empty";
 
+        deleteTemplates();
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         openSiteDashboard(drone, siteName);
@@ -675,25 +690,9 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
         String testName = getTestName();
         String siteName = getSiteName(testName);
-        String[] folderPath = { "Data Dictionary", "Space Templates" };
 
         ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-
-        ShareUserRepositoryPage.openRepository(drone);
-        RepositoryPage repositoryPage = ShareUserRepositoryPage.navigateFoldersInRepositoryPage(drone, folderPath);
-        List<FileDirectoryInfo>items = repositoryPage.getFiles();
-
-        int i = items.size();
-
-        for (int k=1; k<=i; k++)
-        {
-            repositoryPage.deleteItem(1);
-            drone.getCurrentPage().render();
-        }
-
-        // Upload template folder
-        ShareUserRepositoryPage.createFolderInRepository(drone, folderName + 4, folderName + 4);
     }
 
     @Test(groups = { "EnterpriseOnly" })
@@ -703,7 +702,12 @@ public class FolderTemplateCreationTest extends AbstractUtils
         String siteName = getSiteName(testName);
         String[] folderPath = { "Data Dictionary", "Space Templates" };
 
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        deleteTemplates();
+
+        // Upload template folder
+        ShareUserRepositoryPage.createFolderInRepository(drone, folderName + 4, folderName + 4);
+
+        ShareUser.openUserDashboard(drone);
         openSiteDashboard(drone, siteName);
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
 
@@ -740,8 +744,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUserRepositoryPage.openRepositorySimpleView(drone);
 
         // Upload template folder
-        String folderPath = REPO + SLASH + "Data Dictionary" + SLASH + "Space Templates";
-        ShareUserRepositoryPage.navigateToFolderInRepository(drone, folderPath);
+        ShareUserRepositoryPage.navigateFoldersInRepositoryPage(drone, folderPath);
         ShareUserRepositoryPage.createFolderInRepository(drone, folderName + 5, folderName + 5);
     }
 
