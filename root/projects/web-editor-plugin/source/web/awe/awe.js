@@ -685,11 +685,11 @@
          var formUri = null;
          if (o.formId)
          {
-            formUri = YAHOO.lang.substitute(WEF.get("contextPath") + '/service/components/form?mode=create&mimeType={mimeType}&itemKind=type&itemId={shortType}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}&destination={parentNodeRef}',o);
+            formUri = YAHOO.lang.substitute(WEF.get("contextPath") + '/service/components/form?mode=create&mimeType=text/html&itemKind=type&itemId={shortType}&formId={formId}&nodeRef={nodeRef}&redirect={redirectUrl}&destination={parentNodeRef}',o);
          }
          else
          {
-            formUri = YAHOO.lang.substitute(WEF.get("contextPath") + '/service/components/form?mode=create&mimeType={mimeType}&itemKind=type&itemId={shortType}&nodeRef={nodeRef}&redirect={redirectUrl}&destination={parentNodeRef}',o);
+            formUri = YAHOO.lang.substitute(WEF.get("contextPath") + '/service/components/form?mode=create&mimeType=text/html&itemKind=type&itemId={shortType}&nodeRef={nodeRef}&redirect={redirectUrl}&destination={parentNodeRef}',o);
          }
 
          this.module.getFormPanelInstance('wef-panel').setOptions(
@@ -697,7 +697,7 @@
             formName: 'wefPanel',
 	        formId: o.formId,
 	        formUri: encodeURI(formUri),
-            mimeType: o.mimeType,
+            mimeType: 'text/html',
             parentNodeRef: o.parentNodeRef,
             domContentId: o.id,
             title: Alfresco.util.message.call(this, 'message.create', '', o.typeTitle),
