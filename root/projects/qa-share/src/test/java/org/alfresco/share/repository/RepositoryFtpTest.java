@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -983,6 +984,26 @@ public class RepositoryFtpTest extends AbstractUtils
         assertTrue(documentLibraryPage.isFileVisible(fileName3));
 
     }
+
+    /**
+     * AONE-6448: Connect to FTP via Firefox
+     */
+
+    @Test
+    public void AONE_6448() throws Exception
+    {
+        String ftpUrl = "ftp://%s:%s@%s";
+        String serverIP = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "") + ":" + ftpPort;
+        ftpUrl = String.format(ftpUrl, ADMIN_USERNAME, ADMIN_PASSWORD, serverIP);
+
+        // Navigate to ftp://login:pass@server_ip
+        drone.navigateTo(ftpUrl);
+        String handle1 = drone.getWindowHandle();
+        assertTrue(drone.findAndWait(By.cssSelector(".up")).getAttribute("href").contains(ftpUrl));
+        assertTrue(getDrone().findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
+    }
+
+
   private boolean canListDirectory (FTPClient ftpClient, String remoteObject) throws IOException
   {
 
