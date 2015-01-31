@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SiteLayout;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -309,6 +310,20 @@ public class CustomiseUserDashboardPage extends SharePage
         }
 
         return new DashBoardPage(drone);
+    }
+    
+    /**
+     * Remove dashlet by name.
+     *
+     * @param dashlet
+     */
+    public DashBoardPage removeDashlet(Dashlets dashlet)
+    {
+        String dashletXpath = String.format("//div[@class='column']//span[text()='%s']/../div", dashlet.getDashletName());
+        WebElement element = drone.findAndWait(By.xpath(dashletXpath));
+        drone.dragAndDrop(element, drone.find(TRASHCAN));
+        waitUntilAlert();
+        return selectOk();
     }
 
 }

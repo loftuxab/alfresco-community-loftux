@@ -19,6 +19,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
     private static final By DASHLET_CONTAINER_PLACEHOLDER = By.cssSelector("div.dashlet.webview");
     private static final By IF_FRAME_WITH_SITE = By.cssSelector("iframe[class='iframe-body']");
     private static final By DEFAULT_MESSAGE = By.cssSelector("h3[class$='default-body']");
+    protected static final By DASHLET_TITLE_WEB = By.cssSelector(".title > a");
 
     /**
      * Constructor.
@@ -150,6 +151,18 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
         catch (NoSuchElementException e)
         {
             return false;
+        }
+    }
+    
+    public void clickTitle()
+    {
+        try
+        {
+            dashlet.findElement(DASHLET_TITLE_WEB).click();
+        }
+        catch (TimeoutException te)
+        {
+            throw new UnsupportedOperationException("Exceeded time to find the title.", te);
         }
     }
 

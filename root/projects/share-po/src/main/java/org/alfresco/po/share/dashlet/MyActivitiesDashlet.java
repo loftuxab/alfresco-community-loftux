@@ -67,6 +67,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
     protected MyActivitiesDashlet(WebDrone drone)
     {
         super(drone, By.cssSelector(DASHLET_DIV_PLACEHOLDER));
+        setResizeHandle(By.xpath(".//div[contains (@class, 'yui-resize-handle')]"));
     }
 
     @SuppressWarnings("unchecked")
