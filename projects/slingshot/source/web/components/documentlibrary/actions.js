@@ -1655,13 +1655,14 @@
             zIndex = 1000;
          }
 
+         var repoPath = record[0] ? record[0].location.repoPath : record.location.repoPath;
          this.modules.copyMoveTo.setOptions(
          {
             allowedViewModes: allowedViewModes,
             mode: mode,
             siteId: this.options.siteId,
             containerId: this.options.containerId,
-            path: this.currentPath,
+            path: this.options.repositoryBrowsing ? repoPath : this.currentPath,
             files: record,
             /* Fix for MNT-12432. Do not overwrite this.modules.copyMoveTo.options.rootNode option if repoBrowsing is enabled. Could cause Repository tab view inconsistency */
             rootNode: this.options.repositoryBrowsing ? this.modules.copyMoveTo.options.rootNode : this.options.rootNode,
