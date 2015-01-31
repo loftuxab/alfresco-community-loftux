@@ -1,7 +1,6 @@
 package org.alfresco.po.share.wqs;
 
 import org.alfresco.po.share.ShareLink;
-import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
@@ -70,10 +69,11 @@ public class WcmqsAllPublicationsPage extends WcmqsAbstractPage
         {
             return drone.find(PUBLICATION_ELEMENT_TITLE).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException e)
         {
-            return false;
         }
+        return false;
+
 
     }
 
@@ -83,10 +83,11 @@ public class WcmqsAllPublicationsPage extends WcmqsAbstractPage
         {
             return drone.find(PUBLICATION_PREVIEWS).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException e)
         {
-            return false;
         }
+        return false;
+
 
     }
 
@@ -96,10 +97,11 @@ public class WcmqsAllPublicationsPage extends WcmqsAbstractPage
         {
             return drone.find(PUBLICATION_ELEMENT_DATE_AUTHOR).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException e)
         {
-            return false;
         }
+        return false;
+
 
     }
 
@@ -109,10 +111,11 @@ public class WcmqsAllPublicationsPage extends WcmqsAbstractPage
         {
             return drone.find(PUBLICATION_ELEMENT_DESCRIPTION).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException e)
         {
-            return false;
         }
+        return false;
+
 
     }
 
@@ -122,10 +125,11 @@ public class WcmqsAllPublicationsPage extends WcmqsAbstractPage
         {
             return drone.find(PUBLICATION_ELEMENT_TAGSECTION).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException e)
         {
-            return false;
         }
+        return false;
+
 
     }
 

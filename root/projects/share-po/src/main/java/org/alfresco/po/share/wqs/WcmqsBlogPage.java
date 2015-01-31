@@ -1,16 +1,16 @@
 package org.alfresco.po.share.wqs;
 
-import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.WebDroneUtil;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+
 /**
  * Created by Lucian Tuca on 11/18/2014.
  */
@@ -18,15 +18,10 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
 {
         @RenderWebElement
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
-//        private final By BLOGS_TITLE = By.cssSelector("div.interior-header");
-
         public static final String ETHICAL_FUNDS = "Ethical funds";
         public static final String COMPANY_ORGANISES_WORKSHOP = "Company organises workshop";
         public static final String ANALYSTS_LATEST_THOUGHTS = "latest thoughts";
-
-
         public static final String BLOG = "blog";
-
         public static final String BLOG_1 = "blog1.html";
         public static final String BLOG_2 = "blog2.html";
         public static final String BLOG_3 = "blog3.html";
@@ -66,10 +61,12 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
 
         /**
          * Method to navigate to a blog post found by its title
+         *
          * @param title - Blog post title
          */
         public void openBlogPost(String title)
         {
+                WebDroneUtil.checkMandotaryParam("title", title);
                 try
                 {
                         drone.findAndWait(By.xpath(String.format("//a[contains(text(),'%s')]", title))).click();
@@ -80,54 +77,53 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
                 }
         }
 
-        public boolean checkIfBlogIsDeleted(String title)
+        public boolean isBlogDeleted(String title)
         {
-                boolean check;
+                WebDroneUtil.checkMandotaryParam("title", title);
                 try
                 {
                         drone.waitUntilElementDisappears(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
                                 SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
-                        check = true;
+                        return true;
                 }
-                catch (NoSuchElementException nse)
+                catch (TimeoutException e)
                 {
-                        return false;
                 }
 
-                return check;
+                return false;
         }
 
-        public boolean checkIfBlogExists(String title)
+        public boolean isBlogDisplayed(String title)
         {
-                boolean check;
+                WebDroneUtil.checkMandotaryParam("title", title);
                 try
                 {
                         drone.waitForElement(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
                                 SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
-                        check = true;
+                        return true;
                 }
-                catch (NoSuchElementException nse)
+                catch (TimeoutException e)
                 {
-                        return false;
                 }
 
-                return check;
+                return false;
         }
-        
+
         /**
          * Method to click a blog post name from share
-         * 
+         *
          * @param blogNameFromShare of the blog post declared in share!
          */
         public void clickBlogNameFromShare(String blogNameFromShare)
         {
-            try
-            {
-                drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", blogNameFromShare))).click();
-            }
-            catch (TimeoutException e)
-            {
-                throw new PageOperationException("Exceeded time to find news link. " + e.toString());
-            }
+                WebDroneUtil.checkMandotaryParam("blogNameFromShare", blogNameFromShare);
+                try
+                {
+                        drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", blogNameFromShare))).click();
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find news link. " + e.toString());
+                }
         }
 }

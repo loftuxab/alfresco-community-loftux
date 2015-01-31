@@ -1,6 +1,5 @@
 package org.alfresco.po.share.wqs;
 
-import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.util.FileDownloader;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
@@ -88,10 +87,11 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_NAME).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+
+                return false;
 
         }
 
@@ -101,10 +101,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_DETAILS_SECTION).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+                return false;
 
         }
 
@@ -114,10 +114,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_DATE).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+                return false;
 
         }
 
@@ -127,10 +127,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_PREVIEW).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+                return false;
         }
 
         public boolean isPublicationTagsDisplay()
@@ -139,10 +139,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_TAGS_SECTION).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+                return false;
 
         }
 
@@ -152,11 +152,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_DESCRIPTION).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
-
+                return false;
         }
 
         public boolean isPublicationAuthorDisplay()
@@ -165,10 +164,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_AUTHOR).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+                return false;
 
         }
 
@@ -178,11 +177,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_PUBLISH_DATE).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
-
+                return false;
         }
 
         public boolean isPublicationSizeDisplay()
@@ -191,10 +189,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_SIZE).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+                return false;
 
         }
 
@@ -204,10 +202,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_MIME_TYPE).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+                return false;
 
         }
 
@@ -217,10 +215,10 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         return drone.find(PUBLICATION_DOWNLOAD).isDisplayed();
                 }
-                catch (TimeoutException e)
+                catch (NoSuchElementException e)
                 {
-                        return false;
                 }
+                return false;
 
         }
 
@@ -243,7 +241,7 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                                 filePath = fileUrl.replace("?a=true", "");
                         }
                 }
-                catch (NoSuchElementException nse)
+                catch (NoSuchElementException e)
                 {
                 }
                 return filePath;
@@ -287,6 +285,11 @@ public class WcmqsPublicationPage extends WcmqsAbstractPage
                 {
                         throw new PageOperationException("Exceeded time to find tag. " + e.toString());
                 }
+                catch (NoSuchElementException e)
+                {
+                        throw new PageOperationException("Exceeded time to find tag. " + e.toString());
+                }
+
         }
 
 }
