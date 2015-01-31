@@ -7,7 +7,6 @@ import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 
 /**
@@ -69,18 +68,11 @@ public class InformationEventForm extends AbstractEventForm
      */
     public EditEventForm clickOnEditEvent()
     {
-        try
+
+        drone.findAndWait(EDIT_BUTTON).click();
+        if (logger.isDebugEnabled())
         {
-            drone.findAndWait(EDIT_BUTTON).click();
             logger.info("Click edit event button");
-        }
-        catch (NoSuchElementException e)
-        {
-            logger.debug("Unable to locate edit Event button");
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
         }
         return new EditEventForm(drone);
     }
@@ -92,20 +84,13 @@ public class InformationEventForm extends AbstractEventForm
      */
     public DeleteEventForm clickOnDeleteEvent()
     {
-        try
+        drone.findAndWait(DELETE_BUTTON).click();
+        if (logger.isDebugEnabled())
         {
-            drone.findAndWait(DELETE_BUTTON).click();
             logger.info("Click delete event button");
         }
-        catch (NoSuchElementException e)
-        {
-            logger.debug("Unable to locate delete Event button");
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
-        }
         return new DeleteEventForm(drone);
+
     }
 
     /**
@@ -115,15 +100,8 @@ public class InformationEventForm extends AbstractEventForm
      */
     public boolean isEditButtonPresent()
     {
-        boolean isPresent = false;
-        try
-        {
-            isPresent = drone.isElementDisplayed(EDIT_BUTTON);
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
-        }
+        boolean isPresent;
+        isPresent = drone.isElementDisplayed(EDIT_BUTTON);
         return isPresent;
     }
 
@@ -134,15 +112,8 @@ public class InformationEventForm extends AbstractEventForm
      */
     public boolean isDeleteButtonPresent()
     {
-        boolean isPresent = false;
-        try
-        {
-            isPresent = drone.isElementDisplayed(DELETE_BUTTON);
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
-        }
+        boolean isPresent;
+        isPresent = drone.isElementDisplayed(DELETE_BUTTON);
         return isPresent;
     }
 
@@ -237,19 +208,12 @@ public class InformationEventForm extends AbstractEventForm
      */
     public CalendarPage closeInformationForm()
     {
-        try
+        drone.findAndWait(OK_BUTTON).click();
+        if (logger.isDebugEnabled())
         {
-            drone.findAndWait(OK_BUTTON).click();
             logger.info("Click ok event button");
         }
-        catch (NoSuchElementException e)
-        {
-            logger.debug("Unable to locate ok button information event form");
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
-        }
+
         return drone.getCurrentPage().render();
     }
 
@@ -304,15 +268,8 @@ public class InformationEventForm extends AbstractEventForm
      */
     public boolean isDeleteButtonEnabled()
     {
-        boolean isPresent = false;
-        try
-        {
-            isPresent = drone.findAndWait(DELETE_BUTTON).isEnabled();
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
-        }
+        boolean isPresent;
+        isPresent = drone.findAndWait(DELETE_BUTTON).isEnabled();
         return isPresent;
     }
 
@@ -323,15 +280,8 @@ public class InformationEventForm extends AbstractEventForm
      */
     public boolean isOkButtonEnabled()
     {
-        boolean isPresent = false;
-        try
-        {
-            isPresent = drone.findAndWait(OK_BUTTON).isEnabled();
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
-        }
+        boolean isPresent;
+        isPresent = drone.findAndWait(OK_BUTTON).isEnabled();
         return isPresent;
     }
 
@@ -342,15 +292,8 @@ public class InformationEventForm extends AbstractEventForm
      */
     public boolean isRecurrencePresent()
     {
-        boolean isPresent = false;
-        try
-        {
-            isPresent = drone.isElementDisplayed(RECURRENCE_LABEL);
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
-        }
+        boolean isPresent;
+        isPresent = drone.isElementDisplayed(RECURRENCE_LABEL);
         return isPresent;
     }
 
