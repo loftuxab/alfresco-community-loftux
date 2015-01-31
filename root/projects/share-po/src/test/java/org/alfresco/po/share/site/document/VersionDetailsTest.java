@@ -97,7 +97,7 @@ public class VersionDetailsTest extends AbstractTest
         versionDetails = detailsPage.getCurrentVersionDetails();
         Assert.assertEquals(versionDetails.getVersionNumber(), "1.0", "Verifying Version Number");
         Assert.assertEquals(versionDetails.getFileName(), file.getName(), "Verifying File Name");
-        Assert.assertEquals(versionDetails.getLastModified(), "just now", "Verifying Last modified");
+        Assert.assertTrue(!versionDetails.getLastModified().isEmpty());
         Assert.assertTrue(versionDetails.getUserName().getDescription().contains("Administrator"), "Verifying user name");
         Assert.assertEquals(versionDetails.getComment(), "(No Comment)", "Verifying Version comment");
     }
@@ -122,10 +122,11 @@ public class VersionDetailsTest extends AbstractTest
         versionDetails = detailsPage.getCurrentVersionDetails();
         Assert.assertEquals(versionDetails.getVersionNumber(), "2.0", "Verifying Version Number");
         Assert.assertEquals(versionDetails.getFileName(), file.getName(), "Verifying File Name");
-        Assert.assertEquals(versionDetails.getLastModified(), "just now", "Verifying Last modified");
+        Assert.assertFalse(versionDetails.getLastModified().isEmpty());
         Assert.assertTrue(versionDetails.getUserName().getDescription().toLowerCase().contains("admin"), "Verifying user name");
         Assert.assertEquals(versionDetails.getComment(), comment2, "Verifying Version comment");
-        Assert.assertTrue(versionDetails.getFullDetails().equals("Administrator just now\n" + comment2));
+        Assert.assertTrue(versionDetails.getFullDetails().startsWith("Administrator"));
+        Assert.assertTrue(versionDetails.getFullDetails().contains(comment2));
 
         List<VersionDetails> olderVersions = detailsPage.getOlderVersionDetails();
         Assert.assertEquals(olderVersions.size(), 2);

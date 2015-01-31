@@ -12,7 +12,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
-        <webdrone.version>2.6</webdrone.version>
+        <webdrone.version>2.7.3</webdrone.version>
         <share-po.version>${project.version}</share-po.version>
         <office.component>libreofficecomponent</office.component>
         <enable.hybrid>false</enable.hybrid>
@@ -80,7 +80,6 @@
             <groupId>org.alfresco</groupId>
             <artifactId>share-po</artifactId>
             <version>${share-po.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
