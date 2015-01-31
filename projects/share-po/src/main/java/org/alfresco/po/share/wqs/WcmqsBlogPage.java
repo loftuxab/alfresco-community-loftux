@@ -186,4 +186,22 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
                 }
                 return false;
         }
+
+        /**
+         * Method to click a blog read more button give the blog name
+         *
+         * @param blogName of the blog post declared in share!
+         */
+        public void clickReadMoreByBlog(String blogName)
+        {
+                try
+                {
+                        drone.find(By.xpath(String.format("//a[contains(text(),\"%s\")]/../..//a[contains(text(),\"read more\")]", blogName))).click();
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find news link. " + e.toString());
+                }
+        }
+
 }

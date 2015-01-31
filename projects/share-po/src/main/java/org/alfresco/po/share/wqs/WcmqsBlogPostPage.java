@@ -8,6 +8,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -44,6 +47,8 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         private final By FEEDBACK_COMMENT = By.cssSelector("textarea.bc-textarea");
         private final By POST_BUTTON = By.cssSelector("input.bc-submit");
         private final By ADD_SUCCESS_MESSAGE = By.cssSelector("div.contact-success");
+        private final By FORM_PROBLEMS_MESSAGE = By.cssSelector("div.contact-error");
+        private final By INVALID_INPUT_MESSAGES = By.xpath("//span[contains(@class,\"contact-error-value\")]");
 
         /**
          * Constructor.
@@ -129,6 +134,56 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         }
 
         /**
+         * Method that retuns the value of The name Form field
+         * @return String
+         */
+        public String getVisitorName()
+        {
+                try
+                {
+                        return drone.findAndWait(VISITOR_NAME).getAttribute("value");
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time find the requested field " + e.toString());
+                }
+        }
+
+        /**
+         * Method that retuns the value of The name Form field
+         *
+         * @return String
+         */
+        public String getVisitorEmail()
+        {
+                try
+                {
+                        return drone.findAndWait(VISITOR_EMAIL).getAttribute("value");
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time find the requested field " + e.toString());
+                }
+        }
+
+        /**
+         * Method that retuns the value of The name Form field
+         *
+         * @return String
+         */
+        public String getVisitorWebsite()
+        {
+                try
+                {
+                        return drone.findAndWait(VISITOR_WEBSITE).getAttribute("value");
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time find the requested field " + e.toString());
+                }
+        }
+
+        /**
          * Presses the delete button while you are in blog editing
          */
         public void deleteArticle()
@@ -196,7 +251,9 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         {
                 try
                 {
-                        drone.findAndWait(VISITOR_NAME).sendKeys(visitorName);
+                        WebElement element = drone.findAndWait(VISITOR_NAME);
+                        element.clear();
+                        element.sendKeys(visitorName);
                 }
                 catch (TimeoutException e)
                 {
@@ -212,7 +269,10 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         {
                 try
                 {
-                        drone.findAndWait(VISITOR_EMAIL).sendKeys(visitorEmail);
+                        WebElement element = drone.findAndWait(VISITOR_EMAIL);
+                        element.clear();
+                        element.sendKeys(visitorEmail);
+
                 }
                 catch (TimeoutException e)
                 {
@@ -285,6 +345,47 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
                 catch (TimeoutException e)
                 {
                         return false;
+                }
+        }
+
+        /**
+         * Method to verify that the form main error message on invalid input is displayed
+         *
+         * @return Boolean
+         */
+        public boolean isFormProblemsMessageDisplay()
+        {
+                try
+                {
+                        WebElement message = drone.findAndWait(FORM_PROBLEMS_MESSAGE);
+                        return message.isDisplayed();
+                }
+                catch (TimeoutException e)
+                {
+                        return false;
+                }
+        }
+
+        /**
+         * Method to get input field errors
+         *
+         * @return WcmqsEditPage
+         */
+        public List<String> getFormErrorMessages()
+        {
+                try
+                {
+                        ArrayList<String> errorString = new ArrayList<String>();
+                        List<WebElement> messages = drone.findAndWaitForElements(INVALID_INPUT_MESSAGES);
+                        for (WebElement message : messages)
+                        {
+                                errorString.add(message.getText());
+                        }
+                        return errorString;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find the input field errors " + e.toString());
                 }
         }
 

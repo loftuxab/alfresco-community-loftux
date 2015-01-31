@@ -1,7 +1,6 @@
 package org.alfresco.po.share.wqs;
 
 import org.alfresco.po.share.ShareLink;
-import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
@@ -38,6 +37,8 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
     public static final String HOUSE_PRICES = "House prices face rollercoaster ride";
     public static final String EUROPE_DEPT_CONCERNS = "Europe debt concerns ease but bank fears remain";
     public static final String INVESTORS_FEAR = "Investors fear rising risk of US regional defaults";
+    public static final String CREDIT_CARDS = "Credit card interest rates rise";
+    public static final String EXPERTS_WEIGHT_STOCKS = "Experts Weigh Stocks, the Dollar, and the 'Fiscal Hangover'";
 
     public static final String NEWS = "news";
     public static final String GLOBAL = "global";
@@ -208,25 +209,6 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
         try
         {
             drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", newsName))).click();
-        }
-        catch (TimeoutException e)
-        {
-            throw new PageOperationException("Exceeded time to find news link. " + e.toString());
-        }
-
-    }
-
-    /**
-     * Method to click a news title
-     *
-     * @param newsTitle - the title of the news in wcmqs site
-     * @return
-     */
-    public void clickNewsByTitle(String newsTitle)
-    {
-        try
-        {
-            drone.findAndWait(By.xpath(String.format("//a[text()=\"%s\"]", newsTitle))).click();
         }
         catch (TimeoutException e)
         {

@@ -260,4 +260,61 @@ public abstract class WcmqsAbstractPage extends SharePage
             throw new PageOperationException("Exceeded time to find search button. " + te.toString());
         }
     }
+
+    /**
+     * Method to click a news title
+     *
+     * @param newsTitle - the title of the news in wcmqs site
+     * @return
+     */
+    public void clickLinkByTitle(String newsTitle)
+    {
+        try
+        {
+            drone.findAndWait(By.xpath(String.format("//a[contains(text(),\"%s\")]", newsTitle))).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find news link. " + e.toString());
+        }
+
+    }
+
+    /**
+     * Method to click a news title
+     *
+     * @param newsTitle - the title of the news in wcmqs site
+     * @param section   - the class of the section where you want to search
+     * @return
+     */
+    public void clickLinkByTitle(String newsTitle, String section)
+    {
+        try
+        {
+            drone.findAndWait(By.xpath(String.format("//*[@class=\"" + section + "\"]//a[contains(text(),\"%s\")]", newsTitle))).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find news link. " + e.toString());
+        }
+
+    }
+
+    /**
+     * Method to click on a document from any publication root page
+     *
+     * @param documentTitle
+     */
+    public void clickImageLink(String documentTitle)
+    {
+        try
+        {
+            drone.findAndWait(By.xpath(String.format("//a[contains(text(),\"%s\")]/../..//img", documentTitle))).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find Document link. " + e.toString());
+        }
+    }
+
 }
