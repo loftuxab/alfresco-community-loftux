@@ -72,6 +72,16 @@ public class FtpsTest extends FtpsUtil
         //creating test data
         try
         {
+            SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+            RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
+            if (clusteringPage.isClusterEnabled())
+            {
+                server = clusteringPage.getClusterMembers().get(0);
+            }
+            else
+            {
+                server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+            }
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
             UserProfile profile = new UserProfile();
             profile.setfName(testUser);
@@ -92,17 +102,6 @@ public class FtpsTest extends FtpsUtil
                 managePermissionsPage.setAccessType(profile, userRoles[Arrays.asList(folderNames).indexOf(theFolder)]);
                 managePermissionsPage.selectSave();
             }
-            SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
-            if (clusteringPage.isClusterEnabled())
-            {
-                server = clusteringPage.getClusterMembers().get(0);
-            }
-            else
-            {
-                server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
-            }
-
             FtpsUtil.setCustomFtpPort(drone, ftpPort);
             if (!keystorePath.isEmpty())
             {
@@ -379,6 +378,12 @@ public class FtpsTest extends FtpsUtil
         assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, folderName, remotePathToRepo), folderName + " was deleted");
     }
 
+    /**
+     * Copy and Move non-empty folder
+     *
+     * @throws Exception
+     */
+
     @Test
     public void AONE_8026() throws Exception
     {
@@ -400,6 +405,7 @@ public class FtpsTest extends FtpsUtil
         ShareUserRepositoryPage.openRepository(drone).render();
         ShareUserRepositoryPage.uploadFileInFolderInRepository(drone, fileInfo2);
 
+        //Move Folder1 from the space, where it is located, to other space by FTPS
         FtpsUtil.moveFolder(server, ADMIN_USERNAME, ADMIN_PASSWORD, remotePathToRepo + "/" + folder1, subFolder1, remotePathToRepo + "/" + folder2);
 
         //Log in to Alfresco client and navigate to the space, were moved by FTPS Folder1 was located

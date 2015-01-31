@@ -57,7 +57,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         FtpsUtil.setCustomFtpPort(drone, ftpPort);
         SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
         RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
-        if(clusteringPage.isClusterEnabled())
+        if (clusteringPage.isClusterEnabled())
         {
             nodeUrl = clusteringPage.getClusterMembers().get(0);
         }
@@ -65,7 +65,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         {
             nodeUrl = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
         }
-        if(!keystorePath.isEmpty())
+        if (!keystorePath.isEmpty())
         {
             FtpsUtil.enableFtps(nodeUrl, keystorePath, truststorePath);
         }
@@ -90,7 +90,7 @@ public class RepositoryFtpsTest extends FtpsUtil
 
         //generating keystore and truststore
         //when alfresco is running on remote host - files must be pre-generated
-        if(!keystorePath.isEmpty() & !truststorePath.isEmpty())
+        if (!keystorePath.isEmpty() & !truststorePath.isEmpty())
         {
             FtpsUtil.enableFtps(nodeUrl, keystorePath, truststorePath);
         }
@@ -129,7 +129,7 @@ public class RepositoryFtpsTest extends FtpsUtil
 
         //generating keystore only
         //when alfresco is running on remote host - file must be pre-generated
-        if(!truststorePath.isEmpty())
+        if (!truststorePath.isEmpty())
         {
             FtpsUtil.enableFtps(nodeUrl, keystorePath, null);
         }
@@ -186,7 +186,7 @@ public class RepositoryFtpsTest extends FtpsUtil
     {
         //generating keystore only
         //when alfresco is running on remote host - file must be pre-generated
-        if(!truststorePath.isEmpty())
+        if (!truststorePath.isEmpty())
         {
             FtpsUtil.enableFtps(nodeUrl, keystorePath, null);
         }
@@ -217,7 +217,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
         String fileName = getFileName(testName);
-        file = newFile(fileName, fileName);
+        file = newFile(DATA_FOLDER + fileName, fileName);
         String remotePath = remotePathToSites + "/" + siteName + "/" + "documentLibrary";
 
         // Create user
@@ -278,7 +278,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
         ftpsClient.changeWorkingDirectory(remotePath);
         ftpsClient.setControlKeepAliveTimeout(600);
-        file = newFile(fileName + "1", fileName + "1");
+        file = newFile(DATA_FOLDER + fileName + "1", fileName + "1");
         try
         {
             FileInputStream inputStream = new FileInputStream(file);
@@ -613,7 +613,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
         String fileName = getFileName(testName + ".txt");
         String editedFileName = getFileName(testName + " (" + drone.getValue("working.copy") + ").txt");
-        file = newFile(fileName, fileName);
+        file = newFile(DATA_FOLDER + fileName, fileName);
         String remotePath = remotePathToSites + "/" + siteName + "/" + "documentLibrary";
 
         // Create user
