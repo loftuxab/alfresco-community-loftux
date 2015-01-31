@@ -328,6 +328,18 @@ define(["dojo/_base/declare",
          
          this.addAccessibilityLabel();
       },
+      
+      /**
+       * When the search box loads, add a label to support accessibility
+       * @instance
+       */
+      addAccessibilityLabel: function alfresco_header_SearchBox__addAccessibilityLabel() {
+         domConstruct.create("label", {
+            "for": "HEADER_SEARCHBOX_FORM_FIELD",
+            innerHTML: this.message("search.label"),
+            "class": "hidden"
+         }, this._searchTextNode, "before");
+      },
 
       /**
        * This indicated whether or not the search box should link to the faceted search page or not. It is used by the
