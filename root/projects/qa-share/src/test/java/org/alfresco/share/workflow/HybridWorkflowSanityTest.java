@@ -222,9 +222,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         assertEquals(syncInf2.getCloudSyncLocation(), DOMAIN_HYBRID + ">" + cloudSiteName + ">" + DEFAULT_FOLDER_NAME, "Failed to displayed sync info");
 
         // Open Site Document Library, verify the document is part of the workflow, document is synced and verify Sync Status
-        DocumentLibraryPage documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName);
-
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced(), "Verifying the document is synced");
+        SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName);
         // Verify the sync status for the Content
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName), "Verifying the Sync Status is \"Synced\"");
         ShareUser.logout(drone);
@@ -233,7 +231,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         // Open Site document library and verify the file is a part of workflow
-        documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSiteName);
+        DocumentLibraryPage documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSiteName);
         waitAndCheckIfVisible(hybridDrone, documentLibraryPage, fileName);
         assertTrue(documentLibraryPage.isItemVisble(fileName), "Cloud: File was not synced.");
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Workflow was not created.");
@@ -1085,6 +1083,11 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Fill the form details and start workflow
         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+
+        // Open Site Document Library, verify the document is part of the workflow, document is synced and verify Sync Status
+        SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName);
+        // Verify the sync status for the Content
+        assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName), "Verifying the Sync Status is \"Synced\"");
         ShareUser.logout(drone);
 
         // Login as reviewer1 User,
