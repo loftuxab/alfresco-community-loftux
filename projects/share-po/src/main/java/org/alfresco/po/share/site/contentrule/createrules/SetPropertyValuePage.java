@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.alfresco.po.share.site.contentrule;
+package org.alfresco.po.share.site.contentrule.createrules;
 
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.ShareDialogue;
@@ -44,6 +44,9 @@ public class SetPropertyValuePage extends ShareDialogue
     private final By propertyFoldersListCss = By.cssSelector("span[class$='ygtvlabel']");
     private final By setValueOkButtonCss = By
             .cssSelector("span[id$='selectSetPropertyDialog-ok-button']>span>button");
+
+    private final  String DATE_BUTTON = "//table[contains(@class,'calendar')]//a[text()='%s']";
+    private final By CALENDAR_BUTTON = By.cssSelector(".datepicker-icon");
 
     private final By getValueXpath (String valueName)
     {
@@ -83,7 +86,6 @@ public class SetPropertyValuePage extends ShareDialogue
     {
         return render(new RenderTime(maxPageLoadingTime));
     }
-
 
     /**
      * This method finds the clicks on ok button
@@ -170,5 +172,51 @@ public class SetPropertyValuePage extends ShareDialogue
 
         throw new PageOperationException("Unable to select value");
     }
+
+    /**
+     * Method to set date
+     *
+     * @param date
+     */
+    public void setDate(String date)
+    {
+        if (date == null)
+        {
+            throw new IllegalArgumentException("Date is required");
+        }
+
+        try
+        {
+            String dateXpath = String.format(DATE_BUTTON, date);
+            WebElement element = drone.findAndWait(By.xpath(dateXpath));
+            element.click();
+        }
+        catch (TimeoutException te)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Exceeded time to find the date button ", te);
+            }
+        }
+    }
+
+    /**
+     * This method finds the clicks on calendar icon
+     *
+     */
+    public void clickCalendarButton()
+    {
+        try
+        {
+            drone.findAndWait(CALENDAR_BUTTON).click();
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Unable to find calendar icon : ", e);
+            throw new PageException("Unable to find the calendar icon.");
+        }
+    }
+
+
 
 }

@@ -1,6 +1,6 @@
 package org.alfresco.po.share.site.contentrule.createrules.selectors.impl;
 
-import org.alfresco.po.share.site.contentrule.SetPropertyValuePage;
+import org.alfresco.po.share.site.contentrule.createrules.SetPropertyValuePage;
 import org.alfresco.po.share.site.contentrule.createrules.EmailMessageForm;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractActionSelector;
 import org.alfresco.webdrone.WebDrone;
