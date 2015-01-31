@@ -40,7 +40,7 @@ import static org.testng.Assert.fail;
  * @author Aliaksei Boole
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = { "AlfrescoOne" })
+@Test(groups = { "AlfrescoOne", "TestBug" })
 public class SiteMembershipExternalDomainAPITest extends SiteMembershipAPI
 {
     private static Log logger = LogFactory.getLog(SiteMembershipExternalDomainAPITest.class);
