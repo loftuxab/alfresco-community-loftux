@@ -195,7 +195,7 @@ public class AdminConsolePage extends SharePage implements HtmlPage
     {
         WebElement replicationJobsPage = drone.find(REPLICATION_JOBS_LINK);
         replicationJobsPage.click();
-        drone.waitForPageLoad(3);
+        drone.waitForPageLoad(5);
         logger.info("Navigating to Replication Jobs page");
         return drone.getCurrentPage().render();
     }
