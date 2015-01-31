@@ -43,6 +43,8 @@ public class WcmqsNewsPage extends SharePage
     public static final String GLOBAL = "global";
     public static final String COMPANIES = "companies";
     public static final String MARKETS = "markets";
+    public static final String COLLECTIONS = "collections";
+    public static final String SECTION_ARTICLES = "section.articles";
 
     public static final String ARTICLE_4 = "article4.html";
     public static final String ARTICLE_3 = "article3.html";
