@@ -208,7 +208,6 @@ public class ReplicationJobsClusterTest extends AbstractUtils
         ShareUser.getSharePage(drone).getNav().getAdminConsolePage().navigateToReplicationJobs().render();
         assertTrue(jobsPage.getJobDetails(jobName).getStatus().equals(RUNNING), "The job status is incorrect");
         assertTrue(waitUntilJobComplete(jobName));
-
     }
 
     /**
@@ -388,8 +387,13 @@ public class ReplicationJobsClusterTest extends AbstractUtils
         jobsPage.getJobDetails(jobName).clickRunButton();
 
         //Job started successfully, job's status is 'running';
-        ReplicationJobStatus theStatus = jobsPage.getJobDetails(jobName).getStatus();
-        assertTrue(theStatus.equals(RUNNING), "The job hasn't started");
+        do
+        {
+            jobsPage.getJobDetails(jobName).clickRefresh();
+        }
+        while (jobsPage.getJobDetails(jobName).getStatus().equals(PENDING) || jobsPage.getJobDetails(jobName).getStatus().equals(NEW));
+        assertTrue(jobsPage.getJobDetails(jobName).getStatus().equals(RUNNING) || jobsPage.getJobDetails(jobName).getStatus().equals(COMPLETED),
+            "The job hasn't started");
 
         //Wait while job run and click 'Refresh' button at the ServerA;
         do

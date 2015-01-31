@@ -51,7 +51,7 @@ import static org.testng.Assert.*;
  * @author Abhijeet Bharade
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = { "AlfrescoOne", "Cloud2" })
+@Test(groups = { "AlfrescoOne" })
 public class FavouriteAPITests extends FavouritesAPI
 {
     private String testName;

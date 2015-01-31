@@ -65,7 +65,7 @@ import static org.testng.Assert.assertTrue;
  * @author Meenal Bhave
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = { "AlfrescoOne", "MyAlfresco" })
+@Test(groups = { "AlfrescoOne" })
 public class CmisBrowserTests extends CmisUtils
 {
     private String testName;
@@ -106,14 +106,14 @@ public class CmisBrowserTests extends CmisUtils
         String folderName = "folder-" + System.currentTimeMillis();
 
         // Create Folder
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
         properties.put(PropertyIds.NAME, folderName);
         Folder f = createFolder(CMISBinding.ATOMPUB10, testUser2, testUser2, DOMAIN, siteName, properties);
         String folderId = f.getId();
 
         // Create Document
-        Map<String, Serializable> docProperties = new HashMap<String, Serializable>();
+        Map<String, Serializable> docProperties = new HashMap<>();
         docProperties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
         docProperties.put(PropertyIds.NAME, fileName);
         docProperties.put(PropertyIds.DESCRIPTION, "important document");
@@ -139,7 +139,7 @@ public class CmisBrowserTests extends CmisUtils
         String thisFolderNameGuid = ShareUser.getGuid(drone, thisFolderName);
         PublicApiClient.CmisSession cmisSession = getCmisSession(CMISBinding.ATOMPUB10, testUser2, DOMAIN);
         ContentData document = cmisSession.getContent(thisFileNameGuid);
-        assertTrue(document.getBytes().length > 0);
+        assertTrue(document.getBytes().length > 0, "Document wasn't retrieved");
         String invalidId = thisFileNameGuid + "inv";
         try
         {
@@ -157,7 +157,6 @@ public class CmisBrowserTests extends CmisUtils
         {
             assertTrue(e instanceof IllegalArgumentException, "Object is not a document!:" + e);
         }
-
     }
 
     @Test
@@ -173,7 +172,7 @@ public class CmisBrowserTests extends CmisUtils
         String thisFolderNameGuid = ShareUser.getGuid(drone, thisFolderName);
         PublicApiClient.CmisSession cmisSession = getCmisSession(CMISBinding.ATOMPUB10, testUser2, DOMAIN);
         FolderNode children = cmisSession.getChildren(thisFolderNameGuid, 0, 100);
-        assertTrue(children.getDocumentNodes().toString().contains(thisFileNameGuid));
+        assertTrue(children.getDocumentNodes().toString().contains(thisFileNameGuid), "The children are not retrieved");
         String invalidId = thisFolderName + "inv";
         try
         {
@@ -198,7 +197,7 @@ public class CmisBrowserTests extends CmisUtils
     {
         publicApiClient.setRequestContext(new RequestContext(DOMAIN, getAuthDetails(testUser)[0], getAuthDetails(testUser)[1]));
         HttpResponse httpResponse = publicApiClient.get(DOMAIN + "/public/cmis/versions/1.0/atom", null);
-        assertEquals(httpResponse.getStatusCode(), 200, httpResponse.getStatusCode(), "The operation wasn't successful");
+        assertEquals(httpResponse.getStatusCode(), 200, "The operation wasn't successful");
         assertTrue(httpResponse.getResponse().contains("cmis:repositoryId") && httpResponse.getResponse().contains(DOMAIN), "The operation wasn't successful");
     }
 
@@ -227,5 +226,6 @@ public class CmisBrowserTests extends CmisUtils
         Document doc2 = doc1.getObjectOfLatestVersion(false);
         String versionLabel2 = doc2.getVersionLabel();
         assertTrue(Double.parseDouble(versionLabel2) > Double.parseDouble(versionLabel), "Incorrect version size");
+        assertEquals(doc2.getVersionLabel(), "1.1", "Incorrect version label");
     }
 }
