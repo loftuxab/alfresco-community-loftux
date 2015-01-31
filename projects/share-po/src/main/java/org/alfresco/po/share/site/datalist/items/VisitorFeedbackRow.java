@@ -1,21 +1,5 @@
-/*
- * Copyright (C) 2005-2015 Alfresco Software Limited
- * This file is part of Alfresco
- * Alfresco is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * Alfresco is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License
- * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.alfresco.po.share.site.datalist.items;
 
-import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -30,22 +14,25 @@ import org.openqa.selenium.WebElement;
 /**
  * Page object to reflect Visitor Feedback list item
  *
- * @author Cristins.Axinte, Sergiu Vidrascu
+ * @author Cristins.Axinte
  */
 
-public class VisitorFeedbackRow extends SharePage
+public class VisitorFeedbackRow extends AbstractItem
 {
         private static Log logger = LogFactory.getLog(VisitorFeedbackRow.class);
 
         private static final By VISITOR_EMAIL_FIELD = By.cssSelector("td[class*='ws_visitorEmail']");
         private static final By FLAGGED_FIELD = By.cssSelector("td[class*='ws_commentFlagged']");
+        private static final By FEEDBACK_TYPE_FIELD = By.cssSelector("td[class*='ws_feedbackType']");
+        private static final By FEEDBACK_SUBJECT_FIELD = By.cssSelector("td[class*='ws_feedbackSubject']");
         private static final By COMMENT_FIELD = By.cssSelector("td[class*='ws_feedbackComment']");
+        private static final By RATING_FIELD = By.cssSelector("td[class*='ws_rating']");
         private static final By RELEVANT_ASSET_FIELD = By.cssSelector("td[class*='ws_relevantAssetAssoc']");
         private static final By VISITOR_NAME_FIELD = By.cssSelector("td[class*='ws_visitorName']");
         private static final By VISITOR_WEBSITE_FIELD = By.cssSelector("td[class*='ws_visitorWebsite']");
         private static final By DUPLICATE_BUTTON = By.cssSelector("a[Title=\"Duplicate\"]");
-        private static final By EDIT_BUTTON = By.cssSelector("a[Title=\"Edit\"]");
         private static final By DUPLICATE_MESSAGE = By.xpath(".//span[contains(text(),'Item was duplicated')]");
+
         private WebElement webElement;
 
         public VisitorFeedbackRow(WebDrone drone)
@@ -188,57 +175,26 @@ public class VisitorFeedbackRow extends SharePage
         /**
          * Method to click Duplicate on row
          *
+         * @return String
          */
         public void clickDuplicateOnRow()
         {
                 try
                 {
                         webElement.click();
-                        WebElement button = webElement.findElement(DUPLICATE_BUTTON);
-                        drone.executeJavaScript(String.format("window.scrollTo('%s', 0)", button.getLocation().getX()));
-                        button.click();
+                        webElement.findElement(DUPLICATE_BUTTON).click();
                 }
                 catch (NoSuchElementException te)
                 {
                         logger.debug("Unable to locate any element for visitor feedback list form");
                         throw new PageOperationException("Could not find the specified button. " + te.toString());
-                }
-                catch (IllegalArgumentException ie)
-                {
-                        logger.debug("The Jscript in the function is not set");
-                        throw new PageOperationException("Java script did not execute properly " + ie.toString());
-                }
-        }
-
-        /**
-         * Method to click Edit on row
-         *
-         */
-        public void clickEditOnRow()
-        {
-                try
-                {
-                        webElement.click();
-                        WebElement button = webElement.findElement(EDIT_BUTTON);
-                        drone.executeJavaScript(String.format("window.scrollTo('%s', 0)", button.getLocation().getX()));
-                        button.click();
-                }
-                catch (NoSuchElementException te)
-                {
-                        logger.debug("Unable to locate any element for visitor feedback list form");
-                        throw new PageOperationException("Could not find the specified button. " + te.toString());
-                }
-                catch (IllegalArgumentException ie)
-                {
-                        logger.debug("The Jscript in the function is not set");
-                        throw new PageOperationException("Java script did not execute properly " + ie.toString());
                 }
         }
 
         /**
          * Method to verify if the Duplication message success appeared
          *
-         * @return boolean
+         * @return
          */
         public boolean isDuplicateMessageDisplayed()
         {

@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2005-2015 Alfresco Software Limited
- * This file is part of Alfresco
- * Alfresco is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * Alfresco is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License
- * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.alfresco.po.share.wqs;
 
 import org.alfresco.webdrone.RenderTime;
@@ -24,7 +9,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -32,16 +16,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Created by Lucian Tuca on 11/18/2014.
- * Modified by Sergiu Vidrascu on 01/09/2015
  */
 public class WcmqsBlogPage extends WcmqsAbstractPage
 {
-        @RenderWebElement
+        @RenderWebElement private final By PAGE_LOGO = By.cssSelector("#logo>a");
         private final By BLOG_ENTRIES = By.cssSelector("div[class='blog-entry']");
         private final By BLOG_POST_DATE = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(1)");
         private final By BLOG_POST_CREATOR = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(2)");
         private final By BlOG_POST_COMMENTS_LINK = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(3)>a");
-        private final By TAG_LIST = By.cssSelector(".tag-list>li>a");
+
         public static final String ETHICAL_FUNDS = "Ethical funds";
         public static final String COMPANY_ORGANISES_WORKSHOP = "Company organises workshop";
         public static final String ANALYSTS_LATEST_THOUGHTS = "latest thoughts";
@@ -220,44 +203,4 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
                 }
         }
 
-        /**
-         * Method to get all tags in taglist as text
-         *
-         * @return List<String>
-         */
-        public List<String> getTagList()
-        {
-                try
-                {
-                        ArrayList<String> taglist = new ArrayList<String>();
-                        List<WebElement> tags = drone.findAndWaitForElements(TAG_LIST);
-                        for (WebElement tag : tags)
-                        {
-                                taglist.add(tag.getText());
-                        }
-                        return taglist;
-                }
-                catch (TimeoutException e)
-                {
-                        throw new PageOperationException("Exceeded time to find the tags " + e.toString());
-                }
-        }
-
-        /**
-         * Method to click on a tag in the tag list
-         *
-         * @param tagName
-         */
-        public void clickTag(String tagName)
-        {
-                WebDroneUtil.checkMandotaryParam("tagName", tagName);
-                try
-                {
-                        drone.findAndWait(By.xpath(String.format("//ul[@class=\"tag-list\"]//a[contains(text(),'%s')]", tagName))).click();
-                }
-                catch (TimeoutException e)
-                {
-                        throw new PageOperationException("Exceeded time to find blog post. " + e.toString());
-                }
-        }
 }

@@ -1,6 +1,5 @@
 package org.alfresco.po.share.site.datalist.items;
 
-import org.alfresco.po.share.ShareDialogue;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -17,7 +16,7 @@ import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
  * 
  * @author Marina.Nenadovets
  */
-public class ContactListItem extends ShareDialogue
+public class ContactListItem extends AbstractItem
 {
     private static Log logger = LogFactory.getLog(ContactListItem.class);
 
