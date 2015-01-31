@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import org.alfresco.application.util.Application;
+import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.po.share.CustomiseUserDashboardPage;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.ShareLink;
@@ -32,7 +32,7 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.windows.application.MicorsoftOffice2010;
+import org.alfresco.utilities.Application;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;

@@ -8,7 +8,7 @@ package org.alfresco.share.calendar.timezone;
 
 import java.util.Map;
 
-import org.alfresco.application.util.Application;
+import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.po.share.dashlet.SiteCalendarDashlet;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.SiteDashboardPage;
@@ -20,7 +20,7 @@ import org.alfresco.share.util.CalendarUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.windows.application.MicorsoftOffice2010;
+import org.alfresco.utilities.Application;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;

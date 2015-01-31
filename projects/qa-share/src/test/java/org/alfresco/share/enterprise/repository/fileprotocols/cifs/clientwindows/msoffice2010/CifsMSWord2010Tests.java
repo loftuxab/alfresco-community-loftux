@@ -1,18 +1,11 @@
 package org.alfresco.share.enterprise.repository.fileprotocols.cifs.clientwindows.msoffice2010;
 
 import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import javax.swing.ImageIcon;
-
-import org.alfresco.application.util.Application;
+import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.explorer.WindowsExplorer;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
@@ -22,8 +15,8 @@ import org.alfresco.share.util.CifsUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.utilities.Application;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.alfresco.windows.application.MicorsoftOffice2010;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
