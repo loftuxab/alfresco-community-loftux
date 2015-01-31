@@ -281,7 +281,7 @@ public class FilmstripActions extends SharePage
                 WebElement element = drone.find(By.cssSelector("div.alf-gallery-item-thumbnail"));
                 if (element.isDisplayed())
                 {
-                    drone.sendkeys(keysToSend);
+                    inputFromKeyborad(keysToSend);
                     return FactorySharePage.resolvePage(drone);
                 }
                 else

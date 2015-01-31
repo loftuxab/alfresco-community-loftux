@@ -223,11 +223,12 @@ public class ShareUtil
         String protocolVar = PageUtils.getProtocol(currentUrl);
         String consoleUrlVar = PageUtils.getAddress(currentUrl);
         currentUrl = String.format("%s%s:%s@%s/" + WEB_SCRIPTs_PAGE, protocolVar, userInfo[0], userInfo[1], consoleUrlVar);
-        try {
+        try 
+        {
             drone.navigateTo(currentUrl);
-
-        } catch (Exception e) {
-
+        }
+        catch (Exception e) 
+        {
             if (logger.isDebugEnabled())
             {
                 logger.debug("Following exception was occurred" + e + ". Param currentUrl was " + currentUrl);

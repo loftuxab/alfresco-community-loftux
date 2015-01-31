@@ -19,16 +19,13 @@
 
 package org.alfresco.po.alfresco;
 
+import static org.testng.Assert.assertTrue;
+
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.PageUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertTrue;
 
 /**
  * Created by ivan.kornilov on 23.04.2014.
@@ -36,59 +33,14 @@ import static org.testng.Assert.assertTrue;
 @Listeners(FailedTestListener.class)
 public class AlfrescoTest extends AbstractTest
 {
-    private static Log logger = LogFactory.getLog(AbstractTest.class);
 
-
-    @Test(groups = "Enterprise-only", timeOut = 400000)
-    public void checkLogin() throws Exception
+    @Test(groups = "Enterprise-only")
+    public void checkWebScriptsPage() throws Exception
     {
-        LoginAlfrescoPage loginPage = new LoginAlfrescoPage(drone);
-        drone.navigateTo(loginPage.getAlfrescoURL(shareUrl));
-        MyAlfrescoPage alfrescoPage = loginPage.login(username, password);
-        alfrescoPage.render();
-        assertTrue(alfrescoPage.userIsLoggedIn("admin"));
-
-    }
-
-    @Test(dependsOnMethods = "checkLogin", groups = "Enterprise-only", timeOut = 400000)
-    public void checkTenantAdminConsole() throws InterruptedException
-    {
-
-        TenantAdminConsolePage adminConsolePage = new TenantAdminConsolePage(drone);
-        drone.navigateTo(adminConsolePage.getTenantURL(shareUrl));
-        adminConsolePage.createTenant("user123" + Math.random(), "123");
-        adminConsolePage.render();
-        assertTrue(adminConsolePage.isOpened(), String.format("Page %s does not opened", adminConsolePage));
-
-    }
-
-    @Test(dependsOnMethods = "checkLogin", groups = "Enterprise-only", timeOut = 400000)
-    public void checkRepoAdminConsole() throws InterruptedException
-    {
-        RepositoryAdminConsolePage repositoryAdminConsolePage = new RepositoryAdminConsolePage(drone);
-        drone.navigateTo(PageUtils.getProtocol(shareUrl) + PageUtils.getAddress(shareUrl) + "/alfresco/faces/jsp/admin/repoadmin-console.jsp");
-        assertTrue(repositoryAdminConsolePage.isOpened(), String.format("Page %s does not opened", repositoryAdminConsolePage));
-
-    }
-
-    @Test(groups = "Enterprise-only", timeOut = 400000)
-    public void checkWebScriptsPage()
-
-    {
-        try
-        {
-            loginAs(username, password).render();
-            WebScriptsPage webScriptsPage = ShareUtil.navigateToWebScriptsHome(drone, username, password).render();
-            WebScriptsMaintenancePage webScriptsMaintenancePage = webScriptsPage.clickRefresh();
-            assertTrue(webScriptsMaintenancePage.isOpened());
-        }
-            catch (Exception e)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Following exception was occurred" + e);
-                }
-            }
+        loginAs(username, password).render();
+        WebScriptsPage webScriptsPage = ShareUtil.navigateToWebScriptsHome(drone, username, password).render();
+        WebScriptsMaintenancePage webScriptsMaintenancePage = webScriptsPage.clickRefresh();
+        assertTrue(webScriptsMaintenancePage.isOpened());
     }
 
 }
