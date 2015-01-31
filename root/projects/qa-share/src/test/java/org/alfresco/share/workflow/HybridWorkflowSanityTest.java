@@ -1085,7 +1085,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(hybridDrone, reviewer1, DEFAULT_PASSWORD);
         // Navigate to MyTasks page
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, true), "Cloud: task is not displayed");
         // Verify Task Details are displayed correctly
         TaskDetails taskDetails = myTasksPage.getTaskDetails(workFlowName);
 
@@ -1116,7 +1116,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(hybridDrone, reviewer2, DEFAULT_PASSWORD);
         // Navigate to MyTasks page
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, true), "Cloud: task is not displayed");
         // Verify Task Details are displayed correctly
         taskDetails = myTasksPage.getTaskDetails(workFlowName);
 
