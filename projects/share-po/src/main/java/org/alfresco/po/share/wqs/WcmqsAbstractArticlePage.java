@@ -6,6 +6,7 @@ import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 
 public abstract class WcmqsAbstractArticlePage extends WcmqsAbstractPage
@@ -13,7 +14,7 @@ public abstract class WcmqsAbstractArticlePage extends WcmqsAbstractPage
     protected final By EDIT_LINK = By.cssSelector("a.alfresco-content-edit");
     protected final By CREATE_LINK = By.cssSelector("a.alfresco-content-new");
     protected final By DELETE_LINK = By.cssSelector("a.alfresco-content-delete");
-    
+
     public WcmqsAbstractArticlePage(WebDrone drone)
     {
         super(drone);
@@ -40,7 +41,7 @@ public abstract class WcmqsAbstractArticlePage extends WcmqsAbstractPage
     {
         return render(new RenderTime(time));
     }
-    
+
     public WcmqsEditPage clickEditButton()
     {
         try
@@ -50,7 +51,7 @@ public abstract class WcmqsAbstractArticlePage extends WcmqsAbstractPage
         }
         catch (TimeoutException e)
         {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+            throw new PageOperationException("Exceeded time to find edit button. ", e);
         }
     }
 
@@ -62,7 +63,7 @@ public abstract class WcmqsAbstractArticlePage extends WcmqsAbstractPage
         }
         catch (TimeoutException e)
         {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+            throw new PageOperationException("Exceeded time to find edit button. ", e);
         }
     }
 
@@ -74,43 +75,43 @@ public abstract class WcmqsAbstractArticlePage extends WcmqsAbstractPage
         }
         catch (TimeoutException e)
         {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+            throw new PageOperationException("Exceeded time to find edit button. ", e);
         }
     }
-    
+
     public boolean isEditButtonDisplayed()
     {
         try
         {
-            return drone.findAndWait(EDIT_LINK).isDisplayed();
+            return drone.find(EDIT_LINK).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException e)
         {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+            return false;
         }
     }
-    
+
     public boolean isCreateButtonDisplayed()
     {
         try
         {
-            return drone.findAndWait(CREATE_LINK).isDisplayed();
+            return drone.find(CREATE_LINK).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException e)
         {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+            return false;
         }
     }
-    
+
     public boolean isDeleteButtonDisplayed()
     {
         try
         {
-            return drone.findAndWait(DELETE_LINK).isDisplayed();
+            return drone.find(DELETE_LINK).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException e)
         {
-            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+            return false;
         }
     }
 }
