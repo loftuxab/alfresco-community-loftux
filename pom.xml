@@ -180,7 +180,7 @@
     <installer.libreoffice.version>4.2.5-alfresco</installer.libreoffice.version>
 
     <manifest.major.version>5</manifest.major.version>
-    <manifest.minor.version>0</manifest.minor.version>
+    <manifest.minor.version>1</manifest.minor.version>
     <manifest.servicepack.version>0</manifest.servicepack.version>
     <manifest.implementation.version>${project.version}</manifest.implementation.version>
   </properties>
