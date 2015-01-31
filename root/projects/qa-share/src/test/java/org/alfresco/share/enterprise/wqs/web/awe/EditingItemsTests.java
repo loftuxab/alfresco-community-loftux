@@ -7,19 +7,17 @@ import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.wqs.*;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
+import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -29,13 +27,13 @@ public class EditingItemsTests extends AbstractUtils
         private String testName;
         private String wqsURL;
         private String siteName;
-        private String ipAddress;
-        private String hostName;
 
         public static final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
         public static final String QUICK_START_EDITORIAL = "Quick Start Editorial";
+        public static final String QUICK_START_LIVE = "Quick Start Live";
         public static final String ROOT = "root";
         public static final String BLOG = "blog";
+        public static final String NEWS = "news";
         public static final String BLOG_FILE1 = "blog1.html";
         public static final String BLOG_FILE2 = "blog2.html";
         public static final String BLOG_FILE3 = "blog3.html";
@@ -59,21 +57,11 @@ public class EditingItemsTests extends AbstractUtils
         @BeforeClass(alwaysRun = true)
         public void setup() throws Exception
         {
-
+                super.setup();
                 testName = this.getClass().getSimpleName();
-                siteName = testName;
-                hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
-                try
-                {
-                        ipAddress = InetAddress.getByName(hostName).toString().replaceAll(".*/", "");
-                        logger.info("Ip address from Alfresco server was obtained");
-                }
-                catch (UnknownHostException | SecurityException e)
-                {
-                        logger.error("Ip address from Alfresco server could not be obtained");
-                }
-
-                wqsURL = siteName + ":8080/wcmqs";
+                siteName = getSiteName(testName);
+                //        siteName="Share-55952SiteName";
+                wqsURL = wcmqs;
                 logger.info(" wcmqs url : " + wqsURL);
                 logger.info("Start Tests from: " + testName);
         }
@@ -93,43 +81,33 @@ public class EditingItemsTests extends AbstractUtils
         @Test(groups = { "DataPrepWQS" })
         public void dataPrep_AONE() throws Exception
         {
-                // User login
+                String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
+
+                // User
+                String[] testUserInfo = new String[] { testUser };
+                CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
                 // ---- Step 1 ----
                 // ---- Step Action -----
                 // WCM Quick Start is installed; - is not required to be executed automatically
-                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 2 ----
                 // ---- Step Action -----
                 // Site "My Web Site" is created in Alfresco Share;
+                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
                 ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
 
                 // ---- Step 3 ----
                 // ---- Step Action -----
                 // WCM Quick Start Site Data is imported;
                 SiteDashboardPage siteDashBoard = ShareUserDashboard.addDashlet(drone, siteName, Dashlets.WEB_QUICK_START);
+
                 SiteWebQuickStartDashlet wqsDashlet = siteDashBoard.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
                 wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
                 wqsDashlet.clickImportButtton();
                 wqsDashlet.waitForImportMessage();
 
-                //Change property for quick start to sitename
-                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-                documentLibPage.selectFolder("Alfresco Quick Start");
-                EditDocumentPropertiesPage documentPropertiesPage = documentLibPage.getFileDirectoryInfo("Quick Start Editorial").selectEditProperties()
-                        .render();
-                documentPropertiesPage.setSiteHostname(siteName);
-                documentPropertiesPage.clickSave();
-
-                //Change property for quick start live to ip address
-                documentLibPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
-                documentPropertiesPage.setSiteHostname(ipAddress);
-                documentPropertiesPage.clickSave();
-
-                //setup new entry in hosts to be able to access the new wcmqs site
-                String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
-                        + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
-                Runtime.getRuntime().exec(setHostAddress);
+                ShareUser.logout(drone);
 
         }
 
@@ -1012,9 +990,7 @@ public class EditingItemsTests extends AbstractUtils
 
         }
 
-        /**
-         * AONE-5628:Editing "First slide" article
-         */
+        /** AONE-5628:Editing "First slide" article */
         @Test(groups = { "WQS", "EnterpriseOnly" })
         public void AONE_5628() throws Exception
         {
@@ -1204,9 +1180,7 @@ public class EditingItemsTests extends AbstractUtils
 
         }
 
-        /**
-         * AONE-5630:Editing "Third slide" article
-         */
+        /** AONE-5630:Editing "Third slide" article */
         @Test(groups = { "WQS", "EnterpriseOnly" })
         public void AONE_5630() throws Exception
         {
@@ -1295,10 +1269,10 @@ public class EditingItemsTests extends AbstractUtils
                 Assert.assertNotNull(properties);
                 Assert.assertEquals(properties.get("Name"), SLIDE_FILE3, "Name Property is not " + SLIDE_FILE3);
                 Assert.assertTrue(properties.get("Title").toString().contains(newTitle), "Title of blog " + SLIDE_FILE3 + " was not updated.");
-                Assert.assertTrue(properties.get("Description").toString().contains(newDescription),
-                        "Description of blog " + SLIDE_FILE3 + " was not updated.");
-                //        Assert.assertTrue(properties.get("TemplateName").toString().contains(newTemplateName),"Template name of blog "+SLIDE_FILE1+" was not updated.");
-
-        }
+                Assert.assertTrue(properties.get("Description").toString().contains(newDescription), "Description of blog " + SLIDE_FILE3+" was not updated.");
+//        Assert.assertTrue(properties.get("TemplateName").toString().contains(newTemplateName),"Template name of blog "+SLIDE_FILE1+" was not updated.");
+               
+    }
+    
 
 }
