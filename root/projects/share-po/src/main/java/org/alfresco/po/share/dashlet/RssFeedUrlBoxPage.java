@@ -163,6 +163,22 @@ public class RssFeedUrlBoxPage extends SharePage
         }
     }
     
+    public boolean isLinkNewWindowSelected()
+    {
+        boolean selected;
+        
+        try
+        {
+            WebElement element = drone.findAndWait(CHK_OPEN_IN_NEW_WINDOW);
+            selected = element.isSelected();
+            return selected;
+        }
+        catch (TimeoutException te)
+        {
+            throw new ShareException("Unable to find checkbox");
+        }
+    }
+    
     public void clearUrlField()
     {
         try
@@ -192,5 +208,10 @@ public class RssFeedUrlBoxPage extends SharePage
         {
             throw new ShareException("Unable to find Url field");
         }
+    }
+    
+    public void waitUntilCheckDisapperers()
+    {
+        drone.waitUntilElementDisappears(CHK_OPEN_IN_NEW_WINDOW, 30);
     }
 }
