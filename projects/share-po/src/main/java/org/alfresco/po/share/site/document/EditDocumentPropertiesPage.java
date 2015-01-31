@@ -41,7 +41,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 {
     public enum Fields
     {
-        NAME, TITLE, DESCRIPTION, AUTHOR, PUBLISHER, CONTRIBUTOR, TYPE, IDENTIFIER, SOURCE, COVERAGE, RIGHTS, SUBJECT;
+        NAME, TITLE, DESCRIPTION, AUTHOR, PUBLISHER, CONTRIBUTOR, TYPE, IDENTIFIER, SOURCE, COVERAGE, RIGHTS, SUBJECT, SITE_CONFIGURATION;
     }
 
     private final String tagName;
@@ -654,5 +654,23 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     public String getRenditionConfig()
     {
         return getValue(REDITION_CONFIG);
+    }
+    
+    /**
+     * Enters a value in to the properties form.
+     *
+     * @param siteConfiguration
+     */
+    public void setSiteConfiguration(String siteConfiguration)
+    {
+        setInput(drone.find(INPUT_SITE_CONFIGURATION_SELECTOR), siteConfiguration);
+    }
+
+    /**
+     * Get text seen on the Site Configuration textarea.
+     */
+    public String getSiteConfiguration()
+    {
+        return drone.find(INPUT_SITE_CONFIGURATION_SELECTOR).getText();
     }
 }
