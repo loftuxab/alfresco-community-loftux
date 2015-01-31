@@ -140,7 +140,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2905() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "35";
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -154,7 +154,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2905() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "35";
         String testUser = getUserNameFreeDomain(testName);
         String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
 
@@ -203,13 +203,12 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
 
         // wait a few seconds to load the RSS Feed
         rssDashlet.waitUntilLoadingDisappears();
-
+        
         // ---- Step 6 ----
         // ---- Step action ---
         // Click on any RSS news;
         // ---- Expected results ----
         // RSS news is opened in new window;
-        Thread.sleep(4000);
         List<ShareLink> links = rssDashlet.getHeadlineLinksFromDashlet();
         links.get(0).openLink();
 
