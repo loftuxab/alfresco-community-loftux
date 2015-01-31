@@ -18,12 +18,6 @@
  */
 package org.alfresco.share.util;
 
-import static org.testng.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.SharePage;
@@ -40,6 +34,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Abhijeet Bharade
