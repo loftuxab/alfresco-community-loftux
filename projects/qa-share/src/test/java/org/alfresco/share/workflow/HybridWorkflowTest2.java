@@ -191,44 +191,6 @@ public class HybridWorkflowTest2 extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    /**
-     * AONE-15688 & ALF-210:Create Simple Cloud Task and update when its
-     * incomplete.
-     * <ul>
-     * <li>1) Login to OP user and upload a file.</li>
-     * <li>2) Start work flow with the file created on 1. which will sync file
-     * with cloud.</li>
-     * <li>3) Go back to file uploaded and try to unsync the file.
-     * <li>4) Login as CL-User, Open CL site and verfiy no chane happened.
-     * </ul>
-     */
-    @Test(groups = "Hybrid", enabled = true)
-    public void AONE_15688() throws Exception
-    {
-        String user1 = getUserNameForDomain(prefixIncomplete + testName, testDomain);
-
-        String cloudUser = getUserNameForDomain(prefixIncomplete + testName, testDomain);
-
-        String opSiteName = getSiteName(prefixIncomplete + testName) + "-OP";
-        String cloudSiteName = getSiteName(prefixIncomplete + testName) + "-CL";
-
-        String fileName = getFileName(testName) + ".txt";
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isUnSyncFromCloudLinkPresent());
-
-        ShareUser.logout(drone);
-        // TODO : TestLink: Please update the 2nd step accordingly.
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
-
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isUnSyncFromCloudLinkPresent());
-
-        ShareUser.logout(hybridDrone);
-    }
-
     @Test(groups = "DataPrepHybridWorkflow2")
     public void dataPrep_15211() throws Exception
     {
