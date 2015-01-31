@@ -2738,6 +2738,22 @@ Alfresco.util.createBalloon = function(p_context, p_params, showEvent, hideEvent
          closeButton.innerHTML = "x";
          Dom.addClass(closeButton, "closeButton");
          Event.addListener(closeButton, "click", this.hide, this, true);
+         
+         // Register the ESC key
+         this.escapeListener = new YUIKeyListener(document,
+         {
+            keys: YUIKeyListener.KEY.ESCAPE
+         },
+         {
+            fn: function(eventName, keyEvent)
+            {
+               this.hide();
+            },
+            scope: this,
+            correctScope: true
+         });
+         this.escapeListener.enable();
+         
          wrapper.appendChild(closeButton);
       }
 
