@@ -50,7 +50,6 @@ import static org.testng.Assert.assertEquals;
 public class RepositoryCifsTests extends AbstractUtils
 {
     private static Log logger = LogFactory.getLog(RepositoryCifsTests.class);
-    private static String remotePathMain = "Alfresco" + "/" + "Sites" + "/" + "%s" + "/" + "documentLibrary" + "/";
 
     @Override
     @BeforeClass
@@ -78,7 +77,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String testUser = getUserNameFreeDomain(testName) + System.currentTimeMillis();
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
         String folderName = getFolderName(testName);
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         // Create user
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -123,7 +122,7 @@ public class RepositoryCifsTests extends AbstractUtils
         File TEST_FILE_DOCX = new File(DATA_FOLDER + SLASH + FILE_DOCX);
         File TEST_FILE_DOC = new File(DATA_FOLDER + SLASH + FILE_DOC);
 
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         String remotePathUserHome = "Alfresco" + "/" + "User Homes" + "/";
 
         // Create user
@@ -177,7 +176,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
         String folderName = getFolderName(testName);
         String folderNewName = folderName + "CIFS";
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         // Create user
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -223,7 +222,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
         String fileName = getFileName(testName);
         String fileNewName = fileName + "-CIFS";
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         File file = newFile(fileName, fileName);
         file.deleteOnExit();
 
@@ -273,7 +272,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
         String folderName = getFolderName(testName);
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
 
         // Create user
         String[] testUserInfo = new String[] { testUser };
@@ -319,7 +318,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
         String fileName = getFileName(testName);
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         File file = newFile(fileName, fileName);
         file.deleteOnExit();
 
@@ -370,7 +369,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
         String fileName = getFileName(testName + ".txt");
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         File file = newFile(fileName, fileName);
         file.deleteOnExit();
 
@@ -430,7 +429,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String editedFileName = getFileName(testName + " (Working Copy).txt");
         File file = newFile(fileName, fileName);
         file.deleteOnExit();
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
 
         // Create user
         String[] testUserInfo = new String[] { testUser };
@@ -504,8 +503,8 @@ public class RepositoryCifsTests extends AbstractUtils
         file1.deleteOnExit();
         file2.deleteOnExit();
 
-        String remotePath = String.format(remotePathMain, siteName1);
-        String destination = String.format(remotePathMain, siteName2);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName1 + "/" + "documentLibrary" + "/";
+        String destination = "Alfresco" + "/" + "Sites" + "/" + siteName2 + "/" + "documentLibrary" + "/";
 
         // Create user
         String[] testUserInfo = new String[] { testUser };
@@ -575,7 +574,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String folderNewName = folderName + "-CIFS";
         String fileNewName = fileName + "-CIFS";
 
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         String remotePathToFolder = remotePath + folderNewName + "/";
 
         // Create users
@@ -662,7 +661,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String folderNewName = folderName + "-CIFS";
         String fileNewName = fileName + "-CIFS";
 
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         String remotePathToFolder = remotePath + folderNewName + "/";
 
         // Create users
@@ -759,7 +758,7 @@ public class RepositoryCifsTests extends AbstractUtils
         File newFile = newFile(fileNewName, fileNewName);
         newFile.deleteOnExit();
 
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         String remotePathToFolder = remotePath + folderName + "/";
 
         // Create users
@@ -855,7 +854,7 @@ public class RepositoryCifsTests extends AbstractUtils
         File newFile = newFile(fileNewName, fileNewName);
         newFile.deleteOnExit();
 
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         String remotePathToFolder = remotePath + folderName + "/";
 
         // Create users
@@ -935,7 +934,7 @@ public class RepositoryCifsTests extends AbstractUtils
         file.deleteOnExit();
         String folderName = getFolderName(testName);
 
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         String remotePathToFolder = remotePath + folderName + "/";
 
         // Create users
@@ -1061,7 +1060,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName) + System.currentTimeMillis();
         String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
         String temp_folder = "temp_remove";
         String dataPath = DATA_FOLDER + temp_folder;
         String fileName = "temp%s.txt";
@@ -1127,7 +1126,7 @@ public class RepositoryCifsTests extends AbstractUtils
         String folderName = getFolderName(testName);
         String subFolderName = "sub_" + folderName;
         String subFileName = "sub_" + getFileName(testName) + ".txt";
-        String remotePath = String.format(remotePathMain, siteName);
+        String remotePath = "Alfresco" + "/" + "Sites" + "/" + siteName + "/" + "documentLibrary" + "/";
 
         // Create user
         String[] testUserInfo = new String[] { testUser };
