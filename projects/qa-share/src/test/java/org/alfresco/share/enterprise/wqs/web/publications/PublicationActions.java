@@ -106,20 +106,9 @@ public class PublicationActions extends AbstractUtils
                 documentPropertiesPage.clickSave();
 
                 //setup new entry in hosts to be able to access the new wcmqs site
-                String setHostAddress = "cmd.exe /c echo " + ipAddress + " " + siteName + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
+                String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
+                        + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
                 Runtime.getRuntime().exec(setHostAddress);
-
-                documentLibPage.selectFolder("Quick Start Editorial");
-                documentLibPage.selectFolder("root");
-                documentLibPage.selectFolder("publications");
-                documentLibPage.getFileDirectoryInfo("WCM.pdf").addTag("tag2");
-                documentLibPage.selectFolder("white-papers");
-                documentLibPage.getFileDirectoryInfo("Datasheet_OEM.pdf").addTag("tag1");
-                documentLibPage.getNavigation().clickFolderUp();
-                documentLibPage = new DocumentLibraryPage(drone);
-                documentLibPage.selectFolder("research-reports");
-                documentLibPage.getFileDirectoryInfo("Enterprise_Network_0410.pdf").addTag("tag2");
-
         }
 
         /**
@@ -307,6 +296,25 @@ public class PublicationActions extends AbstractUtils
                 File testFile = wcmqsPublicationPage.downloadFiles();
                 Assert.assertTrue(testFile.length() > 0);
 
+        }
+
+        @Test(groups = "DataPrepWQS")
+        public void dataPrep_AONE_5666() throws Exception
+        {
+                // ---- Data prep ----
+                ShareUser.openSiteDashboard(drone, siteName);
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder("Alfresco Quick Start");
+                documentLibPage.selectFolder("Quick Start Editorial");
+                documentLibPage.selectFolder("root");
+                documentLibPage.selectFolder("publications");
+                documentLibPage.getFileDirectoryInfo("WCM.pdf").addTag("tag2");
+                documentLibPage.selectFolder("white-papers");
+                documentLibPage.getFileDirectoryInfo("Datasheet_OEM.pdf").addTag("tag1");
+                documentLibPage.getNavigation().clickFolderUp();
+                documentLibPage = new DocumentLibraryPage(drone);
+                documentLibPage.selectFolder("research-reports");
+                documentLibPage.getFileDirectoryInfo("Enterprise_Network_0410.pdf").addTag("tag2");
         }
 
         /**
