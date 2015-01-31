@@ -104,10 +104,11 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 documentPropertiesPage.clickSave();
 
                 //setup new entry in hosts to be able to access the new wcmqs site
-                String setHostAddress = "cmd.exe /c echo " + ipAddress + " " + siteName + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
+                String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
+                        + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
                 Runtime.getRuntime().exec(setHostAddress);
-
         }
+
         /**
          * AONE-5641:Deleting "Ethical funds" blog post
          */
