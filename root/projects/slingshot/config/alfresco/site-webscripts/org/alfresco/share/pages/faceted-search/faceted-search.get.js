@@ -182,10 +182,15 @@ var sideBarMenu = {
 
 // Make a request to the Repository to get the configured facets to use in search...
 var rawFacets = [];
-var result = remote.call("/api/facet/facet-config");
-if (result.status.code == status.STATUS_OK)
+var searchConfig = config.scoped["Search"]["search"];
+var displayFacets = searchConfig.getChildValue("display-facets");
+if (displayFacets == "true")
 {
-   rawFacets = JSON.parse(result).facets;
+   var result = remote.call("/api/facet/facet-config");
+   if (result.status.code == status.STATUS_OK)
+   {
+      rawFacets = JSON.parse(result).facets;
+   }
 }
 
 // Iterate over the list of facets and create an array of widgets for each one.

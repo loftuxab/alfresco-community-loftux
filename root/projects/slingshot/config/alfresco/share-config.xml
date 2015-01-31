@@ -151,6 +151,9 @@
               always-options - always search full repository no matter what the context, still shows the search context options
          -->
          <repository-search>always-options</repository-search>
+         
+         <!-- default option to display filter pane. Override if solr1 is used. -->
+         <display-facets>true</display-facets>
       </search>
       
       <!-- sorting fields and labels -->
