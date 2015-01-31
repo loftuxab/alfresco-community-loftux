@@ -56,12 +56,6 @@ public class AlfrescoTicketCmisAuthenticationProvider extends StandardAuthentica
         return getTicket();
     }
 
-    @Override
-    protected String getUser()
-    {
-        return "";
-    }
-
     private String getTicket()
     {
         // MNT-9344 fix - refetch Ticket due to expiration
