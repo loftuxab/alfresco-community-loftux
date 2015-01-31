@@ -4,6 +4,7 @@ import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.datalist.AbstractDataList;
 import org.alfresco.po.share.site.datalist.DataListPage;
 import org.alfresco.po.share.site.datalist.items.ContactListItem;
+import org.alfresco.po.share.site.datalist.items.VisitorFeedbackRowProperties;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.logging.Log;
@@ -59,8 +60,8 @@ public class ContactList extends AbstractDataList
     {
         logger.info("Creating an item");
         selectNewItem();
-        ContactListItem contactListItem = new ContactListItem(drone);
-        contactListItem.fillItemFields(data);
+        VisitorFeedbackRowProperties contactListItem = new VisitorFeedbackRowProperties(drone);
+        contactListItem.setAllProperties(data);
         contactListItem.clickSave();
         waitUntilAlert();
         return new ContactList(drone).render();
@@ -72,8 +73,8 @@ public class ContactList extends AbstractDataList
         try
         {
             clickEditItem(title);
-            ContactListItem contactListItem = new ContactListItem(drone);
-            contactListItem.editAnItem(data);
+            VisitorFeedbackRowProperties contactListItem = new VisitorFeedbackRowProperties(drone);
+            contactListItem.editAllProperties(data);
             return drone.getCurrentPage().render();
         }
         catch (TimeoutException te)

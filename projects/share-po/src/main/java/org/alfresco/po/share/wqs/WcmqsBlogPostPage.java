@@ -41,6 +41,7 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 
         @RenderWebElement
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
+        private final By COMMENT_FORM = By.cssSelector(".blog-comment-fieldset");
         private final By VISITOR_NAME = By.cssSelector("input[name='visitorName']");
         private final By VISITOR_EMAIL = By.cssSelector("input[name='visitorEmail']");
         private final By VISITOR_WEBSITE = By.cssSelector("input[name='visitorWebsite']");
@@ -49,6 +50,8 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         private final By ADD_SUCCESS_MESSAGE = By.cssSelector("div.contact-success");
         private final By FORM_PROBLEMS_MESSAGE = By.cssSelector("div.contact-error");
         private final By INVALID_INPUT_MESSAGES = By.xpath("//span[contains(@class,\"contact-error-value\")]");
+        private final By REPORT_POST = By.cssSelector(".comments-report>a");
+        private final By COMMENT_FEEDBACK_SUBJECT = By.cssSelector(".comments-text");
 
         /**
          * Constructor.
@@ -245,7 +248,6 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 
         /**
          * Method that types the visitor name
-         * @return String
          */
         public void setVisitorName(String visitorName)
         {
@@ -263,7 +265,6 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 
         /**
          * Method that types the visitor email
-         * @return String
          */
         public void setVisitorEmail(String visitorEmail)
         {
@@ -282,7 +283,6 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 
         /**
          * Method that types the visitor website
-         * @return String
          */
         public void setVisitorWebsite(String visitorWebsite)
         {
@@ -298,7 +298,6 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 
         /**
          * Method that types the visitor comment
-         * @return String
          */
         public void setVisitorComment(String comment)
         {
@@ -313,9 +312,9 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         }
 
         /**
-         * Method to click on Create article
+         * Method to click on Post Button
          *
-         * @return WcmqsEditPage
+         * @return WcmqsBlogPostPage
          */
         public WcmqsBlogPostPage clickPostButton()
         {
@@ -326,20 +325,55 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
                 }
                 catch (TimeoutException e)
                 {
-                        throw new PageOperationException("Exceeded time to create article. " + e.toString());
+                        throw new PageOperationException("Exceeded time to click the post button. " + e.toString());
+                }
+        }
+
+        /**
+         * Method to click on report the last added post
+         *
+         * @return WcmqsBlogPostPage
+         */
+        public WcmqsBlogPostPage reportLastCreatedPost()
+        {
+                try
+                {
+                        List<WebElement> messages = drone.findAndWaitForElements(REPORT_POST);
+                        messages.get(messages.size() - 1).click();
+                        return this;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to report the post article. " + e.toString());
                 }
         }
 
         /**
          * Method to verify the add comment successful message
          *
-         * @return WcmqsEditPage
          */
         public boolean isAddCommentMessageDisplay()
         {
                 try
                 {
                         WebElement message = drone.findAndWait(ADD_SUCCESS_MESSAGE);
+                        return message.isDisplayed();
+                }
+                catch (TimeoutException e)
+                {
+                        return false;
+                }
+        }
+
+        /**
+         * Method to verify the leave comment form is displayed
+         *
+         */
+        public boolean isLeaveCommentFormDisplayed()
+        {
+                try
+                {
+                        WebElement message = drone.findAndWait(COMMENT_FORM);
                         return message.isDisplayed();
                 }
                 catch (TimeoutException e)
@@ -560,6 +594,30 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
                         throw new PageOperationException("Exceeded time to click AWE Edit article" + e.toString());
                 }
         }
+
+        /**
+         * Method to get all feedback comments in
+         *
+         * @return
+         */
+        public List<String> getFeedBackComments()
+        {
+                try
+                {
+                        ArrayList<String> errorString = new ArrayList<String>();
+                        List<WebElement> messages = drone.findAndWaitForElements(COMMENT_FEEDBACK_SUBJECT);
+                        for (WebElement message : messages)
+                        {
+                                errorString.add(message.getText());
+                        }
+                        return errorString;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find the feedback Subjects " + e.toString());
+                }
+        }
+
 
 
 }
