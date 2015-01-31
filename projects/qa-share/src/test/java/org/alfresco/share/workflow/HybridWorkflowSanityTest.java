@@ -1,18 +1,21 @@
 package org.alfresco.share.workflow;
 
 import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.SyncInfoPage;
 import org.alfresco.po.share.task.*;
 import org.alfresco.po.share.workflow.*;
 import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.openqa.selenium.By;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -23,36 +26,27 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 /**
- * @author Ranjith Manyam
+ * @author Dmitry Yukhnovets on 10.12.2014.
  */
 @Listeners(FailedTestListener.class)
 public class HybridWorkflowSanityTest extends AbstractWorkflow
 {
     private static final Logger logger = Logger.getLogger(HybridWorkflowSanityTest.class);
 
-    private String testDomain1;
-    private String testDomain2;
-
     @Override
-    @BeforeClass(alwaysRun=true)
+    @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
         super.setup();
         testName = this.getClass().getSimpleName();
 
         logger.info("[Suite ] : Start Tests in: " + testName);
-        testDomain1 = "hwsanity1.test";
-        testDomain2 = "hwsanity2.test";
     }
 
     /**
      * AONE-15732:Enable Hybrid Workflow functionality
-     * <ul>
-     * <li>1) Login as Admin, Select MyTasks from Tasks</li>
-     * <li>2) Select Start Workflow button and verify "Cloud Task or Review" workflow displayed in the drop down</li>
-     * </ul>
      */
-    @Test(groups="Hybrid", enabled = true)
+    @Test(groups = "Hybrid")
     public void AONE_15732() throws Exception
     {
         try
@@ -71,21 +65,18 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
     }
 
     /**
-     * AONE-15733:Create Simple Cloud Task AONE-15734:Complete Simple Cloud Task
-     * <ul>
-     * <li>1) Create User1 (OP)</li>
-     * <li>3) Create a cloud user and upgrade the account</li>
-     * <li>5) Login as User1, Set Up cloud sync with the cloud user</li>
-     * </ul>
+     * AONE-15733:Create Simple Cloud Task
      */
-    @Test(groups="DataPrepHybrid")
-    public void dataPrep_15100() throws Exception
+    @Test(groups = "Hybrid")
+    public void AONE_15733() throws Exception
     {
+
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String user1 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { user1 };
 
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
         // Create User1 (On-premise)
@@ -99,53 +90,18 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
-    }
 
-    /**
-     * AONE-15733:Create Simple Cloud Task AONE-15734:Complete Simple Cloud Task
-     * <ul>
-     * <li>1) Login as Cloud User, Create a site and Logout</li>
-     * <li>2) Login as User1 (OP), Create a site and Upload a document</li>
-     * <li>3) Navigate to WorkFlows I've Started page and select StartWorkflow button</li>
-     * <li>4) Select "Cloud Task or Review" from select a workflow dropdown</li>
-     * <li>5) Select Simple Cloud Task and fill in the form with Message, Due Date, Task Priority etc.</li>
-     * <li>6) Select Cloud Destination, Select Assignee, select content and select "Start Workflow" button</li>
-     * <li>7) Verify a task is displayed in Active Workflows list</li>
-     * <li>7) Load Site Document library and verify Document is part of workflow</li>
-     * <li>8) Verify Document is cloud synced</li>
-     * <li>9) Login to Cloud, open site document library and verify the synced document is displayed</li>
-     * <li>10) Navigate to MyTasks page and verify a task is displayed in Active Tasks list</li>
-     * <li>11) Verify the task details are accurate</li>
-     * <li>12) Edit task and mark it as complete</li>
-     * <li>13) Verify the task is disappeared from Active Tasks list</li>
-     * <li>14) Select Completed and verify the task is displayed and the task details re correct</li>
-     * <li>15) Login as OP user and verify there is a task displayed under Active task with the workflow name</li>
-     * <li>16) Verify the task details are correct</li>
-     * <li>17) Edit the task and mark it as completed</li>
-     * <li>18) Verify the task is disappeared from Active Tasks list</li>
-     * <li>19) Select Completed and Verify the task is displayed and the task details are correct</li>
-     * <li>20) Navigate to Workflows I've Started page and verify the workflow doesn't exists in Active WorkFlows</li>
-     * <li>21) Select Completed and verify the workflow is displayed and the details are correct</li>
-     * </ul>
-     */
-    @Test(groups="Hybrid", enabled = true)
-    public void AONE_15733() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String uniqueString = String.valueOf(System.currentTimeMillis()).substring(7,12);
-        String opSiteName = getSiteName(testName) + uniqueString + "-OP";
-        String cloudSiteName = getSiteName(testName) + uniqueString + "-CL";
-        String fileName = getFileName(testName) + uniqueString + ".txt";
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSiteName = getSiteName(testName) + uniqueData + "-CL";
+        String fileName = getFileName(testName) + uniqueData + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
 
-        String workFlowName = testName + uniqueString + "-WF";
+        String workFlowName = testName + uniqueData + "-WF";
         String due = getDueDateString();
         DateTime dueDate = getDueDate(due);
 
-        String cloudCommentInProgress = testName + "-Cloud Comment InProgress";
-        String cloudComment = testName + "-Cloud Comment";
+        String cloudCommentInProgress = testName + uniqueData + "-Cloud Comment InProgress";
+        String cloudComment = testName + uniqueData + "-Cloud Comment";
 
         // Login as User1 (Cloud) and Create a Site
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -160,15 +116,16 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.uploadFileInFolder(drone, fileInfo).render();
 
         // Start Simple Cloud Task workflow
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName);
-
+        MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
+        StartWorkFlowPage startWorkFlowPage = (StartWorkFlowPage) myWorkFlowsPage.selectStartWorkflowButton();
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = (CloudTaskOrReviewPage) startWorkFlowPage.getWorkflowPage(WorkFlowType.CLOUD_TASK_OR_REVIEW);
         cloudTaskOrReviewPage.selectTask(TaskType.SIMPLE_CLOUD_TASK);
+        cloudTaskOrReviewPage.selectItem(fileName, opSiteName);
         // Verify "Simple Cloud Task" is selected
-        assertTrue(cloudTaskOrReviewPage.isTaskTypeSelected(TaskType.SIMPLE_CLOUD_TASK));
+        assertTrue(cloudTaskOrReviewPage.isTaskTypeSelected(TaskType.SIMPLE_CLOUD_TASK), "Simple Cloud Task is not selected");
 
         // Fill up Task Details
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-
         formDetails.setMessage(workFlowName);
         formDetails.setDueDate(due);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -176,87 +133,89 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         formDetails.setAssignee(cloudUser);
         formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
 
+        Assert.assertEquals(formDetails.getMessage(), workFlowName, "Workflow message was entered incorrectly");
+        Assert.assertEquals(formDetails.getDueDate(), due, "Workflow Due date was entered incorrectly");
+        Assert.assertEquals(formDetails.getTaskPriority(), Priority.MEDIUM, "Workflow Priority was entered incorrectly");
+        Assert.assertEquals(formDetails.getSiteName(), cloudSiteName, "Workflow Site was entered incorrectly");
+        Assert.assertEquals(formDetails.getAssignee(), cloudUser, "Workflow Assignee was entered incorrectly");
+        Assert.assertEquals(formDetails.getContentStrategy(), KeepContentStrategy.DELETECONTENT, "Workflow content strategy was entered incorrectly");
+
         // Fill the form details and start workflow
-        DocumentLibraryPage documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        myWorkFlowsPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
 
-        // Verify the document is part of the workflow
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Verifying the document is part of a workflow");
-
-        // Verify the document is synced
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced(), "Verifying the document is synced");
-
-        // Verify the Sync Status
-        assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName), "Verifying the Sync Status is \"Synced\"");
-
-        drone.refresh();
-        documentLibraryPage.render();
-
-        // Verify Sync location is displayed correctly.
-        SyncInfoPage syncInfoPage = ShareUserSitePage.getFileDirectoryInfo(drone, fileName).clickOnViewCloudSyncInfo().render();
-        assertEquals(syncInfoPage.getCloudSyncLocation(), DOMAIN_HYBRID + ">" + cloudSiteName + ">" + DEFAULT_FOLDER_NAME);
-        syncInfoPage.clickOnCloseButton();
-
-        MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
-        // Verify workflow details
+        // Verify the details of the newly created workflow.
         List<WorkFlowDetails> workFlowDetails = myWorkFlowsPage.getWorkFlowDetails(workFlowName);
 
-        assertEquals(workFlowDetails.size(), 1);
-        assertEquals(workFlowDetails.get(0).getWorkFlowName(), formDetails.getMessage(), "Verifying workflow name");
-        assertEquals(workFlowDetails.get(0).getDue(), getDueDate(formDetails.getDueDate()), "Verifying workflow due date");
-        assertEquals(getLocalDate(workFlowDetails.get(0).getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
-        assertEquals(workFlowDetails.get(0).getType(), WorkFlowType.CLOUD_TASK_OR_REVIEW, "Verifying Workflow type");
-        assertEquals(workFlowDetails.get(0).getDescription(), WorkFlowDescription.CREATE_A_TASK_OR_START_A_REVIEW, "Verifying Workflow Description");
+        assertEquals(workFlowDetails.size(), 1, "Some workflows were created");
+        assertEquals(workFlowDetails.get(0).getWorkFlowName(), formDetails.getMessage(), "Verifying workflow name after creation workflow");
+        assertEquals(workFlowDetails.get(0).getDue(), getDueDate(formDetails.getDueDate()), "Due date is not correct after creation workflow");
+        assertEquals(getLocalDate(workFlowDetails.get(0).getStartDate()), getToDaysLocalDate(), "Start date is not correct after creation workflow");
+        assertEquals(workFlowDetails.get(0).getType(), WorkFlowType.CLOUD_TASK_OR_REVIEW, "Type of task is not correct after creation workflow");
+        assertEquals(workFlowDetails.get(0).getDescription(), WorkFlowDescription.CREATE_A_TASK_OR_START_A_REVIEW,
+                "Description is not correct after creation workflow");
 
         // Select the workflow to view WorkFlow Details
         WorkFlowDetailsPage workFlowDetailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName).render();
 
-        // Verify WorkFlow Details page header
-        assertEquals(workFlowDetailsPage.getPageHeader(), getWorkFlowDetailsHeader(workFlowName));
+        // Verify WorkFlow Details page The following title is displayed:
+        // "Details: Simple Cloud Task test message (Start a task or review on Alfresco Cloud)"
+        assertEquals(workFlowDetailsPage.getPageHeader(), getWorkFlowDetailsHeader(workFlowName), "Page Title is not correct");
 
         // Verify WorkFlow Details General Info section
         WorkFlowDetailsGeneralInfo generalInfo = workFlowDetailsPage.getWorkFlowDetailsGeneralInfo();
 
-        assertEquals(generalInfo.getTitle(), WorkFlowTitle.CLOUD_TASK_OR_REVIEW);
-        assertEquals(generalInfo.getDescription(), WorkFlowDescription.CREATE_A_TASK_OR_START_A_REVIEW);
-        assertEquals(generalInfo.getStartedBy(), getUserFullName(user1));
-        assertEquals(getLocalDate(generalInfo.getDueDate()), getLocalDate(dueDate));
-        assertEquals(generalInfo.getCompleted(), "<in progress>");
-        assertEquals(getLocalDate(generalInfo.getStartDate()), getToDaysLocalDate());
-        assertEquals(generalInfo.getPriority(), formDetails.getTaskPriority());
-        assertEquals(generalInfo.getStatus(), WorkFlowStatus.WORKFLOW_IN_PROGRESS);
-        assertEquals(generalInfo.getMessage(), workFlowName);
+        assertEquals(generalInfo.getTitle(), WorkFlowTitle.CLOUD_TASK_OR_REVIEW, "Title is not correct on workflow details page");
+        assertEquals(generalInfo.getDescription(), WorkFlowDescription.CREATE_A_TASK_OR_START_A_REVIEW, "Description is not correct on workflow details page");
+        assertEquals(generalInfo.getStartedBy(), getUserFullName(user1), "Started by value is not correct on workflow details page");
+        assertEquals(getLocalDate(generalInfo.getDueDate()), getLocalDate(dueDate), "Due date is not correct on workflow details page");
+        assertEquals(generalInfo.getCompleted(), "<in progress>", "Completion status is not correct on workflow details page");
+        assertEquals(getLocalDate(generalInfo.getStartDate()), getToDaysLocalDate(), "Start date is not correct on workflow details page");
+        assertEquals(generalInfo.getPriority(), formDetails.getTaskPriority(), "Task Priority is not correct on workflow details page");
+        assertEquals(generalInfo.getStatus(), WorkFlowStatus.WORKFLOW_IN_PROGRESS, "Status is not correct on workflow details page");
+        assertEquals(generalInfo.getMessage(), workFlowName, "Workflow message is not correct on workflow details page");
 
         // Verify WorkFlow Details More Info section
         WorkFlowDetailsMoreInfo moreInfo = workFlowDetailsPage.getWorkFlowDetailsMoreInfo();
 
-        assertEquals(moreInfo.getType(), formDetails.getTaskType());
-        assertEquals(moreInfo.getDestination(), DOMAIN_HYBRID);
-        assertEquals(moreInfo.getAfterCompletion(), formDetails.getContentStrategy());
-        assertFalse(moreInfo.isLockOnPremise());
-        assertEquals(moreInfo.getAssignmentList().size(), 1);
-        assertEquals(moreInfo.getAssignmentList().get(0), getUserFullNameWithEmail(cloudUser, cloudUser));
+        assertEquals(moreInfo.getType(), formDetails.getTaskType(), "Task type is not correct for WorkFlow Details More Info section");
+        assertEquals(moreInfo.getDestination(), DOMAIN_HYBRID, "Destination is not correct for WorkFlow Details More Info section");
+        assertEquals(moreInfo.getAfterCompletion(), formDetails.getContentStrategy(), "Content strategy is not correct for WorkFlow Details More Info section");
+        assertFalse(moreInfo.isLockOnPremise(), "Incorrect value for locking on WorkFlow Details More Info section");
+        assertEquals(moreInfo.getAssignmentList().size(), 1, "Count of users is not correct for WorkFlow Details More Info section");
+        assertEquals(moreInfo.getAssignmentList().get(0), getUserFullNameWithEmail(cloudUser, cloudUser),
+                "Assignee user is not correct for WorkFlow Details More Info section");
 
         // Verify WorkFlow Details Item section
         List<WorkFlowDetailsItem> items = workFlowDetailsPage.getWorkFlowItems();
-        assertEquals(items.size(), 1);
-        assertEquals(items.get(0).getItemName(), fileName);
-        assertEquals(items.get(0).getDescription(), NONE);
-        assertEquals(getLocalDate(items.get(0).getDateModified()), getToDaysLocalDate());
+        assertEquals(items.size(), 1, "Count of added files is not correct.");
+        assertEquals(items.get(0).getItemName(), fileName, "File name is not correct");
+        assertEquals(items.get(0).getDescription(), NONE, "File description is not correct");
+        assertEquals(getLocalDate(items.get(0).getDateModified()), getToDaysLocalDate(), "File date is not correct");
 
         // Verify WorkFlow Details Current Tasks table displays "No Tasks"
-        assertTrue(workFlowDetailsPage.isNoTasksMessageDisplayed());
+        assertTrue(workFlowDetailsPage.isNoTasksMessageDisplayed(), "No Tasks message is not displayed for WorkFlow Details Current Tasks table");
 
         // Verify WorkFlow Details History List
         List<WorkFlowDetailsHistory> historyList = workFlowDetailsPage.getWorkFlowHistoryList();
 
-        assertEquals(historyList.size(), 1);
-        assertEquals(historyList.get(0).getType(), WorkFlowHistoryType.START_TASK_OR_REVIEW_ON_CLOUD);
-        assertEquals(historyList.get(0).getCompletedBy(), getUserFullName(user1));
-        assertEquals(getLocalDate(historyList.get(0).getCompletedDate()), getToDaysLocalDate());
-        assertEquals(historyList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE);
-        assertEquals(historyList.get(0).getComment(), "");
+        assertEquals(historyList.size(), 1, "Count of History rows is not equals 1");
+        assertEquals(historyList.get(0).getType(), WorkFlowHistoryType.START_TASK_OR_REVIEW_ON_CLOUD,
+                "Task type is not correct for WorkFlow Details History List");
+        assertEquals(historyList.get(0).getCompletedBy(), getUserFullName(user1), "User Name is not correct for WorkFlow Details History List");
+        assertEquals(getLocalDate(historyList.get(0).getCompletedDate()), getToDaysLocalDate(),
+                "Today local date is not correct for WorkFlow Details History List");
+        assertEquals(historyList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE, "Workflow History outcome is not correct");
+        assertEquals(historyList.get(0).getComment(), "", "Any comment was added.");
 
-
+        // Verify the chosen content item.
+        DocumentDetailsPage documentDetailsPage = (DocumentDetailsPage) items.get(0).getItemNameLink().click();
+        // Content item is part of workflow
+        assertTrue(documentDetailsPage.isPartOfWorkflow(), "Content is not part of workflows");
+        // The content item is synced to Cloud.
+        assertTrue(documentDetailsPage.isRequestSyncIconDisplayed(), "Content was not synced");
+        // Sync Location is displayed correctly.
+        SyncInfoPage syncInf2 = documentDetailsPage.getSyncInfoPage();
+        assertEquals(syncInf2.getCloudSyncLocation(), DOMAIN_HYBRID + ">" + cloudSiteName + ">" + DEFAULT_FOLDER_NAME, "Failed to displayed sync info");
 
         ShareUser.logout(drone);
 
@@ -264,19 +223,18 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         // Open Site document library and verify the file is a part of workflow
-        documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSiteName);
+        DocumentLibraryPage documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSiteName);
 
-        assertTrue(documentLibraryPage.isFileVisible(fileName), "Verifying the document is displayed");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Verifying the document is part of Workflow");
+        assertTrue(documentLibraryPage.isItemVisble(fileName), "Cloud: File was not synced.");
+        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Workflow was not created.");
 
         // Navigate to MyTasks page
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-
         // Verify Task Details are displayed correctly
+        assertTrue(myTasksPage.isTaskPresent(workFlowName), "Cloud: New task is not displayed");
         TaskDetails taskDetails = myTasksPage.getTaskDetails(workFlowName);
 
         assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
-
         assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Verifying workflow due date");
         assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
         assertEquals(taskDetails.getStatus(), TaskStatus.NOTYETSTARTED.getTaskName(), "Verifying status");
@@ -284,54 +242,55 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         assertEquals(taskDetails.getDescription(), "Task", "Verifying Workflow Description");
         assertEquals(taskDetails.getStartedBy(), cloudUser, "Verifying Started by user");
 
-        //Task History Verifications
+        // Task History Verifications
         TaskHistoryPage taskHistoryPage = ShareUserWorkFlow.navigateToTaskHistoryPage(hybridDrone, workFlowName);
 
         // Verify Task History Page Header
-        assertEquals(taskHistoryPage.getPageHeader(), getSimpleCloudTaskDetailsHeader(workFlowName));
+        assertEquals(taskHistoryPage.getPageHeader(), getSimpleCloudTaskDetailsHeader(workFlowName), "Cloud: Task details is not correct on Task History Page");
 
         // Verify Task History Page General Info Section
         generalInfo = taskHistoryPage.getWorkFlowDetailsGeneralInfo();
 
-        assertEquals(generalInfo.getTitle(), WorkFlowTitle.HYBRID_TASK);
-        assertEquals(generalInfo.getDescription(), WorkFlowDescription.ASSIGN_NEW_TASK_TO_SOMEONE_ON_THE_CLOUD);
-        assertEquals(generalInfo.getStartedBy(), getUserFullName(cloudUser));
-        assertEquals(getLocalDate(generalInfo.getDueDate()), getLocalDate(dueDate));
-        assertEquals(generalInfo.getCompleted(), "<in progress>");
-        assertEquals(getLocalDate(generalInfo.getStartDate()), getToDaysLocalDate());
-        assertEquals(generalInfo.getPriority(), formDetails.getTaskPriority());
-        assertEquals(generalInfo.getStatus(), WorkFlowStatus.TASK_IN_PROGRESS);
-        assertEquals(generalInfo.getMessage(), workFlowName);
+        assertEquals(generalInfo.getTitle(), WorkFlowTitle.HYBRID_TASK, "Cloud: Title is not correct on Task History Page");
+        assertEquals(generalInfo.getDescription(), WorkFlowDescription.ASSIGN_NEW_TASK_TO_SOMEONE_ON_THE_CLOUD,
+                "Cloud: Description is not correct on Task History Page");
+        assertEquals(generalInfo.getStartedBy(), getUserFullName(cloudUser), "Cloud: 'Started by' info is not correct on Task History Page");
+        assertEquals(getLocalDate(generalInfo.getDueDate()), getLocalDate(dueDate), "Cloud: Due date is not correct on Task History Page");
+        assertEquals(generalInfo.getCompleted(), "<in progress>", "Cloud: Status is not correct on Task History Page");
+        assertEquals(getLocalDate(generalInfo.getStartDate()), getToDaysLocalDate(), "Cloud: Local Date is not correct on Task History Page");
+        assertEquals(generalInfo.getPriority(), formDetails.getTaskPriority(), "Cloud: Priority is not correct on Task History Page");
+        assertEquals(generalInfo.getStatus(), WorkFlowStatus.TASK_IN_PROGRESS, "Cloud: Status is not correct on Task History Page");
+        assertEquals(generalInfo.getMessage(), workFlowName, "Cloud: Task message is not correct on Task History Page");
 
         // Verify Task History Page More Info Section
         moreInfo = taskHistoryPage.getWorkFlowDetailsMoreInfo();
-        assertEquals(moreInfo.getNotification(), SendEMailNotifications.YES);
+        assertEquals(moreInfo.getNotification(), SendEMailNotifications.YES, "Send email option is not correct");
 
         // Verify Task History Page Item Details
         items = taskHistoryPage.getWorkFlowItems();
-        assertEquals(items.size(), 1);
-        assertEquals(items.get(0).getItemName(), fileName);
-        assertEquals(items.get(0).getDescription(), NONE);
-        assertEquals(getLocalDate(items.get(0).getDateModified()), getToDaysLocalDate());
+        assertEquals(items.size(), 1, "Count of files is not equal 1");
+        assertEquals(items.get(0).getItemName(), fileName, "FileName is displayed incorrectly");
+        assertEquals(items.get(0).getDescription(), NONE, "Description is displayed incorrectly");
+        assertEquals(getLocalDate(items.get(0).getDateModified()), getToDaysLocalDate(), "Modified Date is displayed incorrectly");
 
         // Verify Task History Page Current Tasks List
         List<WorkFlowDetailsCurrentTask> currentTaskList = taskHistoryPage.getCurrentTasksList();
 
-        assertEquals(currentTaskList.size(), 1);
-        assertEquals(currentTaskList.get(0).getTaskType(), CurrentTaskType.TASK);
-        assertEquals(currentTaskList.get(0).getAssignedTo(), getUserFullName(cloudUser));
-        assertEquals(currentTaskList.get(0).getDueDate().toLocalDate(), dueDate.toLocalDate());
-        assertEquals(currentTaskList.get(0).getTaskStatus(), TaskStatus.NOTYETSTARTED);
+        assertEquals(currentTaskList.size(), 1, "Count of tasks is not equals 1");
+        assertEquals(currentTaskList.get(0).getTaskType(), CurrentTaskType.TASK, "Task is displayed incorrectly");
+        assertEquals(currentTaskList.get(0).getAssignedTo(), getUserFullName(cloudUser), "Assignee User is displayed incorrectly");
+        assertEquals(currentTaskList.get(0).getDueDate().toLocalDate(), dueDate.toLocalDate(), "Due Date is displayed incorrectly");
+        assertEquals(currentTaskList.get(0).getTaskStatus(), TaskStatus.NOTYETSTARTED, "Task status is displayed incorrectly");
 
         // Verify Task History Page History List
         historyList = taskHistoryPage.getWorkFlowHistoryList();
 
-        assertEquals(historyList.size(), 1);
-        assertEquals(historyList.get(0).getType(), WorkFlowHistoryType.TASK);
-        assertEquals(historyList.get(0).getCompletedBy(), getUserFullName(cloudUser));
-        assertEquals(getLocalDate(historyList.get(0).getCompletedDate()), getToDaysLocalDate());
-        assertEquals(historyList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE);
-        assertEquals(historyList.get(0).getComment(), "");
+        assertEquals(historyList.size(), 1, "Workflow History list is not equals 1");
+        assertEquals(historyList.get(0).getType(), WorkFlowHistoryType.TASK, "Workflow History list contains incorrect incorrect History Type");
+        assertEquals(historyList.get(0).getCompletedBy(), getUserFullName(cloudUser), "History List doesn't contain assignee user");
+        assertEquals(getLocalDate(historyList.get(0).getCompletedDate()), getToDaysLocalDate(), "Completed Date is displayed incorrectly");
+        assertEquals(historyList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE, "OutCome status is displayed incorrectly");
+        assertEquals(historyList.get(0).getComment(), "", "Any comment is displayed, but it was not added");
 
         // Navigate to Task Details Page
         TaskDetailsPage taskDetailsPage = ShareUserWorkFlow.navigateToTaskDetailsPage(hybridDrone, workFlowName);
@@ -342,25 +301,24 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         // Verify Task Info Task Details Page
         TaskInfo taskInfo = taskDetailsPage.getTaskDetailsInfo();
 
-        assertEquals(taskInfo.getMessage(), workFlowName);
-        assertEquals(taskInfo.getOwner(), getUserFullName(user1));
-        assertEquals(taskInfo.getPriority(), Priority.MEDIUM);
-        assertEquals(getLocalDate(taskInfo.getDueDate()), getLocalDate(dueDate));
-        // TODO - Due Date format is incorrect -ALF-20755
-        // assertEquals(taskInfo.getDueDateString(), dueDate.toString("E dd MMM yyy"));
-        assertFalse(StringUtils.isEmpty(taskInfo.getIdentifier()));
+        assertEquals(taskInfo.getMessage(), workFlowName, "Message is displayed incorrectly on Task Details Page");
+        assertEquals(taskInfo.getOwner(), getUserFullName(user1), "Owner is displayed incorrectly on Task Details Page");
+        assertEquals(taskInfo.getPriority(), Priority.MEDIUM, "Priority is displayed incorrectly on Task Details Page");
+        assertEquals(getLocalDate(taskInfo.getDueDate()), getLocalDate(dueDate), "Due Date is displayed incorrectly on Task Details Page");
+        assertEquals(taskInfo.getDueDateString(), dueDate.toString("dd MMM, yyyy"));
+        assertFalse(StringUtils.isEmpty(taskInfo.getIdentifier()), "Identified is empty on Task Details Page");
 
         // Verify 'Progress' section (Status: Not Yet Started)
-        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.NOTYETSTARTED);
+        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.NOTYETSTARTED, "Progress section is not correct on Task Details Page");
 
         // Verify Item Details
         List<TaskItem> taskItems = taskDetailsPage.getTaskItems();
-        assertEquals(taskItems.size(), 1);
-        assertEquals(taskItems.get(0).getItemName(), fileName);
-        assertEquals(taskItems.get(0).getDescription(), NONE);
-        assertEquals(getLocalDate(taskItems.get(0).getDateModified()), getToDaysLocalDate());
+        assertEquals(taskItems.size(), 1, "Count of items is not equal 1 on Task Details Page");
+        assertEquals(taskItems.get(0).getItemName(), fileName, "Incorrect file is displayed on Task Details Page");
+        assertEquals(taskItems.get(0).getDescription(), NONE, "Incorrect description is displayed on Task Details Page");
+        assertEquals(getLocalDate(taskItems.get(0).getDateModified()), getToDaysLocalDate(), "Modified date is incorrect on Task Details Page ");
 
-        assertEquals(taskDetailsPage.getComment(), NONE);
+        assertEquals(taskDetailsPage.getComment(), NONE, "Any comment has been added.");
 
         // Navigate to Edit Task Page
         EditTaskPage editTaskPage = taskDetailsPage.selectEditButton().render();
@@ -368,67 +326,68 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         // Edit Task Page - Verify Task Info section
         taskInfo = editTaskPage.getTaskDetailsInfo();
 
-        assertEquals(taskInfo.getMessage(), workFlowName);
-        assertEquals(taskInfo.getOwner(), getUserFullName(user1));
-        assertEquals(taskInfo.getPriority(), Priority.MEDIUM);
-        assertEquals(getLocalDate(taskInfo.getDueDate()), getLocalDate(dueDate));
-        assertFalse(StringUtils.isEmpty(taskInfo.getIdentifier()));
+        assertEquals(taskInfo.getMessage(), workFlowName, "Workflow name is displayed incorrectly on Edit Task Page");
+        assertEquals(taskInfo.getOwner(), getUserFullName(user1), "Owner is displayed incorrectly on Edit Task Page");
+        assertEquals(taskInfo.getPriority(), Priority.MEDIUM, "Priority is displayed incorrectly on Edit Task Page");
+        assertEquals(getLocalDate(taskInfo.getDueDate()), getLocalDate(dueDate), "Due date is not correct on Edit Task Page");
+        assertFalse(StringUtils.isEmpty(taskInfo.getIdentifier()), "Identifier is not correct on Edit Task Page");
 
         // Edit Task Page - Verify Task Item
         taskItems = taskDetailsPage.getTaskItems();
 
-        assertEquals(taskItems.size(), 1);
-        assertEquals(taskItems.get(0).getItemName(), fileName);
-        assertEquals(taskItems.get(0).getDescription(), NONE);
-        assertEquals(getLocalDate(taskItems.get(0).getDateModified()), getToDaysLocalDate());
+        assertEquals(taskItems.size(), 1, "Count of items is not equals 1 on Edit Task Page");
+        assertEquals(taskItems.get(0).getItemName(), fileName, "File name is displayed on Edit Task Page");
+        assertEquals(taskItems.get(0).getDescription(), NONE, "Incorrect description is displayed on Edit Task Page");
+        assertEquals(getLocalDate(taskItems.get(0).getDateModified()), getToDaysLocalDate(), "Modified date is not correct on Edit Task Page");
 
         // Verify Status Drop down options
         List<TaskStatus> statusOptions = editTaskPage.getStatusOptions();
 
-        assertEquals(statusOptions.size(), TaskStatus.values().length);
-        assertTrue(statusOptions.containsAll(getTaskStatusList()));
+        assertEquals(statusOptions.size(), TaskStatus.values().length, "Some Status options are not displayed");
+        assertTrue(statusOptions.containsAll(getTaskStatusList()), "Some Status options are not displayed");
 
-        assertFalse(editTaskPage.isReAssignButtonDisplayed(), "Verifying ReAssign button is not displayed (AONE-15676)");
+        assertTrue(editTaskPage.isButtonsDisplayed(EditTaskPage.Button.TASK_DONE), "Task Done button is not displayed on Edit Task Page");
+        assertTrue(editTaskPage.isButtonsDisplayed(EditTaskPage.Button.SAVE_AND_CLOSE), "Save and Close button is not displayed on Edit Task Page");
+        assertTrue(editTaskPage.isButtonsDisplayed(EditTaskPage.Button.CANCEL), "Cancel button is not displayed on Edit Task Page");
 
-        // Select Task Status as "In-Progress", enter a comment, select Save and verify the Task Status and comment are saved in Task Details Page
+        // Select Task Status as "In-Progress", enter a comment, select Save and verify
+        // the Task Status and comment are saved in Task Details Page
         taskDetailsPage = ShareUserWorkFlow.completeTask(hybridDrone, TaskStatus.INPROGRESS, cloudCommentInProgress, EditTaskAction.SAVE).render();
-        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.INPROGRESS);
-        assertEquals(taskDetailsPage.getComment(), cloudCommentInProgress);
+        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.INPROGRESS, "Task status has not been changed to In Progress");
+        assertEquals(taskDetailsPage.getComment(), cloudCommentInProgress, "Comment has not been added");
 
         // Go to Edit Task page, select Task Status as "On-Hold", change the comment and click on Cancel
         taskDetailsPage = ShareUserWorkFlow.completeTaskFromTaskDetailsPage(hybridDrone, TaskStatus.ONHOLD, cloudComment, EditTaskAction.CANCEL).render();
         // Verify the changes are not reflected in Task Details Page
-        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.INPROGRESS);
-        assertEquals(taskDetailsPage.getComment(), cloudCommentInProgress);
+        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.INPROGRESS, "Updates have not been canceled. New status has been applied");
+        assertEquals(taskDetailsPage.getComment(), cloudCommentInProgress, "Updates have not been canceled. New comment has been applied");
 
         // Complete the task and verify task is completed (with the comment)
         taskDetailsPage = ShareUserWorkFlow.completeTaskFromTaskDetailsPage(hybridDrone, TaskStatus.COMPLETED, cloudComment, EditTaskAction.TASK_DONE).render();
 
-        assertFalse(taskDetailsPage.isEditButtonPresent());
-        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.COMPLETED);
-        assertEquals(taskDetailsPage.getComment(), cloudComment);
+        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.COMPLETED, "Task status has not been changed to Completed");
+        assertEquals(taskDetailsPage.getComment(), cloudComment, "Comment has not been edited");
 
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
         // Verify task is not displayed in Active Tasks list
-        assertFalse(myTasksPage.isTaskPresent(workFlowName));
+        assertFalse(myTasksPage.isTaskPresent(workFlowName), "The task is still displayed for Active task, but task was completed");
 
         // Select Completed Tasks and verify Task is displayed and the task details are correct.
         myTasksPage = myTasksPage.selectCompletedTasks().render();
 
-        assertTrue(myTasksPage.isTaskPresent(workFlowName));
+        assertTrue(myTasksPage.isTaskPresent(workFlowName), "Completed task is not displayed for Completed filter");
 
         // Verify Task Details in MyTasks Page (Completed Tasks)
         taskDetails = myTasksPage.getTaskDetails(workFlowName);
-
-        assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
-        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Verifying workflow due date");
-        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
-        assertEquals(getLocalDate(taskDetails.getEndDate()), getToDaysLocalDate(), "Verify Workflow End date");
-        assertEquals(taskDetails.getStatus(), TaskStatus.COMPLETED.getTaskName(), "Verifying status");
-        assertEquals(taskDetails.getType(), TaskDetailsType.TASK, "Verifying Task type");
-        assertEquals(taskDetails.getDescription(), "Task", "Verifying Workflow Description");
-        assertEquals(taskDetails.getStartedBy(), user1, "Verifying Started by user");
+        assertEquals(taskDetails.getTaskName(), workFlowName, "Task name is not correct on Completed Task page");
+        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Due Date is not correct on Completed Task page");
+        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Start Date is not correct on Completed Task page");
+        assertEquals(getLocalDate(taskDetails.getEndDate()), getToDaysLocalDate(), "End Date is not correct on Completed Task page");
+        assertEquals(taskDetails.getStatus(), TaskStatus.COMPLETED.getTaskName(), "Status is not updated on Completed Task page");
+        assertEquals(taskDetails.getType(), TaskDetailsType.TASK, "Task type is not correct on Completed Task page");
+        assertEquals(taskDetails.getDescription(), "Task", "Description is not correct on Completed Task page");
+        assertEquals(taskDetails.getStartedBy(), user1, "Started by value is not correct on Completed Task page");
 
         // Navigate to Task History Page
         taskHistoryPage = ShareUserWorkFlow.navigateToTaskHistoryPage(hybridDrone, workFlowName);
@@ -436,233 +395,355 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         // Verify General Info section
         generalInfo = taskHistoryPage.getWorkFlowDetailsGeneralInfo();
 
-        assertEquals(generalInfo.getTitle(), WorkFlowTitle.HYBRID_TASK);
-        assertEquals(generalInfo.getDescription(), WorkFlowDescription.ASSIGN_NEW_TASK_TO_SOMEONE_ON_THE_CLOUD);
-        assertEquals(generalInfo.getStartedBy(), getUserFullName(user1));
-        assertEquals(getLocalDate(generalInfo.getDueDate()), getLocalDate(dueDate));
-        assertEquals(getLocalDate(generalInfo.getCompletedDate()), getToDaysLocalDate());
-        assertEquals(getLocalDate(generalInfo.getStartDate()), getToDaysLocalDate());
-        assertEquals(generalInfo.getPriority(), formDetails.getTaskPriority());
-        assertEquals(generalInfo.getStatus(), WorkFlowStatus.TASK_COMPLETE);
-        assertEquals(generalInfo.getMessage(), workFlowName);
+        assertEquals(generalInfo.getTitle(), WorkFlowTitle.HYBRID_TASK, "Title is not correct on Task History Page");
+        assertEquals(generalInfo.getDescription(), WorkFlowDescription.ASSIGN_NEW_TASK_TO_SOMEONE_ON_THE_CLOUD,
+                "Description is not correct on Task History Page");
+        assertEquals(generalInfo.getStartedBy(), getUserFullName(user1), "Started By value is not correct on Task History Page");
+        assertEquals(getLocalDate(generalInfo.getDueDate()), getLocalDate(dueDate), "Due date is not correct on Task History Page");
+        assertEquals(getLocalDate(generalInfo.getCompletedDate()), getToDaysLocalDate(), "Completed Date is not correct on Task History Page");
+        assertEquals(getLocalDate(generalInfo.getStartDate()), getToDaysLocalDate(), "Started Date is not correct on Task History Page");
+        assertEquals(generalInfo.getPriority(), formDetails.getTaskPriority(), "Task priority is not correct on Task History Page");
+        assertEquals(generalInfo.getStatus(), WorkFlowStatus.TASK_COMPLETE, "Status is not correct on Task History Page");
+        assertEquals(generalInfo.getMessage(), workFlowName, "Message is not correct on Task History Page");
 
         // Verify More Info section
         moreInfo = taskHistoryPage.getWorkFlowDetailsMoreInfo();
 
-        assertEquals(moreInfo.getNotification(), SendEMailNotifications.YES);
+        assertEquals(moreInfo.getNotification(), SendEMailNotifications.YES, "Email notification is not correct ");
 
         // Verify Item details
         items = taskHistoryPage.getWorkFlowItems();
-        assertEquals(items.size(), 1);
-        assertEquals(items.get(0).getItemName(), fileName);
-        assertEquals(items.get(0).getDescription(), NONE);
-        assertEquals(getLocalDate(items.get(0).getDateModified()), getToDaysLocalDate());
+        assertEquals(items.size(), 1, "Count of files is not equals 1 on History page");
+        assertEquals(items.get(0).getItemName(), fileName, "File name is displayed incorrectly on History page");
+        assertEquals(items.get(0).getDescription(), NONE, "Any File description is displayed on History page");
+        assertEquals(getLocalDate(items.get(0).getDateModified()), getToDaysLocalDate(), "Modified date is not displayed correctly on History page");
+        assertTrue(taskHistoryPage.isDeleteWorkFlowButtonDisplayed(), "Delete Workflow button is not displayed on History Page");
 
-        // Verify "Current Tasks" section (Displays "No Tasks")
-        assertTrue(taskHistoryPage.isNoTasksMessageDisplayed());
+        // 44. Verify "Current Tasks" section (Displays "No Tasks")
+        assertTrue(taskHistoryPage.isNoTasksMessageDisplayed(), "'No tasks' message is not displayed on History page for current task section");
 
         // Verify "History" section
         historyList = taskHistoryPage.getWorkFlowHistoryList();
 
-        assertEquals(historyList.size(), 2);
-        assertEquals(historyList.get(0).getType(), WorkFlowHistoryType.TASK);
-        assertEquals(historyList.get(0).getCompletedBy(), getUserFullName(cloudUser));
-        assertEquals(getLocalDate(historyList.get(0).getCompletedDate()), getToDaysLocalDate());
-        assertEquals(historyList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE);
-        assertEquals(historyList.get(0).getComment(), cloudComment);
+        assertEquals(historyList.size(), 2, "Some actions from history list are incorrect.");
+        assertEquals(historyList.get(0).getType(), WorkFlowHistoryType.TASK, "First Task Type is not correct for History List");
+        assertEquals(historyList.get(0).getCompletedBy(), getUserFullName(cloudUser), "'Completed by' value is not correct for first task on History List");
+        assertEquals(getLocalDate(historyList.get(0).getCompletedDate()), getToDaysLocalDate(),
+                "'Completed Date' value is not correct for first task on History List");
+        assertEquals(historyList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE, "'OutCome' value is not correct for first task on History List");
+        assertEquals(historyList.get(0).getComment(), cloudComment, "Comment is not correct for first task on History List");
 
-        assertEquals(historyList.get(1).getType(), WorkFlowHistoryType.TASK);
-        assertEquals(historyList.get(1).getCompletedBy(), getUserFullName(cloudUser));
-        assertEquals(getLocalDate(historyList.get(1).getCompletedDate()), getToDaysLocalDate());
-        assertEquals(historyList.get(1).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE);
-        assertEquals(historyList.get(1).getComment(), "");
+        assertEquals(historyList.get(1).getType(), WorkFlowHistoryType.TASK, "Second Task Type is not correct for History List");
+        assertEquals(historyList.get(1).getCompletedBy(), getUserFullName(cloudUser), "'Completed by' value is not correct for second task on History List");
+        assertEquals(getLocalDate(historyList.get(1).getCompletedDate()), getToDaysLocalDate(),
+                "'Completed Date' value is not correct for second task on History List");
+        assertEquals(historyList.get(1).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE, "'OutCome' value is not correct for second task on History List");
+        assertEquals(historyList.get(1).getComment(), "", "Comment is not correct for first task on History List");
 
         ShareUser.logout(hybridDrone);
 
         // Login as OP user
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
-        // Open My Tasks page
+        // 46 Open My Tasks page
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
 
         // Verify a new task is displayed for OP user
-        assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName));
+        assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName), "Completed task (on Cloud) is not displayed for OP.");
 
         // Verify the task details
         taskDetails = myTasksPage.getTaskDetails(workFlowName);
 
-        assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
-        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Verifying workflow due date");
-        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
-        assertNull(taskDetails.getEndDate(), "Verify Workflow End date is NULL as the task is still active");
-        assertEquals(taskDetails.getStatus(), TaskStatus.NOTYETSTARTED.getTaskName(), "Verifying status");
-        assertEquals(taskDetails.getType(), TaskDetailsType.VERIFY_TASK_WAS_COMPLETED_ON_THE_CLOUD, "Verifying Task type");
-        assertEquals(taskDetails.getDescription(), workFlowName, "Verifying Workflow Description");
-        assertEquals(taskDetails.getStartedBy(), user1, "Verifying Started by user");
+        assertEquals(taskDetails.getTaskName(), workFlowName, "OP: Task name is not displayed on My Task page (task was completed on Cloud)");
+        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due),
+                "OP: Due date  is not correct on My Task page (task was completed on Cloud)");
+        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(),
+                "OP: Start date is not correct on My Task page (task was completed on Cloud)");
+        assertNull(taskDetails.getEndDate(), "OP: End date is not correct on My Task page (task was completed on Cloud)");
+        assertEquals(taskDetails.getStatus(), TaskStatus.NOTYETSTARTED.getTaskName(),
+                "OP: Task Status is not correct on My Task page (task was completed on Cloud)");
+        assertEquals(taskDetails.getType(), TaskDetailsType.VERIFY_TASK_WAS_COMPLETED_ON_THE_CLOUD,
+                "OP: Task type is not correct on My Task page (task was completed on Cloud)");
+        assertEquals(taskDetails.getDescription(), workFlowName,
+                "OP: Description is not correct on My Task page (task was completed on Cloud)Verifying Workflow Description");
+        assertEquals(taskDetails.getStartedBy(), user1, "OP: 'Started by' value is not correct on My Task page (task was completed on Cloud)");
 
-        // Navigate to Workflows I've started
+        // 47 Navigate to Workflows I've started
         myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
         workFlowDetailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName).render();
 
         currentTaskList = workFlowDetailsPage.getCurrentTasksList();
-        assertEquals(currentTaskList.size(), 1);
-        assertEquals(currentTaskList.get(0).getTaskType(), CurrentTaskType.VERIFY_TASK_WAS_COMPLETED_ON_THE_CLOUD);
-        assertEquals(currentTaskList.get(0).getAssignedTo(), getUserFullName(cloudUser));
-        assertEquals(currentTaskList.get(0).getDueDate().toLocalDate(), dueDate.toLocalDate());
-        assertEquals(currentTaskList.get(0).getTaskStatus(), TaskStatus.NOTYETSTARTED);
+        assertEquals(currentTaskList.size(), 1, "OP: Current task List: Count of tasks is not equals 1. when task is completed on Cloud");
+        assertEquals(currentTaskList.get(0).getTaskType(), CurrentTaskType.VERIFY_TASK_WAS_COMPLETED_ON_THE_CLOUD,
+                "OP: Current task List: Task Type is not correct");
+        assertEquals(currentTaskList.get(0).getAssignedTo(), getUserFullName(cloudUser), "OP: Current task List: 'Assigned to' value is not correct");
+        assertEquals(currentTaskList.get(0).getDueDate().toLocalDate(), dueDate.toLocalDate(), "OP: Current task List: 'Due Date' value is not correct");
+        assertEquals(currentTaskList.get(0).getTaskStatus(), TaskStatus.NOTYETSTARTED, "OP: Current task List: Task Status is not correct");
 
         // Navigate to Task Details
         taskDetailsPage = ShareUserWorkFlow.navigateToTaskDetailsPage(drone, workFlowName);
 
         taskInfo = taskDetailsPage.getTaskDetailsInfo();
 
-        assertEquals(taskInfo.getMessage(), workFlowName);
-        assertEquals(taskInfo.getOwner(), getUserFullName(user1));
-        assertEquals(taskInfo.getPriority(), formDetails.getTaskPriority());
-        assertEquals(getLocalDate(taskInfo.getDueDate()), getLocalDate(dueDate));
-        // TODO - KNOWN ISSUE: ALF-20755
-        // assertTrue(taskInfo.getDueDateString().equals(dueDate.toString("E dd MMM yyy")));
-        assertFalse(StringUtils.isEmpty(taskInfo.getIdentifier()));
+        assertEquals(taskInfo.getMessage(), workFlowName, "OP: Task Details: task name is not correct");
+        assertEquals(taskInfo.getOwner(), getUserFullName(user1), "OP: Task Details: Owner is not correct");
+        assertEquals(taskInfo.getPriority(), formDetails.getTaskPriority(), "OP: Task Details: Priority is not correct");
+        assertEquals(getLocalDate(taskInfo.getDueDate()), getLocalDate(dueDate), "OP: Task Details: 'Due Date' value is not correct");
 
-        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.NOTYETSTARTED);
+        assertTrue(taskInfo.getDueDateString().equals(dueDate.toString("dd MMM, yyyy")), "OP: Format for due Date is not correct.on Task Details Page");
+        assertFalse(StringUtils.isEmpty(taskInfo.getIdentifier()), "OP: Task Details: Identifier value is empty");
+
+        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.NOTYETSTARTED, "OP: Task Details: Task status is not correct.");
 
         taskItems = taskDetailsPage.getTaskItems();
-        assertEquals(taskItems.size(), 1);
-        assertEquals(taskItems.get(0).getItemName(), fileName);
-        assertEquals(taskItems.get(0).getDescription(), NONE);
-        assertEquals(getLocalDate(taskItems.get(0).getDateModified()), getToDaysLocalDate());
+        assertEquals(taskItems.size(), 1, "OP: Task Details: Count of files is not 1");
+        assertEquals(taskItems.get(0).getItemName(), fileName, "OP: Task Details: File name is displayed incorrectly");
+        assertEquals(taskItems.get(0).getDescription(), NONE, "OP: Task Details: Some description has been applied");
+        assertEquals(getLocalDate(taskItems.get(0).getDateModified()), getToDaysLocalDate(), "OP: Task Details: Modified date is not correct.");
 
-        assertEquals(taskDetailsPage.getComment(), cloudComment);
+        assertEquals(taskDetailsPage.getComment(), cloudComment, "OP: Task Details: Comment is not displayed correctly.");
 
         // Edit task and complete the task
         editTaskPage = taskDetailsPage.selectEditButton().render();
 
         taskInfo = editTaskPage.getTaskDetailsInfo();
 
-        assertEquals(taskInfo.getMessage(), workFlowName);
-        assertEquals(taskInfo.getOwner(), getUserFullName(user1));
-        assertEquals(taskInfo.getPriority(), Priority.MEDIUM);
-        assertEquals(getLocalDate(taskInfo.getDueDate()), getLocalDate(dueDate));
-        // TODO : KNOWN ISSUE: ALF-20756
-        // assertTrue(taskInfo.getDueDateString().equals(dueDate.toString("E dd MMM yyy")));
-        assertFalse(StringUtils.isEmpty(taskInfo.getIdentifier()));
+        assertEquals(taskInfo.getMessage(), workFlowName, "OP: Edit Task: Task name is not correct");
+        assertEquals(taskInfo.getOwner(), getUserFullName(user1), "OP: Edit Task: Owner is not correct");
+        assertEquals(taskInfo.getPriority(), Priority.MEDIUM, "OP: Edit Task: Priority is not correct");
+        assertEquals(getLocalDate(taskInfo.getDueDate()), getLocalDate(dueDate), "OP: Edit Task: Due Date is not correct");
+        assertTrue(taskInfo.getDueDateString().equals(dueDate.toString("dd MMM, yyyy")), "OP: Edit Task: Format for 'Due date' is not correct");
+        assertFalse(StringUtils.isEmpty(taskInfo.getIdentifier()), "OP: Edit Task: Identifier is not displayed");
 
         taskItems = taskDetailsPage.getTaskItems();
-        assertEquals(taskItems.size(), 1);
-        assertEquals(taskItems.get(0).getItemName(), fileName);
-        assertEquals(taskItems.get(0).getDescription(), NONE);
-        assertEquals(getLocalDate(taskItems.get(0).getDateModified()), getToDaysLocalDate());
+        assertEquals(taskItems.size(), 1, "OP: Edit Task: Count of files is not equals 1");
+        assertEquals(taskItems.get(0).getItemName(), fileName, "OP: Edit Task: FileName is not correct");
+        assertEquals(taskItems.get(0).getDescription(), NONE, "OP: Edit Task: Some description  has been applied");
+        assertEquals(getLocalDate(taskItems.get(0).getDateModified()), getToDaysLocalDate(), "OP: Edit Task: Modified date is not correct");
+        assertTrue(editTaskPage.isButtonsDisplayed(EditTaskPage.Button.TASK_DONE), "OP: Edit Task: Task Done button is not displayed");
+        assertTrue(editTaskPage.isButtonsDisplayed(EditTaskPage.Button.CANCEL), "OP: Edit Task: Cancel button is not displayed");
+        assertTrue(editTaskPage.isButtonsDisplayed(EditTaskPage.Button.SAVE_AND_CLOSE), "OP: Edit Task: Save and Close button is not displayed");
 
         // Verify Status Drop down options
         statusOptions = editTaskPage.getStatusOptions();
 
-        assertEquals(statusOptions.size(), TaskStatus.values().length);
-        assertTrue(statusOptions.containsAll(getTaskStatusList()));
+        assertEquals(statusOptions.size(), TaskStatus.values().length, "OP: Edit Task: Some Status options are not displayed");
+        assertTrue(statusOptions.containsAll(getTaskStatusList()), "OP: Edit Task: Some Status options are not displayed");
 
-        assertFalse(editTaskPage.isReAssignButtonDisplayed(), "Verifying ReAssign button is not displayed (AONE-15675)");
+        assertFalse(editTaskPage.isReAssignButtonDisplayed(), "Verifying ReAssign button is not displayed");
 
+        // 57-58 Specify any value in the Status drop-down list, e.g. 'On Hold'.
         taskDetailsPage = ShareUserWorkFlow.completeTask(drone, TaskStatus.ONHOLD, EditTaskAction.CANCEL).render();
 
-        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.NOTYETSTARTED);
+        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.NOTYETSTARTED, "OP: Edit Task: Task Status has been changed but cancel button is used");
 
+        // 59 Select Status as "In Progress" and click on Save
         taskDetailsPage = ShareUserWorkFlow.completeTaskFromTaskDetailsPage(drone, TaskStatus.INPROGRESS, EditTaskAction.SAVE);
-        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.INPROGRESS);
+        assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.INPROGRESS, "OP: Edit Task: Task Status has not been changed when save button is used");
 
+        // 61 Specify any value in the Status drop-down list, e.g. 'Completed' and click on Task Done button
         ShareUserWorkFlow.completeTaskFromTaskDetailsPage(drone, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
 
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
 
         // Verify the task is disappeared from Active Tasks list
-        assertFalse(myTasksPage.isTaskPresent(workFlowName));
+        assertFalse(myTasksPage.isTaskPresent(workFlowName), "OP: My Task Page: task is displayed but the task has been completed.");
 
         // Select Completed tasks and verify the task is displayed and the details are accurate
         myTasksPage = myTasksPage.selectCompletedTasks().render();
 
-        assertTrue(myTasksPage.isTaskPresent(workFlowName));
+        assertTrue(myTasksPage.isTaskPresent(workFlowName), "OP: Completed tasks: task is not displayed for Completed Filter.");
 
         taskDetails = myTasksPage.getTaskDetails(workFlowName);
 
-        assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
-        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Verifying workflow due date");
-        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
-        assertEquals(getLocalDate(taskDetails.getEndDate()), getToDaysLocalDate(), "Verify Workflow End date");
-        assertEquals(taskDetails.getStatus(), TaskStatus.COMPLETED.getTaskName(), "Verifying status");
-        assertEquals(taskDetails.getType(), TaskDetailsType.VERIFY_TASK_WAS_COMPLETED_ON_THE_CLOUD, "Verifying Task type");
-        assertEquals(taskDetails.getDescription(), workFlowName, "Verifying Workflow Description");
-        assertEquals(taskDetails.getStartedBy(), user1, "Verifying Started by user");
+        assertEquals(taskDetails.getTaskName(), workFlowName, "OP: Completed tasks: task name is not displayed");
+        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "OP: Completed tasks: due date is not correct");
+        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "OP: Completed tasks: Start date is not correct");
+        assertEquals(getLocalDate(taskDetails.getEndDate()), getToDaysLocalDate(), "OP: Completed tasks: End date is not correct");
+        assertEquals(taskDetails.getStatus(), TaskStatus.COMPLETED.getTaskName(), "OP: Completed tasks: Task Status is not correct");
+        assertEquals(taskDetails.getType(), TaskDetailsType.VERIFY_TASK_WAS_COMPLETED_ON_THE_CLOUD, "OP: Completed tasks: Task Type is not correct");
+        assertEquals(taskDetails.getDescription(), workFlowName, "OP: Completed tasks: Task Description");
+        assertEquals(taskDetails.getStartedBy(), user1, "OP: Completed tasks: 'Started by' value is not correct");
 
-        // Navigate to Workflows I've started
+        // 63 Navigate to Workflows I've started
         myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
 
         // Verify the workflow is not displayed anymore in Active WorkFlows
-        assertFalse(myWorkFlowsPage.isWorkFlowPresent(workFlowName));
+        assertFalse(myWorkFlowsPage.isWorkFlowPresent(workFlowName), "OP: WorkFlow I've started: workflow is displayed but it was completed");
 
         // Select Completed workflows and verify workflow is displayed
         myWorkFlowsPage = myWorkFlowsPage.selectCompletedWorkFlows().render();
 
-        assertEquals(myWorkFlowsPage.getSubTitle(), "Completed Workflows");
-        assertTrue(myWorkFlowsPage.isWorkFlowPresent(workFlowName));
+        assertEquals(myWorkFlowsPage.getSubTitle(), "Completed Workflows", "Completed Workflow page is not opened");
+        assertTrue(myWorkFlowsPage.isWorkFlowPresent(workFlowName), "OP: WorkFlow I've started: Completed Filter: Workflow name is not displayed");
 
         // Verify the completed workflow details are displayed correctly.
         workFlowDetails = myWorkFlowsPage.getWorkFlowDetails(workFlowName);
 
         assertEquals(workFlowDetails.size(), 1);
-        assertEquals(workFlowDetails.get(0).getWorkFlowName(), workFlowName, "Verifying workflow name");
-        assertEquals(workFlowDetails.get(0).getDue(), dueDate, "Verifying workflow due date");
-        assertEquals(getLocalDate(workFlowDetails.get(0).getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
-        assertEquals(getLocalDate(workFlowDetails.get(0).getEndDate()), getToDaysLocalDate(), "Verify Workflow End date");
-        assertEquals(workFlowDetails.get(0).getType(), WorkFlowType.CLOUD_TASK_OR_REVIEW, "Verifying Workflow type");
-        assertEquals(workFlowDetails.get(0).getDescription(), WorkFlowDescription.CREATE_A_TASK_OR_START_A_REVIEW, "Verifying Workflow Description");
+        assertEquals(workFlowDetails.get(0).getWorkFlowName(), workFlowName, "OP: WorkFlow I've started: Completed Filter: Workflow name is not displayed");
+        assertEquals(workFlowDetails.get(0).getDue(), dueDate, "OP: WorkFlow I've started: Completed Filter: Due Date is not correct");
+        assertEquals(getLocalDate(workFlowDetails.get(0).getStartDate()), getToDaysLocalDate(),
+                "OP: WorkFlow I've started: Completed Filter: Start Date is not correct");
+        assertEquals(getLocalDate(workFlowDetails.get(0).getEndDate()), getToDaysLocalDate(),
+                "OP: WorkFlow I've started: Completed Filter: End Date is not correct");
+        assertEquals(workFlowDetails.get(0).getType(), WorkFlowType.CLOUD_TASK_OR_REVIEW,
+                "OP: WorkFlow I've started: Completed Filter: Workflow Type is not correct");
+        assertEquals(workFlowDetails.get(0).getDescription(), WorkFlowDescription.CREATE_A_TASK_OR_START_A_REVIEW,
+                "OP: WorkFlow I've started: Completed Filter: Workflow Description is not correct");
 
         workFlowDetailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName).render();
 
         generalInfo = workFlowDetailsPage.getWorkFlowDetailsGeneralInfo();
 
-        assertEquals(getLocalDate(generalInfo.getCompletedDate()), getToDaysLocalDate());
-        assertEquals(generalInfo.getStatus(), WorkFlowStatus.WORKFLOW_COMPLETE);
+        assertEquals(getLocalDate(generalInfo.getCompletedDate()), getToDaysLocalDate(), "OP: Workflow Details Page: Completed date is not correct");
+        assertEquals(generalInfo.getStatus(), WorkFlowStatus.WORKFLOW_COMPLETE, "OP: Workflow Details Page: Status is not correct");
 
-        assertTrue(workFlowDetailsPage.isNoTasksMessageDisplayed());
+        assertTrue(workFlowDetailsPage.isNoTasksMessageDisplayed(), "OP: Workflow Details Page: some tasks for the workflow are displayed.");
 
+        // 66 Verify 'History' section
         historyList = workFlowDetailsPage.getWorkFlowHistoryList();
 
-        assertEquals(historyList.size(), 2);
-        assertEquals(historyList.get(0).getType(), WorkFlowHistoryType.VERIFY_TASK_COMPLETED_ON_CLOUD);
-        assertEquals(historyList.get(0).getCompletedBy(), getUserFullName(user1));
-        assertEquals(getLocalDate(historyList.get(0).getCompletedDate()), getToDaysLocalDate());
-        assertEquals(historyList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE);
-        assertEquals(historyList.get(0).getComment(), "");
+        assertEquals(historyList.size(), 2, "OP: Workflow Details Page: History Section: count of tasks is not correct");
+        assertEquals(historyList.get(0).getType(), WorkFlowHistoryType.VERIFY_TASK_COMPLETED_ON_CLOUD,
+                "OP: Workflow Details Page: History Section: Type of first task is not correct");
+        assertEquals(historyList.get(0).getCompletedBy(), getUserFullName(user1),
+                "OP: Workflow Details Page: History Section: 'Completed bBlue for first task is not correct");
+        assertEquals(historyList.get(0).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE,
+                "OP: Workflow Details Page: History Section: 'OutCome' value for first task is not correct");
+        assertEquals(historyList.get(0).getComment(), "", "OP: Workflow Details Page: History Section: comment has been added to first task");
 
-        assertEquals(historyList.get(1).getType(), WorkFlowHistoryType.START_TASK_OR_REVIEW_ON_CLOUD);
-        assertEquals(historyList.get(1).getCompletedBy(), getUserFullName(cloudUser));
-        assertEquals(getLocalDate(historyList.get(1).getCompletedDate()), getToDaysLocalDate());
-        assertEquals(historyList.get(1).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE);
-        assertEquals(historyList.get(1).getComment(), "");
+        assertEquals(historyList.get(1).getType(), WorkFlowHistoryType.START_TASK_OR_REVIEW_ON_CLOUD,
+                "OP: Workflow Details Page: History Section: Type of second task is not correct");
+        assertEquals(historyList.get(1).getCompletedBy(), getUserFullName(cloudUser),
+                "OP: Workflow Details Page: History Section: 'Completed By' value for second task is not correct");
+        assertEquals(getLocalDate(historyList.get(1).getCompletedDate()), getToDaysLocalDate(),
+                "OP: Workflow Details Page: History Section: 'Completed Date' value for second task is not correct");
+        assertEquals(historyList.get(1).getOutcome(), WorkFlowHistoryOutCome.TASK_DONE,
+                "OP: Workflow Details Page: History Section: 'OutCome' value for second task is not correct");
+        assertEquals(historyList.get(1).getComment(), "", "OP: Workflow Details Page: History Section: comment has been added to second task");
 
         ShareUser.logout(drone);
     }
 
-    /**
-     * AONE-15735:Create Cloud Review Task AONE-15736:Approve Cloud Review Task
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 3 Cloud Users (cloudUser, Reviewer1, Reviewer2)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
-     */
-    @Test(groups="DataPrepHybrid")
-    public void dataPrep_AONE_15735() throws Exception
+    @Test(groups = "Hybrid")
+    public void AONE_15734() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "-op", DOMAIN_HYBRID);
-        String[] userInfo1 = new String[] { user1 };
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String opUser = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
+        String[] userInfo1 = new String[] { opUser };
 
-        String cloudUser = getUserNameForDomain(testName + "-cl", DOMAIN_HYBRID);
+        String cloudUser = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
-        String reviewer1 = getUserNameForDomain(testName + "-1", DOMAIN_HYBRID).replace("user", "reviewer");
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSiteName = getSiteName(testName) + uniqueData + "-CL";
+        String fileName = getFileName(testName) + uniqueData + ".txt";
+        String workFlowName = uniqueData + "Workflow";
+        String comment = uniqueData + "Comment";
+        String[] fileInfo = { fileName, DOCLIB };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login as CloudUser1 and create a site
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to OP as User1, Create site and upload file
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName);
+        // Upload a document
+        ShareUser.uploadFileInFolder(drone, fileInfo).render();
+
+        // Start Simple Cloud Task Workflow
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName);
+        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+        formDetails.setMessage(workFlowName);
+        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
+        formDetails.setTaskPriority(Priority.MEDIUM);
+        formDetails.setSiteName(cloudSiteName);
+        formDetails.setAssignee(cloudUser);
+        formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
+        formDetails.setLockOnPremise(false);
+        // Create Workflow
+        cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        ShareUser.logout(drone);
+
+        // Login as CloudUser User
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+        // 1. In Cloud open the Simple Cloud Task, which was created in the pre-conditions.
+        findTasks(hybridDrone, workFlowName);
+        TaskDetailsPage taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
+        EditTaskPage editTaskPage = taskDetailsPage.selectEditButton().render();
+        // 2.Add any comment.
+        editTaskPage.enterComment(comment);
+        editTaskPage.selectStatusDropDown(TaskStatus.COMPLETED);
+        // 3.Click Task Done button.
+        editTaskPage.selectTaskDoneButton().render();
+        // Verifying the workflow disappears from the user's Tasks list.
+        myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+        assertFalse(myTasksPage.isTaskPresent(workFlowName), "Completed task is displayed for Active filter");
+        ShareUser.logout(hybridDrone);
+
+        // 4. On-premise verify the Tasks list.
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
+
+        // Verify a new task is displayed for OP user
+        assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName), "Completed task (on Cloud) is not displayed for OP.");
+
+        // Verify the task details
+        TaskDetails taskDetails = myTasksPage.getTaskDetails(workFlowName);
+
+        assertEquals(taskDetails.getTaskName(), workFlowName, "OP: Task name is not displayed on My Task page (task was completed on Cloud)");
+        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(),
+                "OP: Start date is not correct on My Task page (task was completed on Cloud)");
+        assertNull(taskDetails.getEndDate(), "OP: End date is not correct on My Task page (task was completed on Cloud)");
+        assertEquals(taskDetails.getStatus(), TaskStatus.NOTYETSTARTED.getTaskName(),
+                "OP: Task Status is not correct on My Task page (task was completed on Cloud)");
+        assertEquals(taskDetails.getType(), TaskDetailsType.VERIFY_TASK_WAS_COMPLETED_ON_THE_CLOUD,
+                "OP: Task type is not correct on My Task page (task was completed on Cloud)");
+        assertEquals(taskDetails.getDescription(), workFlowName,
+                "OP: Description is not correct on My Task page (task was completed on Cloud)Verifying Workflow Description");
+        assertEquals(taskDetails.getStartedBy(), opUser, "OP: 'Started by' value is not correct on My Task page (task was completed on Cloud)");
+
+        findTasks(drone, workFlowName);
+        taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
+        editTaskPage = taskDetailsPage.selectEditButton().render();
+        editTaskPage.selectTaskDoneButton().render();
+        myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
+        assertFalse(myTasksPage.isTaskPresent(workFlowName), "Completed Task is still displayed.");
+        ShareUser.logout(drone);
+    }
+
+    /**
+     * AONE-15735:Create Cloud Review
+     */
+    @Test(groups = "Hybrid")
+    public void AONE_15735() throws Exception
+    {
+        String testName = getTestName();
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String user1 = getUserNameForDomain(testName + uniqueData + "-op", DOMAIN_HYBRID);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + uniqueData + "-cl", DOMAIN_HYBRID);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String reviewer1 = getUserNameForDomain(testName + uniqueData + "-1", DOMAIN_HYBRID).replace("user", "reviewer");
         String[] reviewerInfo1 = new String[] { reviewer1 };
 
-        String reviewer2 = getUserNameForDomain(testName + "-2", DOMAIN_HYBRID).replace("user", "reviewer");
+        String reviewer2 = getUserNameForDomain(testName + uniqueData + "-2", DOMAIN_HYBRID).replace("user", "reviewer");
         String[] reviewerInfo2 = new String[] { reviewer2 };
 
         // Create User1 (On-premise)
@@ -678,54 +759,14 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
-    }
 
-    /**
-     * AONE-15735:Create Cloud Review Task AONE-15736:Approve Cloud Review Task
-     * <ul>
-     * <li>1) Login as Cloud User, Create a site and Logout</li>
-     * <li>2) Invite Reviewer1 and Reviewer2 to the site as collaborators</li>
-     * <li>3) Login as User1 (OP), Create a site and Upload a document</li>
-     * <li>4) Navigate to WorkFlows I've Started page and select StartWorkflow button</li>
-     * <li>5) Select "Cloud Task or Review" from select a workflow dropdown</li>
-     * <li>6) Select "Cloud Review Task" and fill in the form with Message, Due Date, Task Priority, approval % (50) etc.</li>
-     * <li>7) Select Cloud Destination, Select Reviewers, select content and select "Start Workflow" button</li>
-     * <li>8) Verify a task is displayed in Active Workflows list</li>
-     * <li>9) Load Site Document library and verify Document is part of workflow</li>
-     * <li>10) Verify Document is cloud synced</li>
-     * <li>11) Login to Cloud as Reviewer1, open site document library and verify the synced document is displayed</li>
-     * <li>12) Navigate to MyTasks page and verify a task is displayed in Active Tasks list</li>
-     * <li>13) Verify the task details are accurate</li>
-     * <li>14) Login to Cloud as Reviewer2, open site document library and verify the synced document is displayed</li>
-     * <li>15) Navigate to MyTasks page and verify a task is displayed in Active Tasks list</li>
-     * <li>16) Verify the task details are accurate</li>
-     * <li>17) Edit task and mark it as Approved</li>
-     * <li>18) Verify the task is disappeared from Active Tasks list</li>
-     * <li>19) Select Completed and verify the task is displayed and the task details re correct</li>
-     * <li>20) Login as Reviewer1, verify task is disappeared from the Active tasks list</li>
-     * <li>21) Login as OP user and verify there is a task displayed under Active task with the workflow name</li>
-     * <li>22) Verify the task details are correct</li>
-     * <li>23) Edit the task and mark it as completed</li>
-     * <li>24) Verify the task is disappeared from Active Tasks list</li>
-     * <li>25) Select Completed and Verify the task is displayed and the task details are correct</li>
-     * <li>26) Navigate to Workflows I've Started page and verify the workflow doesn't exists in Active WorkFlows</li>
-     * <li>27) Select Completed and verify the workflow is displayed and the details are correct</li>
-     * </ul>
-     */
-    @Test (groups="Hybrid", enabled = true)
-    public void AONE_15735() throws Exception
-    {
-        String testName = getTestName();
-        String opUser = getUserNameForDomain(testName + "-op", DOMAIN_HYBRID);
-        String cloudUser = getUserNameForDomain(testName + "-cl", DOMAIN_HYBRID);
-        String reviewer1 = getUserNameForDomain(testName + "-1", DOMAIN_HYBRID).replace("user", "reviewer");
-        String reviewer2 = getUserNameForDomain(testName + "-2", DOMAIN_HYBRID).replace("user", "reviewer");
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
-        String fileName = getFileName(testName) + ".txt";
+        String opUser = getUserNameForDomain(testName + uniqueData + "-op", DOMAIN_HYBRID);
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSite = getSiteName(testName) + uniqueData + "-CL";
+        String fileName = getFileName(testName) + uniqueData + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
 
-        String workFlowName = testName + System.currentTimeMillis() + "-WorkFlow";
+        String workFlowName = testName + uniqueData + "-WorkFlow";
         String due = getDueDateString();
         DateTime dueDate = getDueDate(due);
         int requiredApprovalPercentage = 50;
@@ -949,28 +990,21 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    /**
-     * AONE-15737: Reject Cloud Review Task
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 2 Cloud Users (cloudUser, Reviewer1)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
-     */
-    @Test(groups="DataPrepHybrid")
-    public void dataPrep_AONE_15737() throws Exception
+    @Test(groups = "Hybrid")
+    public void AONE_15736() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String user1 = getUserNameForDomain(testName + uniqueData + "-op", DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { user1 };
 
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser = getUserNameForDomain(testName + uniqueData + "-cl", DOMAIN_HYBRID);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
-        String reviewer1 = getUserNameForDomain(testName, DOMAIN_HYBRID).replace("user", "reviewer-1");
+        String reviewer1 = getUserNameForDomain(testName + uniqueData + "-1", DOMAIN_HYBRID).replace("user", "reviewer");
         String[] reviewerInfo1 = new String[] { reviewer1 };
 
-        String reviewer2 = getUserNameForDomain(testName, DOMAIN_HYBRID).replace("user", "reviewer-2");
+        String reviewer2 = getUserNameForDomain(testName + uniqueData + "-2", DOMAIN_HYBRID).replace("user", "reviewer");
         String[] reviewerInfo2 = new String[] { reviewer2 };
 
         // Create User1 (On-premise)
@@ -986,54 +1020,206 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
+
+        String opUser = getUserNameForDomain(testName + uniqueData + "-op", DOMAIN_HYBRID);
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSite = getSiteName(testName) + uniqueData + "-CL";
+        String fileName = getFileName(testName) + uniqueData + ".txt";
+        String comment = uniqueData + "comment";
+        String[] fileInfo = { fileName, DOCLIB };
+
+        String workFlowName = testName + uniqueData + "-WorkFlow";
+        String due = getDueDateString();
+        DateTime dueDate = getDueDate(due);
+        int requiredApprovalPercentage = 100;
+
+        // Login as User1 (Cloud)
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
+
+        ShareUser.logout(hybridDrone);
+
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, getSiteShortname(cloudSite), "SiteContributor", "");
+
+        // Login as User1 (OP)
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+
+        // Open Document library, Upload a file
+        ShareUser.uploadFileInFolder(drone, fileInfo).render();
+
+        // Select "Cloud Task or Review" from select a workflow dropdown
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone);
+
+        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+
+        List<String> userNames = new ArrayList<String>();
+        userNames.add(reviewer1);
+        userNames.add(reviewer2);
+        formDetails.setMessage(workFlowName);
+        formDetails.setDueDate(due);
+        formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
+        formDetails.setTaskPriority(Priority.MEDIUM);
+        formDetails.setApprovalPercentage(requiredApprovalPercentage);
+        formDetails.setSiteName(cloudSite);
+        formDetails.setReviewers(userNames);
+        formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
+
+        // Select uploaded file
+        cloudTaskOrReviewPage.selectItem(fileName, opSiteName);
+
+        // Fill the form details and start workflow
+        cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        ShareUser.logout(drone);
+
+        // Login as reviewer1 User,
+        ShareUser.login(hybridDrone, reviewer1, DEFAULT_PASSWORD);
+        // Navigate to MyTasks page
+        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
+
+        // Verify Task Details are displayed correctly
+        TaskDetails taskDetails = myTasksPage.getTaskDetails(workFlowName);
+
+        assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
+        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Verifying workflow due date");
+        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
+        assertEquals(taskDetails.getStatus(), TaskStatus.NOTYETSTARTED.getTaskName(), "Verifying status");
+        assertEquals(taskDetails.getType(), TaskDetailsType.REVIEW, "Verifying Task type");
+        assertEquals(taskDetails.getDescription(), "Review", "Verifying Workflow Description");
+        assertEquals(taskDetails.getStartedBy(), cloudUser, "Verifying Started by user");
+        // Edit task and mark it as complete
+        // 3. Click Approve button.
+        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName, TaskStatus.COMPLETED, EditTaskAction.APPROVE);
+
+        // Verify task is not displayed in Active Tasks list
+        assertFalse(myTasksPage.isTaskPresent(workFlowName), "Completed task is still displayed");
+        ShareUser.logout(hybridDrone);
+
+        // 4. On-premise verify the Tasks list.
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        // Open My Tasks page
+        ShareUserWorkFlow.navigateToMyTasksPage(drone);
+        // The Cloud Review Task is not present in the list.
+        assertFalse(ShareUser.checkIfTaskIsPresent(drone, workFlowName), "OP: Task is displayed but it was not fully completed");
+        ShareUser.logout(drone);
+
+        // 5. In Cloud open the Cloud Review Task, which was created in the pre-conditions, as another user.
+        ShareUser.login(hybridDrone, reviewer2, DEFAULT_PASSWORD);
+        // Navigate to MyTasks page
+        myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
+
+        // Verify Task Details are displayed correctly
+        taskDetails = myTasksPage.getTaskDetails(workFlowName);
+
+        assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
+        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Verifying workflow due date");
+        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
+        assertEquals(taskDetails.getStatus(), TaskStatus.NOTYETSTARTED.getTaskName(), "Verifying status");
+        assertEquals(taskDetails.getType(), TaskDetailsType.REVIEW, "Verifying Task type");
+        assertEquals(taskDetails.getDescription(), "Review", "Verifying Workflow Description");
+        assertEquals(taskDetails.getStartedBy(), cloudUser, "Verifying Started by user");
+
+        // 6-7. Add any comment. and Click Approve button.
+        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName, TaskStatus.COMPLETED, comment, EditTaskAction.APPROVE);
+
+        // Verify task is not displayed in Active Tasks list
+        assertFalse(myTasksPage.isTaskPresent(workFlowName), "Completed task is still displayed for User's Task List");
+        ShareUser.logout(hybridDrone);
+
+        // 8 On-premise verify the Tasks list.
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // Open My Tasks page
+        myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
+
+        // Verify a new task is displayed for OP user
+        assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName), "OP: Completed (on Cloud) task is not displayed");
+
+        // Verify the task details
+        taskDetails = myTasksPage.getTaskDetails(workFlowName);
+
+        assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
+        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Verifying workflow due date");
+        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
+        assertNull(taskDetails.getEndDate(), "Verify Workflow End date is NULL as the task is still active");
+        assertEquals(taskDetails.getStatus(), TaskStatus.NOTYETSTARTED.getTaskName(), "Verifying status");
+        assertEquals(taskDetails.getType(), TaskDetailsType.DOCUMENT_WAS_APPROVED_ON_THE_CLOUD, "Verifying Task type");
+        assertEquals(taskDetails.getDescription(), workFlowName, "Verifying Workflow Description");
+        assertEquals(taskDetails.getStartedBy(), opUser, "Verifying Started by user");
+
+        // Edit the task and complete the task
+        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, workFlowName, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
+
+        // Verify the task is disappeared from Active Tasks list
+        assertFalse(myTasksPage.isTaskPresent(workFlowName));
+
+        // Select Completed tasks and verify the task is displayed and the details are accurate
+        myTasksPage = myTasksPage.selectCompletedTasks().render();
+
+        assertTrue(myTasksPage.isTaskPresent(workFlowName));
+
+        taskDetails = myTasksPage.getTaskDetails(workFlowName);
+
+        assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
+        assertEquals(taskDetails.getDue(), ShareUserWorkFlow.getDueDateOnMyTaskPage(due), "Verifying workflow due date");
+        assertEquals(getLocalDate(taskDetails.getStartDate()), getToDaysLocalDate(), "Verify Workflow Start date");
+        assertEquals(getLocalDate(taskDetails.getEndDate()), getToDaysLocalDate(), "Verify Workflow End date");
+        assertEquals(taskDetails.getStatus(), TaskStatus.COMPLETED.getTaskName(), "Verifying status");
+        assertEquals(taskDetails.getType(), TaskDetailsType.DOCUMENT_WAS_APPROVED_ON_THE_CLOUD, "Verifying Task type");
+        assertEquals(taskDetails.getDescription(), workFlowName, "Verifying Workflow Description");
+        assertEquals(taskDetails.getStartedBy(), opUser, "Verifying Started by user");
+        ShareUser.logout(drone);
     }
 
     /**
      * AONE-15737: Reject Cloud Review Task
-     * <ul>
-     * <li>1) Login as Cloud User, Create a site and Logout</li>
-     * <li>2) Invite Reviewer1 to the site as collaborator</li>
-     * <li>3) Login as User1 (OP), Create a site and Upload a document</li>
-     * <li>4) Navigate to WorkFlows I've Started page and select StartWorkflow button</li>
-     * <li>5) Select "Cloud Task or Review" from select a workflow dropdown</li>
-     * <li>6) Select "Cloud Review Task" and fill in the form with Message, Due Date, Task Priority, approval % (100) etc.</li>
-     * <li>7) Select Cloud Destination, Select Reviewers, select content and select "Start Workflow" button</li>
-     * <li>8) Verify a task is displayed in Active Workflows list</li>
-     * <li>9) Load Site Document library and verify Document is part of workflow</li>
-     * <li>10) Verify Document is cloud synced</li>
-     * <li>11) Login to Cloud as Reviewer1, open site document library and verify the synced document is displayed</li>
-     * <li>12) Navigate to MyTasks page and verify a task is displayed in Active Tasks list</li>
-     * <li>13) Verify the task details are accurate</li>
-     * <li>14) Edit task and mark it as Rejected</li>
-     * <li>15) Verify the task is disappeared from Active Tasks list</li>
-     * <li>16) Select Completed and verify the task is displayed and the task details re correct</li>
-     * <li>17) Login as OP user and verify there is a task displayed under Active task with the workflow name</li>
-     * <li>18) Verify the task details are correct</li>
-     * <li>19) Edit the task and mark it as completed</li>
-     * <li>20) Verify the task is disappeared from Active Tasks list</li>
-     * <li>21) Select Completed and Verify the task is displayed and the task details are correct</li>
-     * <li>22) Navigate to Workflows I've Started page and verify the workflow doesn't exists in Active WorkFlows</li>
-     * <li>23) Select Completed and verify the workflow is displayed and the details are correct</li>
-     * </ul>
      */
-    @Test(groups="Hybrid", enabled = true)
+    @Test(groups = "Hybrid")
     public void AONE_15737() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String reviewer1 = getUserNameForDomain(testName, DOMAIN_HYBRID).replace("user", "reviewer-1");
-        String reviewer2 = getUserNameForDomain(testName, DOMAIN_HYBRID).replace("user", "reviewer-2");
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
-        String fileName = getFileName(testName) + ".txt";
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String user1 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        String reviewer1 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID).replace("user", "reviewer-1");
+        String[] reviewerInfo1 = new String[] { reviewer1 };
+
+        String reviewer2 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID).replace("user", "reviewer-2");
+        String[] reviewerInfo2 = new String[] { reviewer2 };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, reviewerInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, reviewerInfo2);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.logout(drone);
+
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSite = getSiteName(testName) + uniqueData + "-CL";
+        String fileName = getFileName(testName) + uniqueData + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
 
-        String workFlowName = testName + System.currentTimeMillis() + "-WorkFlow";
+        String workFlowName = testName + uniqueData + "-WorkFlow";
         String due = getDueDateString();
         DateTime dueDate = getDueDate(due);
         int requiredApprovalPercentage = 50;
-        String cloudComment = testName + System.currentTimeMillis() + "-Cloud Comment";
+        String cloudComment = testName + uniqueData + "-Cloud Comment";
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -1079,7 +1265,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Verifying the document is part of a workflow");
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced(), "Verifying the document is synced");
 
-        // Verify the cloudsync status for the content
+        // Verify the cloud sync status for the content
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName), "Verifying the Sync Status is \"Synced\"");
 
         ShareUser.logout(drone);
@@ -1150,7 +1336,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         assertTrue(myTasksPage.isTaskPresent(workFlowName));
 
         ShareUser.logout(hybridDrone);
-
 
         // Login as OP user
         sharePage = ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -1227,23 +1412,19 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
     /**
      * AONE-15738: Cancel Workflow
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 2 Cloud Users (cloudUser, Reviewer1)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
      */
-    @Test(groups="DataPrepHybrid")
-    public void dataPrep_AONE_15738() throws Exception
+    @Test(groups = { "Hybrid" })
+    public void AONE_15738() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String user1 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { user1 };
 
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
-        String reviewer1 = getUserNameForDomain(testName, DOMAIN_HYBRID).replace("user", "reviewer");
+        String reviewer1 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID).replace("user", "reviewer");
         String[] reviewerInfo1 = new String[] { reviewer1 };
 
         // Create User1 (On-premise)
@@ -1258,50 +1439,14 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
-    }
-    /**
-     * AONE-15738: Cancel Workflow
-     * <ul>
-     * <li>1) Login as Cloud User, Create a site and Logout</li>
-     * <li>2) Invite Reviewer1 to the site as collaborator</li>
-     * <li>3) Login as User1 (OP), Create a site and Upload a document</li>
-     * <li>4) Navigate to WorkFlows I've Started page and select StartWorkflow button</li>
-     * <li>5) Select "Cloud Task or Review" from select a workflow dropdown</li>
-     * <li>6) Select "Cloud Review Task" and fill in the form with Message, Due Date, Task Priority, approval % (100) etc.</li>
-     * <li>7) Select Cloud Destination, Select Reviewers, select content and select "Start Workflow" button</li>
-     * <li>8) Verify a task is displayed in Active Workflows list</li>
-     * <li>9) Load Site Document library and verify Document is part of workflow</li>
-     * <li>10) Verify Document is cloud synced</li>
-     * <li>11) Login to Cloud as Reviewer1, open site document library and verify the synced document is displayed</li>
-     * <li>12) Navigate to MyTasks page and verify a task is displayed in Active Tasks list</li>
-     * <li>13) Verify the task details are accurate</li>
-     * <li>14) Edit task and mark it as Rejected</li>
-     * <li>15) Verify the task is disappeared from Active Tasks list</li>
-     * <li>16) Select Completed and verify the task is displayed and the task details re correct</li>
-     * <li>17) Login as OP user and verify there is a task displayed under Active task with the workflow name</li>
-     * <li>18) Verify the task details are correct</li>
-     * <li>19) Edit the task and mark it as completed</li>
-     * <li>20) Verify the task is disappeared from Active Tasks list</li>
-     * <li>21) Select Completed and Verify the task is displayed and the task details are correct</li>
-     * <li>22) Navigate to Workflows I've Started page and verify the workflow doesn't exists in Active WorkFlows</li>
-     * <li>23) Select Completed and verify the workflow is displayed and the details are correct</li>
-     * </ul>
-     */
-    @Test(groups={"Hybrid","IntermittentBugs"}, enabled = true)
-    public void AONE_15738() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String reviewer1 = getUserNameForDomain(testName, DOMAIN_HYBRID).replace("user", "reviewer");
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
-        String fileName = getFileName(testName) + System.currentTimeMillis() + ".txt";
+
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSite = getSiteName(testName) + uniqueData + "-CL";
+        String fileName = getFileName(testName) + uniqueData + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
 
-        String workFlowName = testName + System.currentTimeMillis() + "-WorkFlow";
+        String workFlowName = testName + uniqueData + "-WorkFlow";
         String due = getDueDateString();
-        DateTime dueDate = getDueDate(due);
         int requiredApprovalPercentage = 50;
 
         // Login as User1 (Cloud)
@@ -1413,33 +1558,30 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
         // Verify Task Details are displayed correctly
-        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, false), "Verifying the task is Removed from tasks list");
+        assertFalse(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, false),
+                "Verifying the task is Removed from tasks list");
 
         ShareUser.logout(hybridDrone);
     }
 
     /**
      * AONE-15739: Required approval percentage
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 3 Cloud Users (cloudUser, Reviewer1, Reviewer2)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
      */
-    @Test(groups="DataPrepHybrid")
-    public void dataPrep_AONE_15739() throws Exception
+    @Test(groups = "Hybrid")
+    public void AONE_15739() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String user1 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { user1 };
 
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
-        String reviewer1 = getUserNameForDomain(testName + "-1", DOMAIN_HYBRID).replace("user", "reviewer");
+        String reviewer1 = getUserNameForDomain(testName + uniqueData + "-1", DOMAIN_HYBRID).replace("user", "reviewer");
         String[] reviewerInfo1 = new String[] { reviewer1 };
 
-        String reviewer2 = getUserNameForDomain(testName + "-2", DOMAIN_HYBRID).replace("user", "reviewer");
+        String reviewer2 = getUserNameForDomain(testName + uniqueData + "-2", DOMAIN_HYBRID).replace("user", "reviewer");
         String[] reviewerInfo2 = new String[] { reviewer2 };
 
         // Create User1 (On-premise)
@@ -1455,50 +1597,17 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
-    }
 
-    /**
-     * AONE-15739: Required approval percentage
-     * <ul>
-     * <li>1) Login as Cloud User, Create a site and Logout</li>
-     * <li>2) Invite Reviewer1 and Reviewer2 to the site as collaborators</li>
-     * <li>3) Login as User1 (OP), Create a site and Upload a document</li>
-     * <li>4) Navigate to WorkFlows I've Started page and select StartWorkflow button</li>
-     * <li>5) Select "Cloud Task or Review" from select a workflow dropdown</li>
-     * <li>6) Select "Cloud Review Task" and fill in the form with Message, Due Date, Task Priority, approval % (50) etc.</li>
-     * <li>7) Select Cloud Destination, Select Reviewers, select content and select "Start Workflow" button</li>
-     * <li>8) Verify a task is displayed in Active Workflows list</li>
-     * <li>9) Load Site Document library and verify Document is part of workflow</li>
-     * <li>10) Verify Document is cloud synced</li>
-     * <li>11) Login to Cloud as Reviewer1, Navigate to MyTasks page and verify a task is displayed in Active Tasks list</li>
-     * <li>12) Login to Cloud as Reviewer2, Navigate to MyTasks page and verify a task is displayed in Active Tasks list</li>
-     * <li>13) Login to Cloud as Reviewer1, Navigate to MyTasks page and Approve the task</li>
-     * <li>14) Verify the task is disappeared from Active Tasks list</li>
-     * <li>15) Select Completed and verify the task is displayed</li>
-     * <li>16) Login to Cloud as Reviewer2, Navigate to MyTasks page and verify a task is NOT displayed in Active Tasks and Completed Tasks lists</li>
-     * <li>17) Login as OP user and verify there is a task displayed under Active task with the workflow name</li>
-     * <li>18) Verify the task details are correct</li>
-     * </ul>
-     */
-    @Test(groups="Hybrid", enabled = true)
-    public void AONE_15739() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String reviewer1 = getUserNameForDomain(testName + "-1", DOMAIN_HYBRID).replace("user", "reviewer");
-        String reviewer2 = getUserNameForDomain(testName + "-2", DOMAIN_HYBRID).replace("user", "reviewer");
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
-        String fileName = getFileName(testName) + System.currentTimeMillis() + ".txt";
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSite = getSiteName(testName) + uniqueData + "-CL";
+        String fileName = getFileName(testName) + uniqueData + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
 
-        String workFlowName = testName + System.currentTimeMillis() + "-WorkFlow";
+        String workFlowName = testName + uniqueData + "-WorkFlow";
         String due = getDueDateString();
-        DateTime dueDate = getDueDate(due);
         int requiredApprovalPercentage = 50;
 
-        String cloudComment = testName + System.currentTimeMillis() + "-Cloud Comment";
+        String cloudComment = testName + uniqueData + "-Cloud Comment";
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -1582,9 +1691,8 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(hybridDrone, reviewer1, DEFAULT_PASSWORD);
 
         // Navigate to MyTasks page
-        myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-
-        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName, TaskStatus.COMPLETED, cloudComment,EditTaskAction.APPROVE);
+        ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
+        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName, TaskStatus.COMPLETED, cloudComment, EditTaskAction.APPROVE);
 
         // Verify task is not displayed in Active Tasks list
         assertFalse(myTasksPage.isTaskPresent(workFlowName));
@@ -1638,22 +1746,16 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    /**
-     * AONE-15740: After completion
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 2 Cloud Users (cloudUser, Reviewer1)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
-     */
-    @Test(groups="DataPrepHybrid")
-    public void dataPrep_AONE_15740() throws Exception
+    @Test(groups = "Hybrid")
+    public void AONE_15740() throws Exception
     {
+
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String user1 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { user1 };
 
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
         // Create User1 (On-premise)
@@ -1667,69 +1769,27 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
-    }
 
-    /**
-     * AONE-15740: After completion
-     * <ul>
-     * <li>1) Login as User1 (Cloud) and Create a site</li>
-     * <li>2) Login as User1 (OP), create a site and upload 3 documents</li>
-     * <li>3) Navigate to MyTasks page and select Workflows I've Started link</li>
-     * <li>4) Select "Cloud Task or Review" from select a workflow dropdown</li>
-     * <li>5) Create Workflow1 using File1 (After Completion: Keep content synced on cloud)</li>
-     * <li>6) Create Workflow2 using File2 (After Completion: Keep content on cloud and remove sync)</li>
-     * <li>7) Create Workflow3 using File3 (After Completion: Delete content on cloud and remove sync)</li>
-     * <li>8) Verify Workflows are created successfully</li>
-     * <li>9) Open Site Document Library, verify all files are part of the workflow, and cloud synced</li>
-     * <li>10) Login as CloudUser User (Cloud)</li>
-     * <li>11) Open Site Document Library, verify all files are part of the workflow, and synced</li>
-     * <li>12) Navigate to MyTasks page and Verify tasks are displayed in Active Tasks list</li>
-     * <li>13) Edit each task and mark them as completed</li>
-     * <li>14) Verify tasks are NOT displayed in Active Tasks list any more</li>
-     * <li>15) Verify tasks are displayed in Completed Tasks list</li>
-     * <li>16) Login as User1 (OP), Navigate to MyTasks page</li>
-     * <li>17) Verify a new tasks are displayed for OP user in Active Tasks List</li>
-     * <li>18) Edit each task and mark them as completed</li>
-     * <li>19) Verify the tasks are disappeared from Active Tasks list</li>
-     * <li>20) Select Completed tasks and verify the tasks are displayed</li>
-     * <li>21) Navigate to Workflows I've Started page and verify tasks are not displayed under Active Workflows page</li>
-     * <li>22) Select Completed Workflows and verify workflows are displayed</li>
-     * <li>23) Open Site Document Library</li>
-     * <li>24) Verify File1 is still Synced and NOT part of a workflow any more</li>
-     * <li>25) Verify File2 is NOT Synced and NOT part of a workflow</li>
-     * <li>26) Verify File3 is NOT Synced and NOT part of a workflow</li>
-     * <li>27) Login as CloudUser (Cloud) and Open Site Document Library</li>
-     * <li>28) Verify File1 exists in Site Document Library and still Synced</li>
-     * <li>29) Verify File2 exists in Site Document library and it is not Synced</li>
-     * <li>30) Verify File3 doesn't exist</li>
-     * </ul>
-     */
-    @Test(groups="Hybrid", enabled = true)
-    public void AONE_15740() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSite = getSiteName(testName) + uniqueData + "-CL";
 
-        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName1 = getFileName(testName) + uniqueData + "-1.txt";
         String[] fileInfo1 = { fileName1, DOCLIB };
 
-        String fileName2 = getFileName(testName) + "-2.txt";
+        String fileName2 = getFileName(testName) + uniqueData + "-2.txt";
         String[] fileInfo2 = { fileName2, DOCLIB };
 
-        String fileName3 = getFileName(testName) + "-3.txt";
+        String fileName3 = getFileName(testName) + uniqueData + "-3.txt";
         String[] fileInfo3 = { fileName3, DOCLIB };
 
-        String workFlowName1 = testName + System.currentTimeMillis() + "-1-WF";
-        String workFlowName2 = testName + System.currentTimeMillis() + "-2-WF";
-        String workFlowName3 = testName + System.currentTimeMillis() + "-3-WF";
+        String workFlowName1 = testName + uniqueData + "-1-WF";
+        String workFlowName2 = testName + uniqueData + "-2-WF";
+        String workFlowName3 = testName + uniqueData + "-3-WF";
         String dueDate = getDueDateString();
 
-        String cloudComment1 = testName + System.currentTimeMillis() + "-1-Cloud Comment";
-        String cloudComment2 = testName + System.currentTimeMillis() + "-2-Cloud Comment";
-        String cloudComment3 = testName + System.currentTimeMillis() + "-3-Cloud Comment";
+        String cloudComment1 = testName + uniqueData + "-1-Cloud Comment";
+        String cloudComment2 = testName + uniqueData + "-2-Cloud Comment";
+        String cloudComment3 = testName + uniqueData + "-3-Cloud Comment";
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -1751,7 +1811,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         // Select "Cloud Task or Review" from select a workflow dropdown
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName1);
 
-
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
 
         formDetails.setDueDate(dueDate);
@@ -1771,7 +1830,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         formDetails.setMessage(workFlowName2);
         formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENTREMOVESYNC);
 
-        documentLibraryPage = documentLibraryPage.renderItem(maxWaitTime, fileName2);
+        documentLibraryPage.renderItem(maxWaitTime, fileName2);
         // Select "Cloud Task or Review" from select a workflow dropdown
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName2);
 
@@ -1782,7 +1841,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         formDetails.setMessage(workFlowName3);
         formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
 
-        documentLibraryPage = documentLibraryPage.renderItem(maxWaitTime, fileName3);
+        documentLibraryPage.renderItem(maxWaitTime, fileName3);
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName3);
         cloudTaskOrReviewPage.selectTask(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
@@ -1806,7 +1865,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName3).isCloudSynced(), "Verifying the File3 is synced");
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName3), "Verifying the Sync Status is \"Synced\"");
 
-
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
         // Verify Workflows are created successfully
         assertTrue(myWorkFlowsPage.isWorkFlowPresent(workFlowName1), "Verifying workflow1 exists");
@@ -1815,7 +1873,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(drone);
 
         // Login as CloudUser User
-        SharePage sharePage = ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         // Open Site Document Library, verify all files are part of the workflow, and synced
         documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSite).render();
@@ -1846,7 +1904,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName2, TaskStatus.COMPLETED, cloudComment2, EditTaskAction.TASK_DONE);
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName3, TaskStatus.COMPLETED, cloudComment3, EditTaskAction.TASK_DONE);
 
-
         // Verify tasks are NOT displayed in Active Tasks list any more
         assertFalse(myTasksPage.isTaskPresent(workFlowName1));
         assertFalse(myTasksPage.isTaskPresent(workFlowName2));
@@ -1864,7 +1921,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         sharePage = ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
         // Open My Tasks page
-        myTasksPage = sharePage.getNav().selectMyTasks().render();
+        sharePage.getNav().selectMyTasks().render();
 
         // Verify a new tasks are displayed for OP user in Active Tasks List
         assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName1));
@@ -1875,7 +1932,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, workFlowName1, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
         ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, workFlowName2, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, workFlowName3, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-
 
         // Verify the tasks are disappeared from Active Tasks list
         assertFalse(myTasksPage.isTaskPresent(workFlowName1));
@@ -1940,22 +1996,15 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    /**
-     * AONE-15741:Lock on-premise content
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 2 Cloud Users (cloudUser, Reviewer1)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
-     */
-    @Test(groups="DataPrepHybrid")
-    public void dataPrep_AONE_15741() throws Exception
+    @Test(groups = "Hybrid")
+    public void AONE_15741() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String user1 = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { user1 };
 
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser = getUserNameForDomain(testName + uniqueData, DOMAIN_HYBRID);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
         // Create User1 (On-premise)
@@ -1969,44 +2018,18 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
-    }
 
-    /**
-     * AONE-15741:Lock on-premise content
-     * <ul>
-     * <li>1) Login as User1 (Cloud) and Create a site</li>
-     * <li>2) Login as User1 (OP), create a site and upload 3 documents</li>
-     * <li>3) Navigate to MyTasks page and select Workflows I've Started link</li>
-     * <li>4) Select "Cloud Task or Review" from select a workflow dropdown</li>
-     * <li>5) Create Workflow1 using File1 (Lock On Premise : True)</li>
-     * <li>6) Create Workflow2 using File2 (Lock On Premise : False)</li>
-     * <li>8) Verify Workflows are created successfully</li>
-     * <li>9) Open Site Document Library</li>
-     * <li>10) Verify File1 is Cloud Synced, part of workflow and it is Locked</li>
-     * <li>11) Verify File2 is Cloud Synced, part of workflow and it is NOT Locked</li>
-     * <li>12) Login as CloudUser User (Cloud)</li>
-     * <li>13) Open Site Document Library</li>
-     * <li>14) Verify File1 exists in Site Document Library, it is Synced and part of workflow</li>
-     * <li>15) Verify File2 exists in Site Document Library, it is Synced and part of workflow</li>
-     * </ul>
-     */
-    @Test(groups="Hybrid", enabled = true)
-    public void AONE_15741() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
+        String opSiteName = getSiteName(testName) + uniqueData + "-OP";
+        String cloudSite = getSiteName(testName) + uniqueData + "-CL";
 
-        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName1 = getFileName(testName) + uniqueData + "-1.txt";
         String[] fileInfo1 = { fileName1, DOCLIB };
 
-        String fileName2 = getFileName(testName) + "-2.txt";
+        String fileName2 = getFileName(testName) + uniqueData + "-2.txt";
         String[] fileInfo2 = { fileName2, DOCLIB };
 
-        String workFlowName1 = testName + System.currentTimeMillis() + "-1-WF";
-        String workFlowName2 = testName + System.currentTimeMillis() + "-2-WF";
+        String workFlowName1 = testName + uniqueData + "-1-WF";
+        String workFlowName2 = testName + uniqueData + "-2-WF";
         String dueDate = getDueDateString();
 
         // Login as User1 (Cloud)
@@ -2036,7 +2059,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         // Select "Cloud Task or Review" from select a workflow dropdown
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName1);
 
-
         // Create Workflow1 using File1 (Lock On Premise : True)
         formDetails.setMessage(workFlowName1);
         formDetails.setLockOnPremise(true);
@@ -2047,9 +2069,9 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         formDetails.setMessage(workFlowName2);
         formDetails.setLockOnPremise(false);
 
-        documentLibraryPage = documentLibraryPage.renderItem(maxWaitTime, fileName2);
+        documentLibraryPage.renderItem(maxWaitTime, fileName2);
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName2);
-        documentLibraryPage =  cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
 
         // Verify File1 is Cloud Synced, part of workflow and it is Locked
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName1).isPartOfWorkflow(), "Verifying the File1 is part of a workflow");
@@ -2100,77 +2122,58 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    /**
-     * AONE-15742:Select Destination AONE-15743:Select Assignment
-     * <ul>
-     * <li>1) Create OP Users (User1, testUser1, testUser2)</li>
-     * <li>2) Create Cloud users (cloudUser1, cloudUser2, cloudUser3 & cloudUser4)</li>
-     * <li>3) Upgrade both Cloud networks</li>
-     * <li>4) Login to User1, set up the cloud sync, Create a site and upload a document</li>
-     * <li>5) Login as CloudUser1 and create a site</li>
-     * <li>6) Login as CloudUser2 and create a site</li>
-     * <li>7) CloudUser2 invites CloudUser1 to join the site as Consumer</li>
-     * <li>8) Login as CloudUser3 and create a site</li>
-     * <li>9) Login as CloudUser4 and create a site</li>
-     * </ul>
-     */
-    @Test(groups="DataPrepHybrid")
-    public void dataPrep_AONE_15742() throws Exception
+    @Test(groups = { "Hybrid" })
+    public void AONE_15742() throws Exception
     {
-        String testName = getTestName();
-        String opSite = getSiteName(testName) + "-OP";
-        String cloudSite1 = getSiteName(testName) + "-CL-1";
-        String cloudSite2 = getSiteName(testName) + "-CL-2";
-        String cloudSite3 = getSiteName(testName) + "-CL-3";
-        String cloudSite4 = getSiteName(testName) + "-CL-4";
-        
-        // String file = getFileName(testName) + ".txt";
-        // String[] fileInfo = { file, DOCLIB };
 
-        String user1 = getUserNameForDomain(testName + "-1", testDomain1);
+        String testName = getTestName();
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+        String opSite = getSiteName(testName) + uniqueData + "-OP2";
+        String cloudSite1 = getSiteName(testName) + uniqueData + "-CL2-1";
+        String cloudSite2 = getSiteName(testName) + uniqueData + "-CL2-2";
+        String cloudSite3 = getSiteName(testName) + uniqueData + "-CL2-3";
+        String cloudSite4 = getSiteName(testName) + uniqueData + "-CL2-4";
+        String cloudSite5 = getSiteName(testName) + uniqueData + "-CL2-5";
+        String testDomain1 = "domain1" + uniqueData.substring(7, 12) + ".webd";
+        String testDomain2 = "domain2" + uniqueData.substring(7, 12) + ".webd";
+
+        String user1 = getUserNameForDomain(testName + uniqueData + "-1", testDomain1);
         String[] userInfo1 = new String[] { user1 };
 
-        String opTestUser1 = getUserNameForDomain(testName + "-op-1", testDomain1);
+        String opTestUser1 = getUserNameForDomain(testName + uniqueData + "-op-1", testDomain1);
         String[] opTestUserInfo1 = new String[] { opTestUser1 };
 
-        String opTestUser2 = getUserNameForDomain(testName + "-op-2", testDomain1);
-        String[] opTestUserInfo2 = new String[] { opTestUser2 };
-
-        String cloudUser1 = getUserNameForDomain(testName + "-1", testDomain1);
+        String cloudUser1 = getUserNameForDomain(testName + uniqueData + "-1", testDomain1);
         String[] cloudUserInfo1 = new String[] { cloudUser1 };
 
-        String cloudUser2 = getUserNameForDomain(testName + "-2", testDomain1);
+        String cloudUser2 = getUserNameForDomain(testName + uniqueData + "-2", testDomain1);
         String[] cloudUserInfo2 = new String[] { cloudUser2 };
 
-        String cloudUser3 = getUserNameForDomain(testName + "-1", testDomain2);
+        String cloudUser3 = getUserNameForDomain(testName + uniqueData + "-1", testDomain2);
         String[] cloudUserInfo3 = new String[] { cloudUser3 };
 
-        String cloudUser4 = getUserNameForDomain(testName + "-2", testDomain2);
+        String cloudUser4 = getUserNameForDomain(testName + uniqueData + "-2", testDomain2);
         String[] cloudUserInfo4 = new String[] { cloudUser4 };
 
         // Create OP Users (User1, testUser1, testUser2)
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, opTestUserInfo1);
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, opTestUserInfo2);
+        // CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, opTestUserInfo2);
 
         // Create Cloud users (cloudUser1, cloudUser2, cloudUser3 & cloudUser4)
         CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
         CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo2);
         CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo3);
         CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo4);
-        
+
         // Upgrade both Cloud networks
         CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, testDomain1, "1000");
         CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, testDomain2, "1000");
 
         // Login to User1, set up the cloud sync, Create a site
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        
         signInToAlfrescoInTheCloud(drone, cloudUser1, DEFAULT_PASSWORD);
-        
         ShareUser.createSite(drone, opSite, SITE_VISIBILITY_PUBLIC);
-
-        // ShareUser.uploadFileInFolder(drone, fileInfo).render();
         ShareUser.logout(drone);
 
         // Login as CloudUser1 and create a site
@@ -2180,11 +2183,12 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Login as CloudUser2 and create a site
         ShareUser.login(hybridDrone, cloudUser2, DEFAULT_PASSWORD);
-        ShareUser.createSite(hybridDrone, cloudSite2, SITE_VISIBILITY_PUBLIC);
+        ShareUser.createSite(hybridDrone, cloudSite2, SITE_VISIBILITY_PRIVATE);
+        ShareUser.createSite(hybridDrone, cloudSite5, SITE_VISIBILITY_PRIVATE);
         ShareUser.logout(hybridDrone);
 
         // CloudUser2 invites CloudUser1 to join the site as Consumer
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser2, cloudUser1, getSiteShortname(cloudSite2), "SiteConsumer", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser2, cloudUser1, getSiteShortname(cloudSite5), "SiteConsumer", "");
 
         // Login as CloudUser3 and create a site
         ShareUser.login(hybridDrone, cloudUser3, DEFAULT_PASSWORD);
@@ -2195,46 +2199,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.login(hybridDrone, cloudUser4, DEFAULT_PASSWORD);
         ShareUser.createSite(hybridDrone, cloudSite4, SITE_VISIBILITY_PUBLIC);
         ShareUser.logout(hybridDrone);
-    }
-
-    /**
-     * AONE-15742:Select Destination AONE-15743:Select Assignment
-     * <ul>
-     * <li>1) Login to OP as User1, Navigate to WorkFlows I've started page and select Start Workflow</li>
-     * <li>2) Select WorkFlow Type as "Cloud Task Or Review" and task type as "Simple Cloud Task"</li>
-     * <li>3) Fill in Message (Workflow Name), due date, After Completion</li>
-     * <li>4) Select Destination And Assignee and Verify User can only see Domain1</li>
-     * <li>5) Select network, select CloudSite2 (CloudUser1 is consumer for that site) and Verify User1 have no permission</li> ALF-20094
-     * <li>6) Select CloudSite1, verify user has permission to the folder</li>
-     * <li>7) Select Default folder and select Sync button</li>
-     * <li>8) Verify Destination details (Network, Site and Folder) are displayed correctly</li>
-     * <li>9) Select Assignee button and verify "No items found" for OP TestUser1, OP TestUser2, CloudUser3, CloudUser4</li>
-     * <li>10) Verify CloudUser1 and CloudUser2 can be found from search</li>
-     * <li>11) Select CloudUser1</li>
-     * <li>12) Select the file from the site and start workflow</li>
-     * <li>13) Verify workflow is created</li>
-     * <li>14) Select workflow and verify the Assignee is displayed correctly from the Workflow Details page</li>
-     * <li>15) Login to Cloud as CloudUser1 and verify the task is present</li>
-     * </ul>
-     */
-    @Test(groups={"Hybrid","IntermittentBugs"}, enabled = true)
-    public void AONE_15742() throws Exception
-    {
-        String testName = getTestName();
-        String opSite = getSiteName(testName) + "-OP";
-        String cloudSite1 = getSiteName(testName) + "-CL-1";
-        String cloudSite2 = getSiteName(testName) + "-CL-2";
-        String cloudSite3 = getSiteName(testName) + "-CL-3";
-        String cloudSite4 = getSiteName(testName) + "-CL-4";
-
-        String cloudUser1 = getUserNameForDomain(testName + "-1", testDomain1);
-        String cloudUser2 = getUserNameForDomain(testName + "-2", testDomain1);
-        String cloudUser3 = getUserNameForDomain(testName + "-1", testDomain2);
-        String cloudUser4 = getUserNameForDomain(testName + "-2", testDomain2);
-
-        String user1 = getUserNameForDomain(testName + "-1", testDomain1);
-        String opTestUser1 = getUserNameForDomain(testName + "-op-1", testDomain1);
-        String opTestUser2 = getUserNameForDomain(testName + "-op-2", testDomain1);
 
         String file = getFileName(testName) + System.currentTimeMillis() + ".txt";
         String[] fileInfo = { file, DOCLIB };
@@ -2261,19 +2225,19 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         // Select Destination And Assignee
         DestinationAndAssigneePage destinationAndAssigneePage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
         // Verify User can only see Domain1
-        assertTrue(destinationAndAssigneePage.isNetworkDisplayed(testDomain1));
-        assertFalse(destinationAndAssigneePage.isNetworkDisplayed(testDomain2));
+        assertTrue(destinationAndAssigneePage.isNetworkDisplayed(testDomain1), "Default User's Network is not displayed");
+        assertFalse(destinationAndAssigneePage.isNetworkDisplayed(testDomain2), "External network is displayed");
 
         // Select network, select CloudSite2 (CloudUser1 is consumer for that site)
         destinationAndAssigneePage.selectNetwork(testDomain1);
-        assertTrue(destinationAndAssigneePage.isSiteDisplayed(cloudSite1), "Verifying Site is displayed: " + cloudSite1);
-        assertTrue(destinationAndAssigneePage.isSiteDisplayed(cloudSite2), "Verifying Site is displayed: " + cloudSite2);
-        assertFalse(destinationAndAssigneePage.isSiteDisplayed(cloudSite3), "Verifying Site is NOT displayed: " + cloudSite3);
-        assertFalse(destinationAndAssigneePage.isSiteDisplayed(cloudSite4), "Verifying Site is NOT displayed: " + cloudSite4);
-        // i.e. testsite1 and testsite2.
-        destinationAndAssigneePage.selectSite(cloudSite2);
-        // ALF-20094 is fixed in such a way that sync button is not enabled .. so might be we need to do some more checks - Done
-        // Verify User1 have no permission
+        assertTrue(destinationAndAssigneePage.isSiteDisplayed(cloudSite1), "Public site is NOT displayed: " + cloudSite1 + " from the default network");
+        assertFalse(destinationAndAssigneePage.isSiteDisplayed(cloudSite2), "Private site is displayed: " + cloudSite2 + " from the default network");
+        assertFalse(destinationAndAssigneePage.isSiteDisplayed(cloudSite3), "Site is displayed: " + cloudSite3 + " from external network");
+        assertFalse(destinationAndAssigneePage.isSiteDisplayed(cloudSite4), "Site is displayed: " + cloudSite4 + " from external network");
+        assertTrue(destinationAndAssigneePage.isSiteDisplayed(cloudSite5), "Private site is NOT displayed: " + cloudSite5 + " where user is consumer");
+
+        // i.e. testSite1 and testSite2.
+        destinationAndAssigneePage.selectSite(cloudSite5);
         assertFalse(destinationAndAssigneePage.isSyncButtonEnabled(), "Verifying the Sync button is disabled");
         assertFalse(destinationAndAssigneePage.isSyncPermitted(DEFAULT_FOLDER_NAME), "Verifying User doesn't have permissions to the folder");
 
@@ -2289,41 +2253,108 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         assertEquals(cloudTaskOrReviewPage.getDestinationNetwork(), testDomain1, "Verify Destination Network");
         assertEquals(cloudTaskOrReviewPage.getDestinationSite(), cloudSite1, "Verify Destination Site");
         assertEquals(cloudTaskOrReviewPage.getDestinationFolder(), DEFAULT_FOLDER_NAME + "/", "Verify Destination Folder Name");
+        ShareUser.logout(drone);
+
+    }
+
+    @Test(groups = "Hybrid")
+    public void AONE_15743() throws Exception
+    {
+        String testName = getTestName();
+        String uniqueData = String.valueOf(System.currentTimeMillis());
+
+        String testDomain1 = "domain1" + uniqueData.substring(7, 12) + ".webd";
+        String testDomain2 = "domain2" + uniqueData.substring(7, 12) + ".webd";
+        // 3. with several users in each of them
+        String cloudUser1 = getUserNameForDomain(testName + uniqueData + "-1", testDomain1);
+        String cloudUser2 = getUserNameForDomain(testName + uniqueData + "-2", testDomain1);
+        String cloudUser3 = getUserNameForDomain(testName + uniqueData + "-1", testDomain2);
+        String cloudUser4 = getUserNameForDomain(testName + uniqueData + "-2", testDomain2);
+        String[] cloudUserInfo1 = new String[] { cloudUser1 };
+        String[] cloudUserInfo2 = new String[] { cloudUser2 };
+        String[] cloudUserInfo3 = new String[] { cloudUser3 };
+        String[] cloudUserInfo4 = new String[] { cloudUser4 };
+
+        // 4. Any site is created in Cloud by any user
+        String cloudSite1 = getSiteName(testName) + uniqueData + "-CL2-1";
+        String opSite = getSiteName(testName) + uniqueData + "-OP2";
+
+        // 5. Several users are created on-premise
+        String user1 = getUserNameForDomain(testName + uniqueData + "-1-op", testDomain1);
+        String user2 = getUserNameForDomain(testName + uniqueData + "-2-op", testDomain1);
+
+        String[] userInfo1 = new String[] { user1 };
+        String[] userInfo2 = new String[] { user2 };
+
+        String file = getFileName(testName) + uniqueData + ".txt";
+        String[] fileInfo = { file, DOCLIB };
+
+        String dueDate = getDueDateString();
+        String workFlowName = testName + uniqueData + "-WF";
+
+        // Several users are created on-premise, e.g. testUser1, testUser2
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo2);
+
+        // Create Cloud users (cloudUser1, cloudUser2, cloudUser3 & cloudUser4)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo2);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo3);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo4);
+        // Upgrade both Cloud networks
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, testDomain1, "1000");
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, testDomain2, "1000");
+
+        // Login as User1 (Cloud)
+        ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSite1, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login to OP as User1
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser1, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, opSite, SITE_VISIBILITY_PUBLIC);
+        SiteUtil.openSiteDocumentLibraryURL(drone, opSite);
+        ShareUser.uploadFileInFolder(drone, fileInfo).render();
+        // Start Simple Cloud Task Workflow
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, file);
+
+        // Fill in Message (Workflow Name), due date, After Completion
+        cloudTaskOrReviewPage.enterMessageText(workFlowName);
+        cloudTaskOrReviewPage.enterDueDateText(dueDate);
+        cloudTaskOrReviewPage.selectAfterCompleteDropDown(KeepContentStrategy.DELETECONTENT);
+
+        // Select Destination
+        DestinationAndAssigneePage destinationAndAssigneePage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
+        destinationAndAssigneePage.selectNetwork(testDomain1);
+        destinationAndAssigneePage.selectSite(cloudSite1);
+        destinationAndAssigneePage.selectFolder(DEFAULT_FOLDER_NAME);
+        destinationAndAssigneePage.selectSubmitButtonToSync();
 
         // Select Assignee button and verify "No items found" for OP TestUser1, OP TestUser2, CloudUser3, CloudUser4
         AssignmentPage assignmentPage = cloudTaskOrReviewPage.selectAssignmentPage().render();
-        assertTrue(assignmentPage.isNoItemsFoundMessageDisplayed(opTestUser1));
-        assertTrue(assignmentPage.isNoItemsFoundMessageDisplayed(opTestUser2));
-        assertTrue(assignmentPage.isNoItemsFoundMessageDisplayed(cloudUser3));
-        assertTrue(assignmentPage.isNoItemsFoundMessageDisplayed(cloudUser4));
+        assertTrue(assignmentPage.isNoItemsFoundMessageDisplayed(user1), "On-premise user1 is found on cloud");
+        assertTrue(assignmentPage.isNoItemsFoundMessageDisplayed(user2), "On-premise user2 is found on cloud");
+        assertTrue(assignmentPage.isNoItemsFoundMessageDisplayed(cloudUser3), "User3 from other network is found");
+        assertTrue(assignmentPage.isNoItemsFoundMessageDisplayed(cloudUser4), "User4 from other network is found");
 
         // Verify CloudUser1 and CloudUser2 can be found from search
-        assertTrue(assignmentPage.isUserFound(cloudUser1));
-        assertTrue(assignmentPage.isUserFound(cloudUser2));
+        assertTrue(assignmentPage.isUserFound(cloudUser1), "User1 from the network is NOT found");
+        assertTrue(assignmentPage.isUserFound(cloudUser2), "User2 from the network is NOT found");
 
         // Select CloudUser1
         assignmentPage.selectAssignee(cloudUser1);
 
         cloudTaskOrReviewPage.render();
 
-        assertTrue(cloudTaskOrReviewPage.isAssigneePresent());
-        assertTrue(cloudTaskOrReviewPage.getAssignee().contains(cloudUser1));
+        assertTrue(cloudTaskOrReviewPage.isAssigneePresent(), "Assignee user is not filled");
+        assertTrue(cloudTaskOrReviewPage.getAssignee().contains(cloudUser1), "User1 is not added as assignee");
 
         // Select the file from the site and start workflow
         DocumentLibraryPage documentLibraryPage = cloudTaskOrReviewPage.selectStartWorkflow().render();
 
-        assertTrue(checkIfContentIsSynced(drone, file));
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(file).isPartOfWorkflow());
-
-        MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
-        // Verify workflow is created
-        assertTrue(myWorkFlowsPage.isWorkFlowPresent(workFlowName), "Verifying workflow is created successfully");
-
-        // Select workflow and verify the Assignee is displayed correctly
-        WorkFlowDetailsPage workFlowDetailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName).render();
-
-        assertTrue(workFlowDetailsPage.getAssignee().contains(cloudUser1), "Veifying Assignee");
-
+        assertTrue(checkIfContentIsSynced(drone, file), "Content was not synced to cloud");
+        assertTrue(documentLibraryPage.getFileDirectoryInfo(file).isPartOfWorkflow(), "Workflow icon for content is not displayed");
         ShareUser.logout(drone);
 
         // Login to Cloud as CloudUser1 and verify the task is present
@@ -2331,8 +2362,16 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
-        assertTrue(myTasksPage.isTaskPresent(workFlowName));
+        assertTrue(myTasksPage.isTaskPresent(workFlowName), "Task is not displayed on Cloud");
 
         ShareUser.logout(hybridDrone);
     }
+
+    private void findTasks(WebDrone driver, String workFlowName)
+    {
+
+        assertTrue(driver.findAndWaitWithRefresh(By.xpath(String.format("//a[text()='%s']", workFlowName))).isDisplayed());
+
+    }
+
 }
