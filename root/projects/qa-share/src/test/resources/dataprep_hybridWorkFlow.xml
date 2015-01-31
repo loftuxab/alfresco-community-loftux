@@ -45,10 +45,10 @@
         </classes>
     </test-->
 
-    <test name="dataprep-CloudSyncSmokeTest" verbose="1">
+    <!--<test name="dataprep-CloudSyncSmokeTest" verbose="1">
         <classes>
             <class name="org.alfresco.share.cloudsync.CloudSyncSmokeTest" />
         </classes>
     </test>
-
+    -->
 </suite>
