@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 
@@ -89,6 +90,18 @@ public class CifsMSExcel2010Tests extends AbstractUtils
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:admin admin";
+
+        Runtime.getRuntime().exec(mapConnect);
+        if (checkDirOrFileExists(15, 200, networkDrive + cifsPath))
+        {
+            logger.info("----------Mapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("----------Mapping was not done " + testUser);
+        }
+
         super.tearDown();
     }
 
@@ -105,11 +118,6 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         fileName_6275 = "AONE-6275";
         fileName_6276 = "AONE-6276";
 
-        mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
-
-        Runtime.getRuntime().exec(mapConnect);
-        logger.info("----------Mapping succesfull " + testUser);
-
     }
 
     @AfterMethod(alwaysRun = true)
@@ -118,9 +126,23 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         super.tearDown();
         Runtime.getRuntime().exec("taskkill /F /IM EXCEL.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
+    }
 
-        Runtime.getRuntime().exec("net use * /d /y");
-        logger.info("--------Unmapping succesfull " + testUser);
+    @AfterClass(alwaysRun = true)
+    public void tearDownClass() throws IOException
+    {
+
+        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
+
+        if (checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
+        {
+            logger.info("--------Unmapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("--------Unmapping was not done correctly " + testUser);
+        }
+
     }
 
     @Test(groups = { "DataPrepExcel" })
@@ -183,10 +205,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(ldtp);
         ldtp.waitTime(3);
         excel.exitOfficeApplication(ldtp, fileName_6271);
-        // ldtp.waitTime(3);
-
-        int nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -233,8 +252,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp, fileName_6271);
         // ldtp.waitTime(3);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 9 ----
         // ---- Step Action -----
@@ -279,9 +297,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(ldtp);
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp, fileName_6271);
-        // ldtp.waitTime(3);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 14 ----
         // ---- Step Action -----
@@ -367,10 +383,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(ldtp);
         ldtp.waitTime(3);
         excel.exitOfficeApplication(ldtp, fileName_6272);
-        // ldtp.waitTime(3);
-
-        int nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -417,9 +430,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(ldtp);
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp, fileName_6272);
-        // ldtp.waitTime(3);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 9 ----
         // ---- Step Action -----
@@ -465,9 +476,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(ldtp);
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp, fileName_6272);
-        // ldtp.waitTime(3);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 14 ----
         // ---- Step Action -----
@@ -628,8 +637,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6273);
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -697,9 +705,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6273);
-        // l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -751,9 +757,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6273);
-        // l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -836,9 +840,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6274);
-        // l1.waitTime(5);
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -907,9 +909,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6274);
-        // l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -962,9 +962,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6274);
-        // l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -1014,7 +1012,6 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
 
-        int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = excel.openFileFromCMD(localPath, fileName_6275 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
 
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6275);
@@ -1027,10 +1024,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         l1.waitTime(3);
         excel.exitOfficeApplication(l1, fileName_6275);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 2 ---
         // --- Step action ---
         // Verify the document's content.
@@ -1097,9 +1091,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6275);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1151,9 +1143,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6275);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1199,7 +1189,6 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
 
-        int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = excel.openFileFromCMD(localPath, fileName_6276 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
 
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6276);
@@ -1212,10 +1201,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         l1.waitTime(3);
         excel.exitOfficeApplication(l1, fileName_6276);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave
-                + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -1284,10 +1270,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6276);
-        // l1.waitTime(5);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1340,10 +1323,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1, fileName_6276);
-        // l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1369,13 +1349,99 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         Assert.assertTrue(body3.contains(edit3));
     }
 
-    private int getNumberOfFilesFromPath(String path)
+    private Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
     {
-        int noOfFiles = 0;
-        File folder = new File(path);
-        noOfFiles = folder.listFiles().length;
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                existence = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+            }
+        }
+        return existence;
+    }
 
-        return noOfFiles;
+    private Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
+    {
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+
+            }
+            else
+            {
+                existence = true;
+                break;
+            }
+        }
+        return existence;
+    }
+
+    private Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
+    {
+        long counter = 0;
+        boolean check = false;
+        boolean existence = true;
+        while (counter < TimeUnit.SECONDS.toMillis(timeout))
+        {
+            File test = new File(path);
+            for (File element : test.listFiles())
+            {
+                if (element.isHidden() && element.getName().contains(extension))
+                {
+                    existence = false;
+                    break;
+                }
+            }
+            if (existence)
+            {
+                check = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + 200;
+                existence = true;
+            }
+        }
+        return check;
     }
 
     private void uploadImageInOffice(String image) throws AWTException
