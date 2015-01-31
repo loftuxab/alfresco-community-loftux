@@ -1866,9 +1866,14 @@ body.alfresco-guest
    background: none repeat scroll 0 0 #ccc !important;
 }
 
-.usedDashlet
+li.usedDashlet
 {
-   background-color: #eee !important;
+   background-color: #eee;
+}
+
+li.usedDashlet.dnd-focused
+{
+   background-color: #999;
 }
 
 .path-nav .heading

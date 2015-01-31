@@ -620,6 +620,13 @@
          }
          copy.innerHTML = srcEl.innerHTML + "";
 
+         // update id of copied anchors
+         var anchors = copy.getElementsByTagName("a");
+         for (var i = 0, il = anchors.length; i < il; i++)
+         {
+            Alfresco.util.generateDomId(anchors[i]);
+         }
+
          // Make the draggable draggable and selectable/focusable.
          this._createDraggable(copy, draggableConfig ? draggableConfig.groups : []);
 
