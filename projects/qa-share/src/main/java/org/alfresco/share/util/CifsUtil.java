@@ -125,7 +125,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to upload document to the Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -552,5 +552,25 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
     {
         // TODO Auto-generated method stub
 
+    }
+
+    public static boolean copyFolder(String shareUrl, String username,String password, String cifsPath, String destination) {
+        boolean successful;
+        try{
+
+            String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+            String user = username + ":" + password;
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(user);
+
+            SmbFile sFileOld = new SmbFile("smb://" + server + "/"+cifsPath, auth);
+            SmbFile sFileNew = new SmbFile("smb://" + server + "/"+destination, auth);
+
+            sFileOld.copyTo(sFileNew);
+
+            successful = true;
+        } catch (Exception ex) {
+            successful = false;
+        }
+        return successful;
     }
 }
