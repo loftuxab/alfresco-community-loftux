@@ -3,13 +3,16 @@ package org.alfresco.po.share.wqs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -379,6 +382,50 @@ public abstract class WcmqsAbstractPage extends SharePage
         {
             throw new PageOperationException("Exceeded time to find the tags " + e.toString());
         }
+    }
+        
+    /**
+     * Method to get the headline titles from right side of news Page
+     * 
+     * @return List<ShareLink>
+     */
+    public List<WebElement> getTagLinks()
+    {
+        try
+        {
+            WebElement sectionTags = drone.findAndWait(TAG_LIST);
+            List<WebElement> links = sectionTags.findElements(By.cssSelector("a"));
+            return links;
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageException("Unable to access news site data", nse);
+        }
+
+    }
+    
+    /**
+     * Method to navigate to news folders
+     *
+     * @param folderName - the Name of the folder from SHARE
+     * @return WcmqsNewsPage
+     */
+    public WcmqsNewsPage openNewsPageFolder(String folderName)
+    {
+            try
+            {
+                    WebElement news = drone.findAndWait(NEWS_MENU);
+                    drone.mouseOver(news);
+
+                    drone.findAndWait(By.cssSelector(String.format("a[href$='/wcmqs/news/%s/']", folderName))).click();
+
+            }
+            catch (TimeoutException e)
+            {
+                    throw new PageOperationException("Exceeded time to find news links. " + e.toString());
+            }
+
+            return new WcmqsNewsPage(drone);
     }
 
 }
