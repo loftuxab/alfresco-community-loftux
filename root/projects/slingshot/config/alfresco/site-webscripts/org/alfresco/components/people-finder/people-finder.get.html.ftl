@@ -35,6 +35,7 @@
                </@markup>
 
                <@markup id="searchResults">
+               <div id="${el}-results-info" class="yui-dt-liner theme-bg-color-2 result-info hidden"></div>
                <div id="${el}-results" class="results hidden"></div>
                </@markup>
             </div>
