@@ -277,7 +277,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
             {
                 docLibpage.getFileDirectoryInfo(contentName).selectSyncToCloud().render();
                 drone.waitUntilElementPresent(By.cssSelector("div.hd, .dijitDialogTitleBar"), TimeUnit.MILLISECONDS.toSeconds(maxWaitTime));
-                desAndAssPage = (DestinationAndAssigneePage)FactorySharePage.resolvePage(drone);
+                desAndAssPage = (DestinationAndAssigneePage) FactorySharePage.resolvePage(drone);
             }
             else
             {
@@ -424,7 +424,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
         return false;
     }
-    
+
     public static boolean checkIfSyncFailed(WebDrone driver, String fileName)
     {
         DocumentLibraryPage docLibPage = (DocumentLibraryPage) getSharePage(driver);
@@ -699,7 +699,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
                     {
                         return ATTEMPTED;
                     }
-                    else if(status.contains(SYNCED.getValue()))
+                    else if (status.contains(SYNCED.getValue()))
                     {
                         return SYNCED;
                     }
@@ -717,5 +717,49 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
         {
         }
         return PENDING;
+    }
+
+    /**
+     * This method is used to wait for a file that had the name updated in cloud and waits for the updated file to appear on enterprise
+     * 
+     * @param driver
+     * @param fileName
+     */
+    public static boolean checkIfFileNameIsUpdated(WebDrone driver, String fileName)
+    {
+        DocumentLibraryPage docLibPage = (DocumentLibraryPage) getSharePage(driver);
+        boolean isFileUpdated;
+        try
+        {
+            RenderTime t = new RenderTime(maxWaitTimeCloudSync);
+            while (true)
+            {
+                t.start();
+                try
+                {
+                    isFileUpdated = docLibPage.isFileVisible(fileName);
+                    if (!isFileUpdated)
+                    {
+                        driver.refresh();
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                finally
+                {
+                    t.end();
+                }
+            }
+        }
+        catch (PageException e)
+        {
+        }
+        catch (PageRenderTimeException exception)
+        {
+        }
+
+        return false;
     }
 }
