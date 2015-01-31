@@ -37,95 +37,103 @@ import org.springframework.web.servlet.mvc.AbstractController;
  * @author muzquiano
  * @author kevinr
  */
-public abstract class AbstractLoginController extends AbstractController {
+public abstract class AbstractLoginController extends AbstractController
+{
+    /* password parameter */
+    protected static final String PARAM_PASSWORD = "password";
+    
+    /* username parameter */
+    protected static final String PARAM_USERNAME = "username";
+    
+    
+    /**
+     * <p>A <code>UserFactory</code> is required to authenticate requests. It will be supplied by the Spring Framework
+     * providing that the controller is configured correctly - it requires that a "userFactory" is set with an instance
+     * of a <code>UserFactory</code>. The <code>ConfigBeanFactory</code> can be used to generate <code>UserFactory</code>
+     * Spring Beans</p>
+     */
+    private UserFactory userFactory;
 
-   /**
-    * <p>A <code>UserFactory</code> is required to authenticate requests. It will be supplied by the Spring Framework
-    * providing that the controller is configured correctly - it requires that a "userFactory" is set with an instance
-    * of a <code>UserFactory</code>. The <code>ConfigBeanFactory</code> can be used to generate <code>UserFactory</code>
-    * Spring Beans</p>
-    */
-   private UserFactory userFactory;
+    /**
+     * <p>This method is provided to allow the Spring framework to set a <code>UserFactory</code> required for authenticating
+     * requests</p>
+     * 
+     * @param userFactory
+     */
+    public void setUserFactory(UserFactory userFactory) 
+    {
+        this.userFactory = userFactory;
+    }
 
-   /**
-    * <p>This method is provided to allow the Spring framework to set a <code>UserFactory</code> required for authenticating
-    * requests</p>
-    * 
-    * @param userFactory
-    */
-   public void setUserFactory(UserFactory userFactory) 
-   {
-       this.userFactory = userFactory;
-   }
 
-   
-   public ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception 
-   {
-       request.setCharacterEncoding("UTF-8");
-       
-       String username = (String) request.getParameter("username");
-       String password = (String) request.getParameter("password");
-       
-       boolean success = false;
-       try
-       {
-           // check whether there is already a user logged in
-           HttpSession session = request.getSession(false);
-           // handle SSO which doesn't set a user until later
-           if (session != null && request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID) != null)
-           {
-               // destroy old session and log out the current user
-               AuthenticationUtil.logout(request, response);
-           }
-           
-           // see if we can authenticate the user
-           boolean authenticated = userFactory.authenticate(request, username, password);
-           if (authenticated)
-           {
-               AuthenticationUtil.login(request, response, username, false);
-               
-               // mark the fact that we succeeded
-               success = true;
-           }
-       }
-       catch (Throwable err)
-       {
-           throw new ServletException(err);
-       }
-       
-       // If they succeeded in logging in, redirect to the success page
-       // Otherwise, redirect to the failure page
-       if (success)
-       {
-           onSuccess(request, response);
-       }
-       else
-       {
-           onFailure(request, response);
-       }  
-       
-       return null;
-   }
+    public ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+            throws Exception
+    {
+        request.setCharacterEncoding("UTF-8");
+        
+        String username = (String) request.getParameter(AbstractLoginController.PARAM_USERNAME);
+        String password = (String) request.getParameter(AbstractLoginController.PARAM_PASSWORD);
+        
+        boolean success = false;
+        try
+        {
+            // check whether there is already a user logged in
+            HttpSession session = request.getSession(false);
+            // handle SSO which doesn't set a user until later
+            if (session != null && request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID) != null)
+            {
+                // destroy old session and log out the current user
+                AuthenticationUtil.logout(request, response);
+            }
+            
+            // see if we can authenticate the user
+            boolean authenticated = this.userFactory.authenticate(request, username, password);
+            if (authenticated)
+            {
+                AuthenticationUtil.login(request, response, username, false);
+                
+                // mark the fact that we succeeded
+                success = true;
+            }
+        }
+        catch (Throwable err)
+        {
+            throw new ServletException(err);
+        }
+        
+        // If they succeeded in logging in, redirect to the success page
+        // Otherwise, redirect to the failure page
+        if (success)
+        {
+            onSuccess(request, response);
+        }
+        else
+        {
+            onFailure(request, response);
+        }
+        
+        return null;
+    }
 
-   /**
-    * Template method. 
-    * 
-    * Called after failed authentication.
+    /**
+     * Template method. 
+     * 
+     * Called after failed authentication.
      *
-    * @param request current HTTP request
-    * @param response current HTTP response
-    * @throws Exception in case of errors
-    */
-   protected abstract void onFailure(HttpServletRequest request, HttpServletResponse response) throws Exception;
+     * @param request current HTTP request
+     * @param response current HTTP response
+     * @throws Exception in case of errors
+     */
+    protected abstract void onFailure(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
-   /**
-    * Template method. 
-    * 
-    * Called after successful authentication.
+    /**
+     * Template method. 
+     * 
+     * Called after successful authentication.
      *
-    * @param request current HTTP request
-    * @param response current HTTP response
-    * @throws Exception in case of errors
-    */
-   protected abstract void onSuccess(HttpServletRequest request, HttpServletResponse response) throws Exception;
+     * @param request current HTTP request
+     * @param response current HTTP response
+     * @throws Exception in case of errors
+     */
+    protected abstract void onSuccess(HttpServletRequest request, HttpServletResponse response) throws Exception;
 }
