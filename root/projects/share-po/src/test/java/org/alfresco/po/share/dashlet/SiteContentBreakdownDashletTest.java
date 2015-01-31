@@ -59,6 +59,7 @@ public class SiteContentBreakdownDashletTest extends AbstractSiteDashletTest
     private static int numberOfHtmlFiles = 2;
     private static int numberOfJpgFiles = 3;
     private static int numberOfPdfFiles = 9;
+    private static int numberOfXMLFiles = 2;
 
     DashBoardPage dashBoard;
 
@@ -81,6 +82,7 @@ public class SiteContentBreakdownDashletTest extends AbstractSiteDashletTest
         uploadFiles(docPage, numberOfJpgFiles, ".jpg");
         uploadFiles(docPage, numberOfHtmlFiles, ".html");
         uploadFiles(docPage, numberOfPdfFiles, ".pdf");
+        uploadFiles(docPage, numberOfXMLFiles, ".xml");
 
         navigateToSiteDashboard();
 
@@ -132,7 +134,7 @@ public class SiteContentBreakdownDashletTest extends AbstractSiteDashletTest
     /**
      * Checks files mime types and counts on the pie chart
      */
-    @Test(dependsOnMethods = "instantiateDashlet", groups="TestBug")
+    @Test(dependsOnMethods = "instantiateDashlet")
     public void testMimeTypesAndCounts() throws Exception
     {
         List<String> mimeTypes = siteContentBreakdownDashlet.getTooltipFileTypes();
