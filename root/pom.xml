@@ -174,7 +174,7 @@
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
-    <installer.java.version>1.7.0_67</installer.java.version>
+    <installer.java.version>1.8.0_25</installer.java.version>
     <installer.postgresql.version>9.3.5</installer.postgresql.version>
     <installer.libreoffice.version>4.2.5-alfresco</installer.libreoffice.version>
 
