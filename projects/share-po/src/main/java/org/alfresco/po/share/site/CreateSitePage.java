@@ -288,6 +288,23 @@ public class CreateSitePage extends ShareDialogue
             return false;
         }
     }
+    
+    /**
+     * Checks if the check box with the label public is ticked.
+     * 
+     * @return true if selected
+     */
+    public boolean isPublic()
+    {
+        try
+        {
+            return drone.findAndWait(PUBLIC_CHECKBOX).isSelected();
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+    }
 
     /**
      * Checks if the check box with the label private is ticked.
