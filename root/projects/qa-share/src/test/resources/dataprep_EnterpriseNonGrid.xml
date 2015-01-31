@@ -1,5 +1,16 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Classes" verbose="1" preserve-order="true">
+    <groups>
+        <run>
+            <include name="DataPrep.*"/>
+            <exclude name=".*Bug.*"/>
+        </run>
+    </groups>
+
+    <listeners>
+        <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
+    </listeners>
+
     <test name="dataprep" verbose="1" parallel="classes" thread-count="1">
         <groups>
             <run>
@@ -8,7 +19,7 @@
             </run>
         </groups>
         <classes>
-            <class name="org.alfresco.share.DownloadFilesAndFoldersTest"/>
+            <!--class name="org.alfresco.share.DownloadFilesAndFoldersTest"/>
             <class name="org.alfresco.share.site.document.GoogleDocsTest"/>
             <class name="org.alfresco.share.site.document.GalleryViewTest">
                 <methods>
@@ -49,7 +60,7 @@
                     <include name="dataPrep_AONE_13948"/>
                     <exclude name=".*"/>
                 </methods>
-            </class>
+            </class-->
 
             <class name="org.alfresco.share.AvatarCaching"/>
 
