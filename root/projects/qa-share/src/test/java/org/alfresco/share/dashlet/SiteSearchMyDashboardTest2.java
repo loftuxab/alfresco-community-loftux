@@ -785,11 +785,6 @@ public class SiteSearchMyDashboardTest2 extends AbstractUtils
         Assert.assertFalse(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName2));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName3));
 
-        // Search with ASPECT:* and modifier: user
-        items = ShareUserDashboard.searchSiteSearchDashlet(drone, "ASPECT:*" + " and modifier: " + testUser);
-        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName1));
-        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName2));
-        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName3));
     }
 
     //AONE-14676:Property search: mimetype
