@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.extensions.config.RemoteConfigElement.ConnectorDescriptor;
 import org.springframework.extensions.surf.ServletUtil;
+import org.springframework.extensions.webscripts.RequestCachingConnector;
 import org.springframework.extensions.webscripts.connector.AlfrescoConnector;
 import org.springframework.extensions.webscripts.connector.Connector;
 import org.springframework.extensions.webscripts.connector.ConnectorContext;
@@ -77,7 +78,7 @@ import org.springframework.extensions.webscripts.connector.RemoteClient;
  * @author adavis
  * @author kroast
  */
-public class SlingshotAlfrescoConnector extends AlfrescoConnector
+public class SlingshotAlfrescoConnector extends RequestCachingConnector
 {
     /**
      * The name of the element in the {@link ConnectorDescriptor} 
