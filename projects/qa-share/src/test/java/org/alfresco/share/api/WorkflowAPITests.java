@@ -61,7 +61,7 @@ public class WorkflowAPITests extends WorkflowAPI
     private static Log logger = LogFactory.getLog(WorkflowAPITests.class);
 
     @Override
-    @BeforeClass(alwaysRun = true)
+    @BeforeClass(alwaysRun = true, groups = {"ProductBug"})
     public void beforeClass() throws Exception
     {
         super.beforeClass();
