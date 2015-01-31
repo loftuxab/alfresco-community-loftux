@@ -726,8 +726,10 @@ public class SearchTests extends AbstractUtils
 
     /*
      * AONE-5715 Wildcard search
+     * 
+     * Jira issue #MNT-13143
      */
-    @Test(groups = { "WQS", "EnterpriseOnly" })
+    @Test(groups = { "WQS", "EnterpriseOnly" , "ProductBug"})
     public void AONE_5715() throws Exception
     {
         String searchedText = "*glo?al*";
@@ -815,7 +817,7 @@ public class SearchTests extends AbstractUtils
         contentDetails1.setName(fileName);
         contentDetails1.setTitle(fileTitle);
         contentDetails1.setContent(fileContent);
-        documentLibPage = ShareUser.createContentInCurrentFolder(drone, contentDetails1, ContentType.PLAINTEXT, documentLibPage).render();
+        documentLibPage = ShareUser.createContentInCurrentFolder(drone, contentDetails1, ContentType.PLAINTEXT, documentLibPage);
         return documentLibPage;
     }
 
@@ -929,7 +931,7 @@ public class SearchTests extends AbstractUtils
         // ---- Step action ----
         // More than 20 article items with content "test" are created in 'news' and 'blogs' folders;
 
-        ShareUser.openDocumentLibrary(drone);
+    	documentLibPage=ShareUser.openDocumentLibrary(drone);
         String name;
         // create 10 blogs in "news" folder
         for (int i = 0; i < 10; i++)
