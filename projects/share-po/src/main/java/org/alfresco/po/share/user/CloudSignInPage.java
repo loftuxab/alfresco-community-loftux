@@ -15,9 +15,6 @@ package org.alfresco.po.share.user;
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import org.alfresco.po.share.ShareDialogue;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.webdrone.HtmlPage;
@@ -30,9 +27,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * User Cloud SignIn page object holds all elements of HTML page objects relating to Cloud Sync connect page.
@@ -116,12 +117,15 @@ public class CloudSignInPage extends ShareDialogue
         drone.waitForPageLoad(SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
         try
         {
-            if (isDisconnectButtonDisplayed())
+            if (isCloudSyncPage())
             {
+                drone.findAndWait(By.xpath("//div[contains(@id,'user-cloud-auth') and contains(@class,'notifications')]" +
+                        "//button[contains(@id,'user-cloud-auth') and contains(@id,'default-button-delete-button')]"));
                 return new CloudSyncPage(drone);
             }
             else
             {
+                drone.findAndWait(By.cssSelector("div[id$='cloud-folder-title']"));
                 return new DestinationAndAssigneePage(drone);
             }
         }
@@ -138,52 +142,24 @@ public class CloudSignInPage extends ShareDialogue
      */
     public boolean isDisconnectButtonDisplayed()
     {
-        RenderTime time = new RenderTime(maxPageLoadingTime);
-
-        time.start();
-
-        while (true)
+        List<WebElement> deleteButtons = drone.findAll(By.xpath("//button[contains(@id,'user-cloud-auth') and contains(@id,'default-button-delete-button')]"));
+        for (WebElement deleteButton : deleteButtons)
         {
-            try
+            if (deleteButton.isDisplayed())
             {
-                if (drone.find(By.cssSelector("button[id$='default-button-delete-button']")).isDisplayed())
-                {
-                    return true;
-                }
+                return true;
             }
-            catch (NoSuchElementException nse)
-            {
-            }
-            catch (StaleElementReferenceException se)
-            {
-
-            }
-            try
-            {
-                return !drone.find(By.cssSelector("div[id$='default-cloud-folder-title']")).isDisplayed();
-            }
-            catch (NoSuchElementException nse)
-            {
-
-            }
-            catch (StaleElementReferenceException se)
-            {
-            }
-
-            try
-            {
-                return !drone.find(By.cssSelector("div[id$='cloudDestination-cloud-folder-treeview']")).isDisplayed();
-            }
-            catch (NoSuchElementException nse)
-            {
-            }
-            catch (StaleElementReferenceException se)
-            {
-            }
-            time.end();
-            continue;
         }
+        return false;
+    }
 
+    /**
+     *
+     * @return true if Cloud Sync Page is opened (page in My Profile section)
+     */
+    private boolean isCloudSyncPage()
+    {
+        return drone.findAll(By.xpath("//div[contains(@id,'user-cloud-auth') and contains(@class,'notifications')]")).size() != 0;
     }
 
     public void selectCancelButton()
