@@ -259,6 +259,10 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
             }
             catch (Exception e)
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("An exception occurred while writing the response.", e);
+                }
             }
         }
         else
@@ -361,9 +365,15 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
             resourceNodeRef = resourceFileInfo.getNodeRef();
         }
         
+        if(logger.isDebugEnabled())
+        {
+           logger.debug("The request lock timeout from response is " + lockTimeOut);
+           logger.debug("The resource nodeRef is " + resourceNodeRef);
+        }
+        
         // Does the file already exist (false), or has it been created by this request? 
         boolean newlyCreated = false;
-        
+ 
         // Office 2008/2011 for Mac
         if (resourceNodeRef == null && lockTimeOut != null)
         {
@@ -392,6 +402,11 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
                 if (resourceNodeRef != null)
                 {
                     newlyCreated = true;
+                }
+
+                if (logger.isDebugEnabled())
+                {
+                   logger.debug("Created new node " + resourceNodeRef);
                 }
 
                 response.setStatus(HttpServletResponse.SC_CREATED);
@@ -447,6 +462,10 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
                 FileFolderService fileFolderService = getFileFolderService();
                 if (workingCopyNodeRef != null)
                 {
+                    if(logger.isDebugEnabled())
+                    {
+                       logger.debug("Writing to the workung copy " + workingCopyNodeRef);
+                    }
                     if (fileFolderService.isHidden(workingCopyNodeRef))
                     {
                         fileFolderService.setHidden(workingCopyNodeRef, false);
@@ -463,7 +482,10 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
                         // make it visible for client
                         fileFolderService.setHidden(finalResourceNodeRef, false);
                     }
-
+                    if(logger.isDebugEnabled())
+                    {
+                       logger.debug("Writing to the node " + finalResourceNodeRef);
+                    }
                     // original document writer
                     writer = getContentService().getWriter(finalResourceNodeRef, ContentModel.PROP_CONTENT, true);
 
@@ -487,6 +509,10 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
                 if (workingCopyNodeRef == null && !getNodeService().hasAspect(finalResourceNodeRef, ContentModel.ASPECT_VERSIONABLE) && ContentData.hasContent(contentData)
                         && contentData.getSize() > 0)
                 {
+                    if(logger.isDebugEnabled())
+                    {
+                       logger.debug("Creating a new major version for " + finalResourceNodeRef);
+                    }
                     getVersionService().createVersion(finalResourceNodeRef, Collections.<String, Serializable> singletonMap(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR));
                 }
 
@@ -505,6 +531,10 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
         }
         catch (Exception e)
         {
+            if(logger.isDebugEnabled())
+            {
+               logger.debug("An exception occurred during writing the content.", e);
+            }
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return;
         }
@@ -810,6 +840,10 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
         }
         catch (Throwable e)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("An exception occurred during document uncheckout.", e);
+            }
             if ((e instanceof VtiHandlerException) == false)
             {
                 throw new VtiHandlerException(VtiHandlerException.DOC_NOT_CHECKED_OUT);
