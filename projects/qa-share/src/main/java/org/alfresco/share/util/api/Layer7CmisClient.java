@@ -15,12 +15,14 @@ import java.util.Map;
 /**
  * Created by dmitry.yukhnovets on 13.10.2014.
  */
-public class Layer7CmisClient extends PublicApiClient {
+public class Layer7CmisClient extends PublicApiClient
+{
     private PublicApiHttpClient client;
     private ThreadLocal<RequestContext> rc = new ThreadLocal<RequestContext>();
     private WebDrone drone;
 
-    public Layer7CmisClient(WebDrone drone, PublicApiHttpClient client, UserDataService userDataService) {
+    public Layer7CmisClient(WebDrone drone, PublicApiHttpClient client, UserDataService userDataService)
+    {
         super(client, userDataService);
         this.client = client;
         this.drone = drone;
@@ -32,17 +34,16 @@ public class Layer7CmisClient extends PublicApiClient {
         CmisSession cmisSession = null;
 
         RequestContext context = rc.get();
-        if(context == null)
+        if (context == null)
         {
             throw new RuntimeException("Must set a request context");
         }
-
 
         String networkId = context.getNetworkId();
         String username = context.getRunAsUser();
         UserData userData = findUser(context.getRunAsUser());
 
-        if(userData != null)
+        if (userData != null)
         {
             String password = userData.getPassword();
             String tokenKey = AbstractUtils.getTokenKey(drone, username, password);
@@ -55,23 +56,23 @@ public class Layer7CmisClient extends PublicApiClient {
             // user credentials
             parameters.put(SessionParameter.HEADER + ".0", "Authorization: Bearer " + tokenKey);
 
-            if(binding == CMISDispatcherRegistry.Binding.atom)
+            if (binding == CMISDispatcherRegistry.Binding.atom)
             {
 
                 parameters.put(SessionParameter.BINDING_TYPE, binding.getOpenCmisBinding().value());
                 parameters.put(SessionParameter.ATOMPUB_URL, client.getPublicApiCmisUrl(networkId, binding, version, null));
 
             }
-            else if(binding == CMISDispatcherRegistry.Binding.browser)
+            else if (binding == CMISDispatcherRegistry.Binding.browser)
             {
                 parameters.put(SessionParameter.BROWSER_URL, client.getPublicApiCmisUrl(networkId, binding, version, null));
                 parameters.put(SessionParameter.BINDING_TYPE, binding.getOpenCmisBinding().value());
             }
-            if(networkId != null)
+            if (networkId != null)
             {
                 parameters.put(SessionParameter.REPOSITORY_ID, networkId);
             }
-            if(objectFactoryName != null)
+            if (objectFactoryName != null)
             {
                 parameters.put(SessionParameter.OBJECT_FACTORY_CLASS, objectFactoryName);
             }
@@ -91,6 +92,5 @@ public class Layer7CmisClient extends PublicApiClient {
         this.rc.set(rc);
         super.setRequestContext(rc);
     }
-
 
 }

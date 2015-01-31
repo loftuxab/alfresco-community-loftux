@@ -21,6 +21,7 @@ import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.enums.ViewType;
 import org.alfresco.po.share.site.document.*;
 import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
+import org.alfresco.po.share.site.document.TreeMenuNavigation.TreeMenu;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserRepositoryPage;
@@ -422,6 +423,14 @@ public class RepositoryFolderTests1 extends AbstractUtils
         Map<String, Object> props = folderDetailsPage.getProperties();
 
         Assert.assertEquals(props.get("Categories").toString(), "[" + Categories.TAGS + "]");
+        
+        // Step 7
+        ShareUserRepositoryPage.openRepositoryDetailedView(drone);
+        
+        // Step 8
+        ShareUserSitePage.clickOnCategoriesInTreeMenu(drone, drone.getValue("categories.tree.root"), drone.getValue("category.tags"));
+        
+        ShareUserSitePage.getDocLibInfoWithRetry(drone, folder1, "isContentVisible", folder1, true);
 
         ShareUser.logout(drone);
 
