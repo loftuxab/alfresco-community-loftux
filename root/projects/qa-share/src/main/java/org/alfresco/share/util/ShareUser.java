@@ -106,7 +106,7 @@ public class ShareUser extends AbstractUtils
         catch (Exception e)
         {
             String errorMessage = "Failed: Login: " + userInfo[0] + " Password: " + userInfo[1] + " Error: " + e;
-            logger.info(errorMessage);
+            logger.error(errorMessage,e);
             throw new SkipException(errorMessage);
         }
 
