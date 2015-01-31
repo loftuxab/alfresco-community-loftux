@@ -12,10 +12,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import static org.alfresco.po.share.enums.CloudSyncStatus.*;
@@ -51,7 +48,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
     {
         super.setup();
         testName = this.getClass().getSimpleName();
-        siteName = getSiteName(testName) + System.currentTimeMillis();
+        siteName = getSiteName(testName) + "2";
         fileName = getFileName(testName);
         fileNamePlain = fileName + "plainText";
         editedFileNamePlain = fileNamePlain + "edited";
@@ -153,7 +150,6 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
         while (!docLibCl.isFileVisible(editedFileNamePlain))
         {
             webDriverWait(hybridDrone, timeToWait);
-            ShareUser.login(hybridDrone, adminUserPrem);
             docLibCl = openSitesDocumentLibrary(hybridDrone, siteName).render();
             i++;
             if(i > retryCount)
@@ -278,7 +274,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
         while(!(docLibCl.isFileVisible(newFiles[0]) && docLibCl.isFileVisible(newFiles[1])))
         {
             webDriverWait(hybridDrone, timeToWait);
-            docLibCl = (DocumentLibraryPage) refreshSharePage(hybridDrone);
+            docLibCl = refreshDocumentLibrary(hybridDrone);
             i++;
             if(i > retryCount)
                 break;
@@ -490,11 +486,11 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
         ShareUser.login(hybridDrone, adminUserPrem).render();
         doclibCl = ShareUser.openSitesDocumentLibrary(hybridDrone, siteName);
         assertTrue(doclibCl.isFileVisible(newFolderInCloud), "Items are not available in Cloud");
-        doclibCl = doclibCl.getFileDirectoryInfo(newFolderInCloud).clickOnTitle().render();
+        doclibCl.getFileDirectoryInfo(newFolderInCloud).clickOnTitle().render();
         assertTrue(checkIfContentIsSynced(hybridDrone, folderName), "Items are not synced on Cloud side");
 
         //History should show, sync target location, synced from location, last synced time and date, synced by, last failed sync if any, and version history
-        DocumentDetailsPage detailsPage1 = ShareUser.openSitesDocumentLibrary(drone, siteName).render().getFileDirectoryInfo(editedFileNamePlain)
+        DocumentDetailsPage detailsPage1 = ShareUser.openDocumentLibrary(drone).render().getFileDirectoryInfo(editedFileNamePlain)
             .clickOnTitle().render();
         syncInf1 = detailsPage1.getSyncInfoPage();
         assertTrue(syncInf1.getCloudSyncLocation().equals(syncLocation) && syncInf1.getCloudSyncStatus().contains(ATTEMPTED.getValue()) && syncInf1.
@@ -502,7 +498,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
             && detailsPage1.getCurrentVersionDetails().getVersionNumber().equals("1.1"),
             "Incorrect sync history for " + editedFileNamePlain);
 
-        DocumentDetailsPage detailsPage2 = ShareUser.openSitesDocumentLibrary(drone, siteName).render().getFileDirectoryInfo(fileNameXml)
+        DocumentDetailsPage detailsPage2 = ShareUser.openDocumentLibrary(drone).render().getFileDirectoryInfo(fileNameXml)
             .clickOnTitle().render();
         SyncInfoPage syncInf2 = detailsPage2.getSyncInfoPage();
         assertTrue(syncInf2.getCloudSyncLocation().equals(syncLocation) && syncInf2.getCloudSyncStatus().contains(SYNCED.getValue())
@@ -510,14 +506,14 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
             .contains(adminUserPrem));
         assertNotNull(syncInf2.getSyncPeriodDetails());
 
-        FolderDetailsPage fldDetails = ShareUser.openSitesDocumentLibrary(drone, siteName).render().getFileDirectoryInfo(folderName).selectViewFolderDetails()
+        FolderDetailsPage fldDetails = ShareUser.openDocumentLibrary(drone).render().getFileDirectoryInfo(folderName).selectViewFolderDetails()
             .render();
         SyncInfoPage syncInf3 = fldDetails.getSyncInfoPage();
         assertTrue(syncInf3.getCloudSyncLocation().equals(syncLocation + ">" + newFolderInCloud + ">" + folderName) && syncInf3.getCloudSyncStatus().contains(SYNCED
         .getValue()));
         assertNotNull(syncInf3.getSyncPeriodDetails());
 
-        doclibPrem = ShareUser.openSitesDocumentLibrary(drone, siteName).getFileDirectoryInfo(folderName).clickOnTitle().render();
+        doclibPrem = ShareUser.openDocumentLibrary(drone).getFileDirectoryInfo(folderName).clickOnTitle().render();
         for(String theFile: newFiles)
         {
             DocumentDetailsPage fileDtls = (DocumentDetailsPage)doclibPrem.getFileDirectoryInfo(theFile).clickOnTitle();
@@ -526,6 +522,44 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
                 .contains(SYNCED.getValue()));
             assertNotNull(syncInf1.getSyncPeriodDetails());
             doclibPrem = fileDtls.getSiteNav().selectSiteDocumentLibrary().render().getFileDirectoryInfo(folderName).clickOnTitle().render();
+        }
+
+        //Check history on cloud
+        detailsPage1 = ShareUser.openDocumentLibrary(hybridDrone).render().getFileDirectoryInfo(editedFileNamePlain)
+            .clickOnTitle().render();
+        VersionDetails verdetails1 = detailsPage1.getCurrentVersionDetails();
+        VersionDetails verdetails2 = detailsPage1.getOlderVersionDetails().get(0);
+        String comments2 = detailsPage1.getCommentsOfLastCommit();
+        assertTrue(verdetails1.getVersionNumber().equals("1.1") && verdetails1.getUserName().toString().contains(adminUserPrem) && verdetails1.getFileName()
+            .equals(editedFileNamePlain) && verdetails2.getFileName().equals(fileNamePlain) && comments2.contains(siteName + "/" + editedFileNamePlain),
+            "Incorrect sync history for " + editedFileNamePlain + " in Cloud");
+
+        detailsPage2 = ShareUser.openDocumentLibrary(hybridDrone).render().getFileDirectoryInfo(fileNameXml).clickOnTitle().render();
+        verdetails1 = detailsPage2.getCurrentVersionDetails();
+        comments2 = detailsPage2.getCommentsOfLastCommit();
+        assertTrue(verdetails1.getVersionNumber().equals("1.0") && verdetails1.getUserName().toString().contains(adminUserPrem) && verdetails1.getFileName()
+            .equals(fileNameXml) && comments2.contains(siteName + "/" + fileNameXml),
+            "Incorrect sync history for " + editedFileNamePlain + " in Cloud");
+
+        ShareUser.openDocumentLibrary(hybridDrone).getFileDirectoryInfo(newFolderInCloud).clickOnTitle().render();
+        fldDetails = ShareUser.openFolderDetailPage(hybridDrone, folderName).render();
+        syncInf3 = fldDetails.getSyncInfoPage();
+        assertTrue(syncInf3.getCloudSyncStatus().contains(SYNCED.getValue()));
+        assertNotNull(syncInf3.getSyncPeriodDetails());
+
+        doclibCl = ShareUser.openDocumentLibrary(hybridDrone).getFileDirectoryInfo(newFolderInCloud).clickOnTitle().render();
+        doclibCl.getFileDirectoryInfo(folderName).clickOnTitle().render();
+        for(String theFile: newFiles)
+        {
+            DocumentDetailsPage fileDtls = (DocumentDetailsPage)doclibCl.getFileDirectoryInfo(theFile).clickOnTitle();
+            syncInf1 = fileDtls.getSyncInfoPage();
+            VersionDetails verdetails = fileDtls.getCurrentVersionDetails();
+            assertTrue(syncInf1.getCloudSyncDocumentName().equals(folderName) && syncInf1.getCloudSyncStatus().contains(SYNCED.getValue())
+            && verdetails.getFileName().equals(theFile) && verdetails.getUserName().toString().contains(adminUserPrem)
+            && verdetails.getComment().contains(siteName + "/" + folderName + "/" + theFile));
+            assertNotNull(syncInf1.getSyncPeriodDetails());
+            doclibCl = ShareUser.openDocumentLibrary(hybridDrone).render().getFileDirectoryInfo(newFolderInCloud).clickOnTitle().render();
+            doclibCl.getFileDirectoryInfo(folderName).clickOnTitle().render();
         }
     }
 }
