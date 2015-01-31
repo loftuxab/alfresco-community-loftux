@@ -2,18 +2,26 @@ package org.alfresco.po.share.wqs;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 public class WcmqsNewsArticleDetails extends WcmqsAbstractArticlePage
 {
     private final By ARTICLE_BODY = By.cssSelector("div.article-body");
     private final By TITLE_LINK = By.cssSelector("div.interior-content>h2");
     private final By DETAILS_LINK = By.cssSelector("div.interior-content span.ih-date");
+    private final By ARTICLE_IMG = By.cssSelector("div.article-body img");
+    private final By TAGS_SECTION = By.cssSelector("h3.tag-list");
+    private final By TAG_LIST = By.cssSelector("ul.tag-list");
 
     public WcmqsNewsArticleDetails(WebDrone drone)
     {
@@ -86,5 +94,91 @@ public class WcmqsNewsArticleDetails extends WcmqsAbstractArticlePage
             throw new PageOperationException("Exceeded time to find deatils of the article. " + e.toString());
         }
 
+    }
+    
+    /**
+     * Method to get the link name from "Form" section
+     * 
+     * @return the text of the FromLink
+     */
+    public String getFromLinkName()
+    {
+        try
+        {
+            WebElement detailLink = drone.findAndWait(DETAILS_LINK);
+            return detailLink.findElement(By.cssSelector("a")).getText();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find deatils of the article. " + e.toString());
+        }
+    }
+
+    public boolean isNewsArticleImageDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(ARTICLE_IMG).isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find image of the article. " + e.toString());
+        }
+
+    }
+
+    public boolean isTagsSectionDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(TAGS_SECTION).isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find Tags section of the article. " + e.toString());
+        }
+
+    }
+
+    /**
+     * Method to get all tags in section tag list as text
+     * 
+     * @return List<String> Contains "None" in case of empty list
+     */
+    public List<String> getTagList()
+    {
+
+        ArrayList<String> taglist = new ArrayList<String>();
+        WebElement sectionTags = null;
+        try
+        {
+            sectionTags = drone.find(TAG_LIST);
+        }
+        catch (NoSuchElementException e)
+        {
+            taglist.add("None");
+        }
+
+        List<WebElement> tags = sectionTags.findElements(By.cssSelector("a"));
+        for (WebElement tag : tags)
+        {
+            taglist.add(tag.getText());
+        }
+        return taglist;
+
+    }
+    
+    public WcmqsNewsPage clickComponentLinkFromSection(String componentLink)
+    {
+        try
+        {
+            WebElement detailLink = drone.findAndWait(DETAILS_LINK);
+            detailLink.findElement(By.cssSelector(String.format("a[href*=\"%s\"]",componentLink))).click();
+            return new WcmqsNewsPage(drone);
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find deatils of the article. " + e.toString());
+        }
     }
 }
