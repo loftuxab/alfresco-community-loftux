@@ -191,6 +191,10 @@ public class WebDavUtil extends AbstractUtils
 
     public static boolean editContent(String shareUrl, String userName, String password, String remoteContentName, String remoteFolderPath)
     {
+        if(remoteContentName.contains(" "))
+        {
+            remoteContentName = remoteContentName.replace(" ","%20");
+        }
 
         try
         {
@@ -229,6 +233,10 @@ public class WebDavUtil extends AbstractUtils
 
         ArrayList<String> list = new ArrayList<String>();
 
+        if(remoteObject.contains(" "))
+        {
+            remoteObject = remoteObject.replace(" ","%20");
+        }
         try
         {
 
@@ -309,8 +317,7 @@ public class WebDavUtil extends AbstractUtils
         {
 
             HttpClient client = connectServer(shareUrl, userName, password);
-            DavMethod pFind = new PropFindMethod(serverUrl + "/" + remoteFolderPath,
-                    DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
+            DavMethod pFind = new PropFindMethod(serverUrl + "/" + remoteFolderPath, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
             client.executeMethod(pFind);
             MultiStatus multiStatus = pFind.getResponseBodyAsMultiStatus();
             MultiStatusResponse[] responses = multiStatus.getResponses();
@@ -332,5 +339,83 @@ public class WebDavUtil extends AbstractUtils
         }
 
         return list;
+    }
+
+    /**
+     * Method to move content
+     * 
+     * @param shareUrl
+     * @param userName
+     * @param password
+     * @param remotePath
+     * @param remoteNewPath
+     * @param overwrite
+     * @return true if folder is moved
+     */
+    public static boolean moveContent(String shareUrl, String userName, String password, String remotePath, String remoteNewPath, boolean overwrite)
+    {
+
+        try
+        {
+
+            HttpClient client = connectServer(shareUrl, userName, password);
+            MoveMethod move = new MoveMethod(serverUrl + "/" + remotePath, serverUrl + "/" + remoteNewPath, overwrite);
+            client.executeMethod(move);
+            move.releaseConnection();
+            if (move.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED)
+            {
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return false;
+    }
+
+    public static boolean renameItem(String shareUrl, String userName, String password, String remotePath, String remoteNewPath)
+    {
+        try
+        {
+            return moveContent(shareUrl, userName, password, remotePath, remoteNewPath, false);
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Method to copy content
+     * 
+     * @param shareUrl
+     * @param userName
+     * @param password
+     * @param remotePath
+     * @param copyNewPath
+     * @param overwrite
+     * @return true if folder is moved
+     */
+    public static boolean copyContent(String shareUrl, String userName, String password, String remotePath, String copyNewPath, boolean overwrite)
+    {
+
+        try
+        {
+
+            HttpClient client = connectServer(shareUrl, userName, password);
+            CopyMethod copy = new CopyMethod(serverUrl + "/" + remotePath, serverUrl + "/" + copyNewPath, overwrite);
+            client.executeMethod(copy);
+            copy.releaseConnection();
+            if (copy.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED)
+            {
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return false;
     }
 }
