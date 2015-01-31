@@ -30,7 +30,7 @@ public class TenantAdminConsolePage extends AbstractAdminConsole
 
     private final static By INPUT_FIELD = By.name("tenant-cmd"); 
     private final static By SUBMIT_BUTTON = By.cssSelector("input.inline"); 
-    protected TenantAdminConsolePage(WebDrone drone)
+    public TenantAdminConsolePage(WebDrone drone)
     {
         super(drone);
     }
