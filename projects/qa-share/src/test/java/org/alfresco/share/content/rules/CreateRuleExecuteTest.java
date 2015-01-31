@@ -1694,6 +1694,8 @@ public class CreateRuleExecuteTest extends AbstractUtils
         String value = "smm:propDate";
 
         Date today = new Date(new java.util.Date().getTime());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        String ruleDate = sdf.format(today);
         SimpleDateFormat sdf1 = new SimpleDateFormat("EEE dd MMM yyyy", Locale.ENGLISH);
         String propDate = sdf1.format(today);
 
@@ -1818,6 +1820,8 @@ public class CreateRuleExecuteTest extends AbstractUtils
 
         // Select any property and click "Create" button
         // auto complete createRulePage.fillSetValueField(ruleDate);
+        createRulePage.fillSetValueFieldDate(ruleDate);
+
         folderRulesPageWithRules = createRulePage.clickCreate().render();
         Assert.assertTrue(folderRulesPageWithRules.isPageCorrect(folderName), "Rule page with rule isn't correct");
 
