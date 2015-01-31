@@ -20,6 +20,9 @@
 package org.alfresco.jlan.smb.server;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.springframework.extensions.config.ConfigElement;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
@@ -181,6 +184,9 @@ public class CIFSConfigSection extends ConfigSection {
   
   private boolean m_disableNativeCode = false;
   
+  private List<String> m_terminalServerList;
+  private List<String> m_loadBalancerList;
+  
   /**
    * Class constructor
    * 
@@ -194,6 +200,60 @@ public class CIFSConfigSection extends ConfigSection {
     m_dialects = new DialectSelector();
     m_dialects.EnableAll();
   }
+  
+  /**
+     * Sets the terminal server list.
+     * 
+     * @param terminalServerList
+     */
+    public final int setTerminalServerList(List<String> terminalServerList) throws InvalidConfigurationException
+    {
+        // Inform listeners, validate the configuration change
+
+        int sts = fireConfigurationChange(ConfigId.SMBTerminalServerList, terminalServerList);
+        m_terminalServerList = terminalServerList;
+
+        // Return the change status
+
+        return sts;
+    }
+
+    /**
+     * Gets the terminal server list address.
+     * 
+     * @return the terminal server list address
+     */
+    public final List<String> getTerminalServerList()
+    {
+        return m_terminalServerList;
+    }
+  
+    /**
+     * Sets the load balancer list.
+     * 
+     * @param loadBalancerList
+     */
+    public final int setLoadBalancerList(List<String> loadBalancerList) throws InvalidConfigurationException
+    {
+        // Inform listeners, validate the configuration change
+
+        int sts = fireConfigurationChange(ConfigId.SMBLoadBalancerList, loadBalancerList);
+        m_loadBalancerList = loadBalancerList;
+
+        // Return the change status
+
+        return sts;
+    }
+  
+    /**
+     * Gets the load balancer list address.
+     * 
+     * @return the load balancer list address
+     */
+    public final List<String> getLoadBalancerList()
+    {
+        return m_loadBalancerList;
+    }
   
   /**
    * Get the authenticator object that is used to provide user and share connection authentication.
