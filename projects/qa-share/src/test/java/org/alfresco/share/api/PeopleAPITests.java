@@ -51,7 +51,7 @@ import org.testng.annotations.Test;
  * @author Abhijeet Bharade
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = { "AlfrescoOne", "Cloud2" })
+@Test(groups = { "AlfrescoOne" })
 public class PeopleAPITests extends PeopleAPI
 {
     private String testName;
