@@ -1923,6 +1923,9 @@ var DASHLET_TITLE_BAR_ACTIONS_OPACITY = 0,
                         width: "30em"
                      });
                      
+                     // MNT-12551
+                     Dom.setAttribute(balloon.content, "role", "alert");
+
                      var show = (function(e)
                      {
                         return function(e)
