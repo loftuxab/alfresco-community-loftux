@@ -22,32 +22,30 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.extensions.config.RemoteConfigElement;
+import org.springframework.extensions.config.RemoteConfigElement.EndpointDescriptor;
+
 /**
- * A simple implementation of a credential vault that does not persist anything
- * to disk or database.
+ * A simple implementation of a credential vault.
  * <p>
  * Credentials can be stored and retrieved from this vault but they will be lost
  * when the server is restarted.
- * <p>
- * That said, this implementation will likely be very useable for any situations
- * where you wish to explicitly challenge the end user but only challenge them
- * once.
- * 
- * @author muzquiano
  */
 public class SimpleCredentialVault implements CredentialVault, Serializable
 {
-    public String id;
-    public Map<String, Credentials> credentialsMap = new HashMap<String, Credentials>(8, 1.0f);
+    final protected String id;
+    final protected Map<String, Credentials> credentialsMap = new HashMap<String, Credentials>(8, 1.0f);
+    final protected RemoteConfigElement remote;
     
     /**
      * Instantiates a new simple credential vault.
      * 
      * @param id the id
      */    
-    public SimpleCredentialVault(String id)
+    public SimpleCredentialVault(String id, RemoteConfigElement remote)
     {
         this.id = id;
+        this.remote = remote;
     }
     
     /* (non-Javadoc)
@@ -55,7 +53,7 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
      */
     public void store(Credentials credentials)
     {
-        credentialsMap.put(credentials.getEndpointId(), credentials);
+        this.credentialsMap.put(credentials.getEndpointId(), credentials);
     }
 
     /* (non-Javadoc)
@@ -63,7 +61,19 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
      */
     public Credentials retrieve(String endpointId)
     {
-        return (Credentials) credentialsMap.get(endpointId);
+        Credentials credentials = this.credentialsMap.get(endpointId);
+        if (credentials == null)
+        {
+            // Remap endpoint allow an endpoint to share another endpoint credentials
+            // @see ConnectorService.getConnectorSession()
+            EndpointDescriptor desc = this.remote.getEndpointDescriptor(endpointId);
+            String remapId = desc.getParentId();
+            if (remapId != null)
+            {
+                credentials = this.credentialsMap.get(remapId);
+            }
+        }
+        return credentials;
     }
     
     /* (non-Javadoc)
@@ -71,7 +81,7 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
      */
     public void remove(String endpointId)
     {
-        credentialsMap.remove(endpointId);
+        this.credentialsMap.remove(endpointId);
     }
         
     /* (non-Javadoc)
@@ -99,22 +109,6 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
         store(credentials);
         
         return credentials;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.connector.CredentialVault#load()
-     */
-    public boolean load()
-    {
-        return true;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.connector.CredentialVault#save()
-     */
-    public boolean save()
-    {
-        return true;
     }
 
     /* (non-Javadoc)
