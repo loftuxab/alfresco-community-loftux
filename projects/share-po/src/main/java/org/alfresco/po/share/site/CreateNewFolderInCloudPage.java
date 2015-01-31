@@ -40,9 +40,11 @@ public class CreateNewFolderInCloudPage extends SharePage
 {
     private static final Logger logger = Logger.getLogger(CreateNewFolderInCloudPage.class);
 
-    private static final By FOLDER_TITLE_CSS = By.cssSelector("div[id$='_default-cloud-folder-createFolderInTheCloud-dialogTitle']");
+    private static final By TITLE = By.cssSelector("input[id$='createFolderInTheCloud_prop_cm_title']");
     private static final By NAME = By.cssSelector("input[id$='_default-cloud-folder-createFolderInTheCloud_prop_cm_name']");
-    private static final By DESCRIPTION = By.cssSelector("input[id$='_default-cloud-folder-createFolderInTheCloud_prop_cm_description']");
+    private final By NAME_LABEL = By.cssSelector("div[class='form-field']>label[for$='folder-createFolderInTheCloud_prop_cm_name']");
+    private static final By DESCRIPTION = By.cssSelector("textarea[id$='_default-cloud-folder-createFolderInTheCloud_prop_cm_description']");
+    private final By DESCRIPTION_LABEL = By.cssSelector("div>label[for$='folder-createFolderInTheCloud_prop_cm_description']");
     private static final By SAVE_BUTTON = By.cssSelector("button[id$='_default-cloud-folder-createFolderInTheCloud-form-submit-button']");
 
     /**
@@ -152,10 +154,36 @@ public class CreateNewFolderInCloudPage extends SharePage
 
         if (folderTitle != null && !folderTitle.isEmpty())
         {
-            WebElement inputFolderName = drone.find(FOLDER_TITLE_CSS);
+            WebElement inputFolderName = drone.findAndWait(TITLE);
             inputFolderName.sendKeys(folderTitle);
         }
 
         return createNewFolder(folderName, description);
+    }
+
+    public boolean isNameLabelDisplayed()
+    {
+        try
+        {
+            drone.findAndWait(NAME_LABEL);
+            return true;
+        }
+        catch (TimeoutException te)
+        {
+        }
+        return false;
+    }
+
+    public boolean isDescriptionLabelDisplayed()
+    {
+        try
+        {
+            drone.findAndWait(DESCRIPTION_LABEL);
+            return true;
+        }
+        catch (TimeoutException te)
+        {
+        }
+        return false;
     }
 }
