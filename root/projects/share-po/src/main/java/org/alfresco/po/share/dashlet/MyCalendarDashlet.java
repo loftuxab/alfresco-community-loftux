@@ -212,11 +212,16 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
         {
             String linkText = eventLink.getText();
             if (linkText.equalsIgnoreCase(eventName))
+            {
                 eventLink.click();
-
+                return new CalendarPage(drone);
+            }
         }
 
-        return new CalendarPage(drone);
+        throw new PageOperationException("Event '" + eventName + "' was not found!");
+        
+        
+        
     }
 
     private List<WebElement> getSitesDetailsElem()
@@ -248,10 +253,13 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
         {
             String linkText = eventLink.getText();
             if (linkText.equalsIgnoreCase(siteName))
+            {
                 eventLink.click();
+                return new SiteDashboardPage(drone);
+            }
         }
 
-        return new SiteDashboardPage(drone);
+        throw new PageOperationException("Site '" + siteName + "' was not found!");
     }
 
     /**
