@@ -18,10 +18,6 @@
  */
 package org.alfresco.share.dashlet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.alfresco.po.share.dashlet.SavedSearchDashlet;
 import org.alfresco.po.share.dashlet.SiteSearchItem;
 import org.alfresco.po.share.enums.Dashlets;
@@ -41,6 +37,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Ranjith Manyam
@@ -132,7 +132,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         ShareUser.logout(drone);
     }
 
-    @Test (groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" })
     public void AONE_14709() throws Exception
     {
         String testName = getTestName();
@@ -149,7 +149,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         List<String> searchTermsList = new ArrayList<String>();
         searchTermsList.add("modifier: " + "\"" + userName + "\"");
         searchTermsList.add("modifier: " + "\"" + firstName + "\"");
-        searchTermsList.add("modifier: " + "\"" +  DEFAULT_LASTNAME + "\"");
+        searchTermsList.add("modifier: " + "\"" + DEFAULT_LASTNAME + "\"");
 
         List<SiteSearchItem> items;
 
@@ -205,7 +205,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName1));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName2));
 
-        items = ShareUserDashboard.searchSavedSearchDashlet(drone, "description: "+ fileName1);
+        items = ShareUserDashboard.searchSavedSearchDashlet(drone, "description: " + fileName1);
         Assert.assertEquals(items.size(), 1);
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName2));
 
@@ -336,8 +336,8 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String siteName = getSiteName(testName);
         String fileName1 = testUser + ".txt";
         String fileName2 = "file2";
-        String[] fileInfo1 = {fileName1};
-        String[] fileInfo2 = {fileName2};
+        String[] fileInfo1 = { fileName1 };
+        String[] fileInfo2 = { fileName2 };
 
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -355,7 +355,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         ShareUser.logout(drone);
     }
 
-    @Test(groups = { "EnterpriseOnly", "IntermittentBugs"})
+    @Test(groups = { "EnterpriseOnly", "IntermittentBugs" })
     public void AONE_14713() throws Exception
     {
         String testName = getTestName();
@@ -398,6 +398,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SAVED_SEARCH);
         ShareUser.logout(drone);
     }
+
     @Test(groups = { "alfrscoBug" })
     public void AONE_14714() throws Exception
     {
@@ -518,10 +519,10 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_CONTENT_DASHLET, fileName, true, siteName));
 
         List<String> searchTerms = Arrays.asList("created: today",
-                                                 "created: \"" + getDate("yyyy-MM-dd") + "\"",
-                                                 "created: \"" + getDate("yyyy-MMM-dd") + "\"",
-                                                 "created: [" + getDate("yyyy-MM-dd")+ " TO TODAY]",
-                                                 "created: [" + getDate("yyyy-MM-dd") + " TO NOW]");
+            "created: \"" + getDate("yyyy-MM-dd") + "\"",
+            "created: \"" + getDate("yyyy-MMM-dd") + "\"",
+            "created: [" + getDate("yyyy-MM-dd") + " TO TODAY]",
+            "created: [" + getDate("yyyy-MM-dd") + " TO NOW]");
         List<SiteSearchItem> items;
 
         for (String searchTerm : searchTerms)
@@ -656,7 +657,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         ShareUser.logout(drone);
     }
 
-    @Test(groups = { "EnterpriseOnly", "IntermittentBugs"})
+    @Test(groups = { "EnterpriseOnly", "IntermittentBugs" })
     public void AONE_14719() throws Exception
     {
         String testName = getTestName();
@@ -888,7 +889,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         ShareUser.logout(drone);
     }
 
-    @Test(groups = { "EnterpriseOnly", "IntermittentBugs"})
+    @Test(groups = { "EnterpriseOnly", "IntermittentBugs" })
     public void AONE_14723() throws Exception
     {
         String testName = getTestName();
@@ -985,7 +986,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         List<String> searchTerms = new ArrayList<String>();
         searchTerms.add("12?4");
         searchTerms.add("*234");
-        searchTerms.add("="+fileName);
+        searchTerms.add("=" + fileName);
         searchTerms.add("\"1234\"");
         searchTerms.add("????");
         searchTerms.add("\"???4\"");
@@ -1033,8 +1034,8 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         ShareUser.openSiteDashboard(drone, siteName);
 
         List<String> searchTerms = new ArrayList<String>();
-        searchTerms.add("{http://www.alfresco.org/model/content/1.0}name: "+fileName);
-        searchTerms.add("@{http://www.alfresco.org/model/content/1.0}name: "+fileName);
+        searchTerms.add("{http://www.alfresco.org/model/content/1.0}name: " + fileName);
+        searchTerms.add("@{http://www.alfresco.org/model/content/1.0}name: " + fileName);
 
         List<SiteSearchItem> items;
 
@@ -1136,7 +1137,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
         String[] fileInfo1 = { fileName1 };
 
         String[] testUserInfo = new String[] { testUser };
@@ -1155,7 +1156,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1173,8 +1174,8 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
         String[] fileInfo1 = { fileName1 };
         String[] fileInfo2 = { fileName2 };
         String comment = getComment(fileName1);
@@ -1200,8 +1201,8 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1219,8 +1220,8 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
         String[] fileInfo1 = { fileName1 };
         String[] fileInfo2 = { fileName2 };
 
@@ -1246,8 +1247,8 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1266,13 +1267,13 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
-        String fileName3 = getFileName(testName)+"-3.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
+        String fileName3 = getFileName(testName) + "-3.txt";
         String[] fileInfo1 = { fileName1 };
         String[] fileInfo2 = { fileName2 };
         String[] fileInfo3 = { fileName3 };
-        String comment = testName+" Comment.";
+        String comment = testName + " Comment.";
 
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -1293,7 +1294,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SAVED_SEARCH);
         ShareUser.logout(drone);
     }
-    
+
     //TODO: This test case has an issue opened against it ACE-805, change of test case will happen once issue is fixed.   
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_14732() throws Exception
@@ -1301,9 +1302,9 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
-        String fileName3 = getFileName(testName)+"-3.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
+        String fileName3 = getFileName(testName) + "-3.txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1329,13 +1330,13 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
 
         String file1Content = "big red apple";
         String file2Content = "big red tasty sweet apple";
-        String[] fileInfo1 = {fileName1, DOCLIB, file1Content};
-        String[] fileInfo2 = {fileName2, DOCLIB, file2Content};
+        String[] fileInfo1 = { fileName1, DOCLIB, file1Content };
+        String[] fileInfo2 = { fileName2, DOCLIB, file2Content };
 
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -1356,8 +1357,8 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1383,10 +1384,10 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName = getFileName(testName)+".txt";
+        String fileName = getFileName(testName) + ".txt";
 
         String fileContent = "big red apple";
-        String[] fileInfo = {fileName, DOCLIB, fileContent};
+        String[] fileInfo = { fileName, DOCLIB, fileContent };
 
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -1406,7 +1407,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName = getFileName(testName)+".txt";
+        String fileName = getFileName(testName) + ".txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1424,16 +1425,16 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
-        String fileName3 = getFileName(testName)+"-3.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
+        String fileName3 = getFileName(testName) + "-3.txt";
 
         String file1Content = "this is an item";
         String file2Content = "this the best item";
         String file3Content = "this the best ever";
-        String[] fileInfo1 = {fileName1, DOCLIB, file1Content};
-        String[] fileInfo2 = {fileName2, DOCLIB, file2Content};
-        String[] fileInfo3 = {fileName3, DOCLIB, file3Content};
+        String[] fileInfo1 = { fileName1, DOCLIB, file1Content };
+        String[] fileInfo2 = { fileName2, DOCLIB, file2Content };
+        String[] fileInfo3 = { fileName3, DOCLIB, file3Content };
 
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -1455,9 +1456,9 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName)+"-1.txt";
-        String fileName2 = getFileName(testName)+"-2.txt";
-        String fileName3 = getFileName(testName)+"-3.txt";
+        String fileName1 = getFileName(testName) + "-1.txt";
+        String fileName2 = getFileName(testName) + "-2.txt";
+        String fileName3 = getFileName(testName) + "-3.txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1483,10 +1484,10 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName = getFileName(testName)+".txt";
+        String fileName = getFileName(testName) + ".txt";
 
         String fileContent = "<type>d:text</type>";
-        String[] fileInfo = {fileName, DOCLIB, fileContent};
+        String[] fileInfo = { fileName, DOCLIB, fileContent };
 
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -1504,7 +1505,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName = getFileName(testName)+".txt";
+        String fileName = getFileName(testName) + ".txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1522,10 +1523,10 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName = getFileName(testName)+".txt";
+        String fileName = getFileName(testName) + ".txt";
 
         String fileContent = "apple and banana";
-        String[] fileInfo = {fileName, DOCLIB, fileContent};
+        String[] fileInfo = { fileName, DOCLIB, fileContent };
 
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -1543,7 +1544,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
-        String fileName = getFileName(testName)+".txt";
+        String fileName = getFileName(testName) + ".txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
