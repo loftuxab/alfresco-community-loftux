@@ -2399,7 +2399,7 @@
 
          // DataTable column defintions
          var fpanel = Dom.get("alf-filters"),
-             offset = (fpanel ? parseInt(fpanel.style.width, 10) : 160) + 390;
+             offset = (fpanel ? parseInt(fpanel.style.width, 10) : 160) + 390 + (Alfresco.constants.PORTLET === true ? 200 : 0);
          var columnDefinitions =
          [
             { key: "nodeRef", label: "Select", sortable: false, formatter: this.fnRenderCellSelected(), width: 16 },
@@ -4160,13 +4160,13 @@
          if (!YAHOO.lang.isNumber(width))
          {
             var fpanel = Dom.get("alf-filters"),
-                offset = (fpanel ? parseInt(fpanel.style.width, 10) : 160) + 390,
+                offset = (fpanel ? parseInt(fpanel.style.width, 10) : 160) + 390 + (Alfresco.constants.PORTLET === true ? 200 : 0),
                 width = (Dom.getViewportWidth() - offset) + "px";
          }
          else
          {
             // Width supplied, no action required.
-            width = (width - 390) + "px";
+            width = (width - 390 - (Alfresco.constants.PORTLET === true ? 200 : 0)) + "px";
          }
          var nodes = YAHOO.util.Selector.query('h3.filename', this.id + "-documents");
          for (var i=0; i<nodes.length; i++)
