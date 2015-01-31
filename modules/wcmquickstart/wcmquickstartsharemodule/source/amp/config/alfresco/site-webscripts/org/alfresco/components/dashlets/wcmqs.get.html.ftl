@@ -18,7 +18,7 @@
          </#list>   
          <br>      
          </select>   
-         <button id="${args.htmlid}-load-data-link">&nbsp;&nbsp;&nbsp;${msg("label.button.import")}&nbsp;&nbsp;&nbsp;</button>      
+         <button type="button" id="${args.htmlid}-load-data-link">&nbsp;&nbsp;&nbsp;${msg("label.button.import")}&nbsp;&nbsp;&nbsp;</button>      
       </div>      
    <#else>
       <div class="detail-list-item last-item" >
