@@ -115,7 +115,7 @@ public class BasicSearchTest extends AbstractUtils
      * <li>Check Search Results for diff types of files: Search based on Content</li>
      * </ul>
      */
-    @Test
+    @Test (groups = { "CloudOnly" }, timeOut = 900000, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_13015()
     {
 
@@ -229,7 +229,7 @@ public class BasicSearchTest extends AbstractUtils
      * <li>Check that the User Dash-board > My Sites Dashlet shows the new Site</li>
      * </ul>
      */
-    @Test
+    @Test(groups = { "CloudOnly" }, timeOut = 900000, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_13033()
     {
         /** Start Test */

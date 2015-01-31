@@ -101,7 +101,7 @@ public class LoginTest extends AbstractUtils
     /**
      * Valid Login
      */
-    @Test
+    @Test (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_13124()
     {
         try
@@ -136,7 +136,7 @@ public class LoginTest extends AbstractUtils
     /**
      * Invalid Login
      */
-    @Test
+    @Test (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_13125()
     {
     	try
@@ -177,7 +177,7 @@ public class LoginTest extends AbstractUtils
     /**
      * Incorrect Password
      */
-    @Test
+    @Test  (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_13126()
     {
         try
@@ -213,7 +213,7 @@ public class LoginTest extends AbstractUtils
     /**
      * Incorrect Username 
      */
-    @Test
+    @Test  (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_13127()
     {
         try
@@ -249,7 +249,7 @@ public class LoginTest extends AbstractUtils
     /**
      * Guest Login Fails when user not registered
      */
-    @Test
+    @Test  (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_13129()
     {
         try
