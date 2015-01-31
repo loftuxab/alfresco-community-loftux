@@ -439,4 +439,26 @@ public class SyncInfoPage extends SharePage
            return drone.find(By.cssSelector(".cloud-sync-details-failed-detailed")).isDisplayed();
         }
     }
+    
+    /**
+     * Unsync button enabled.
+     * 
+     * @return
+     */
+    public boolean isUnsyncButtonEnabled()
+    {
+        try
+        {
+
+            return drone.findAndWait(REQ_UNSYNC_BUTTON, WAIT_TIME_3000).isEnabled();
+
+        }
+
+        catch (TimeoutException nse)
+        {
+            logger.error("Time out finding unsync button!!", nse);
+        }
+        return false;
+    }
+ 
 }
