@@ -232,7 +232,8 @@ h4 .lighter
    border-color: transparent;
 }
 
-.yui-skin-lightTheme div.flat-button span.yui-button-hover
+.yui-skin-lightTheme div.flat-button span.yui-button-hover,
+.yui-skin-lightTheme div.flat-button span.yui-button-focus
 {
    background: transparent;
    border-color: #ccc;
@@ -969,6 +970,7 @@ body.yui-skin-lightTheme .yuimenu .bd
 body.yui-skin-lightTheme .yuimenu .bd a:focus
 {
    outline: none;
+   background-color: #eee;
 }
 
 /*
@@ -1102,6 +1104,13 @@ body.yui-skin-lightTheme .categoryview .category .ygtvlph, body.yui-skin-lightTh
 body.yui-skin-lightTheme .categoryview .category .ygtvdepthcell
 {
    background-image: url(images/categoryview-sprite.gif);
+   padding: 1px;
+}
+
+body.yui-skin-lightTheme .treeview a:focus,
+body.yui-skin-lightTheme .category a:focus
+{
+   outline: 1px solid #ccc;
 }
 
 body.yui-skin-lightTheme .treeview .ygtvtn,

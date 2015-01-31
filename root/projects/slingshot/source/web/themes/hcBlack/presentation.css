@@ -588,7 +588,8 @@ span.mce_alfresco-linklibrary
    border-color: transparent;
 }
 
-.yui-skin-hcBlack div.flat-button span.yui-button-hover
+.yui-skin-hcBlack div.flat-button span.yui-button-hover,
+.yui-skin-hcBlack div.flat-button span.yui-button-focus
 {
    background: transparent url(images/sprite.png) repeat-x scroll 0 0;
    border-color: #808080;
@@ -770,6 +771,13 @@ body.yui-skin-hcBlack .yuimenu .bd
    border: 1px solid #000;
 }
 
+body.yui-skin-hcBlack .yuimenu .bd a:focus
+{
+   outline: none;
+   background-color: #000;
+   color: #FFF;
+}
+
 /* YUI Menu roll over state */
 
 body.yui-skin-hcBlack .yuimenuitemlabel
@@ -782,8 +790,6 @@ body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected
    background-color: #000;
 }
 
-body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel,
-body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a,
 body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected div .yuimenuitemlabel,
 body.yui-skin-hcBlack .yuimenu .bd ul li.yuimenuitem-selected div .yuimenuitemlabel a
 {
@@ -892,6 +898,13 @@ body.yui-skin-hcBlack .categoryview .category .ygtvlph, body.yui-skin-hcBlack .c
 body.yui-skin-hcBlack .categoryview .category .ygtvdepthcell
 {
    background-image: url(images/categoryview-sprite.gif);
+   padding: 1px;
+}
+
+body.yui-skin-hcBlack .treeview a:focus,
+body.yui-skin-hcBlack .category a:focus
+{
+   outline: 1px solid #ccc;
 }
 
 body.yui-skin-hcBlack .treeview .ygtvtn,
