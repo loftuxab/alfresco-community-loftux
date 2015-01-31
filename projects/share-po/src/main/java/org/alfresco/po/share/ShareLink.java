@@ -65,4 +65,14 @@ public class ShareLink
         link.click();
         return FactorySharePage.resolvePage(drone);
     }
+    
+    /**
+     * Actions a click on the link element without verifying the page.
+     * 
+     * @return void
+     */
+    public void openLink()
+    {
+        link.click();
+    }
 }
