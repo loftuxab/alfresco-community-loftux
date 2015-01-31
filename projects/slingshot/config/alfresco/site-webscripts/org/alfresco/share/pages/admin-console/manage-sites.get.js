@@ -20,6 +20,7 @@ if (groups != null)
    userData.groups = processedGroups;
 }
 userData.isNetworkAdmin = user.properties["isNetworkAdmin"];
+userData.isAdmin = user.capabilities["isAdmin"];
 
 var siteServiceScope = "MANAGE_SITES_SITE_SERVICE_";
 
@@ -73,6 +74,10 @@ model.jsonModel = {
                         },
                         {
                            property: "user.groups.GROUP_SITE_ADMINISTRATORS",
+                           values: [true]
+                        },
+                        {
+                           property: "user.isAdmin",
                            values: [true]
                         },
                         {
