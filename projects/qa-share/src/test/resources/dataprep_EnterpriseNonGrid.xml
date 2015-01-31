@@ -50,13 +50,9 @@
                     <exclude name=".*"/>
                 </methods>
             </class>
-        </classes>
-    </test>
 
-    <test name="AvatarCaching">
-        <classes>
             <class name="org.alfresco.share.AvatarCaching"/>
+
         </classes>
     </test>
-
 </suite>
