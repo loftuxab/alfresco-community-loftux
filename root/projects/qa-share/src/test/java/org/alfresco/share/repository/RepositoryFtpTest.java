@@ -27,6 +27,9 @@ import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
@@ -956,7 +959,7 @@ public class RepositoryFtpTest extends AbstractUtils
         ftpUrl = "ftp://%s";
         ftpUrl = String.format(ftpUrl, serverIP);
         drone.executeJavaScript("window.location.replace(\"" + ftpUrl + "\"" + ")");
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         //  Fill Login and Pass fields and click 'Ok' button;
         for (String winHandle : drone.getWindowHandles())
@@ -983,7 +986,7 @@ public class RepositoryFtpTest extends AbstractUtils
         ftpUrl = "ftp://%s@%s";
         ftpUrl = String.format(ftpUrl, ADMIN_USERNAME, serverIP);
         drone.executeJavaScript("window.location.replace(\"" + ftpUrl + "\"" + ")");
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         // Fill Password field and click 'Ok' button;
         for (String winHandle : drone.getWindowHandles())
@@ -1003,7 +1006,6 @@ public class RepositoryFtpTest extends AbstractUtils
             }
         }
         assertTrue(drone.findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
-
     }
 
     private void writeToClipboard(String s)
@@ -1021,17 +1023,14 @@ public class RepositoryFtpTest extends AbstractUtils
 
     private void pasteClipboard()
     {
-
         try
         {
-
             Robot robot = new Robot();
             robot.keyPress(KeyEvent.VK_CONTROL);
             robot.keyPress(KeyEvent.VK_V);
             robot.delay(50);
             robot.keyRelease(KeyEvent.VK_V);
             robot.keyRelease(KeyEvent.VK_CONTROL);
-
         }
         catch (AWTException ex)
         {
@@ -1046,15 +1045,15 @@ public class RepositoryFtpTest extends AbstractUtils
         StringBuilder content = new StringBuilder();
         BufferedReader reader;
         String inputLine;
-        String errorLine;
-        Process process;
 
         try
         {
-            File tmpDir = new File (DATA_FOLDER);
-            File file = File.createTempFile("ftp", ".tmp", tmpDir );
+            File tmpDir = new File(DATA_FOLDER);
+            File file = File.createTempFile("ftp", ".tmp", tmpDir);
             file.deleteOnExit();
             Writer writer = new FileWriter(file);
+            DefaultExecutor executor = new DefaultExecutor();
+            CommandLine cmdLine = new CommandLine("ftp");
             if (System.getProperty("os.name").contains("Windows"))
             {
                 writer.write(
@@ -1063,7 +1062,7 @@ public class RepositoryFtpTest extends AbstractUtils
                         + arguments[2] + "\n" + arguments[3] + "\n" + arguments[4] + "\n" + arguments[5] + "\n" + arguments[6] + "\n" + arguments[7] + "\n"
                         + "\nquit"
                 );
-                process = Runtime.getRuntime().exec("ftp -s:" + file);
+                cmdLine.addArgument("-s:" + file);
             }
             else
             {
@@ -1072,35 +1071,24 @@ public class RepositoryFtpTest extends AbstractUtils
                         + arguments[2] + "\n" + arguments[3] + "\n" + arguments[4] + "\n" + arguments[5] + "\n" + arguments[6] + "\n" + arguments[7] + "\n"
                         + "\nquit"
                 );
-                process = Runtime.getRuntime().exec("ftp -n <" + file);
+                cmdLine.addArgument("-n <" + file);
             }
             writer.close();
 
-            InputStream inputStream = process.getInputStream();
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            BufferedReader stdError = new BufferedReader(new
-                InputStreamReader(process.getErrorStream()));
-
+            ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
+            executor.setStreamHandler(new PumpStreamHandler(stdOut));
+            executor.execute(cmdLine);
+            reader = new BufferedReader(new StringReader(stdOut.toString()));
             while ((inputLine = reader.readLine()) != null)
             {
                 content.append(inputLine);
             }
             reader.close();
-
-            // read any errors
-            while ((errorLine = stdError.readLine()) != null)
-            {
-                logger.error(errorLine);
-            }
-            stdError.close();
         }
         catch (IOException ex)
         {
             throw new RuntimeException(ex.getMessage());
         }
-
         return content.toString();
     }
-
 }
