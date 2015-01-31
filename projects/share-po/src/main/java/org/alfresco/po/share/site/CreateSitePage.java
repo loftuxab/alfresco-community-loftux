@@ -14,6 +14,7 @@
  */
 package org.alfresco.po.share.site;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.po.share.ShareDialogue;
@@ -26,6 +27,7 @@ import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 /**
  * Create site page object, holds all element of the HTML page relating to
@@ -57,9 +59,7 @@ public class CreateSitePage extends ShareDialogue
     @Override
     public CreateSitePage render(RenderTime timer)
     {
-        elementRender(timer, 
-                      RenderElement.getVisibleRenderElement(CREATE_SITE_FORM),
-                      RenderElement.getVisibleRenderElement(INPUT_DESCRIPTION));
+        elementRender(timer, RenderElement.getVisibleRenderElement(CREATE_SITE_FORM), RenderElement.getVisibleRenderElement(INPUT_DESCRIPTION));
         return this;
     }
 
@@ -105,10 +105,7 @@ public class CreateSitePage extends ShareDialogue
      * @param boolean is a moderated site
      * @return {@link HtmlPage} page response
      */
-    public HtmlPage createNewSite(final String siteName, 
-                                  final String description,
-                                  final boolean isPriavte,
-                                  final boolean isModerated)
+    public HtmlPage createNewSite(final String siteName, final String description, final boolean isPriavte, final boolean isModerated)
     {
         return createNewSite(siteName, description, isPriavte, isModerated, SiteType.COLLABORATION);
     }
@@ -123,11 +120,7 @@ public class CreateSitePage extends ShareDialogue
      * @param type Collaboration
      * @return {@link HtmlPage} page response
      */
-    protected HtmlPage createNewSite(final String siteName,
-                                  final String description,
-                                  final boolean isPriavte,
-                                  final boolean isModerated,
-                                  final String siteType)
+    protected HtmlPage createNewSite(final String siteName, final String description, final boolean isPriavte, final boolean isModerated, final String siteType)
     {
         if (siteType == null)
         {
@@ -286,7 +279,7 @@ public class CreateSitePage extends ShareDialogue
             return false;
         }
     }
-    
+
     /**
      * Checks if the check box with the label public is ticked.
      * 
@@ -347,6 +340,60 @@ public class CreateSitePage extends ShareDialogue
     }
 
     /**
+     * Get the values of the site type from site create form.
+     * 
+     * @return List String site type
+     */
+
+    public List<String> getSiteType()
+    {
+
+        List<String> options = new ArrayList<String>();
+        try
+        {
+            Select typeOptions = new Select(drone.find(By.tagName("select")));
+            List<WebElement> optionElements = typeOptions.getOptions();
+
+            for (WebElement option : optionElements)
+            {
+                options.add(option.getText());
+            }
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageOperationException("Unable to find After Completion Dropdown", nse);
+        }
+        return options;
+
+    }
+
+    /**
+     * Set the Name of the site
+     * 
+     * @param String site name
+     */
+
+    public void setSiteName(String siteName)
+    {
+        WebElement inputSiteName = drone.findAndWait(INPUT_TITLE);
+        inputSiteName.sendKeys(siteName);
+    }
+
+    /**
+     * Set the URL of the site
+     * 
+     * @param String site name
+     */
+
+    public void setSiteURL(String siteURL)
+    {
+        WebElement inputSiteURL = drone.find(By.name("shortName"));
+
+        inputSiteURL.clear();
+        inputSiteURL.sendKeys(siteURL);
+    }
+
+    /**
      * Get the value of site name from site create form.
      * 
      * @return String site name
@@ -375,15 +422,15 @@ public class CreateSitePage extends ShareDialogue
     {
         return drone.find(By.name("shortName")).getAttribute("value");
     }
-    
+
     /**
      * Check whether URL Name disabled for editing.
      * 
-     * @return True if URL Name  Input text box disabled, else false.
+     * @return True if URL Name Input text box disabled, else false.
      */
     public boolean isUrlNameEditingDisaabled()
     {
-        if(drone.find(By.name("shortName")).getAttribute("disabled") != null)
+        if (drone.find(By.name("shortName")).getAttribute("disabled") != null)
         {
             return true;
         }
@@ -393,11 +440,11 @@ public class CreateSitePage extends ShareDialogue
     /**
      * Check whether URL Name disabled for editing.
      * 
-     * @return True if URL Name  Input text box disabled, else false.
+     * @return True if URL Name Input text box disabled, else false.
      */
     public boolean isNameEditingDisaabled()
     {
-        if(drone.find(By.name("title")).getAttribute("disabled") != null)
+        if (drone.find(By.name("title")).getAttribute("disabled") != null)
         {
             return true;
         }
