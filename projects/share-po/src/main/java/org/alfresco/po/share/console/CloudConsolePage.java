@@ -180,7 +180,7 @@ public class CloudConsolePage extends SharePage
         String consoleUrl;
         if (shareUrl.contains("stagmy.alfresco.com"))
         {
-            consoleUrl = "https://stagcloudconsole.alfresco.com/";
+            consoleUrl = "http://cloudconsoletest.alfresco.com/";
         }
         else
         {
