@@ -56,7 +56,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>Verify the property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14880() throws Exception
     {
         String testName = getTestName();
@@ -136,7 +136,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>Verify the property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14881() throws Exception
     {
         String testName = getTestName();
@@ -211,7 +211,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>Verify the property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14882() throws Exception
     {
         String testName = getTestName();
@@ -292,7 +292,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is applied</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14883() throws Exception
     {
         String testName = getTestName();
@@ -377,7 +377,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is applied</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14884() throws Exception
     {
         String testName = getTestName();
@@ -486,7 +486,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is applied</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14885() throws Exception
     {
         String testName = getTestName();
@@ -595,7 +595,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>Verify the property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14886() throws Exception
     {
         String testName = getTestName();
@@ -692,7 +692,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>Verify the property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14887() throws Exception
     {
         String testName = getTestName();
@@ -783,7 +783,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The file is deleted. No error occurs</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14888() throws Exception
     {
         String testName = getTestName();
@@ -877,7 +877,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The folder is deleted. No error occurs</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14889() throws Exception
     {
         String testName = getTestName();
@@ -973,7 +973,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is applied</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14890() throws Exception
     {
         String testName = getTestName();
@@ -1080,7 +1080,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is applied</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14891() throws Exception
     {
         String testName = getTestName();
@@ -1187,7 +1187,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14892() throws Exception
     {
         String testName = getTestName();
@@ -1352,7 +1352,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14893() throws Exception
     {
         String testName = getTestName();
@@ -1517,7 +1517,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14894() throws Exception
     {
         String testName = getTestName();
@@ -1682,7 +1682,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly", "ProductBug" }, timeOut = 400000)
     public void AONE_14897() throws Exception
     {
         String testName = getTestName();
@@ -1855,7 +1855,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly", "ProductBug" }, timeOut = 400000)
     public void AONE_14898() throws Exception
     {
         String testName = getTestName();
