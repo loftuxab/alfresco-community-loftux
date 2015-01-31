@@ -90,7 +90,7 @@ public class NewFolderPageTest extends AbstractTest
         Assert.assertNotNull(documentLibPage);
     }
 
-    @Test(groups = { "alfresco-one" })
+    @Test(groups = { "alfresco-one" }, enabled = false)
     public void getNotificationMessageTest() throws Exception
     {
         String folderName = "New Folder" + 1;
