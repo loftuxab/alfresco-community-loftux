@@ -45,6 +45,7 @@ import static org.testng.Assert.*;
 import static org.testng.Assert.assertEquals;
 
 @Listeners(FailedTestListener.class)
+@Test(groups = {"ProductBug"})
 public class ProcessesAPITests extends ProcessesAPI
 {
 
@@ -59,7 +60,7 @@ public class ProcessesAPITests extends ProcessesAPI
     private static Log logger = LogFactory.getLog(ProcessesAPITests.class);
 
     @Override
-    @BeforeClass(alwaysRun = true, groups = {"ProductBug"})
+    @BeforeClass(alwaysRun = true)
     public void beforeClass() throws Exception
     {
         super.beforeClass();
