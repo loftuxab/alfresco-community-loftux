@@ -31,19 +31,18 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class MSExcel2011Tests extends AbstractUtils
 {
-
     private String testName;
     private String testUser;
     private String testSiteName;
-    private String testTmpFolderName = "Documents/alfresco-testdocs";
 
     private File xls9760TestFile;
     private File xls9761TestFile;
     private File xls9762TestFile;
-    private File xls9761DownloadTestFile;
+    private File xls9761DownloadTestFile = new File(System.getProperty("user.home"),  "Documents/tmpxls9761TestFile.xlsx");
     private File xls9763TestFile;
+    private File xls9764TestFile;
     private File xls9765TestFile;
-    private File xlsCommonFile;
+    private File xls9766TestFile;
 
     private ArrayList<File> testFiles = new ArrayList<File>();
 
@@ -61,7 +60,7 @@ public class MSExcel2011Tests extends AbstractUtils
         super.setup();
         appExcel2011 = new MicrosoftExcel2011();
         appExcel2011.killProcesses();
-        testName = this.getClass().getSimpleName() + "22";
+        testName = this.getClass().getSimpleName() + "29";
         testUser = getUserNameFreeDomain(testName);
         testSiteName = getSiteName(testName);
 
@@ -70,17 +69,16 @@ public class MSExcel2011Tests extends AbstractUtils
         xls9761TestFile = getTestDataFile(SHAREPOINT, "AONE-9761.xlsx");
         xls9762TestFile = getTestDataFile(SHAREPOINT, "AONE-9762.xlsx");
         xls9763TestFile = getTestDataFile(SHAREPOINT, "AONE-9763.xlsx");
-        xlsCommonFile = getTestDataFile(SHAREPOINT, "InputOpen.xlsx"); // common excel file used in multiple tests
-
-        xls9761DownloadTestFile = new File(System.getProperty("user.home"), testTmpFolderName + "/tmpxls9761TestFile.xlsx");
-        xls9765TestFile = new File(System.getProperty("user.home"), testTmpFolderName + "/AONE-9765.xlsx");
+        xls9765TestFile = getTestDataFile(SHAREPOINT, "AONE-9765.xlsx");
+        xls9764TestFile = getTestDataFile(SHAREPOINT, "InputOpen.xlsx");
+        xls9766TestFile = getTestDataFile(SHAREPOINT, "AONE-9766.xlsx");
 
         // this files will be uploaded on dataprep
         testFiles.add(xls9761TestFile);
         testFiles.add(xls9762TestFile);
         testFiles.add(xls9763TestFile);
-        testFiles.add(xlsCommonFile);
-
+        testFiles.add(xls9766TestFile);
+        testFiles.add(xls9764TestFile);
     }
 
     @Override
@@ -91,6 +89,7 @@ public class MSExcel2011Tests extends AbstractUtils
         {
             appExcel2011.handleCrash();
             appExcel2011.getMDC().exitApplication();
+            appExcel2011.exitApplication();
         }
         catch (Exception e)
         {
@@ -149,6 +148,7 @@ public class MSExcel2011Tests extends AbstractUtils
     private void openCleanMDCtool(String testSiteName, String testUser, String password) throws Exception
     {
         // MDC tool: A sharepoint connection to Alfresco is created
+        appExcel2011.handleCrash();
         appExcel2011.getMDC().killProcesses();
         appExcel2011.getMDC().cleanUpHistoryConnectionList();
         appExcel2011.getMDC().openApplication();
@@ -235,9 +235,9 @@ public class MSExcel2011Tests extends AbstractUtils
         // ---- Expected results ----
         // The document was downloaded correctly. No data was lost.
 
-        xls9761DownloadTestFile = new File(System.getProperty("user.home"), testTmpFolderName + "/tmpxls9761TestFile.xlsx");
+        xls9761DownloadTestFile = new File(System.getProperty("user.home"),  "Documents/tmpxls9761TestFile.xlsx");
         boolean fileSaved = FileBaseUtils.waitForFile(xls9761DownloadTestFile);
-        
+
         Assert.assertTrue(fileSaved, "File " + xls9761DownloadTestFile.getName() + " was saved localy from MDC.");
         Assert.assertEquals(xls9761DownloadTestFile.length(), 8679, "Data was lost from the file downloaded");
         xls9761DownloadTestFile.delete();
@@ -404,7 +404,7 @@ public class MSExcel2011Tests extends AbstractUtils
     {
         openDocumentLibraryForTest();
 
-        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xlsCommonFile.getName()).render();
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9764TestFile.getName());
         String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
 
         openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
@@ -414,7 +414,7 @@ public class MSExcel2011Tests extends AbstractUtils
         // Choose the document and click on Upload button.
         // ---- Expected results ----
         // Upload Changes window is displayed.
-        appExcel2011.getMDC().search(xlsCommonFile.getName());
+        appExcel2011.getMDC().search(xls9764TestFile.getName());
         appExcel2011.getMDC().editFirstDocument();
         appExcel2011.addCredentials(testUser, DEFAULT_PASSWORD);
 
@@ -426,9 +426,9 @@ public class MSExcel2011Tests extends AbstractUtils
         // Click on Upload Changes button.
         // ---- Expected results ----
         // The changes are uploaded. The file is still opened for editing.
-        appExcel2011.waitForWindow(xlsCommonFile.getName());
+        appExcel2011.waitForWindow(xls9764TestFile.getName());
         appExcel2011.edit("edited from excel");
-        appExcel2011.setFileName(xlsCommonFile.getName());
+        appExcel2011.setFileName(xls9764TestFile.getName());
         appExcel2011.save();
 
         // ---- Step 3 ----
@@ -439,6 +439,7 @@ public class MSExcel2011Tests extends AbstractUtils
 
         docDetailsPage.getDrone().refresh();
         docDetailsPage.getDrone().getCurrentPage().render();
+
         boolean isLocked = docDetailsPage.isCheckedOut();
         Assert.assertTrue(isLocked, "File is locked after is was opened localy from Excel");
 
@@ -509,18 +510,18 @@ public class MSExcel2011Tests extends AbstractUtils
         // Choose the document and click on Check Out button.
         // ---- Expected results ----
         // The document is checked out and is opened for editing in a write mode in the default MS Excel app.
-        
-        appExcel2011.getMDC().checkOutFile(xlsCommonFile.getName());
+
+        appExcel2011.getMDC().checkOutFile(xls9766TestFile.getName());
         openDocumentLibraryForTest();
-        appExcel2011.waitForWindow(xlsCommonFile.getName());
+        appExcel2011.waitForWindow(xls9766TestFile.getName());
         appExcel2011.exitApplication();
-        
+
         // ---- Step 2 ----
         // ---- Step action ----
         // Verify the document library of the site in the Share.
         // ---- Expected results ----
         // The document is locked. "The document is locked by you for offline editing" message is displayed.
-        Assert.assertEquals(ShareUserSitePage.getFileDirectoryInfo(drone, xlsCommonFile.getName()).getContentInfo(),
+        Assert.assertEquals(ShareUserSitePage.getFileDirectoryInfo(drone, xls9766TestFile.getName()).getContentInfo(),
                 "This document is locked by you for offline editing.");
     }
 
