@@ -18,10 +18,6 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Keys;
 import org.testng.Assert;
 import org.testng.annotations.*;
-import ru.synesis.TestNgXmlBuilder;
-import ru.synesis.enums.TestsType;
-import ru.synesis.properties.BuildProp;
-import ru.synesis.properties.TestLinkProp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -44,20 +40,6 @@ public class EditingItemsViaAWE extends AbstractUtils
         @BeforeClass(alwaysRun = true)
         public void setup() throws Exception
         {
-                TestLinkProp testLinkProp = new TestLinkProp("AlfrescoOne", "Ent5.0-AuthSubSystem-v5");
-                BuildProp buildProp = new BuildProp("testsuite.xml", TestsType.TEST);
-                TestNgXmlBuilder testNgXmlBuilder = new TestNgXmlBuilder();
-                buildProp.setThreadCount("5");
-                buildProp.setTestName("AuthSubSystem-v5");
-                buildProp.setSuiteName("Automated Tests");
-                testNgXmlBuilder.setProperties(testLinkProp, buildProp);
-                testNgXmlBuilder.build();
-
-                buildProp.setTestsType(TestsType.DATA_PREP);
-                buildProp.setXmlFileName("testsuite-dataPrep.xml");
-
-                testNgXmlBuilder.setProperties(testLinkProp, buildProp);
-                testNgXmlBuilder.build();
 
                 testName = this.getClass().getSimpleName();
                 siteName = testName;
