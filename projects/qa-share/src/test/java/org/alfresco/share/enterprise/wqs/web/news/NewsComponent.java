@@ -141,8 +141,8 @@ public class NewsComponent extends AbstractUtils
     /*
      * AONE-5686 News
      */
-    @Test(groups = { "WQS" , "EnterpriseOnly"})
-	public void AONE_5686() throws Exception
+    @Test(groups = { "WQS", "EnterpriseOnly" })
+    public void AONE_5686() throws Exception
     {
 
         // ---- Step 1 ----
