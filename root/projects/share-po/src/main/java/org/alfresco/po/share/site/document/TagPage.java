@@ -269,8 +269,14 @@ public class TagPage extends AbstractEditProperties
      */
     public int getAddedTagsCount()
     {
-        List<WebElement> addedTags = drone.findAndWaitForElements(ADDED_TAG_LINES);
-        return addedTags.size();
+        try{
+            List<WebElement> addedTags = drone.findAndWaitForElements(ADDED_TAG_LINES);
+            return addedTags.size();
+        }
+        catch(TimeoutException e)
+        {
+            return 0;
+        }
     }
 
     /**
