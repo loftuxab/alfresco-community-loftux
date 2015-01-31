@@ -1,5 +1,6 @@
 package org.alfresco.share.sanity.repository.ftps;
 
+import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
@@ -74,7 +75,7 @@ public class FtpsTest extends FtpsUtil
 
             for (String theFolder : folderNames)
             {
-                String folderPath = REPO + SLASH + theFolder;
+                /*String folderPath = REPO + SLASH + theFolder;
                 String[] fileInfo = { fileName, folderPath, testUser };
                 ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
                 ShareUserRepositoryPage.openRepositoryDetailedView(drone).render();
@@ -85,9 +86,9 @@ public class FtpsTest extends FtpsUtil
                 ManagePermissionsPage.UserSearchPage userSearchPage = managePermissionsPage.selectAddUser().render();
                 managePermissionsPage = userSearchPage.searchAndSelectUser(profile).render();
                 managePermissionsPage.setAccessType(profile, userRoles[Arrays.asList(folderNames).indexOf(theFolder)]);
-                managePermissionsPage.selectSave();
+                managePermissionsPage.selectSave();*/
             }
-            SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+            /*SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
             if (clusteringPage.isClusterEnabled())
             {
@@ -96,7 +97,8 @@ public class FtpsTest extends FtpsUtil
             else
             {
                 server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
-            }
+            }*/
+            server = shareUrl;
             FtpsUtil.setCustomFtpPort(drone, ftpPort);
             if (!keystorePath.isEmpty())
             {
@@ -372,6 +374,49 @@ public class FtpsTest extends FtpsUtil
         //Try to delete space - code 550
         assertEquals(FtpsUtil.deleteSpaceWithoutRights(server, testUser, DEFAULT_PASSWORD, folderPath, remotePathToRepo), 550, "Incorrect reply code received");
         assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, folderName, remotePathToRepo), folderName + " was deleted");
+    }
+
+    @Test
+    public void AONE_8026() throws Exception
+    {
+        String folder1 = getFolderName(getRandomString(5));
+        String folder2 = getFolderName(getRandomString(5));
+        String subFolder1 = getFolderName(getRandomString(5));
+        String subFolder2 = getFolderName(getRandomString(5));
+        String [] fileInfo1 = {testName, REPO + SLASH + folder1 + SLASH + subFolder1};
+        String [] fileInfo2 = {testName, REPO + SLASH + folder1 + SLASH + subFolder2};
+
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUserRepositoryPage.openRepositoryDetailedView(drone).render();
+        ShareUserRepositoryPage.createFolderInRepository(drone, folder1, folder1);
+        ShareUserRepositoryPage.createFolderInRepository(drone, folder2, folder2);
+        ShareUserRepositoryPage.createFolderInFolderInRepository(drone, subFolder1, subFolder1, REPO + SLASH + folder1);
+        ShareUserRepositoryPage.openRepository(drone).render();
+        ShareUserRepositoryPage.createFolderInFolderInRepository(drone, subFolder2, subFolder2, REPO + SLASH + folder1);
+        ShareUserRepositoryPage.uploadFileInFolderInRepository(drone, fileInfo1);
+        ShareUserRepositoryPage.openRepository(drone).render();
+        ShareUserRepositoryPage.uploadFileInFolderInRepository(drone, fileInfo2);
+
+        FtpsUtil.moveFolder(server, ADMIN_USERNAME, ADMIN_PASSWORD, remotePathToRepo + "/" + folder1, subFolder1, remotePathToRepo + "/" + folder2);
+
+        //Log in to Alfresco client and navigate to the space, were moved by FTPS Folder1 was located
+        RepositoryPage repoPage = ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folder1).render();
+        assertFalse(repoPage.isItemVisble(subFolder1), "Folder wasn't moved and still visible");
+        repoPage = ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folder2).render();
+        assertTrue(repoPage.isItemVisble(subFolder1), "Folder wasn't moved and invisible in destination folder");
+        repoPage = (RepositoryPage) repoPage.getFileDirectoryInfo(subFolder1).clickOnTitle();
+        assertTrue(repoPage.isItemVisble(testName), "File wasn't moved");
+
+        //Copy Folder2 from the space, where it is located, to other space by FTPS
+        FtpsUtil.copyFolder(server, ADMIN_USERNAME, ADMIN_PASSWORD, remotePathToRepo + "/" + folder1, subFolder2, remotePathToRepo + "/" + folder2);
+
+        //Navigate to the space, were Folder2 was copied - it has all added items
+        repoPage = ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folder1).render();
+        assertTrue(repoPage.isItemVisble(subFolder2), "Folder is invisible");
+        repoPage = ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folder2).render();
+        assertTrue(repoPage.isItemVisble(subFolder2), "Folder wasn't moved and invisible in destination folder");
+        repoPage = (RepositoryPage) repoPage.getFileDirectoryInfo(subFolder2).clickOnTitle();
+        assertTrue(repoPage.isItemVisble(testName), "File wasn't moved");
     }
 
     @AfterClass(alwaysRun = true)
