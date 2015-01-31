@@ -1276,8 +1276,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Verify the content is part of Workflow and cloudSync icon appears
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Verifying the document is part of a workflow");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced(), "Verifying the document is synced");
-
         // Verify the cloud sync status for the content
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName), "Verifying the Sync Status is \"Synced\"");
 
@@ -1507,8 +1505,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         // Verify the document is prat of the workflow, document is synced and verify Sync Status
 
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Verifying the document is part of a workflow");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced(), "Verifying the document is synced");
-
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName), "Verifying the Sync Status is \"Synced\"");
 
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
@@ -1668,8 +1664,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Verify the document is prat of the workflow, document is synced and verify Sync Status
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Verifying the document is part of a workflow");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced(), "Verifying the document is synced");
-
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName), "Verifying the Sync Status is \"Synced\"");
 
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
@@ -1861,21 +1855,18 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Verify all files are part of the workflow, and cloud synced
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName1).isPartOfWorkflow(), "Verifying the File1 is part of a workflow");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName1).isCloudSynced(), "Verifying the File1 is synced");
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName1), "Verifying the Sync Status is \"Synced\"");
 
         drone.refresh();
         documentLibraryPage.render();
 
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName2).isPartOfWorkflow(), "Verifying the File2 is part of a workflow");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName2).isCloudSynced(), "Verifying the File2 is synced");
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName2), "Verifying the Sync Status is \"Synced\"");
 
         drone.refresh();
         documentLibraryPage.render();
 
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName3).isPartOfWorkflow(), "Verifying the File3 is part of a workflow");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName3).isCloudSynced(), "Verifying the File3 is synced");
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName3), "Verifying the Sync Status is \"Synced\"");
 
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
@@ -2088,7 +2079,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Verify File1 is Cloud Synced, part of workflow and it is Locked
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName1).isPartOfWorkflow(), "Verifying the File1 is part of a workflow");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName1).isCloudSynced(), "Verifying the File1 is synced");
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName1).isLocked(), "Verifying the File1 is Locked");
         assertEquals(documentLibraryPage.getFileDirectoryInfo(fileName1).getContentInfo(), "This document is locked by you.", "Verifying Locked message");
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName1), "Verifying the Sync Status is \"Synced\"");
@@ -2097,7 +2087,6 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         documentLibraryPage.render();
         // Verify File2 is Cloud Synced, part of workflow and it is NOT Locked
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName2).isPartOfWorkflow(), "Verifying the File2 is part of a workflow");
-        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName2).isCloudSynced(), "Verifying the File2 is synced");
         assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName2).isLocked(), "Verifying the File2 is NOT Locked");
         assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName2), "Verifying the Sync Status is \"Synced\"");
 
