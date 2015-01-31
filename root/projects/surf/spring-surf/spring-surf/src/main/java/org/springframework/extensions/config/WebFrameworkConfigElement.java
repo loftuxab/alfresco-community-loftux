@@ -1319,6 +1319,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     public static final String DOJO_PACKAGE_MAIN = "main";
     public static final String DOJO_MESSAGES_OBJECT = "messages-object";
     public static final String DOJO_MESSAGES_DEFAULT_SCOPE = "default-messages-scope";
+    public static final String DOJO_DEFAULT_LESS_CONFIG = "default-less-configuration";
     
     /*
      * DOJO CONFIGURATION VALUES
@@ -1330,6 +1331,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected String  dojoBaseUrl = null;
     protected String  dojoMessagesObject = null;
     protected String  dojoMessagesDefaultScope = null;
+    protected String  dojoDefaultLessConfig = null;
     protected Map<String, String> dojoPackages = new HashMap<String, String>();
     protected Map<String, String> dojoPackagesMain = new HashMap<String, String>();
     
@@ -1379,6 +1381,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     {
         return dojoMessagesDefaultScope;
     }
+    
+    public String getDojoDefafultLessConfig()
+    {
+        return dojoDefaultLessConfig;
+    }
 
     /**
      * Processes the Dojo configuration from the supplied {@link Element}
@@ -1424,6 +1431,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             if (messagesDefaultScope != null)
             {
                 configElement.dojoMessagesDefaultScope = messagesDefaultScope;
+            }
+            String defaultLessConfig = dojoConfig.elementTextTrim(DOJO_DEFAULT_LESS_CONFIG);
+            if (defaultLessConfig != null)
+            {
+                configElement.dojoDefaultLessConfig = defaultLessConfig;
             }
             Element packages = dojoConfig.element(DOJO_PACKAGES);
             if (packages != null)
@@ -1493,6 +1505,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         if (configElement.dojoMessagesDefaultScope != null)
         {
             combinedElement.dojoMessagesDefaultScope = configElement.dojoMessagesDefaultScope;
+        }
+        combinedElement.dojoDefaultLessConfig = this.dojoDefaultLessConfig;
+        if (configElement.dojoDefaultLessConfig != null)
+        {
+            combinedElement.dojoDefaultLessConfig = configElement.dojoDefaultLessConfig;
         }
         combinedElement.dojoPackages = this.dojoPackages;
         if (configElement.dojoPackages != null)

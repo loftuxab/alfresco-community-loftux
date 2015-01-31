@@ -4,19 +4,19 @@
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 400;
-  src: url(../../js/alfresco/css/opensans.woff) format('woff');
+  src: url(../../css/fonts/opensans.woff) format('woff');
 }
 @font-face {
   font-family: 'Open Sans Bold';
   font-style: normal;
   font-weight: 600;
-  src: url(../../js/alfresco/css/opensansbold.woff) format('woff');
+  src: url(../../css/fonts/opensansbold.woff) format('woff');
 }
 @font-face {
   font-family: 'Open Sans Condensed';
   font-style: normal;
   font-weight: 300;
-  src: url(../../js/alfresco/css/opensanscondensed.woff) format('woff');
+  src: url(../../css/fonts/opensanscondensed.woff) format('woff');
 }
 
 button::-moz-focus-inner,

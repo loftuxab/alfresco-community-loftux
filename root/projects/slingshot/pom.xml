@@ -199,12 +199,11 @@
             <groupId>org.apache.myfaces.core</groupId>
             <artifactId>myfaces-impl</artifactId>
         </dependency>
-        <!-- Dependency on Dojo ZIP -->
+        <!-- Dependency on external Aikau project (this includes Dojo) -->
         <dependency>
-            <groupId>org.dojotoolkit</groupId>
-            <artifactId>dojo</artifactId>
-            <version>1.9.0</version>
-            <type>zip</type>
+            <groupId>org.alfresco</groupId>
+            <artifactId>aikau</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <!-- Dependency on YUI ZIP (custom version deployed at artifacts.alfresco.com) -->
         <dependency>
@@ -284,12 +283,6 @@
                                 <exclude>WEB-INF/classes/*</exclude>
                                 <exclude>WEB-INF/lib/*</exclude>
                             </excludes>
-                        </overlay>
-                        <overlay>
-                            <groupId>org.dojotoolkit</groupId>
-                            <artifactId>dojo</artifactId>
-                            <type>zip</type>
-                            <targetPath>js/lib</targetPath>
                         </overlay>
                         <overlay>
                             <groupId>com.yahoo.platform.yui</groupId>
