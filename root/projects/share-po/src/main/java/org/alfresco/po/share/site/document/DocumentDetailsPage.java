@@ -69,6 +69,9 @@ public class DocumentDetailsPage extends DetailsPage
     private static final String CLICK_HERE_TO_DOWNLOAD_LINK = "Click here to download it.";
     private static final String THIN_DARK_TITLE_ELEMENT = "div.node-header>div.node-info>h1.thin.dark";
     private static final String SYNC_TO_CLOUD = "a[title='Sync to Cloud'].action-link>span";
+
+    private static final String DELETE_DOCUMENT = "a[title='Delete Document'].action-link>span";
+
     private static final String UNSYNC_FROM_CLOUD = "a[title='Unsync from Cloud'].action-link>span";
     protected static final String CHECKEDOUT_MESSAGE_PLACEHOLDER = "div.node-header>div.status-banner.theme-bg-color-2.theme-border-4";
     protected static final String ACTION_SET_ID = "document.detail.action.set.id";
@@ -216,6 +219,20 @@ public class DocumentDetailsPage extends DetailsPage
     {
         // Render must have populated the document version
         return this.documentVersion;
+    }
+
+    public boolean isDeleteDocumentLinkDisplayed()
+    {
+        try
+        {
+            WebElement el = drone.find(By.cssSelector(DELETE_DOCUMENT));
+            boolean isDeleteDocument = drone.find(By.cssSelector(DELETE_DOCUMENT)).isDisplayed();
+            return isDeleteDocument;
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
     }
 
     /**
