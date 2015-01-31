@@ -274,4 +274,23 @@ public class DetailsPageTest extends AbstractTest
 
         Assert.assertTrue(folderDetails.isSynPanelPresent());
     }
+    
+    @Test(dependsOnMethods="isSynPanelPresent", groups = { "Hybrid" })
+    public void isErrorEditOffline() throws Exception
+    {
+        SitePage page = drone.getCurrentPage().render();
+        documentLibPage = page.getSiteNav().selectSiteDocumentLibrary().render();
+        String fileName = "fileName" + System.currentTimeMillis();
+         
+        // Upload File
+        File file = SiteUtil.prepareFile(fileName);
+        UploadFilePage uploadForm = documentLibPage.getNavigation().selectFileUpload().render();
+        documentLibPage = uploadForm.uploadFile(file.getCanonicalPath()).render();
+        fileName = file.getName();
+        
+        DocumentDetailsPage docDetails = documentLibPage.selectFile(fileName).render();  
+        docDetails.selectEditOffLine();
+        
+        Assert.assertFalse(docDetails.isErrorEditOfflineDocument(fileName));      
+    }
 }
