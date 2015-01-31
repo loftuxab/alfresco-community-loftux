@@ -1523,7 +1523,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     done.close();
                 }
 
-                deleteDirectory(newCore);
+                deleteDirectory(new File(core.getCoreDescriptor().getInstanceDir()));
             }
 
         }
@@ -2600,7 +2600,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     done.close();
                 }
 
-                deleteDirectory(newCore);
+                deleteDirectory(new File(core.getCoreDescriptor().getInstanceDir()));
             }
 
         }
