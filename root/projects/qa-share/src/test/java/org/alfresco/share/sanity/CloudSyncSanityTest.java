@@ -48,14 +48,14 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
     {
         super.setup();
         testName = this.getClass().getSimpleName();
-        siteName = getSiteName(testName) + System.currentTimeMillis();
+        siteName = getSiteName(testName);
         fileName = getFileName(testName);
         fileNamePlain = fileName + "plainText";
         editedFileNamePlain = fileNamePlain + "edited";
         fileNameXml = fileName + "xml";
         editedContentXml = fileNameXml + "edited";
         folderName = getFolderName(testName);
-        retryCount = 10;
+        retryCount = 5;
         timeToWait = 30000;
         newFiles = new String[] { "file1", "file2", "file3", "file4"};
         syncLocation = DOMAIN_PREMIUM + ">" + siteName + ">" + DEFAULT_FOLDER_NAME;
@@ -133,7 +133,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test()
+    @Test
     public void AONE_8218() throws Exception
     {
         int i = 0;
@@ -147,15 +147,18 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
         //The changes are synced to Cloud
         ShareUser.login(hybridDrone, adminUserPrem);
         DocumentLibraryPage docLibCl = openSitesDocumentLibrary(hybridDrone, siteName);
-        while (!docLibCl.isFileVisible(editedFileNamePlain))
+        boolean isVisible = docLibCl.isFileVisible(editedFileNamePlain);
+        while (!isVisible)
         {
             webDriverWait(hybridDrone, timeToWait);
+            ShareUser.openSiteDashboard(hybridDrone, siteName).render();
             docLibCl = openSitesDocumentLibrary(hybridDrone, siteName).render();
+            isVisible = docLibCl.isFileVisible(editedFileNamePlain);
             i++;
             if(i > retryCount)
                 break;
         }
-        assertTrue(docLibCl.isFileVisible(editedFileNamePlain), "File properties were not edited in Cloud");
+        assertTrue(isVisible, "File properties were not edited in Cloud");
 
         //1st sync set: change file properties in Cloud
         EditDocumentPropertiesPage editPageCloud = docLibCl.getFileDirectoryInfo(editedFileNamePlain).selectEditProperties().render();
@@ -344,7 +347,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test()
+    @Test
     public void AONE_8219() throws Exception
     {
         //1st sync set: unsync and DO NOT remove the files from Cloud
@@ -413,7 +416,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test()
+    @Test
     public void AONE_8220() throws Exception
     {
         String newFolderInCloud = "new_fol";
