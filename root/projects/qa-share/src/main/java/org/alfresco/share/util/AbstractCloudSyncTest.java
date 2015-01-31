@@ -380,6 +380,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
         String status = "";
         SyncInfoPage syncInfoPage;
+        int i = 0;
 
         try
         {
@@ -401,7 +402,15 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
                         webDriverWait(driver, 1000);
                         // Expected to work for RepoPage too
                         docLibPage = refreshSharePage(driver).render();
-                        docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();
+                        if (i == 6 || i == 11 )
+                        {
+                            logger.info("Select request sync for file " + fileName);
+                            docLibPage.render();
+                            docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();
+                            docLibPage.getFileDirectoryInfo(fileName).selectRequestSync().render();
+                        }
+                        i++;
+                        docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();      
                     }
                     else
                     {
@@ -511,7 +520,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
                 if (counter == 2 || counter == 3)
                 {
-                    DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(driver, siteName);
+                    DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(driver, siteName).render();
                     docLib.getFileDirectoryInfo(fileName).selectRequestSync().render();
                 }
             }
