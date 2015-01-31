@@ -85,7 +85,7 @@ public class TrashcanTest3 extends AbstractUtils
         String testName = getTestName();
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
-        String trashcanUser = getUserNameFreeDomain(testName + System.currentTimeMillis());
+        String trashcanUser = getUserNameFreeDomain(testName);
 
         String fileName1 = "fi1-" + getFileName(testName) + getRandomString(5);
         String fileName2 = "fi2-" + getFileName(testName) + getRandomString(5);
@@ -167,7 +167,7 @@ public class TrashcanTest3 extends AbstractUtils
     {
 
         String testName = getTestName();
-        String trashcanUser = getUserNameFreeDomain(testName + System.currentTimeMillis());
+        String trashcanUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName) + System.currentTimeMillis();
 
         String fileName1 = getFileName(testName) + "-1" + getRandomString(5);
@@ -244,7 +244,7 @@ public class TrashcanTest3 extends AbstractUtils
     {
 
         String testName = getTestName();
-        String trashcanUser = getUserNameFreeDomain(testName + System.currentTimeMillis());
+        String trashcanUser = getUserNameFreeDomain(testName);
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, trashcanUser);
 
         String siteName1 = getSiteName(testName) + "-1" + System.currentTimeMillis();
@@ -327,7 +327,7 @@ public class TrashcanTest3 extends AbstractUtils
     public void AONE_14188() throws Exception
     {
         String testName = getTestName();
-        String trashcanUser = getUserNameFreeDomain(testName + System.currentTimeMillis());
+        String trashcanUser = getUserNameFreeDomain(testName);
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, trashcanUser);
 
         String siteName1 = getSiteName(testName) + "-1" + System.currentTimeMillis();
@@ -400,8 +400,8 @@ public class TrashcanTest3 extends AbstractUtils
         String testName = getTestName();
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
-        String trashcanUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
-        String trashcanUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
+        String trashcanUser1 = getUserNameFreeDomain(testName + "user1");
+        String trashcanUser2 = getUserNameFreeDomain(testName + "user2");
 
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
         String folderName1 = "fo3-" + getFolderName(testName) + System.currentTimeMillis();
@@ -508,8 +508,8 @@ public class TrashcanTest3 extends AbstractUtils
         String testName = getTestName();
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
-        String trashcanUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
-        String trashcanUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
+        String trashcanUser1 = getUserNameFreeDomain(testName + "user1");
+        String trashcanUser2 = getUserNameFreeDomain(testName + "user2");
 
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
         String folderName1 = "fo3-" + getFolderName(testName) + System.currentTimeMillis();
@@ -665,8 +665,8 @@ public class TrashcanTest3 extends AbstractUtils
         String testName = getTestName();
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
-        String trashcanUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
-        String trashcanUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
+        String trashcanUser1 = getUserNameFreeDomain(testName + "user1");
+        String trashcanUser2 = getUserNameFreeDomain(testName + "user2");
 
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
         String folderName1 = "fo3-" + getFolderName(testName) + System.currentTimeMillis();
@@ -788,8 +788,8 @@ public class TrashcanTest3 extends AbstractUtils
     public void AONE_14194() throws Exception
     {
         String testName = getTestName();
-        String testUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
-        String testUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
+        String testUser1 = getUserNameFreeDomain(testName + "user1");
+        String testUser2 = getUserNameFreeDomain(testName + "user2");
         String siteName1 = getSiteName(testName) + "-1" + System.currentTimeMillis();
 
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
@@ -887,8 +887,8 @@ public class TrashcanTest3 extends AbstractUtils
 
         String testName = getTestName();
 
-        String testUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
-        String testUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
+        String testUser1 = getUserNameFreeDomain(testName + "user1");
+        String testUser2 = getUserNameFreeDomain(testName + "user2");
 
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
         String folderName = getFolderName(testName) + System.currentTimeMillis();
@@ -976,7 +976,7 @@ public class TrashcanTest3 extends AbstractUtils
     {
 
         String testName = getTestName();
-        String trashcanUser = getUserNameFreeDomain(testName + System.currentTimeMillis());
+        String trashcanUser = getUserNameFreeDomain(testName);
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
         String folder = getFolderName(testName) + System.currentTimeMillis();
@@ -1076,7 +1076,7 @@ public class TrashcanTest3 extends AbstractUtils
 
         String testName = getTestName();
 
-        String trashcanUser = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
+        String trashcanUser = getUserNameFreeDomain(testName + "user1");
 
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
