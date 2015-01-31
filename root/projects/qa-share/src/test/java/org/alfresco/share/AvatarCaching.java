@@ -129,10 +129,9 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
-        editProfilePage.clickCancel();
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
-        File file = new File(DATA_FOLDER + SLASH + TEST_FILE);
+        File file = newFile(TEST_FILE, "gogno from hell");
         ShareUserSitePage.uploadFile(customDrone, file).render();
     }
 
@@ -186,7 +185,6 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
-        editProfilePage.clickCancel();
         ShareUser.openUserDashboard(customDrone);
         ShareUserDashboard.addDashlet(customDrone, MY_PROFILE);
     }
@@ -242,11 +240,10 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
-        editProfilePage.clickCancel();
         ShareUser.openUserDashboard(customDrone);
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
-        File file = new File(DATA_FOLDER + SLASH + TEST_FILE);
+        File file = newFile(TEST_FILE, "gogno from hell");
         ShareUserSitePage.uploadFile(customDrone, file).render();
         SiteDashboardPage siteDashboardPage = SiteUtil.openSiteDashboard(customDrone, siteName);
         CustomiseSiteDashboardPage customiseSiteDashboardPage = siteDashboardPage.getSiteNav().selectCustomizeDashboard().render();
@@ -332,11 +329,10 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
-        editProfilePage.clickCancel();
         ShareUser.openUserDashboard(customDrone);
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
-        File file = new File(DATA_FOLDER + SLASH + TEST_FILE);
+        File file = newFile(TEST_FILE, "gogno from hell");
         ShareUserSitePage.uploadFile(customDrone, file).render();
         SiteDashboardPage siteDashboardPage = SiteUtil.openSiteDashboard(customDrone, siteName);
         CustomiseSiteDashboardPage customiseSiteDashboardPage = siteDashboardPage.getSiteNav().selectCustomizeDashboard().render();
@@ -423,7 +419,6 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
-        editProfilePage.clickCancel();
     }
 
     /**
@@ -478,7 +473,6 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
-        editProfilePage.clickCancel();
     }
 
     /**
@@ -534,7 +528,6 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
-        editProfilePage.clickCancel();
         ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD);
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUserMembers.inviteUserToSiteWithRole(customDrone, testUser, testUser2, siteName, COLLABORATOR);
@@ -597,12 +590,11 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
-        editProfilePage.clickCancel();
         ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD);
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUserMembers.inviteUserToSiteWithRole(customDrone, testUser, testUser2, siteName, COLLABORATOR);
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
-        File file = new File(DATA_FOLDER + SLASH + TEST_FILE);
+        File file = newFile(TEST_FILE, "gogno from hell");
         ShareUserSitePage.uploadFile(customDrone, file).render();
         ShareUser.login(customDrone, testUser2, DEFAULT_PASSWORD).render();
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
