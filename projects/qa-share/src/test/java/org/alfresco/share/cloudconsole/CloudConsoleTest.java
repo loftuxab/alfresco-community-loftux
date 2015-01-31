@@ -38,15 +38,14 @@ public class CloudConsoleTest extends AbstractUtils
     private final String PASSWORD = "wR5qiqNY";
 
     @Override
-    // TODO: Group=MyAlfresco?
-    @BeforeClass(alwaysRun = true, groups = { "Cloud2" })
+    @BeforeClass(alwaysRun = true, groups = "CloudOnly")
     public void setup() throws Exception
     {
         super.setup();
         cloudConsolePage = new CloudConsolePage(drone);
     }
 
-    @BeforeMethod(groups = { "Cloud2" })
+    @BeforeMethod(groups = "CloudOnly")
     public void beforeTest() throws Exception
     {
         String cloudConsoleUrl = ShareUser.getCloudConsoleURL(drone);
@@ -78,7 +77,7 @@ public class CloudConsoleTest extends AbstractUtils
      * enter an e-mail address, after that it should show the account details
      */
 
-    @Test(groups = { "Cloud2" })
+    @Test(groups = { "CloudOnly" })
     public void AONE_13886()
     {
         String testName = getTestName();
@@ -98,7 +97,7 @@ public class CloudConsoleTest extends AbstractUtils
      * click bulk upload option
      * Users should be invited successfully
      */
-    @Test(groups = { "Cloud2" })
+    @Test(groups = { "CloudOnly" })
     public void AONE_13887()
     {
         String testName = getTestName();
@@ -106,9 +105,6 @@ public class CloudConsoleTest extends AbstractUtils
         String user2 = getUserNameFreeDomain(testName + 2);
 
         String[] usersForInvitation = { user1, user2 };
-        
-        // TODO: Avoid webdrone / share-po code (render) in the tests, to keep tests simpler and easy maintainable
-        // TODO: Avoid page chains
         Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().render().openInviteUsersTab().render()
                 .executeCorrectBulkImport(usersForInvitation);
 
@@ -121,7 +117,7 @@ public class CloudConsoleTest extends AbstractUtils
      * click bulk upload option
      * all the users in the file should be uploaded successfully
      */
-    @Test(groups = { "Cloud2" })
+    @Test(groups = { "CloudOnly" })
     public void AONE_13888()
     {
         String testName = getTestName();
