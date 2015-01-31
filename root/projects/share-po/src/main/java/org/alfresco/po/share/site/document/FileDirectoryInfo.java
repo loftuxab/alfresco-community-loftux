@@ -334,6 +334,13 @@ public interface FileDirectoryInfo
      * @return SyncInfoPage
      */
     SyncInfoPage clickOnViewCloudSyncInfo();
+    
+    /**
+     * This method verifies if cloud info button is displayed
+     *
+     * @return SyncInfoPage
+     */
+    boolean isViewCloudSyncInfoDisplayed();
 
     /**
      * Selects the "Inline Edit" link on the select data row on
