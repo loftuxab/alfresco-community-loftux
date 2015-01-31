@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="HybridWorkFlow" verbose="1" preserve-order="true" parallel="tests" thread-count="7">
+<suite name="HybridWorkFlow" verbose="1" preserve-order="true" parallel="tests" thread-count="1">
     <groups>
         <run>
             <exclude name="DataPrep.*" />
