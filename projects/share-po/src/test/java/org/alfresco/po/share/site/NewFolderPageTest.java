@@ -96,12 +96,14 @@ public class NewFolderPageTest extends AbstractTest
         String folderName = "New Folder" + 1;
 
         NewFolderPage newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
-        newFolderPage.typeName("?");
-//        newFolderPage.selectSubmitButton();
-        Assert.assertTrue(newFolderPage.isNotificationMessagePresent());
-        Assert.assertNotEquals(newFolderPage.getNotificationMessage(), "");
-        newFolderPage.typeName(folderName);
+        newFolderPage.type(folderName);
         newFolderPage.selectSubmitButton();
         Assert.assertNotNull(documentLibPage);
+
+        newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
+        newFolderPage.type(folderName);
+        newFolderPage.selectSubmitButton();
+        Assert.assertNotEquals(newFolderPage.getNotificationMessage(), "");
+
     }
 }

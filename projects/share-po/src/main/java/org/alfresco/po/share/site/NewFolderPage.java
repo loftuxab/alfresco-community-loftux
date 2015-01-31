@@ -46,7 +46,7 @@ public class NewFolderPage extends ShareDialogue
     private final By descriptionLocator = By.cssSelector("textarea[id$='default-createFolder_prop_cm_description']");
     private final By submitButton = By.cssSelector("button[id$='default-createFolder-form-submit-button']");
     private final By cancelButton = By.cssSelector("button[id$='createFolder-form-cancel-button']");
-    private final By NOTIFICATION_BALLOON = By.cssSelector("div[style*='visible']>div>div.balloon>div.text");
+    private final By NOTIFICATION_MESSAGE = By.cssSelector("div[style*='visible']>div>div>span.message");
 
     private final RenderElement folderTitleElement = getVisibleRenderElement(folderTitleCss);
     private final RenderElement nameElement = getVisibleRenderElement(name);
@@ -347,7 +347,6 @@ public class NewFolderPage extends ShareDialogue
         return message;
     }
 
-
     /**
      * Mimics the action of clicking the save button.
      *
@@ -360,40 +359,27 @@ public class NewFolderPage extends ShareDialogue
     }
 
     /**
-     * Method finds notification baloon
+     * Method finds notification message
      *
-     * @return notification message
+     * @return notification message string value
      */
     public String getNotificationMessage()
     {
         try
         {
-            WebElement notifBalloon = drone.findAndWait(NOTIFICATION_BALLOON);
-            return notifBalloon.getText();
+            WebElement notifMessage = drone.findAndWait(NOTIFICATION_MESSAGE);
+            return notifMessage.getText();
         }
         catch (TimeoutException toe)
         {
-            throw new PageException("Time out finding notification balloon.", toe);
+            throw new PageException("Time out finding notification message.", toe);
         }
 
     }
 
-    /**
-     * Method checks if notification baloon is present
-     *
-     * @return false if notification isn't present
-     */
-    public boolean isNotificationMessagePresent()
+    public void type(String text)
     {
-        try
-        {
-            return drone.find(NOTIFICATION_BALLOON).isDisplayed();
-        }
-        catch (NoSuchElementException nse)
-        {
-        }
-
-        return false;
+        clearAndType(name, text);
     }
 
 }
