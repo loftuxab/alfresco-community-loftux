@@ -127,6 +127,43 @@
             nodeRef = jsNode.nodeRef;
          
          elCell.innerHTML = '<input id="checkbox-' + oRecord.getId() + '" type="checkbox" name="fileChecked" value="'+ nodeRef + '"' + (scope.selectedFiles[nodeRef] ? ' checked="checked">' : '>');
+
+         // MNT-12522
+         var row = Dom.getAncestorByTagName(elCell, "tr");
+         var checkbox = elCell.children[0];
+         Event.addListener(checkbox, "focus", function()
+         {
+            _unhighlightRows(this);
+            this.onEventHighlightRow({target : row});
+         }, this.parentDocumentList, true);
+
+         new YAHOO.util.KeyListener(checkbox,
+         {
+            keys : YAHOO.util.KeyListener.KEY.TAB,
+            shift : true
+         },
+         {
+            fn : function()
+            {
+               _unhighlightRows(this);
+               var previous = Dom.getPreviousSibling(row);
+               if (previous !== null)
+               {
+                  this.onEventHighlightRow({target : previous});
+               }
+            },
+            scope : this.parentDocumentList,
+            correctScope : true
+         }, "keydown").enable();
+
+         function _unhighlightRows(scope)
+         {
+            var highlightedRows = Dom.getElementsByClassName("yui-dt-highlighted", "tr", Dom.getAncestorByTagName(row, "tbody"));
+            for (var i = 0; i < highlightedRows.length; i++)
+            {
+               scope.onEventUnhighlightRow({target : highlightedRows[i]});
+            }
+         }
       },
       
       /**
