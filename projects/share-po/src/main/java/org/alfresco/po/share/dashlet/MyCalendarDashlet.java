@@ -212,8 +212,7 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
         {
             String linkText = eventLink.getText();
             if (linkText.equalsIgnoreCase(eventName))
-                ;
-            eventLink.click();
+                eventLink.click();
 
         }
 
@@ -249,9 +248,7 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
         {
             String linkText = eventLink.getText();
             if (linkText.equalsIgnoreCase(siteName))
-                ;
-            eventLink.click();
-
+                eventLink.click();
         }
 
         return new SiteDashboardPage(drone);
@@ -271,14 +268,15 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
         {
             String linkText = eventLink.getText();
             if (linkText.equalsIgnoreCase(event))
-                ;
-            Boolean repeating = eventLink.getText().contains("Repeating");
-            return repeating;
+            {
+                Boolean repeating = eventLink.getText().contains("Repeating");
+                return repeating;
+            }
         }
 
         return false;
     }
-    
+
     /**
      * Return true if event with the details is displayed
      * 
@@ -318,13 +316,13 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * true if event displayed in dashlet
-     *
+     * 
      * @param eventName
      * @param date
      * @param siteName
      * @return
      */
-    public boolean isEventDisplayed(String eventName, String date, String siteName )
+    public boolean isEventDisplayed(String eventName, String date, String siteName)
     {
         checkNotNull(eventName);
         checkNotNull(date);
@@ -335,7 +333,7 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Click on event's date
-     *
+     * 
      * @return CalendarPage
      */
     public SiteDashboardPage clickEventSiteName(String eventName, String siteName)

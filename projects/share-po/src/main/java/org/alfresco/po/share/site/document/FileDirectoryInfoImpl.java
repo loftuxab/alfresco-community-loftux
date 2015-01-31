@@ -1358,6 +1358,28 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         }
         throw new PageException("Not able to click on view cloud sync info link.");
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#isViewCloudSyncInfoDisplayed()
+     */
+    @Override
+    public boolean isViewCloudSyncInfoDisplayed()
+    { 
+        
+        try
+        {
+            return findAndWait(SYNC_INFO_PAGE).isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Exceeded the time to find css.", e);          
+        }
+        return false;
+
+    }
+    
+    
 
     /*
      * (non-Javadoc)
