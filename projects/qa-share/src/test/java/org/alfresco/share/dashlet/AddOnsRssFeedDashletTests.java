@@ -40,7 +40,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2904() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -58,7 +58,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2904() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -79,7 +79,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
             else
             {
                 logger.info("Wait a few seconds to load the RSS feed");
-                Thread.sleep(7000);
+                rssDashlet.waitUntilLoadingDisappears();
                 counter++;
             }
         }
@@ -140,7 +140,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2905() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -157,7 +157,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2905() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
         String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
 
@@ -209,7 +209,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         // Click on any RSS news;
         // ---- Expected results ----
         // RSS news is opened in new window;
-        Thread.sleep(5);
+        //Thread.sleep(5);
         List<ShareLink> links = rssDashlet.getHeadlineLinksFromDashlet();
         links.get(0).openLink();
         Set<String> windowHandles = drone.getWindowHandles();
@@ -220,7 +220,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2906() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -237,7 +237,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2906() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
@@ -293,7 +293,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         // ---- Expected results ----
         // Dashlet displays correctly
         rssFeedUrlBoxPage.clickOk();
-        rssDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.ALFRESCO_ADDONS_RSS_FEED).render();
+        //rssDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.ALFRESCO_ADDONS_RSS_FEED).render();
         rssDashlet.render();
         Assert.assertTrue(rssDashlet.getHeaderInfo().equals(headerInfo));
         Assert.assertTrue(rssDashlet.isHelpIconDisplayed());

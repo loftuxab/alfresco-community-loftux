@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="Test for Sprint 37" verbose="1" preserve-order="true"
-	parallel="tests" thread-count="2">
+	parallel="tests" thread-count="1">
 
 	<groups>
 		<run>
@@ -15,7 +15,14 @@
 		<listener
 			class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
 	</listeners>
-	 
+
+	<test name="MyDashboardWebViewDashletTests" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.mydashboard.MyDashboardWebViewDashletTests" />
+		</classes>
+	</test>
+	
 	<test name="AddOnsRssFeedDashletTests" verbose="1">
 		<classes>
 			<class
@@ -30,20 +37,13 @@
 		</classes>
 	</test>
 	
-	<test name="MyDashboardWebViewDashletTests" verbose="1">
-		<classes>
-			<class
-				name="org.alfresco.share.mydashboard.MyDashboardWebViewDashletTests" />
-		</classes>
-	</test>
-	
+<!-- 
 	<test name="TinyMCE editor" verbose="1">
 		<classes>
 			<class
 				name="org.alfresco.share.site.document.DocumentDetailsPageCommentsTests" />
 		</classes>
 	</test>
-<!-- 
 	
 	<test name="My Activities Dashlet Tests" verbose="1">
 		<classes>

@@ -53,7 +53,7 @@ public class MyDashboardViewTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2820() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
 
         // Create User
@@ -64,7 +64,7 @@ public class MyDashboardViewTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2820() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);

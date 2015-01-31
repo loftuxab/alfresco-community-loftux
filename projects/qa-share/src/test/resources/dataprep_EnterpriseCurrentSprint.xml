@@ -35,6 +35,7 @@
 		</classes>
 	</test>
 	
+	<!--  
 	<test name="TinyMCE editor" verbose="1">
 		<classes>
 			<class
@@ -42,7 +43,7 @@
 		</classes>
 	</test>
 
-<!--  
+
 	<test name="My Activities Dashlet Tests" verbose="1">
 		<classes>
 			<class
