@@ -1,6 +1,8 @@
 package org.alfresco.share.util;
 
 import com.jcraft.jsch.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -10,16 +12,23 @@ import java.util.Properties;
  */
 public class SshCommandProcessor extends AbstractUtils{
 
+    private static Log logger = LogFactory.getLog(SshCommandProcessor.class);
     private final JSch jsch = new JSch();
     private Session session;
     private Channel channel;
 
-    public void connect() {
-        try {
-            if (isSecureSession) {
+    public void connect()
+    {
+        int i = 0;
+        try
+        {
+            if (isSecureSession)
+            {
                 jsch.addIdentity(pathToKeys, "passphrase");
                 session = jsch.getSession(serverUser, sshHost, serverShhPort);
-            } else {
+            }
+            else
+            {
                 session = jsch.getSession(serverUser, sshHost, serverShhPort);
                 session.setPassword(serverPass);
             }
@@ -27,10 +36,20 @@ public class SshCommandProcessor extends AbstractUtils{
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
             session.setServerAliveInterval(50000);
-            session.connect();
-        } catch (JSchException e) {
+            logger.info("try ssh connect");
+            session.connect(5000);
+        }
+        catch (JSchException e)
+        {
             e.printStackTrace();
-            System.exit(1);
+            logger.info(e);
+
+            if (i < 5)
+            {
+                connect();
+                i++;
+            }
+            // System.exit(1);
         }
     }
 
