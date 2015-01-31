@@ -26,6 +26,7 @@ import org.alfresco.windows.application.MicorsoftOffice2010;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -63,8 +64,6 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
     private static final String CIFS_LOCATION = "cifs";
     public String officePath;
     WindowsExplorer explorer = new WindowsExplorer();
-    MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
-    MicorsoftOffice2010 excel = new MicorsoftOffice2010(Application.EXCEL, "2010");
     MicorsoftOffice2010 power = new MicorsoftOffice2010(Application.POWERPOINT, "2010");
     String mapConnect;
     String networkDrive;
@@ -107,32 +106,26 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        Runtime.getRuntime().exec("net use * /d /y");
-        ;
-        logger.info("Unmapping succesfull " + testUser);
-
         Runtime.getRuntime().exec(mapConnect);
-        logger.info("Mapping succesfull " + testUser);
+        logger.info("----------Mapping succesfull " + testUser);
 
     }
 
     @AfterMethod(alwaysRun = true)
     public void teardownMethod() throws Exception
     {
-        Runtime.getRuntime().exec("taskkill /F /IM EXCEL.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM POWERPNT.EXE");
-        Runtime.getRuntime().exec("taskkill /F /IM WINWORD.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
     }
+    
+    @AfterClass(alwaysRun = true)
+    public void unmapDrive() throws Exception
+    {
+        Runtime.getRuntime().exec("net use * /d /y");
+        logger.info("--------Unmapping succesfull " + testUser);
+    }
 
-    // @AfterClass(alwaysRun = true)
-    // public void unmapDrive() throws Exception
-    // {
-    // Runtime.getRuntime().exec("net use * /d /y");
-    // logger.info("Unmapping succesfull " + testUser);
-    // }
-
-    @Test(groups = { "DataPrepWord" })
+    @Test(groups = { "DataPrepPowerPoint" })
     public void dataPrep_6277() throws Exception
     {
         String testName = getTestName();
@@ -325,7 +318,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepWord" })
+    @Test(groups = { "DataPrepPowerPoint" })
     public void dataPrep_6278() throws Exception
     {
         String testName = getTestName();
@@ -540,7 +533,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepExcel" })
+    @Test(groups = { "DataPrepPowerPoint" })
     public void dataPrep_6279() throws Exception
     {
 
@@ -562,7 +555,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepExcel" })
+    @Test(groups = { "DataPrepPowerPoint" })
     public void dataPrep_6280() throws Exception
     {
 
@@ -584,7 +577,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepExcel" })
+    @Test(groups = { "DataPrepPowerPoint" })
     public void dataPrep_6281() throws Exception
     {
         String testName = getTestName();
@@ -605,7 +598,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepExcel" })
+    @Test(groups = { "DataPrepPowerPoint" })
     public void dataPrep_6282() throws Exception
     {
         String testName = getTestName();
@@ -1193,7 +1186,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // --- Expected results --
         // The document is opened in write mode.
         l1 = power.openFileFromCMD(fullPath, fileName_6281 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
-        l1 = excel.getAbstractUtil().setOnWindow(fileName_6281);
+        l1 = power.getAbstractUtil().setOnWindow(fileName_6281);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6281), "Microsoft Excel - " + fileName_6281 + " window is active.");
 
@@ -1384,7 +1377,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // --- Expected results --
         // The document is opened in write mode.
         l1 = power.openFileFromCMD(fullPath, fileName_6282 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
-        l1 = excel.getAbstractUtil().setOnWindow(fileName_6282);
+        l1 = power.getAbstractUtil().setOnWindow(fileName_6282);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6282), "Microsoft Excel - " + fileName_6282 + " window is active.");
 

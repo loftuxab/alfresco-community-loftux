@@ -28,8 +28,8 @@ import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.alfresco.windows.application.MicorsoftOffice2010;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.AfterClass;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -73,8 +73,6 @@ public class CifsMSWord2010Tests extends AbstractUtils
     public String officePath;
     WindowsExplorer explorer = new WindowsExplorer();
     MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
-    MicorsoftOffice2010 excel = new MicorsoftOffice2010(Application.EXCEL, "2010");
-    MicorsoftOffice2010 power = new MicorsoftOffice2010(Application.POWERPOINT, "2010");
     String mapConnect;
     String networkDrive;
     String networkPath;
@@ -113,10 +111,10 @@ public class CifsMSWord2010Tests extends AbstractUtils
         fileName_6277 = "AONE-6277";
         fileName_6278 = "AONE-6278";
 
-        cifsPath = power.getCIFSPath();
+        cifsPath = word.getCIFSPath();
 
-        networkDrive = power.getMapDriver();
-        networkPath = power.getMapPath();
+        networkDrive = word.getMapDriver();
+        networkPath = word.getMapPath();
         mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
 
         // create user
@@ -125,11 +123,8 @@ public class CifsMSWord2010Tests extends AbstractUtils
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        // Runtime.getRuntime().exec("net use * /d /y");
-        // logger.info("Unmapping succesfull " + testUser);
-
-        // Runtime.getRuntime().exec(mapConnect);
-        // logger.info("Mapping succesfull " + testUser);
+        Runtime.getRuntime().exec(mapConnect);
+        logger.info("----------Mapping succesfull " + testUser);
 
     }
 
@@ -142,14 +137,14 @@ public class CifsMSWord2010Tests extends AbstractUtils
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
     }
 
-    // @AfterClass(alwaysRun = true)
-    // public void unmapDrive() throws Exception
-    // {
-        Runtime.getRuntime().exec("net use " + networkDrive + " /d");
-    // logger.info("Unmapping succesfull " + testUser);
-    // }
+    @AfterClass(alwaysRun = true)
+    public void unmapDrive() throws Exception
+    {
+        Runtime.getRuntime().exec("net use * /d /y");
+        logger.info("--------Unmapping succesfull " + testUser);
+    }
 
-    @Test(groups = { "DataPrepExcel" })
+    @Test(groups = { "DataPrepWord" })
     public void dataPrep_6267() throws Exception
     {
 
@@ -178,7 +173,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
     // logger.info("Unmapping succesfull " + testUser);
     // }
 
-    @Test(groups = { "DataPrepExcel" })
+    @Test(groups = { "DataPrepWord" })
     public void dataPrep_6268() throws Exception
     {
 
@@ -200,7 +195,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepExcel" })
+    @Test(groups = { "DataPrepWord" })
     public void dataPrep_6269() throws Exception
     {
         String testName = getTestName();
@@ -221,7 +216,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepExcel" })
+    @Test(groups = { "DataPrepWord" })
     public void dataPrep_6270() throws Exception
     {
         String testName = getTestName();
@@ -1307,6 +1302,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         detailsPage.render();
     }
 
+    /** AONE-6265:MS Word 2010 - uploaded to Share */
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6265() throws IOException
     {
@@ -1492,6 +1488,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         detailsPage.render();
     }
 
+    /** AONE-6266:MS Word 2010 - uploaded to Share (big) */
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6266() throws IOException, AWTException
     {
@@ -3069,9 +3066,6 @@ public class CifsMSWord2010Tests extends AbstractUtils
     }
 
     /** AONE-6268:MS Word 2010 - created via context menu (big) */
-    /**
-     * @throws Exception
-     */
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6268() throws Exception
     {
