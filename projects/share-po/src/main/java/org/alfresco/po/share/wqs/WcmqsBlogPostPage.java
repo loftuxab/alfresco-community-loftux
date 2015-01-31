@@ -17,6 +17,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 {
         private final By CREATE_ARTICLE = By.cssSelector("a[id='yui-gen5']");
+        @RenderWebElement
         private final By TITLE = By.xpath(".//div/h2");
         private final By CONTENT = By.xpath(".//div/div[2]/p");
         private final By DELETE_LINK = By.cssSelector("a[class=alfresco-content-delete]");
