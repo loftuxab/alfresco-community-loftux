@@ -575,6 +575,23 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
             }
         }
     }
+
+    
+    @Override
+    public void declareRecord(){
+        
+        try
+        {
+            selectMoreAction().click();
+            super.declareRecord();
+        }
+        catch (NoSuchElementException e)
+        {
+            
+            throw(e);
+        }
+    }
+
     
     /*
      * (non-Javadoc)
@@ -592,5 +609,6 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
         getDrone().mouseOverOnElement(contentActions);
         super.selectLocateFile();
     }
+
 
 }

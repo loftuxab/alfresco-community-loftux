@@ -74,7 +74,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     private static final String FILE_EDIT_INFO = "div.yui-dt-liner div:nth-of-type(1)";
     private static final String TAG_INFO = "span[title='Tag'] + form + span.item";
     private static final String TAG_COLLECTION = TAG_INFO + " > span.tag > a";
-    private static final String IMG_FOLDER = "/documentlibrary/images/folder";
+    private static final String IMG_FOLDER = "/documentlibrary/images/unfiled-record-folder-48.png";
     private static final String FAVOURITE_CONTENT = "a[class*='favourite-action']";
     private static final String LIKE_CONTENT = "a[class*='like-action']";
     private static final String LIKE_COUNT = "span.likes-count";
@@ -102,7 +102,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     protected String TITLE = "span.title";
     protected By TAG_LINK_LOCATOR = By.cssSelector("div.yui-dt-liner>div>span>span>a.tag-link");
     protected String THUMBNAIL = "td.yui-dt-col-thumbnail>div>span>a";
-    protected String THUMBNAIL_TYPE = "td.yui-dt-col-thumbnail>div>span";
+    protected String THUMBNAIL_TYPE = "td.yui-dt36-col-thumbnail>div>span";
     protected String INPUT_TAG_NAME = "div.inlineTagEdit input";
     protected String INPUT_CONTENT_NAME = "input[name='prop_cm_name']";
     protected String nodeRef;
@@ -115,6 +115,9 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     protected String rowElementXPath = null;
     protected String MORE_ACTIONS;
     protected String VIEW_ORIGINAL_DOCUMENT = "div.document-view-original>a";
+
+    protected String IS_FOLDER ="img[src*='.png']";
+
     private static final By TAGS_FIELD = By.cssSelector("div.detail span.item span.faded");
     protected String DESCRIPTION_INFO = "div.detail>span.faded";
 
@@ -885,6 +888,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
      * folder Page.
      * 
      * @return {boolean} <tt>true</tt> if the content is of type folder.
+     * @author hamara
      */
     @Override
     public boolean isFolder()
@@ -2909,7 +2913,10 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         
     }
     
-
+/**
+ * Verifies whether type is record.
+ * @author hamara
+ */
     public boolean isTypeRecord(){
         boolean isTypeRecord = false;
         WebElement rec = findElement(By.cssSelector(IN_COMPLETE_RECORD));
@@ -2931,4 +2938,30 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         
             
     }
+    /**
+     * Verifies whether type is record.
+     * @author hamara
+     */
+        public boolean isFolderType(){
+            boolean isTypeFolder = false;
+            WebElement rec = findElement(By.cssSelector(IS_FOLDER));
+            String rec_text = rec.getAttribute("src");
+           
+            try
+            {
+                if(rec_text != null && rec_text.contains("png")){
+                    isTypeFolder = true;
+                }
+            }
+            catch (Exception e)
+            {
+               
+                e.printStackTrace();
+            }
+                
+            return isTypeFolder;
+            
+                
+        }
+    
 }
