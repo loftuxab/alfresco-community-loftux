@@ -64,7 +64,7 @@ public class FolderTemplateCreationTest2 extends CmisUtils
         logger.info("Starting Tests: " + testName);
     }
 
-    @Test(groups = {"EnterpriseOnly", "NonGrid" })
+    @Test(groups = {"EnterpriseOnly"})
     public void AONE_15042() throws Exception
     {
         String testName = getTestName();
@@ -88,7 +88,7 @@ public class FolderTemplateCreationTest2 extends CmisUtils
 
     }
 
-    @Test(groups = {"EnterpriseOnly", "NonGrid" })
+    @Test(groups = {"EnterpriseOnly"})
     public void AONE_15043() throws Exception
     {
         String testName = getTestName();
