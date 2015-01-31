@@ -19,5 +19,9 @@
             <class name="org.alfresco.share.user.trashcan.TrashcanTest3"/>
         </classes>
     </test>
-
+    <test name="RepositoryWebDavTests">
+        <classes>
+            <class name="org.alfresco.share.repository.RepositoryWebDavTests"/>
+        </classes>
+    </test>
 </suite>
