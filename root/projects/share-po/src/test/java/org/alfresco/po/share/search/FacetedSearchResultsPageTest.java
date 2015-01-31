@@ -41,6 +41,7 @@ import java.util.List;
  * @author Shan Nagarajan
  * @since 1.0
  */
+
 @Listeners(FailedTestListener.class)
 public class FacetedSearchResultsPageTest extends AbstractTest
 {
@@ -70,7 +71,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         
     }   
         
-    @Test(groups = {"Enterprise-only"},dependsOnMethods="searchEmptyResult")
+    @Test(groups = {"Enterprise-only", "TestBug"},dependsOnMethods="searchEmptyResult")
     public void selectNthSearchResult() throws Exception
     {
         SearchBox search = dashBoard.getSearch();
@@ -82,7 +83,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertTrue(name.equalsIgnoreCase(itemPage.getDocumentTitle()));
     }
     
-    @Test(groups = {"Enterprise-only"},dependsOnMethods="selectNthSearchResult")
+    @Test(groups = {"Enterprise-only", "TestBug"},dependsOnMethods="selectNthSearchResult")
     public void selectSearchResultByName() throws Exception
     {
         SearchBox search = dashBoard.getSearch();
@@ -94,7 +95,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertTrue(name.equalsIgnoreCase(itemPage.getDocumentTitle()));
     }
     
-    @Test(groups = {"Enterprise-only"},dependsOnMethods="selectSearchResultByName")
+    @Test(groups = {"Enterprise-only", "TestBug"},dependsOnMethods="selectSearchResultByName")
     public void selectFirstSearchResult() throws Exception
     {
         SearchBox search = dashBoard.getSearch();
@@ -105,7 +106,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertTrue(itemPage.getTitle().contains("Document Details"));
     }
     
-    @Test(groups = {"Enterprise-only"}, dependsOnMethods="selectFirstSearchResult")
+    @Test(groups = {"Enterprise-only", "TestBug"}, dependsOnMethods="selectFirstSearchResult")
     public void selectSearchResultOfTypeFolder() throws Exception
     {
         SearchBox search = dashBoard.getSearch();
@@ -116,7 +117,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertTrue(itemPage.getTitle().contains("Library"));
     }
     
-    @Test(groups = {"Enterprise-only"}, dependsOnMethods="selectSearchResultOfTypeFolder")
+    @Test(groups = {"Enterprise-only", "TestBug"}, dependsOnMethods="selectSearchResultOfTypeFolder")
     public void selectSearchResultOfTypeWiki() throws Exception
     {
         SearchBox search = dashBoard.getSearch();
@@ -127,7 +128,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertTrue(itemPage.getTitle().contains("Wiki"));
     }
     
-    @Test(groups = {"Enterprise-only"}, dependsOnMethods="selectSearchResultOfTypeWiki")
+    @Test(groups = {"Enterprise-only", "TestBug"}, dependsOnMethods="selectSearchResultOfTypeWiki")
     public void selectSearchResultOfTypeDataList() throws Exception
     {
         SearchBox search = dashBoard.getSearch();
@@ -138,7 +139,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertTrue(itemPage.getTitle().contains("Project Lists"));
     }
     
-    @Test(groups = {"Enterprise-only"}, dependsOnMethods="selectSearchResultOfTypeDataList")
+    @Test(groups = {"Enterprise-only", "TestBug"}, dependsOnMethods="selectSearchResultOfTypeDataList")
     public void pagination() throws Exception
     {
         int expectedResultLength = 10;
@@ -174,7 +175,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
      * @throws Exception
      */
 
-    @Test(groups = { "Enterprise-only" }, dependsOnMethods="pagination")
+    @Test(groups = { "Enterprise-only", "TestBug" }, dependsOnMethods="pagination")
     public void searchSortDescTest() throws Exception
     {
         String selectedSort;
@@ -196,7 +197,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
      * @throws Exception
      */
 
-    @Test(groups = { "Enterprise-only" }, dependsOnMethods="searchSortDescTest")
+    @Test(groups = { "Enterprise-only", "TestBug" }, dependsOnMethods="searchSortDescTest")
     public void searchSortTest() throws Exception
     {
         FacetedSearchPage resultPage;
@@ -226,7 +227,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
      * @author Charu
      * 
      */
-    @Test(groups = { "Enterprise-only" }, dependsOnMethods="searchSortTest")
+    @Test(groups = { "Enterprise-only", "TestBug" }, dependsOnMethods="searchSortTest")
     public void searchSortExceptionTest() throws Exception
     {
         String selectedSort;
@@ -243,7 +244,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertNotNull(facetedSearchPage);
      }
     
-    @Test(groups = { "Enterprise-only"}, dependsOnMethods="searchSortExceptionTest")
+    @Test(groups = { "Enterprise-only", "TestBug"}, dependsOnMethods="searchSortExceptionTest")
     public void getResultCount()
     {
         SearchBox search = dashBoard.getSearch();
@@ -253,7 +254,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertEquals(facetedSearchPage.getResultCount(),0);
     }
     
-    @Test(groups = { "Enterprise-only"}, dependsOnMethods="getResultCount")
+    @Test(groups = { "Enterprise-only", "TestBug"}, dependsOnMethods="getResultCount")
     public void selectFacet()
     {
         SearchBox search = dashBoard.getSearch();
@@ -271,7 +272,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
      * @author Charu
      * 
      */
-    @Test(groups = { "Enterprise-only" })
+    @Test(groups = { "Enterprise-only", "TestBug" })
     public void searchSelectViewTest() throws Exception
     {       
     	SearchBox search = dashBoard.getSearch();
@@ -296,7 +297,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         
      }
     
-    @Test(groups = { "Enterprise-only" },dependsOnMethods="searchSelectViewTest")
+    @Test(groups = { "Enterprise-only", "TestBug" },dependsOnMethods="searchSelectViewTest")
     public void clickImagePreviewTest() throws Exception
     {  	      
        
@@ -319,7 +320,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
        
      }
     
-    @Test(groups = { "Enterprise-only" },dependsOnMethods="clickImagePreviewTest")
+    @Test(groups = { "Enterprise-only", "TestBug" },dependsOnMethods="clickImagePreviewTest")
     public void clickConfigureSearchTest() throws Exception
     {
         String groupName = "ALFRESCO_SEARCH_ADMINISTRATORS";    
@@ -335,7 +336,7 @@ public class FacetedSearchResultsPageTest extends AbstractTest
         Assert.assertTrue(facetedSearchConfigPage.getTitle().equals("Search Manager"));
     }
     
-    @Test(groups = { "Enterprise-only" },dependsOnMethods="clickConfigureSearchTest")
+    @Test(groups = { "Enterprise-only", "TestBug" },dependsOnMethods="clickConfigureSearchTest")
     public void clickLinksOnSearchItemTest() throws Exception
     { 
         SearchBox search = dashBoard.getSearch();        
