@@ -340,40 +340,49 @@ public class MyTasksPage extends SharePage
                 taskDetails.setDescription(taskRow.findElement(By.cssSelector("div.description>span")).getText());
                 taskDetails.setStartedBy(taskRow.findElement(By.cssSelector("div.initiator>span")).getText());
 
+                if (taskRow.findElements(By.cssSelector("div[class^='ended']>span")).size() != 0)
+                {
+                    if (taskRow.findElement(By.cssSelector("div[class^='ended']>span")).isDisplayed())
+                    {
+                        taskDetails.setEndDate(taskRow.findElement(By.cssSelector("div[class^='ended']>span")).getText());
+                    }
+                }
+
                 List<String> labels = new ArrayList<String>();
                 List<WebElement> webElements = drone.findAll(By.cssSelector("div > label"));
                 for (WebElement label : webElements)
                 {
                     labels.add(label.getText());
                 }
-                
+
                 taskDetails.setTaskLabels(labels);
 
                 drone.mouseOverOnElement(taskRow);
-                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'task-edit')]/a/span")).size()!=0){
+                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'task-edit')]/a/span")).size() != 0)
+                {
                     taskDetails.setEditTaskDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'task-edit')]/a/span")).isDisplayed());
-                } else {
+                }
+                else
+                {
                     taskDetails.setEditTaskDisplayed(false);
                 }
 
-                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'task-view')]/a/span")).size()!=0){
+                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'task-view')]/a/span")).size() != 0)
+                {
                     taskDetails.setViewTaskDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'task-view')]/a/span")).isDisplayed());
-                } else {
+                }
+                else
+                {
                     taskDetails.setViewTaskDisplayed(false);
                 }
 
-                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'workflow-view')]/a/span")).size()!=0){
+                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'workflow-view')]/a/span")).size() != 0)
+                {
                     taskDetails.setViewWorkFlowDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'workflow-view')]/a/span")).isDisplayed());
-                } else {
-                    taskDetails.setViewWorkFlowDisplayed(false);
                 }
-
-
-                if (taskRow.findElements(By.cssSelector("div[class^='ended']>span")).size()!=0){
-                    if (taskRow.findElement(By.cssSelector("div[class^='ended']>span")).isDisplayed())
-                    {
-                        taskDetails.setEndDate(taskRow.findElement(By.cssSelector("div[class^='ended']>span")).getText());
-                    }
+                else
+                {
+                    taskDetails.setViewWorkFlowDisplayed(false);
                 }
             }
             else
