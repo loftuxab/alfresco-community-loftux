@@ -1038,6 +1038,20 @@
             }
          }, this.widgets.dataTable, true);
 
+
+         this.widgets.dataTable.subscribe("postRenderEvent", function()
+         {
+            if (me.currentSort)
+            {
+               //Set focus back on selected sort column
+               //Expecting only one <a> element in Th
+               if(me.currentSort.oColumn._elTh.getElementsByTagName("a").length ==1)
+               {
+                  me.currentSort.oColumn._elTh.getElementsByTagName("a")[0].focus(); 
+               }
+            }
+         }, this.widgets.dataTable, true);		 
+
          // Rendering complete event handler
          this.widgets.dataTable.subscribe("renderEvent", function()
          {
