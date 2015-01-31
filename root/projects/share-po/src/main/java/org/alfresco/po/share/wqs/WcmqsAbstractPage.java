@@ -1,9 +1,12 @@
 package org.alfresco.po.share.wqs;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -15,10 +18,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 public abstract class WcmqsAbstractPage extends SharePage
 {
@@ -344,19 +343,18 @@ public abstract class WcmqsAbstractPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(By.xpath(String.format("//a[contains(text(),\"%s\")]/../..//img", documentTitle))).isDisplayed();
+            return drone.find(By.xpath(String.format("//a[contains(text(),\"%s\")]/../..//img", documentTitle))).isDisplayed();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException nse)
         {
-            throw new PageOperationException("Exceeded time to find Document link. " + e.toString());
+            return false;
         }
-
     }
 
     /**
      * Method to get all tags in section tag list as text
      * 
-     * @return List<String>  Contains "None" in case of empty list
+     * @return List<String> Contains "None" in case of empty list
      */
     public List<String> getTagList()
     {
@@ -380,10 +378,10 @@ public abstract class WcmqsAbstractPage extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new PageOperationException("Exceeded time to find the tags " + e.toString());
+            throw new PageOperationException("Exceeded time to find the tags ", e);
         }
     }
-        
+
     /**
      * Method to get the headline titles from right side of news Page
      * 
@@ -403,29 +401,28 @@ public abstract class WcmqsAbstractPage extends SharePage
         }
 
     }
-    
+
     /**
      * Method to navigate to news folders
-     *
+     * 
      * @param folderName - the Name of the folder from SHARE
      * @return WcmqsNewsPage
      */
     public WcmqsNewsPage openNewsPageFolder(String folderName)
     {
-            try
-            {
-                    WebElement news = drone.findAndWait(NEWS_MENU);
-                    drone.mouseOver(news);
+        try
+        {
+            WebElement news = drone.findAndWait(NEWS_MENU);
+            drone.mouseOver(news);
 
-                    drone.findAndWait(By.cssSelector(String.format("a[href$='/wcmqs/news/%s/']", folderName))).click();
-
-            }
-            catch (TimeoutException e)
-            {
-                    throw new PageOperationException("Exceeded time to find news links. " + e.toString());
-            }
-
+            drone.find(By.cssSelector(String.format("a[href$='/wcmqs/news/%s/']", folderName))).click();
             return new WcmqsNewsPage(drone);
+
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find news links. ", e);
+        }
     }
 
 }
