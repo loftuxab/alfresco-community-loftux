@@ -58,9 +58,9 @@ public class MSWordTests extends AbstractUtils
     MicrosoftOffice2013 word = new MicrosoftOffice2013(Application.WORD, "2013");
 
     private static DocumentLibraryPage documentLibPage;
-    public String officePath;
-    public String sharepointPath;
     private static final String SHAREPOINT = "sharepoint";
+    public String sharepointPath;
+    
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -87,13 +87,8 @@ public class MSWordTests extends AbstractUtils
         docFileName_9827 = "WInputCancel";
 
         Runtime.getRuntime().exec("taskkill /F /IM WINWORD.EXE");
-
-        Properties officeAppProperty = new Properties();
-        officeAppProperty.load(this.getClass().getClassLoader().getResourceAsStream("qa-share.properties"));
-        String officeVersion = "2013";
-        sharepointPath = officeAppProperty.getProperty("sharepoint.path");
-        officePath = officeAppProperty.getProperty("office" + officeVersion + ".path");
-
+        
+        sharepointPath = word.getSharePointPath();
     }
 
     @AfterMethod(alwaysRun = true)
@@ -158,7 +153,7 @@ public class MSWordTests extends AbstractUtils
     {
 
         // MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
 
         // Enter some content to the document;
         word.editOffice(l, "new input data");
@@ -194,7 +189,7 @@ public class MSWordTests extends AbstractUtils
     {
 
         // MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         // 1. Enter the credentials;
@@ -242,7 +237,7 @@ public class MSWordTests extends AbstractUtils
     public void AONE_9810() throws Exception
     {
         // 1. MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         // Open document window is opened;
@@ -303,7 +298,7 @@ public class MSWordTests extends AbstractUtils
     public void AONE_9811() throws Exception
     {
         // MS Office word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -327,7 +322,7 @@ public class MSWordTests extends AbstractUtils
     {
 
         // MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
 
         // Enter some content to the document;
         String newContent = "new input data for 9812";
@@ -387,7 +382,7 @@ public class MSWordTests extends AbstractUtils
     public void AONE_9813() throws Exception
     {
         // 1. MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -452,7 +447,7 @@ public class MSWordTests extends AbstractUtils
     public void AONE_9814() throws Exception
     {
         // 1. MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -518,7 +513,7 @@ public class MSWordTests extends AbstractUtils
     {
 
         // 1. MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -585,7 +580,7 @@ public class MSWordTests extends AbstractUtils
     {
 
         // 1. MS Office word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -652,7 +647,7 @@ public class MSWordTests extends AbstractUtils
     public void AONE_9824() throws Exception
     {
         // 1. MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -700,7 +695,7 @@ public class MSWordTests extends AbstractUtils
     public void AONE_9825() throws Exception
     {
         // 1. MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -755,7 +750,7 @@ public class MSWordTests extends AbstractUtils
     public void AONE_9826() throws Exception
     {
         // 1. MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -810,7 +805,7 @@ public class MSWordTests extends AbstractUtils
     public void AONE_9827() throws Exception
     {
         // 1. MS Office Word 2013 is opened;
-        Ldtp l = word.openOfficeApplication(officePath);
+        Ldtp l = word.openOfficeApplication();
         word.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);

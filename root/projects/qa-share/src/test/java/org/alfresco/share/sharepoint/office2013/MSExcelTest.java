@@ -54,7 +54,7 @@ public class MSExcelTest extends AbstractUtils
     MicrosoftOffice2013 excel = new MicrosoftOffice2013(Application.EXCEL, "2013");
     private static final String SHAREPOINT = "sharepoint";
 
-    public String officePath;
+ 
     public String sharepointPath;
 
     @Override
@@ -82,11 +82,8 @@ public class MSExcelTest extends AbstractUtils
 
         Runtime.getRuntime().exec("taskkill /F /IM EXCEL.EXE");
 
-        Properties officeAppProperty = new Properties();
-        officeAppProperty.load(this.getClass().getClassLoader().getResourceAsStream("qa-share.properties"));
-        String officeVersion = "2013";
-        sharepointPath = officeAppProperty.getProperty("sharepoint.path");
-        officePath = officeAppProperty.getProperty("office" + officeVersion + ".path");
+        sharepointPath = excel.getSharePointPath();
+
 
     }
 
@@ -143,7 +140,7 @@ public class MSExcelTest extends AbstractUtils
     {
 
         // MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         // Enter some content to the document;
         excel.editOffice(l, "new input data");
 
@@ -159,8 +156,8 @@ public class MSExcelTest extends AbstractUtils
         // 4. Enter a workbook name;
         // 5. Click Save button;
 
-        String path = getPathSharepoint(drone);
-        excel.operateOnSaveAsWithSharepoint(l, path, siteName, xlsFileName_9829, testUser, DEFAULT_PASSWORD);
+        
+        excel.operateOnSaveAsWithSharepoint(l, sharepointPath, siteName, xlsFileName_9829, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9829);
 
@@ -183,7 +180,7 @@ public class MSExcelTest extends AbstractUtils
     public void AONE_9830() throws Exception
     {
         // MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         // Enter some content to the document;
         String newContent = "new input data for 9830";
         excel.editOffice(l, newContent);
@@ -199,8 +196,8 @@ public class MSExcelTest extends AbstractUtils
         // document;
         // Enter a workbook name;
         // Click Save button;
-        String path = getPathSharepoint(drone);
-        excel.operateOnSaveAsWithSharepoint(l, path, siteName, xlsFileName_9830, testUser, DEFAULT_PASSWORD);
+        
+        excel.operateOnSaveAsWithSharepoint(l, sharepointPath, siteName, xlsFileName_9830, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9830);
         // 1. Workbook is saved in MS Office Excel 2013;
@@ -243,7 +240,7 @@ public class MSExcelTest extends AbstractUtils
     public void AONE_9831() throws Exception
     {
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Open document window is opened;
@@ -252,8 +249,8 @@ public class MSExcelTest extends AbstractUtils
         // open;
         // Click Open button;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9831, testUser, DEFAULT_PASSWORD);
+        
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9831, testUser, DEFAULT_PASSWORD);
 
         // Workbook is opened in MS Office Excel 2013;
 
@@ -302,18 +299,18 @@ public class MSExcelTest extends AbstractUtils
     {
 
         // MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // 1. Enter the credentials;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // 2. Type url into File name field (e.g. http://<host>:7070/alfresco);
         // 3. Select the workbook from site Document Library you would like to
         // open;
         // 4. Click Open button;
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9832, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9832, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9832);
         // the window name contains "frm" string at the begining
@@ -327,18 +324,18 @@ public class MSExcelTest extends AbstractUtils
     public void AONE_9833() throws Exception
     {
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // Type url into File name field (e.g. http://<host>:7070/alfresco);
         // Select the workbook from site Document Library you would like to
         // open;
         // Click Open button;
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9833, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9833, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9833);
         // the window name contains "frm" string at the begining(3);
@@ -395,18 +392,18 @@ public class MSExcelTest extends AbstractUtils
     {
 
         // MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // 1. Enter the credentials;
         excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // 2. Type url into File name field (e.g. http://<host>:7070/alfresco);
         // 3. Select the workbook from site Document Library you would like to
         // open;
         // 4. Click Open button;
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9834, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9834, testUser, DEFAULT_PASSWORD);
         String actualName = excel.getAbstractUtil().findWindowName(xlsFileName_9834);
         Assert.assertTrue(actualName.contains(xlsFileName_9834), "Microsoft Excel window is active.");
 
@@ -443,18 +440,18 @@ public class MSExcelTest extends AbstractUtils
     public void AONE_9835() throws Exception
     {
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // Type url into File name field (e.g. http://<host>:7070/alfresco);
         // Select the workbook from site Document Library you would like to
         // open;
         // Click Open button;
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9835, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9835, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9835);
         // the window name contains "frm" string at the begining
@@ -516,19 +513,19 @@ public class MSExcelTest extends AbstractUtils
     {
 
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // Type url into File name field (e.g. http://<host>:7070/alfresco);
         // Select the workbook from site Document Library you would like to
         // open;
         // Click Open button;
 
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9836, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9836, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9836);
         // the window name contains "frm" string at the begining
@@ -582,19 +579,19 @@ public class MSExcelTest extends AbstractUtils
     {
 
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // Type url into File name field (e.g. http://<host>:7070/alfresco);
         // Select the workbook from site Document Library you would like to
         // open;
         // Click Open button;
 
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9837, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9837, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9837);
         Assert.assertTrue(excelName.contains(xlsFileName_9837 + " - Excel"));
@@ -649,18 +646,18 @@ public class MSExcelTest extends AbstractUtils
     {
 
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // Type url into File name field (e.g. http://<host>:7070/alfresco);
         // Select the workbook from site Document Library you would like to
         // open;
         // Click Open button;
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9838, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9838, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9838);
         // Workbook is opened in MS Office Excel 2013;
@@ -713,19 +710,19 @@ public class MSExcelTest extends AbstractUtils
     public void AONE_9839() throws Exception
     {
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // Type url into File name field (e.g. http://<host>:7070/alfresco);
         // Select the workbook from site Document Library you would like to
         // open;
         // Click Open button;
 
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9839, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9839, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9839);
 
@@ -770,19 +767,19 @@ public class MSExcelTest extends AbstractUtils
     public void AONE_9840() throws Exception
     {
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;
         // excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // Type url into File name field (e.g. http://<host>:7070/alfresco);
         // Select the workbook from site Document Library you would like to
         // open;
         // Click Open button;
 
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9840, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9840, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9840);
 
@@ -828,7 +825,7 @@ public class MSExcelTest extends AbstractUtils
     public void AONE_9841() throws Exception
     {
         // 1. MS Office Excel 2013 is opened;
-        Ldtp l = excel.openOfficeApplication(officePath);
+        Ldtp l = excel.openOfficeApplication();
         excel.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;
@@ -836,14 +833,14 @@ public class MSExcelTest extends AbstractUtils
 
         // Enter the credentials;
         excel.operateOnSecurity(l, testUser, DEFAULT_PASSWORD);
-        String path = getPathSharepoint(drone);
+        
 
         // Type url into File name field (e.g. http://<host>:7070/alfresco);
         // Select the workbook from site Document Library you would like to
         // open;
         // Click Open button;
 
-        excel.operateOnOpen(l, path, siteName, xlsFileName_9841, testUser, DEFAULT_PASSWORD);
+        excel.operateOnOpen(l, sharepointPath, siteName, xlsFileName_9841, testUser, DEFAULT_PASSWORD);
 
         String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9841);
 

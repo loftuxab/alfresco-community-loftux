@@ -48,7 +48,6 @@ public class MSPowerPointTests extends AbstractUtils
     private String pptxFileName_9854;
     private String fileType = ".pptx";
 
-    public String officePath;
     public String sharepointPath;
 
     MicrosoftOffice2013 powerpoint = new MicrosoftOffice2013(Application.POWERPOINT, "2013");
@@ -81,11 +80,7 @@ public class MSPowerPointTests extends AbstractUtils
 
         Runtime.getRuntime().exec("taskkill /F /IM POWERPNT.EXE");
 
-        Properties officeAppProperty = new Properties();
-        officeAppProperty.load(this.getClass().getClassLoader().getResourceAsStream("qa-share.properties"));
-        String officeVersion = "2013";
-        sharepointPath = officeAppProperty.getProperty("sharepoint.path");
-        officePath = officeAppProperty.getProperty("office" + officeVersion + ".path");
+        sharepointPath = powerpoint.getSharePointPath();
 
     }
 
@@ -152,7 +147,7 @@ public class MSPowerPointTests extends AbstractUtils
     {
 
         // MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
 
         // Enter some content to the document;
         powerpoint.editOffice(l, "new input data for 9842");
@@ -180,7 +175,7 @@ public class MSPowerPointTests extends AbstractUtils
     {
 
         // MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         // Enter some content to the document;
         powerpoint.editOffice(l, "new input data for 9843");
 
@@ -234,7 +229,7 @@ public class MSPowerPointTests extends AbstractUtils
     public void AONE_9844() throws Exception
     {
         // 1. MS Office Powerpoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
 
         powerpoint.navigateToOpenSharePointBrowse(l);
 
@@ -297,7 +292,7 @@ public class MSPowerPointTests extends AbstractUtils
     public void AONE_9845() throws Exception
     {
         // MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         // 1. Enter the credentials
@@ -318,7 +313,7 @@ public class MSPowerPointTests extends AbstractUtils
     public void AONE_9846() throws Exception
     {
         // 1. MS PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         // Enter the credentials;;
@@ -376,7 +371,7 @@ public class MSPowerPointTests extends AbstractUtils
     {
 
         // MS Office PowerPont 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         // 1. Enter the credentials;
@@ -422,7 +417,7 @@ public class MSPowerPointTests extends AbstractUtils
     public void AONE_9848() throws Exception
     {
         // 1. MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -474,7 +469,7 @@ public class MSPowerPointTests extends AbstractUtils
     {
 
         // 1. MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -539,7 +534,7 @@ public class MSPowerPointTests extends AbstractUtils
     {
 
         // 1. MS Office word 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -606,7 +601,7 @@ public class MSPowerPointTests extends AbstractUtils
     {
 
         // 1. MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -651,7 +646,7 @@ public class MSPowerPointTests extends AbstractUtils
     public void AONE_9852() throws Exception
     {
         // 1. MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -707,7 +702,7 @@ public class MSPowerPointTests extends AbstractUtils
     public void AONE_9853() throws Exception
     {
         // 1. MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
@@ -762,7 +757,7 @@ public class MSPowerPointTests extends AbstractUtils
     public void AONE_9854() throws Exception
     {
         // 1. MS Office PowerPoint 2013 is opened;
-        Ldtp l = powerpoint.openOfficeApplication(officePath);
+        Ldtp l = powerpoint.openOfficeApplication();
         powerpoint.navigateToOpenSharePointBrowse(l);
 
         String path = getPathSharepoint(drone);
