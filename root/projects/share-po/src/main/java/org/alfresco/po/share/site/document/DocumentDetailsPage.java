@@ -104,6 +104,8 @@ public class DocumentDetailsPage extends DetailsPage
 
     private static final String DOCUMENT_BODY = "div[id$='document-details_x0023_default-viewer']";
 
+    private static final By VIEW_ORIGINAL_DOCUMENT = By.cssSelector("div.document-view-original>a");
+
     private static final String ERROR_EDITING_DOCUMENT = ".//*[@id='message']/div/span";
 
     public synchronized void setPreviousVersion(final String previousVersion)
@@ -1272,6 +1274,18 @@ public class DocumentDetailsPage extends DetailsPage
     }
 
     /**
+     * Method to to verify if the download button for a version is present
+     * 
+     * @param versionNumber revision number
+     */
+    public boolean isDownloadPreviousVersion(String versionNumber)
+    {
+        WebElement downloadButton = drone.findAndWait(By.xpath("//span[contains(text(),'" + versionNumber
+                + "')]//..//..//span[@class='actions']//a[@title='Download']"));
+        return downloadButton.isDisplayed();
+    }
+
+    /**
      * Method to download the document to the specified version.
      * 
      * @param versionNumber revision number
@@ -1281,6 +1295,7 @@ public class DocumentDetailsPage extends DetailsPage
         WebElement downloadButton = drone.findAndWait(By.cssSelector("a[rel='" + versionNumber + "'] + a.download"));
         downloadButton.click();
         // Assumes driver capability settings to save file in a specific location when
+        // //span[contains(text(),'1.1')]//..//..//span[@class='actions']//a[@title='Download']
     }
 
     /**
@@ -1444,7 +1459,7 @@ public class DocumentDetailsPage extends DetailsPage
     {
         try
         {
-            return drone.find(VIEW_WORKING_COPY).isDisplayed();
+            return drone.findAndWait(VIEW_WORKING_COPY).isDisplayed();
         }
         catch (NoSuchElementException nse)
         {
@@ -1745,5 +1760,47 @@ public class DocumentDetailsPage extends DetailsPage
             throw new PageException("Unable to find the popup", e);
         }
 
+    }
+
+    /**
+     * Verify if View Original Document is displayed
+     * 
+     * @return true if present
+     */
+    public boolean isViewOriginalLinkPresent()
+    {
+        try
+        {
+            return drone.findAndWait((VIEW_ORIGINAL_DOCUMENT)).isDisplayed();
+        }
+        catch (NoSuchElementException te)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("View Original Document link is not displayed", te);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Click on View Original Document
+     * 
+     * @return new DocumentDetailsPage
+     */
+    public DocumentDetailsPage selectViewOriginalDocument()
+    {
+        try
+        {
+            WebElement link = drone.findAndWait((VIEW_ORIGINAL_DOCUMENT));
+            link.click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Unable to select View Original Document ", e);
+        }
+
+        return new DocumentDetailsPage(drone);
     }
 }
