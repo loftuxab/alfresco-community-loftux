@@ -898,7 +898,134 @@ public class FtpsUtil extends AbstractUtils
             file.delete();
         }
     }
+    /**
+     * Method to copy a folder
+     *
+     * @param shareUrl
+     * @param user
+     * @param password
+     * @param remoteFolderName
+     * @param remoteFolderPath
+     * @param destination
+     */
 
+    public static boolean copyFolder(String shareUrl, String user, String password, String remoteFolderPath, String remoteFolderName, String destination) throws
+        IOException
+    {
+        boolean result;
+        FTPSClient ftpsClient = connectServer(shareUrl, user, password);
+
+        try
+        {
+            ftpsClient.changeWorkingDirectory(remoteFolderPath + "/" + remoteFolderName);
+            ftpsClient.setControlKeepAliveTimeout(600);
+
+            if (ftpsClient.listNames().length == 0)
+            {
+
+                ftpsClient.changeWorkingDirectory(destination);
+                result = ftpsClient.makeDirectory(remoteFolderName);
+                if (!result)
+                {
+                    logger.error(ftpsClient.getReplyString());
+                    ftpsClient.logout();
+                    ftpsClient.disconnect();
+                    return result;
+                }
+            }
+
+            else
+
+            {
+                for (FTPFile file : ftpsClient.listFiles())
+                {
+                    if (!ftpsClient.printWorkingDirectory().startsWith(remoteFolderPath))
+                    {
+                        ftpsClient.changeWorkingDirectory(remoteFolderPath + "/" + remoteFolderName);
+                    }
+
+                    if (file.isFile())
+                    {
+
+                        InputStream inputStream = null;
+                        ByteArrayOutputStream outputStream = null;
+
+                        try
+                        {
+                            outputStream = new ByteArrayOutputStream();
+                            ftpsClient.retrieveFile(file.getName(), outputStream);
+                            inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+                            ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
+                            ftpsClient.changeWorkingDirectory(destination);
+                            if (ftpsClient.listDirectories().length == 0)
+                            {
+                                result = ftpsClient.makeDirectory(remoteFolderName);
+
+                                if (!result)
+                                {
+                                    logger.error(ftpsClient.getReplyString());
+                                    ftpsClient.logout();
+                                    ftpsClient.disconnect();
+                                    return result;
+                                }
+                            }
+                            else
+                            {
+                                for (FTPFile content : ftpsClient.listDirectories())
+                                {
+                                    if (!content.getName().equalsIgnoreCase(remoteFolderName))
+                                    {
+                                        result = ftpsClient.makeDirectory(remoteFolderName);
+                                        if (!result)
+                                        {
+                                            logger.error(ftpsClient.getReplyString());
+                                            ftpsClient.logout();
+                                            ftpsClient.disconnect();
+                                            return result;
+                                        }
+                                    }
+                                }
+                            }
+
+                            ftpsClient.changeWorkingDirectory(destination + "/" + remoteFolderName);
+                            ftpsClient.storeFile(file.getName(), inputStream);
+
+                        }
+                        catch (IOException ex)
+                        {
+                            throw new RuntimeException(ex.getMessage());
+                        }
+                        finally
+                        {
+                            if (inputStream != null)
+                                inputStream.close();
+
+                            if (outputStream != null)
+                                outputStream.close();
+                        }
+
+                    }
+
+                    if (file.isDirectory())
+                    {
+                        copyFolderContents(ftpsClient, remoteFolderPath, file.getName(), destination);
+                    }
+
+                }
+            }
+
+            ftpsClient.logout();
+            ftpsClient.disconnect();
+            result = true;
+        }
+
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+
+        return result;
+    }
     /**
      * Method to move a folder
      *
