@@ -841,16 +841,19 @@ public UserRole getExistingPermission(String name)
                     {
                         throw new IllegalArgumentException("User profile is null");
                     }
-                    String fullName = searchRow.getUserName();
-                    String[] name = fullName.split(" ");
-                    userProfile.setfName(name[0]);
+                    else if (searchRow.getUserName().contains(searchText))
+                    {
+                        String fullName = searchRow.getUserName();
+                        String[] name = fullName.split(" ");
+                        userProfile.setfName(name[0]);
 
-                    if (name.length > 1)
-                        userProfile.setlName(name[1]);
-                    else
-                        userProfile.setlName("");
+                        if (name.length > 1)
+                            userProfile.setlName(name[1]);
+                        else
+                            userProfile.setlName("");
 
-                    return searchRow.clickAdd();
+                        return searchRow.clickAdd();
+                    }
 
                 }
             }
