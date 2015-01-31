@@ -3094,7 +3094,7 @@ public class AdvanceSearchTest extends AbstractUtils
     {
         /** Start Test */
 
-        testName = getTestName() + 2;
+        testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName).replace("-", "");
 
