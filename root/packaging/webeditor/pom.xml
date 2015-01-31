@@ -92,7 +92,7 @@
                                 <artifactItem>
                                     <groupId>com.yahoo.platform.yui</groupId>
                                     <artifactId>yui</artifactId>
-                                    <version>2.9.0-alfresco-20141112</version>
+                                    <version>${dependency.yui.version}</version>
                                     <type>zip</type>
                                 </artifactItem>
                             </artifactItems>
