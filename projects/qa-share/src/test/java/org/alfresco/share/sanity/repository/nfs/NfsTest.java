@@ -20,7 +20,12 @@
 package org.alfresco.share.sanity.repository.nfs;
 
 import org.alfresco.po.share.RepositoryPage;
+import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.UserRole;
+import org.alfresco.po.share.systemsummary.AdminConsoleLink;
+import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
+import org.alfresco.po.share.systemsummary.SystemSummaryPage;
+import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.share.util.*;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
@@ -53,6 +58,7 @@ public class NfsTest extends NfsUtil
     private static String testUser;
     private static String[] folderNames;
     private static UserRole[] userRoles;
+    private static final String regexUrl = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
     private static final Pattern DOMAIN_PATTERN = Pattern.compile("\\w+(\\.\\w+)*(\\.\\w{2,})");
     private static String pathToNFS = "/tmp/alf/";
@@ -77,6 +83,18 @@ public class NfsTest extends NfsUtil
         {
 
             ShareUser.createEnterpriseUser(drone, ADMIN_USERNAME, testUser, testUser, DEFAULT_LASTNAME, DEFAULT_PASSWORD);
+            SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+            RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
+            if (clusteringPage.isClusterEnabled())
+            {
+                mountPointHost = shareUrl.replaceFirst(regexUrl, clusteringPage.getClusterMembers().get(0) + ":" + nodePort);
+                dronePropertiesMap.get(drone).setShareUrl(mountPointHost);
+            }
+            else
+            {
+                mountPointHost = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+            }
+
 
             for (String folder : folderNames)
             {
@@ -91,19 +109,21 @@ public class NfsTest extends NfsUtil
             }
 
 
-            NfsUtil.configNfsServer(shareUrl, ADMIN_PASSWORD, testUser);
-            NfsUtil.configNfsUser(shareUrl, testUser);
+
+            NfsUtil.configNfsServer(mountPointHost, ADMIN_PASSWORD, testUser);
+            NfsUtil.configNfsUser(mountPointHost, testUser);
 
             // Mount NFS
             setSshHost(mountPointHost);
-            RemoteUtil.mountNfs(shareUrl, nfsPort, nfsMountPort);
+            mountPointHost = sshHost;
+            RemoteUtil.mountNfs(mountPointHost, nfsPort, nfsMountPort);
 
             // Create user on server
             RemoteUtil.createUserOnServer(testUser, DEFAULT_PASSWORD);
         }
         catch (Exception e)
         {
-            throw new SkipException("Skipping as test data wasn't generated: " + e.getMessage());
+            throw new SkipException("Skipping as test data wasn't generated: " + e);
         }
 
     }

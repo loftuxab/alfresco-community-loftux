@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  * This file is part of Alfresco
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -26,7 +26,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 /**
- * Created by olga Lokhach
+ * Created by Olga Lokhach
  */
 public class NfsUtil extends AbstractUtils
 {
@@ -69,12 +69,16 @@ public class NfsUtil extends AbstractUtils
     {
         String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
 
-        JmxUtils.invokeAlfrescoServerProperty(server, "Alfresco:Type=Configuration,Category=fileServers,id1=default,id2=nfs.user.mappings,id3=" + userName, NFS_STOP);
-        JmxUtils.setAlfrescoServerProperty(server,"Alfresco:Type=Configuration,Category=fileServers,id1=default,id2=nfs.user.mappings,id3=" + userName, USER_GID,
-            "500");
+        JmxUtils.invokeAlfrescoServerProperty(server, "Alfresco:Type=Configuration,Category=fileServers,id1=default,id2=nfs.user.mappings,id3=" + userName,
+            NFS_STOP);
         JmxUtils
-            .setAlfrescoServerProperty(server,"Alfresco:Type=Configuration,Category=fileServers,id1=default,id2=nfs.user.mappings,id3=" + userName, USER_UID, "1000");
-        JmxUtils.invokeAlfrescoServerProperty(server,"Alfresco:Type=Configuration,Category=fileServers,id1=default,id2=nfs.user.mappings,id3=" + userName, NFS_START);
+            .setAlfrescoServerProperty(server, "Alfresco:Type=Configuration,Category=fileServers,id1=default,id2=nfs.user.mappings,id3=" + userName, USER_GID,
+                "500");
+        JmxUtils
+            .setAlfrescoServerProperty(server, "Alfresco:Type=Configuration,Category=fileServers,id1=default,id2=nfs.user.mappings,id3=" + userName, USER_UID,
+                "1000");
+        JmxUtils.invokeAlfrescoServerProperty(server, "Alfresco:Type=Configuration,Category=fileServers,id1=default,id2=nfs.user.mappings,id3=" + userName,
+            NFS_START);
         JmxUtils.invokeAlfrescoServerProperty(server, JMX_FILE_SERVERS_CONFIG, NFS_STOP);
         JmxUtils.invokeAlfrescoServerProperty(server, JMX_FILE_SERVERS_CONFIG, NFS_START);
     }
@@ -111,8 +115,7 @@ public class NfsUtil extends AbstractUtils
         }
         catch (JSchException e)
         {
-            e.printStackTrace();
-            logger.info(e);
+            logger.error("Error handled during connection via ssh", e);
         }
         return channel;
     }
@@ -147,16 +150,31 @@ public class NfsUtil extends AbstractUtils
                         return true;
                     }
                 }
-                channel.disconnect();
-                session.disconnect();
             }
         }
         catch (SftpException ex)
         {
-            logger.error(ex.getMessage());
+            logger.error("The file system connection was lost or the path is invalid", ex);
+        }
+        finally
+        {
+            channel.disconnect();
+            session.disconnect();
         }
         return false;
     }
+
+    /**
+     * Method to rename a remote content or folder
+     *
+     * @param serverIP
+     * @param user
+     * @param password
+     * @param pathToNFS
+     * @param oldName
+     * @param newName
+     * @return true if a content is renamed
+     */
 
     public static boolean renameFileOrFolder(String serverIP, String user, String password, String pathToNFS, String oldName, String newName)
     {
@@ -177,7 +195,7 @@ public class NfsUtil extends AbstractUtils
         }
         catch (SftpException ex)
         {
-            logger.error(ex.getMessage());
+            logger.error("Seem access denied", ex);
         }
         finally
         {
@@ -187,10 +205,22 @@ public class NfsUtil extends AbstractUtils
         return successful;
     }
 
+    /**
+     * Method to edit a remote content
+     *
+     * @param serverIP
+     * @param user
+     * @param password
+     * @param pathToNFS
+     * @param filename
+     * @param content
+     * @return true if a content is edited
+     */
+
     public static boolean editContent(String serverIP, String user, String password, String pathToNFS, String filename, String content)
     {
         boolean successful = false;
-        OutputStream outputStream;
+        OutputStream outputStream = null;
 
         try
         {
@@ -199,33 +229,36 @@ public class NfsUtil extends AbstractUtils
             if (channel.isConnected())
             {
                 channel.cd(pathToNFS);
-            }
-            if (isObjectExists(serverIP, user, password, pathToNFS, filename))
-            {
+
                 try
                 {
                     outputStream = channel.put(filename);
                     outputStream.write(content.getBytes());
-                    outputStream.flush();
-                    outputStream.close();
                     successful = true;
                 }
-                catch (SftpException ex)
+                finally
                 {
-                    logger.error(ex.getMessage());
+                    if (outputStream != null)
+                    {
+                        outputStream.flush();
+                        outputStream.close();
+                    }
                 }
             }
         }
-        catch (Exception ex)
+        catch (SftpException ex)
         {
-            logger.error(ex.getMessage());
+            logger.error("Seem access denied", ex);
+        }
+        catch (Exception e)
+        {
+            logger.error("Seem access denied", e);
         }
         finally
         {
             channel.disconnect();
             session.disconnect();
         }
-
         return successful;
     }
 
@@ -259,8 +292,7 @@ public class NfsUtil extends AbstractUtils
         }
         catch (SftpException ex)
         {
-            logger.error(ex.getMessage());
-            successful = false;
+            logger.error("Seem access denied", ex);
         }
         finally
         {
@@ -300,8 +332,7 @@ public class NfsUtil extends AbstractUtils
         }
         catch (SftpException ex)
         {
-            logger.error("Seem access denied");
-            successful = false;
+            logger.error("Seem access denied", ex);
         }
         finally
         {
@@ -324,11 +355,9 @@ public class NfsUtil extends AbstractUtils
     public static boolean uploadContent(String serverIP, String user, String password, String pathToNFS, File contentName)
     {
 
-        InputStream inputStream;
-        OutputStream outputStream;
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         boolean result = false;
-
-
 
         try
         {
@@ -337,46 +366,56 @@ public class NfsUtil extends AbstractUtils
             if (channel.isConnected())
             {
                 channel.cd(pathToNFS);
-                inputStream = new FileInputStream(contentName);
-                outputStream = channel.put(contentName.getName());
 
-                if (outputStream != null)
+                try
                 {
-
-                    byte[] buffer = new byte[4096];
-                    int l;
-                    logger.info("Starting upload file[" + contentName.getName() + "]");
-                    while ((l = inputStream.read(buffer)) != -1)
+                    inputStream = new FileInputStream(contentName);
+                    outputStream = channel.put(contentName.getName());
+                    if (outputStream != null)
                     {
-                        outputStream.write(buffer, 0, l);
+
+                        byte[] buffer = new byte[4096];
+                        int l;
+                        logger.info("Starting upload file[" + contentName.getName() + "]");
+                        while ((l = inputStream.read(buffer)) != -1)
+                        {
+                            outputStream.write(buffer, 0, l);
+                        }
+                        logger.info("Content uploaded!");
+                        result = true;
                     }
-                    logger.info("Content uploaded!");
-                    inputStream.close();
-                    outputStream.flush();
-                    outputStream.close();
-                    result = true;
+                    else
+                    {
+                        logger.error("Seem access denied");
+                    }
                 }
-                else
+                finally
                 {
-                    logger.error("Seem access denied");
+                    if (inputStream != null)
+                    {
+                        inputStream.close();
+                    }
+                    if (outputStream != null)
+                    {
+                        outputStream.flush();
+                        outputStream.close();
+                    }
                 }
             }
         }
         catch (SftpException e)
         {
-            logger.error(e.getMessage());
+            logger.error("Seem access denied", e);
         }
-
         catch (IOException ex)
         {
-            logger.error(ex.getMessage());
+            logger.error("Seem access denied", ex);
         }
         finally
         {
             channel.disconnect();
             session.disconnect();
         }
-
         return result;
     }
 
@@ -412,7 +451,6 @@ public class NfsUtil extends AbstractUtils
                     logger.info("Folder deleted!");
                     successful = true;
                 }
-
                 else
                 {
                     for (ChannelSftp.LsEntry listItem : list)
@@ -427,18 +465,18 @@ public class NfsUtil extends AbstractUtils
                             emptyFolderContents(channel, listItem.getFilename());
                         }
                     }
+
+                    channel.cd("..");
+                    channel.rmdir(folderName);
+                    logger.info("Folder deleted!");
+                    successful = true;
                 }
-                channel.cd("..");
-                channel.rmdir(folderName);
-                logger.info("Folder deleted!");
-                successful = true;
             }
 
         }
         catch (SftpException ex)
         {
-            logger.error(ex.getMessage());
-            successful = false;
+            logger.error("Seem access denied", ex);
         }
         finally
         {
@@ -462,12 +500,9 @@ public class NfsUtil extends AbstractUtils
                     channel.cd("..");
                     channel.rmdir(folderName);
                     logger.info("Folder deleted!");
-                    return;
                 }
-
                 else
                 {
-
                     for (ChannelSftp.LsEntry listItem : list)
                     {
                         if (!listItem.getAttrs().isDir())
@@ -479,13 +514,15 @@ public class NfsUtil extends AbstractUtils
                             emptyFolderContents(channel, listItem.getFilename());
                         }
                     }
+                    channel.cd("..");
+                    channel.rmdir(folderName);
                 }
             }
 
         }
         catch (SftpException ex)
         {
-            logger.error("Seem access denied");
+            logger.error("Seem access denied", ex);
         }
     }
 
@@ -513,9 +550,7 @@ public class NfsUtil extends AbstractUtils
             if (channel.isConnected())
             {
                 channel.cd(pathToNFS);
-            }
-            if (isObjectExists(serverIP, user, password, pathToNFS, remoteContentName))
-            {
+
                 try
                 {
                     InputStream inputStream = channel.get(remoteContentName);
@@ -526,15 +561,16 @@ public class NfsUtil extends AbstractUtils
                     }
                     reader.close();
                 }
-                catch (IOException ex)
+                catch (IOException e)
                 {
-                    throw new RuntimeException(ex.getMessage());
+                    throw new RuntimeException("The file system connection was lost or the path is invalid:", e);
                 }
             }
+
         }
         catch (SftpException ex)
         {
-            logger.error(ex.getMessage());
+            logger.error("The file system connection was lost or the path is invalid", ex);
         }
 
         finally
@@ -561,8 +597,8 @@ public class NfsUtil extends AbstractUtils
 
     {
         boolean successful = false;
-        InputStream inputStream;
-        ByteArrayOutputStream outputStream;
+        InputStream inputStream = null;
+        ByteArrayOutputStream outputStream = null;
 
         try
         {
@@ -579,9 +615,7 @@ public class NfsUtil extends AbstractUtils
                     channel.mkdir(remoteFolderName);
                     successful = true;
                 }
-
                 else
-
                 {
                     for (ChannelSftp.LsEntry listItem : list)
                     {
@@ -605,18 +639,19 @@ public class NfsUtil extends AbstractUtils
                                 }
                                 channel.cd(destination + remoteFolderName);
                                 channel.put(inputStream, listItem.getFilename());
-                                inputStream.close();
-                                outputStream.close();
+                            }
+                            finally
+                            {
+                                if (inputStream != null)
+                                {
+                                    inputStream.close();
+                                }
+                                if (outputStream != null)
+                                {
+                                    outputStream.close();
+                                }
+                            }
 
-                            }
-                            catch (SftpException ex)
-                            {
-                                throw new RuntimeException(ex.getMessage());
-                            }
-                            catch (IOException e)
-                            {
-                                throw new RuntimeException(e.getMessage());
-                            }
                         }
                         else
                         {
@@ -625,11 +660,16 @@ public class NfsUtil extends AbstractUtils
                     }
                 }
             }
+
             successful = true;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Seem access denied: ", e);
         }
         catch (SftpException ex)
         {
-            throw new RuntimeException(ex.getMessage());
+            throw new RuntimeException("Seem access denied: ", ex);
 
         }
         finally
@@ -642,8 +682,8 @@ public class NfsUtil extends AbstractUtils
 
     private static void copyFolderContents(ChannelSftp channel, String remoteFolderPath, String folderName, String destination)
     {
-        InputStream inputStream;
-        ByteArrayOutputStream outputStream;
+        InputStream inputStream = null;
+        ByteArrayOutputStream outputStream = null;
 
         try
         {
@@ -657,11 +697,8 @@ public class NfsUtil extends AbstractUtils
                 {
                     channel.cd(newDestination);
                     channel.mkdir(folderName);
-                    return;
                 }
-
                 else
-
                 {
                     for (ChannelSftp.LsEntry listItem : list)
                     {
@@ -680,17 +717,17 @@ public class NfsUtil extends AbstractUtils
                                 }
                                 channel.cd(newDestination + folderName);
                                 channel.put(inputStream, listItem.getFilename());
-                                inputStream.close();
-                                outputStream.close();
-                                return;
                             }
-                            catch (SftpException ex)
+                            finally
                             {
-                                throw new RuntimeException(ex.getMessage());
-                            }
-                            catch (IOException e)
-                            {
-                                throw new RuntimeException(e.getMessage());
+                                if (inputStream != null)
+                                {
+                                    inputStream.close();
+                                }
+                                if (outputStream != null)
+                                {
+                                    outputStream.close();
+                                }
                             }
                         }
                         else
@@ -701,10 +738,13 @@ public class NfsUtil extends AbstractUtils
                 }
             }
         }
-
+        catch (IOException e)
+        {
+            throw new RuntimeException("Seem access denied: ", e);
+        }
         catch (SftpException ex)
         {
-            throw new RuntimeException(ex.getMessage());
+            throw new RuntimeException("Seem access denied: ", ex);
         }
     }
 
@@ -731,13 +771,10 @@ public class NfsUtil extends AbstractUtils
         }
         catch (TimeoutException e)
         {
-
+            logger.error("The file system connection was lost", e);
         }
         return successful;
 
     }
-
-
-
 
 }
