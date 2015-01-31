@@ -46,4 +46,26 @@
         </classes>
     </test>
 
+    <test name="Template tests Suite">
+        <classes>
+            <class name="org.alfresco.share.site.document.FolderTemplateCreationTest">
+            <methods>
+                <include name="dataPrep_AONE_15032"/>
+                <include name="dataPrep_AONE_15033"/>
+                <include name="dataPrep_AONE_15034"/>
+                <include name="dataPrep_AONE_15035"/>
+                <include name="dataPrep_AONE_15036"/>
+                <include name="dataPrep_AONE_15037"/>
+                <include name="dataPrep_AONE_15038"/>
+                <include name="dataPrep_AONE_15039"/>
+                <include name="dataPrep_AONE_15040"/>
+                <include name="dataPrep_AONE_15041"/>
+                <include name="dataPrep_AONE_15045"/>
+                <include name="dataPrep_AONE_15046"/>
+                <!--include name="dataPrep_AONE_15047"/-->
+            </methods>
+            </class>
+        </classes>
+    </test>
+
 </suite>
