@@ -16,7 +16,6 @@ package org.alfresco.po.share.site.document;
 
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.ShareDialogue;
-import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.preview.PdfJsPlugin;
 import org.alfresco.po.share.site.UpdateFilePage;
 import org.alfresco.po.share.user.CloudSignInPage;
@@ -36,7 +35,6 @@ import org.openqa.selenium.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -104,6 +102,7 @@ public class DocumentDetailsPage extends DetailsPage
     protected static final By PROMPT_PANEL_ID = By.id("prompt");
     private static final By BUTTON_TAG_NAME = By.tagName("button");
     private static final By HISTORY_VERSIONS = By.cssSelector("div[class*='document-versions'] span[class='document-version']");
+    private static final By SYNC_MESSAGE = By.xpath(".//span[contains(text(),'Sync was created')]");
 
     private static final By DOCUMENT_BODY = By.cssSelector("div[id$='document-details_x0023_default-viewer']");
 
@@ -1831,4 +1830,29 @@ public class DocumentDetailsPage extends DetailsPage
 
         return new DocumentDetailsPage(drone);
     }
+
+
+    /**
+     * Returns true if Sync message is present
+     *
+     * @return boolean
+     */
+
+    public boolean isSyncMessagePresent()
+    {
+        try
+        {
+            drone.waitForElement(SYNC_MESSAGE, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+            WebElement syncMessage = drone.find(SYNC_MESSAGE);
+            if (syncMessage != null)
+                return true;
+        }
+        catch(TimeoutException toe)
+        {
+            logger.error("Message element not found!!", toe);
+            return false;
+        }
+        return false;
+    }
+
 }

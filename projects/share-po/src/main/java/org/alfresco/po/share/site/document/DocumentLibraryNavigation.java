@@ -15,12 +15,6 @@
 
 package org.alfresco.po.share.site.document;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.ShareLink;
@@ -47,6 +41,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Represent elements found on the HTML page relating to the document library
@@ -96,6 +96,7 @@ public class DocumentLibraryNavigation extends SharePage
     private static final String CREATE_DOCUMENT_FROM_TEMPLATE = "//span[text()='Create document from template']/parent::a";
     private static final By BREAD_CRUMBS_PARENT = By.cssSelector("div[id$='default-breadcrumb'] a[class='folder']:first-child");
     private static final By BREAD_CRUMBS_PARENT_SPAN = By.cssSelector("span[class='label']>a");
+    private static final By SYNC_TO_CLOUD_BUTTON = By.cssSelector("button[id$=default-syncToCloud-button-button]");
 
     private Log logger = LogFactory.getLog(this.getClass());
 
@@ -669,6 +670,41 @@ public class DocumentLibraryNavigation extends SharePage
         catch (TimeoutException e)
         {
             String exceptionMessage = "Not able to find the \"Sync to Cloud\" Link";
+            logger.error(exceptionMessage, e);
+            throw new PageOperationException(exceptionMessage);
+        }
+    }
+
+    /**
+     * Mimics the  select "Sync to Cloud" button from Navigation bar.
+     * It displays when have boths files and folders selected
+     * Assumes Cloud sync is already set-up
+     *
+     * @return {@link DestinationAndAssigneePage}
+     */
+    public HtmlPage selectSyncToCloudFromNav()
+    {
+
+        try
+        {
+            {
+                WebElement element = drone.findAndWait(SYNC_TO_CLOUD_BUTTON);
+                String id = element.getAttribute("id");
+                element.click();
+                if (isSignUpDialogVisible())
+                {
+                    return new CloudSignInPage(getDrone());
+                }
+                else
+                {
+                    return new DestinationAndAssigneePage(getDrone());
+                }
+            }
+
+        }
+        catch (TimeoutException e)
+        {
+            String exceptionMessage = "Not able to find the \"Sync to Cloud\" button";
             logger.error(exceptionMessage, e);
             throw new PageOperationException(exceptionMessage);
         }
