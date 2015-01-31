@@ -74,7 +74,6 @@ public class SyncInfoPageTest extends AbstractDocumentTest
         drone.refresh();
         desAndAsgPage = (DestinationAndAssigneePage) documentLibPage.getFileDirectoryInfo(file.getName()).selectSyncToCloud().render();
         documentLibPage = ((DocumentLibraryPage) desAndAsgPage.selectSubmitButtonToSync()).render();
-        // Assert.assertTrue(documentLibPage.isMessagePresent(Optype.SYNC));
         documentLibPage.render().getNavigation().selectCreateNewFolder().render().createNewFolder(folder);
         drone.refresh();
         documentLibPage.render().getNavigation().selectCreateNewFolder().render().createNewFolder(folder2);
@@ -114,6 +113,7 @@ public class SyncInfoPageTest extends AbstractDocumentTest
         Assert.assertTrue(syncInfoPage.isSyncStatusPresent());
         Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
         Assert.assertNotNull(syncInfoPage.getSyncPeriodDetails());
+        Assert.assertFalse(syncInfoPage.isUnableToRetrieveLocation());
         syncInfoPage.clickOnCloseButton();
         documentLibPage = (DocumentLibraryPage) drone.getCurrentPage().render();
         Assert.assertTrue(documentLibPage instanceof DocumentLibraryPage);
@@ -138,7 +138,7 @@ public class SyncInfoPageTest extends AbstractDocumentTest
         Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
         syncInfoPage.selectUnsyncRemoveContentFromCloud(false);
     }
-
+    
     @AfterClass
     public void teardown()
     {
