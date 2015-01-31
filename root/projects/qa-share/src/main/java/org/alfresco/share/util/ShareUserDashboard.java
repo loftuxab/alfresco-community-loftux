@@ -630,4 +630,32 @@ public class ShareUserDashboard extends AbstractUtils
             throw new PageOperationException("Cannot get the Dashlet: " + DashletName.getDashletName());
         }
     }
+    
+    /**
+     * Removes dashlet from the user dashboard page
+     * 
+     * @param driver
+     * @param dashlet
+     * @param siteName
+     * @return
+     */
+    public static DashBoardPage removeDashletFromUserDashboard(WebDrone driver, Dashlets dashlet)
+    {
+        DashBoardPage dashBoard = null;
+        SharePage thisPage = ShareUser.getSharePage(driver);
+
+        if (!(thisPage instanceof DashBoardPage))
+        {
+            dashBoard = ShareUser.openUserDashboard(driver);
+        }
+        else
+        {
+            dashBoard = (DashBoardPage) thisPage;
+        }
+
+        CustomiseUserDashboardPage customiseUserDashBoard = dashBoard.getNav().selectCustomizeUserDashboard();
+        customiseUserDashBoard.render();
+        dashBoard = customiseUserDashBoard.removeDashlet(dashlet).render();
+        return dashBoard;
+    }
 }

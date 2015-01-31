@@ -16,6 +16,27 @@
 			class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
 	</listeners>
 
+	<test name="AddOnsRssFeedDashletTests" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.dashlet.AddOnsRssFeedDashletTests" />
+		</classes>
+	</test>
+	
+	<test name="MyDashboardViewTests" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.mydashboard.MyDashboardViewTests" />
+		</classes>
+	</test>
+	
+	<test name="MyDashboardWebViewDashlet" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.mydashboard.MyDashboardWebViewDashlet" />
+		</classes>
+	</test>
+	
 	<test name="TinyMCE editor" verbose="1">
 		<classes>
 			<class
@@ -23,13 +44,16 @@
 		</classes>
 	</test>
 
+<!-- 
+	
+
 	<test name="My Activities Dashlet Tests" verbose="1">
 		<classes>
 			<class
 				name="org.alfresco.share.mydashboard.myactivities.MyActivitiesDashletTests" />
 		</classes>
 	</test>
-
+ -->
 	<!-- <test name="Site Activities Dashlet Test" verbose="1"> <classes> <class 
 		name="org.alfresco.share.dashlet.SiteActivitiesDashletTest" /> </classes> 
 		</test> <test name="People Finer Search By Tests" verbose="1"> <classes> 
