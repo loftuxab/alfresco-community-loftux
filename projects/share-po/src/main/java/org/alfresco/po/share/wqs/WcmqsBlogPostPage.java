@@ -278,5 +278,10 @@ public class WcmqsBlogPostPage extends SharePage
                 return false;
             }
         }
+        
+        public WcmqsComment getCommentSection(String visitorName, String commentText)
+        {
+            return new WcmqsComment(drone,visitorName,commentText);
+        }
 
 }
