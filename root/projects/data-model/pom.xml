@@ -9,6 +9,15 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <!-- Files to exclude from SonarQube analysis -->
+        <sonar.exclusions>
+            source/java/org/alfresco/repo/search/impl/parsers/CMIS*er.java,
+            source/java/org/alfresco/repo/search/impl/parsers/FTSParser.java,
+            source/java/org/alfresco/repo/search/impl/parsers/FTSLexer.java
+        </sonar.exclusions>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
