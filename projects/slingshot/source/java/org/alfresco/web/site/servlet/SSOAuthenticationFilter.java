@@ -363,6 +363,16 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                 public String getRemoteUser()
                 {
                     String remoteUser = req.getHeader(userHeader);
+                    // MNT-11041 Share SSOAuthenticationFilter and non-ascii username strings
+                    if (remoteUser != null)
+                    {
+                        byte[] out = Base64.decode(remoteUser.getBytes());
+                        if (out == null)
+                        {
+                            out = remoteUser.getBytes();
+                        }
+                        remoteUser = new String(out);
+                    }
                     if (remoteUser != null)
                     {
                         remoteUser = extractUserFromProxyHeader(remoteUser);
