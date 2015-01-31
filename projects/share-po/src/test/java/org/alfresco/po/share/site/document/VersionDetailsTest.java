@@ -125,6 +125,7 @@ public class VersionDetailsTest extends AbstractTest
         Assert.assertEquals(versionDetails.getLastModified(), "just now", "Verifying Last modified");
         Assert.assertTrue(versionDetails.getUserName().getDescription().toLowerCase().contains("admin"), "Verifying user name");
         Assert.assertEquals(versionDetails.getComment(), comment2, "Verifying Version comment");
+        Assert.assertTrue(versionDetails.getFullDetails().equals("Administrator just now\n" + comment2));
 
         List<VersionDetails> olderVersions = detailsPage.getOlderVersionDetails();
         Assert.assertEquals(olderVersions.size(), 2);

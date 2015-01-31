@@ -38,7 +38,6 @@ import java.util.Locale;
  */
 public class SyncInfoPage extends SharePage
 {
-
     private static Log logger = LogFactory.getLog(FileDirectoryInfo.class);
     private static final By CLOSE_BUTTON = By.cssSelector("div[style*='visible'] div.info-balloon .closeButton");
     private static final By IS_CLOUD_SYNC_STATUS = By.cssSelector("div[style*='visible'] div.cloud-sync-status-heading+p");
@@ -54,6 +53,7 @@ public class SyncInfoPage extends SharePage
     public static final By STATUS_HEADING = By.cssSelector(".cloud-sync-status-heading");
     private static final By INDIRECT_SYNC_LOCATION = By.cssSelector(".cloud-sync-indirect-root .view-in-cloud");
     private static final By FAILED_SYNC = By.cssSelector("div[style*='visible'] .cloud-sync-details-failed-detailed");
+    private static final By UNABLE_RETRIEVE_LOCATION = By.xpath("//p[text()='Unable to retrieve location']");
 
     public enum ButtonType
     {
@@ -461,4 +461,17 @@ public class SyncInfoPage extends SharePage
         return false;
     }
  
+    public boolean isUnableToRetrieveLocation()
+    {
+        try
+        {
+            return drone.find(UNABLE_RETRIEVE_LOCATION).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+            
+        }
+        return false;
+
+    }
 }

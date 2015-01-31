@@ -35,6 +35,7 @@ public class VersionDetails
     private ShareLink userName;
     private String lastModified;
     private String comment;
+    private String fullDetails;
 
     public VersionDetails(WebDrone drone, WebElement element)
     {
@@ -45,6 +46,7 @@ public class VersionDetails
             userName = new ShareLink(element.findElement(By.cssSelector("div.version-panel-right>div.version-details>div.version-details-right>a")), drone);
             lastModified = element.findElement(By.cssSelector("div.version-panel-right>div.version-details>div.version-details-right>span")).getText();
             comment = element.findElement(By.cssSelector("div.version-panel-right>div.version-details>div.version-details-right")).getText().split("\n")[1];
+            fullDetails = element.findElement(By.cssSelector(".version-details-right")).getText();
         }
         catch (NoSuchElementException nse)
         {
@@ -75,5 +77,10 @@ public class VersionDetails
     public String getComment()
     {
         return comment;
+    }
+    
+    public String getFullDetails()
+    {
+        return fullDetails;
     }
 }
