@@ -18,6 +18,10 @@
  */
 package org.alfresco.share.util;
 
+import org.alfresco.po.share.util.PageUtils;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,6 +45,11 @@ public class HttpUtil
     private static Log logger = LogFactory.getLog(HttpUtil.class);
 
     private static final String MIME_TYPE_JSON = "application/json";
+    private static final String ADMIN_SYSTEMSUMMARY_PAGE = "alfresco/service/enterprise/admin";
+
+    private static GetMethod get;
+    private static String response;
+    private static HttpState state;
 
     public HttpUtil()
     {
@@ -115,6 +124,40 @@ public class HttpUtil
             logger.debug("Json string value: " + se);
         }
         return se;
+    }
+
+    /**
+     * Method for check alfresco running
+     *
+     * @param nodeUrl
+     * @return true if alfresco running, else return false
+     */
+    public static boolean alfrescoRunning(String nodeUrl)
+    {
+        boolean rv;
+        String protocolVar = PageUtils.getProtocol(nodeUrl);
+        String consoleUrlVar = PageUtils.getAddress(nodeUrl);
+        String systemUrl = String.format("%s%s:%s@%s/" + ADMIN_SYSTEMSUMMARY_PAGE, protocolVar, AbstractUtils.ADMIN_USERNAME, AbstractUtils.ADMIN_PASSWORD,
+                consoleUrlVar);
+        logger.info("Check alfresco running via url: " + systemUrl);
+        try
+        {
+            HttpClient client = new HttpClient();
+            get = new GetMethod(systemUrl + ADMIN_SYSTEMSUMMARY_PAGE);
+            get.getParams().setSoTimeout(5000);
+            client.executeMethod(get);
+            response = readStream(get.getResponseBodyAsStream());
+            state = client.getState();
+            get.releaseConnection();
+            rv = response.contains("alfresco");
+        }
+
+        catch (Throwable ex)
+        {
+            rv = false;
+
+        }
+        return rv;
     }
 
 }
