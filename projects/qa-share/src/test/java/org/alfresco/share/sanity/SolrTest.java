@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -30,7 +30,10 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.calendar.CalendarPage;
 import org.alfresco.po.share.site.discussions.DiscussionsPage;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.DetailsPage;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.task.TaskDetailsPage;
 import org.alfresco.po.share.user.*;
@@ -55,14 +58,13 @@ import java.util.Calendar;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.alfresco.po.share.dashlet.SiteContentFilter.MY_FAVOURITES;
-import static org.alfresco.po.share.dashlet.SiteContentFilter.I_AM_EDITING;
-import static org.alfresco.po.share.dashlet.SiteContentFilter.I_HAVE_RECENTLY_MODIFIED;
 import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.*;
-import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.*;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.*;
+import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.ALL_TOPICS;
+import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.MY_TOPICS;
 import static org.alfresco.po.share.dashlet.MyTasksFilter.ACTIVE_TASKS;
 import static org.alfresco.po.share.dashlet.MyTasksFilter.COMPLETED_TASKS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.*;
+import static org.alfresco.po.share.dashlet.SiteContentFilter.*;
 import static org.testng.Assert.*;
 
 /**
@@ -111,15 +113,6 @@ public class SolrTest extends AbstractUtils
         // User login
         ShareUser.login(drone, user, DEFAULT_PASSWORD);
 
-        // Add all dashlets to the userdashboard
-        DashBoardPage dashBoardPage = ShareUser.openUserDashboard(drone).render();
-        dashBoardPage.getNav().selectCustomizeUserDashboard().render();
-        CustomiseUserDashboardPage customiseUserDashboardPage = drone.getCurrentPage().render();
-        customiseUserDashboardPage.removeAllDashlets();
-        dashBoardPage.getNav().selectCustomizeUserDashboard().render();
-        customiseUserDashboardPage = drone.getCurrentPage().render();
-        customiseUserDashboardPage.selectChangeLayou().selectNewLayout(3);
-        customiseUserDashboardPage.addAllDashlets().render();
 
         //Two sites are created
         //Several events are created: at least one event is passed, three events are upcoming - simple one day event, all day event, multy-day event.
@@ -340,10 +333,7 @@ public class SolrTest extends AbstractUtils
         assertTrue (myTasksPage.isFilterTitle("Completed Tasks"), "Completed Tasks page don't open");
 
         // Verify Alfresco Add-Ons RSS Feed dashlet
-        DashBoardPage dashBoardPage = ShareUser.openUserDashboard(drone).render();
-        dashBoardPage.getNav().selectCustomizeUserDashboard().render();
-        CustomiseUserDashboardPage customiseUserDashboardPage = drone.getCurrentPage().render();
-        customiseUserDashboardPage.removeDashlet(Dashlets.RSS_FEED).render();
+        ShareUserDashboard.addDashlet(drone, Dashlets.ALFRESCO_ADDONS_RSS_FEED).render();
         AddOnsRssFeedDashlet rssDashlet = ShareUserDashboard.getAddOnsRssFeedDashlet(drone, "addOns-rss").render();
         assertTrue(rssDashlet.isHelpIconDisplayed(), "Help icon isn't displayed");
         rssDashlet.clickOnHelpIcon();
@@ -379,6 +369,7 @@ public class SolrTest extends AbstractUtils
         assertEquals(links.size(), 5);
 
         // Verify Saved Search dashlet
+        ShareUserDashboard.addDashlet(drone, Dashlets.SAVED_SEARCH).render();
         SavedSearchDashlet savedSearchDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.SAVED_SEARCH).render();
         assertEquals(savedSearchDashlet.getTitle(), Dashlets.SAVED_SEARCH.getDashletName());
         assertEquals(savedSearchDashlet.getContent(), "No results found.");
@@ -387,7 +378,7 @@ public class SolrTest extends AbstractUtils
         assertTrue(savedSearchDashlet.isBalloonDisplayed(), "Baloon popup isn't displayed");
         savedSearchDashlet.closeHelpBallon();
         assertFalse(savedSearchDashlet.isBalloonDisplayed(), "Baloon popup is displayed");
-        assertTrue(savedSearchDashlet.isConfigIconDisplayed(), "Configure icon isn't available");
+        assertTrue(savedSearchDashlet.isConfigureIconDisplayed(), "Configure icon isn't available");
 
         // Configure Saved Search dashlet
         ShareUserDashboard.configureSavedSearch(drone, "*" + testName + "*", searchTitle, SearchLimit.TEN);
@@ -400,6 +391,7 @@ public class SolrTest extends AbstractUtils
         assertEquals(searchResults.size(), 10);
 
         // Verify Content I'm editing dashlet
+        ShareUserDashboard.addDashlet(drone, Dashlets.CONTENT_I_AM_EDITING).render();
         EditingContentDashlet editingContentDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.CONTENT_I_AM_EDITING).render();
         assertEquals(editingContentDashlet.getTitle(), Dashlets.CONTENT_I_AM_EDITING.getDashletName());
         assertTrue(editingContentDashlet.isHelpIconDisplayed(), "Help icon isn't displayed");
@@ -413,6 +405,11 @@ public class SolrTest extends AbstractUtils
         assertTrue(editingContentDashlet.isItemWithDetailDisplayed(siteName + 2 + "topic", siteName + 2));
 
         // Verify My Profile dashlet
+        DashBoardPage dashBoardPage = ShareUser.openUserDashboard(drone).render();
+        dashBoardPage.getNav().selectCustomizeUserDashboard().render();
+        CustomiseUserDashboardPage customiseUserDashboardPage = drone.getCurrentPage().render();
+        customiseUserDashboardPage.selectChangeLayou().selectNewLayout(3);
+        customiseUserDashboardPage.addDashlet(Dashlets.MY_PROFILE, 2).render();
         MyProfileDashlet myProfileDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.MY_PROFILE).render();
         assertEquals(myProfileDashlet.getTitle(), Dashlets.MY_PROFILE.getDashletName());
         assertTrue(myProfileDashlet.isHelpIconPresent(), "Help icon isn't displayed");
@@ -435,7 +432,10 @@ public class SolrTest extends AbstractUtils
         assertNotNull(myProfilePage);
 
         // Verify My Discussions dashlet
-        ShareUser.openUserDashboard(drone).render();
+        dashBoardPage = ShareUser.openUserDashboard(drone).render();
+        dashBoardPage.getNav().selectCustomizeUserDashboard().render();
+        customiseUserDashboardPage = drone.getCurrentPage().render();
+        customiseUserDashboardPage.addDashlet(Dashlets.MY_DISCUSSIONS, 2).render();
         MyDiscussionsDashlet myDiscussionsDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.MY_DISCUSSIONS).render();
         assertEquals(myDiscussionsDashlet.getTitle(), Dashlets.MY_DISCUSSIONS.getDashletName());
         assertTrue(myDiscussionsDashlet.isHelpIconDisplayed(), "Help icon isn't displayed");
@@ -450,37 +450,41 @@ public class SolrTest extends AbstractUtils
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 1 + "topic" }, true);
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 2 + "topic" }, true);
 
-        myDiscussionsDashlet.selectTopicsFilter(ALL_TOPICS).render();
+        myDiscussionsDashlet.selectTopicsFilter(ALL_TOPICS).render().render();
         topicsTitles = myDiscussionsDashlet.getTopics(MyDiscussionsDashlet.LinkType.Topic);
         assertEquals(topicsTitles.size(), 2, "Expected topics aren't displayed");
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 1 + "topic" }, true);
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 2 + "topic" }, true);
 
-        myDiscussionsDashlet.selectTopicsHistoryFilter(LAST_DAY_TOPICS);
+        myDiscussionsDashlet.selectTopicsHistoryFilter(LAST_DAY_TOPICS).render();
         topicsTitles = myDiscussionsDashlet.getTopics(MyDiscussionsDashlet.LinkType.Topic);
         assertEquals(topicsTitles.size(), 2, "Expected topics aren't displayed");
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 1 + "topic" }, true);
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 2 + "topic" }, true);
 
-        myDiscussionsDashlet.selectTopicsHistoryFilter(SEVEN_DAYS_TOPICS);
+        myDiscussionsDashlet.selectTopicsHistoryFilter(SEVEN_DAYS_TOPICS).render();
         topicsTitles = myDiscussionsDashlet.getTopics(MyDiscussionsDashlet.LinkType.Topic);
         assertEquals(topicsTitles.size(), 2, "Expected topics aren't displayed");
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 1 + "topic" }, true);
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 2 + "topic" }, true);
 
-        myDiscussionsDashlet.selectTopicsHistoryFilter(FOURTEEN_DAYS_TOPICS);
+        myDiscussionsDashlet.selectTopicsHistoryFilter(FOURTEEN_DAYS_TOPICS).render();
         topicsTitles = myDiscussionsDashlet.getTopics(MyDiscussionsDashlet.LinkType.Topic);
         assertEquals(topicsTitles.size(), 2, "Expected topics isn't displayed");
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 1 + "topic" }, true);
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 2 + "topic" }, true);
 
-        myDiscussionsDashlet.selectTopicsHistoryFilter(TWENTY_EIGHT_DAYS_TOPICS);
+        myDiscussionsDashlet.selectTopicsHistoryFilter(TWENTY_EIGHT_DAYS_TOPICS).render();
         topicsTitles = myDiscussionsDashlet.getTopics(MyDiscussionsDashlet.LinkType.Topic);
         assertEquals(topicsTitles.size(), 2, "Expected topics aren't displayed");
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 1 + "topic" }, true);
         ShareUserDashboard.searchMyDiscussionDashletWithRetry(drone, new String[] { siteName + 2 + "topic" }, true);
 
         // Verify Site Search dashlet. Search for any item
+        dashBoardPage = ShareUser.openUserDashboard(drone).render();
+        dashBoardPage.getNav().selectCustomizeUserDashboard().render();
+        customiseUserDashboardPage = drone.getCurrentPage().render();
+        customiseUserDashboardPage.addDashlet(Dashlets.SITE_SEARCH, 3).render();
         SiteSearchDashlet searchDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.SITE_SEARCH).render();
         assertEquals(searchDashlet.getTitle(), Dashlets.SITE_SEARCH.getDashletName());
         assertTrue(searchDashlet.isHelpIconDisplayed(), "Help icon isn't displayed");
@@ -549,22 +553,9 @@ public class SolrTest extends AbstractUtils
         assertTrue(favouritesDoc.contains(fileName2 + 1), fileName2 + 1 + " is not found ");
         assertTrue(favouritesDoc.contains(fileName2 + 2), fileName2 + 2 + " is not found ");
 
-        // Verify Simple View
-        myDocuments.clickSimpleView();
-        List<SimpleViewInformation> informations = myDocuments.getSimpleViewInformation();
-        assertNotNull(informations);
-        assertEquals(informations.size(), 2);
-
-        for (SimpleViewInformation simpleViewInformation : informations)
-        {
-            assertTrue(simpleViewInformation.getContentStatus().contains("Created"));
-            assertNotNull(simpleViewInformation.getContentDetail());
-            assertNotNull(simpleViewInformation.getThumbnail());
-            assertNotNull(simpleViewInformation.getUser());
-        }
-
         // Verify Detailed View
         myDocuments.clickDetailView();
+        myDocuments = ShareUserDashboard.getDashlet(drone, Dashlets.MY_DOCUMENTS).render();
         List<DetailedViewInformation> detailedInf = myDocuments.getDetailedViewInformation();
         assertNotNull(detailedInf);
         assertEquals(detailedInf.size(), 2);
@@ -583,6 +574,21 @@ public class SolrTest extends AbstractUtils
             assertNotNull(detailedViewInformation.getLike());
             assertNotNull(detailedViewInformation.getFavorite());
             assertNotNull(detailedViewInformation.getComment());
+        }
+
+        // Verify Simple View
+        myDocuments.clickSimpleView();
+        myDocuments = ShareUserDashboard.getDashlet(drone, Dashlets.MY_DOCUMENTS).render();
+        List<SimpleViewInformation> informations = myDocuments.getSimpleViewInformation();
+        assertNotNull(informations);
+        assertEquals(informations.size(), 2);
+
+        for (SimpleViewInformation simpleViewInformation : informations)
+        {
+            assertTrue(simpleViewInformation.getContentStatus().contains("Created"));
+            assertNotNull(simpleViewInformation.getContentDetail());
+            assertNotNull(simpleViewInformation.getThumbnail());
+            assertNotNull(simpleViewInformation.getUser());
         }
 
         // Verify My Sites dashlet.
@@ -662,6 +668,10 @@ public class SolrTest extends AbstractUtils
         assertFalse(mySitesDashlet.isSitePresent(siteName + 3), siteName + 3 + " is found ");
 
         // Verify My Calendar
+        dashBoardPage = ShareUser.openUserDashboard(drone).render();
+        dashBoardPage.getNav().selectCustomizeUserDashboard().render();
+        customiseUserDashboardPage = drone.getCurrentPage().render();
+        customiseUserDashboardPage.addDashlet(Dashlets.MY_CALENDAR, 3).render();
         MyCalendarDashlet myCalendarDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.MY_CALENDAR).render();
         assertEquals(myCalendarDashlet.getTitle(), Dashlets.MY_CALENDAR.getDashletName());
         assertTrue(myCalendarDashlet.isHelpIconDisplayed(), "Help icon isn't displayed");
@@ -686,17 +696,16 @@ public class SolrTest extends AbstractUtils
         dashBoardPage = customiseUserDashboardPage.removeDashlet(Dashlets.ALFRESCO_ADDONS_RSS_FEED).render();
         dashBoardPage.getNav().selectCustomizeUserDashboard().render();
         customiseUserDashboardPage = drone.getCurrentPage().render();
-        customiseUserDashboardPage.addDashlet(Dashlets.RSS_FEED, 2).render();
+        customiseUserDashboardPage.addDashlet(Dashlets.RSS_FEED, 1).render();
         RssFeedDashlet rssFeedDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.RSS_FEED).render();
         for (int i = 0; i < 1000; i++)
         {
-            if (!"Rss Feed".equals(rssFeedDashlet.getTitle()))
+            if (rssFeedDashlet.getTitle().equals("Alfresco Blog"))
             {
                 break;
             }
         }
-        String defaultTitle = rssFeedDashlet.getTitle();
-        assertEquals(defaultTitle, "Alfresco Blog", "Rss dashlet doesn't show Alfresco rss by default.");
+        assertTrue(rssFeedDashlet.getTitle().equals("Alfresco Blog"), "Rss dashlet doesn't show Alfresco rss by default.");
         assertTrue(rssFeedDashlet.isHelpIconDisplayed(), "Help icon isn't displayed");
         rssFeedDashlet.clickOnHelpIcon();
         assertTrue(rssFeedDashlet.isBalloonDisplayed(), "Baloon popup isn't displayed");
@@ -722,6 +731,10 @@ public class SolrTest extends AbstractUtils
         assertEquals(links.size(), 5);
 
         // Verify Web View
+        dashBoardPage = ShareUser.openUserDashboard(drone).render();
+        dashBoardPage.getNav().selectCustomizeUserDashboard().render();
+        customiseUserDashboardPage = drone.getCurrentPage().render();
+        customiseUserDashboardPage.addDashlet(Dashlets.WEB_VIEW, 3).render();
         WebViewDashlet webViewDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.WEB_VIEW).render();
         assertEquals(webViewDashlet.getTitle(), Dashlets.WEB_VIEW.getDashletName());
         assertTrue(webViewDashlet.isHelpIconDisplayed(), "Help icon isn't displayed");
@@ -736,6 +749,13 @@ public class SolrTest extends AbstractUtils
         ConfigureWebViewDashletBoxPage configureWebViewDashletBoxPage = webViewDashlet.clickConfigure();
         assertNotNull(configureWebViewDashletBoxPage);
         configureWebViewDashletBoxPage.config(extSiteUrl, extSiteUrl);
+        for (int i = 0; i < 1000; i++)
+        {
+            if (webViewDashlet.getWebViewDashletTitle().equals(extSiteUrl))
+            {
+                break;
+            }
+        }
         assertEquals(webViewDashlet.getWebViewDashletTitle(), extSiteUrl);
         assertTrue(webViewDashlet.isFrameShow(extSiteUrl), extSiteUrl + " isn't displayed");
 
@@ -919,7 +939,7 @@ public class SolrTest extends AbstractUtils
         ShareUser.openSitesDocumentLibrary(drone, siteName + 1).render();
         for (int i = 1; i < 8; i++)
         {
-            ShareUser.uploadFileInFolder(drone, new String[] { fileName + i, DOCLIB }).render();
+            ShareUser.uploadFileInFolder(drone, new String[] { fileName + i, DOCLIB }).render(maxWaitTime);
         }
         ShareUser.createFolderInFolder(drone, folderName, folderName, DOCLIB_CONTAINER).render();
 
@@ -1012,8 +1032,8 @@ public class SolrTest extends AbstractUtils
         assertEquals(myProfilePage.getEmailName(), user1);
 
         // Edit the Profile
-        EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
-        myProfilePage = editProfilePage.editLastName("edited");
+        EditProfilePage editProfilePage = myProfilePage.openEditProfilePage().render();
+        myProfilePage = editProfilePage.editLastName("edited").render();
         assertTrue(myProfilePage.getUserName().endsWith("edited"), "New last name isn't displayed");
 
         // Verify Content on My Profile
@@ -1132,7 +1152,7 @@ public class SolrTest extends AbstractUtils
             "Activity is disabled for site");
 
         // Verify the mail
-        Thread.sleep(10000); //solr wait
+        Thread.sleep(30000); //solr wait
         JmxUtils.invokeAlfrescoServerProperty("Alfresco:Name=Schedule,Group=DEFAULT,Type=MonitoredCronTrigger,Trigger=feedNotifierTrigger", "executeNow");
 
         String emailMsg = MailUtil.getMailAsString(user1, "Alfresco Share: Recent Activities");
