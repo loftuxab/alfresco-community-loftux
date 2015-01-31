@@ -303,6 +303,16 @@
    vertical-align: middle;
 }
 
+.object-finder .picker-items .item-name
+{
+   word-break: break-all;
+}
+
+.object-finder .picker-items .description
+{
+   word-break: break-all;
+}
+
 .object-finder .panel-left,
 .object-finder .panel-right
 {
