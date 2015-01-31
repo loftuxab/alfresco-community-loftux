@@ -14,6 +14,9 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+/**
+ * @author bogdan.bocancea
+ */
 
 public class WcmqsNewsPage extends SharePage
 {
@@ -92,6 +95,25 @@ public class WcmqsNewsPage extends SharePage
         try
         {   
             return  drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]//.././/./.././span[@class='newslist-date']", newsName))).getText();            
+        }
+        catch (TimeoutException e)
+        {
+            throw new TimeoutException("Exceeded time to find news links. " + e.toString());
+        }   
+            
+    }
+    
+    /**
+     * Method to get the description for a news  
+     * @param newsName - the of the news declared in share!
+     * 
+     * @return String news description
+     */
+    public String getNewsDescrition(String newsName)
+    {
+        try
+        {   
+            return  drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]//.././/./.././p']", newsName))).getText();            
         }
         catch (TimeoutException e)
         {
