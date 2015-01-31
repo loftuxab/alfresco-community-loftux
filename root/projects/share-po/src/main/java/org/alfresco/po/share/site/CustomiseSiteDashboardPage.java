@@ -211,15 +211,9 @@ public class CustomiseSiteDashboardPage extends SharePage
 
         for (WebElement source : dashlets)
         {
-            int posX = source.getSize().getWidth() / 2;
-            int posY = source.getSize().getHeight() / 2;
             target = drone.find(By.cssSelector(String.format(COLUMN_FORMAT, currentColumn)));
-            WebDriver webDriver = ((WebDroneImpl) drone).getDriver();
-            Actions builder = new Actions(webDriver);
-            builder.clickAndHold(source).pause(2000);
-            builder.moveToElement(target, posX, posY).pause(1000).perform();
-            builder.release().pause(1000).build()
-                    .perform();
+            drone.dragAndDrop(source, target);
+            drone.executeJavaScript("window.scrollTo(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight,document.documentElement.clientHeight));", "");
 
             if (dashletCounter % MAX_DASHLETS_IN_COLUMN == 0)
             {
