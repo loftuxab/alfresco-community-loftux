@@ -1149,6 +1149,7 @@ public class SolrTest extends AbstractUtils
         assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activity2, true, siteName + 1, ActivityType.DESCRIPTION),
             "Activity is disabled for site");
 
+        //TODO  Refer to JIRA for failures - https://issues.alfresco.com/jira/browse/MNT-13084
         // Verify the mail
         Thread.sleep(10000); //solr wait
         JmxUtils.invokeAlfrescoServerProperty("Alfresco:Name=Schedule,Group=DEFAULT,Type=MonitoredCronTrigger,Trigger=feedNotifierTrigger", "executeNow");

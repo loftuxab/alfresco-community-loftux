@@ -103,6 +103,9 @@
         <constructor-arg name="blogUsername" value="${blogUsername}" />
         <constructor-arg name="blogPassword" value="${blogPassword}" />
         <constructor-arg name="ftpPort" value="${ftpPort}" />
+        <constructor-arg name="nfsMountPort" value="${nfsMountPort}" />
+        <constructor-arg name="mountPointHost" value="${mountPointHost}" />
+        <constructor-arg name="nfsPort" value="${nfsPort}" />
         <constructor-arg name="serverShhPort" value="${serverShhPort}" />
         <constructor-arg name="serverUser" value="${serverUser}" />
         <constructor-arg name="serverPass" value="${serverPass}" />
@@ -168,6 +171,9 @@
         <constructor-arg name="blogUsername" value="${blogUsername}" />
         <constructor-arg name="blogPassword" value="${blogPassword}" />
         <constructor-arg name="ftpPort" value="${ftpPort}" />
+        <constructor-arg name="nfsMountPort" value="${nfsMountPort}" />
+        <constructor-arg name="mountPointHost" value="${mountPointHost}" />
+        <constructor-arg name="nfsPort" value="${nfsPort}" />
         <constructor-arg name="serverShhPort" value="${serverShhPort}" />
         <constructor-arg name="serverUser" value="${serverUser}" />
         <constructor-arg name="serverPass" value="${serverPass}" />

@@ -285,6 +285,9 @@ public abstract class AbstractUtils
     protected static String blogPassword;
     protected static String ftpPort;
     protected static String sshHost;
+    protected static String nfsMountPort;
+    protected static String mountPointHost;
+    protected static String nfsPort;
     protected static int serverShhPort;
     protected static String serverUser;
     protected static String serverPass;
@@ -360,6 +363,9 @@ public abstract class AbstractUtils
         licenseShare = testProperties.getLicenseShare();
         nodePort = testProperties.getNodePort();
         ftpPort = testProperties.getFtpPort();
+        nfsMountPort = testProperties.getNfsMountPort();
+        mountPointHost = testProperties.getMountPointHost();
+        nfsPort = testProperties.getNfsPort();
         jmxrmiPort = testProperties.getJmxPort();
         jmxrmiUser = testProperties.getJmxUser();
         jmxrmiPassword = testProperties.getJmxPassword();
