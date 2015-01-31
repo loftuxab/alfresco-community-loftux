@@ -196,9 +196,9 @@
             <artifactId>log4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.8.8</version>
+            <groupId>org.alfresco.test</groupId>
+            <artifactId>alfresco-testng</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
