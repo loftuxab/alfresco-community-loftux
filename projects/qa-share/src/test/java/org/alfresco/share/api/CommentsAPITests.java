@@ -175,7 +175,7 @@ public class CommentsAPITests extends CommentsAPI
         // Status: 400
         try
         {
-            getNodeComments(testUser, DOMAIN, null, siteRef);
+            getNodeComments(testUser, DOMAIN, null, siteRef + "/a");
             Assert.fail(String.format("AONE_14230: , %s, Expected Result: %s", "get nodes comments request with incorrect node id type", "Error 400"));
         }
         catch (PublicApiException e)
@@ -335,6 +335,9 @@ public class CommentsAPITests extends CommentsAPI
         createNodeComment(testUser, DOMAIN, docGuid2, nodeComment);
         nodeComment = new Comment("New Title3", "<p>new comment3</p>");
         createNodeComment(testUser, DOMAIN, docGuid2, nodeComment);
+        nodeComment = new Comment("New Title4", "<p>new comment4</p>");
+        createNodeComment(testUser, DOMAIN, docGuid2, nodeComment);
+
 
         ShareUser.login(drone, testUser);
 
@@ -384,51 +387,51 @@ public class CommentsAPITests extends CommentsAPI
     public void AONE_14235() throws Exception
     {
         Map<String, String> param = new HashMap<String, String>();
-        try
-        {
-            param.put("maxItems", "a");
-            getNodeComments(testUser, DOMAIN, param, docGuid2);
-            Assert.fail(String.format("Test: , %s, Expected Result: %s", "getNodecomments request with incorrect maxItems - " + param, "Error 400"));
-        }
-        catch (PublicApiException e)
-        {
-            assertEquals(e.getHttpResponse().getStatusCode(), 400);
-        }
-        try
-        {
-            param.clear();
-            param.put("skipCount", "s");
-            getNodeComments(testUser, DOMAIN, param, docGuid2);
-            Assert.fail(String.format("Test: , %s, Expected Result: %s", "getNodecomments request with incorrect skipCount - " + param, "Error 400"));
-        }
-        catch (PublicApiException e)
-        {
-            assertEquals(e.getHttpResponse().getStatusCode(), 400);
-        }
+               try
+                {
+                    param.put("maxItems", "a");
+                    getNodeComments(testUser, DOMAIN, param, docGuid2);
+                    Assert.fail(String.format("Test: , %s, Expected Result: %s", "getNodecomments request with incorrect maxItems - " + param, "Error 400"));
+                }
+                catch (PublicApiException e)
+                {
+                    assertEquals(e.getHttpResponse().getStatusCode(), 400);
+                }
+                try
+                {
+                    param.clear();
+                    param.put("skipCount", "s");
+                    getNodeComments(testUser, DOMAIN, param, docGuid2);
+                    Assert.fail(String.format("Test: , %s, Expected Result: %s", "getNodecomments request with incorrect skipCount - " + param, "Error 400"));
+                }
+                catch (PublicApiException e)
+                {
+                    assertEquals(e.getHttpResponse().getStatusCode(), 400);
+                }
 
-        try
-        {
-            param.clear();
-            param.put("maxItems", "-1");
-            getNodeComments(testUser, DOMAIN, param, docGuid2);
-            Assert.fail(String.format("Test: , %s, Expected Result: %s", "getNodecomments request with incorrect maxItems - " + param, "Error 400"));
-        }
-        catch (PublicApiException e)
-        {
-            assertEquals(e.getHttpResponse().getStatusCode(), 400);
-        }
+                try
+                {
+                    param.clear();
+                    param.put("maxItems", "-1");
+                    getNodeComments(testUser, DOMAIN, param, docGuid2);
+                    Assert.fail(String.format("Test: , %s, Expected Result: %s", "getNodecomments request with incorrect maxItems - " + param, "Error 400"));
+                }
+                catch (PublicApiException e)
+                {
+                    assertEquals(e.getHttpResponse().getStatusCode(), 400);
+                }
 
-        try
-        {
-            param.clear();
-            param.put("skipCount", "-2");
-            getNodeComments(testUser, DOMAIN, param, docGuid2);
-            Assert.fail(String.format("Test: , %s, Expected Result: %s", "getNodecomments request with incorrect skipCount - " + param, "Error 400"));
-        }
-        catch (PublicApiException e)
-        {
-            assertEquals(e.getHttpResponse().getStatusCode(), 400);
-        }
+                try
+                {
+                    param.clear();
+                    param.put("skipCount", "-2");
+                    getNodeComments(testUser, DOMAIN, param, docGuid2);
+                    Assert.fail(String.format("Test: , %s, Expected Result: %s", "getNodecomments request with incorrect skipCount - " + param, "Error 400"));
+                }
+                catch (PublicApiException e)
+                {
+                    assertEquals(e.getHttpResponse().getStatusCode(), 400);
+                }
 
         param.clear();
         param.put("maxItems", "10");
