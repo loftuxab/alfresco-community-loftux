@@ -67,6 +67,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
             for (int k=1; k<=i; k++)
             {
                 repositoryPage.deleteItem(1);
+                drone.getCurrentPage();
             }
         }
 
@@ -149,7 +150,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15049", alwaysRun = true)
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15048", alwaysRun = true)
     public void AONE_15033() throws Exception
     {
         String testName = getTestName();
@@ -185,7 +186,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
         // Upload template folder
         ShareUserRepositoryPage.navigateFoldersInRepositoryPage(drone, folderPath);
-        ShareUserRepositoryPage.createFolderInRepository(drone, folderName, folderName);
+        ShareUserRepositoryPage.createFolderInRepository(drone, folderName + 0, folderName + 0);
 
         // Create user
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
@@ -194,7 +195,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15032", alwaysRun = true)
     public void AONE_15034() throws Exception
     {
         String testName = getTestName();
@@ -207,9 +208,9 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
         // Select the Create menu > Create folder from templates
         ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        documentLibraryPage.createFolderFromTemplateHover(folderName).render();
+        documentLibraryPage.createFolderFromTemplateHover(folderName + 0).render();
         drone.getCurrentPage().render();
-        assertTrue(documentLibraryPage.isFileVisible(folderName), "Folder isn't created");
+        assertTrue(documentLibraryPage.isFileVisible(folderName + 0), "Folder isn't created");
 
     }
 
@@ -235,7 +236,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15034", alwaysRun = true)
     public void AONE_15035() throws Exception
     {
         String testName = getTestName();
@@ -269,7 +270,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15035", alwaysRun = true)
     public void AONE_15036() throws Exception
     {
         String testName = getTestName();
@@ -285,7 +286,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
         docLib.selectCreateFolderFromTemplateHover();
         List<WebElement> templates = documentLibraryPage.getTemplateList();
-        assertTrue(templates.get(0).getText().contains(folderName), "List of templates isn't present");
+        assertTrue(templates.get(0).getText().contains(folderName + 0), "List of templates isn't present");
         assertTrue(templates.get(1).getText().contains(folderName + 1), "List of templates isn't present");
         documentLibraryPage.getNavigation().selectCreateContentDropdown();
 
@@ -311,7 +312,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15036", alwaysRun = true)
     public void AONE_15037() throws Exception
     {
         String testName = getTestName();
@@ -323,7 +324,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
 
         // Select any template. Fill in a name field with a new name and create a folder
-        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName).render();
+        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName + 0).render();
         drone.getCurrentPage().render();
         newFolder.typeName(folderName + 2);
         newFolder.selectSubmitButton();
@@ -347,7 +348,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15037", alwaysRun = true)
     public void AONE_15038() throws Exception
     {
         String testName = getTestName();
@@ -361,7 +362,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
 
         // Select any template. Type into "Name" field special symbols (such as *".<>/\|?:)
-        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName).render();
+        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName + 0).render();
         drone.getCurrentPage().render();
         newFolder.typeName(wildcardsWrong);
 
@@ -413,7 +414,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15038", alwaysRun = true)
     public void AONE_15039() throws Exception
     {
         String testName = getTestName();
@@ -488,7 +489,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15039", alwaysRun = true)
     public void AONE_15040() throws Exception
     {
         String testName = getTestName();
@@ -512,45 +513,95 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-//    @Test(groups = { "DataPrepEnterpriseOnly" })
-//    public void dataPrep_AONE_15044() throws Exception
-//    {
-//
-//        String testName = getTestName();
-//        String testUser = getUserNameFreeDomain(testName);
-//        String siteName = getSiteName(testName);
-//
-//        // Create user
-//        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
-//
-//        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-//        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-//
-//    }
+    @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_15041() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
 
-//    @Test(groups = { "EnterpriseOnly" })
-//    public void AONE_15044() throws Exception
-//    {
-//        String testName = getTestName();
-//        String testUser = getUserNameFreeDomain(testName);
-//        String siteName = getSiteName(testName);
-//        String notification = "The value cannot be empty.";
-//
-//
-//        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-//        openSiteDashboard(drone, siteName);
-//        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
-//
-//        // Select any template. Leave name field empty
-//        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName).render();
-//        drone.getCurrentPage().render();
-//        newFolder.typeName(newFolder.typeNameWithValidation(""));
-//
-//        assertEquals(newFolder.getNotificationMessage(), notification, "Friendly notification isn't present");
-////        assertEquals(newFolder.getMessage(NewFolderPage.Fields.NAME), drone.getValue("message.value.cannot.be.empty"),
-////                "Friendly notification isn't present");
-//
-//    }
+        // Create user
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
+
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUserRepositoryPage.openRepositorySimpleView(drone);
+
+        // Upload template folder
+        ShareUserRepositoryPage.navigateFoldersInRepositoryPage(drone, folderPath);
+        ShareUserRepositoryPage.createFolderInRepository(drone, folderName + 6, folderName + 6);
+
+        // Navigate the document's manage permission.
+        ShareUser.returnManagePermissionPage(drone, folderName + 6);
+
+        // Add created user in permission with "Collaborator".
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, testUser, true, UserRole.COLLABORATOR, true);
+
+        // Create Site
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+    }
+
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15040", alwaysRun = true)
+    public void AONE_15041() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        openSiteDashboard(drone, siteName);
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
+
+        // Select the Create menu > Create folder from templates
+        ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        documentLibraryPage.createFolderFromTemplateHover(folderName + 6).render();
+        drone.getCurrentPage().render();
+        assertTrue(documentLibraryPage.isFileVisible(folderName + 6), "Folder isn't created");
+
+        ShareUser.returnManagePermissionPage(drone, folderName + 6);
+        ManagePermissionsPage managePermissionsPage = drone.getCurrentPage().render();
+        UserRole role = managePermissionsPage.getExistingPermission(testUser);
+        Assert.assertEquals(role, UserRole.COLLABORATOR, "The permissions aren't set for the created folder");
+    }
+
+    @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_15044() throws Exception
+    {
+
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+
+        // Create user
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+
+    }
+
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15041", alwaysRun = true)
+    public void AONE_15044() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+        String notification = "The value cannot be empty.";
+
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        openSiteDashboard(drone, siteName);
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
+
+        // Select any template. Leave name field empty
+        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName + 0).render();
+        drone.getCurrentPage().render();
+        newFolder.type("");
+        newFolder.typeDescription("kkkk");
+        newFolder.type("");
+
+        assertEquals(newFolder.getMessage(NewFolderPage.Fields.NAME), notification, "Friendly notification isn't present");
+
+    }
 
     @Test(groups = { "DataPrepEnterpriseOnly" })
     public void dataPrep_AONE_15045() throws Exception
@@ -568,7 +619,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15044", alwaysRun = true)
     public void AONE_15045() throws Exception
     {
         String testName = getTestName();
@@ -617,7 +668,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15045", alwaysRun = true)
     public void AONE_15046() throws Exception
     {
         String testName = getTestName();
@@ -631,7 +682,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
 
         // Select any template. Fill in a name field with a duplicate name and create a folder
-        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName).render();
+        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName + 0).render();
         drone.getCurrentPage().render();
         for (String s : xss)
         {
@@ -642,7 +693,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         }
     }
 
-    @Test(groups = { "DataPrepEnterpriseOnly" })
+    @Test(groups = { "DataPrepEnterpriseOnly" }, dependsOnMethods = "AONE_15046", alwaysRun = true)
     public void dataPrep_AONE_15047() throws Exception
     {
 
@@ -673,7 +724,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
 
         // Select any template. Fill in a name field with a duplicate name and create a folder
-        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName).render();
+        NewFolderPage newFolder = documentLibraryPage.openFolderFromTemplateHover(folderName + 0).render();
         drone.getCurrentPage().render();
         newFolder.typeName(folder);
         newFolder.selectSubmitButton();
@@ -695,7 +746,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15033", alwaysRun = true)
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15049", alwaysRun = true)
     public void AONE_15048() throws Exception
     {
         String testName = getTestName();
@@ -748,7 +799,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUserRepositoryPage.createFolderInRepository(drone, folderName + 5, folderName + 5);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15047", alwaysRun = true)
     public void AONE_15049() throws Exception
     {
         String testName = getTestName();
