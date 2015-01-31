@@ -349,7 +349,6 @@
 <suite-files>
     <!--suite-file path="dataprep_BY_sanity.xml"/>
     <suite-file path="dataprep_BY_repository.xml"/>-->
-    <suite-file path="dataprep_BY_doclib2.xml"/>
     <suite-file path="dataprep_BY_dashlet.xml"/>
     <suite-file path="dataprep_BY_contentRules.xml"/>
     <suite-file path="dataprep_BY_doclib.xml"/>
