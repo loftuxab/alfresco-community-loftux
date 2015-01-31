@@ -32,7 +32,8 @@ import org.junit.runners.Suite.SuiteClasses;
     AlfrescoDwsServiceHandlerTest.class,
     AlfrescoListServiceHandlerTest.class,
     DefaultUrlHelperTest.class,
-    VtiPathHelperTest.class
+    VtiPathHelperTest.class,
+    AlfrescoMethodHandlerTest.class
 })
 public class HandlerTestSuite
 {

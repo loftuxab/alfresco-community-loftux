@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -19,6 +19,7 @@
 package org.alfresco.module.vti.handler.alfresco;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
@@ -28,7 +29,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.VtiHandlerException;
@@ -40,6 +40,7 @@ import org.alfresco.module.vti.metadata.dic.VtiSortField;
 import org.alfresco.module.vti.metadata.model.DocMetaInfo;
 import org.alfresco.module.vti.metadata.model.DocsMetaInfo;
 import org.alfresco.module.vti.metadata.model.Document;
+import org.alfresco.module.vti.web.BufferedHttpServletRequest;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.site.SiteModel;
@@ -66,6 +67,8 @@ import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.cmr.webdav.WebDavService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
+import org.alfresco.util.TempFileProvider;
+import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.surf.util.URLDecoder;
@@ -88,7 +91,53 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
     private WebDavService davService;
     private WebDAVHelper davHelper;
     private TenantService tenantService;
+
+    private boolean encryptTempFiles = false;
+    private String tempDirectoryName = null;
+    private int memoryThreshold = 4 * 1024 * 1024; // 4mb
+    private long maxContentSize = (long) 4 * 1024 * 1024 * 1024; // 4gb
+    private ThresholdOutputStreamFactory streamFactory = null;
     
+    public void init()
+    {
+        File tempDirectory = TempFileProvider.getTempDir(tempDirectoryName);
+        this.streamFactory = ThresholdOutputStreamFactory.newInstance(tempDirectory, memoryThreshold, maxContentSize, encryptTempFiles);
+    }
+
+    public void setStreamFactory(ThresholdOutputStreamFactory streamFactory)
+    {
+        this.streamFactory = streamFactory;
+    }
+
+    public void setEncryptTempFiles(Boolean encryptTempFiles)
+    {
+        if (encryptTempFiles != null)
+        {
+            this.encryptTempFiles = encryptTempFiles.booleanValue();
+        }
+    }
+
+    public void setTempDirectoryName(String tempDirectoryName)
+    {
+        this.tempDirectoryName = tempDirectoryName;
+    }
+
+    public void setMemoryThreshold(Integer memoryThreshold)
+    {
+        if (memoryThreshold != null)
+        {
+            this.memoryThreshold = memoryThreshold.intValue();
+        }
+    }
+
+    public void setMaxContentSize(Long maxContentSize)
+    {
+        if (maxContentSize != null)
+        {
+            this.maxContentSize = maxContentSize.longValue();
+        }
+    }
+
     /**
      * Set authentication component
      * 
@@ -382,78 +431,89 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
         }
         
         // updates changes on the server
-        
-        UserTransaction tx = getTransactionService().getUserTransaction(false);
+
+        final BufferedHttpServletRequest bufferedRequest = new BufferedHttpServletRequest(request, streamFactory);
+        final NodeRef finalResourceNodeRef = resourceNodeRef;
+        final String finalDecodedUrl = decodedUrl;
+        final boolean finalNewlyCreated = newlyCreated;
+        RetryingTransactionCallback<Void> work = new RetryingTransactionCallback<Void>()
+        {
+            @SuppressWarnings("deprecation")
+            @Override
+            public Void execute() throws Throwable
+            {               
+                ContentWriter writer;
+                boolean newlyCreated = finalNewlyCreated;
+                FileFolderService fileFolderService = getFileFolderService();
+                if (workingCopyNodeRef != null)
+                {
+                    if (fileFolderService.isHidden(workingCopyNodeRef))
+                    {
+                        fileFolderService.setHidden(workingCopyNodeRef, false);
+                    }
+
+                    // working copy writer
+                    writer = getContentService().getWriter(workingCopyNodeRef, ContentModel.PROP_CONTENT, true);
+                }
+                else
+                {
+                    // ALF-17662, hidden node is the same as non-existed node for SPP
+                    if (fileFolderService.isHidden(finalResourceNodeRef))
+                    {
+                        // make it visible for client
+                        fileFolderService.setHidden(finalResourceNodeRef, false);
+                    }
+
+                    // original document writer
+                    writer = getContentService().getWriter(finalResourceNodeRef, ContentModel.PROP_CONTENT, true);
+
+                }
+
+                String documentName = getNodeService().getProperty(finalResourceNodeRef, ContentModel.PROP_NAME).toString();
+                String mimetype = getMimetypeService().guessMimetype(documentName);
+                writer.setMimetype(mimetype);
+                writer.putContent(bufferedRequest.getInputStream());
+
+                // If needed, mark the node as having now had its content supplied
+                if (getNodeService().hasAspect(finalResourceNodeRef, ContentModel.ASPECT_WEBDAV_NO_CONTENT))
+                {
+                    // CLOUD-2209: newly created documents not shown in activity feed.
+                    newlyCreated = true;
+                    getNodeService().removeAspect(finalResourceNodeRef, ContentModel.ASPECT_WEBDAV_NO_CONTENT);
+                }
+
+                // If we actually have content, it's time to add the versionable aspect and save the current version
+                ContentData contentData = writer.getContentData();
+                if (workingCopyNodeRef == null && !getNodeService().hasAspect(finalResourceNodeRef, ContentModel.ASPECT_VERSIONABLE) && ContentData.hasContent(contentData)
+                        && contentData.getSize() > 0)
+                {
+                    getVersionService().createVersion(finalResourceNodeRef, Collections.<String, Serializable> singletonMap(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR));
+                }
+
+                String siteId = davHelper.determineSiteId(getPathHelper().getRootNodeRef(), finalDecodedUrl);
+                String tenantDomain = davHelper.determineTenantDomain();
+                long fileSize = contentData.getSize();
+                reportUploadEvent(finalDecodedUrl, siteId, tenantDomain, newlyCreated, mimetype, fileSize);
+
+                return null;
+            }
+        };
+
         try
         {
-            // we don't use RetryingTransactionHelper here cause we can read request input stream only once
-            tx.begin();
-
-            ContentWriter writer;
-
-            FileFolderService fileFolderService = getFileFolderService();
-            if (workingCopyNodeRef != null)
-            {
-                if (fileFolderService.isHidden(workingCopyNodeRef))
-                {
-                    fileFolderService.setHidden(workingCopyNodeRef, false);
-                }
-
-                // working copy writer
-                writer = getContentService().getWriter(workingCopyNodeRef, ContentModel.PROP_CONTENT, true);
-            }
-            else
-            {
-                // ALF-17662, hidden node is the same as non-existed node for SPP
-                if (fileFolderService.isHidden(resourceNodeRef))
-                {
-                    // make it visible for client
-                    fileFolderService.setHidden(resourceNodeRef, false);
-                }
-
-                // original document writer
-                writer = getContentService().getWriter(resourceNodeRef, ContentModel.PROP_CONTENT, true);
-
-            }
-
-            String documentName = getNodeService().getProperty(resourceNodeRef, ContentModel.PROP_NAME).toString();
-            String mimetype = getMimetypeService().guessMimetype(documentName);
-            writer.setMimetype(mimetype);
-            writer.putContent(request.getInputStream());
-
-            // If needed, mark the node as having now had its content supplied
-            if (getNodeService().hasAspect(resourceNodeRef, ContentModel.ASPECT_WEBDAV_NO_CONTENT))
-            {
-                // CLOUD-2209: newly created documents not shown in activity feed.
-                newlyCreated = true;
-                getNodeService().removeAspect(resourceNodeRef, ContentModel.ASPECT_WEBDAV_NO_CONTENT);
-            }
-            
-            // If we actually have content, it's time to add the versionable aspect and save the current version 
-            ContentData contentData = writer.getContentData();
-            if (workingCopyNodeRef == null && !getNodeService().hasAspect(resourceNodeRef, ContentModel.ASPECT_VERSIONABLE) && ContentData.hasContent(contentData) && contentData.getSize() > 0)
-            {
-                getVersionService().createVersion(resourceNodeRef, Collections.<String,Serializable>singletonMap(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR));
-            }
-            
-            String siteId = davHelper.determineSiteId(getPathHelper().getRootNodeRef(), decodedUrl);
-            String tenantDomain = davHelper.determineTenantDomain();
-            long fileSize = contentData.getSize();
-            reportUploadEvent(decodedUrl, siteId, tenantDomain, newlyCreated, mimetype, fileSize);
-            
-            tx.commit();
+            getTransactionService().getRetryingTransactionHelper().doInTransaction(work);
         }
         catch (Exception e)
         {
-            try
-            {
-                tx.rollback();
-            }
-            catch (Exception tex)
-            {
-            }
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             return;
+        }
+        finally
+        {
+            if (bufferedRequest != null)
+            {
+                bufferedRequest.close();
+            }
         }
 
         // original document properties
@@ -676,7 +736,7 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
     /**
      * @see org.alfresco.module.vti.handler.MethodHandler#uncheckOutDocument(java.lang.String, java.lang.String, boolean, java.util.Date, boolean, boolean)
      */
-    public DocMetaInfo uncheckOutDocument(String serviceName, String documentName, boolean force, Date timeCheckedOut, boolean rlsshortterm, boolean validateWelcomeNames)
+    public DocMetaInfo uncheckOutDocument(String serviceName, String documentName, boolean force, Date timeCheckedOut, final boolean rlsshortterm, boolean validateWelcomeNames)
     {
         // force ignored
         // timeCheckedOut ignored
@@ -690,7 +750,7 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
         AlfrescoMethodHandler.assertFile(fileFileInfo);
         FileInfo documentFileInfo = fileFileInfo;
 
-        DocumentStatus documentStatus = getDocumentHelper().getDocumentStatus(documentFileInfo.getNodeRef());
+        final DocumentStatus documentStatus = getDocumentHelper().getDocumentStatus(documentFileInfo.getNodeRef());
 
         // if document isn't checked out then throw exception
         if (VtiDocumentHelper.isCheckedout(documentStatus) == false)
@@ -718,39 +778,38 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
             throw new VtiHandlerException(VtiHandlerException.DOC_CHECKED_OUT);
         }
 
-        UserTransaction tx = getTransactionService().getUserTransaction(false);
+        final FileInfo finalDocumentFileInfo = documentFileInfo;
+
+        RetryingTransactionCallback<Void> work = new RetryingTransactionCallback<Void>()
+        {
+            @Override
+            public Void execute() throws Throwable
+            {
+                if (rlsshortterm)
+                {
+                    // try to release short-term checkout
+                    // if user have long-term checkout then skip releasing short-term checkout
+                    if (documentStatus.equals(DocumentStatus.LONG_CHECKOUT_OWNER) == false)
+                    {
+                        getLockService().unlock(finalDocumentFileInfo.getNodeRef());
+                    }
+                }
+                else
+                {
+                    // try to cancel long-term checkout
+                    NodeRef workingCopyNodeRef = getCheckOutCheckInService().getWorkingCopy(finalDocumentFileInfo.getNodeRef());
+                    getCheckOutCheckInService().cancelCheckout(workingCopyNodeRef);
+                }
+                return null;
+            }
+        };
+
         try
         {
-            tx.begin();
-
-            if (rlsshortterm)
-            {
-                // try to release short-term checkout
-                // if user have long-term checkout then skip releasing short-term checkout
-                if (documentStatus.equals(DocumentStatus.LONG_CHECKOUT_OWNER) == false)
-                {
-                    getLockService().unlock(documentFileInfo.getNodeRef());
-                }
-            }
-            else
-            {
-                // try to cancel long-term checkout
-                NodeRef workingCopyNodeRef = getCheckOutCheckInService().getWorkingCopy(documentFileInfo.getNodeRef());
-                getCheckOutCheckInService().cancelCheckout(workingCopyNodeRef);
-            }
-
-            tx.commit();
+            getTransactionService().getRetryingTransactionHelper().doInTransaction(work);
         }
         catch (Throwable e)
         {
-            try
-            {
-                tx.rollback();
-            }
-            catch (Exception tex)
-            {
-            }
-
             if ((e instanceof VtiHandlerException) == false)
             {
                 throw new VtiHandlerException(VtiHandlerException.DOC_NOT_CHECKED_OUT);
