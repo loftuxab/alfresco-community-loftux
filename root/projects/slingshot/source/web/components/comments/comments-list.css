@@ -106,12 +106,12 @@ a.help-link
 
 .comments-list .details .comment-content ul li
 {
-   list-style-type: disc;
+   list-style-type: inherit;
 }
 
 .comments-list .details .comment-content ol li
 {
-   list-style-type: decimal;
+   list-style-type: inherit;
 }
 
 div.comment-content

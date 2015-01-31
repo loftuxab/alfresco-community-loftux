@@ -26,6 +26,14 @@
   margin-left: 110px;
 }
 
+.alfresco-share .sticky-wrapper .reply .content ul,
+.alfresco-share .sticky-wrapper .reply .content ol,
+.alfresco-share .sticky-wrapper .topicview .content ul,
+.alfresco-share .sticky-wrapper .topicview .content ol
+{
+    padding: 0.5em 0 0.5em 1.3em;
+}
+
 
 /********
  * NODE *
@@ -233,10 +241,10 @@ html>body .node, .reply, .comment {
   padding-left: 40px;
 }
 .yuieditor ul li {
-  list-style-type: disc; 
+  list-style-type: inherit; 
 }
 .yuieditor ol li {
-  list-style-type: decimal; 
+  list-style-type: inherit; 
 }
 
 
