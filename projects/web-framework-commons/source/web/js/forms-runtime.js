@@ -296,11 +296,6 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
 
             // make sure the submit elements start in the correct state
             this._runValidations(null, null, Alfresco.forms.Form.NOTIFICATION_LEVEL_FIELD);
-			
-            if (!this.isValid())
-            {
-               this._setSubmitButtonsDisabled(true);
-            }
 
             // Set up an escape listener so we can close 3rd party widgets such as ballons when escape is clicked
             var escapeListener = new KeyListener(document,
@@ -327,17 +322,6 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          {
             this._showInternalError("form with id of '" + this.formId + 
                   "' could not be located, ensure the form is created after the form element is available.");
-         }
-      },
-	  
-      _setSubmitButtonsDisabled: function(disabled)
-      {
-         for (var i = 0; i < this.submitElements.length; i++)
-         {
-            if (this.submitElements[i] !== undefined)
-            {
-                this.submitElements[i]._setDisabled(disabled);
-            }
          }
       },
 
@@ -938,7 +922,6 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                this._runValidations(event, fieldId, Alfresco.forms.Form.NOTIFICATION_LEVEL_CONTAINER);
             }
          }
-         this._setSubmitButtonsDisabled(!this.isValid());
       },
 
       /**
