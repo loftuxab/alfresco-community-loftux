@@ -568,7 +568,7 @@ public class SolrTest extends AbstractUtils
             assertEquals(detailedViewInformation.getDescription(), "No Description");
             assertEquals(detailedViewInformation.getVersion(), 1.0);
             assertEquals(detailedViewInformation.getLikecount(), 0);
-            assertEquals(detailedViewInformation.getFileSize(), "60 bytes");
+            assertNotNull(detailedViewInformation.getFileSize());
             assertNotNull(detailedViewInformation.getLike());
             assertNotNull(detailedViewInformation.getFavorite());
             assertNotNull(detailedViewInformation.getComment());
