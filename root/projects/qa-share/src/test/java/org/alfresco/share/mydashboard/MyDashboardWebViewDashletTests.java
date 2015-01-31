@@ -35,7 +35,7 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2898() throws Exception
     {
-        String testName = getTestName() + "30";
+        String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -52,7 +52,7 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2898() throws Exception
     {
-        String testName = getTestName() + "30";
+        String testName = getTestName() ;
         String testUser = getUserNameFreeDomain(testName);
         String url = "http://www.google.com/";
         String linkTitle = "Google";
@@ -100,6 +100,7 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
                 break;
             }
             
+            logger.info("Wait for the title to be updated");
             i++;
         }
 
