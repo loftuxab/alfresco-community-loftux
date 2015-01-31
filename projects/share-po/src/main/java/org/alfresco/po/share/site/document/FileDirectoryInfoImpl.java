@@ -93,7 +93,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     protected String TITLE = "span.title";
     protected By TAG_LINK_LOCATOR = By.cssSelector("div.yui-dt-liner>div>span>span>a.tag-link");
     protected String THUMBNAIL = "td.yui-dt-col-thumbnail>div>span>a";
-    protected String THUMBNAIL_TYPE = "td.yui-dt36-col-thumbnail>div>span";
+    protected String THUMBNAIL_TYPE = "td.yui-dt-col-thumbnail>div>span";
     protected String INPUT_TAG_NAME = "div.inlineTagEdit input";
     protected String INPUT_CONTENT_NAME = "input[name='prop_cm_name']";
     protected String nodeRef;
