@@ -157,7 +157,7 @@ public class SiteFinderPage extends SharePage
      */
     public SiteFinderPage searchForSite(final String title)
     {
-        if(title == null)
+        if (title == null)
         {
             throw new IllegalArgumentException("Title can't be null.");
         }
@@ -369,7 +369,7 @@ public class SiteFinderPage extends SharePage
 
     /**
      * Simulates the action of user clicking on Request to Join button.
-     *
+     * 
      * @param siteName String site name
      * @return {@link SiteFinderPage} page response object
      */
@@ -382,6 +382,7 @@ public class SiteFinderPage extends SharePage
         findButtonForSite(siteName, "Request to Join").click();
         return new SiteFinderPage(drone);
     }
+
     /**
      * Simulates the action of user clicking on Leaving to Join button.
      * 
@@ -497,6 +498,28 @@ public class SiteFinderPage extends SharePage
     }
 
     /**
+     * Click on site by index
+     * 
+     * @param index 
+     * @return {@link SiteDashboardPage} page response object
+     */
+    public SiteDashboardPage selectSiteByIndex(final int index)
+    {
+        try
+        {
+            List<WebElement> siteRows = drone.findAll(By.cssSelector("h3>a"));
+            WebElement site = siteRows.get(index);
+
+            site.click();
+            return new SiteDashboardPage(drone);
+        }
+        catch (PageException e)
+        {
+            throw new PageException("Site at index:" + index + "' could not be found.");
+        }      
+    }
+
+    /**
      * Checks weather button is present for a given site name.
      * 
      * @param siteName
@@ -515,7 +538,7 @@ public class SiteFinderPage extends SharePage
             return false;
         }
     }
-    
+
     /**
      * Click the delete button for a site in Site finder page
      * 
@@ -525,13 +548,9 @@ public class SiteFinderPage extends SharePage
      */
     public HtmlPage clickDelete(String siteName)
     {
-    	WebElement deleteButton = findButtonForSite(siteName, "Delete");
-    	deleteButton.click();
-        return new DeleteSitePage(drone);    
+        WebElement deleteButton = findButtonForSite(siteName, "Delete");
+        deleteButton.click();
+        return new DeleteSitePage(drone);
     }
-    
-}
-    
-    
-    
 
+}
