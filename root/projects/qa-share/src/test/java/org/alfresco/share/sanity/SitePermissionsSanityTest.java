@@ -113,7 +113,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
     public void dataPrep_AONE_15204() throws Exception
     {
         String siteName = getSiteName(testName);
-        String user1 = username + "1";
+        String user1 = username +"1";
 
         //creating 6 users
         for (int i = 1; i <= 6; i++)
@@ -250,37 +250,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
         //Verify Help icon on all the dashlets
         assertTrue(siteDashboardPage.isHelpDisplayedForAllDashlets(), "The help balloon isn't available");
 
-        //Verify actions from Welcome dashlet
-        SiteWelcomeDashlet welcomeDashlet = dashBoard.getDashlet("welcome-site").render();
-
-        //Customize the site dashboard - customize site dashboard window opens
-        List<ShareLink> elements = welcomeDashlet.getOptions();
-
-        assertEquals(elements.size(), 4, "The count of links isn't 4");
-        drone.navigateTo(elements.get(0).getHref().toString());
-        HtmlPage customizeSitePage = drone.getCurrentPage().render();
-        assertTrue(customizeSitePage instanceof CustomiseSiteDashboardPage, "The user isn't redirected to Customize Site Dashboard");
-        drone.navigateTo(siteUrl);
-
-        //Invite People - Invite People page opens
-        drone.navigateTo(elements.get(1).getHref().toString());
-        HtmlPage invitePeoplePage = drone.getCurrentPage().render();
-        assertTrue(invitePeoplePage instanceof InviteMembersPage, "The user isn't redirected to Invite People page");
-        drone.navigateTo(siteUrl);
-
-        //Upload Content - Document Library page opens, Upload dialog popups
-        drone.navigateTo(elements.get(2).getHref().toString());
-        UploadFilePage uploadFilePage = new UploadFilePage(drone).render();
-        assertTrue(uploadFilePage.isUploadInputDisplayed(), "Upload form isn't pop up");
-        drone.navigateTo(siteUrl);
-
-        // Sign Up - the user is redirected to cloud sign up
-        drone.navigateTo(elements.get(3).getHref().toString());
-
-        String expectedSignUp = "http://www.alfresco.com/products/cloud?utm_source=AlfEnt4&utm_medium=anchor&utm_campaign=claimnetwork";
-        assertEquals(drone.getCurrentUrl(), expectedSignUp);
-        drone.navigateTo(siteUrl);
-
         //Navigate to Document Library, set any view as default
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         assertTrue(documentLibraryPage.getNavigation().isSetDefaultViewVisible());
@@ -403,10 +372,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
 
         //Data prep for blog
         String url = "alfrescoqacloud.wordpress.com";
-        String blogUsername = "alfrescoqaauto";
-        String blogPassword = "parkh0use";
-      
-        // Removed Configure blog page since ACE-2094 and need to update the test
+
         //Create a Blog post
         blogPage.createPostInternally(testName, testName).render();
 
@@ -502,42 +468,12 @@ public class SitePermissionsSanityTest extends AbstractUtils
         //Verify Help icon on all the dashlets
         assertTrue(siteDashboardPage.isHelpDisplayedForAllDashlets(), "The help balloon isn't available");
 
-        //Verify actions from Welcome dashlet
-        SiteWelcomeDashlet welcomeDashlet = dashBoard.getDashlet("welcome-site").render();
-
-        //Go to Document Library - Document Library page opens
-        List<ShareLink> elements = welcomeDashlet.getOptions();
-
-        assertEquals(elements.size(), 4, "The count of links isn't 4");
-        drone.navigateTo(elements.get(0).getHref());
-        DocumentLibraryPage documentLibraryPage = drone.getCurrentPage().render();
-        assertTrue(documentLibraryPage instanceof DocumentLibraryPage, "The user isn't redirected to Document Library Page");
-        drone.navigateTo(siteUrl);
-
-        //View Site Members - Search for People page opens
-        drone.navigateTo(elements.get(1).getHref());
-        SiteMembersPage siteMembersPage = drone.getCurrentPage().render();
-        assertTrue(siteMembersPage instanceof SiteMembersPage, "The user isn't redirected to Members page");
-        drone.navigateTo(siteUrl);
-
-        //Upload Content - Document Library page opens, Upload dialog popups
-        drone.navigateTo(elements.get(2).getHref());
-        UploadFilePage uploadFilePage = new UploadFilePage(drone).render();
-        assertTrue(uploadFilePage.isUploadInputDisplayed(), "Upload form isn't pop up");
-        drone.navigateTo(siteUrl);
-
-        // Sign Up - the user is redirected to
-        drone.navigateTo(elements.get(3).getHref());
-        String expectedSignUp = "http://www.alfresco.com/products/cloud?utm_source=AlfEnt4&utm_medium=anchor&utm_campaign=claimnetwork";
-        assertEquals(drone.getCurrentUrl(), expectedSignUp);
-        drone.navigateTo(siteUrl);
-
         //Verify Search on site search dashlet
         SiteSearchDashlet siteSearchDashlet = ShareUserDashboard.getSiteSearchDashlet(drone).render();
         assertTrue(siteSearchDashlet.siteSearchWithRetry(itemForSearch), "Unable to use search from the dashlet");
 
         //Navigate to Document Library, set any view as default
-        documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         assertFalse(documentLibraryPage.getNavigation().isSetDefaultViewVisible(), "Set View to default is present");
 
         //Subscribe to RSS Feed
@@ -573,7 +509,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_PERMISSION_DOC), "Manage Permissions action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_ASPECTS), "Manage aspects action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(CHNAGE_TYPE), "Change type action isn't available");
-        
 
         //Verify icons near document section
         assertTrue(documentDetailsPage.isEditPropertiesIconDisplayed(), "Edit properties icon isn't displayed");
@@ -656,11 +591,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
 
         //Data prep for blog
         String url = "alfrescoqacloud.wordpress.com";
-        String blogUsername = "alfrescoqaauto";
-        String blogPassword = "parkh0use";
-
-        
-        // Removed Configure blog page since ACE-2094 and need to update the test
 
         //Create a Blog post
         blogPage.createPostInternally(testName, testName).render();
@@ -698,7 +628,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         contactList.duplicateAnItem(testName);
 
         //Browse to site Members
-        siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
+        SiteMembersPage siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
 
         //Only People and Groups tags are present
         assertTrue(siteMembersPage.isPeopleLinkPresent(), "People link is not displayed");
@@ -770,43 +700,13 @@ public class SitePermissionsSanityTest extends AbstractUtils
         //Verify Help icon on all the dashlets
         assertTrue(siteDashboardPage.isHelpDisplayedForAllDashlets(), "The help balloon isn't available");
 
-        //Verify actions from Welcome dashlet
-        SiteWelcomeDashlet welcomeDashlet = dashBoard.getDashlet("welcome-site").render();
-
-        //Go to Document Library - Document Library page opens
-        List<ShareLink> elements = welcomeDashlet.getOptions();
-
-        assertEquals(elements.size(), 4, "The count of links isn't 4");
-        drone.navigateTo(elements.get(0).getHref());
-        DocumentLibraryPage documentLibraryPage = drone.getCurrentPage().render();
-        assertTrue(documentLibraryPage instanceof DocumentLibraryPage, "The user isn't redirected to Document Library Page");
-        drone.navigateTo(siteUrl);
-
-        //View Site Members - Search for People page opens
-        drone.navigateTo(elements.get(1).getHref());
-        SiteMembersPage siteMembersPage = drone.getCurrentPage().render();
-        assertTrue(siteMembersPage instanceof SiteMembersPage, "The user isn't redirected to Members page");
-        drone.navigateTo(siteUrl);
-
-        //Upload Content - Document Library page opens, Upload dialog popups
-        drone.navigateTo(elements.get(2).getHref());
-        UploadFilePage uploadFilePage = new UploadFilePage(drone).render();
-        assertTrue(uploadFilePage.isUploadInputDisplayed(), "Upload form isn't pop up");
-        drone.navigateTo(siteUrl);
-
-        // Sign Up - the user is redirected to
-        drone.navigateTo(elements.get(3).getHref());
-        String expectedSignUp = "http://www.alfresco.com/products/cloud?utm_source=AlfEnt4&utm_medium=anchor&utm_campaign=claimnetwork";
-        assertEquals(drone.getCurrentUrl(), expectedSignUp);
-        drone.navigateTo(siteUrl);
-
         //Verify Search on site search dashlet
         SiteSearchDashlet siteSearchDashlet = ShareUserDashboard.getSiteSearchDashlet(drone).render();
         assertTrue(siteSearchDashlet.siteSearchWithRetry(itemForSearch), "Unable to use search from the dashlet");
 
         //Navigate to Document Library, set any view as default
         ShareUser.openDocumentLibrary(drone).render();
-        documentLibraryPage = new DocumentLibraryPage(drone).render();
+        DocumentLibraryPage documentLibraryPage = new DocumentLibraryPage(drone).render();
         assertFalse(documentLibraryPage.getNavigation().isSetDefaultViewVisible(), "Set View to default is present");
 
         //Subscribe to RSS Feed
@@ -962,7 +862,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         contactList.duplicateAnItem(testName);
 
         //Browse to site Members
-        siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
+        SiteMembersPage siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
 
         //Only People and Groups tags are present
         assertTrue(siteMembersPage.isPeopleLinkPresent(), "People link is not displayed");
@@ -1023,44 +923,8 @@ public class SitePermissionsSanityTest extends AbstractUtils
         //Verify Help icon on all the dashlets
         assertTrue(siteDashboardPage.isHelpDisplayedForAllDashlets(), "The help balloon isn't available");
 
-        //Verify actions from Welcome dashlet
-        SiteWelcomeDashlet welcomeDashlet = dashBoard.getDashlet("welcome-site").render();
-
-        //Go to Document Library - Document Library page opens
-        List<ShareLink> elements = welcomeDashlet.getOptions();
-
-        assertEquals(elements.size(), 4, "The count of links isn't 4");
-        drone.navigateTo(elements.get(0).getHref());
-        DocumentLibraryPage documentLibraryPage = drone.getCurrentPage().render();
-        assertTrue(documentLibraryPage instanceof DocumentLibraryPage, "The user isn't redirected to Document Library Page");
-        drone.navigateTo(siteUrl);
-
-        //View Site Members - Search for People page opens
-        drone.navigateTo(elements.get(1).getHref());
-        SiteMembersPage siteMembersPage = drone.getCurrentPage().render();
-        assertTrue(siteMembersPage instanceof SiteMembersPage, "The user isn't redirected to Members page");
-        drone.navigateTo(siteUrl);
-
-        //Edit your profile - current user profile page opens
-        drone.navigateTo(elements.get(2).getHref());
-        try
-        {
-            new EditProfilePage(drone).render();
-        }
-        catch (Exception e)
-        {
-            fail("User profile page isn't opened");
-        }
-        drone.navigateTo(siteUrl);
-
-        // Sign Up - the user is redirected to
-        drone.navigateTo(elements.get(3).getHref());
-        String expectedSignUp = "http://www.alfresco.com/products/cloud?utm_source=AlfEnt4&utm_medium=anchor&utm_campaign=claimnetwork";
-        assertEquals(drone.getCurrentUrl(), expectedSignUp);
-        drone.navigateTo(siteUrl);
-
         //Navigate to Document Library, set any view as default
-        documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         assertFalse(documentLibraryPage.getNavigation().isSetDefaultViewVisible(), "Set View to default is present");
 
         //Subscribe to RSS Feed
@@ -1169,7 +1033,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertFalse(contactList.isNewItemEnabled(), "New item is enabled");
         assertFalse(contactList.isDuplicateDisplayed(testName), "Duplicate link is displayed");
 
-        siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
+        SiteMembersPage siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
 
         //Only People and Groups tags are present
         assertTrue(siteMembersPage.isPeopleLinkPresent(), "People link is not displayed");
@@ -1737,7 +1601,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
     /**
      * Check Edit others content for Collaborator
      */
-    @Test(groups = "Sanity"/*, dependsOnMethods = "AONE_15210"*/)
+    @Test(groups = "Sanity", dependsOnMethods = "AONE_15210")
     public void AONE_15221() throws Exception
     {
         /** Start Test */
@@ -1759,10 +1623,10 @@ public class SitePermissionsSanityTest extends AbstractUtils
         SiteDashboardPage dashboard = ShareUser.openSiteDashboard(drone, siteName);
 
         //Navigate to Document Library
-        ShareUser.openDocumentLibrary(drone);
+        ShareUser.openDocumentLibrary(drone).render();
 
         //Edit collaborator document
-        ShareUser.openDocumentDetailPage(drone, fileName);
+        ShareUser.openDocumentDetailPage(drone, fileName).render();
         DocumentDetailsPage documentDetailsPage = ShareUser.editTextDocument(drone, editedItem, editedItem, editedItem);
 
         //Add a comment to the document
