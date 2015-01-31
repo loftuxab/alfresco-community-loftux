@@ -347,6 +347,8 @@
                     does not provide a name in a recognised way this value will be used to scope the messages -->
                <default-messages-scope>default</default-messages-scope>
                
+               <default-less-configuration>/js/aikau/1.0/alfresco/css/less/defaults.less</default-less-configuration>
+               
                <!-- Dojo is NOT included in Surf by default - the Dojo packages will need to be made available
                     in the suggested locations or an override configured. -->
                <packages>

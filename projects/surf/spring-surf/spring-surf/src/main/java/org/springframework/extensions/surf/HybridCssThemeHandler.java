@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2009 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of the Spring Surf Extension project.
  *
@@ -18,7 +18,11 @@
 package org.springframework.extensions.surf;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.config.WebFrameworkConfigElement;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.surf.types.Theme;
 
@@ -37,6 +41,8 @@ import com.asual.lesscss.LessException;
  */
 public class HybridCssThemeHandler extends CssThemeHandler
 {
+    private static final Log logger = LogFactory.getLog(HybridCssThemeHandler.class);
+    
     /**
      * The engine to use for LESS processing.
      */
@@ -51,22 +57,85 @@ public class HybridCssThemeHandler extends CssThemeHandler
     }
 
     /**
+     * The default LESS configuration. This will be populated with the contents of a file referenced by the 
+     * web-framework > defaults > dojo-pages > default-less-configuration.
+     */
+    private String defaultLessConfig = null;
+    
+    /**
+     * Returns the current default LESS configuration. If it has not previously been retrieved then it will
+     * attempt to load it.
+     * 
+     * @return A String containing the default LESS configuration variables.
+     */
+    public String getDefaultLessConfig()
+    {
+        if (this.defaultLessConfig == null)
+        {
+            WebFrameworkConfigElement wfce = this.getWebFrameworkConfigElement();
+            if (wfce != null)
+            {
+                String defaultLessConfigPath = wfce.getDojoDefafultLessConfig();
+                if (defaultLessConfigPath != null)
+                {
+                    try
+                    {
+                        InputStream in = this.getDependencyHandler().getResourceInputStream(defaultLessConfigPath);
+                        if (in != null)
+                        {
+                            this.defaultLessConfig = this.getDependencyHandler().convertResourceToString(in);
+                        }
+                        else
+                        {
+                            if (logger.isErrorEnabled())
+                            {
+                                logger.error("Could not find the default LESS configuration at: " + defaultLessConfigPath);
+                            }
+                           
+                            // Set the configuration as the empty string as it's not in the configured location
+                            this.defaultLessConfig = "";
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        if (logger.isErrorEnabled())
+                        {
+                            logger.error("An exception occurred retrieving the default LESS configuration from: " + defaultLessConfigPath, e);
+                        }
+                    }
+                }
+                else
+                {
+                    if (logger.isErrorEnabled())
+                    {
+                        logger.error("A location for the default LESS configuration file has not been specififed");
+                    }
+                    this.defaultLessConfig = "";
+                }
+            }
+        }
+        return this.defaultLessConfig;
+    }
+
+    /**
      * Looks for a CSS token called "LessVariables" which should contain the LESS style variables that 
      * can be applied to each CSS file.
      * 
      * @return
      */
     public String getLessVariables() {
-        String variables = null;
+        String variables = this.getDefaultLessConfig();
         Theme currentTheme = ThreadLocalRequestContext.getRequestContext().getTheme();
         if (currentTheme == null)
         {
             currentTheme = ThreadLocalRequestContext.getRequestContext().getObjectService().getTheme("default");
         }
-        variables = currentTheme.getCssTokens().get(LessForJavaCssThemeHandler.LESS_TOKEN);
-        if (variables == null)
+        String themeVariables = currentTheme.getCssTokens().get(LessForJavaCssThemeHandler.LESS_TOKEN);
+        if (themeVariables != null)
         {
-            variables = "";
+            // Add a new line just to make sure the first theme specific variable isn't appended to 
+            // the end of the last default variable!
+            variables += "\n" + themeVariables;
         }
         return variables;
     }

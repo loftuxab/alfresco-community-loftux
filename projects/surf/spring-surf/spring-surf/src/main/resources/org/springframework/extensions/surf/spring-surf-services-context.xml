@@ -418,8 +418,10 @@
         source file to be customized by theme specific variables -->
    <!-- <bean id="css.theme.handler" parent="css.theme.handler.abstract" class="org.springframework.extensions.surf.CssThemeHandler"/> -->
    <bean id="css.theme.handler.abstract" abstract="true">
-      <property name="tokenRegex" value="(\$([^;\s\{\}]*))"/>
-      <property name="targetGroup" value="2"/>  <!-- This is the group within the regex pattern that identifies the token name -->
+      <property name="tokenRegex"                value="(\$([^;\s\{\}]*))"/>
+      <property name="targetGroup"               value="2"/>  <!-- This is the group within the regex pattern that identifies the token name -->
+      <property name="webFrameworkConfigElement" ref="webframework.config.element"/>
+      <property name="dependencyHandler"         ref="dependency.handler" />
    </bean>
    
    <!-- The depenendency aggregator is used to combine multiple dependency files into a single resource that is cached
@@ -445,7 +447,8 @@
              want to generate error message for -->
        <property name="missingFileWarningSuppressionList">
           <list>
-             <value>js/alfresco/dummy/module.js</value>
+             <value>js/alfresco/dummy/module\.js</value>
+             <value>js/aikau/([\d\.])*/alfresco/dummy/module\.js</value>
           </list>
        </property>
        
