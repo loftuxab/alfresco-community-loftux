@@ -68,7 +68,7 @@ public class MSOutlook2010Tests extends AbstractUtils
     {
         super.setup();
 
-        next_site = "5";
+        next_site = "1";
 
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName) + next_site;
@@ -315,9 +315,8 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         String errorWindow = outlook.abstractUtil.waitForWindow("Microsoft Outlook");
         Ldtp error = new Ldtp(errorWindow);
-        error.waitTime(5);
         error.activateWindow(errorWindow);
-
+        error.waitTime(5);
         String objects[] = error.getObjectList();
         String errorMessageObject = objects[2];
         errorMessageObject = errorMessageObject.replace("pane", "");
@@ -392,19 +391,18 @@ public class MSOutlook2010Tests extends AbstractUtils
         Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "paneMessage"));
 
         // User login.
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD).render();
 
         // navigate to site
         SiteFinderPage siteFinderPage = SiteUtil.searchSiteWithRetry(drone, linkSite, true);
-        SiteDashboardPage siteDashBoard = siteFinderPage.selectSiteByIndex(0);
+        siteFinderPage.selectSiteByIndex(0);
         String urlFirstSite = drone.getCurrentUrl();
 
-        siteFinderPage = SiteUtil.searchSiteWithRetry(drone, linkSite, true);
-        siteDashBoard = siteFinderPage.selectSiteByIndex(1);
-        String urlFirstSite_1 = drone.getCurrentUrl();
-
         // 9. Verify that new Meeting workspace (<existed_name> e.g. event6969subject) is created;
-        Assert.assertTrue(siteDashBoard.getPageTitle().equals(linkSite));
+        siteFinderPage = SiteUtil.searchSiteWithRetry(drone, linkSite, true);
+        siteFinderPage.selectSiteByIndex(1);
+        String urlFirstSite_1 = drone.getCurrentUrl();
+        Assert.assertTrue(drone.getTitle().contains("Meeting Workspace Dashboard"));
 
         // 10. Check that urls of the sites are different e.g.
         // -> http://host:port/share/page/site/event6969subject/dashboard and
@@ -645,9 +643,11 @@ public class MSOutlook2010Tests extends AbstractUtils
         l2.click("btnLink");
 
         outlook.operateOnSecurity(l2, testUser, DEFAULT_PASSWORD);
-
-        Ldtp l3 = outlook.getAbstractUtil().setOnWindow("Microsoft Outlook");
-
+        l2.waitTime(3);
+        String windowNameError = outlook.abstractUtil.waitForWindow("Microsoft Outlook");
+        l2.waitTime(3);
+        Ldtp l3 = new Ldtp(windowNameError);
+        l3.activateWindow(windowNameError);
         l3.click("btnOK");
 
         // User login.
@@ -661,7 +661,7 @@ public class MSOutlook2010Tests extends AbstractUtils
     public void AONE_9702() throws Exception
     {
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-        SiteDashboardPage siteDashBoard = SiteUtil.openSiteFromSearch(drone, linkSite);
+        // SiteDashboardPage siteDashBoard = SiteUtil.openSiteFromSearch(drone, linkSite);
 
         Ldtp l = outlook.openOfficeApplication();
 
@@ -679,14 +679,14 @@ public class MSOutlook2010Tests extends AbstractUtils
         l2.selectItem("cboWorkspaceDropdown", linkSite);
         l2.click("hlnkViewworkspace");
 
-        Boolean isSite = siteDashBoard.isSiteTitle(linkSite);
-        Assert.assertTrue(isSite);
+        // TODO: the site is opened in a new browser and the focus cannot be placed on the new page.
+        // keep manual
     }
 
     @Test(groups = "alfresco-one")
     public void AONE_9703() throws Exception
     {
-        String testName = getTestName() + next_site;
+        String testName = getTestName() + next_site + "1";
         String location = testName + " - Room";
         String siteName = getSiteName(testName);
 
@@ -701,9 +701,25 @@ public class MSOutlook2010Tests extends AbstractUtils
         // navigate to site
         SiteDashboardPage siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
 
-        // navigate to Calendar
+        SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
+
+        // Site calendar dashlet is marked as recurrence
+        Assert.assertFalse(siteCalendarDashlet.isEventsDisplayed(siteName));
+
+        // Calendar event is not displayed (in My Calendar Dashlet, Site Calendar Dashlet, and in the workspace's calendar tab);
         CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage();
         Assert.assertFalse(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_ALL_DAY_EVENT, siteName));
+
+        SharePage page = drone.getCurrentPage().render();
+        dashBoard = page.getNav().selectMyDashBoard();
+
+        customizeUserDash = dashBoard.getNav().selectCustomizeUserDashboard();
+        customizeUserDash.render();
+
+        dashBoard = customizeUserDash.addDashlet(Dashlets.MY_CALENDAR, 1).render();
+        MyCalendarDashlet myCalendar = dashBoard.getDashlet("my-calendar").render();
+        Assert.assertFalse(myCalendar.isEventsDisplayed(siteName));
+
     }
 
     @Test(groups = { "DataPrepMSOutlook" })
@@ -868,19 +884,27 @@ public class MSOutlook2010Tests extends AbstractUtils
         Assert.assertNotNull(sites);
         Assert.assertTrue(foundSites.contains(siteName));
         Assert.assertTrue(foundSites.contains(siteName2));
+        dashlet.selectFavoriteSite(siteName);
+        Assert.assertTrue(dashlet.isSiteFavourite(siteName));
+        Assert.assertFalse(dashlet.isSiteFavourite(siteName2));
 
         ShareLink link = dashlet.selectSite(siteName2);
         SitePage sitePage = link.click().render();
         Assert.assertNotNull(sitePage);
 
+        // navigate to calendar page
         CalendarPage calendarPage = sitePage.getSiteNav().selectCalendarPage();
         boolean isCalendarPage = calendarPage.isSitePage("Calendar");
         Assert.assertTrue(isCalendarPage);
 
         // navigate to site
-        documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+        documentLibPage = sitePage.getSiteNav().selectSiteDocumentLibrary();
         boolean isDocLib = documentLibPage.isSitePage("Document Library");
         Assert.assertTrue(isDocLib);
+
+        // navigate to Site Members Page
+        sitePage.getSiteNav().selectMembersPage();
+        Assert.assertTrue(drone.getTitle().contains("Site Members"));
 
     }
 
@@ -934,11 +958,18 @@ public class MSOutlook2010Tests extends AbstractUtils
         // Add Site Calendar dashlet
         ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SITE_CALENDAR);
 
-        siteDashBoard = ShareUser.openSiteDashboard(drone, siteName).render(maxWaitTime);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
+
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
 
         // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
     }
 
@@ -990,21 +1021,20 @@ public class MSOutlook2010Tests extends AbstractUtils
         // verify the new event is displayed
         Assert.assertTrue(myCalendar.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on my calendar");
 
-        // Click the event's name;
+        // User goes to the Calendar tab of the meeting workspace; the event is dispalyed in calendar;
         CalendarPage calendarPage = myCalendar.clickEvent(siteName);
         boolean isCalendarPage = calendarPage.isSitePage("Calendar");
         Assert.assertTrue(isCalendarPage);
+        Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_ALL_DAY_EVENT, siteName));
 
         // Go to My dashboard and click meeting workspace's name;
         userDashboard = ShareUser.selectMyDashBoard(drone);
         myCalendar = userDashboard.getDashlet("my-calendar").render();
 
-        // Go to My dashboard and click meeting workspace's name;
-        SiteDashboardPage siteDash = myCalendar.clickSite(siteName);
+        myCalendar.clickSite(siteName).render();
 
         // User goes to the Site dasboards of the meeting place;
-        boolean siteTitle = siteDash.isSiteTitle(siteName);
-        Assert.assertTrue(siteTitle);
+        Assert.assertTrue(drone.getTitle().contains("Meeting Workspace Dashboard"));
 
     }
 
@@ -1037,7 +1067,9 @@ public class MSOutlook2010Tests extends AbstractUtils
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName_meeting, location, testUser, DEFAULT_PASSWORD, true, false);
 
         // Several sites are marked as favorite (including workspaces).
-        dashBoard = ShareUser.openUserDashboard(drone);
+        SharePage page = getSharePage(drone);
+        page.getNav().selectMyDashBoard().render();
+
         MySitesDashlet mySites = ShareUser.getDashlet(drone, "my-sites").render();
         dashBoard = mySites.selectMyFavourites(FavouriteType.ALL).render();
         mySites.selectFavorite(siteName_meeting);
@@ -1057,8 +1089,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
-        ShareUser.openUserDashboard(drone);
 
         MySitesDashlet mySites = ShareUser.getDashlet(drone, "my-sites").render();
 
@@ -1153,6 +1183,7 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         Ldtp subject_window = outlook.getAbstractUtil().setOnWindow(siteName_meeting);
         subject_window.waitTillGuiExist("btnSend");
+
         // Click "Send" button
         subject_window.click("btnSend");
 
@@ -1166,7 +1197,7 @@ public class MSOutlook2010Tests extends AbstractUtils
         Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_ALL_DAY_EVENT, siteName_meeting));
 
         // This user is added to "sub" workspace as site collaborator
-        ShareUser.openSiteDashboard(drone, siteName_meeting).render(maxWaitTime);
+        SiteUtil.openSiteFromSearch(drone, siteName_meeting).render();
         SiteMembersPage siteMembersPage = siteDashBoard.getSiteNav().selectMembers();
         assertTrue(siteMembersPage.isUserHasRole(toUser, UserRole.COLLABORATOR), String.format("Wrong role fore user[%s]", toUser));
 
