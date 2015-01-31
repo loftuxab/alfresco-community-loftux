@@ -70,27 +70,6 @@ public class HybridWorkflowTest1 extends AbstractWorkflow
         testDomain = DOMAIN_HYBRID;
     }
 
-    /*public void dataPrep(String testName) throws Exception
-    {
-        String user1 = getUserNameForDomain(testName, testDomain);
-        String[] userInfo1 = new String[] { user1 };
-
-        String cloudUser = getUserNameForDomain(testName, testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-        ShareUser.logout(drone);
-    }*/
-
     @Test (groups="Hybrid", enabled = true)
     public void AONE_15593() throws Exception
     {
