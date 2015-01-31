@@ -1,9 +1,13 @@
 package org.alfresco.share.repository;
 
+import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.systemsummary.AdminConsoleLink;
+import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
+import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.share.util.FtpsUtil;
 import org.alfresco.share.util.ShareUser;
@@ -41,7 +45,7 @@ public class RepositoryFtpsTest extends FtpsUtil
     private static String remotePathToSites = "/" + "Alfresco" + "/" + "Sites";
     private static String remotePathToRepo = "/" + "Alfresco";
     private static File file;
-    private static String server;
+    private static String nodeUrl;
 
     @Override
     @BeforeClass
@@ -49,17 +53,26 @@ public class RepositoryFtpsTest extends FtpsUtil
     {
         super.setup();
         testName = this.getClass().getSimpleName();
-        server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
         logger.info("Starting Tests: " + testName);
         FtpsUtil.setCustomFtpPort(drone, ftpPort);
+        SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+        RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
+        if(clusteringPage.isClusterEnabled())
+        {
+            nodeUrl = clusteringPage.getClusterMembers().get(0);
+        }
+        else
+        {
+            nodeUrl = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+        }
         if(!keystorePath.isEmpty())
         {
-            FtpsUtil.enableFtps(keystorePath, truststorePath);
+            FtpsUtil.enableFtps(nodeUrl, keystorePath, truststorePath);
         }
         else
         {
             File keyStore = FtpsUtil.generateKeyStore(getRandomString(6));
-            FtpsUtil.enableFtps(keyStore, null);
+            FtpsUtil.enableFtps(nodeUrl, keyStore, null);
         }
     }
 
@@ -73,13 +86,13 @@ public class RepositoryFtpsTest extends FtpsUtil
         String trustStoreName = getRandomString(6);
 
         //disabling FTPS
-        FtpsUtil.disableFtps();
+        FtpsUtil.disableFtps(nodeUrl);
 
         //generating keystore and truststore
         //when alfresco is running on remote host - files must be pre-generated
         if(!keystorePath.isEmpty() & !truststorePath.isEmpty())
         {
-            FtpsUtil.enableFtps(keystorePath, truststorePath);
+            FtpsUtil.enableFtps(nodeUrl, keystorePath, truststorePath);
         }
         else if (!keystorePath.isEmpty() & truststorePath.isEmpty())
         {
@@ -89,14 +102,14 @@ public class RepositoryFtpsTest extends FtpsUtil
         {
             File keyStoreFile = FtpsUtil.generateKeyStore(keyStoreName);
             File trustStoreFile = FtpsUtil.generateTrustStore(keyStoreFile, trustStoreName);
-            FtpsUtil.enableFtps(keyStoreFile, trustStoreFile);
+            FtpsUtil.enableFtps(nodeUrl, keyStoreFile, trustStoreFile);
         }
 
         //log in and check ftps is on
         TrustManager trustManager = TrustManagerUtils.getValidateServerCertificateTrustManager();
         FTPSClient ftpsClient = new FTPSClient(false);
         ftpsClient.setTrustManager(trustManager);
-        ftpsClient.connect(server, Integer.parseInt(ftpPort));
+        ftpsClient.connect(nodeUrl, Integer.parseInt(ftpPort));
         ftpsClient.enterLocalPassiveMode();
         assertTrue(ftpsClient.isConnected() && ftpsClient.isRemoteVerificationEnabled(), "Couldn't connect FTP TLS");
         boolean success = ftpsClient.login(ADMIN_USERNAME, ADMIN_PASSWORD);
@@ -112,25 +125,25 @@ public class RepositoryFtpsTest extends FtpsUtil
         String keyStoreName = getRandomString(6);
 
         //disabling FTPS
-        FtpsUtil.disableFtps();
+        FtpsUtil.disableFtps(nodeUrl);
 
         //generating keystore only
         //when alfresco is running on remote host - file must be pre-generated
         if(!truststorePath.isEmpty())
         {
-            FtpsUtil.enableFtps(keystorePath, null);
+            FtpsUtil.enableFtps(nodeUrl, keystorePath, null);
         }
         else
         {
             File keyStoreFile = FtpsUtil.generateKeyStore(keyStoreName);
-            FtpsUtil.enableFtps(keyStoreFile, null);
+            FtpsUtil.enableFtps(nodeUrl, keyStoreFile, null);
         }
 
         //log in and check ftps is on
         TrustManager trustManager = TrustManagerUtils.getValidateServerCertificateTrustManager();
         FTPSClient ftpsClient = new FTPSClient(false);
         ftpsClient.setTrustManager(trustManager);
-        ftpsClient.connect(server, Integer.parseInt(ftpPort));
+        ftpsClient.connect(nodeUrl, Integer.parseInt(ftpPort));
         ftpsClient.enterLocalPassiveMode();
         assertTrue(ftpsClient.isConnected() && ftpsClient.isRemoteVerificationEnabled(), "Couldn't connect FTP TLS");
         boolean success = ftpsClient.login(ADMIN_USERNAME, ADMIN_PASSWORD);
@@ -144,14 +157,14 @@ public class RepositoryFtpsTest extends FtpsUtil
     public void AONE_6456() throws Exception
     {
         //disabling FTPS
-        FtpsUtil.disableFtps();
+        FtpsUtil.disableFtps(nodeUrl);
         FTPSClient ftpsClient = new FTPSClient(false);
 
         try
         {
             TrustManager trustManager = TrustManagerUtils.getValidateServerCertificateTrustManager();
             ftpsClient.setTrustManager(trustManager);
-            ftpsClient.connect((server), Integer.parseInt(ftpPort));
+            ftpsClient.connect((nodeUrl), Integer.parseInt(ftpPort));
             ftpsClient.enterLocalPassiveMode();
             boolean success = ftpsClient.login(ADMIN_USERNAME, ADMIN_PASSWORD);
             assertFalse(success, "Could log in");
@@ -175,17 +188,17 @@ public class RepositoryFtpsTest extends FtpsUtil
         //when alfresco is running on remote host - file must be pre-generated
         if(!truststorePath.isEmpty())
         {
-            FtpsUtil.enableFtps(keystorePath, null);
+            FtpsUtil.enableFtps(nodeUrl, keystorePath, null);
         }
         else
         {
             File keyStoreFile = FtpsUtil.generateKeyStore(getRandomString(6));
-            FtpsUtil.enableFtps(keyStoreFile, null);
+            FtpsUtil.enableFtps(nodeUrl, keyStoreFile, null);
         }
 
         //log in through FTP
         FTPClient ftpClient = new FTPClient();
-        ftpClient.connect(server, Integer.parseInt(ftpPort));
+        ftpClient.connect(nodeUrl, Integer.parseInt(ftpPort));
         ftpClient.enterLocalPassiveMode();
         ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
         ftpClient.getReplyCode();
@@ -221,7 +234,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         FTPSClient ftpsClient = new FTPSClient(false);
         ftpsClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
         ftpsClient.setTrustManager(trustManager);
-        ftpsClient.connect((server), Integer.parseInt(ftpPort));
+        ftpsClient.connect((nodeUrl), Integer.parseInt(ftpPort));
         ftpsClient.login(testUser, DEFAULT_PASSWORD);
         ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
         ftpsClient.changeWorkingDirectory(remotePath);
@@ -256,7 +269,7 @@ public class RepositoryFtpsTest extends FtpsUtil
             throw new RuntimeException(ex.getMessage());
         }
 
-        ftpsClient.connect((server), Integer.parseInt(ftpPort));
+        ftpsClient.connect((nodeUrl), Integer.parseInt(ftpPort));
         ftpsClient.login(testUser, DEFAULT_PASSWORD);
         ftpsClient.execPBSZ(0);
 
@@ -296,7 +309,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         }
 
         //check files are present
-        ftpsClient.connect((server), Integer.parseInt(ftpPort));
+        ftpsClient.connect((nodeUrl), Integer.parseInt(ftpPort));
         ftpsClient.login(ADMIN_USERNAME, ADMIN_PASSWORD);
         ftpsClient.changeWorkingDirectory(remotePath);
         String allFiles[] = ftpsClient.listNames();
@@ -324,7 +337,7 @@ public class RepositoryFtpsTest extends FtpsUtil
 
         try
         {
-            ftpsClient.connect((server), Integer.parseInt(ftpPort));
+            ftpsClient.connect((nodeUrl), Integer.parseInt(ftpPort));
             ftpsClient.login(ADMIN_USERNAME, ADMIN_PASSWORD);
             ftpsClient.enterLocalPassiveMode();
             ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -337,8 +350,8 @@ public class RepositoryFtpsTest extends FtpsUtil
         uploadFileAndQuit(file, ftpsClient);
 
         //The server should handle lost connections and free the port automatically and quickly.
-        assertFalse(isRemotePortInUse(server, 55000) && isRemotePortInUse(server, 55001) && isRemotePortInUse(server, 55002) && isRemotePortInUse(server, 55003)
-            && isRemotePortInUse(server, 55004));
+        assertFalse(isRemotePortInUse(nodeUrl, 55000) && isRemotePortInUse(nodeUrl, 55001) && isRemotePortInUse(nodeUrl, 55002) && isRemotePortInUse(nodeUrl, 55003)
+            && isRemotePortInUse(nodeUrl, 55004));
     }
 
     /**
@@ -979,21 +992,8 @@ public class RepositoryFtpsTest extends FtpsUtil
     @AfterClass(alwaysRun = true)
     private void disableFTPS()
     {
-        FtpsUtil.disableFtps();
-        deleteKeystores();
-    }
-
-    private void deleteKeystores()
-    {
-        File ftpsFolder = new File(DATA_FOLDER + "ftps");
-        try
-        {
-            FileUtils.cleanDirectory(ftpsFolder);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        FtpsUtil.disableFtps(nodeUrl);
+        deleteKeyStores();
     }
 
     private void uploadFileAndQuit(File file, FTPSClient ftpsClient) throws IOException

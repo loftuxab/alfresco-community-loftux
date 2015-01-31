@@ -10,6 +10,7 @@ import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.PrintCommandListener;
@@ -48,6 +49,8 @@ public class FtpsUtil extends AbstractUtils
     private static String TRUSTSTORENAME;
     private static final String pathToKeyStoreFile = DATA_FOLDER + "ftps";
 
+    protected static final String regexUrl = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
+
 
     /**
      * Method to generate a keystore file
@@ -77,7 +80,7 @@ public class FtpsUtil extends AbstractUtils
         cmdLine.addArgument(String.valueOf(VALIDITY));
         DefaultExecutor executor = new DefaultExecutor();
         int value = executor.execute(cmdLine);
-        if(value == 0)
+        if (value == 0)
         {
             logger.info("Generated keystore " + KEYSTORENAME);
         }
@@ -120,7 +123,7 @@ public class FtpsUtil extends AbstractUtils
         cmdLine.addArgument(pathToKeyStoreFile + SLASH + "alfresco.cer");
         DefaultExecutor executor = new DefaultExecutor();
         int value = executor.execute(cmdLine);
-        if(value == 0)
+        if (value == 0)
         {
             logger.info("Keystore was imported to alfresco.cer file");
         }
@@ -143,7 +146,7 @@ public class FtpsUtil extends AbstractUtils
         cmdLine1.addArgument("-noprompt");
         executor = new DefaultExecutor();
         value = executor.execute(cmdLine1);
-        if(value == 0)
+        if (value == 0)
         {
             logger.info("Generated truststore " + TRUSTSTORENAME);
         }
@@ -155,26 +158,32 @@ public class FtpsUtil extends AbstractUtils
     }
 
     /**
-     * Method to generate keystore and unable ftps through jmx
+     * Method to enable ftps through jmx
+     *
+     * @param nodeUrl    url of one of the nodes
+     * @param keyStore   File
+     * @param trustStore File
+     * @throws Exception
      */
-    public static void enableFtps(File keyStore, File trustStore) throws Exception
+    public static void enableFtps(String nodeUrl, File keyStore, File trustStore) throws Exception
     {
         String keyStrFilePathOnSys = keyStore.getAbsolutePath();
-        JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.enabled", true);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", true);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", keyStrFilePathOnSys);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", PASS);
+
+        JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_STOP);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.enabled", true);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", true);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", keyStrFilePathOnSys);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", PASS);
         if (trustStore == null)
         {
-            JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+            JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_START);
         }
         else
         {
             String trustStrFilePathOnSys = trustStore.getAbsolutePath();
-            JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", trustStrFilePathOnSys);
-            JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", PASS);
-            JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+            JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", trustStrFilePathOnSys);
+            JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", PASS);
+            JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_START);
         }
         logger.info("FTPS is on.");
     }
@@ -182,26 +191,27 @@ public class FtpsUtil extends AbstractUtils
     /**
      * Method to enable ftps based on keystores' paths
      *
-     * @param pathToKeyStoreFile
-     * @param pathToTrustStoreFile
+     * @param nodeUrl              url of one of the nodes
+     * @param pathToKeyStoreFile   String
+     * @param pathToTrustStoreFile String
      * @throws Exception
      */
-    public static void enableFtps(String pathToKeyStoreFile, String pathToTrustStoreFile) throws Exception
+    public static void enableFtps(String nodeUrl, String pathToKeyStoreFile, String pathToTrustStoreFile) throws Exception
     {
-        JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.enabled", true);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", true);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", pathToKeyStoreFile);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", PASS);
-        if (pathToTrustStoreFile == null)
+        JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_STOP);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.enabled", true);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", true);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", pathToKeyStoreFile);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", PASS);
+        if (pathToTrustStoreFile.isEmpty())
         {
-            JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+            JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_START);
         }
         else
         {
-            JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", pathToTrustStoreFile);
-            JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", PASS);
-            JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+            JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", pathToTrustStoreFile);
+            JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", PASS);
+            JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_START);
         }
         logger.info("FTPS is on.");
     }
@@ -209,31 +219,31 @@ public class FtpsUtil extends AbstractUtils
     /**
      * Method to disable ftps through jmx
      */
-    public static void disableFtps()
+    public static void disableFtps(String nodeUrl)
     {
-        JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.enabled", true);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", false);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", "");
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", "");
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", "");
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", "");
-        JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+        JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_STOP);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.enabled", true);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", false);
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", "");
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", "");
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", "");
+        JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", "");
+        JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_START);
         logger.info("FTPS is off.");
     }
 
     /**
      * Method to init the client
      *
-     * @param shareUrl
+     * @param nodeUrl
      * @param user
      * @param password
      * @return FTPSClient
      */
-    private static FTPSClient connectServer(String shareUrl, String user, String password) throws IOException
+    private static FTPSClient connectServer(String nodeUrl, String user, String password) throws IOException
     {
 
-        String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+        String server = PageUtils.getAddress(nodeUrl).replaceAll("(:\\d{1,5})?", "");
         int port = Integer.parseInt(ftpPort);
 
         TrustManager trustManager = TrustManagerUtils.getValidateServerCertificateTrustManager();
@@ -260,14 +270,14 @@ public class FtpsUtil extends AbstractUtils
     /**
      * Method to upload a content
      *
-     * @param shareUrl
+     * @param nodeUrl
      * @param user
      * @param password
      * @param contentName
      * @param remoteFolderPath
      * @return true if content is uploaded
      */
-    public static boolean uploadContent(String shareUrl, String user, String password, File contentName, String remoteFolderPath)
+    public static boolean uploadContent(String nodeUrl, String user, String password, File contentName, String remoteFolderPath)
     {
 
         InputStream inputStream;
@@ -276,7 +286,7 @@ public class FtpsUtil extends AbstractUtils
 
         try
         {
-            FTPSClient ftpsClient = connectServer(shareUrl, user, password);
+            FTPSClient ftpsClient = connectServer(nodeUrl, user, password);
             ftpsClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
             ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
             ftpsClient.changeWorkingDirectory(remoteFolderPath);
@@ -501,6 +511,7 @@ public class FtpsUtil extends AbstractUtils
         }
         return result;
     }
+
 
     /**
      * Method to get a content from FTP
@@ -1033,6 +1044,14 @@ public class FtpsUtil extends AbstractUtils
         return result;
     }
 
+    /**
+     * Method to copy the contents of the folder
+     *
+     * @param FTPSClient
+     * @param remoteFolderPath
+     * @param folderName
+     * @param destination
+     */
     private static void copyFolderContents(FTPSClient FTPSClient, String remoteFolderPath, String folderName, String destination)
     {
         try
@@ -1123,6 +1142,12 @@ public class FtpsUtil extends AbstractUtils
         }
     }
 
+    /**
+     * Method to restrict ftp ports to given values
+     *
+     * @param portFrom
+     * @param portTo
+     */
     public static void restrictPort(String portFrom, String portTo)
     {
         JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
@@ -1130,5 +1155,284 @@ public class FtpsUtil extends AbstractUtils
         JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.dataPortTo", portTo);
         JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
         logger.info("FTP port range was restricted from " + portFrom + " to " + portTo);
+    }
+
+    /**
+     * Method to try delete contents (should be used by the user without rights to perform the operation)
+     *
+     * @param shareUrl
+     * @param user
+     * @param password
+     * @param remoteContentName
+     * @param remoteFilePath
+     * @return reply code int value
+     */
+    public static int deleteContentWithoutRights(String shareUrl, String user, String password, String remoteContentName, String remoteFilePath)
+    {
+        int replyCode;
+        boolean result;
+
+        try
+        {
+            FTPSClient FTPSClient = connectServer(shareUrl, user, password);
+            FTPSClient.changeWorkingDirectory(remoteFilePath);
+            result = FTPSClient.deleteFile(remoteContentName);
+            replyCode = FTPSClient.getReplyCode();
+            if (!result)
+            {
+                logger.error(FTPSClient.getReplyString());
+            }
+            FTPSClient.logout();
+            FTPSClient.disconnect();
+
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return replyCode;
+    }
+
+    /**
+     * Method to try create a space (should be used by the user without rights to perform the operation)
+     *
+     * @param shareUrl
+     * @param user
+     * @param password
+     * @param spaceName
+     * @param remoteFilePath
+     * @return reply code int value
+     */
+    public static int createSpaceWithoutRights(String shareUrl, String user, String password, String spaceName, String remoteFilePath)
+    {
+        int replyCode;
+        boolean result;
+
+        try
+        {
+            FTPSClient ftpsClient = connectServer(shareUrl, user, password);
+            ftpsClient.changeWorkingDirectory(remoteFilePath);
+            result = ftpsClient.makeDirectory(spaceName);
+            if (!result)
+            {
+                logger.info(ftpsClient.getReplyString());
+            }
+            replyCode = ftpsClient.getReplyCode();
+            ftpsClient.logout();
+            ftpsClient.disconnect();
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return replyCode;
+    }
+
+    /**
+     * Method to try upload contents (should be used by the user without rights to perform the operation)
+     *
+     * @param nodeUrl
+     * @param user
+     * @param password
+     * @param contentName
+     * @param remoteFolderPath
+     * @return reply code int value
+     */
+    public static int uploadContentWithoutRights(String nodeUrl, String user, String password, File contentName, String remoteFolderPath)
+    {
+
+        InputStream inputStream;
+        OutputStream outputStream;
+        int replyCode = 200;
+
+        try
+        {
+            FTPSClient ftpsClient = connectServer(nodeUrl, user, password);
+            ftpsClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+            ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
+            ftpsClient.changeWorkingDirectory(remoteFolderPath);
+            ftpsClient.setControlKeepAliveTimeout(600);
+            if (ftpsClient.isConnected())
+                try
+                {
+                    inputStream = new FileInputStream(contentName);
+                    outputStream = ftpsClient.storeFileStream(contentName.getName());
+
+                    if (outputStream != null)
+                    {
+
+                        byte[] buffer = new byte[4096];
+                        int l;
+                        while ((l = inputStream.read(buffer)) != -1)
+                        {
+                            outputStream.write(buffer, 0, l);
+                        }
+
+                        inputStream.close();
+                        outputStream.flush();
+                        outputStream.close();
+                        replyCode = ftpsClient.getReplyCode();
+                    }
+                    else
+                    {
+                        logger.error(ftpsClient.getReplyString());
+                        replyCode = ftpsClient.getReplyCode();
+                    }
+                    ftpsClient.logout();
+                    ftpsClient.disconnect();
+                }
+                catch (IOException ex)
+                {
+                    throw new RuntimeException(ex.getMessage());
+                }
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return replyCode;
+    }
+
+    /**
+     * Method to try delete space (should be used by the user without rights to perform the operation)
+     *
+     * @param shareUrl
+     * @param user
+     * @param password
+     * @param remoteSpaceName
+     * @param remoteFolderPath
+     * @return reply code int value
+     * @throws IOException
+     */
+    public static int deleteSpaceWithoutRights(String shareUrl, String user, String password, String remoteSpaceName, String remoteFolderPath) throws IOException
+    {
+        boolean result;
+        int replyCode;
+        FTPSClient ftpsClient = connectServer(shareUrl, user, password);
+        ftpsClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+        ftpsClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+        try
+        {
+            ftpsClient.changeWorkingDirectory(remoteFolderPath);
+            result = ftpsClient.removeDirectory(remoteSpaceName);
+            replyCode = ftpsClient.getReplyCode();
+            if (!result)
+            {
+                logger.error(ftpsClient.getReplyString());
+            }
+
+            ftpsClient.logout();
+            ftpsClient.disconnect();
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return replyCode;
+
+    }
+
+    /**
+     * Method to try rename file (should be used by the user without rights to perform the operation)
+     *
+     * @param shareUrl
+     * @param username
+     * @param userpass
+     * @param ftppath
+     * @param object
+     * @param newName
+     * @return reply code int value
+     * @throws IOException
+     */
+    public static int renameFileWithoutRights(String shareUrl, String username, String userpass, String ftppath, String object, String newName) throws IOException
+    {
+        boolean result;
+        int replyCode = 200;
+        FTPSClient FTPSClient = connectServer(shareUrl, username, userpass);
+
+        try
+        {
+            boolean isChanged = FTPSClient.changeWorkingDirectory(ftppath);
+            if (!isChanged)
+            {
+                throw new ShareException("No such directory " + ftppath);
+            }
+
+            result = FTPSClient.rename(object, newName);
+            if (!result)
+            {
+                logger.error(FTPSClient.getReplyString());
+                replyCode = FTPSClient.getReplyCode();
+            }
+
+            FTPSClient.logout();
+            FTPSClient.disconnect();
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return replyCode;
+
+    }
+
+    /**
+     * Method to try edit contents (should be used by the user without rights to perform the operation)
+     *
+     * @param shareUrl
+     * @param user
+     * @param password
+     * @param remoteContentName
+     * @param remoteFolderPath
+     * @param newContent
+     * @return reply code int value
+     */
+    public static int editContentWithoutRights(String shareUrl, String user, String password, String remoteContentName, String remoteFolderPath, String newContent)
+    {
+
+        OutputStream outputStream;
+        int replyCode;
+
+        try
+        {
+            FTPSClient FTPSClient = connectServer(shareUrl, user, password);
+            FTPSClient.changeWorkingDirectory(remoteFolderPath);
+            outputStream = FTPSClient.storeFileStream(remoteContentName);
+            if (outputStream != null)
+            {
+                outputStream.write(newContent.getBytes());
+                outputStream.close();
+                replyCode = FTPSClient.getReplyCode();
+            }
+            else
+            {
+                logger.error(FTPSClient.getReplyString());
+                replyCode = FTPSClient.getReplyCode();
+            }
+            FTPSClient.logout();
+            FTPSClient.disconnect();
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return replyCode;
+    }
+
+    /**
+     * Helper method to clear up ftps folder
+     */
+    protected void deleteKeyStores()
+    {
+        File ftpsFolder = new File(DATA_FOLDER + "ftps");
+        try
+        {
+            FileUtils.cleanDirectory(ftpsFolder);
+        }
+        catch (IOException e)
+        {
+            e.getMessage();
+        }
     }
 }
