@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum WorkFlowDescription
 {
 
-    CREATE_A_TASK_OR_START_A_REVIEW("Create a task or start a review on Alfresco Cloud"),
+    CREATE_A_TASK_OR_START_A_REVIEW("Assign a task or review in Alfresco Cloud"),
     ASSIGN_NEW_TASK_TO_YOUR_SELF_OR_COLLEAGUE("Assign a new task to yourself or a colleague"),
     HYBRID_ADHOC_TASK_PROCESS("Hybrid Adhoc Task Process"),
     HYBRID_REVIEW_AND_APPROVE_PROCESS("Hybrid Review And Approve Process"),
