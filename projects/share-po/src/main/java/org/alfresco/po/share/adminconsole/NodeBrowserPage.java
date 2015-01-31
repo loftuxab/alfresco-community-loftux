@@ -67,6 +67,9 @@ public class NodeBrowserPage extends AdminConsolePage
 
     private final static By RESULT_NAMES = By.cssSelector("td[class*='sortable'][headers*='-name'] > div > a[href='#']");
 
+    private final static By CONTENT_URL = By.xpath("//a[contains(text(),'contentUrl')]");
+
+
     public enum Store
     {
         ALFRESCO_USER("user://alfrescoUserStore"),
@@ -388,5 +391,25 @@ public class NodeBrowserPage extends AdminConsolePage
             }
         }
         throw new PageOperationException("Unable to find " + name);
+    }
+
+    /**
+     * Method to open details form for the founded item
+     * @param itemName
+     */
+    public void getItemDetails (String itemName)
+    {
+        ShareLink link = getSearchResults("cm:" + itemName).getName();
+        link.click();
+    }
+
+    /**
+     * Method to find a link to the location of the item
+     * @return String value of the link
+     */
+    public String getContentUrl ()
+    {
+        WebElement contentUrl = drone.findAndWait(CONTENT_URL);
+        return contentUrl.getText();
     }
 }
