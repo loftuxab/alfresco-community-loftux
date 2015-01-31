@@ -19,6 +19,7 @@ import org.testng.annotations.Test;
 import static org.alfresco.po.share.site.document.ContentType.PLAINTEXT;
 import static org.alfresco.po.share.site.document.ContentType.XML;
 import static org.alfresco.share.util.ShareUser.*;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -31,7 +32,6 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
 
     protected static String fileName;
     protected static String fileNamePlain, fileNameXml, editedFileNamePlain, editedContentXml, siteA, siteB;
-    protected static String testName;
     protected static String folderName;
     protected static int retryCount;
     protected static long timeToWait;
@@ -39,18 +39,19 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
     protected static DestinationAndAssigneeBean desAndAssBean;
     DocumentLibraryPage doclibPrem;
     DocumentLibraryPage doclibCl;
-    String [] subFolders = {"subfolder1", "subfolder2"};
-    String [] subFiles = {"subFile1", "subFile2"};
-    String [] content = {"content1", "content2"};
-    protected static String [] newFiles;
+    String[] subFolders = { "subfolder1", "subfolder2" };
+    String[] subFiles = { "subFile1", "subFile2" };
+    String[] content = { "content1", "content2" };
+    protected static String[] newFiles;
 
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
-        super.setup();
         testName = this.getClass().getSimpleName();
+        logger.info("Start Tests in " + testName);
+        super.setup();
         siteA = getSiteName(testName);
-        siteB = getSiteName(testName) + "SY3";
+        siteB = getSiteName(testName) + "SY";
         fileName = getFileName(testName);
         folderName = getFolderName(testName);
         fileNamePlain = fileName + "plainText";
@@ -58,7 +59,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         fileNameXml = fileName + "xml";
         editedContentXml = fileNameXml + "edited";
         folderName = getFolderName(testName);
-        newFiles = new String[] { "file1", "file2", "file3", "file4"};
+        newFiles = new String[] { "file1", "file2", "file3", "file4" };
         retryCount = 5;
         timeToWait = 25000;
         syncLocation = DOMAIN_PREMIUM + ">" + siteB + ">" + DEFAULT_FOLDER_NAME;
@@ -68,8 +69,13 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         desAndAssBean.setSyncToPath(DEFAULT_FOLDER_NAME);
     }
 
+    /**
+     * Sync. Folder with files to Cloud. Mixed case for user
+     * 
+     * @throws Exception
+     */
     @Test(groups = { "DataPrepHybrid" })
-    public void dataPrep_AONE_15428() throws Exception
+    public void dataPrep_AONE_15582() throws Exception
     {
         ShareUser.login(hybridDrone, adminUserPrem, DEFAULT_PASSWORD);
         ShareUser.createSite(hybridDrone, siteA, SITE_VISIBILITY_PUBLIC);
@@ -80,7 +86,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         doclibPrem = openSitesDocumentLibrary(drone, siteA).render();
         createFolderInFolder(drone, folderName, folderName, DOCLIB);
         ContentDetails contentDetails = new ContentDetails();
-        for(int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
         {
             createFolderInFolder(drone, subFolders[i], subFolders[i], folderName);
             doclibPrem.getFileDirectoryInfo(subFolders[i]).clickOnTitle();
@@ -92,11 +98,15 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         }
     }
 
+    /**
+     * Sync. Folder with files to Cloud. Mixed case for user
+     *
+     * @throws Exception
+     */
     @Test(groups = "Hybrid")
-    public void AONE_15428() throws Exception
+    public void AONE_15582() throws Exception
     {
-        String mixedCaseUserName = "uSeRaDmIn@pReMiErNet.tEsT";
-
+        String mixedCaseUserName = getUserNameWithMixedCase("admin", hybridDomainPremium);
         ShareUser.login(drone, adminUserPrem);
         disconnectCloudSync(drone);
         doclibPrem = openSitesDocumentLibrary(drone, siteA).render().getFileDirectoryInfo(folderName).clickOnTitle().render();
@@ -175,7 +185,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
      * Sync to Cloud
      */
     @Test(groups = { "DataPrepHybrid" })
-    public void dataPrep_AONE_15429() throws Exception
+    public void dataPrep_AONE_15583() throws Exception
     {
         // Login into cloud and create a site
         ShareUser.login(hybridDrone, adminUserPrem, DEFAULT_PASSWORD);
@@ -203,7 +213,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
     }
 
     @Test(groups = { "Hybrid" })
-    public void AONE_15429() throws Exception
+    public void AONE_15583() throws Exception
     {
         desAndAssBean = new DestinationAndAssigneeBean();
         desAndAssBean.setNetwork(hybridDomainPremium);
@@ -243,8 +253,13 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
             && checkIfContentIsSynced(hybridDrone, folderName), "Items are not synced on Cloud side");
     }
 
+    /**
+     * Change the synced items
+     *
+     * @throws Exception
+     */
     @Test(groups = { "Hybrid" })
-    public void AONE_15430() throws Exception
+    public void AONE_15584() throws Exception
     {
         int i;
         //1st sync set: change file properties in On-premise
@@ -278,7 +293,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
             docLibPrem = openSitesDocumentLibrary(drone, siteB).render();
             actualDesc = docLibPrem.getFileDirectoryInfo(editedFileNamePlain).selectEditProperties().getDescription();
             i++;
-            if(i > retryCount)
+            if (i > retryCount)
                 break;
         }
         assertTrue(actualDesc.equals(editedFileNamePlain), "File properties were not edited On-Premise");
@@ -288,13 +303,13 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         detailsPrem = editTextDocument(drone, fileNameXml, fileNameXml, editedContentXml).render();
         i = 0;
         String actualContent = detailsPrem.selectInlineEdit().getDetails().getContent();
-        while(!actualContent.contains(editedContentXml))
+        while (!actualContent.contains(editedContentXml))
         {
             openSiteDashboard(drone, siteB).render();
-            detailsPrem = (DocumentDetailsPage)openDocumentLibrary(drone).render().getFileDirectoryInfo(fileNameXml).clickOnTitle();
+            detailsPrem = (DocumentDetailsPage) openDocumentLibrary(drone).render().getFileDirectoryInfo(fileNameXml).clickOnTitle();
             actualContent = detailsPrem.selectInlineEdit().getDetails().getContent();
             i++;
-            if(i > retryCount)
+            if (i > retryCount)
                 break;
         }
         assertTrue(actualContent.contains(editedContentXml), "Document wasn't edited On-Prem");
@@ -312,7 +327,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
             detailsCl = docLibCl.selectFile(fileNameXml).render();
             actualContent = detailsCl.selectInlineEdit().getDetails().getContent();
             i++;
-            if(i > retryCount)
+            if (i > retryCount)
                 break;
         }
         assertTrue(actualContent.contains(editedContentXml), "File content wasn't edited on Cloud");
@@ -323,7 +338,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         getSharePage(hybridDrone).render();
         EditTextDocumentPage editPage = detailsCl.selectInlineEdit().render();
         boolean isEdited = editPage.getDetails().getContent().contains(editedContentXml + "1");
-        if(!isEdited)
+        if (!isEdited)
         {
             refreshSharePage(hybridDrone).render();
             isEdited = editPage.getDetails().getContent().contains(editedContentXml + "1");
@@ -342,7 +357,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
             detailsPrem = docLibPrem.selectFile(fileNameXml).render();
             actualContent = detailsPrem.selectInlineEdit().getDetails().getContent();
             i++;
-            if(i > retryCount)
+            if (i > retryCount)
                 break;
         }
         assertTrue(actualContent.contains(editedContentXml + "1"), "Content wasn't changed On-Premise");
@@ -373,12 +388,12 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         docLibCl = openSitesDocumentLibrary(hybridDrone, siteB).render();
         docLibCl.getFileDirectoryInfo(folderName).clickOnTitle().render();
         i = 0;
-        while(!(docLibCl.isFileVisible(newFiles[0]) && docLibCl.isFileVisible(newFiles[1])))
+        while (!(docLibCl.isFileVisible(newFiles[0]) && docLibCl.isFileVisible(newFiles[1])))
         {
             webDriverWait(hybridDrone, timeToWait);
             docLibCl = refreshDocumentLibrary(hybridDrone);
             i++;
-            if(i > retryCount)
+            if (i > retryCount)
                 break;
         }
         assertTrue(docLibCl.isFileVisible(newFiles[0]) && docLibCl.isFileVisible(newFiles[1]), "Files were not added to Cloud");
@@ -398,8 +413,8 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
 
         //3rd sync set: add new files to synced Cloud folder
         docLibCl = openSitesDocumentLibrary(hybridDrone, siteB).render();
-        String [] fileInfo = { newFiles[2], folderName};
-        String [] fileInfo2 = { newFiles[3], folderName};
+        String[] fileInfo = { newFiles[2], folderName };
+        String[] fileInfo2 = { newFiles[3], folderName };
         uploadFileInFolder(hybridDrone, fileInfo).render();
         uploadFileInFolder(hybridDrone, fileInfo2).render();
         //https://issues.alfresco.com/jira/browse/CLOUD-2229
@@ -416,12 +431,12 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         ShareUser.login(drone, adminUserPrem).render();
         docLibPrem = openSitesDocumentLibrary(drone, siteB).getFileDirectoryInfo(folderName).clickOnTitle().render();
         i = 0;
-        while(!(docLibPrem.isFileVisible(newFiles[2]) && docLibPrem.isFileVisible(newFiles[3])))
+        while (!(docLibPrem.isFileVisible(newFiles[2]) && docLibPrem.isFileVisible(newFiles[3])))
         {
             webDriverWait(drone, timeToWait);
             docLibPrem = (DocumentLibraryPage) refreshSharePage(drone);
             i++;
-            if(i > retryCount)
+            if (i > retryCount)
                 break;
         }
 
@@ -441,17 +456,86 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         syncInf2.clickOnCloseButton();
     }
 
-    private boolean waitAndCheckIfVisible (WebDrone driver, DocumentLibraryPage docLib, String contentName)
+    /**
+     * Unsync the sets
+     *
+     * @throws Exception
+     */
+    @Test
+    public void AONE_15585() throws Exception
+    {
+        //1st sync set: unsync and DO NOT remove the files from Cloud
+        ShareUser.login(drone, adminUserPrem);
+        DocumentLibraryPage docLibPrem = openSitesDocumentLibrary(drone, siteB).getFileDirectoryInfo(editedFileNamePlain)
+            .selectUnSyncAndRemoveContentFromCloud(false).render();
+
+        //The content is unsynced but files are still there and sync icon is removed in Cloud and on-premise
+        FileDirectoryInfo fileOnPrem = docLibPrem.getFileDirectoryInfo(editedFileNamePlain);
+        assertFalse(fileOnPrem.isCloudSynced() && fileOnPrem.isViewCloudSyncInfoLinkPresent() && fileOnPrem.isUnSyncFromCloudLinkPresent(),
+            editedFileNamePlain + " is still Cloud synced.");
+        ShareUser.login(hybridDrone, adminUserPrem);
+        DocumentLibraryPage doclibCl = openSitesDocumentLibrary(hybridDrone, siteB).render();
+        assertTrue(doclibCl.isFileVisible(editedFileNamePlain), "File is removed from Cloud");
+        FileDirectoryInfo fileOnCl = docLibPrem.getFileDirectoryInfo(editedFileNamePlain);
+        assertFalse(fileOnCl.isCloudSynced() && fileOnCl.isViewCloudSyncInfoLinkPresent(), "Sync icon and/or info are displayed for " + editedFileNamePlain);
+
+        //2nd sync set: unsync and remove the files from Cloud
+        ShareUser.login(drone, adminUserPrem);
+        docLibPrem = openSitesDocumentLibrary(drone, siteB).getFileDirectoryInfo(fileNameXml)
+            .selectUnSyncAndRemoveContentFromCloud(true).render();
+
+        //The content is unsynced and files removed from Cloud and sync icon is removed in On-premise
+        fileOnPrem = docLibPrem.getFileDirectoryInfo(fileNameXml);
+        assertFalse(fileOnPrem.isCloudSynced() && fileOnPrem.isViewCloudSyncInfoLinkPresent() && fileOnPrem.isUnSyncFromCloudLinkPresent(),
+            fileNameXml + " is still Cloud synced.");
+        ShareUser.login(hybridDrone, adminUserPrem);
+        doclibCl = openSitesDocumentLibrary(hybridDrone, siteB).render();
+        assertFalse(doclibCl.isFileVisible(fileNameXml), "File " + fileNameXml + " is still present in Cloud");
+
+        //3rd sync set: unsync the folder and DO NOT remove folder
+        docLibPrem = openSitesDocumentLibrary(drone, siteB).getFileDirectoryInfo(folderName).selectUnSyncAndRemoveContentFromCloud(false).render();
+
+        //Files are unsynced but folder and files are still available in Cloud and cloud icon is not available in On-premise and Cloud
+        fileOnPrem = docLibPrem.getFileDirectoryInfo(folderName);
+        assertFalse(fileOnPrem.isCloudSynced() && fileOnPrem.isViewCloudSyncInfoLinkPresent() && fileOnPrem.isUnSyncFromCloudLinkPresent(),
+            editedFileNamePlain + " is still Cloud synced.");
+        docLibPrem = docLibPrem.getFileDirectoryInfo(folderName).clickOnTitle().render();
+        for (String theFile : newFiles)
+        {
+            fileOnPrem = docLibPrem.getFileDirectoryInfo(theFile);
+            assertFalse(fileOnPrem.isCloudSynced() && fileOnPrem.isViewCloudSyncInfoLinkPresent() && fileOnPrem.isUnSyncFromCloudLinkPresent(),
+                theFile + " is still Cloud synced.");
+        }
+
+        fileOnCl = openSitesDocumentLibrary(hybridDrone, siteB).getFileDirectoryInfo(folderName);
+        boolean isSynced = fileOnCl.isCloudSynced() && fileOnCl.isViewCloudSyncInfoLinkPresent();
+        if (isSynced)
+        {
+            webDriverWait(hybridDrone, 5000);
+            fileOnCl = refreshDocumentLibrary(hybridDrone).render().getFileDirectoryInfo(folderName);
+            isSynced = fileOnCl.isCloudSynced() && fileOnCl.isViewCloudSyncInfoLinkPresent();
+        }
+        assertFalse(isSynced, folderName + " is still synced on Cloud");
+        doclibCl = fileOnCl.clickOnTitle().render();
+        for (String theFile : newFiles)
+        {
+            fileOnCl = doclibCl.getFileDirectoryInfo(theFile);
+            assertFalse(fileOnCl.isCloudSynced() && fileOnCl.isViewCloudSyncInfoLinkPresent(),
+                theFile + " is still Cloud synced.");
+        }
+    }
+
+    private boolean waitAndCheckIfVisible(WebDrone driver, DocumentLibraryPage docLib, String contentName)
     {
         int i = 0;
         boolean isVisible = docLib.isItemVisble(contentName);
-        while(!isVisible)
+        while (!isVisible)
         {
             webDriverWait(driver, timeToWait);
             docLib = refreshDocumentLibrary(driver).render();
             isVisible = docLib.isItemVisble(contentName);
             i++;
-            if(i > retryCount)
+            if (i > retryCount)
             {
                 break;
             }
