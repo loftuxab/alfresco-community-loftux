@@ -536,14 +536,14 @@ public class EditingItemsViaAWE extends AbstractUtils
         // Data is changed successfully;
         String newContent = "content " + getTestName();
         editPage.insertTextInContent(newContent);
-        if (AlfrescoVersion.Enterprise42.equals(alfrescoVersion) || AlfrescoVersion.Enterprise43.equals(alfrescoVersion))
-        {
-            Assert.assertTrue(editPage.getContentTextarea().contains(newContent), "The article content does not contain: " + newContent);
-        }
-        else
-        {
+//        if (AlfrescoVersion.Enterprise42.equals(alfrescoVersion) || AlfrescoVersion.Enterprise43.equals(alfrescoVersion))
+//        {
+//            Assert.assertTrue(editPage.getContentTextarea().contains(newContent), "The article content does not contain: " + newContent);
+//        }
+//        else
+//        {
             Assert.assertTrue(editPage.getContentTinyMCEEditor().getText().contains(newContent), "The article content does not contain: " + newContent);
-        }
+//        }
 
 
         // ---- Step 2 ----
