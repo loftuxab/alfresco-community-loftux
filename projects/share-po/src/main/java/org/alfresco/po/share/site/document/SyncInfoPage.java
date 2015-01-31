@@ -14,6 +14,12 @@
  */
 package org.alfresco.po.share.site.document;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.HtmlPage;
@@ -22,13 +28,11 @@ import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.*;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 /**
  * Sync Info Details Page
@@ -53,6 +57,10 @@ public class SyncInfoPage extends SharePage
     private static final By INDIRECT_SYNC_LOCATION = By.cssSelector(".cloud-sync-indirect-root .view-in-cloud");
     private static final By FAILED_SYNC = By.cssSelector("div[style*='visible'] .cloud-sync-details-failed-detailed");
     private static final By UNABLE_RETRIEVE_LOCATION = By.xpath("//p[text()='Unable to retrieve location']");
+    private static final By SHOW_DETAILS = By.cssSelector(".cloud-sync-details-failed-show-link");
+    private static final By SYNC_FAILED_HEADER_DETAIL = By.cssSelector(".cloud-sync-error-code");
+    private static final By SYNC_FAILED_TECHNICAL_REPORT = By.cssSelector("textarea[id$='default-cloud-sync-error-details'] ");
+
     private static Log logger = LogFactory.getLog(FileDirectoryInfo.class);
 
     public SyncInfoPage(WebDrone drone)
@@ -471,4 +479,66 @@ public class SyncInfoPage extends SharePage
     {
         CANCEL, REMOVE;
     }
+
+    /**
+     * Method to click Show Details
+     */
+    public void clickShowDetails()
+    {
+        try
+        {
+            drone.findAndWait(SHOW_DETAILS).click();
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new NoSuchElementException("Show details element not found", nse);
+        }
+        catch (TimeoutException nse)
+        {
+            throw new TimeoutException("Timeout for finding Show Details element", nse);
+        }
+    }
+
+    /**
+     * Get the failed sync error
+     * 
+     * @return String
+     */
+    public String getSyncFailedErrorDetail()
+    {
+        try
+        {
+            return drone.findAndWait(SYNC_FAILED_HEADER_DETAIL).getText();
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new NoSuchElementException("Error element not found", nse);
+        }
+        catch (TimeoutException nse)
+        {
+            throw new TimeoutException("Timeout for finding Error header element", nse);
+        }
+    }
+
+    /**
+     * Get the technical report error when sync fails
+     * 
+     * @return String
+     */
+    public String getTechnicalReport()
+    {
+        try
+        {
+            return drone.findAndWait(SYNC_FAILED_TECHNICAL_REPORT).getText();
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new NoSuchElementException("Technical report element not found", nse);
+        }
+        catch (TimeoutException nse)
+        {
+            throw new TimeoutException("Timeout for finding Technical report element", nse);
+        }
+    }
+
 }
