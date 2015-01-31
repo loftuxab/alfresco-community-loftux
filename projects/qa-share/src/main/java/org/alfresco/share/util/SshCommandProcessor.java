@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.alfresco.share.util;
 
 import com.jcraft.jsch.*;
@@ -9,14 +24,14 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * @author  Sergey Kardash
+ * @author Sergey Kardash
  */
-public class SshCommandProcessor extends AbstractUtils{
+public class SshCommandProcessor extends AbstractUtils
+{
 
     private static Log logger = LogFactory.getLog(SshCommandProcessor.class);
     private final JSch jsch = new JSch();
     private Session session;
-    private Channel channel;
 
     public void connect()
     {
@@ -47,119 +62,100 @@ public class SshCommandProcessor extends AbstractUtils{
             catch (JSchException e)
             {
                 i++;
-                e.printStackTrace();
-                logger.info(e);
+                logger.error("Error handled during connection via ssh", e);
 
                 if (i > 5)
                 {
                     result = true;
                 }
-                if (sshHost==null){
-                    throw new SkipException("host mustn't be null");
+                if (sshHost == null)
+                {
+                    throw new SkipException("host mustn't be null", e);
                 }
                 // System.exit(1);
             }
         }
     }
 
-    public void disconnect() {
+    public void disconnect()
+    {
         if (session != null)
             session.disconnect();
     }
 
-    public String executeCommand(String command) {
+    public String executeCommand(String command)
+    {
         StringBuilder rv = new StringBuilder();
-        try {
-            if (session == null || !session.isConnected()) {
+        try
+        {
+            if (session == null || !session.isConnected())
+            {
                 connect();
             }
-            channel = session.openChannel("exec");
+            Channel channel = session.openChannel("exec");
             ((ChannelExec) channel).setCommand(command);
             channel.setInputStream(null);
             ((ChannelExec) channel).setErrStream(System.err);
             InputStream in = channel.getInputStream();
             channel.connect();
             byte[] tmp = new byte[1024];
-            while (true) {
-                while (in.available() > 0) {
-                    int i = in.read(tmp, 0, 1024);
-                    if (i < 0) break;
-                    rv.append(new String(tmp, 0, i));
+            while (true)
+            {
+                int bytesRead;
+                while ((bytesRead = in.read(tmp)) != -1)
+                {
+                    if (bytesRead < 0)
+                    {
+                        break;
+                    }
+                    rv.append(new String(tmp, 0, bytesRead, "UTF-8"));
                 }
-                if (channel.isClosed()) {
+
+                if (channel.isClosed())
+                {
                     break;
                 }
-                try {
+                try
+                {
                     Thread.sleep(100);
-                } catch (Exception ee) {
-                    ee.printStackTrace();
+                }
+                catch (Exception ee)
+                {
+                    logger.error("Error handled during execution command via ssh", ee);
                 }
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             rv.append(ex.getMessage());
         }
         return rv.toString();
     }
 
-    public void connect(int timeOut) {
-        try {
-            if (isSecureSession) {
+    public void connect(int timeOut)
+    {
+        try
+        {
+            if (isSecureSession)
+            {
                 jsch.addIdentity(pathToKeys, "passphrase");
                 session = jsch.getSession(serverUser, sshHost, serverShhPort);
-            } else {
+            }
+            else
+            {
                 session = jsch.getSession(serverUser, sshHost, serverShhPort);
                 session.setPassword(serverPass);
             }
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
-            session.setServerAliveInterval(timeOut*1000);
-            session.connect(timeOut*1000);
-        } catch (JSchException e) {
-            e.printStackTrace();
-            System.exit(1);
+            session.setServerAliveInterval(timeOut * 1000);
+            session.connect(timeOut * 1000);
+        }
+        catch (JSchException e)
+        {
+            logger.error("Error handled during connection via ssh", e);
         }
     }
 
-    public String executeCommand(String command, int timeOut) {
-        StringBuilder rv = new StringBuilder();
-        try {
-            if (session == null || !session.isConnected()) {
-                connect(timeOut);
-            }
-
-            channel = session.openChannel("exec");
-            ((ChannelExec) channel).setCommand(command);
-            channel.setInputStream(null);
-            //((ChannelExec)channel).setPty(true);
-            ((ChannelExec) channel).setErrStream(System.err);
-            InputStream in = channel.getInputStream();
-            channel.connect();
-            byte[] tmp = new byte[1024];
-            int k = 0;
-            while (true) {
-                while (in.available() > 0) {
-                    int i = in.read(tmp, 0, 1024);
-                    if (i < 0) break;
-                    rv.append(new String(tmp, 0, i));
-                }
-                if (channel.isClosed()) {
-                    break;
-                }
-                try {
-                    k++;
-                    Thread.sleep(1000);
-                } catch (Exception ee) {
-                    ee.printStackTrace();
-                }
-                if (k > timeOut){
-                    System.out.println("Timeout " + timeOut + " seconds is exceeded");
-                    break;
-                }
-            }
-        } catch (Exception ex) {
-            rv.append(ex.getMessage());
-        }
-        return rv.toString();
-    }
 }
