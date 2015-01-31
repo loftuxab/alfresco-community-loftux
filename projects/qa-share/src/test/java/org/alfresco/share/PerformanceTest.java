@@ -145,7 +145,7 @@ public class PerformanceTest extends CmisUtils
         FileDirectoryInfo fileDirectoryInfo = documentLibraryPage.getFileDirectoryInfo(folderName1);
         CopyOrMoveContentPage copyOrMoveContentPage = fileDirectoryInfo.selectMoveTo();
         copyOrMoveContentPage.selectSite(siteName2).selectPath(folderName2).selectOkButton();
-        webDriverWait(drone, 30000);
+        webDriverWait(drone, 60000);
         documentLibraryPage = openSitesDocumentLibrary(drone, siteName2);
         documentLibraryPage = documentLibraryPage.selectFolder(folderName2).render();
         documentLibraryPage = documentLibraryPage.selectFolder(folderName1).render();
@@ -198,7 +198,7 @@ public class PerformanceTest extends CmisUtils
             DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(customDrone, siteName);
             DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(BIG_DATA_FILE);
             documentDetailsPage.clickOnDownloadLinkForUnsupportedDocument();
-            webDriverWait(customDrone, 600000);
+            webDriverWait(customDrone, 300000);
             assertTrue(downloadedBigDataFile.exists(), "Big data file don't download");
             assertEquals(downloadedBigDataFile.length(), 1024 * 1024 * 2047L, "File does not fully downloaded.");
         }
