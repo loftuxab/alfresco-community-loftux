@@ -486,6 +486,11 @@
             });
          }
 
+         // MNT-12892 fix, dinamically calculate width of upload label
+         // from the flash-upload.css file browse div has following styles: margin-left: 10px; width: 38px; margin-right: 10px;
+         var label = Dom.getElementsByClassName("label", "div")[0];
+         label.parentNode.style.width = (10 + 38 + 10 + 1) + label.offsetWidth + "px";
+
          YAHOO.lang.later(this, 2000, function()
          {
             Dom.addClass(this.id + "-flashuploader-div", "hidden");
