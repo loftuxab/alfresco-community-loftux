@@ -41,6 +41,7 @@
       dateFormat = Alfresco.thirdparty.dateFormat,
       History = YAHOO.util.History,
       $jCalendar = ""; // Cache the jQuery selector. Populated in renderEvents after DOM has rendered.
+      document.jquery = $;  // MNT-13070: IE replaces jQuery object with latest initialized
    
    YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype,
    {
@@ -103,7 +104,7 @@
          }
 
          // Prevent unnecessary DOM lookups and cache the jQuery object for the calendar container.
-         $jCalendar = $('#' + this.options.id);
+         $jCalendar = document.jquery('#' + this.options.id);
 
          // invoke Full Calendar
          this.initFullCalendar();
