@@ -131,6 +131,16 @@ public class WcmqsEditPage extends SharePage
         insertTextInContent(articleDetails.getContent());
         return clickSubmitButton();
     }
+    
+    public WcmqsArticleDetails getArticleDetails()
+    {
+        String name=drone.findAndWait(NAME_INPUT).getAttribute("value");
+        String title=drone.findAndWait(TITLE_INPUT).getAttribute("value");
+        String description= drone.findAndWait(DESCRIPTION_INPUT).getText();
+        String content=getContentTinyMCEEditor().getText();
+        String templateName=drone.findAndWait(TEMPLATENAME_INPUT).getAttribute("value");
+        return new WcmqsArticleDetails(name, title, description, content, templateName);
+    }
 
     /**
      * Get TinyMCEEditor object to navigate TinyMCE functions.
