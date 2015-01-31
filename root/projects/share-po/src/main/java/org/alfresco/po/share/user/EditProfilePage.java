@@ -70,7 +70,7 @@ public class EditProfilePage extends SharePage
         UploadFilePage uploadFilePage = new UploadFilePage(drone);
         uploadFilePage.upload(file.getAbsolutePath());
         drone.findAndWait(SAVE_CHANGES).click();
-        logger.info("Avatar["+file.getName()+"] uploaded.");
+        logger.info("Avatar[" + file.getName() + "] uploaded.");
     }
 
     public MyProfilePage clickCancel()
