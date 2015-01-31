@@ -63,7 +63,7 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
 {
 
     private static Log logger = LogFactory.getLog(SiteSearchMyDashboardTest.class);
-    private String siteDomain = "siteSearch.test";
+    private String siteDomain = "siteSearchr.test";
     private String expectedHelpBallonMsg = "Use this dashlet to perform a site search and view the results.\nClicking the item name takes you to the details page so you can preview or work with the item.";
     private static final String NO_RESULTS_FOUND_MESSAGE = "No results found.";
 
@@ -114,17 +114,28 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
         Assert.assertNotNull(dashBoardPage);
         SiteSearchDashlet searchDashlet = ShareUserDashboard.getSiteSearchDashlet(drone);
         Assert.assertNotNull(searchDashlet);
+
+        //1. The following items are displayed: "Site Search" name of the dashlet;
         Assert.assertEquals(searchDashlet.getTitle(), Dashlets.SITE_SEARCH.getDashletName());
+        //Search field with the "Search" button;
+        Assert.assertTrue(searchDashlet.isSearchFieldDisplayed(), "Search field is not found!");
+        Assert.assertTrue(searchDashlet.isSearchButtonDisplayed(), "Search button is not found!");
+        //Drop down menu with the number of items to be displayed;
+        Assert.assertTrue(searchDashlet.isDropDownResultsSizeDisplayed(), "Result size drop down is not found!");
 
         // Verify Help balloon message has been displayed correctly
+        //2. Click on ? icon
         searchDashlet.clickOnHelpIcon();
-        Assert.assertTrue(searchDashlet.isBalloonDisplayed());
+        Assert.assertTrue(searchDashlet.isBalloonDisplayed(), "Balloon is not displayed!");
         Assert.assertEquals(searchDashlet.getHelpBalloonMessage(), expectedHelpBallonMsg);
+        //3. Click on X icon.
         searchDashlet.closeHelpBallon().render();
         Assert.assertFalse(searchDashlet.isBalloonDisplayed());
 
+        //4. Click on drop down menu.
         Assert.assertEquals(searchDashlet.getAvailableResultSizes(), Arrays.asList("10", "25", "50", "100"));
 
+        //5. Click on "Search" button.
         searchDashlet.search("").render();
         Assert.assertEquals(searchDashlet.getContent(), NO_RESULTS_FOUND_MESSAGE);
     }
@@ -334,6 +345,7 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
         String testUser = getUserNameForDomain(testName, siteDomain);
         String content = "content";
         String test = "finish";
+        String part = "tent";
         String fileName = content + testName + test + ".doc";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -358,7 +370,8 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
 
         // Configure Saved search with "*test*"
-        items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test + "*", SearchLimit.HUNDRED);
+        //items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test + "*", SearchLimit.HUNDRED);
+        items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + part + "*", SearchLimit.HUNDRED);
 
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
@@ -522,7 +535,7 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
         String tag = testName + 2;
         String fileName = testName + ".doc";
 
-
+        //ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         // Configure Site search with Tag
