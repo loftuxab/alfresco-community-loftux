@@ -20,6 +20,7 @@ import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -64,6 +65,12 @@ public class ContactWorkflowTests extends AbstractUtils
         wqsURL = siteName + ":8080/wcmqs";
         logger.info(" wcmqs url : " + wqsURL);
         logger.info("Start Tests from: " + testName);
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDown()
+    {
+        super.tearDown();
     }
 
     @Test(groups = { "DataPrepWQS" })
