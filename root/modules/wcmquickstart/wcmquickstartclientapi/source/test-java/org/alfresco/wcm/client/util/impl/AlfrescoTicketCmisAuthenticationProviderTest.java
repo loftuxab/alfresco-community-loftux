@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 public class AlfrescoTicketCmisAuthenticationProviderTest
@@ -133,8 +134,12 @@ public class AlfrescoTicketCmisAuthenticationProviderTest
             thread.start();
         }
 
-        while(!threads.isEmpty())
+        for (int i=0; !threads.isEmpty(); i++)
         {
+            if (i >= 600) // give up after approx 5 mins - hung the build
+            {
+                fail("Not all threads ("+threads.size()+") are still to finish.");
+            }
             Thread.sleep(500);
         }
         
