@@ -88,7 +88,7 @@ public class FactorySharePage implements PageFactory
     protected static final String FAILURE_PROMPT = "div[id='prompt']";
     protected static final String SHARE_DIALOGUE = "div.hd, .dijitDialogTitleBar";
     protected static ConcurrentHashMap<String, Class<? extends SharePage>> pages;
-    //private static final By SHARE_DIALOGUE_HEADER = By.cssSelector("div.hd");
+    protected static final By SHARE_DIALOGUE_HEADER = By.cssSelector("div.hd");
     private static final String cloudSignInDialogueHeader = "Sign in to Alfresco in the cloud";
 
     static
