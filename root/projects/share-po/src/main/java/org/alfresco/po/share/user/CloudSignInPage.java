@@ -269,5 +269,69 @@ public class CloudSignInPage extends ShareDialogue
         }
         return false;
     }
+    
+    /**
+     * Logs user into the site by first finding the login panel, populating the
+     * fields and submitting the form without verifying the returned page.
+     */
+    public void loginToCloud(String userName, String password)
+    {
+        WebElement usernameInput = drone.findAndWait(USERNAME_INPUT);
+        usernameInput.clear();
+        usernameInput.sendKeys(userName);
+
+        // To introduce a little lag before typing in the password: Same as LoginPage
+        WebElement button = drone.findAndWait(CONNECT_BUTTON);
+
+        WebElement passwordInput = drone.findAndWait(PASSWORD_INPUT);
+        passwordInput.clear();
+        passwordInput.sendKeys(password);
+
+        button.submit();
+        drone.waitUntilElementDisappears(By.cssSelector(".message"), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+    }
+        
+    /**
+     * Verify if the Sign up Link is displayed
+     * 
+     * @return true if the link displayed else false.
+     */
+    public boolean isAccountNotRecognised()
+    {
+        try
+        {
+            return drone.find(By.cssSelector(".error")).isDisplayed();
+        }
+        catch (NoSuchElementException e)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Error: 'Email or password not recognised' is not visible", e);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Verify if the Sign up Link is displayed
+     * 
+     * @return true if the link displayed else false.
+     */
+    public String getAccountNotRecognisedError()
+    {
+        try
+        {
+            return drone.find(By.cssSelector(".error")).getText();
+        }
+        catch (NoSuchElementException e)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Error: 'Email or password not recognised' is not visible", e);
+            }
+        }
+
+        return "";
+    }
 
 }
