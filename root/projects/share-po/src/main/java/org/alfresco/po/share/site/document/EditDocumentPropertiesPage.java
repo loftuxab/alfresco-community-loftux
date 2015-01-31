@@ -59,7 +59,6 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
         tagName = null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public EditDocumentPropertiesPage render(RenderTime timer)
     {
@@ -109,7 +108,6 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     /**
      * Check to see if tags are visible on the page
      * and match the given tag.
-     * 
      * @param name identifier tag name
      * @return true if name matches tag
      */
@@ -136,14 +134,12 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public EditDocumentPropertiesPage render(long time)
     {
         return render(new RenderTime(time));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public EditDocumentPropertiesPage render()
     {
@@ -153,7 +149,6 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     /**
      * Verify if edit properties element,
      * that contains the form is visible.
-     * 
      * @return true if displayed
      */
     public boolean isEditPropertiesVisible()
@@ -195,7 +190,6 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Check if tags are attached to the particular document value.
-     * 
      * @return true if tag elements are displayed
      */
     public boolean hasTags()
@@ -360,7 +354,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     {
         clickSave();
         // WEBDRONE-523: Amended to return HtmlPage rather than DocumentDetailsPage
-        return FactorySharePage.resolvePage(drone);
+        return drone.getCurrentPage();
     }
 
     /**

@@ -11,27 +11,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
         <webdrone.page.render.wait.time>6000</webdrone.page.render.wait.time>
         <testng.xml>src/test/resources/testng.xml</testng.xml>
         <test.exclude>nonEnterprise</test.exclude>
         <testng.suite.filename>src/test/resources/testng_share_po.xml</testng.suite.filename>
+        <argLine>-Xms512m -Xmx1024m</argLine>
     </properties>
-    <repositories>
-        <repository>
-            <id>alfresco-public-snapshots</id>
-            <releases>
-                <enabled>false</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-             </snapshots>
-             <name>Alfresco Public Snapshots Repository</name>
-             <url>https://artifacts.alfresco.com/nexus/content/repositories/public-snapshots/</url>
-        </repository>
-    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.alfresco</groupId>
@@ -277,7 +263,6 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.6.3.201306030806</version>
                         <executions>
                             <execution>
                                 <id>prepare-jacoco</id>
@@ -362,7 +347,6 @@
                                 <suiteXmlFile>src/test/resources/CalendarPageSuite.xml</suiteXmlFile>
                                 <suiteXmlFile>src/test/resources/MyProfileSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
@@ -407,7 +391,6 @@
                                 <suiteXmlFile>src/test/resources/CalendarPageSuite.xml</suiteXmlFile>
                                 <suiteXmlFile>src/test/resources/MyProfileSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
@@ -436,7 +419,6 @@
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/IntermittentTestsSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
@@ -461,7 +443,6 @@
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/InDevSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
@@ -486,7 +467,6 @@
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/testng_Hybrid.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
