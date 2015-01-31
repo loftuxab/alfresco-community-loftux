@@ -109,7 +109,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     protected String DECLARE_AS_RECORD = "div.rm-create-record>a";
     protected String IN_COMPLETE_RECORD = "div.info-banner";
 
-    protected String IS_FOLDER ="img[src*='.png']";
+    protected String IS_FOLDER = "img[src*='.png']";
 
     private static final By TAGS_FIELD = By.cssSelector("div.detail span.item span.faded");
     protected String DESCRIPTION_INFO = "div.detail>span.faded";
@@ -1361,28 +1361,26 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         }
         throw new PageException("Not able to click on view cloud sync info link.");
     }
-    
+
     /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#isViewCloudSyncInfoDisplayed()
      */
     @Override
     public boolean isViewCloudSyncInfoDisplayed()
-    { 
-        
+    {
+
         try
         {
             return findAndWait(SYNC_INFO_PAGE).isDisplayed();
         }
         catch (TimeoutException e)
         {
-            logger.error("Exceeded the time to find css.", e);          
+            logger.error("Exceeded the time to find css.", e);
         }
         return false;
 
     }
-    
-    
 
     /*
      * (non-Javadoc)
@@ -2917,10 +2915,10 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         }
         throw new PageException("Unable to find Edit Offline link");
     }
-    
-  
-    public void declareRecord(){
-        
+
+    public void declareRecord()
+    {
+
         try
         {
             WebElement declare_record = drone.findAndWait(By.cssSelector(DECLARE_AS_RECORD));
@@ -2930,21 +2928,24 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         {
             throw new PageOperationException("Unable to find element");
         }
-        
+
     }
-    
-/**
- * Verifies whether type is record.
- * @author hamara
- */
-    public boolean isTypeRecord(){
+
+    /**
+     * Verifies whether type is record.
+     * 
+     * @author hamara
+     */
+    public boolean isTypeRecord()
+    {
         boolean isTypeRecord = false;
         WebElement rec = findElement(By.cssSelector(IN_COMPLETE_RECORD));
         String rec_text = rec.getText();
-       
+
         try
         {
-            if(rec_text != null && rec_text.contains("Incomplete Record")){
+            if (rec_text != null && rec_text.contains("Incomplete Record"))
+            {
                 isTypeRecord = true;
             }
         }
@@ -2953,41 +2954,42 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-            
+
         return isTypeRecord;
-        
-            
+
     }
-    
+
     /**
      * Verifies whether type is record.
+     * 
      * @author hamara
      */
-        public boolean isFolderType(){
-            boolean isTypeFolder = false;
-            WebElement rec = findElement(By.cssSelector(IS_FOLDER));
-            String rec_text = rec.getAttribute("src");
-           
-            try
+    public boolean isFolderType()
+    {
+        boolean isTypeFolder = false;
+        WebElement rec = findElement(By.cssSelector(IS_FOLDER));
+        String rec_text = rec.getAttribute("src");
+
+        try
+        {
+            if (rec_text != null && rec_text.contains("png"))
             {
-                if(rec_text != null && rec_text.contains("png")){
-                    isTypeFolder = true;
-                }
+                isTypeFolder = true;
             }
-            catch (Exception e)
-            {
-               
-                e.printStackTrace();
-            }
-                
-            return isTypeFolder;
-            
-                
         }
+        catch (Exception e)
+        {
+
+            e.printStackTrace();
+        }
+
+        return isTypeFolder;
+
+    }
 
     /**
      * This method gets the list of in line tags after clicking on tag info icon.
-     *
+     * 
      * @return List<String> collection of tags
      */
 
@@ -3012,8 +3014,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         }
         return tagsList;
     }
-    
-    
+
     /*
      * Clicks on Preview Web Asset from the action menu
      */
@@ -3028,6 +3029,21 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     {
         WebElement indirSyncedIcon = findElement(By.cssSelector(INDIRECTLY_SYNCED_ICON));
         return indirSyncedIcon.isDisplayed();
+    }
+
+    public String getSyncInfoToolTip()
+    {
+
+        try
+        {
+            return drone.find(SYNC_INFO_PAGE).getAttribute("title");
+        }
+        catch (NoSuchElementException te)
+        {
+            logger.error("Sync info is not displayed", te);
+
+        }
+        return null;
     }
 
 }

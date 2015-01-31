@@ -862,5 +862,7 @@ public interface FileDirectoryInfo
     public void selectPreviewWebAsset();
 
     public boolean isIndirectlySyncedIconPresent();
+    
+    public String getSyncInfoToolTip();
 
 }
