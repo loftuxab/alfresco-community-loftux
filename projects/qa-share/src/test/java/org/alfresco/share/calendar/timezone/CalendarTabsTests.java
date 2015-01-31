@@ -13,7 +13,7 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.calendar.CalendarPage;
 import org.alfresco.po.share.site.calendar.InformationEventForm;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.CalendarUtil;
 import org.alfresco.share.util.ShareUser;

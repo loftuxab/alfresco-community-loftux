@@ -1,5 +1,19 @@
 package org.alfresco.share.repository;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+import javax.net.ssl.SSLException;
+import javax.net.ssl.TrustManager;
+
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.exception.ShareException;
@@ -14,8 +28,7 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.apache.commons.io.FileUtils;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.PrintCommandListener;
@@ -25,14 +38,13 @@ import org.apache.commons.net.ftp.FTPCmd;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.util.TrustManagerUtils;
 import org.testng.Assert;
-import org.testng.annotations.*;
-
-import javax.net.ssl.SSLException;
-import javax.net.ssl.TrustManager;
-import java.io.*;
-import java.net.Socket;
-
-import static org.testng.Assert.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
 
 /**
  * @author Marina.Nenadovets

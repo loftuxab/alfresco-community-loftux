@@ -18,6 +18,25 @@
  */
 package org.alfresco.share.sanity;
 
+import static java.util.Arrays.asList;
+import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.MY_ACTIVITIES;
+import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
+import static org.alfresco.po.share.site.links.LinksListFilter.FilterOption.ALL_LINKS;
+import static org.alfresco.po.share.site.links.LinksListFilter.FilterOption.MY_LINKS;
+import static org.alfresco.po.share.site.links.LinksListFilter.FilterOption.RECENTLY_ADDED;
+import static org.alfresco.po.share.site.links.LinksPage.CheckBoxAction.ALL;
+import static org.alfresco.po.share.site.links.LinksPage.CheckBoxAction.INVERT_SELECTION;
+import static org.alfresco.po.share.site.links.LinksPage.CheckBoxAction.SELECT_NONE;
+import static org.alfresco.po.share.site.links.LinksPage.SelectedAction.DELETE;
+import static org.alfresco.po.share.site.links.LinksPage.SelectedAction.DESELECT_ALL;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.util.List;
+import java.util.Set;
+
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.ActivityShareLink;
 import org.alfresco.po.share.dashlet.MyActivitiesDashlet;
@@ -25,32 +44,26 @@ import org.alfresco.po.share.dashlet.SiteActivitiesDashlet;
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
-import org.alfresco.po.share.site.links.*;
+import org.alfresco.po.share.site.links.LinkComment;
+import org.alfresco.po.share.site.links.LinkDirectoryInfo;
+import org.alfresco.po.share.site.links.LinksDetailsPage;
+import org.alfresco.po.share.site.links.LinksListFilter;
+import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.RandomUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.Set;
-
-import static java.util.Arrays.asList;
-import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.MY_ACTIVITIES;
-import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
-import static org.alfresco.po.share.site.links.LinksListFilter.FilterOption.*;
-import static org.alfresco.po.share.site.links.LinksPage.CheckBoxAction.ALL;
-import static org.alfresco.po.share.site.links.LinksPage.CheckBoxAction.INVERT_SELECTION;
-import static org.alfresco.po.share.site.links.LinksPage.CheckBoxAction.SELECT_NONE;
-import static org.alfresco.po.share.site.links.LinksPage.SelectedAction.DELETE;
-import static org.alfresco.po.share.site.links.LinksPage.SelectedAction.DESELECT_ALL;
-import static org.testng.Assert.*;
 
 /**
  * @author Aliaksei Boole

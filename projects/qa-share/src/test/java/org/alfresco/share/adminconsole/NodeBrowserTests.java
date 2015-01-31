@@ -14,25 +14,32 @@
  */
 package org.alfresco.share.adminconsole;
 
+import static org.alfresco.po.share.adminconsole.NodeBrowserPage.QueryType.LUCENE;
+import static org.alfresco.po.share.adminconsole.NodeBrowserPage.QueryType.STORE_ROOT;
+import static org.alfresco.po.share.adminconsole.NodeBrowserPage.Store.ARCHIVE_SPACE_STORE;
+import static org.alfresco.po.share.adminconsole.NodeBrowserPage.Store.WORKSPACE_SPACE_STORE;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.util.Locale;
+
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.adminconsole.NodeBrowserPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.NodeBrowserPageUtil;
 import org.alfresco.share.util.ShareUser;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.testng.annotations.*;
-
-import java.util.Locale;
-
-
-import static org.alfresco.po.share.adminconsole.NodeBrowserPage.QueryType.*;
-import static org.alfresco.po.share.adminconsole.NodeBrowserPage.Store.*;
-import static org.testng.Assert.*;
+import org.testng.annotations.AfterGroups;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeGroups;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * @author Aliaksei Boole

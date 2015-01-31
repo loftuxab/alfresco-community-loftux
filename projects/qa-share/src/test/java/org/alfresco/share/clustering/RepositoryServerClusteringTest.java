@@ -1,28 +1,28 @@
 package org.alfresco.share.clustering;
 
-import org.alfresco.po.share.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
+import org.alfresco.po.share.systemsummary.ClusterValidationPage;
 import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
-import org.alfresco.po.share.systemsummary.ClusterValidationPage;
-import org.alfresco.share.util.JmxUtils;
 import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.JmxUtils;
 import org.alfresco.share.util.RemoteUtil;
 import org.alfresco.share.util.ShareUser;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageOperationException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**

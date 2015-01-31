@@ -15,7 +15,15 @@
 
 package org.alfresco.share.repository;
 
-import com.cobra.ldtp.Ldtp;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.application.windows.NotepadApplications;
 import org.alfresco.explorer.MoveAndCopyActions;
@@ -28,25 +36,32 @@ import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractIfSelector;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.ActionSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.WhenSelectorImpl;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.share.util.*;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DetailsPage;
+import org.alfresco.po.share.site.document.DocumentAspect;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.SelectAspectsPage;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.CifsUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.utilities.Application;
 import org.alfresco.utilities.LdtpUtil;
 import org.alfresco.webdrone.exception.PageException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.testng.Assert.assertTrue;
+import com.cobra.ldtp.Ldtp;
 
 /**
  * @author Sergey Kardash

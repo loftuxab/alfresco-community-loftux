@@ -1,11 +1,23 @@
 package org.alfresco.share.sanity.repository.ftps;
 
+import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
+import static org.alfresco.po.share.enums.UserRole.CONSUMER;
+import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
+import static org.alfresco.po.share.enums.UserRole.COORDINATOR;
+import static org.alfresco.po.share.enums.UserRole.EDITOR;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
 import org.alfresco.po.share.site.document.UserProfile;
-import org.alfresco.po.share.site.document.UserSearchRow;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
@@ -15,8 +27,7 @@ import org.alfresco.share.util.FtpsUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserRepositoryPage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.apache.commons.io.FileUtils;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.SkipException;
@@ -24,14 +35,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.alfresco.po.share.enums.UserRole.*;
-import static org.testng.Assert.*;
 
 /**
  * This class contains tests from Enterprise -> Sanity -> FTPS area

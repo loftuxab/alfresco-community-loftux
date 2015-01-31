@@ -1,26 +1,38 @@
 package org.alfresco.share.site.document;
 
+import static org.alfresco.po.share.site.document.DocumentAspect.ALIASABLE_EMAIL;
+import static org.alfresco.po.share.site.document.DocumentAspect.AUDIO;
+import static org.alfresco.po.share.site.document.DocumentAspect.CLASSIFIABLE;
+import static org.alfresco.po.share.site.document.DocumentAspect.EXIF;
+import static org.alfresco.po.share.site.document.DocumentAspect.GEOGRAPHIC;
+import static org.alfresco.po.share.site.document.DocumentAspect.INDEX_CONTROL;
+import static org.alfresco.po.share.site.document.DocumentAspect.INLINE_EDITABLE;
+import static org.alfresco.po.share.site.document.DocumentAspect.RESTRICTABLE;
+import static org.alfresco.po.share.site.document.DocumentAspect.SUMMARIZABLE;
+import static org.alfresco.po.share.site.document.DocumentAspect.VERSIONABLE;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.enums.UserRole;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.ChangeTypePage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.*;
-
-import static org.alfresco.po.share.site.document.DocumentAspect.*;
-import org.alfresco.share.util.*;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author maryia.zaichanka

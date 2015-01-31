@@ -18,13 +18,19 @@
  */
 package org.alfresco.share.adminconsole.summary;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.systemsummary.directorymanagement.DirectoryInfoRow;
 import org.alfresco.po.share.systemsummary.directorymanagement.DirectoryManagementPage;
 import org.alfresco.po.share.systemsummary.directorymanagement.StatusRow;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.RandomUtil;
 import org.alfresco.share.util.SystemSummaryAdminUtil;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -32,11 +38,6 @@ import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.testng.Assert.*;
 
 /**
  * @author Aliaksei Boole

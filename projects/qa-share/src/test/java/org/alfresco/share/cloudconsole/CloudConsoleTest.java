@@ -1,12 +1,15 @@
 package org.alfresco.share.cloudconsole;
 
+import java.io.File;
+import java.util.Map;
+
 import org.alfresco.po.share.console.CloudConsolePage;
 import org.alfresco.po.share.console.CloudConsoleSearchResultPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -14,9 +17,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.Map;
 
 /**
  * Class to include: Tests for Cloud Console

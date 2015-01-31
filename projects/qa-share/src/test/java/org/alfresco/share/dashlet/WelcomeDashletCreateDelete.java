@@ -18,6 +18,9 @@
  */
 package org.alfresco.share.dashlet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.dashlet.SiteWelcomeDashlet;
@@ -27,16 +30,13 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserProfile;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Welcome Widget Remove test case (7950). 

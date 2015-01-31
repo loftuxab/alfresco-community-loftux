@@ -1,24 +1,31 @@
 package org.alfresco.po.share.site.datalist;
 
+import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectOptions.INVERT_SELECT;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectOptions.SELECT_ALL;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectOptions.SELECT_NONE;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectedItemsOptions.DELETE;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectedItemsOptions.DESELECT_ALL;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectedItemsOptions.DUPLICATE;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.datalist.lists.ContactList;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.alfresco.po.share.enums.DataLists.*;
-import static org.alfresco.po.share.site.datalist.DataListPage.selectOptions.*;
-import static org.alfresco.po.share.site.datalist.DataListPage.selectedItemsOptions.*;
-import static org.testng.Assert.*;
 
 /**
  * Holds tests for Data Lists web elements

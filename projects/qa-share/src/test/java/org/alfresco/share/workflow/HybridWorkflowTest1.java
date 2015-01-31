@@ -19,30 +19,18 @@
 
 package org.alfresco.share.workflow;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.site.SiteDashboardPage;
-import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.task.TaskStatus;
-import org.alfresco.po.share.workflow.AssignmentPage;
 import org.alfresco.po.share.workflow.CloudTaskOrReviewPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
-import org.alfresco.po.share.workflow.KeepContentStrategy;
-import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.Priority;
 import org.alfresco.po.share.workflow.TaskType;
-import org.alfresco.po.share.workflow.WorkFlowFormDetails;
 import org.alfresco.share.util.AbstractWorkflow;
-import org.alfresco.share.util.EditTaskAction;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.ShareUserWorkFlow;
-import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

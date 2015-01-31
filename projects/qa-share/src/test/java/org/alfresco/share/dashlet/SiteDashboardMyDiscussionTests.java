@@ -15,6 +15,15 @@
 
 package org.alfresco.share.dashlet;
 
+import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.FOURTEEN_DAYS_TOPICS;
+import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.LAST_DAY_TOPICS;
+import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.SEVEN_DAYS_TOPICS;
+import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.TWENTY_EIGHT_DAYS_TOPICS;
+import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.ALL_TOPICS;
+import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.MY_TOPICS;
+
+import java.util.List;
+
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.dashlet.MyDiscussionsDashlet;
 import org.alfresco.po.share.dashlet.MyDiscussionsDashlet.LinkType;
@@ -29,21 +38,20 @@ import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.discussions.DiscussionsPage;
 import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserAdmin;
+import org.alfresco.share.util.ShareUserDashboard;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
-
-import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.*;
-import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.ALL_TOPICS;
-import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.MY_TOPICS;
 
 /**
  * 1) AONE_14754() - My Discussions dashlet. No topics created

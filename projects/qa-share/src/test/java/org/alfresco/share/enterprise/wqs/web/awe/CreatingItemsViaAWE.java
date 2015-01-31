@@ -1,22 +1,37 @@
 package org.alfresco.share.enterprise.wqs.web.awe;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
+
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
 import org.alfresco.po.share.dashlet.WebQuickStartOptions;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.SiteDashboardPage;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.po.share.wqs.*;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.wqs.WcmqsBlogPage;
+import org.alfresco.po.share.wqs.WcmqsBlogPostPage;
+import org.alfresco.po.share.wqs.WcmqsEditPage;
+import org.alfresco.po.share.wqs.WcmqsHomePage;
+import org.alfresco.po.share.wqs.WcmqsLoginPage;
+import org.alfresco.po.share.wqs.WcmqsNewsArticleDetails;
+import org.alfresco.po.share.wqs.WcmqsNewsPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.*;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Created by Lucian Tuca on 11/17/2014.

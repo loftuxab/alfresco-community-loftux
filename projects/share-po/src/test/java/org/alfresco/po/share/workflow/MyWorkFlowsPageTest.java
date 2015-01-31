@@ -18,12 +18,38 @@
  */
 package org.alfresco.po.share.workflow;
 
+import static org.alfresco.po.share.task.AssignFilter.ME;
+import static org.alfresco.po.share.task.AssignFilter.UNASSIGNED;
+import static org.alfresco.po.share.workflow.DueFilters.NEXT_7_DAYS;
+import static org.alfresco.po.share.workflow.DueFilters.NO_DATE;
+import static org.alfresco.po.share.workflow.DueFilters.OVERDUE;
+import static org.alfresco.po.share.workflow.DueFilters.TODAY;
+import static org.alfresco.po.share.workflow.DueFilters.TOMORROW;
+import static org.alfresco.po.share.workflow.Priority.HIGH;
+import static org.alfresco.po.share.workflow.Priority.LOW;
+import static org.alfresco.po.share.workflow.Priority.MEDIUM;
+import static org.alfresco.po.share.workflow.StartedFilter.LAST_14_DAYS;
+import static org.alfresco.po.share.workflow.StartedFilter.LAST_28_DAYS;
+import static org.alfresco.po.share.workflow.StartedFilter.LAST_7_DAYS;
+import static org.alfresco.po.share.workflow.WorkFlowType.NEW_WORKFLOW;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.task.*;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.po.share.task.EditTaskPage;
+import org.alfresco.po.share.task.TaskDetails;
+import org.alfresco.po.share.task.TaskFilters;
+import org.alfresco.po.share.task.TaskStatus;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.joda.time.DateTime;
@@ -33,22 +59,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.alfresco.po.share.task.AssignFilter.ME;
-import static org.alfresco.po.share.task.AssignFilter.UNASSIGNED;
-import static org.alfresco.po.share.workflow.DueFilters.*;
-import static org.alfresco.po.share.workflow.Priority.HIGH;
-import static org.alfresco.po.share.workflow.Priority.LOW;
-import static org.alfresco.po.share.workflow.Priority.MEDIUM;
-import static org.alfresco.po.share.workflow.StartedFilter.LAST_14_DAYS;
-import static org.alfresco.po.share.workflow.StartedFilter.LAST_28_DAYS;
-import static org.alfresco.po.share.workflow.StartedFilter.LAST_7_DAYS;
-import static org.alfresco.po.share.workflow.WorkFlowType.NEW_WORKFLOW;
-import static org.testng.Assert.*;
 
 /**
  * Integration test to verify MyWorkFlowsPage.

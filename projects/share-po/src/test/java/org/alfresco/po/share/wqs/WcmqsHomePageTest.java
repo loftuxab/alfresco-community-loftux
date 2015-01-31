@@ -11,10 +11,12 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.test.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.net.InetAddress;
@@ -23,6 +25,7 @@ import java.net.UnknownHostException;
 /**
  * Created by rdorobantu on 12/8/2014.
  */
+@Listeners(FailedTestListener.class)
 public class WcmqsHomePageTest extends AbstractTest
 {
     private static final Logger logger = Logger.getLogger(WcmqsHomePageTest.class);

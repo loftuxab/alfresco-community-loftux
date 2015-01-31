@@ -19,7 +19,7 @@
 package org.alfresco.po.share;
 
 import org.alfresco.po.share.site.document.SharedFilesPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.openqa.selenium.Keys;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;

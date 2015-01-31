@@ -19,7 +19,7 @@
 package org.alfresco.share.api.cmis;
 
 import org.alfresco.share.enums.CMISBinding;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;

@@ -1,14 +1,14 @@
 package org.alfresco.po.share.systemsummary;
 
+import java.util.List;
+
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.ShareUtil;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
 
 /**
  * @author Sergey Kardash

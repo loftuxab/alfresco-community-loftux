@@ -1,22 +1,37 @@
 package org.alfresco.share.site.document;
 
+import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.BOLD;
+import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.BOLD_EDIT;
+import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.BULLET;
+import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.ITALIC;
+import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.NUMBER;
+import static org.alfresco.share.util.RandomUtil.getRandomListString;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
+
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.enums.TinyMceColourCode;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.AddCommentForm;
+import org.alfresco.po.share.site.document.EditCommentForm;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.PaginationForm;
+import org.alfresco.po.share.site.document.TinyMceEditor;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.log4j.Logger;
-import org.testng.annotations.*;
-
-import java.util.List;
-
-import static org.alfresco.share.util.RandomUtil.*;
-import static org.testng.Assert.*;
-import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * @author Aliaksei Boole

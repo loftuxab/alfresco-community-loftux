@@ -18,18 +18,47 @@
  */
 package org.alfresco.share.sanity;
 
-import org.alfresco.po.share.*;
+import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
+import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
+import static org.alfresco.po.share.enums.UserRole.CONSUMER;
+import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
+import static org.alfresco.po.share.enums.UserRole.COORDINATOR;
+import static org.alfresco.po.share.enums.UserRole.MANAGER;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.GroupsPage;
+import org.alfresco.po.share.NewGroupPage;
+import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.ShareUtil;
+import org.alfresco.po.share.SiteMember;
 import org.alfresco.po.share.dashlet.MyTasksDashlet;
 import org.alfresco.po.share.dashlet.SiteMembersDashlet;
-import org.alfresco.po.share.site.*;
+import org.alfresco.po.share.site.AddGroupsPage;
+import org.alfresco.po.share.site.InviteMembersPage;
+import org.alfresco.po.share.site.PendingInvitesPage;
+import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.SiteGroupsPage;
+import org.alfresco.po.share.site.SiteMembersPage;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.MailUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserAdmin;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.exception.PageException;
-import org.alfresco.webdrone.exception.PageOperationException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cyberneko.html.parsers.DOMParser;
@@ -37,7 +66,6 @@ import org.dom4j.Document;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
-import org.jbpm.mail.Mail;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
@@ -46,16 +74,6 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
-import static org.alfresco.po.share.enums.UserRole.*;
-import static org.testng.Assert.*;
 
 /**
  * @author Aliaksei Boole

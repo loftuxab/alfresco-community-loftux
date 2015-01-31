@@ -32,6 +32,7 @@ import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.po.share.util.ShareTestProperty;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
+import org.alfresco.test.AlfrescoTests;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.WebDroneImpl;
@@ -48,6 +49,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.testng.annotations.*;
 
 import javax.imageio.ImageIO;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -64,7 +66,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  *
  * @author Michael Suzuki
  */
-public abstract class AbstractTest
+public abstract class AbstractTest implements AlfrescoTests
 {
     private static Log logger = LogFactory.getLog(AbstractTest.class);
     private static ApplicationContext ctx;
@@ -232,8 +234,8 @@ public abstract class AbstractTest
 
     public void saveOsScreenShot(String methodName) throws IOException, AWTException
     {
-    	Robot robot = new Robot();
-    	BufferedImage screenShot = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+        Robot robot = new Robot();
+        BufferedImage screenShot = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
         ImageIO.write(screenShot, "png", new File("target/webdrone-" + methodName+ "_OS" +".png"));
     }
 
@@ -246,15 +248,6 @@ public abstract class AbstractTest
         File file = drone.getScreenShot();
         File tmp = new File("target/webdrone-" + methodName + ".png");
         FileUtils.copyFile(file, tmp);
-        //Commented OS Screen Shot Since Tests are on Selenium Grid
-//        try
-//        {
-//            saveOsScreenShot(methodName);
-//        }
-//        catch (AWTException e)
-//        {
-//            logger.error("Not able to take the OS screen shot: " + e);
-//        }
     }
 
     public void savePageSource(String methodName) throws IOException

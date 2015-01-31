@@ -1,5 +1,3 @@
-package org.alfresco.share.unit;
-
 /*
  * Copyright (C) 2005-2012 Alfresco Software Limited.
  * This file is part of Alfresco
@@ -14,9 +12,10 @@ package org.alfresco.share.unit;
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.alfresco.share.unit;
 
 import org.alfresco.share.util.api.DPAPIUtils;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;

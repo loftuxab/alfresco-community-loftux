@@ -19,18 +19,22 @@
 
 package org.alfresco.po.share.user;
 
-import org.alfresco.po.share.*;
-import org.alfresco.po.share.util.FailedTestListener;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import org.alfresco.po.share.AbstractTest;
+import org.alfresco.po.share.ChangePasswordPage;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.ShareUtil;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Integration test to verify Change Password page elements are in place.

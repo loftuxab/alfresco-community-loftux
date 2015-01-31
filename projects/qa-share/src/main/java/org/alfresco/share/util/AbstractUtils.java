@@ -59,6 +59,7 @@ import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.console.CloudConsolePage;
 import org.alfresco.share.search.SearchKeys;
 import org.alfresco.share.util.api.tokenKey.Layer7AuthorizationOnCloud;
+import org.alfresco.test.AlfrescoTests;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -97,7 +98,7 @@ import com.google.common.io.Files;
  * 
  * @author Meenal Bhave
  */
-public abstract class AbstractUtils
+public abstract class AbstractUtils implements AlfrescoTests
 {
 
     public enum PerformOperation

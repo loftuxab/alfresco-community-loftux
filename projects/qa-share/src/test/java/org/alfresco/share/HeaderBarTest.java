@@ -44,7 +44,7 @@ import org.alfresco.share.util.ShareUser.SiteOperation;
 import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.Keys;

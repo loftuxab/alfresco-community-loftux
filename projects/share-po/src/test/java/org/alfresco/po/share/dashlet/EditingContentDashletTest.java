@@ -19,21 +19,28 @@
 
 package org.alfresco.po.share.dashlet;
 
-import org.alfresco.po.share.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+
+import org.alfresco.po.share.AlfrescoVersion;
+import org.alfresco.po.share.CustomiseUserDashboardPage;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-
-import static org.testng.Assert.*;
 
 /**
  * Tests for Content I'm Editing dashlet web elements

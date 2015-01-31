@@ -1,5 +1,13 @@
 package org.alfresco.share.enterprise.wqs.web.awe;
 
+import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.BOLD;
+import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.BULLET;
+import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.ITALIC;
+import static org.testng.Assert.assertEquals;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
 import org.alfresco.po.share.dashlet.WebQuickStartOptions;
 import org.alfresco.po.share.enums.Dashlets;
@@ -9,21 +17,24 @@ import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.TinyMceEditor;
 import org.alfresco.po.share.site.document.TinyMceEditor.FormatType;
-import org.alfresco.po.share.wqs.*;
+import org.alfresco.po.share.wqs.WcmqsArticleDetails;
+import org.alfresco.po.share.wqs.WcmqsEditPage;
+import org.alfresco.po.share.wqs.WcmqsHomePage;
+import org.alfresco.po.share.wqs.WcmqsLoginPage;
+import org.alfresco.po.share.wqs.WcmqsNewsArticleDetails;
+import org.alfresco.po.share.wqs.WcmqsNewsPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Keys;
 import org.testng.Assert;
-import org.testng.annotations.*;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.*;
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 @Listeners(FailedTestListener.class)
 public class EditingItemsViaAWE extends AbstractUtils

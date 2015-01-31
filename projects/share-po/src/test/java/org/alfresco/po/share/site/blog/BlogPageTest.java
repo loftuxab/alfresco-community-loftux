@@ -1,25 +1,31 @@
 package org.alfresco.po.share.site.blog;
 
-import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
-import org.alfresco.po.share.site.CustomizeSitePage;
-import org.alfresco.po.share.site.SitePageType;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
-import org.alfresco.po.thirdparty.firefox.RssFeedPage;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import static org.alfresco.po.share.enums.BlogPostStatus.UPDATED;
+import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.ALL;
+import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.LATEST;
+import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.MY_DRAFTS;
+import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.MY_PUBLISHED;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static org.alfresco.po.share.enums.BlogPostStatus.UPDATED;
-import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.*;
-import static org.testng.Assert.*;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
+import org.alfresco.po.share.site.CustomizeSitePage;
+import org.alfresco.po.share.site.SitePageType;
+import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.po.thirdparty.firefox.RssFeedPage;
+import org.alfresco.test.FailedTestListener;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Holds tests for Blog page web elements

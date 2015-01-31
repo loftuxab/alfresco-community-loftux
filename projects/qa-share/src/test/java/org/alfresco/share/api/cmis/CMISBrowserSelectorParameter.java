@@ -15,19 +15,19 @@
 package org.alfresco.share.api.cmis;
 
 
+import static org.testng.Assert.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.share.enums.CMISBinding;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.testng.Assert.assertTrue;
 
 /**
  * Class to include: Tests for CMIS Selector Parameter for Browser binding

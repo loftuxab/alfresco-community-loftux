@@ -6,7 +6,7 @@ import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.ConfigureWebViewDashletBoxPage;
 import org.alfresco.po.share.dashlet.WebViewDashlet;
 import org.alfresco.po.share.enums.Dashlets;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;

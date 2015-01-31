@@ -18,19 +18,19 @@
  */
 package org.alfresco.po.share.site;
 
-import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
-
 import static org.alfresco.po.share.enums.Dashlets.SITE_MEMBERS;
 import static org.alfresco.po.share.enums.Dashlets.SITE_NOTICE;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
+import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Customize Site Dashboard Page Test.

@@ -19,6 +19,14 @@
 
 package org.alfresco.share.user;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.io.File;
+import java.util.Locale;
+
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.dashlet.SiteActivitiesDashlet;
@@ -36,9 +44,16 @@ import org.alfresco.po.share.user.NotificationPage;
 import org.alfresco.po.share.user.UserSiteItem;
 import org.alfresco.po.share.user.UserSitesPage;
 import org.alfresco.share.site.document.TableViewDocLibTest;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ActivityType;
+import org.alfresco.share.util.JmxUtils;
+import org.alfresco.share.util.MailUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserProfile;
+import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
@@ -48,11 +63,6 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.Locale;
-
-import static org.testng.Assert.*;
 
 /**
  * @author Jamie Allison

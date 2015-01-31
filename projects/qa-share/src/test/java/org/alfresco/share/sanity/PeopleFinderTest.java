@@ -19,22 +19,26 @@
 
 package org.alfresco.share.sanity;
 
-import org.alfresco.po.share.*;
+import static org.testng.AssertJUnit.assertTrue;
+
+import java.util.List;
+
+import org.alfresco.po.share.ChangePasswordPage;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.PeopleFinderPage;
+import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.UserProfilePage;
 import org.alfresco.po.share.dashlet.MyActivitiesDashlet;
 import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
-
-import static org.testng.AssertJUnit.assertTrue;
 
 @Listeners(FailedTestListener.class)
 public class PeopleFinderTest extends AbstractUtils

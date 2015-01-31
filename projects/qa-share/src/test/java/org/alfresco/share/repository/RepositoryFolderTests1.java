@@ -17,19 +17,39 @@
  */
 package org.alfresco.share.repository;
 
+import static org.alfresco.po.share.site.document.DocumentAspect.CLASSIFIABLE;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.enums.ViewType;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.Categories;
+import org.alfresco.po.share.site.document.ConfirmDeletePage;
 import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
-import org.alfresco.po.share.site.document.TreeMenuNavigation.TreeMenu;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
+import org.alfresco.po.share.site.document.DocumentAction;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.ManagePermissionsPage;
+import org.alfresco.po.share.site.document.PaginationForm;
+import org.alfresco.po.share.site.document.UserProfile;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserRepositoryPage;
 import org.alfresco.share.util.ShareUserRepositoryPage.Operation;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
@@ -37,13 +57,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-import static org.alfresco.po.share.site.document.DocumentAspect.CLASSIFIABLE;
-import static org.testng.Assert.*;
 
 /**
  * @author jcule

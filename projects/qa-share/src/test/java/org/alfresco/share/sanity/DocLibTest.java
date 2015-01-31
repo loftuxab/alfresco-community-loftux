@@ -1,5 +1,24 @@
 package org.alfresco.share.sanity;
 
+import static org.alfresco.po.share.site.document.DocumentAspect.ALIASABLE_EMAIL;
+import static org.alfresco.po.share.site.document.DocumentAspect.CLASSIFIABLE;
+import static org.alfresco.po.share.site.document.DocumentAspect.DUBLIN_CORE;
+import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.ALL_DOCUMENTS;
+import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.IM_EDITING;
+import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.MY_FAVORITES;
+import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.OTHERS_EDITING;
+import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.RECENTLY_ADDED;
+import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.RECENTLY_MODIFIED;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.NewFolderPage;
@@ -10,12 +29,49 @@ import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractIfSelector;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.ActionSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.WhenSelectorImpl;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.po.share.workflow.*;
-import org.alfresco.share.util.*;
+import org.alfresco.po.share.site.document.AddCommentForm;
+import org.alfresco.po.share.site.document.CategoryPage;
+import org.alfresco.po.share.site.document.ChangeTypePage;
+import org.alfresco.po.share.site.document.ConfirmDeletePage;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
+import org.alfresco.po.share.site.document.DocumentAspect;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentEditOfflinePage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.EditHtmlDocumentPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.InlineEditPage;
+import org.alfresco.po.share.site.document.ManagePermissionsPage;
+import org.alfresco.po.share.site.document.MimeType;
+import org.alfresco.po.share.site.document.RevertToVersionPage;
+import org.alfresco.po.share.site.document.SelectAspectsPage;
+import org.alfresco.po.share.site.document.ShareLinkPage;
+import org.alfresco.po.share.site.document.TagPage;
+import org.alfresco.po.share.site.document.TinyMceEditor;
+import org.alfresco.po.share.site.document.TreeMenuNavigation;
+import org.alfresco.po.share.site.document.UserProfile;
+import org.alfresco.po.share.site.document.ViewPropertiesPage;
+import org.alfresco.po.share.workflow.NewWorkflowPage;
+import org.alfresco.po.share.workflow.Priority;
+import org.alfresco.po.share.workflow.StartWorkFlowPage;
+import org.alfresco.po.share.workflow.WorkFlowFormDetails;
+import org.alfresco.po.share.workflow.WorkFlowType;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserRepositoryPage;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.ShareUserWorkFlow;
+import org.alfresco.share.util.SiteUtil;
+import org.alfresco.share.util.WebDroneType;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDroneImpl;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,16 +80,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static org.alfresco.po.share.site.document.DocumentAspect.*;
-import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.*;
-import static org.testng.Assert.*;
 
 /**
 * This class contains the sanity tests for document library

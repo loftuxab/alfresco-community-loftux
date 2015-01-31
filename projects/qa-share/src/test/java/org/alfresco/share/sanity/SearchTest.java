@@ -1,8 +1,31 @@
 package org.alfresco.share.sanity;
 
+import static org.alfresco.po.share.site.SitePageType.BLOG;
+import static org.alfresco.po.share.site.SitePageType.DISCUSSIONS;
+import static org.alfresco.po.share.site.SitePageType.DOCUMENT_LIBRARY;
+import static org.alfresco.po.share.site.SitePageType.LINKS;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.enums.UserRole;
-import org.alfresco.po.share.search.*;
+import org.alfresco.po.share.search.FacetedSearchPage;
+import org.alfresco.po.share.search.FacetedSearchScopeMenu;
+import org.alfresco.po.share.search.RepositoryResultsPage;
+import org.alfresco.po.share.search.SearchResult;
+import org.alfresco.po.share.search.SiteResultsPage;
+import org.alfresco.po.share.search.SortType;
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
@@ -15,9 +38,14 @@ import org.alfresco.po.share.site.links.LinksDetailsPage;
 import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.share.search.SearchKeys;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserSearchPage;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.WebDroneType;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,14 +53,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.alfresco.po.share.site.SitePageType.*;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * This class includes Search Sanity tests

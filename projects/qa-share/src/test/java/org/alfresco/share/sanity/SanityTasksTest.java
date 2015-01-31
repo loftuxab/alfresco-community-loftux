@@ -18,38 +18,75 @@
  */
 package org.alfresco.share.sanity;
 
-import org.alfresco.po.share.*;
+import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
+import static org.alfresco.po.share.task.AssignFilter.ME;
+import static org.alfresco.po.share.task.AssignFilter.UNASSIGNED;
+import static org.alfresco.po.share.task.EditTaskPage.Button.ADD;
+import static org.alfresco.po.share.task.EditTaskPage.Button.APPROVE;
+import static org.alfresco.po.share.task.EditTaskPage.Button.CANCEL;
+import static org.alfresco.po.share.task.EditTaskPage.Button.CLAIM;
+import static org.alfresco.po.share.task.EditTaskPage.Button.REASSIGN;
+import static org.alfresco.po.share.task.EditTaskPage.Button.REJECT;
+import static org.alfresco.po.share.task.EditTaskPage.Button.RELEASE_TO_POOL;
+import static org.alfresco.po.share.task.EditTaskPage.Button.SAVE_AND_CLOSE;
+import static org.alfresco.po.share.task.EditTaskPage.Button.TASK_DONE;
+import static org.alfresco.po.share.task.TaskStatus.CANCELLED;
+import static org.alfresco.po.share.task.TaskStatus.COMPLETED;
+import static org.alfresco.po.share.workflow.DueFilters.NEXT_7_DAYS;
+import static org.alfresco.po.share.workflow.DueFilters.NO_DATE;
+import static org.alfresco.po.share.workflow.DueFilters.OVERDUE;
+import static org.alfresco.po.share.workflow.DueFilters.TODAY;
+import static org.alfresco.po.share.workflow.DueFilters.TOMORROW;
+import static org.alfresco.po.share.workflow.Priority.HIGH;
+import static org.alfresco.po.share.workflow.Priority.LOW;
+import static org.alfresco.po.share.workflow.Priority.MEDIUM;
+import static org.alfresco.po.share.workflow.StartedFilter.LAST_14_DAYS;
+import static org.alfresco.po.share.workflow.StartedFilter.LAST_28_DAYS;
+import static org.alfresco.po.share.workflow.StartedFilter.LAST_7_DAYS;
+import static org.alfresco.po.share.workflow.WorkFlowType.GROUP_REVIEW_AND_APPROVE;
+import static org.alfresco.po.share.workflow.WorkFlowType.NEW_WORKFLOW;
+import static org.alfresco.po.share.workflow.WorkFlowType.POOLED_REVIEW_AND_APPROVE;
+import static org.alfresco.po.share.workflow.WorkFlowType.REVIEW_AND_APPROVE;
+import static org.alfresco.po.share.workflow.WorkFlowType.SEND_DOCS_FOR_REVIEW;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.GroupsPage;
+import org.alfresco.po.share.MyTasksPage;
+import org.alfresco.po.share.NewGroupPage;
+import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.dashlet.MyTasksDashlet;
-import org.alfresco.po.share.task.*;
-import org.alfresco.po.share.workflow.*;
+import org.alfresco.po.share.task.EditTaskPage;
+import org.alfresco.po.share.task.TaskDetails;
+import org.alfresco.po.share.task.TaskFilters;
+import org.alfresco.po.share.task.TaskInfo;
+import org.alfresco.po.share.task.TaskStatus;
+import org.alfresco.po.share.workflow.MyWorkFlowsPage;
+import org.alfresco.po.share.workflow.NewWorkflowPage;
+import org.alfresco.po.share.workflow.StartWorkFlowPage;
+import org.alfresco.po.share.workflow.WorkFlowDetails;
+import org.alfresco.po.share.workflow.WorkFlowFilters;
+import org.alfresco.po.share.workflow.WorkFlowFormDetails;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserAdmin;
 import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
-import static org.alfresco.po.share.task.AssignFilter.ME;
-import static org.alfresco.po.share.task.AssignFilter.UNASSIGNED;
-import static org.alfresco.po.share.task.EditTaskPage.Button.*;
-import static org.alfresco.po.share.task.TaskStatus.CANCELLED;
-import static org.alfresco.po.share.task.TaskStatus.COMPLETED;
-import static org.alfresco.po.share.workflow.DueFilters.*;
-import static org.alfresco.po.share.workflow.Priority.*;
-import static org.alfresco.po.share.workflow.StartedFilter.*;
-import static org.alfresco.po.share.workflow.WorkFlowType.*;
-import static org.testng.Assert.*;
 
 /**
  * @author Aliaksei Boole

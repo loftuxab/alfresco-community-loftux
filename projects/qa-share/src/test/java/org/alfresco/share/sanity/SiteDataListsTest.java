@@ -1,5 +1,23 @@
 package org.alfresco.share.sanity;
 
+import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectOptions.INVERT_SELECT;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectOptions.SELECT_ALL;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectOptions.SELECT_NONE;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectedItemsOptions.DELETE;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectedItemsOptions.DESELECT_ALL;
+import static org.alfresco.po.share.site.datalist.DataListPage.selectedItemsOptions.DUPLICATE;
+import static org.alfresco.po.share.site.datalist.DataListTreeMenuNavigation.ListsMenu.ALL;
+import static org.alfresco.po.share.site.datalist.DataListTreeMenuNavigation.ListsMenu.CREATED_BY_ME;
+import static org.alfresco.po.share.site.datalist.DataListTreeMenuNavigation.ListsMenu.RECENTLY_ADDED;
+import static org.alfresco.po.share.site.datalist.DataListTreeMenuNavigation.ListsMenu.RECENTLY_MODIFIED;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
@@ -13,23 +31,12 @@ import org.alfresco.share.util.ActivityType;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.alfresco.po.share.enums.DataLists.*;
-import static org.alfresco.po.share.site.datalist.DataListPage.selectOptions.*;
-import static org.alfresco.po.share.site.datalist.DataListPage.selectedItemsOptions.*;
-import static org.alfresco.po.share.site.datalist.DataListTreeMenuNavigation.ListsMenu.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * This class includes Site Data Lists Sanity tests

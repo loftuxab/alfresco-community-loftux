@@ -14,7 +14,8 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.*;
+import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.SEVEN_DAYS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.TODAY;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -30,9 +31,9 @@ import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.exception.PageException;

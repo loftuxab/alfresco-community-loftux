@@ -1,15 +1,15 @@
 package org.alfresco.po.share.console.tabs;
 
+import java.io.File;
+import java.util.Map;
+
 import org.alfresco.po.share.console.AbstractCloudConsoleTest;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.Map;
 
 /**
  * Integration test to validate the Cloud Console Pages.

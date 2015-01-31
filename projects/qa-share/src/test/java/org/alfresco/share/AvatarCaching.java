@@ -18,12 +18,31 @@
  */
 package org.alfresco.share;
 
+import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
+import static org.alfresco.po.share.enums.Dashlets.MY_PROFILE;
+import static org.alfresco.po.share.enums.Dashlets.SITE_MEMBERS;
+import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.io.File;
+import java.net.URLEncoder;
+
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarRequest;
 import net.lightbody.bmp.core.har.HarResponse;
 import net.lightbody.bmp.proxy.ProxyServer;
-import org.alfresco.po.share.*;
+
+import org.alfresco.po.share.AddUserToGroupForm;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.GroupsPage;
+import org.alfresco.po.share.NewGroupPage;
+import org.alfresco.po.share.PeopleFinderPage;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.InviteMembersPage;
@@ -37,10 +56,16 @@ import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.user.EditProfilePage;
 import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.JmxUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserDashboard;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
@@ -51,15 +76,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.net.URLEncoder;
-
-import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
-import static org.alfresco.po.share.enums.Dashlets.MY_PROFILE;
-import static org.alfresco.po.share.enums.Dashlets.SITE_MEMBERS;
-import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
-import static org.testng.Assert.*;
 
 /**
  * @author Aliaksei Boole

@@ -3,8 +3,8 @@ package org.alfresco.po.share.adminconsole;
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.admin.AdminConsolePage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 

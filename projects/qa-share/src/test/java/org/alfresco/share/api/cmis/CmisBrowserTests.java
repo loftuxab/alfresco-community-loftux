@@ -15,6 +15,14 @@
 
 package org.alfresco.share.api.cmis;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiClient;
@@ -25,39 +33,18 @@ import org.alfresco.share.enums.CMISBinding;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.api.CmisUtils;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.enums.BindingType;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.chemistry.opencmis.tck.impl.JUnitHelper;
-import org.apache.chemistry.opencmis.tck.impl.TestParameters;
-import org.apache.chemistry.opencmis.tck.tests.basics.BasicsTestGroup;
-import org.apache.chemistry.opencmis.tck.tests.control.ControlTestGroup;
-import org.apache.chemistry.opencmis.tck.tests.crud.CRUDTestGroup;
-import org.apache.chemistry.opencmis.tck.tests.filing.FilingTestGroup;
-import org.apache.chemistry.opencmis.tck.tests.query.QueryTestGroup;
-import org.apache.chemistry.opencmis.tck.tests.types.TypesTestGroup;
-import org.apache.chemistry.opencmis.tck.tests.versioning.VersioningTestGroup;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Class to include: Tests for cmis tests with various bindings as poc

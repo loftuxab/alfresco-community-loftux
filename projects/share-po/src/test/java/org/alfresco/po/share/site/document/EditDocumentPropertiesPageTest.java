@@ -18,20 +18,8 @@
  */
 package org.alfresco.po.share.site.document;
 
-import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.SharePopup;
-import org.alfresco.po.share.site.CreateSitePage;
-import org.alfresco.po.share.site.SiteDashboardPage;
-import org.alfresco.po.share.site.UploadFilePage;
-import org.alfresco.po.share.site.document.EditDocumentPropertiesPage.Fields;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,8 +27,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.SharePopup;
+import org.alfresco.po.share.site.CreateSitePage;
+import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.UploadFilePage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage.Fields;
+import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Integration test to verify document CRUD is operating correctly.

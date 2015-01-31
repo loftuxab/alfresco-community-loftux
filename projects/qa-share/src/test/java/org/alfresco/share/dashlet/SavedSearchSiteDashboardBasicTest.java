@@ -18,6 +18,9 @@
  */
 package org.alfresco.share.dashlet;
 
+import static java.util.Arrays.asList;
+import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +38,11 @@ import org.alfresco.po.share.site.calendar.EditEventForm;
 import org.alfresco.po.share.site.calendar.InformationEventForm;
 import org.alfresco.po.share.site.datalist.DataListPage;
 import org.alfresco.po.share.site.discussions.DiscussionsPage;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
 import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.share.util.AbstractUtils;
@@ -44,16 +51,13 @@ import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import static java.util.Arrays.asList;
-import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
 
 /**
  * @author Ranjith Manyam

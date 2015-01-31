@@ -14,6 +14,9 @@
  */
 package org.alfresco.share.site.document;
 
+import java.io.File;
+import java.util.List;
+
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
@@ -25,17 +28,13 @@ import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import javax.swing.text.Document;
-import java.io.File;
-import java.util.List;
 
 /**
  * @author nshah

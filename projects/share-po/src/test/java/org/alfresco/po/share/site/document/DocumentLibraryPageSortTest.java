@@ -25,13 +25,13 @@ import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-import org.testng.Assert;
 
 /**
  * Unit test to verify document library page sort operations are operating
