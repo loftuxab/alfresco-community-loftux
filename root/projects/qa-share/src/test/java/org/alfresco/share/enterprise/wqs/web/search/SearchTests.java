@@ -153,7 +153,7 @@ public class SearchTests extends AbstractUtils
         documentPropertiesPage.clickSave();
 
         documentLibPage.render();
-        documentLibPage=ShareUser.openDocumentLibrary(drone).render();
+        documentLibPage = ShareUser.openDocumentLibrary(drone).render();
         dataPrep_AONE_5710(documentLibPage);
 
         dataPrep_AONE_5711(documentLibPage);
@@ -161,9 +161,9 @@ public class SearchTests extends AbstractUtils
         dataPrep_AONE_5712(documentLibPage);
 
         dataPrep_AONE_5713(documentLibPage);
-        
+
         ShareUser.logout(drone);
-        
+
         // setup new entry in hosts to be able to access the new wcmqs site
         String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
                 + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
@@ -726,10 +726,9 @@ public class SearchTests extends AbstractUtils
 
     /*
      * AONE-5715 Wildcard search
-     * 
      * Jira issue #MNT-13143
      */
-    @Test(groups = { "WQS", "EnterpriseOnly" , "ProductBug"})
+    @Test(groups = { "WQS", "EnterpriseOnly", "ProductBug" })
     public void AONE_5715() throws Exception
     {
         String searchedText = "*glo?al*";
@@ -812,7 +811,7 @@ public class SearchTests extends AbstractUtils
     private DocumentLibraryPage navigateToFolderAndCreateContent(DocumentLibraryPage documentLibPage, String folderName, String fileName, String fileContent, String fileTitle)
             throws Exception
     {
-        documentLibPage=navigateToFolder(documentLibPage, folderName);
+        documentLibPage = navigateToFolder(documentLibPage, folderName);
         ContentDetails contentDetails1 = new ContentDetails();
         contentDetails1.setName(fileName);
         contentDetails1.setTitle(fileTitle);
@@ -823,10 +822,10 @@ public class SearchTests extends AbstractUtils
 
     private DocumentLibraryPage navigateToFolder(DocumentLibraryPage documentLibPage, String folderName)
     {
-        documentLibPage=documentLibPage.selectFolder(ALFRESCO_QUICK_START).render();
-        documentLibPage=documentLibPage.selectFolder(QUICK_START_EDITORIAL).render();
-        documentLibPage=documentLibPage.selectFolder(ROOT).render();
-        documentLibPage=documentLibPage.selectFolder(folderName).render();
+        documentLibPage = documentLibPage.selectFolder(ALFRESCO_QUICK_START).render();
+        documentLibPage = documentLibPage.selectFolder(QUICK_START_EDITORIAL).render();
+        documentLibPage = documentLibPage.selectFolder(ROOT).render();
+        documentLibPage = documentLibPage.selectFolder(folderName).render();
         return documentLibPage;
     }
 
@@ -931,7 +930,7 @@ public class SearchTests extends AbstractUtils
         // ---- Step action ----
         // More than 20 article items with content "test" are created in 'news' and 'blogs' folders;
 
-    	documentLibPage=ShareUser.openDocumentLibrary(drone);
+        documentLibPage = ShareUser.openDocumentLibrary(drone);
         String name;
         // create 10 blogs in "news" folder
         for (int i = 0; i < 10; i++)
