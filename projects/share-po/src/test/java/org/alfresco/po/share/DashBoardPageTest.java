@@ -97,7 +97,15 @@ public class DashBoardPageTest extends AbstractTest
         dashBoard.inputFromKeyborad(Keys.ARROW_RIGHT);
         dashBoard.inputFromKeyborad(Keys.ARROW_RIGHT);
         dashBoard.inputFromKeyborad(Keys.RETURN);
+
         Assert.assertTrue(drone.getCurrentPage().render() instanceof SharedFilesPage);
     }
-}
 
+    @Test(dependsOnMethods = "refreshPage", groups = "nonGrid")
+    public void getFooterPageTest()
+    {
+        FootersPage footer = dashBoard.getFooter();
+        Assert.assertTrue(footer instanceof FootersPage);
+        Assert.assertEquals(alfrescoVersion.getVersion().toString() + ".0", footer.getAlfrescoVersion());
+    }
+}

@@ -20,22 +20,49 @@
 package org.alfresco.po.alfresco;
 
 import org.alfresco.po.share.SharePage;
+import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.openqa.selenium.By;
 
+import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
+
 /**
- * Abstract class to hold all common features in alfresco admin pages.
- * @author Michael Suzuki
- *
+ * Created by olga.lokhach on 6/17/2014.
  */
-public abstract class AbstractAdminConsole extends SharePage
+public class AbstractAdminConsole extends SharePage
 {
-    protected final static By SUBMIT_BUTTON = By.cssSelector("input.inline"); 
+    private final By INPUT_FIELD = By.xpath("//input[@id='searchForm:command']");
+    private final By SUBMIT_BUTTON = By.xpath("//input[@id='searchForm:submitCommand']");
     private final By CLOSE_BUTTON = By.cssSelector("input[id$='Admin-console-title:_idJsp1']");
-    
+
     public AbstractAdminConsole(WebDrone drone)
     {
         super(drone);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AbstractAdminConsole render(RenderTime renderTime)
+    {
+        elementRender(renderTime,
+            getVisibleRenderElement(INPUT_FIELD),
+            getVisibleRenderElement(SUBMIT_BUTTON),
+            getVisibleRenderElement(CLOSE_BUTTON));
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AbstractAdminConsole render()
+    {
+        return render(new RenderTime(maxPageLoadingTime));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AbstractAdminConsole render(final long time)
+    {
+        return render(new RenderTime(time));
     }
 
     /**
@@ -47,11 +74,26 @@ public abstract class AbstractAdminConsole extends SharePage
     public void clickClose()
     {
         drone.findAndWait(CLOSE_BUTTON).click();
+
     }
 
-    public String getResult()
+    /**
+     * Method for send commands
+     *
+     * @param request
+     * @return
+     */
+    public void sendCommands(String request)
     {
-        return drone.findAndWait(By.tagName("pre")).getText();
+        drone.findAndWait(INPUT_FIELD).clear();
+        drone.findAndWait(INPUT_FIELD).sendKeys(String.format("%s", request));
+        drone.findAndWait(SUBMIT_BUTTON).click();
+    }
+
+    public String findText()
+    {
+        return drone.findAndWait(By.xpath("//*[@id='result']")).getText();
+
     }
 
 }
