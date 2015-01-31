@@ -1,7 +1,6 @@
 package org.alfresco.share.cloud.documentlibrary;
 
-import java.io.File;
-
+import com.ibm.icu.text.DecimalFormat;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
@@ -20,7 +19,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import com.ibm.icu.text.DecimalFormat;
+import java.io.File;
 
 /**
  * @author bogdan.bocancea
@@ -113,7 +112,7 @@ public class UploadItemsTests extends AbstractUtils
 
     }
 
-    @Test(groups = "AlfrescoOneCloud")
+    @Test(groups = "CloudOnly")
     public void AONE_12513() throws Exception
     {
         String testName = getTestName();
