@@ -39,6 +39,9 @@
           <delimiters>
             <delimiter>@</delimiter>
           </delimiters>
+          <nonFilteredFileExtensions>
+            <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+          </nonFilteredFileExtensions>
         </configuration>
       </plugin>
     </plugins>
