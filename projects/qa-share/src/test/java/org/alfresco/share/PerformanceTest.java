@@ -23,9 +23,11 @@ import org.alfresco.po.share.search.FacetedSearchPage;
 import org.alfresco.po.share.site.document.*;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.rest.api.tests.client.PublicApiClient;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.FtpUtil;
+import org.alfresco.share.util.RandomUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CmisUtils;
-import org.alfresco.share.util.api.TagsAPI;
 import org.alfresco.share.util.httpCore.CoreHelper;
 import org.alfresco.share.util.httpCore.HttpCore;
 import org.alfresco.share.util.httpCore.Response;
@@ -69,7 +71,6 @@ public class PerformanceTest extends CmisUtils
     private static final String DOMAIN = "-default-";
     private static final String BIG_DATA_FILE = "DemoRandomAccessFile.out";
     private static final String LONG_FILE_NAME = "Directors report for year ended";
-    private static final TagsAPI tagsApi = new TagsAPI();
     private static final HttpCore HTTP_CORE = new HttpCore();
     private static final CoreHelper CORE_HELPER = new CoreHelper();
 
@@ -77,8 +78,6 @@ public class PerformanceTest extends CmisUtils
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
-        tagsApi.beforeClass();
-        tagsApi.tearDown();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
     }
