@@ -63,7 +63,7 @@ public class FtpsUtil extends AbstractUtils
         CommandLine cmdLine = new CommandLine("keytool");
         cmdLine.addArgument("-genkeypair");
         cmdLine.addArgument("-dname");
-        cmdLine.addArgument("cn=Test Name, ou=QA, o=SomeCompany, L=Ghost Town, ST=Uruguay, c=UY");
+        cmdLine.addArgument("cn=TestName,ou=QA,o=SomeCompany,L=GhostTown,ST=Uruguay,c=UY");
         cmdLine.addArgument("-keyalg");
         cmdLine.addArgument(ALGORITHM);
         cmdLine.addArgument("-alias");
@@ -71,7 +71,7 @@ public class FtpsUtil extends AbstractUtils
         cmdLine.addArgument("-keypass");
         cmdLine.addArgument(PASS);
         cmdLine.addArgument("-keystore");
-        cmdLine.addArgument(System.getProperty("java.io.tmpdir") + SLASH + KEYSTORENAME);
+        cmdLine.addArgument(pathToKeyStoreFile + SLASH + KEYSTORENAME);
         cmdLine.addArgument("-storepass");
         cmdLine.addArgument(PASS);
         cmdLine.addArgument("-validity");
@@ -86,7 +86,7 @@ public class FtpsUtil extends AbstractUtils
         {
             throw new ShareException("Exception occurred when generation keystore");
         }
-        return new File(System.getProperty("java.io.tmpdir") + SLASH + KEYSTORENAME);
+        return new File(pathToKeyStoreFile + SLASH + KEYSTORENAME);
     }
 
     /**
