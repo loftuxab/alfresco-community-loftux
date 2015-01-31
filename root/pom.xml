@@ -1172,6 +1172,15 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <!-- MNT-13089 SQLServer needs the transaction isolation parameter increased -->
+                        <systemPropertyVariables>
+                            <db.txn.isolation>4096</db.txn.isolation>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
             </plugins>
         </build>
         <dependencies>
