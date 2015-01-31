@@ -100,9 +100,16 @@ public class HybridWorkflowTest1 extends AbstractWorkflow
         // Start Simple Cloud Task Workflow
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone);
 
+        //Verify the General section
         Assert.assertTrue(cloudTaskOrReviewPage.isCloudReviewTaskElementsPresent(), "Verifying Cloud Task or Review fields displayed");
+        Assert.assertTrue(cloudTaskOrReviewPage.isMessageTextFieldPresent(), "Message text field is not displayed");
+        Assert.assertTrue(cloudTaskOrReviewPage.isTypeDropDownPresent(), "Type drop down list is not present");
+        Assert.assertTrue(cloudTaskOrReviewPage.isHelpIconPresent(), "Help icon is not present");
+        Assert.assertTrue(cloudTaskOrReviewPage.isDueDatePresent(), "Due date field is not present");
+        Assert.assertTrue(cloudTaskOrReviewPage.isPriorityDropDownPresent(), "Priority drop down is nor present");
 
         cloudTaskOrReviewPage.clickHelpIcon();
+
         Assert.assertEquals(cloudTaskOrReviewPage.getHelpText(), "This field must have between 0 and 250 characters.");
         cloudTaskOrReviewPage.clickHelpIcon();
 
