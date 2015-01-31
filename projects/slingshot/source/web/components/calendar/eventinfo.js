@@ -547,6 +547,13 @@
                      Dom.setAttribute(startTimeEl, "value", formatDate(startDate, this.msg("date-format.shortTime")));
                      Dom.setAttribute(endTimeEl, "value", formatDate(endDate, this.msg("date-format.shortTime")));
                   }
+                  else
+                  {
+                     var defaultStartTime = Alfresco.util.parseTime(startTimeEl.value),
+                     defaultEndTime = Alfresco.util.parseTime(endTimeEl.value);
+                     Dom.setAttribute(startTimeEl, "value", formatDate(defaultStartTime, this.msg("date-format.shortTime")));
+                     Dom.setAttribute(endTimeEl, "value", formatDate(defaultEndTime, this.msg("date-format.shortTime")));
+                  }
 
                   // hide mini-cal
                   EditDialog.dialog.hideEvent.subscribe(function()
