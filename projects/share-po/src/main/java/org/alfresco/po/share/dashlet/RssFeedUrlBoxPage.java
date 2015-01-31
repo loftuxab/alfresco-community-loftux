@@ -210,6 +210,11 @@ public class RssFeedUrlBoxPage extends SharePage
         }
     }
     
+    /**
+     * Wait until check box open in new window disappears
+     * 
+     * @param url
+     */
     public void waitUntilCheckDisapperers()
     {
         drone.waitUntilElementDisappears(CHK_OPEN_IN_NEW_WINDOW, 30);

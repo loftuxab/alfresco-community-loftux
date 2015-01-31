@@ -168,6 +168,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
 
     public String getWebViewDashletTitle()
     {
+        drone.waitUntilElementPresent(DASHLET_TITLE_WEB, 6);
         return dashlet.findElement(DASHLET_TITLE_WEB).getText();
     }
 

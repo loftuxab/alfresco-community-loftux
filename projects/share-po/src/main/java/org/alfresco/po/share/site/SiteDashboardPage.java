@@ -193,7 +193,7 @@ public class SiteDashboardPage extends SitePage implements Dashboard
     public boolean isSiteTitle(String title)
     {
         try
-        {
+        {  
             WebElement titleSpan = drone.findAndWait(By.cssSelector(".alfresco-header-Title"));
             return titleSpan.getText().toLowerCase().contains(title.toLowerCase());
         }
