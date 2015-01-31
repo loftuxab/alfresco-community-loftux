@@ -22,10 +22,7 @@ import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -211,6 +208,11 @@ public class SyncInfoPage extends SharePage
         {
             logger.error("Unable to find Close button on Sync Info page", e);
             throw new PageException("Not able to click on Sync Info close button.");
+        }
+        catch (ElementNotVisibleException env)
+        {
+            logger.info("Nothing to close");
+            return FactorySharePage.resolvePage(drone);
         }
     }
 

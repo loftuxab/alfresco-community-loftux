@@ -36,6 +36,7 @@ public class CloudSyncPage extends SharePage
 {
     private static final By SIGN_IN_BUTTON = By.cssSelector("button[id$='default-button-signIn-button']");
     public static final By DISCONNECT_BUTTON = By.cssSelector("button[id$='default-button-delete-button']");
+    private static final By EDIT_BUTTON = By.cssSelector("button[id$='default-button-edit-button']");
 
     private final Log logger = LogFactory.getLog(CloudSyncPage.class);
 
@@ -191,5 +192,22 @@ public class CloudSyncPage extends SharePage
         {
         }
         throw new PageException("Not able click disconnect button.");
+    }
+
+    public CloudSignInPage selectEditButton()
+    {
+        try
+        {
+            drone.findAndWait(EDIT_BUTTON).click();
+        }
+        catch (StaleElementReferenceException ser)
+        {
+            selectEditButton();
+        }
+        catch (NoSuchElementException e)
+        {
+            throw new PageException("Not able to find Edit button", e);
+        }
+        return new CloudSignInPage(drone).render();
     }
 }
