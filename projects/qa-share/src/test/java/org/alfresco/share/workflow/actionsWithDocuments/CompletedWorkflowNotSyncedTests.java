@@ -27,7 +27,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
+public class CompletedWorkflowNotSyncedTests extends AbstractWorkflow
 {
     protected String testUser;
     private String testDomain;
@@ -37,11 +37,8 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     DocumentLibraryPage documentLibraryPage;
     protected long maxPageLoadingTime = 20000;
     protected String testName = "";
-    // protected String prefixIncomplete = "WFInComplete";
     protected String prefixComplete = "WFComplete";
 
-    // protected String prefixCompleteWithRemoveSync = "WFCompleteRemoveSync";
-    // protected String prefixCompleteWithRemoveFile = "WFCompltetRemoveFile";
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -56,7 +53,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
 
     }
 
-    // @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods = "setup")
+    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods = "setup")
     public void dataPrep_createUsers() throws Exception
     {
         String opUser = getUserNameForDomain(testName + "opUser", testDomain);
@@ -144,7 +141,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void dataPrep_15700() throws Exception
     {
 
-        createCompletedWorkflow("15700" + "A1");
+        createCompletedWorkflow("15700" + "A4");
     }
 
     /**
@@ -155,7 +152,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15700() throws Exception
     {
 
-        String prefix = "15700" + "A1";
+        String prefix = "15700" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
 
@@ -210,7 +207,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void dataPrep_15701() throws Exception
     {
 
-        createCompletedWorkflow("15701Z3");
+        createCompletedWorkflow("15701" + "A4");
     }
 
     /**
@@ -221,8 +218,9 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15701() throws Exception
     {
 
-        String prefix = "15701" + "A1";
+        String prefix = "15701" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
+        String cloudSiteName = getSiteName(prefix + testName) + "-CL";
         String fileName = getFileName(prefix + testName) + ".txt";
 
         String modifiedFileTitle = testName + "modifiedBy ";
@@ -234,8 +232,8 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
         // --- Expected results ---
         // The properties are changed successfully..
 
-        ShareUser.login(hybridDrone, opUser, DEFAULT_PASSWORD);
-        EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, opSiteName, fileName);
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSiteName, fileName);
         editDocumentProperties.setDocumentTitle(modifiedFileTitle + cloudUser);
         editDocumentProperties.setDescription(descOfFile + cloudUser);
         editDocumentProperties.selectSave().render();
@@ -272,7 +270,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void dataPrep_15702() throws Exception
     {
 
-        createCompletedWorkflow("15702" + "A1");
+        createCompletedWorkflow("15702" + "A4");
     }
 
     /**
@@ -283,13 +281,13 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15702() throws Exception
     {
 
-        String prefix = "15702" + "A1";
+        String prefix = "15702" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
 
         String fileName = getFileName(prefix + testName) + ".txt";
 
-        String modifiedContentByOnPrem = testName + " modifiedBy: OP User" + "A1";
+        String modifiedContentByOnPrem = testName + " modifiedBy: OP User" + "A4";
 
         // --- Step 1 ---
         // --- Step action ---
@@ -341,7 +339,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void dataPrep_15703() throws Exception
     {
 
-        createCompletedWorkflow("15703" + "A1");
+        createCompletedWorkflow("15703" + "A4");
     }
 
     /**
@@ -352,7 +350,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15703() throws Exception
     {
 
-        String prefix = "15703" + "A1";
+        String prefix = "15703" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
 
@@ -377,7 +375,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContentByCloud);
         contentDetails.setName(fileName);
-        
+
         documentDetailsPage = inlineEditPage.save(contentDetails).render();
         ShareUser.logout(hybridDrone);
 
@@ -407,7 +405,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void dataPrep_15704() throws Exception
     {
 
-        createCompletedWorkflow("15704" + "A1");
+        createCompletedWorkflow("15704" + "A4");
     }
 
     /**
@@ -418,7 +416,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15704() throws Exception
     {
 
-        String prefix = "15704" + "A1";
+        String prefix = "15704" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
 
@@ -465,7 +463,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void dataPrep_15705() throws Exception
     {
 
-        createCompletedWorkflow("15705Z2");
+        createCompletedWorkflow("15705" + "A4");
     }
 
     /**
@@ -476,7 +474,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15705() throws Exception
     {
 
-        String prefix = "15705Z2";
+        String prefix = "15705" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
 
@@ -523,7 +521,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void dataPrep_15706() throws Exception
     {
 
-        createCompletedWorkflow("15706");
+        createCompletedWorkflow("15706" + "A4");
     }
 
     /**
@@ -534,11 +532,11 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15706() throws Exception
     {
 
-        String prefix = "15706";
+        String prefix = "15706" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
         String fileName = getFileName(prefix + testName) + ".txt";
-  
+
         // --- Step 1 ---
         // --- Step action ---
         // OP Remove the synced document.
@@ -572,12 +570,13 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
         ShareUser.logout(hybridDrone);
     }
-    
+
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15707() throws Exception
     {
 
-        createCompletedWorkflow("15707");
+        createCompletedWorkflow("15707" + "A4");
+
     }
 
     /**
@@ -588,7 +587,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15707() throws Exception
     {
 
-        String prefix = "15707";
+        String prefix = "15707" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
         String fileName = getFileName(prefix + testName) + ".txt";
@@ -626,12 +625,12 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
         ShareUser.logout(hybridDrone);
     }
-    
+
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15708() throws Exception
     {
 
-        createCompletedWorkflow("15708");
+        createCompletedWorkflow("15708" + "A4");
     }
 
     /**
@@ -642,7 +641,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15708() throws Exception
     {
 
-        String prefix = "15708";
+        String prefix = "15708" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
         String fileName = getFileName(prefix + testName) + ".txt";
@@ -669,14 +668,14 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
         ShareUser.logout(hybridDrone);
-        
+
     }
-    
+
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15709() throws Exception
     {
 
-        createCompletedWorkflow("15709");
+        createCompletedWorkflow("15709" + "A4");
     }
 
     /**
@@ -687,7 +686,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
     public void AONE_15709() throws Exception
     {
 
-        String prefix = "15709";
+        String prefix = "15709" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSiteName = getSiteName(prefix + testName) + "-CL";
         String fileName = getFileName(prefix + testName) + ".txt";
@@ -703,7 +702,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isUnSyncFromCloudLinkPresent());
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
         ShareUser.logout(hybridDrone);
-        
+
         // --- Step 2 ---
         // --- Step action ---
         // OP Verify the document.
@@ -714,7 +713,7 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
         ShareUser.logout(drone);
-        
+
     }
-    
+
 }
