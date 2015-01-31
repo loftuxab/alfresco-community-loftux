@@ -227,7 +227,7 @@ public class SyncInfoPage extends SharePage
         }
         catch (NoSuchElementException nse)
         {
-            return drone.find(By.cssSelector("div.cloud-sync-status-heading+p")).getText();
+            return drone.findAndWait(By.cssSelector("div.cloud-sync-status-heading+p")).getText();
         }
     }
 
@@ -242,7 +242,7 @@ public class SyncInfoPage extends SharePage
         try
         {
             List<WebElement> elements;
-            drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3000);
+            drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3);
             elements = drone.findAll(SYNC_LOCATION);
 
             if(elements.size()==0)
