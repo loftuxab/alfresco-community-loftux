@@ -18,6 +18,9 @@
  */
 package org.alfresco.web.site.servlet;
 
+import static org.alfresco.web.site.SlingshotPageView.REDIRECT_QUERY;
+import static org.alfresco.web.site.SlingshotPageView.REDIRECT_URI;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Principal;
@@ -67,7 +70,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.config.ConfigService;
 import org.springframework.extensions.config.RemoteConfigElement;
-import org.springframework.extensions.config.RemoteConfigElement.ConnectorDescriptor;
 import org.springframework.extensions.config.RemoteConfigElement.EndpointDescriptor;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.RequestContextUtil;
@@ -77,16 +79,13 @@ import org.springframework.extensions.surf.exception.PlatformRuntimeException;
 import org.springframework.extensions.surf.site.AuthenticationUtil;
 import org.springframework.extensions.surf.types.Page;
 import org.springframework.extensions.surf.util.Base64;
-import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.Description.RequiredAuthentication;
+import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.connector.Connector;
 import org.springframework.extensions.webscripts.connector.ConnectorContext;
 import org.springframework.extensions.webscripts.connector.ConnectorService;
 import org.springframework.extensions.webscripts.connector.Response;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import static org.alfresco.web.site.SlingshotPageView.REDIRECT_URI;
-import static org.alfresco.web.site.SlingshotPageView.REDIRECT_QUERY;
 
 /**
  * SSO Authentication Filter Class for web-tier, supporting NTLM and Kerberos challenges from the repository tier.
@@ -473,6 +472,8 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         {
             if (logger.isDebugEnabled())
                 logger.debug("userHeader external auth - skipping auth filter...");
+            // Set the external auth flag so the UI knows we are using SSO (no Logout button shown etc.)
+            setExternalAuthSession(session);
             chain.doFilter(sreq, sresp);
             return;
         }
@@ -485,8 +486,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         {
             if (debug)
                 logger.debug("Touching the repo to ensure we still have an authenticated session.");
-            // Set the external auth flag so the UI knows we are using SSO etc.
-            session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
+            setExternalAuthSession(session);
             challengeOrPassThrough(chain, req, res, session);
             return;
         }
@@ -663,6 +663,16 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                 chain.doFilter(req, res);
             }
         }
+    }
+
+    /**
+     * Set the external auth Session flag so the UI knows we are using SSO (no Logout button shown etc.)
+     * 
+     * @param session
+     */
+    private void setExternalAuthSession(HttpSession session)
+    {
+        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
     }
     
     /**
@@ -1112,8 +1122,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                     if (logger.isDebugEnabled())
                         logger.debug("User logged on via NTLM, " + ntlmDetails);
                     
-                    // Set the external auth flag so the UI knows we are using SSO etc.
-                    session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
+                    setExternalAuthSession(session);
                     
                     onSuccess(req, res, session, userName);
                     
@@ -1303,24 +1312,22 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                     
                     if (Status.STATUS_OK == remoteRes.getStatus().getCode() ||
                             Status.STATUS_TEMPORARY_REDIRECT == remoteRes.getStatus().getCode())
-                   {
-                       if (logger.isDebugEnabled())
+                    {
+                        if (logger.isDebugEnabled())
                            logger.debug("Authentication succeded on the repo side.");
-                       // Create User ID in session so the web-framework dispatcher knows we have logged in
-                       session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userName);
-                       
-                       // Set the external auth flag so the UI knows we are using SSO etc.
-                       session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
-                       
-
-                   } else if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode()) {
-                       if (logger.isDebugEnabled())
-                           logger.debug("Authentication failed on repo side - beging login process again.");
-                       res.setHeader(HEADER_WWWAUTHENTICATE, authHdr);
-                       res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-                       res.flushBuffer();
-                   }
+                        // Create User ID in session so the web-framework dispatcher knows we have logged in
+                        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userName);
+                        
+                        setExternalAuthSession(session);
+                    }
+                    else if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode()) {
+                        if (logger.isDebugEnabled())
+                            logger.debug("Authentication failed on repo side - beging login process again.");
+                        res.setHeader(HEADER_WWWAUTHENTICATE, authHdr);
+                        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        
+                        res.flushBuffer();
+                    }
                 }
                 else
                 {
@@ -1335,8 +1342,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                 if (logger.isDebugEnabled())
                     logger.debug("Authentication succeded on the repo side.");
                 
-                // Set the external auth flag so the UI knows we are using SSO etc.
-                session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
+                setExternalAuthSession(session);
 
                 onSuccess(req, res, session, userName);
             }
