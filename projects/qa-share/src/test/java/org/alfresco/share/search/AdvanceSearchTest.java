@@ -25,6 +25,7 @@ import static org.testng.Assert.assertTrue;
 
 @Listeners(FailedTestListener.class)
 @SuppressWarnings("unused")
+@Test(groups = { "TestBug" })
 public class AdvanceSearchTest extends AbstractUtils
 {
     private static Log logger = LogFactory.getLog(AdvanceSearchTest.class);
