@@ -18,9 +18,9 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 @Listeners(FailedTestListener.class)
-public class MyDashboardWebViewDashlet extends AbstractUtils
+public class MyDashboardWebViewDashletTests extends AbstractUtils
 {
-    private static Log logger = LogFactory.getLog(MyDashboardViewTests.class);
+    private static Log logger = LogFactory.getLog(MyDashboardWebViewDashletTests.class);
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -35,7 +35,7 @@ public class MyDashboardWebViewDashlet extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2898() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "2";
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -52,9 +52,9 @@ public class MyDashboardWebViewDashlet extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2898() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName()+ "2";
         String testUser = getUserNameFreeDomain(testName);
-        String url = "http://google.com";
+        String url = "https://www.google.com";
         String linkTitle = "Google";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
