@@ -1,8 +1,5 @@
 package org.alfresco.share.cloudconsole;
 
-import java.io.File;
-import java.util.Map;
-
 import org.alfresco.po.share.console.CloudConsolePage;
 import org.alfresco.po.share.console.CloudConsoleSearchResultPage;
 import org.alfresco.share.util.AbstractUtils;
@@ -17,6 +14,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.util.Map;
 
 /**
  * Class to include: Tests for Cloud Console
@@ -89,7 +89,7 @@ public class CloudConsoleTest extends AbstractUtils
         // Search
         CloudConsoleSearchResultPage resultPage = consolePage.executeSearch(testUser).render();
         
-        Assert.assertTrue(resultPage.isVisibleResults());
+        Assert.assertTrue(resultPage.isVisibleResults(), "User cannot found");
     }
 
     /**
@@ -105,11 +105,11 @@ public class CloudConsoleTest extends AbstractUtils
         String user2 = getUserNameFreeDomain(testName + 2);
 
         String[] usersForInvitation = { user1, user2 };
-        Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().render().openInviteUsersTab().render()
+        Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().openInviteUsersTab()
                 .executeCorrectBulkImport(usersForInvitation);
 
-        Assert.assertTrue(results.containsKey(user1) && results.get(user1));
-        Assert.assertTrue(results.containsKey(user2) && results.get(user2));
+        Assert.assertTrue(results.containsKey(user1) && results.get(user1), "First user is not invited");
+        Assert.assertTrue(results.containsKey(user2) && results.get(user2), "Second user is not invited");
     }
 
     /**
@@ -125,11 +125,11 @@ public class CloudConsoleTest extends AbstractUtils
         String user2 = getUserNameFreeDomain(testName + 2);
         String usersForInvitation = user1 + "\r\n" + user2;
         File fileForBulkImport = SiteUtil.newFile(DATA_FOLDER + testName + ".txt", usersForInvitation).getAbsoluteFile();
-        Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().render().openInviteUsersTab().render()
+        Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().openInviteUsersTab()
                 .executeCorrectBulkImport(fileForBulkImport);
 
-        Assert.assertTrue(results.containsKey(user1) && results.get(user1));
-        Assert.assertTrue(results.containsKey(user2) && results.get(user2));
+        Assert.assertTrue(results.containsKey(user1) && results.get(user1), "First user is not invited");
+        Assert.assertTrue(results.containsKey(user2) && results.get(user2), "Second user is not invited");
     }
 
 }
