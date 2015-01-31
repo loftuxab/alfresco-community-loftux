@@ -6,6 +6,7 @@ import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
@@ -72,12 +73,12 @@ public class WorkFlowActionsTest extends AbstractWorkflow
         cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
 
         folderName = getFolderName(testName);
-        // fileName = getFileName(testName) + "" + ".txt";
-        cloudSite = getSiteName(testName + "CL03");
-        opSite = getSiteName(testName + "OP03");
+        // fileName = getFileName(testName) + "" + "D3a" + ".txt";
+        cloudSite = getSiteName(testName + "CL" + "D3a");
+        opSite = getSiteName(testName + "OP" + "D3a");
     }
     
-//    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods ="setup")
+    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods ="setup")
     public void dataPrep_createUsers() throws Exception {
 
             String opUser = getUserNameForDomain(testName + "opUser", testDomain);
@@ -90,7 +91,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
 //          String cloudSite = getSiteName(testName) + "CL";
 
             folderName = getFolderName(testName);
-            // fileName = getFileName(testName) + ".txt";
+            // fileName = getFileName(testName) + "D3a" + ".txt";
 
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
 
@@ -767,7 +768,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
 
-        String fileName = getFileName(testName) + ".txt";
+        String fileName = getFileName(testName) + "D3a" + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
 
         String workFlowName1 = testName + System.currentTimeMillis() + "-WF";
@@ -907,7 +908,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
 
-        String fileName = getFileName(testName) + ".txt";
+        String fileName = getFileName(testName) + "D3a" + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
 
         String workFlowName1 = testName + System.currentTimeMillis() + "-WF";
@@ -1070,7 +1071,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
        EditTaskPage editTaskPage;
 
        folderName = getFolderName(testName);
-       fileName = getFileName(testName) + "-15671" + ".txt";
+       fileName = getFileName(testName) + "-15671" + "D3a" + ".txt";
        String[] fileInfo = { fileName, DOCLIB };
 
        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
@@ -1108,7 +1109,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
       public void AONE_15671() throws Exception {
 
        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-       String workFlowName = "Simple Cloud Task " + testName + "-15671CL1";
+       String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15671CL1";
        EditTaskPage editTaskPage;
        TaskDetailsPage taskDetailsPage;
        WorkFlowDetailsPage workflowDetailsPage;
@@ -1173,13 +1174,12 @@ public class WorkFlowActionsTest extends AbstractWorkflow
      public void dataPrep_15673() throws Exception 
      {
          String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-         String workFlowName = "Simple Cloud Task " + testName + "-15673CLoio";
+         String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15673CLoio";
          TaskDetailsPage taskDetailsPage;
          EditTaskPage editTaskPage;
 
          folderName = getFolderName(testName);
-         fileName = getFileName(testName) + "-15673oio" + ".txt";
-
+         fileName = getFileName(testName) + "-15673" + "D3a" + ".txt";
          String[] fileInfo = { fileName, DOCLIB };
 
          ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
@@ -1208,6 +1208,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
          ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
          MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
 
+         findTasks(hybridDrone, workFlowName);
          taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
          editTaskPage = taskDetailsPage.selectEditButton().render();
          editTaskPage.enterComment("test comment edited");
@@ -1220,7 +1221,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
       public void AONE_15673() throws Exception {
 
        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-       String workFlowName = "Simple Cloud Task " + testName + "-15673CL";
+       String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15673CL";
        EditTaskPage editTaskPage;
        TaskDetailsPage taskDetailsPage;
        WorkFlowDetailsPage workflowDetailsPage;
@@ -1285,13 +1286,12 @@ public class WorkFlowActionsTest extends AbstractWorkflow
      public void dataPrep_15674() throws Exception 
      {
        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-       String workFlowName = "Simple Cloud Task " + testName + "-15674CL";
+       String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15674CL";
        TaskDetailsPage taskDetailsPage;
        EditTaskPage editTaskPage;
 
        folderName = getFolderName(testName);
-       fileName = getFileName(testName) + "-15674cccc" + ".txt";
-
+       fileName = getFileName(testName) + "-15674" + "D3a" + ".txt";
        String[] fileInfo = { fileName, DOCLIB };
 
        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
@@ -1319,7 +1319,8 @@ public class WorkFlowActionsTest extends AbstractWorkflow
 
        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
-
+       
+       findTasks(hybridDrone, workFlowName);
        taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
        editTaskPage = taskDetailsPage.selectEditButton().render();
        editTaskPage.enterComment("test comment edited");
@@ -1333,8 +1334,8 @@ public class WorkFlowActionsTest extends AbstractWorkflow
      {
 
        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-       String workFlowName = "Simple Cloud Task " + testName + "-15674CL";
-       fileName = getFileName(testName) + "-15674cccc" + ".txt";
+       String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15674CL";
+       fileName = getFileName(testName) + "-15674" + "D3a" + ".txt";
        EditTaskPage editTaskPage;
        TaskDetailsPage taskDetailsPage;
        WorkFlowDetailsPage workflowDetailsPage;
@@ -1447,12 +1448,12 @@ public class WorkFlowActionsTest extends AbstractWorkflow
      public void dataPrep_15675() throws Exception 
      {
        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-       String workFlowName = "Simple Cloud Task " + testName + "-15675CL";
+       String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15675CL";
        TaskDetailsPage taskDetailsPage;
        EditTaskPage editTaskPage;
 
        folderName = getFolderName(testName);
-       fileName = getFileName(testName) + "-15675" + ".txt";
+       fileName = getFileName(testName) + "-15675" + "D3a" + ".txt";
 
        String[] fileInfo = { fileName, DOCLIB };
 
@@ -1480,6 +1481,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
        
        MyTasksPage myTasksPage11 = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
 
+       findTasks(hybridDrone, workFlowName);
        taskDetailsPage = myTasksPage11.selectViewTasks(workFlowName).render();
        editTaskPage = taskDetailsPage.selectEditButton().render();
        
@@ -1491,8 +1493,8 @@ public class WorkFlowActionsTest extends AbstractWorkflow
      @Test(groups = "Hybrid", enabled = true)
      public void AONE_15675() throws Exception
     {
-      String workFlowName = "Simple Cloud Task " + testName + "-15675CL";
-      fileName = getFileName(testName) + "-15675" + ".txt";
+      String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15675CL";
+      fileName = getFileName(testName) + "-15675" + "D3a" + ".txt";
 
       try 
       {
@@ -1524,12 +1526,12 @@ public class WorkFlowActionsTest extends AbstractWorkflow
      public void dataPrep_15676() throws Exception 
      {
        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-       String workFlowName = "Simple Cloud Task " + testName + "-15676CL";
+       String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15676CL";
        TaskDetailsPage taskDetailsPage;
        EditTaskPage editTaskPage;
 
        folderName = getFolderName(testName);
-       fileName = getFileName(testName) + "-15676" + ".txt";
+       fileName = getFileName(testName) + "-15676" + "D3a" + ".txt";
 
        String[] fileInfo = { fileName, DOCLIB };
 
@@ -1557,6 +1559,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
        
        MyTasksPage myTasksPage11 = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
 
+       findTasks(hybridDrone, workFlowName);
        taskDetailsPage = myTasksPage11.selectViewTasks(workFlowName).render();
        editTaskPage = taskDetailsPage.selectEditButton().render();
        
@@ -1570,8 +1573,8 @@ public class WorkFlowActionsTest extends AbstractWorkflow
     {
 
       String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-      String workFlowName = "Simple Cloud Task " + testName + "-15676CL";
-      fileName = getFileName(testName) + "-15676" + ".txt";
+      String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15676CL";
+      fileName = getFileName(testName) + "-15676" + "D3a" + ".txt";
 
       try 
       {
@@ -1604,12 +1607,12 @@ public class WorkFlowActionsTest extends AbstractWorkflow
      public void dataPrep_15677() throws Exception 
      {
        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-       String workFlowName = "Simple Cloud Task " + testName + "-15677CL";
+       String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15677CL";
        TaskDetailsPage taskDetailsPage;
        EditTaskPage editTaskPage;
 
        folderName = getFolderName(testName);
-       fileName = getFileName(testName) + "-15677" + ".txt";
+       fileName = getFileName(testName) + "-15677" + "D3a" + ".txt";
 
        String[] fileInfo = { fileName, DOCLIB };
 
@@ -1639,6 +1642,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
 
        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
        
+       findTasks(hybridDrone, workFlowName);
        MyTasksPage myTasksPage11 = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
 
        taskDetailsPage = myTasksPage11.selectViewTasks(workFlowName).render();
@@ -1654,8 +1658,8 @@ public class WorkFlowActionsTest extends AbstractWorkflow
     {
 
       String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-      String workFlowName = "Simple Cloud Task " + testName + "-15677CL";
-      fileName = getFileName(testName) + "-15677" + ".txt";
+      String workFlowName = "Simple Cloud Task " + testName + "D3a" + "-15677CL";
+      fileName = getFileName(testName) + "-15677" + "D3a" + ".txt";
 
       try 
       {
@@ -1683,5 +1687,13 @@ public class WorkFlowActionsTest extends AbstractWorkflow
 
       ShareUser.logout(drone);
   }
+
+
+     private void findTasks(WebDrone driver, String workFlowName)
+     {
+
+         assertTrue(driver.findAndWaitWithRefresh(By.xpath(String.format("//a[text()='%s']", workFlowName))).isDisplayed());
+         
+    }
      
 }
