@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.po.share.ShareLink;
-import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
@@ -18,7 +17,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-public class WcmqsHomePage extends SharePage
+public class WcmqsHomePage extends WcmqsAbstractPage
 {
     private static Log logger = LogFactory.getLog(WcmqsHomePage.class);
     private final By PAGE_MENU = By.cssSelector("div[id='myslidemenu']");
