@@ -955,12 +955,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName));
 
         // Click the event's name -> Event Info window pops up;
+        String infoWeekDay;
+        ;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
+
         InformationEventForm eventInfo = calendarPage.clickOnEvent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName).render();
         Assert.assertTrue(eventInfo.getStartDateTime().contains(startTime));
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
 
         String recDetail = eventInfo.getRecurrenceDetail();
-        Assert.assertTrue(recDetail.contains("Occurs every 5 days effective"));
+        String infoRecCompare = "Occurs every 5 days effective " + infoWeekDay + " from " + startTime + " to " + endTime;
+        Assert.assertTrue(recDetail.contains(infoRecCompare));
 
         eventInfo.closeInformationForm();
 
@@ -982,6 +990,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+
         // check start and end date, duration of the event at Site calendar dashlet
         Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
@@ -993,6 +1002,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         dashBoard = customizeUserDash.addDashlet(Dashlets.MY_CALENDAR, 1).render();
         MyCalendarDashlet myCalendar = dashBoard.getDashlet("my-calendar").render();
+        myCalendar.render(maxWaitTime);
 
         // My Calendar dashlet event is marked as recurring
         Boolean repeating = myCalendar.isRepeating(siteName);
@@ -1110,8 +1120,16 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         Assert.assertTrue(eventInfo.getStartDateTime().contains(startTime));
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
 
+        String infoWeekDay;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
+
+        String compareDetail = "Occurs each week on Monday, Tuesday, Wednesday, Thursday, Friday, effective " + infoWeekDay + " from " + startTime + " to "
+                + endTime;
+
         String recDetail = eventInfo.getRecurrenceDetail();
-        Assert.assertTrue(recDetail.contains("Occurs each week on"));
+        Assert.assertTrue(recDetail.contains(compareDetail));
 
         eventInfo.closeInformationForm();
 
@@ -1133,6 +1151,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+
         // check start and end date, duration of the event at Site calendar dashlet
         Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
@@ -1223,6 +1242,14 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // Any number is entered, day (s) are selected; Settings are saved;
         recurrence.deleteText("txtRecureveryEditableTextweek(s)", 0);
         recurrence.enterString("txtRecureveryEditableTextweek(s)", "3");
+
+        String day;
+        SimpleDateFormat format = new SimpleDateFormat("EEEE");
+
+        Calendar cal = Calendar.getInstance();
+        day = format.format(cal.getTime());
+
+        recurrence.click("chk" + day);
         recurrence.click("chkMonday");
         recurrence.click("chkTuesday");
         recurrence.click("chkWednesday");
@@ -1257,13 +1284,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage().render();
         Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName));
 
+        String infoWeekDay;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
+
         // Click the event's name -> Event Info window pops up;
         InformationEventForm eventInfo = calendarPage.clickOnEvent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName).render();
         Assert.assertTrue(eventInfo.getStartDateTime().contains(startTime));
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
 
         String recDetail = eventInfo.getRecurrenceDetail();
-        Assert.assertTrue(recDetail.contains("Occurs every 3 weeks on"));
+        String compareDetail = "Occurs every 3 weeks on Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, effective " + infoWeekDay + " from " + startTime
+                + " to " + endTime;
+        Assert.assertTrue(recDetail.contains(compareDetail));
 
         eventInfo.closeInformationForm();
 
@@ -1278,14 +1312,14 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 1);
+        //calendar.add(Calendar.DATE, 1);
         weekDay = dayFormat.format(calendar.getTime());
-
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
         // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+
         // check start and end date, duration of the event at Site calendar dashlet
         Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
@@ -2527,7 +2561,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         {
             e.printStackTrace();
         }
-        
+
         return convertedHour;
     }
 }
