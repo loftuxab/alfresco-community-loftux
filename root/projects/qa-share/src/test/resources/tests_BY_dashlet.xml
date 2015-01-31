@@ -37,7 +37,11 @@
 
     <test name="SiteSearchMyDashboardTest2" verbose="1">
         <classes>
-            <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest2" />
+            <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest2" >
+                <methods>
+                    <include name="AONE_14838"/>
+                </methods>
+            </class>
         </classes>
     </test>
 
