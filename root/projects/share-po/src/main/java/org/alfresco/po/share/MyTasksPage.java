@@ -56,6 +56,7 @@ public class MyTasksPage extends SharePage
     private static final By SUB_TITLE = By.cssSelector("h2[id$='_default-filterTitle']");
     private static final By START_WORKFLOW_BUTTON = By.cssSelector("button[id$='-startWorkflow-button-button']");
     private static final By WORKFLOW_FILTER_TITLE = By.cssSelector("h2[class='thin']");
+    private static final By PRIORITY_LINK=By.cssSelector("div.yui-dt-liner img");
 
     private static final RenderElement LOADING_ELEMENT = new RenderElement(By.cssSelector(".yui-dt-loading"), ElementState.INVISIBLE);
     private static final RenderElement START_WORKFLOW_BUTTON_RENDER = RenderElement.getVisibleRenderElement(START_WORKFLOW_BUTTON);
@@ -616,5 +617,29 @@ public class MyTasksPage extends SharePage
             return count;
         }
         return count;
+    }
+       
+    /**
+     * Returns <code>true</code> if the Priority icon is present and
+     * enabled, otherwise returns <code>false</code>.
+     * 
+     * @param taskName
+     * @return
+     */
+    public boolean isTaskPriorityIconEnabled(String taskName)
+    {
+        WebElement task = findTaskRow(taskName);
+        if (task != null)
+        {
+            try
+            {
+                return task.findElement(PRIORITY_LINK).isEnabled();
+            }
+            catch (NoSuchElementException e)
+            {
+            }
+        }
+
+        return false;
     }
 }
