@@ -14,25 +14,23 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import java.util.List;
-
-import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.webdrone.HtmlPage;
-import org.alfresco.webdrone.RenderElement;
-import org.alfresco.webdrone.RenderTime;
-import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.exception.PageException;
-import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.alfresco.po.share.FactorySharePage;
+import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
+import org.alfresco.webdrone.*;
+import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+
+import java.util.List;
 
 /**
  * My tasks dashlet object, holds all element of the HTML page relating to
@@ -47,8 +45,13 @@ public class MyTasksDashlet extends AbstractDashlet implements Dashlet
 
     private static final String DATA_LIST_CSS_LOCATION = "h3 > a";
     private static final String DIV_DASHLET_CONTENT_PLACEHOLDER = "div.dashlet.my-tasks";
-    private static final String LIST_OF_TASKS = "h3>a[title='Edit Task']";
+    private static final String LIST_OF_TASKS = "div.dashlet.my-tasks h3>a";
     private static final By COMPLETE_TASK_BUTTON = By.cssSelector("a[href*='completed']");
+    private static final By ACTIVE_TASK_BUTTON = By.cssSelector("a[href*='active']");
+    private static final String DEFAULT_FILTER_BUTTON = "div.dashlet.my-tasks button[id$='default-filters-button']";
+    private static final String DASHLET_LIST_OF_FILTER_BUTTONS = "div[class*='yui-button-menu yui-menu-button-menu visible']>div.bd>ul.first-of-type>li>a";
+    private static final String TASK_VIEW_LINK = "a[@class='view-task']";
+    private static final String TASK_EDIT_LINK = "a[@class='edit-task']";
 
     /**
      * Constructor.
@@ -214,5 +217,228 @@ public class MyTasksDashlet extends AbstractDashlet implements Dashlet
         }
         dashlet.findElement(COMPLETE_TASK_BUTTON).click();
         return drone.getCurrentPage().render();
+    }
+
+    /**
+     * Retrieves the My Tasks FilterButton based on the given cssSelector
+     * and clicks on it.
+     */
+    private void clickFilterButton()
+    {
+        try
+        {
+            drone.findAndWait(By.cssSelector(DEFAULT_FILTER_BUTTON)).click();
+        }
+        catch (TimeoutException e)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Exceeded time to find and click the Filter Button.", e);
+            }
+        }
+    }
+
+    /**
+     * Select the given {@link MyTasksFilter} on My Tasks Dashlet.
+     *
+     * @param filter - The {@link MyTasksFilter} to be selected
+     * @return {@link org.alfresco.webdrone.HtmlPage}
+     */
+    public HtmlPage selectTasksFilter(MyTasksFilter filter)
+    {
+        clickFilterButton();
+        List<WebElement> filterElements = drone.findAndWaitForElements(By.cssSelector(DASHLET_LIST_OF_FILTER_BUTTONS));
+        if (filterElements != null)
+        {
+            for (WebElement webElement : filterElements)
+            {
+                if (webElement.getText().equals(filter.getDescription()))
+                {
+                    webElement.click();
+                }
+            }
+        }
+        waitUntilAlert(1);
+        return FactorySharePage.resolvePage(drone);
+    }
+
+    /**
+     * Mimic click on 'Active task' button
+     *
+     * @return
+     */
+    public MyTasksPage selectActive()
+    {
+        if (dashlet == null)
+        {
+            dashlet = drone.findAndWait(By.cssSelector(DIV_DASHLET_CONTENT_PLACEHOLDER), 100L);
+        }
+        dashlet.findElement(ACTIVE_TASK_BUTTON).click();
+        return drone.getCurrentPage().render();
+    }
+
+    /**
+     * Returns the div that hold the task info.
+     *
+     * @return
+     */
+    private WebElement getTaskRow(String taskName)    {
+
+        return drone.findAndWait(By.xpath("//h3/a[text()='" + taskName + "']"));
+    }
+
+    /**
+     * Method to check if a given task is displayed in My Tasks Dashlet
+     *
+     * @param taskName
+     * @return True if Task exists
+     */
+    public boolean isTaskPresent(String taskName)
+    {
+        List<ShareLink> taskLinks = getTasks();
+        try
+        {
+            for (ShareLink taskLink : taskLinks)
+            {
+                if (taskLink.getDescription().contains(taskName))
+                {
+                return true;
+                }
+            }
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Time out while finding user", e);
+            return false;
+        }
+        return false;
+    }
+
+
+    /**
+     * Returns <code>true</code> if the Task view button is present and enabled,
+     * otherwise returns <code>false</code>.
+     *
+     * @param taskName
+     * @return
+     */
+    public boolean isTaskViewButtonEnabled(String taskName)
+    {
+        WebElement task = getTaskRow(taskName);
+        if (task != null)
+        {
+            try
+            {
+                return drone.find(By.xpath("//h3/a[text()='" + taskName + "']/../../../..//"+TASK_VIEW_LINK)).isEnabled();
+            }
+            catch (NoSuchElementException e)
+            {
+                return false;
+            }
+            catch (TimeoutException e)
+            {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns <code>true</code> if the Task edit button is present and
+     * enabled, otherwise returns <code>false</code>.
+     *
+     * @param taskName
+     * @return
+     */
+    public boolean isTaskEditButtonEnabled(String taskName)
+    {
+        WebElement task = getTaskRow(taskName);
+        if (task != null)
+        {
+            try
+            {
+                return drone.find(By.xpath("//h3/a[text()='" + taskName + "']/../../../..//"+TASK_EDIT_LINK)).isEnabled();
+            }
+            catch (NoSuchElementException e)
+            {
+                return false;
+            }
+            catch (TimeoutException e)
+            {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Clicks on edit task for single task
+     * @param taskName
+     * @return {@link HtmlPage}
+     */
+
+    public HtmlPage selectEditTask(String taskName)
+    {
+        if (taskName == null)
+        {
+            throw new UnsupportedOperationException("Taskname should not be null");
+        }
+        try
+        {
+            List<WebElement> elements = drone.findAll(By.cssSelector(LIST_OF_TASKS));
+            for (WebElement webElement : elements)
+            {
+                if (webElement.getText().equals(taskName))
+                {
+                    Actions mouseOver = new Actions(((WebDroneImpl) drone).getDriver());
+                    mouseOver.moveToElement(drone.find(By.xpath("//a[text()='" + taskName + "']"))).
+                    moveToElement(drone.find(By.xpath("//h3/a[text()='" + taskName + "']/../../../..//"+TASK_EDIT_LINK))).click().perform();
+                    return FactorySharePage.resolvePage(drone);
+                }
+            }
+        }
+            catch (NoSuchElementException ex)
+            {
+                logger.error("My Task Dashlet is not present", ex);
+            }
+            throw new PageException("Task is not found");
+
+    }
+
+    /**
+     * Clicks on edit task for single task
+     * @param taskName
+     * @return {@link HtmlPage}
+     */
+
+    public HtmlPage selectViewTask(String taskName)
+    {
+        if (taskName == null)
+        {
+            throw new UnsupportedOperationException("Taskname should not be null");
+        }
+        try
+        {
+            List<WebElement> elements = drone.findAll(By.cssSelector(LIST_OF_TASKS));
+            for (WebElement webElement : elements)
+            {
+                if (webElement.getText().equals(taskName))
+                {
+                    Actions mouseOver = new Actions(((WebDroneImpl) drone).getDriver());
+                    mouseOver.moveToElement(drone.find(By.xpath("//a[text()='" + taskName + "']"))).
+                        moveToElement(drone.find(By.xpath("//h3/a[text()='" + taskName + "']/../../../..//"+TASK_VIEW_LINK))).click().perform();
+                    return FactorySharePage.resolvePage(drone);
+                }
+            }
+        }
+        catch (NoSuchElementException ex)
+        {
+            logger.error("My Task Dashlet is not present", ex);
+        }
+        throw new PageException("Task is not found");
+
     }
 }

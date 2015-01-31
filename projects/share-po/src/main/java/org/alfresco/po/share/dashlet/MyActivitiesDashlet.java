@@ -14,9 +14,6 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.exception.ShareException;
@@ -35,10 +32,13 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * My activities dashlet object, holds all element of the HTML page relating to
  * share's my activities dashlet on dashboard page.
- * 
+ *
  * @author Michael Suzuki
  * @since 1.3
  */
@@ -86,12 +86,14 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
     /**
      * Populates all the possible links that appear on the dashlet
      * data view, the links are of user, document or site.
-     * 
+     *
      * @param selector css placeholder for the dashlet data
      */
     private synchronized void populateData()
     {
         activity = new ArrayList<ActivityShareLink>();
+        ArrayList<ShareLink> shareLinks = new ArrayList<>();
+
         try
         {
             List<WebElement> links = drone.findAll(By.cssSelector("div[id$='default-activityList'] > div.activity"));
@@ -101,22 +103,43 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
                 WebElement userLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class^='theme-color']"));
                 ShareLink user = new ShareLink(userLink, drone);
 
-                WebElement siteLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class^='site-link']"));
-                ShareLink site = new ShareLink(siteLink, drone);
-
                 String description = div.findElement(By.cssSelector("div.content>span.detail")).getText();
 
-                if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a")).size() > 2)
+                if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a")).size() < 2)
                 {
+                    activity.add(new ActivityShareLink(user, description));
+                }
+
+                else if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a")).size() == 2)
+                {
+
+                    if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a[class^='theme-color']")).size() > 1)
+                    {
+                        List<WebElement> userLinks = div.findElements(By.cssSelector("div.activity>div.content>span.detail>a[class^='theme-color']"));
+                        for (WebElement element : userLinks)
+                        {
+                            shareLinks.add(new ShareLink(element, drone));
+                        }
+                        activity.add(new ActivityShareLink(shareLinks.get(0), shareLinks.get(1), description));
+                    }
+                    else
+                    {
+                        WebElement siteLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class^='site-link']"));
+                        ShareLink site = new ShareLink(siteLink, drone);
+                        activity.add(new ActivityShareLink(user, site, description));
+                    }
+                }
+
+                else if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a")).size() > 2)
+                {
+                    WebElement siteLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class^='site-link']"));
+                    ShareLink site = new ShareLink(siteLink, drone);
 
                     WebElement documentLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class*='item-link']"));
                     ShareLink document = new ShareLink(documentLink, drone);
                     activity.add(new ActivityShareLink(user, document, site, description));
                 }
-                else
-                {
-                    activity.add(new ActivityShareLink(user, site, description));
-                }
+
             }
         }
         catch (NoSuchElementException nse)
@@ -173,7 +196,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
      * Select a link from activity list by a given name
      * with a default of document type, as there are additional
      * links such as user or site in the same web element.
-     * 
+     *
      * @param name identifier to match against link title
      */
     public ActivityShareLink selectLink(final String name)
@@ -183,7 +206,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Find the match and selects on the link.
-     * 
+     *
      * @param name identifier to match against link title
      * @param enum that determines document, site or user type link
      */
@@ -224,7 +247,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
     /**
      * Selects the document link on the activity that appears on my activities dashlet
      * by matching the name to the link.
-     * 
+     *
      * @param name identifier
      */
     public HtmlPage selectActivityDocument(final String name)
@@ -236,7 +259,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
     /**
      * Selects the user link on an activity that appears on my activities dashlet
      * by matching the name to the link.
-     * 
+     *
      * @param name identifier
      */
     public HtmlPage selectActivityUser(final String name)
@@ -248,7 +271,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
     /**
      * Selects a the site link on an activity that appears on my activities dashlet
      * by matching the name to the link.
-     * 
+     *
      * @param name identifier
      */
     public HtmlPage selectActivitySite(final String name)
@@ -259,7 +282,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Get Activities based on the link type.
-     * 
+     *
      * @param linktype Document, User or Site
      * @return {@link ShareLink} collection
      */
@@ -274,7 +297,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Select option from "My Activities" drop down
-     * 
+     *
      * @param myActivitiesOption
      * @return {@link ShareLink} collection
      * @author Cristina.Axinte
@@ -314,7 +337,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Select option from history filter drop down
-     * 
+     *
      * @param SiteActivitiesHistoryFilter
      * @return {@link ShareLink} collection
      * @author Cristina.Axinte
@@ -338,7 +361,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Method for navigate to RSS Feed Page from site activity dashlet.
-     * 
+     *
      * @param username
      * @param password
      * @return RssFeedPage
@@ -369,7 +392,7 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Method returns if the specified option is selected in My Activities button
-     * 
+     *
      * @param myActivitiesOption
      * @return
      * @author Cristina.Axinte
@@ -395,14 +418,14 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Method returns if the specified option is selected in history button
-     * 
+     *
      * @param historyOption
      * @return
      * @author Cristina.Axinte
      */
     public boolean isHistoryOptionSelected(SiteActivitiesHistoryFilter lastDays)
     {
-        
+
         try
         {
             WebElement dropdown = drone.findAndWait(HISTORY_BUTTON);

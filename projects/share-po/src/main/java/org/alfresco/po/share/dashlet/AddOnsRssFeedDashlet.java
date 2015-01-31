@@ -14,20 +14,16 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.alfresco.webdrone.exception.PageRenderTimeException;
+import org.openqa.selenium.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Aliaksei Boole
@@ -53,7 +49,45 @@ public class AddOnsRssFeedDashlet extends AbstractDashlet implements Dashlet
     @Override
     public synchronized AddOnsRssFeedDashlet render(RenderTime timer)
     {
-        elementRender(timer, getVisibleRenderElement(DASHLET_CONTAINER_PLACEHOLDER));
+        try
+        {
+            while (true)
+            {
+                timer.start();
+                synchronized (this)
+                {
+                    try
+                    {
+                        this.wait(50L);
+                    }
+                    catch (InterruptedException e)
+                    {
+                    }
+                }
+                try
+                {
+                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    break;
+                }
+                catch (NoSuchElementException e)
+                {
+
+                }
+                catch (StaleElementReferenceException ste)
+                {
+                    // DOM has changed therefore page should render once change
+                    // is completed
+                }
+                finally
+                {
+                    timer.end();
+                }
+            }
+        }
+        catch (PageRenderTimeException te)
+        {
+            throw new NoSuchDashletExpection(this.getClass().getName() + " failed to find my profile dashlet", te);
+        }
         return this;
     }
 
@@ -70,7 +104,6 @@ public class AddOnsRssFeedDashlet extends AbstractDashlet implements Dashlet
     {
         return render(new RenderTime(maxPageLoadingTime));
     }
-
     /**
      * This method gets the focus by placing mouse over on Site RSS Feed Dashlet.
      */

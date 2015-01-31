@@ -18,17 +18,14 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import java.util.List;
-
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.dashlet.MySitesDashlet.FavouriteType;
+import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePage;
-import org.alfresco.po.share.site.document.ConfirmDeletePage;
-import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
 import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.webdrone.exception.PageException;
@@ -39,6 +36,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import java.util.List;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Integration test to verify My Site dash let page elements are in place.
@@ -53,12 +55,14 @@ public class MySiteDashletTest extends AbstractTest
     private static Log logger = LogFactory.getLog(MySiteDashletTest.class);
     private DashBoardPage dashBoard;
     private String siteName;
+    private String newSiteName;
     private String sampleSiteFullName = "Sample: Web Site Design Project";
 
     @BeforeClass(groups={"alfresco-one"})
     public void setup()throws Exception
     {
         siteName = "MySiteTests" + System.currentTimeMillis();
+        newSiteName = "NewSiteTests" + System.currentTimeMillis();
         dashBoard = loginAs(username, password);
         SiteUtil.createSite(drone, siteName, "description", "Public");
     }
@@ -156,17 +160,29 @@ public class MySiteDashletTest extends AbstractTest
         dashlet = dashBoard.getDashlet("my-sites").render();
         Assert.assertTrue(dashlet.selectSite(siteName).click() instanceof SiteDashboardPage);
     }
-    
-    @Test(dependsOnMethods = "selectMyFavouriteSite", enabled=false)
-    public void deleteSiteFromSiteDashlet()
+
+    @Test(dependsOnMethods = "selectMyFavouriteSite")
+    public void createSiteFromSiteDashlet() throws Exception
     {
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
         MySitesDashlet dashlet = dashBoard.getDashlet("my-sites").render();
-        ConfirmDeletePage confirmDeletePage = dashlet.deleteSite(siteName).render();
-        confirmDeletePage = confirmDeletePage.selectAction(Action.Delete).render();
-        dashBoard = confirmDeletePage.selectAction(Action.Delete).render();
-        dashlet = dashBoard.getDashlet("my-sites").render();
-        Assert.assertFalse(dashlet.isSiteFavourite(siteName));
+        Assert.assertTrue(dashlet.isCreateSiteButtonDisplayed(), "Create Site button isn't displayed");
+        CreateSitePage createSitePage = dashlet.clickCreateSiteButton().render();
+        SiteDashboardPage siteDashboardPage = createSitePage.createNewSite(newSiteName, "description").render();
+        assertTrue(siteDashboardPage.isSiteTitle(newSiteName), "Site Dashboard page for created site " + newSiteName + " isn't opened");
     }
+
+    @Test(dependsOnMethods = "createSiteFromSiteDashlet")
+    public void deleteSiteFromSiteDashlet() throws Exception
+    {
+        SharePage page = drone.getCurrentPage().render();
+        dashBoard = page.getNav().selectMyDashBoard();
+        MySitesDashlet dashlet = dashBoard.getDashlet("my-sites").render();
+        dashlet.deleteSite(newSiteName).render();
+        dashlet = dashBoard.getDashlet("my-sites").render();
+        dashlet.selectMyFavourites(MySitesDashlet.FavouriteType.ALL).render();
+        assertFalse(dashlet.isSitePresent(newSiteName), newSiteName + " is found ");
+    }
+
 }
