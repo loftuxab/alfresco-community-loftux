@@ -22,7 +22,7 @@ public class WcmqsBlogPage extends SharePage
 
         public static final String ETHICAL_FUNDS = "Ethical funds";
         public static final String COMPANY_ORGANISES_WORKSHOP = "Company organises workshop";
-        public static final String ANALYSTS_LATEST_THOUGHTS = "Our top analyst's latest thoughts";
+        public static final String ANALYSTS_LATEST_THOUGHTS = "latest thoughts";
 
         public static final String BLOG_MENU = "Blog";
         public static final String BLOG = "blog";
@@ -82,7 +82,7 @@ public class WcmqsBlogPage extends SharePage
 
         public boolean checkIfBlogIsDeleted(String title)
         {
-                boolean check = false;
+                boolean check;
                 try
                 {
                         drone.waitUntilElementDisappears(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
@@ -99,7 +99,7 @@ public class WcmqsBlogPage extends SharePage
 
         public boolean checkIfBlogExists(String title)
         {
-                boolean check = false;
+                boolean check;
                 try
                 {
                         drone.waitForElement(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
@@ -118,7 +118,6 @@ public class WcmqsBlogPage extends SharePage
          * Method to click a blog post name from share
          * 
          * @param blogNameFromShare of the blog post declared in share!
-         * @return
          */
         public void clickBlogNameFromShare(String blogNameFromShare)
         {
