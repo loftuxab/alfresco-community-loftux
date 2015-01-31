@@ -831,7 +831,7 @@ public class CreateRuleSetPropertyTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "EnterpriseOnly", "ProductBug" })
+    @Test(groups = { "EnterpriseOnly"})
     public void AONE_14877() throws Exception
     {
         String testName = getTestName();
@@ -896,7 +896,7 @@ public class CreateRuleSetPropertyTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "EnterpriseOnly", "ProductBug" })
+    @Test(groups = { "EnterpriseOnly"})
     public void AONE_14878() throws Exception
     {
         String testName = getTestName();
