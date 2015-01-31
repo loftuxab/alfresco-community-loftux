@@ -533,7 +533,7 @@
                list = this.options.listTypes[i];
                el = document.createElement("div");
 
-               el.innerHTML = '<h4>' + $html(list.title) + '</h4><span>' + $html(list.description) + '</span>';
+               el.innerHTML = '<h4><a href="#" tabindex="0">' + $html(list.title) + '</a></h4><span>' + $html(list.description) + '</span>';
                el.onclick = fnOnClick(el, list.name);
                containerEl.appendChild(el);
             }
