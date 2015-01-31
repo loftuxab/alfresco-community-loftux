@@ -69,7 +69,6 @@ public class PerformanceTest extends CmisUtils
     private static final String DOMAIN = "-default-";
     private static final String BIG_DATA_FILE = "DemoRandomAccessFile.out";
     private static final String LONG_FILE_NAME = "Directors report for year ended";
-    private String serverAddress;
     private static final TagsAPI tagsApi = new TagsAPI();
     private static final HttpCore HTTP_CORE = new HttpCore();
     private static final CoreHelper CORE_HELPER = new CoreHelper();
@@ -81,7 +80,6 @@ public class PerformanceTest extends CmisUtils
         tagsApi.beforeClass();
         tagsApi.tearDown();
         testName = this.getClass().getSimpleName();
-        serverAddress = JmxUtils.getAddress(dronePropertiesMap.get(drone).getShareUrl());
         logger.info("Starting Tests: " + testName);
     }
 
