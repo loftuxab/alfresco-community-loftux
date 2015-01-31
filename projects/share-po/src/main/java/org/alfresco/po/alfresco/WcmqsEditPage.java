@@ -5,14 +5,15 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.document.TinyMceEditor;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -72,8 +73,34 @@ public class WcmqsEditPage extends SharePage
     {
         drone.findAndWait(NAME_INPUT).clear();
         drone.findAndWait(NAME_INPUT, SECONDS.convert(maxPageLoadingTime, MILLISECONDS)).sendKeys(newName);
+
+    }
+    
+    /**
+     * Method for move focus to title input
+     * 
+     * @param 
+     * @return
+     */
+    public void moveFocusToTitle()
+    {
+         drone.find(TITLE_INPUT).click();
     }
 
+
+    /**
+     * Method for edit name by sending keys
+     * 
+     * @param userName
+     * @return
+     */
+    public void sendKeyOnName(Keys key)
+    {
+        drone.findAndWait(NAME_INPUT).clear();
+        drone.findAndWait(NAME_INPUT, SECONDS.convert(maxPageLoadingTime, MILLISECONDS)).sendKeys(key);
+
+    }
+    
     /**
      * Method for edit title
      * 
@@ -167,7 +194,7 @@ public class WcmqsEditPage extends SharePage
         }
         catch (TimeoutException toe)
         {
-            throw new ShareException("Time out finding #tinymce content", toe);
+            throw new PageException("Time out finding #tinymce content", toe);
         }
     }
 
@@ -185,7 +212,7 @@ public class WcmqsEditPage extends SharePage
         }
         catch (TimeoutException toe)
         {
-            throw new ShareException("Time out finding notification balloon.", toe);
+            throw new PageException("Time out finding notification balloon.", toe);
         }
         
     }
