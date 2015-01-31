@@ -373,15 +373,15 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         // For indirectly synced content/folder the 'synced indirectly' icon is displayed.
         assertTrue(docLibPrem.getFileDirectoryInfo(newFiles[0]).isIndirectlySyncedIconPresent() && docLibPrem.getFileDirectoryInfo(newFiles[1])
             .isIndirectlySyncedIconPresent(), "Indirectly synced icon isn't displayed");
-        boolean isSynced = checkIfContentIsSynced(drone, newFiles[0]);
+        //boolean isSynced = checkIfContentIsSynced(drone, newFiles[0]);
         SyncInfoPage syncInf1 = docLibPrem.getFileDirectoryInfo(newFiles[0]).clickOnViewCloudSyncInfo().render();
-        assertTrue(syncInf1.getCloudSyncLocation().equals(syncLocation + ">" + folderName) && isSynced, "File " +
+        assertTrue(syncInf1.getCloudSyncLocation().equals(syncLocation + ">" + folderName), "File " +
             "wasn't synced");
         syncInf1.clickOnCloseButton();
 
-        isSynced = checkIfContentIsSynced(drone, newFiles[1]);
+        //isSynced = checkIfContentIsSynced(drone, newFiles[1]);
         SyncInfoPage syncInf2 = docLibPrem.getFileDirectoryInfo(newFiles[1]).clickOnViewCloudSyncInfo().render();
-        assertTrue(syncInf2.getCloudSyncLocation().equals(syncLocation + ">" + folderName) && isSynced, "File " +
+        assertTrue(syncInf2.getCloudSyncLocation().equals(syncLocation + ">" + folderName), "File " +
             "wasn't synced");
         syncInf2.clickOnCloseButton();
 
@@ -399,7 +399,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         assertTrue(docLibCl.isFileVisible(newFiles[0]) && docLibCl.isFileVisible(newFiles[1]), "Files were not added to Cloud");
         assertTrue(docLibCl.getFileDirectoryInfo(newFiles[0]).isIndirectlySyncedIconPresent() && docLibCl.getFileDirectoryInfo(newFiles[1])
             .isIndirectlySyncedIconPresent(), "Indirectly synced icons are not displayed on Cloud side");
-        isSynced = checkIfContentIsSynced(hybridDrone, newFiles[0]);
+        boolean isSynced = checkIfContentIsSynced(hybridDrone, newFiles[0]);
         SyncInfoPage syncInf3 = docLibCl.getFileDirectoryInfo(newFiles[0]).clickOnViewCloudSyncInfo().render();
         assertTrue(isSynced && syncInf3.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " +
             newFiles[0]);
