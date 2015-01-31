@@ -72,6 +72,7 @@ public class DocumentLibraryPage extends SitePage
     private static By CATEGORY_ROOT_SPACER_LINK = By.xpath(CATEGORY_ROOT_SPACER + "//a");
     private static final String CHECK_BOX = "input[id^='checkbox-yui']";
     private static final By DOCUMENT_LIBRARY = By.cssSelector("a[href$='documentlibrary']");
+    private static final By SYNC_MESSAGE = By.xpath(".//span[contains(text(),'Sync was created')]");
 
     public enum Optype
     {
@@ -1105,6 +1106,30 @@ public class DocumentLibraryPage extends SitePage
         }
         throw new PageOperationException("Message element not found!!");
     }
+    
+    /**
+     * Returns true if Sync message is present
+     *
+     * @return boolean
+     */
+    
+    public boolean isSyncMessagePresent()
+    {
+        try
+        {
+            drone.waitForElement(SYNC_MESSAGE, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+            WebElement syncMessage = drone.find(SYNC_MESSAGE);
+            if (syncMessage != null)
+                return true;
+        }
+        catch(TimeoutException toe)
+        {
+            logger.error("Message element not found!!", toe);
+            return false;
+        }
+        return false;
+    }
+    
 
     /**
      * Returns true if Cloud Sync sign up dialog is visible
