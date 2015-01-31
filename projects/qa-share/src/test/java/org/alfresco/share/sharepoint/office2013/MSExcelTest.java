@@ -62,7 +62,7 @@ public class MSExcelTest extends AbstractUtils
 
                 testName = this.getClass().getSimpleName();
                 testUser = getUserNameFreeDomain(testName);
-                siteName = getSiteName(testName);
+                siteName = getSiteName(testName)+11;
                 xlsFileName_9829 = "SaveFileToShare";
                 xlsFileName_9830 = "CheckInAfterSaving";
                 xlsFileName_9831 = "InputSavechanges";
@@ -359,8 +359,10 @@ public class MSExcelTest extends AbstractUtils
                 // "No else can edit this document or view your changes until it is checked it"
                 // message is displayed at the pane; Check the excel is in Read-Only
                 // mode
-                Assert.assertTrue(excel.getAbstractUtil().isObjectDisplayed(l1, "DiscardCheckOut"), "Discard Check Out action is not available");
-                Assert.assertTrue(excel.getAbstractUtil().isObjectDisplayed(l1, "CheckIn"), "Check In action is not available");
+                String expectedMessage="No one else can edit this workbook or view your changes until it is checked in.";
+                Assert.assertTrue(excel.getAbstractUtil().isObjectDisplayed(l2, expectedMessage.replace(" ", "").replace(".", "")), "Message: "+expectedMessage+" is not displayed.");
+                Assert.assertTrue(excel.getAbstractUtil().isObjectDisplayed(l2, "DiscardCheckOut"), "Discard Check Out action is not available");
+                Assert.assertTrue(excel.getAbstractUtil().isObjectDisplayed(l2, "CheckIn"), "Check In action is not available");
 
                 // 6. Log into Share;
 
@@ -399,13 +401,18 @@ public class MSExcelTest extends AbstractUtils
                 String excelName = excel.getAbstractUtil().findWindowName(xlsFileName_9834);
                 Assert.assertTrue(excelName.contains(xlsFileName_9834) && excelName.contains("Excel"), "File was not found");
 
+                Ldtp l1 = excel.getAbstractUtil().setOnWindow(xlsFileName_9834);
+
+                // Checkout the document
+                excel.checkOutOffice(l1); 
+                
+                Ldtp l2 = excel.getAbstractUtil().setOnWindow(xlsFileName_9834);
+
                 // 1. Make some changes to the excel document;
                 // 2. Click Save button;
                 String newContent = testName;
-                excel.editOffice(l, newContent);
-                // Ldtp l2 = new
-                // Ldtp(excel.getAbstractUtil().findWindowName("AONE_9834"));
-                excel.saveOffice(l);
+                excel.editOffice(l2, newContent);
+                excel.saveOffice(l2);
 
                 // 3. Log into Share;
                 ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
