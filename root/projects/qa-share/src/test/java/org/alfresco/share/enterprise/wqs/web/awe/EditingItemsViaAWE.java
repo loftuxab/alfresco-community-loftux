@@ -4,14 +4,13 @@ import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.BOLD;
 import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.BULLET;
 import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.ITALIC;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
-import org.alfresco.po.alfresco.WcmqsArticleDetails;
-import org.alfresco.po.alfresco.WcmqsEditPage;
-import org.alfresco.po.alfresco.WcmqsHomePage;
-import org.alfresco.po.alfresco.WcmqsLoginPage;
-import org.alfresco.po.alfresco.WcmqsNewsArticleDetails;
-import org.alfresco.po.alfresco.WcmqsNewsPage;
+import org.alfresco.po.share.wqs.WcmqsArticleDetails;
+import org.alfresco.po.share.wqs.WcmqsEditPage;
+import org.alfresco.po.share.wqs.WcmqsHomePage;
+import org.alfresco.po.share.wqs.WcmqsLoginPage;
+import org.alfresco.po.share.wqs.WcmqsNewsArticleDetails;
+import org.alfresco.po.share.wqs.WcmqsNewsPage;
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
 import org.alfresco.po.share.dashlet.WebQuickStartOptions;
 import org.alfresco.po.share.enums.Dashlets;
@@ -25,6 +24,7 @@ import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Keys;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -45,8 +45,9 @@ public class EditingItemsViaAWE extends AbstractUtils
     public void setup() throws Exception
     {
         super.setup();
-        wqsURL = "http://localhost:8080/wcmqs";
         testName = this.getClass().getSimpleName();
+        wqsURL = wcmqs;
+        logger.info(" wcmqs url : " + wqsURL);
         logger.info("Start Tests from: " + testName);
     }
 
@@ -94,6 +95,7 @@ public class EditingItemsViaAWE extends AbstractUtils
 
     }
 
+    /** AONE-5607:Verify correct displaying of Edit blog post/article page */
     @Test(groups = "WQS")
     public void AONE_5607() throws Exception
     {
@@ -103,7 +105,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Expected results ----
         // Sample site is opened
 
-        drone.navigateTo("http://localhost:8080/wcmqs/");
+        drone.navigateTo(wqsURL);
 
         // ---- Step 2 ----
         // ---- Step action ---
@@ -126,6 +128,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // Edit window is opened
 
         WcmqsEditPage wcmqsEditPage = wcmqsNewsArticleDetails.clickEditButton();
+        wcmqsEditPage.render();
 
         // ---- Step 4 ----
         // ---- Step action ---
@@ -133,13 +136,72 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Expected results ----
         // The form contains of fields: Name(mandatory), Title, Description,
         // Content, Template Name. It also contains Submit and Cancel buttons
-        // TODO: wcmqsEditPage.isFieldDisplayed("");
+        Assert.assertTrue(wcmqsEditPage.isNameFieldDisplayed(),"Name field is not displayed");
+        Assert.assertTrue(wcmqsEditPage.isNameFieldMandatory(),"Name field is not mandatory");
+        Assert.assertTrue(wcmqsEditPage.isTitleFieldDisplayed(),"Title field is not displayed");
+        Assert.assertTrue(wcmqsEditPage.isDescriptionFieldDisplayed(),"Description field is not displayed");
+        Assert.assertTrue(wcmqsEditPage.isContentFrameDisplayed(),"Content frame is not displayed");
+        Assert.assertTrue(wcmqsEditPage.isTemplateNameDisplayed(),"Template Name field is not displayed");
+        Assert.assertTrue(wcmqsEditPage.isSubmitButtonDisplayed(),"Submit button is not displayed");
+        Assert.assertTrue(wcmqsEditPage.isCancelButtonDisplayed(),"Cancel button is not displayed");
     }
+    
+    /**  AONE-5608:Editing blog post/article, Name(negative test with spaces) */
+    @Test(groups = "WQS")
+    public void AONE_5608() throws Exception
+    {
+        drone.navigateTo(wqsURL);
+        drone.maximize();
 
+        WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+        wcmqsHomePage.selectFirstArticleFromLeftPanel();
+
+        // Login
+        WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+        wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+        WcmqsNewsArticleDetails wcmqsNewsArticleDetails = new WcmqsNewsArticleDetails(drone);
+        WcmqsEditPage wcmqsEditPage = wcmqsNewsArticleDetails.clickEditButton();
+
+        // ---- Step 1 ----
+        // ---- Step action ---
+        // Fill all mandatory fields with correct information
+        // ---- Expected results ----
+        // Data is entered successfully
+        String name = wcmqsEditPage.getArticleDetails().getName();
+        wcmqsEditPage.editName(name);
+
+        // ---- Step 2 ----
+        // ---- Step action ---
+        // Verify Submit button
+        // ---- Expected results ----
+        // Submit button is active
+        Assert.assertTrue(wcmqsEditPage.isSubmitButtonDisplayed(), "Submit button is not displayed.");
+
+        // ---- Step 3 ----
+        // ---- Step action ---
+        // Fill Name field with spaces;
+        // ---- Expected results ----
+        // Data is entered successfully;
+        String newName="ar tic le"+getTestName()+".html";
+        wcmqsEditPage.editName(newName);
+        wcmqsEditPage.moveFocusToTitle();
+        Assert.assertTrue(wcmqsEditPage.getArticleDetails().getName().contains(newName));
+
+        // ---- Step 4 ----
+        // ---- Step action ---
+        // Verify Submit button
+        // ---- Expected results ----
+        // Submit button isn't active/friendly notification is displayed;
+        Assert.assertEquals(wcmqsEditPage.getNotificationMessage(), "The value cannot have spaces.");
+
+    }  
+
+    /** AONE-5609:Editing blog post/article, Name(negative test, empty field) */
     @Test(groups = "WQS")
     public void AONE_5609() throws Exception
     {
-        drone.navigateTo("http://localhost:8080/wcmqs/");
+        drone.navigateTo(wqsURL);
+        drone.maximize();
 
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.selectFirstArticleFromLeftPanel();
@@ -170,23 +232,23 @@ public class EditingItemsViaAWE extends AbstractUtils
         // Leave Name field empty
         // ---- Expected results ----
         // Name field is empty
-        String name2 = "";
-        wcmqsEditPage.editName(name2);
+        wcmqsEditPage.sendKeyOnName(Keys.RETURN);
 
         // ---- Step 4 ----
         // ---- Step action ---
         // Verify Submit button
         // ---- Expected results ----
         // Submit button isn't active/friendly notification is displayed
-        wcmqsEditPage.clickSubmitButton();
+        //wcmqsEditPage.clickSubmitButton();
         Assert.assertEquals(wcmqsEditPage.getNotificationMessage(), "The value cannot be empty.");
 
     }
 
+    /** AONE-5610:Editing blog post/article, Name(negative test with wildcards) */
     @Test(groups = "WQS", enabled = true)
     public void AONE_5610() throws Exception
     {
-        drone.navigateTo("http://localhost:8080/wcmqs/");
+        drone.navigateTo(wqsURL);
 
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.selectFirstArticleFromLeftPanel();
@@ -230,10 +292,11 @@ public class EditingItemsViaAWE extends AbstractUtils
 
     }
 
+    /** AONE-5611:Editing blog post/article, Name(positive test) */
     @Test(groups = "WQS", enabled = true)
     public void AONE_5611() throws Exception
     {
-        drone.navigateTo("http://localhost:8080/wcmqs/");
+        drone.navigateTo(wqsURL);
 
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.selectFirstArticleFromLeftPanel();
@@ -265,6 +328,7 @@ public class EditingItemsViaAWE extends AbstractUtils
 
     }
 
+    /** AONE-5612:Editing Content field */
     @Test(groups = "WQS", enabled = true)
     public void AONE_5612() throws Exception
     {
@@ -274,7 +338,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         String textBullet = "Bullet Text";
         String colorText = "Color Text";
 
-        drone.navigateTo("http://localhost:8080/wcmqs/");
+        drone.navigateTo(wqsURL);
 
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         WcmqsNewsArticleDetails wcmqsNewsArticleDetails = new WcmqsNewsArticleDetails(drone);
@@ -354,7 +418,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Expected results ----
         // Last formatting action is canceled
         String editedText = "text to undo";
-        tinyMceEditor.setText("aaaa");
+        tinyMceEditor.setText(editedText);
         tinyMceEditor.clickEdit();
         tinyMceEditor.clickUndo();
         Assert.assertFalse(tinyMceEditor.getContent().contains(editedText));
@@ -418,6 +482,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 1 ----
         // ---- Step Action -----
         // Change some data in Content field;
+        // ---- Expected results ----
         // Data is changed successfully;
         String newContent = "content " + getTestName();
         editPage.insertTextInContent(newContent);
@@ -426,6 +491,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 2 ----
         // ---- Step Action -----
         // Click Cancel button;
+        // ---- Expected results ----
         // Edit blog post/article form is closed, changes are not saved;
         editPage.clickCancelButton();
         article = WcmqsNewsArticleDetails.getCurrentNewsArticlePage(drone);
@@ -459,6 +525,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 1 ----
         // ---- Step Action -----
         // Change some data in Title field;
+        // ---- Expected results ----
         // Data is changed successfully;
         String newTitle = "title " + getTestName();
         editPage.editTitle(newTitle);
@@ -467,6 +534,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 2 ----
         // ---- Step Action -----
         // Click Cancel button;
+        // ---- Expected results ----
         // Edit blog post/article form is closed, changes are not saved;
         editPage.clickCancelButton();
         article = WcmqsNewsArticleDetails.getCurrentNewsArticlePage(drone);
@@ -500,6 +568,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 1 ----
         // ---- Step Action -----
         // Change some data in Title field;
+        // ---- Expected results ----
         // Data is changed successfully;
         String newTitle = "title " + getTestName();
         editPage.editTitle(newTitle);
@@ -508,6 +577,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 2 ----
         // ---- Step Action -----
         // Click Sumbit button;
+        // ---- Expected results ----
         // Edit blog post/article form is closed, changes are saved;
         editPage.clickSubmitButton();
         WcmqsNewsPage newsPage = new WcmqsNewsPage(drone);
@@ -541,6 +611,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 1 ----
         // ---- Step Action -----
         // Change data in Description field;
+        // ---- Expected results ----
         // Data is entered successfully;
         String newDescription = "new description " + getTestName();
         editPage.editDescription(newDescription);
@@ -549,6 +620,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 2 ----
         // ---- Step Action -----
         // Click Cancel button;
+        // ---- Expected results ----
         // Edit blog post/article form is closed, description data isn't changed;
         editPage.clickCancelButton();
         article = WcmqsNewsArticleDetails.getCurrentNewsArticlePage(drone);
@@ -585,6 +657,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 1 ----
         // ---- Step Action -----
         // Change data in Description field;
+        // ---- Expected results ----
         // Data is entered successfully;
         String newDescription = "new description~!@#$%^&*(a)";
         editPage.editDescription(newDescription);
@@ -593,6 +666,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 2 ----
         // ---- Step Action -----
         // Click Submit button;
+        // ---- Expected results ----
         // Edit blog post/article form is closed, description data is changed;
         editPage.clickSubmitButton();
         WcmqsNewsPage newsPage = new WcmqsNewsPage(drone).render();
@@ -627,6 +701,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 1 ----
         // ---- Step Action -----
         // Change data in Description field;
+        // ---- Expected results ----
         // Data is entered successfully;
         String newDescription = "new description " + getTestName();
         editPage.editDescription(newDescription);
@@ -635,6 +710,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step 2 ----
         // ---- Step Action -----
         // Click Submit button;
+        // ---- Expected results ----
         // Edit blog post/article form is closed, description data is changed;
         editPage.clickSubmitButton();
         WcmqsNewsPage newsPage = new WcmqsNewsPage(drone).render();
