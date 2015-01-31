@@ -1120,6 +1120,24 @@
     </profile>
 
     <profile>
+        <id>db2</id>
+        <properties>
+            <db.driver>com.ibm.db2.jcc.DB2Driver</db.driver>
+            <db.url>jdbc:db2://${db.host}:50000/${db.name}</db.url>
+            <db.username>db2admin</db.username>
+            <!-- No master URL for DB2: it's not possible to drop a database through an SQL command -->
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>com.ibm.db2.jcc</groupId>
+                <artifactId>db2jcc4</artifactId>
+                <version>4.12.55</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </profile>
+
+    <profile>
         <id>h2</id>
         <properties>
             <db.params>MODE=PostgreSQL;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000;MVCC=TRUE</db.params>
