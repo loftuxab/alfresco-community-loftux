@@ -5,10 +5,12 @@ import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
 import org.alfresco.po.share.site.document.UserProfile;
+import org.alfresco.po.share.site.document.UserSearchRow;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.util.PageUtils;
+import org.alfresco.share.util.FtpUtil;
 import org.alfresco.share.util.FtpsUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserRepositoryPage;
@@ -26,6 +28,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.alfresco.po.share.enums.UserRole.*;
 import static org.testng.Assert.*;
@@ -89,7 +92,7 @@ public class FtpsTest extends FtpsUtil
                 managePermissionsPage.setAccessType(profile, userRoles[Arrays.asList(folderNames).indexOf(theFolder)]);
                 managePermissionsPage.selectSave();
             }
-            /*SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+            SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
             if (clusteringPage.isClusterEnabled())
             {
@@ -98,7 +101,7 @@ public class FtpsTest extends FtpsUtil
             else
             {
                 server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
-            }*/
+            }
 
             FtpsUtil.setCustomFtpPort(drone, ftpPort);
             if (!keystorePath.isEmpty())
@@ -113,8 +116,7 @@ public class FtpsTest extends FtpsUtil
         }
         catch (Exception e)
         {
-            disableFTPS();
-            throw new SkipException("Skipping as test data wasn't generated");
+            throw new SkipException("Skipping as test data wasn't generated: " + e.getMessage());
         }
     }
 
@@ -424,6 +426,7 @@ public class FtpsTest extends FtpsUtil
     private void deleteFolders()
     {
             boolean isRemoved;
+
             for (String theFolder : folderNames)
             {
                 try
@@ -434,7 +437,9 @@ public class FtpsTest extends FtpsUtil
                 }
                 catch (IOException ex)
                 {
-                    throw new RuntimeException(ex.getMessage());
+                    isRemoved = FtpUtil.DeleteSpace(server, ADMIN_USERNAME, ADMIN_PASSWORD, theFolder, remotePathToRepo);
+                    if(!isRemoved)
+                        FtpUtil.DeleteSpace(server, ADMIN_USERNAME, ADMIN_PASSWORD, theFolder + "-FTPS", remotePathToRepo);
                 }
             }
     }
