@@ -59,7 +59,7 @@ public abstract class AbstractEditProperties extends ShareDialogue
     protected static final By INPUT_SITE_HOSTNAME_SELECTOR = By.cssSelector("input[id$='hostName']");
     protected static final By WEB_ASSETS_LIST = By.cssSelector("div[id$='webassets-cntrl-currentValueDisplay']");
     protected static final By REDITION_CONFIG = By.cssSelector("textarea[id$='prop_ws_renditionConfig']");
-
+    protected static final By INPUT_RECORD_LOCATION = By.cssSelector("input[id$='prop_rma_location']");
     /**
      * Clear the input field and inserts the new value.
      *
@@ -290,4 +290,15 @@ public abstract class AbstractEditProperties extends ShareDialogue
     {
         drone.findAndWait(TRANSFER_ENABLED).click();
     }
+    
+    /**
+     * Enters a value in to the record properties.
+     *
+     * @param name String name input
+     */
+    public void setLocation(final String location)
+    {
+        setInput(drone.findAndWait(INPUT_RECORD_LOCATION), location);
+    }
+
 }

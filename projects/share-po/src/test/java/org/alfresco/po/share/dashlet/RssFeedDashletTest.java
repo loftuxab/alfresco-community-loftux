@@ -52,8 +52,8 @@ public class RssFeedDashletTest extends AbstractSiteDashletTest
 
     private static final String EXP_HELP_BALLOON_MSG = "This dashlet shows the RSS feed of your choice. Click the edit icon on the dashlet to change the feed.";
     private static final String EXP_TITLE_BY_DEFAULT = "Alfresco Blog";
-    private static final String CUSTOM_RSS_URL = "http://projects.apache.org/feeds/atom.xml";
-    private static final String EXP_CUSTOM_RSS_TITLE = "Apache Software Foundation Project Releases";
+    private static final String CUSTOM_RSS_URL = "http://rss.cnn.com/rss/edition_europe.rss";
+    private static final String EXP_CUSTOM_RSS_TITLE = "CNN.com - Europe";
     String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
     String rssTitle = "Reuters: Business News";
 

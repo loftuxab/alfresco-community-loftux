@@ -21,8 +21,10 @@ import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.po.share.DeleteGroupFromGroupPage;
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.webdrone.ElementState;
 import org.alfresco.webdrone.HtmlPage;
@@ -40,6 +42,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
 /**
@@ -957,7 +960,67 @@ public class CloudTaskOrReviewPage extends WorkFlowPage
         }
     }
 
-    /**
+    public boolean isMessageTextFieldPresent()
+    {
+        try
+        {
+            return (drone.findAndWait(MESSAGE_TEXT).isDisplayed());
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+    }
+
+    public boolean isTypeDropDownPresent()
+    {
+        try
+        {
+            return (drone.findAndWait(TYPE_DROP_DOWN_BUTTON).isDisplayed());
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+    }
+
+    public boolean isHelpIconPresent()
+    {
+        try
+        {
+            return (drone.findAndWait(WORKFLOW_DESCRIPTION_HELP_ICON).isDisplayed());
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+    }
+
+    public boolean isDueDatePresent()
+    {
+        try
+        {
+            return (drone.findAndWait(DUE_DATE).isDisplayed());
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+    }
+
+    public boolean isPriorityDropDownPresent()
+    {
+        try
+        {
+            return (drone.findAndWait(PRIORITY_DROPDOWN).isDisplayed());
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+    }
+
+     /**
      * Verify if if selected After Completion is correct
      * 
      * @return true if exists
