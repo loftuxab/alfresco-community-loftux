@@ -111,6 +111,8 @@ public class SiteTest extends AbstractTest
         Assert.assertTrue(siteName.equalsIgnoreCase(site.getPageTitle()));
         Assert.assertTrue(site.getSiteNav().isDashboardActive());
         Assert.assertFalse(site.getSiteNav().isDocumentLibraryActive());
+        Assert.assertTrue(site.getSiteNav().isDashboardDisplayed());
+        Assert.assertTrue(site.getSiteNav().isSelectSiteMembersDisplayed());
     }
     
     @Test(dependsOnMethods="createSite")
@@ -277,6 +279,15 @@ public class SiteTest extends AbstractTest
         Assert.assertTrue(siteDetails.isPrivate());
         Assert.assertFalse(siteDetails.isModerate());
         siteDetails.cancel();
+    }
+    
+    @Test(dependsOnMethods = "createPrivateModerateSiteShouldYeildPrivateSite")
+    public void isEditingEnabled()
+    {
+        CreateSitePage createSite = dashBoard.getNav().selectCreateSite().render();
+        Assert.assertFalse(createSite.isNameEditingDisaabled(), "Name Should be enabled for editing.");
+        Assert.assertFalse(createSite.isUrlNameEditingDisaabled(), "URL Name should be enabled for editing");
+        createSite.cancel();
     }
     
     @Test(expectedExceptions = UnsupportedOperationException.class)

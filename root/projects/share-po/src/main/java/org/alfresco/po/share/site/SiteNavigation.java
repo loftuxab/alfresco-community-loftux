@@ -50,7 +50,6 @@ public class SiteNavigation extends AbstractSiteNavigation
     private Log logger = LogFactory.getLog(SiteNavigation.class);
 
     protected final String siteMembersCSS;
-    protected final By moreButton;
     private final String documentLibLink;
     private final By customizeDashboardLink;
 
@@ -63,7 +62,6 @@ public class SiteNavigation extends AbstractSiteNavigation
         siteMembersCSS = drone.getElement("site.members");
         documentLibLink = getAlfrescoVersion().isDojoSupported() ? LABEL_DOCUMENTLIBRARY_PLACEHOLDER : String.format(SITE_LINK_NAV_PLACEHOLER, 3);
         customizeDashboardLink = getAlfrescoVersion().isDojoSupported() ? By.id("HEADER_CUSTOMIZE_SITE_DASHBOARD") : CUSTOMISE_DASHBOARD_BTN;
-        moreButton = getAlfrescoVersion().isDojoSupported() ? By.cssSelector("span.alf-menu-arrow") : By.cssSelector("button[id$='_default-more-button']");
     }
 
     /**
@@ -168,9 +166,9 @@ public class SiteNavigation extends AbstractSiteNavigation
     /**
      * Mimics the action of clicking more button.
      */
-    public void selectMore()
+    public void selectSiteConfigMore()
     {
-        findElement(moreButton).click();
+        findElement(By.cssSelector(SITE_CONFIG_MORE)).click();
     }
 
     /**
@@ -185,7 +183,7 @@ public class SiteNavigation extends AbstractSiteNavigation
         {
             if (Enterprise41.equals(getAlfrescoVersion()))
             {
-                selectMore();
+                selectSiteConfigMore();
                 List<WebElement> elements = findAllWithWait(MORE_BUTTON_LINK);
                 for (WebElement webElement : elements)
                 {
@@ -450,7 +448,7 @@ public class SiteNavigation extends AbstractSiteNavigation
         {
             if (Enterprise41.equals(getAlfrescoVersion()))
             {
-                selectMore();
+                selectSiteConfigMore();
                 drone.findAndWait(LEAVE_SITE).click();
             }
             else
@@ -466,13 +464,26 @@ public class SiteNavigation extends AbstractSiteNavigation
         }
         throw new PageException("Not able to find Leave Site Link.");
     }
-
-    private void clickMoreIfExist()
+    
+    /**
+     * Checks if More drop down is displayed.
+     *
+     * @return <code>true</code> if displayed <code>false</code> otherwise
+     */
+    public boolean isMoreDisplayed()
+    {
+        return isLinkDisplayed(SITE_MORE_PAGES);
+    }
+    
+    protected void clickMoreIfExist()
     {
         try
         {
-            WebElement element = drone.find(SITE_MORE_PAGES);
-            element.click();
+            if(isMoreDisplayed())
+            {
+                WebElement element = drone.find(SITE_MORE_PAGES);
+                element.click();
+            }
         }
         catch (StaleElementReferenceException e)
         {

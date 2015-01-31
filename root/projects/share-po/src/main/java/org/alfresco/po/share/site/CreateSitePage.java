@@ -154,8 +154,6 @@ public class CreateSitePage extends ShareDialogue
                 }
                 selectSiteType(siteType);
                 return selectOk();
-                // drone.find(SUBMIT_BUTTON).click();
-                // return new SiteDashboardPage(drone);
             default:
                 throw new PageOperationException("No site type match found for: " + siteType + " out of the following possible options: Collaboration");
         }
@@ -377,4 +375,33 @@ public class CreateSitePage extends ShareDialogue
     {
         return drone.find(By.name("shortName")).getAttribute("value");
     }
+    
+    /**
+     * Check whether URL Name disabled for editing.
+     * 
+     * @return True if URL Name  Input text box disabled, else false.
+     */
+    public boolean isUrlNameEditingDisaabled()
+    {
+        if(drone.find(By.name("shortName")).getAttribute("disabled") != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check whether URL Name disabled for editing.
+     * 
+     * @return True if URL Name  Input text box disabled, else false.
+     */
+    public boolean isNameEditingDisaabled()
+    {
+        if(drone.find(By.name("title")).getAttribute("disabled") != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
 }
