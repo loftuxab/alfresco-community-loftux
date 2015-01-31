@@ -71,8 +71,8 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
         opUser = getUserNameForDomain(testName + "opUser", testDomain);
         cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
 
-        cloudSite = getSiteName(testName + "CL" + "D1");
-        opSite = getSiteName(testName + "OP" + "D1");
+        cloudSite = getSiteName(testName + "CL");
+        opSite = getSiteName(testName + "OP");
 
     }
 
@@ -891,7 +891,6 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
     public void AONE_15625() throws Exception
     {
 
-    
         String workFlowName = "Cloud Review Task test message" + testName + "-15625CL";
         fileName = getFileName(testName) + "-15625" + ".txt";
 
@@ -991,7 +990,9 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
 
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
-        EditTaskPage editTaskPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).navigateToEditTaskPage(workFlowName).render();
+        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+        findTasks(hybridDrone, workFlowName);
+        EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
 
         editTaskPage.enterComment("test comment");
         editTaskPage.selectSaveButton().render();
@@ -1006,7 +1007,6 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
     public void AONE_15626() throws Exception
     {
 
-    
         String workFlowName = "Cloud Review Task test message" + testName + "-15626CL";
         fileName = getFileName(testName) + "-15626" + ".txt";
 
@@ -1094,15 +1094,14 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
 
         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
 
-
         ShareUser.logout(drone);
 
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
-        
+
         findTasks(hybridDrone, workFlowName);
-        
+
         EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
 
         editTaskPage.enterComment("test comment");
@@ -1132,7 +1131,6 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
     public void AONE_15627() throws Exception
     {
 
-    
         String workFlowName = "Cloud Review Task test message" + testName + "-15627CL";
         fileName = getFileName(testName) + "-15627" + ".txt";
 
@@ -1245,13 +1243,12 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             // The following data is displayed:
             // Verify task was completed on the cloud admin (None) Not Yet Started
             // TODO task was approved
-            
+
             List<WorkFlowDetailsCurrentTask> workFlowDetailsCurrentTask = workFlowDetailsPage.getCurrentTasksList();
             assertEquals(workFlowDetailsCurrentTask.get(0).getTaskType(), CurrentTaskType.DOCUMENT_WAS_APPROVED_ON_CLOUD);
             assertEquals(workFlowDetailsCurrentTask.get(0).getAssignedTo(), getUserFullName(opUser));
             assertEquals(workFlowDetailsCurrentTask.get(0).getDueDateString(), NONE);
             assertEquals(workFlowDetailsCurrentTask.get(0).getTaskStatus(), TaskStatus.NOTYETSTARTED);
-
 
             // --- Step 10 ---
             // --- Step action ---
@@ -1261,7 +1258,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
 
             myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).selectActiveTasks().render();
             assertTrue(myTasksPage.isTaskPresent(workFlowName));
-                        
+
             // --- Step 11 ---
             // --- Step action ---
             // Open the task details.
@@ -1269,13 +1266,13 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             // Performed correctly. Information details are displayed. The title is
             // "Details: Cloud Review Task test message (Document was approved on the cloud)". Edit button is present under the information details section.
 
-            taskDetailsPage =  myTasksPage.selectViewTasks(workFlowName).render();
+            taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
             assertTrue(taskDetailsPage.isBrowserTitle("Task Details"));
 
             String header = "Details: " + workFlowName + " (Document was approved on the cloud)";
             assertEquals(taskDetailsPage.getTaskDetailsHeader(), header);
             assertTrue(taskDetailsPage.isEditButtonPresent());
-            
+
             // --- Step 12 ---
             // --- Step action ---
             // Verify 'Info' section.
@@ -1294,7 +1291,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             assertEquals(taskInfo.getPriority(), Priority.MEDIUM);
             assertEquals(taskInfo.getDueDateString(), NONE);
             assertNotNull(taskInfo.getIdentifier());
-            
+
             // --- Step 13 ---
             // --- Step action ---
             // Verify 'Progress' section.
@@ -1303,7 +1300,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             // Status: Not Yet Started
 
             assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.NOTYETSTARTED);
-     
+
             // --- Step 14 ---
             // --- Step action ---
             // Verify 'Items' section.
@@ -1313,7 +1310,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             List<TaskItem> taskItems = taskDetailsPage.getTaskItems();
             assertEquals(taskItems.size(), 1);
             assertEquals(taskItems.get(0).getItemName(), fileName);
-            
+
             // --- Step 15 ---
             // --- Step action ---
             // Verify 'Response' section.
@@ -1322,8 +1319,7 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
             // Comment: test comment edited
 
             assertEquals(taskDetailsPage.getComment(), getUserFullName(cloudUser) + ": " + "test comment edited  (Approved)");
-            
-            
+
             ShareUser.logout(drone);
 
         }
@@ -1374,13 +1370,14 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
         // edit task with comment an
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
         findTasks(hybridDrone, workFlowName);
-      
+
         EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
 
         editTaskPage.enterComment("test comment");
         editTaskPage.selectStatusDropDown(TaskStatus.INPROGRESS);
 
         myTasksPage = editTaskPage.selectSaveButton().render();
+        findTasks(hybridDrone, workFlowName);
         TaskDetailsPage taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
 
         assertEquals(taskDetailsPage.getTaskStatus(), TaskStatus.INPROGRESS);
@@ -1404,7 +1401,6 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
     public void AONE_15628() throws Exception
     {
 
-    
         String workFlowName = "Cloud Review Task test message" + testName + "-15628CL";
         fileName = getFileName(testName) + "-15628" + ".txt";
 
@@ -1574,7 +1570,6 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
     public void AONE_15629() throws Exception
     {
 
-    
         String workFlowName = "Cloud Review Task test message" + testName + "-15629CL";
         fileName = getFileName(testName) + "-15629" + ".txt";
 
@@ -1691,6 +1686,6 @@ public class CompleteCloudReviewTaskTests extends AbstractWorkflow
     {
 
         assertTrue(driver.findAndWaitWithRefresh(By.xpath(String.format("//a[text()='%s']", workFlowName))).isDisplayed());
-        
-   }
+
+    }
 }
