@@ -142,9 +142,10 @@
         <property name="documentHelper" ref="vtiDocumentHelper" />
         <property name="pathHelper" ref="vtiPathHelper" />
         <property name="shareUtils" ref="shareUtils" />
+        <property name="davService" ref="webdavService"/>
         <property name="activityPoster" ref="vtiActivityPoster"/>
         <property name="davHelper" ref="sppDAVHelper"/>
-        <property name="davService" ref="webdavService"/>
+        <property name="tenantService" ref="tenantService"/>
     </bean>
     
     <bean id="vtiHandlerTarget" parent="abstractVtiHandlerTarget"/>
