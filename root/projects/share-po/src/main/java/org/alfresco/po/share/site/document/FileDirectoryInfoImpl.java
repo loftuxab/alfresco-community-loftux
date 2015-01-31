@@ -106,6 +106,8 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     protected String rowElementXPath = null;
     protected String MORE_ACTIONS;
     protected String VIEW_ORIGINAL_DOCUMENT = "div.document-view-original>a";
+    protected String DECLARE_AS_RECORD = "div.rm-create-record>a";
+    protected String IN_COMPLETE_RECORD = "div.info-banner";
 
     protected String IS_FOLDER ="img[src*='.png']";
 
@@ -116,8 +118,6 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
 
     protected By DETAIL_WINDOW = By.xpath("//div[@class='alf-detail-thumbnail']/../../..");
     protected String DOCUMENT_WEB_ASSET = "div.document-preview-webasset>a";
-    protected String DECLARE_AS_RECORD = "div.rm-create-record>a";
-    protected String IN_COMPLETE_RECORD = "div.info-banner";
 
     public FileDirectoryInfoImpl(String nodeRef, WebElement webElement, WebDrone drone)
     {
@@ -2702,6 +2702,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         throw new UnsupportedOperationException("Not implemented in current view.");
     }
 
+    /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface.isGeoLocationIconDisplayed()
      */
@@ -2727,6 +2728,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface.isEXIFIconDisplayed()
+     */
     @Override
     public boolean isEXIFIconDisplayed()
     {
@@ -2830,8 +2832,10 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         return "";
     }
 
+    /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#selectLocateFile()
+     */
     @Override
     public void selectLocateFile()
     {
@@ -2853,6 +2857,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#selectEditOfflineAndCloseFileWindow()
+     */
     @Override
     public DocumentLibraryPage selectEditOfflineAndCloseFileWindow()
     {
@@ -2885,11 +2890,9 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
             throw new PageException("Robot not working");
         }
         throw new PageException("Unable to find Edit Offline link");
-        
-            
     }
     
-    @Override
+  
     public void declareRecord(){
         
         try
@@ -2929,6 +2932,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         
             
     }
+    
     /**
      * Verifies whether type is record.
      * @author hamara

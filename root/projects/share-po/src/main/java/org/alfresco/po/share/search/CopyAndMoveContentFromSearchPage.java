@@ -27,9 +27,8 @@ public class CopyAndMoveContentFromSearchPage extends ShareDialogue
 
     private static Log logger = LogFactory.getLog(CopyAndMoveContentFromSearchPage.class);
 
-    private final RenderElement FOOTER_ELEMENT = getVisibleRenderElement(By.cssSelector("div[class='footer']"));
-    private final RenderElement HEADER_ELEMENT = getVisibleRenderElement(By.cssSelector("div[class='dijitDialogTitleBar']"));
-    private final RenderElement DOC_LIST_VIEW = getVisibleRenderElement((By.cssSelector("div[id^='alfresco_documentlibrary_views_AlfDocumentListView']")));
+    private final RenderElement footerElement = getVisibleRenderElement(By.cssSelector("div[class='footer']"));
+    private final RenderElement headerElement = getVisibleRenderElement(By.cssSelector("div[class='dijitDialogTitleBar']"));
     private final By destinationListCss = By
             .cssSelector("div[class='sub-pickers']>div[class^='alfresco-menus-AlfMenuBar']>div>div[class^='dijitReset dijitInline']>span");
     private final By copyMoveOkOrCancelButtonCss = By.cssSelector("div[class='footer']>span");
@@ -57,13 +56,7 @@ public class CopyAndMoveContentFromSearchPage extends ShareDialogue
     @Override
     public CopyAndMoveContentFromSearchPage render(RenderTime timer)
     {
-        elementRender(timer, HEADER_ELEMENT, FOOTER_ELEMENT);
-        return this;
-    }
-    
-    public CopyAndMoveContentFromSearchPage renderDocumentListView(long timeInMilliSceonds)
-    {
-        elementRender(new RenderTime(timeInMilliSceonds), DOC_LIST_VIEW);
+        elementRender(timer, headerElement, footerElement);
         return this;
     }
 
@@ -336,24 +329,22 @@ public class CopyAndMoveContentFromSearchPage extends ShareDialogue
                 }
                 else if (!drone.isElementDisplayed(subpath))
                 {
-                    while (isNextButtonEnabled() || !(drone.isElementDisplayed(subpath)))
+                    scrollDwon();
+                    while (isNextButtonEnabled())
                     {
-                        scrollDwon();
+                        // scrollDwon();
                         selectNextButton();
                         if (drone.isElementDisplayed(subpath))
                         {
-                           break;
+                            drone.waitForElement(subpath, SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+                            drone.findAndWait(subpath).click();
                         }
+                        scrollDwon();
                     }
                 }
                 else if (!drone.isElementDisplayed(subpath) && (!isNextButtonEnabled()))
                 {
                     throw new PageOperationException("Next button enabled when site is displayed");
-                }
-                if (drone.isElementDisplayed(subpath))
-                {
-                    drone.waitForElement(subpath, SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
-                    drone.findAndWait(subpath).click();
                 }
                 pathCount++;
             }
@@ -372,13 +363,17 @@ public class CopyAndMoveContentFromSearchPage extends ShareDialogue
 
         catch (NoSuchElementException ne)
         {
-                 System.out.println(ne.getMessage());
+            if (logger.isTraceEnabled())
+            {
                 logger.trace("Unable to select the final folder", ne);
+            }
         }
         catch (TimeoutException e)
         {
-                System.out.println(e.getMessage());
+            if (logger.isTraceEnabled())
+            {
                 logger.trace("Unable to select the final folder ", e);
+            }
         }
 
         throw new PageOperationException("Unable to select the final folder");
@@ -387,19 +382,17 @@ public class CopyAndMoveContentFromSearchPage extends ShareDialogue
     /**
      * This method finds the clicks on next button in CopyAndMoveContentFromSearchPage
      */
-    public CopyAndMoveContentFromSearchPage selectNextButton()
+    public void selectNextButton()
     {
         selectButton(nextCss, "Unable to find the Next button on Copy/Move Dialog.");
-        return this;
     }
 
     /**
      * This method finds the clicks on back button in CopyAndMoveContentFromSearchPage
      */
-    public CopyAndMoveContentFromSearchPage selectBackButton()
+    public void selectBackButton()
     {
         selectButton(backCss, "Unable to find the close button on Copy/Move Dialog.");
-        return this;
     }
 
     /**
@@ -434,7 +427,7 @@ public class CopyAndMoveContentFromSearchPage extends ShareDialogue
     {
         try
         {
-            if (drone.findAndWait(nextCss).isDisplayed() && drone.findAndWait(nextCss).isEnabled())
+            if (drone.findAndWait(nextCss).isEnabled())
             {
                 return true;
             }
@@ -455,7 +448,7 @@ public class CopyAndMoveContentFromSearchPage extends ShareDialogue
     {
         try
         {
-            if (drone.findAndWait(backCss).isDisplayed() && drone.findAndWait(backCss).isEnabled())
+            if (drone.findAndWait(backCss).isEnabled())
             {
                 return true;
             }
@@ -471,18 +464,12 @@ public class CopyAndMoveContentFromSearchPage extends ShareDialogue
      * 
      * @return
      */
-    public CopyAndMoveContentFromSearchPage scrollDwon()
-    {              
-        By paginatorCss = By.cssSelector("div[id^='alfresco_documentlibrary_AlfDocumentListPaginator'] div[id$='PAGE_MARKER']");
-        try
+    private void scrollDwon()
+    {
+        WebElement element = drone.findAndWait(By.cssSelector("div[id$='PAGE_MARKER']>span"));
+        if (element.isDisplayed())
         {
-            WebElement paginator = drone.findAndWait(paginatorCss);
-            paginator.click();
-            return this;
-        }
-        catch (TimeoutException e)
-        {
-           throw new PageOperationException("Unable to click on paginator", e);
+            element.click();
         }
     }
 
