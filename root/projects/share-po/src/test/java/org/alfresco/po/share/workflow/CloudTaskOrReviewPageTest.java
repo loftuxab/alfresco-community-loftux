@@ -29,12 +29,14 @@ import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.SharePopup;
+import org.alfresco.po.share.site.SiteFinderPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.user.CloudSyncPage;
+import org.alfresco.po.share.user.Language;
 import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
@@ -168,6 +170,31 @@ public class CloudTaskOrReviewPageTest extends AbstractTest
         
         String date = cloudTaskOrReviewPage.getItemDate(file.getName());
         Assert.assertFalse(date.isEmpty());
+    }
+    
+    @Test(dependsOnMethods = "checkExceptionForNullDocs")
+    public void checkSelectCloudReviewWithLanguage()
+    {
+        SiteFinderPage siteFinder;
+        
+        SharePage page = drone.getCurrentPage().render();
+        siteFinder = page.getNav().selectSearchForSites().render();
+        siteFinder = SiteUtil.siteSearchRetry(drone, siteFinder, siteName);
+        siteFinder.selectSite(siteName);
+        
+        SitePage site = drone.getCurrentPage().render();
+        DocumentLibraryPage documentLibPage = site.getSiteNav().selectSiteDocumentLibrary().render();
+
+        DocumentDetailsPage documentDetailsPage = documentLibPage.selectFile(file.getName()).render();
+        
+        startWorkFlowPage = documentDetailsPage.selectStartWorkFlowPage().render();
+        cloudTaskOrReviewPage = ((CloudTaskOrReviewPage) startWorkFlowPage.getCloudTaskOrReviewPageInLanguage(Language.ENGLISH_US));
+        
+        cloudTaskOrReviewPage.selectTask(TaskType.CLOUD_REVIEW_TASK);
+        assertTrue(cloudTaskOrReviewPage.isTaskTypeSelected(TaskType.CLOUD_REVIEW_TASK));
+        assertFalse(cloudTaskOrReviewPage.isTaskTypeSelected(TaskType.SIMPLE_CLOUD_TASK));
+        
+        Assert.assertTrue(cloudTaskOrReviewPage.isAfterCompletionDropdownPresent());       
     }
 
     /**
