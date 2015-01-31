@@ -1,4 +1,4 @@
-package org.alfresco.po.alfresco;
+package org.alfresco.po.share.wqs;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 

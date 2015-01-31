@@ -1,4 +1,4 @@
-package org.alfresco.po.alfresco;
+package org.alfresco.po.share.wqs;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
