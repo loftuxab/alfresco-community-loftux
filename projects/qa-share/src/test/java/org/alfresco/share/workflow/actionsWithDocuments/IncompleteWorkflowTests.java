@@ -1,4 +1,4 @@
-package org.alfresco.share.workflow;
+package org.alfresco.share.workflow.actionsWithDocuments;
 
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.ContentDetails;
