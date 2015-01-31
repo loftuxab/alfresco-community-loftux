@@ -14,23 +14,13 @@
  */
 package org.alfresco.po.share.rules;
 
-import static org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractIfSelector.StringCompareOption.CONTAINS;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-
-import org.alfresco.po.share.AbstractTest;
-import org.alfresco.po.share.AlfrescoVersion;
-import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.NewUserPage;
-import org.alfresco.po.share.ShareUtil;
-import org.alfresco.po.share.UserSearchPage;
+import org.alfresco.po.share.*;
 import org.alfresco.po.share.site.NewFolderPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPageWithRules;
 import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
+import org.alfresco.po.share.site.contentrule.createrules.EmailMessageForm;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.ActionSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.IfSelectorCloudImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.IfSelectorEnterpImpl;
@@ -43,6 +33,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import static org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractIfSelector.StringCompareOption.CONTAINS;
+import static org.testng.Assert.*;
 
 /**
  * @author Aliaksei Boole
@@ -60,7 +53,7 @@ public class RulePagesTest extends AbstractTest
 
     /**
      * Pre test setup of a dummy file to upload.
-     * 
+     *
      * @throws Exception
      */
     @BeforeClass(groups = "alfresco-one")
@@ -75,7 +68,7 @@ public class RulePagesTest extends AbstractTest
 
     /**
      * Create User
-     * 
+     *
      * @throws Exception
      */
     private void createUserAndLogin() throws Exception
@@ -157,12 +150,12 @@ public class RulePagesTest extends AbstractTest
         whenSelector.selectInbound();
 
         AlfrescoVersion version = drone.getProperties().getVersion();
-        
-        if(!version.isCloud())
+
+        if (!version.isCloud())
         {
             ActionSelectorEnterpImpl actionSelectorEnterp = createRulePage.getActionOptionsObj();
             actionSelectorEnterp.selectIncrementCounter();
-            
+
             IfSelectorEnterpImpl ifSelectorEnterp = createRulePage.getIfOptionObj();
             ifSelectorEnterp.selectAllItems();
         }
@@ -189,12 +182,12 @@ public class RulePagesTest extends AbstractTest
         whenSelector.selectUpdate();
 
         AlfrescoVersion version = drone.getProperties().getVersion();
-        
-        if(!version.isCloud())
+
+        if (!version.isCloud())
         {
             ActionSelectorEnterpImpl actionSelectorEnterp = createRulePage.getActionOptionsObj();
             actionSelectorEnterp.selectExtractMetadata();
-            
+
             IfSelectorEnterpImpl ifSelectorEnterp = createRulePage.getIfOptionObj();
             ifSelectorEnterp.selectAuthor(CONTAINS, "a");
         }
@@ -253,12 +246,12 @@ public class RulePagesTest extends AbstractTest
         whenSelector.selectUpdate();
 
         AlfrescoVersion version = drone.getProperties().getVersion();
-        
-        if(!version.isCloud())
+
+        if (!version.isCloud())
         {
             ActionSelectorEnterpImpl actionSelectorEnterp = createRulePage.getActionOptionsObj();
             actionSelectorEnterp.selectExtractMetadata();
-            
+
             IfSelectorEnterpImpl ifSelectorEnterp = createRulePage.getIfOptionObj();
             ifSelectorEnterp.selectAuthor(CONTAINS, "a");
         }
@@ -279,6 +272,22 @@ public class RulePagesTest extends AbstractTest
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
         assertTrue(folderRulesPageWithRules.isRuleNameDisplayed("testRuleName3"));
+    }
+
+    @Test(dependsOnMethods = "isRuleNameDisplayedTest", groups = "EnterpriseOnly")
+    public void checkEmailForm()
+    {
+        FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
+        CreateRulePage createRulePage = folderRulesPageWithRules.clickNewRuleButton();
+        ActionSelectorEnterpImpl actionSelectorEnterp = createRulePage.getActionOptionsObj();
+        EmailMessageForm emailMessageForm = actionSelectorEnterp.selectSendEmail();
+        assertTrue(emailMessageForm.isDisplay());
+        emailMessageForm.addUserToRecipients(userName);
+        emailMessageForm.removeUserFromRecipients(userName);
+        emailMessageForm.fillSubjectField("test subj");
+        emailMessageForm.fillMessageArea("test body. Arrrrrrrrr!!!!");
+        emailMessageForm.clickClose();
+        assertFalse(emailMessageForm.isDisplay());
     }
 
 }
