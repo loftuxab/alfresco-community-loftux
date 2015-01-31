@@ -362,6 +362,7 @@
                             <includes>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/utilities/utilities.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/button/button-min.js</include>
+                                <include>${project.build.directory}/${project.build.finalName}/yui/button/buttonariaplugin-min.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/container/container-min.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/menu/menu-min.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/json/json-min.js</include>
@@ -398,6 +399,7 @@
                                 <include>${project.build.directory}/${project.build.finalName}/yui/get/get-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/yuiloader/yuiloader-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/button/button-debug.js</include>
+                                <include>${project.build.directory}/${project.build.finalName}/yui/button/buttonariaplugin-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/container/container-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/menu/menu-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/json/json-debug.js</include>
