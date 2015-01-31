@@ -35,6 +35,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.List;
 
 import static org.alfresco.po.share.task.EditTaskPage.Button.*;
 import static org.testng.Assert.assertFalse;
@@ -92,8 +93,19 @@ public class EditTaskPageTest extends AbstractTaskTest
     {
         SiteUtil.deleteSite(drone, siteName);
     }
-
+    
     @Test(groups = "Enterprise4.2")
+    public void checkIsLabels()
+    {
+        List<String> formLabels = pageUnderTest.getAllLabels();       
+        assertTrue(formLabels.contains("Message:"));
+        assertTrue(formLabels.contains("Owner:"));
+        assertTrue(formLabels.contains("Priority:"));
+        assertTrue(formLabels.contains("Due:"));
+        assertTrue(formLabels.contains("Identifier:"));
+    }
+       
+    @Test(groups = "Enterprise4.2", dependsOnMethods = "checkIsLabels")
     public void checkIsButtonDisplayed()
     {
         assertTrue(pageUnderTest.isButtonsDisplayed(SAVE_AND_CLOSE));

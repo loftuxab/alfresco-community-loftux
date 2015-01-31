@@ -38,13 +38,13 @@ import org.openqa.selenium.WebElement;
  */
 public class TaskHistoryPage extends AbstractWorkFlowTaskDetailsPage
 {
-    private static final By MY_TASKS_LIST_LINK = By.cssSelector("span>a[href*='workflows|active']");
+    //private static final By MY_TASKS_LIST_LINK = By.cssSelector("span>a[href*='workflows|active']");
 
     private static final By ALL_FIELD_LABELS = By.cssSelector("span[class$='viewmode-label']");
 
     private final Log logger = LogFactory.getLog(this.getClass());
 
-    private RenderElement myTasksListLink = getVisibleRenderElement(MY_TASKS_LIST_LINK);
+    //private RenderElement myTasksListLink = getVisibleRenderElement(MY_TASKS_LIST_LINK);
 
     /**
      * Constructor.
@@ -61,7 +61,7 @@ public class TaskHistoryPage extends AbstractWorkFlowTaskDetailsPage
     {
         try
         {
-            elementRender(timer, getMenuTitle(), getWorkflowDetailsHeader(), getFormFieldsElements(), myTasksListLink);
+            elementRender(timer, getMenuTitle(), getWorkflowDetailsHeader(), getFormFieldsElements());
         }
         catch (PageRenderTimeException te)
         {
