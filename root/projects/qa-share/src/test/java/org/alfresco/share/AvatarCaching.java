@@ -117,7 +117,7 @@ public class AvatarCaching extends AbstractUtils
         return requestFound;
     }
 
-    @Test(groups = { "Share", "NonGrid" })
+    @Test(groups = { "Share", "NonGrid", "DataPrepAvatarCaching" })
     public void dataPrep_AONE_13951() throws Exception
     {
         String testName = getTestName();
@@ -129,6 +129,7 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
+        editProfilePage.clickCancel();
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
         File file = new File(DATA_FOLDER + SLASH + TEST_FILE);
@@ -174,7 +175,7 @@ public class AvatarCaching extends AbstractUtils
         }
     }
 
-    @Test(groups = { "Share", "NonGrid" })
+    @Test(groups = { "Share", "NonGrid", "DataPrepAvatarCaching" })
     public void dataPrep_AONE_13952() throws Exception
     {
         String testName = getTestName();
@@ -185,6 +186,7 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
+        editProfilePage.clickCancel();
         ShareUser.openUserDashboard(customDrone);
         ShareUserDashboard.addDashlet(customDrone, MY_PROFILE);
     }
@@ -228,7 +230,7 @@ public class AvatarCaching extends AbstractUtils
         }
     }
 
-    @Test(groups = { "Share", "NonGrid" })
+    @Test(groups = { "Share", "NonGrid", "DataPrepAvatarCaching" })
     public void dataPrep_AONE_13953() throws Exception
     {
         String testName = getTestName();
@@ -318,7 +320,7 @@ public class AvatarCaching extends AbstractUtils
         }
     }
 
-    @Test(groups = { "Share", "NonGrid" })
+    @Test(groups = { "Share", "NonGrid", "DataPrepAvatarCaching" })
     public void dataPrep_AONE_13954() throws Exception
     {
         String testName = getTestName();
@@ -408,7 +410,7 @@ public class AvatarCaching extends AbstractUtils
         }
     }
 
-    @Test(groups = { "Share", "NonGrid" })
+    @Test(groups = { "Share", "NonGrid", "DataPrepAvatarCaching" })
     public void dataPrep_AONE_13955() throws Exception
     {
         String testName = getTestName();
@@ -465,7 +467,7 @@ public class AvatarCaching extends AbstractUtils
         }
     }
 
-    @Test(groups = { "Share", "NonGrid" })
+    @Test(groups = { "Share", "NonGrid", "DataPrepAvatarCaching" })
     public void dataPrep_AONE_13956() throws Exception
     {
         String testName = getTestName();
@@ -518,7 +520,7 @@ public class AvatarCaching extends AbstractUtils
         }
     }
 
-    @Test(groups = { "Share", "NonGrid" })
+    @Test(groups = { "Share", "NonGrid", "DataPrepAvatarCaching" })
     public void dataPrep_AONE_13957() throws Exception
     {
         String testName = getTestName();
@@ -581,7 +583,7 @@ public class AvatarCaching extends AbstractUtils
         }
     }
 
-    @Test(groups = { "Share", "NonGrid" })
+    @Test(groups = { "Share", "NonGrid", "DataPrepAvatarCaching" })
     public void dataPrep_AONE_13958() throws Exception
     {
         String testName = getTestName();
