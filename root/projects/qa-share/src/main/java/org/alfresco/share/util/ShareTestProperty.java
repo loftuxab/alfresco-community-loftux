@@ -75,6 +75,9 @@ public class ShareTestProperty
     private final String licenseShare;
     private final String maxWaitTimeCloudSync;
     private String ftpPort;
+    private String nfsMountPort;
+    private String mountPointHost;
+    private String nfsPort;
     private String sshHost;
     private int serverShhPort;
     private String serverUser;
@@ -96,7 +99,7 @@ public class ShareTestProperty
             final String uniqueTestRunName, final String domainFree, final String domainPremium, final String domainHybrid, final String domainLiveSearch, final String defaultUser,
             final String uniqueTestDataString, final String adminUsername, final String adminPassword, final String superadminUsername,
             final String superadminPassword, final int httpSecurePort, final String headerKey, final String mimeTypes, final String jmxrmiPort, final String jmxrmiUser, final String jmxrmiPassword, final String nodePort, final String licenseShare, final String maxWaitTimeCloudSync,
-            final String blogUrl, final String blogUsername, final String blogPassword, final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String wcmqs, final String replicationEndPointHost,
+            final String blogUrl, final String blogUsername, final String blogPassword, final String nfsMountPort,  final String mountPointHost, final String nfsPort,final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String wcmqs, final String replicationEndPointHost,
             final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath)
     {
         this.shareUrl = shareUrl;
@@ -141,6 +144,9 @@ public class ShareTestProperty
         this.nodePort = nodePort;
         this.licenseShare = licenseShare;
         this.maxWaitTimeCloudSync = maxWaitTimeCloudSync;
+        this.nfsMountPort = nfsMountPort;
+        this.mountPointHost = mountPointHost;
+        this.nfsPort = nfsPort;
         this.ftpPort = ftpPort;
         this.serverShhPort = serverShhPort;
         this.serverUser = serverUser;
@@ -455,7 +461,7 @@ public class ShareTestProperty
                 + ", serviceAccountPKCS12FileName=" + serviceAccountPKCS12FileName + ", googleDriveUserName=" + googleDriveUserName
                 + ", googleDrivePassword=" + googleDrivePassword + ", serviceDriveAccountEmail=" + serviceDriveAccountEmail
                 + ", serviceDriveAccountPKCS12FileName=" + serviceDriveAccountPKCS12FileName + ", mimeTypes=" + mimeTypes + ", jmxrmiPort=" + jmxrmiPort
-                + ", jmxrmiUser=" + jmxrmiUser + ", jmxrmiPassword=" + jmxrmiPassword + ", nodePort=" + nodePort + ", ftpPort=" + ftpPort + ", blogUrl=" + blogUrl + ", blogUsername="
+                + ", jmxrmiUser=" + jmxrmiUser + ", jmxrmiPassword=" + jmxrmiPassword + ", nodePort=" + nodePort + ", nfsMountPort=" + nfsMountPort + ", mountPointHost=" + mountPointHost + ", nfsPort=" + nfsPort + ", ftpPort=" + ftpPort + ", blogUrl=" + blogUrl + ", blogUsername="
                 + blogUsername + ", blogPassword=" + blogPassword + ", serverShhPort=" + serverShhPort + ", serverUser="
                 + serverUser + ", serverPass=" + serverPass + ", isSecureSession=" + isSecureSession + "]";
     }
@@ -578,6 +584,27 @@ public class ShareTestProperty
     public String getFtpPort()
     {
         return ftpPort;
+    }
+
+    /**
+     * @return NFS mount port
+     */
+    public String getNfsMountPort()
+    {
+        return nfsMountPort;
+    }
+
+    public String getMountPointHost()
+    {
+        return mountPointHost;
+    }
+
+    /**
+     * @return NFS server port
+     */
+    public String getNfsPort()
+    {
+        return nfsPort;
     }
 
     public int getSshPort()

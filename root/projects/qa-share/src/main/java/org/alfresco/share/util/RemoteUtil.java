@@ -149,44 +149,6 @@ public class RemoteUtil extends AbstractUtils
         return String.format("`cygpath -u '%s'`", winPath);
     }
 
-    public static boolean isFileExist(String file_path)
-    {
-        String output;
-        initConnection();
-
-
-                output = commandProcessor.executeCommand("ls -d " + file_path);
-                if (output.contains(file_path) && !output.contains("No such file or directory"))
-                    return true;
-
-
-        System.out.println("File is not exist");
-        return false;
-    }
-
-    public static boolean isFileEmpty(String file_path)
-    {
-        String output;
-        initConnection();
-
-        output = commandProcessor.executeCommand("ls -s " + file_path);
-        if (output.contains(0 + " " + file_path))
-        {
-            return true;
-        }
-
-        else
-        {
-            return false;
-        }
-    }
-
-    public static void checkForStrings(String searchText, String filepath, String resultsFilePath) 
-    {
-        initConnection();
-        commandProcessor.executeCommand("strings " + filepath + " | grep " + searchText + " > " + resultsFilePath);
-
-    }
 
     public static void mountNfs(String shareUrl, String nfsServerPort, String mountServerPort) throws Exception
     {
