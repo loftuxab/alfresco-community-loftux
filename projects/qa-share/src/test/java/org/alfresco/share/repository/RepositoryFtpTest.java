@@ -998,7 +998,6 @@ public class RepositoryFtpTest extends AbstractUtils
 
         // Navigate to ftp://login:pass@server_ip
         drone.navigateTo(ftpUrl);
-        String handle1 = drone.getWindowHandle();
         assertTrue(drone.findAndWait(By.cssSelector(".up")).getAttribute("href").contains(ftpUrl));
         assertTrue(getDrone().findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
     }
