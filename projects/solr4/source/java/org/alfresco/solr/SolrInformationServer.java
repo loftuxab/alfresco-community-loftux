@@ -1831,7 +1831,7 @@ public class SolrInformationServer implements InformationServer
             {
                 String tag = ISO9075.decode(matcher.group(1));
                 doc.addField(FIELD_TAG, tag);
-                doc.addField(FIELD_SUGGEST, tag);
+                doc.addField(FIELD_TAG_SUGGEST, tag);
             }
            
         }

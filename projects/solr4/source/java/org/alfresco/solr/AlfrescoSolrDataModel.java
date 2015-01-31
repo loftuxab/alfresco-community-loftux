@@ -833,7 +833,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
             
             if(isSuggestable(propertyQName))
             {
-                indexedField.addField("suggest", false, false);
+                indexedField.addField("suggest_@"+propertyDefinition.getName().toString(), false, false);
             }
         }
         else
