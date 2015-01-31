@@ -68,7 +68,7 @@ public class MSOutlook2010Tests extends AbstractUtils
     {
         super.setup();
 
-        next_site = "4";
+        next_site = "5";
 
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName) + next_site;
@@ -137,7 +137,7 @@ public class MSOutlook2010Tests extends AbstractUtils
         Assert.assertEquals(eventInfo.getWhereDetail(), location);
 
         String weekDay;
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
 
         Calendar calendar = Calendar.getInstance();
         weekDay = dayFormat.format(calendar.getTime());
@@ -189,7 +189,7 @@ public class MSOutlook2010Tests extends AbstractUtils
         Assert.assertEquals(eventInfo.getWhereDetail(), location);
 
         String weekDay;
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
 
         Calendar calendar = Calendar.getInstance();
         weekDay = dayFormat.format(calendar.getTime());
@@ -370,10 +370,8 @@ public class MSOutlook2010Tests extends AbstractUtils
     @Test(groups = "alfresco-one")
     public void AONE_9696() throws Exception
     {
-
         String testName = getTestName();
         String location = testName + " - Room";
-        String new_subject = linkSite + "_1";
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
@@ -381,29 +379,44 @@ public class MSOutlook2010Tests extends AbstractUtils
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, linkSite, location, testUser, DEFAULT_PASSWORD, true, false);
 
+        String windowNameSite = outlook.abstractUtil.waitForWindow(linkSite);
+        Ldtp l1 = new Ldtp(windowNameSite);
+        l1.activateWindow(windowNameSite);
+
+        // "Go to workspace" link appears in Meeting Workspase sidebar.
+        Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "hlnkGotoworkspace"));
+
+        // paneMessage: is the pane that holds the new event informations
+        // Meeting Workspace: sub (link)
+        // Visit the workspace to learn more about this meeting or edit its contents" message is displayed in message field
+        Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "paneMessage"));
+
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         // navigate to site
-        SiteDashboardPage siteDashBoard = SiteUtil.openSiteFromSearch(drone, linkSite);
+        SiteFinderPage siteFinderPage = SiteUtil.searchSiteWithRetry(drone, linkSite, true);
+        SiteDashboardPage siteDashBoard = siteFinderPage.selectSiteByIndex(0);
+        String urlFirstSite = drone.getCurrentUrl();
 
-        // navigate to Calendar
-        // Meeting Workspace with <existed_name>_1 is created;
-        // TODO: BUG! the name of the new site does not contain "_1"
-        CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage();
-        Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_ALL_DAY_EVENT, new_subject));
+        siteFinderPage = SiteUtil.searchSiteWithRetry(drone, linkSite, true);
+        siteDashBoard = siteFinderPage.selectSiteByIndex(1);
+        String urlFirstSite_1 = drone.getCurrentUrl();
 
-        // verify event information
-        InformationEventForm eventInfo = calendarPage.clickOnEvent(CalendarPage.EventType.MONTH_TAB_ALL_DAY_EVENT, new_subject).render();
-        Assert.assertEquals(eventInfo.getWhatDetail(), new_subject);
-        Assert.assertEquals(eventInfo.getWhereDetail(), location);
+        // 9. Verify that new Meeting workspace (<existed_name> e.g. event6969subject) is created;
+        Assert.assertTrue(siteDashBoard.getPageTitle().equals(linkSite));
+
+        // 10. Check that urls of the sites are different e.g.
+        // -> http://host:port/share/page/site/event6969subject/dashboard and
+        // -> http://host:port/share/page/site/event6969subject_1/dashboard
+        Assert.assertFalse(urlFirstSite.equals(urlFirstSite_1));
+        Assert.assertTrue(urlFirstSite_1.contains(linkSite + "_1"));
 
     }
 
     @Test(groups = "alfresco-one")
     public void AONE_9697() throws Exception
     {
-
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
@@ -496,7 +509,7 @@ public class MSOutlook2010Tests extends AbstractUtils
         Assert.assertEquals(eventInfo.getWhereDetail(), location);
 
         String weekDay;
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
 
         Calendar calendar = Calendar.getInstance();
         weekDay = dayFormat.format(calendar.getTime());
