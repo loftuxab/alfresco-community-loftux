@@ -15,16 +15,18 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 /**
+ * The news page that is opened for a folder (Global Economy, Companies, Markets .... )
+ * 
  * @author bogdan.bocancea
  */
 
 public class WcmqsNewsPage extends SharePage
 {
 
-    protected static String TITLES_NEWS = "ul[class$='newslist-wrapper'] > li > h4";
+    protected static String TITLES_NEWS = "//div[@id='left']//div[@class='interior-content']//a//.././/./.././a";
 
     @RenderWebElement
-    private final By PAGE_TITLE = By.cssSelector("div.interior-header > h2");
+    private final By PAGE_LOGO = By.cssSelector("#logo>a");
 
     /**
      * Constructor.
@@ -69,7 +71,7 @@ public class WcmqsNewsPage extends SharePage
         List<ShareLink> titles = new ArrayList<ShareLink>();
         try
         {
-            List<WebElement> links = drone.findAll(By.cssSelector(TITLES_NEWS));
+            List<WebElement> links = drone.findAll(By.xpath(TITLES_NEWS));
             for (WebElement div : links)
             {
                 titles.add(new ShareLink(div, drone));
@@ -103,6 +105,30 @@ public class WcmqsNewsPage extends SharePage
     }
 
     /**
+     * Method to get the date and time for a news
+     * 
+     * @param newsName - the of the news declared in share!
+     * @return String news Date and Time
+     */
+    public boolean isDateTimeNewsPresent(String newsName)
+    {
+        boolean present = false;
+
+        try
+        {
+            present = drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]//.././/./.././span[@class='newslist-date']", newsName)))
+                    .isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+
+        }
+
+        return present;
+
+    }
+
+    /**
      * Method to get the description for a news
      * 
      * @param newsName - the of the news declared in share!
@@ -112,7 +138,45 @@ public class WcmqsNewsPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]//.././/./.././p']", newsName))).getText();
+            return drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]//.././/./.././p", newsName))).getText();
+        }
+        catch (TimeoutException e)
+        {
+            throw new TimeoutException("Exceeded time to find news links. " + e.toString());
+        }
+
+    }
+
+    /**
+     * Method title the title for a news
+     * 
+     * @param newsName - the of the news declared in share!
+     * @return
+     */
+    public String getNewsTitle(String newsName)
+    {
+        try
+        {
+            return drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", newsName))).getText();
+        }
+        catch (TimeoutException e)
+        {
+            throw new TimeoutException("Exceeded time to find the title:" + e.toString());
+        }
+
+    }
+
+    /**
+     * Method to click a news title
+     * 
+     * @param newsName - the of the news declared in share!
+     * @return
+     */
+    public void clickNewsTitle(String newsName)
+    {
+        try
+        {
+            drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", newsName))).click();
         }
         catch (TimeoutException e)
         {
