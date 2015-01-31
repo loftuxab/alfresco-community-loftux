@@ -35,112 +35,113 @@ import java.util.List;
 
 /**
  * This class Tests the Version Details bean
- * 
+ *
  * @author Ranjith Manyam
  * @since 5.0
  */
 @Listeners(FailedTestListener.class)
 public class VersionDetailsTest extends AbstractTest
 {
-    private final Log logger = LogFactory.getLog(this.getClass());
+        private static String siteName;
+        private static DocumentLibraryPage documentLibPage;
+        private static DocumentDetailsPage detailsPage;
+        private final Log logger = LogFactory.getLog(this.getClass());
+        private VersionDetails versionDetails;
+        private File file;
+        private File file1;
+        private File file2;
+        private String comment1;
+        private String comment2;
 
-    private static String siteName;
-    private static DocumentLibraryPage documentLibPage;
-    private static DocumentDetailsPage detailsPage;
-    private VersionDetails versionDetails;
-    private File file;
-    private File file1;
-    private File file2;
-    private String comment1;
-    private String comment2;
-
-    /**
-     * Pre test setup: Site creation, file upload, folder creation
-     * 
-     * @throws Exception
-     */
-    @BeforeClass(groups = { "alfresco-one" })
-    public void prepare() throws Exception
-    {
-        if (logger.isTraceEnabled())
+        /**
+         * Pre test setup: Site creation, file upload, folder creation
+         *
+         * @throws Exception
+         */
+        @BeforeClass(groups = { "alfresco-one" })
+        public void prepare() throws Exception
         {
-            logger.trace("====prepare====");
+                if (logger.isTraceEnabled())
+                {
+                        logger.trace("====prepare====");
+                }
+
+                siteName = "site" + System.currentTimeMillis();
+                file = SiteUtil.prepareFile();
+                file1 = SiteUtil.prepareFile();
+                file2 = SiteUtil.prepareFile();
+                comment1 = String.valueOf(System.currentTimeMillis()) + "-1";
+                comment2 = String.valueOf(System.currentTimeMillis()) + "-2";
+
+                ShareUtil.loginAs(drone, shareUrl, username, password).render();
+
+                SiteUtil.createSite(drone, siteName, "description", "Public");
+
+                SitePage page = drone.getCurrentPage().render();
+                documentLibPage = page.getSiteNav().selectSiteDocumentLibrary().render();
+                UploadFilePage uploadForm = documentLibPage.getNavigation().selectFileUpload().render();
+                documentLibPage = uploadForm.uploadFile(file.getCanonicalPath()).render();
+                detailsPage = documentLibPage.selectFile(file.getName()).render();
         }
-        
-        siteName = "site" + System.currentTimeMillis();
-        file = SiteUtil.prepareFile();
-        file1 = SiteUtil.prepareFile();
-        file2 = SiteUtil.prepareFile();
-        comment1 = String.valueOf(System.currentTimeMillis()) + "-1";
-        comment2 = String.valueOf(System.currentTimeMillis()) + "-2";
 
-        ShareUtil.loginAs(drone, shareUrl, username, password).render();
-        
-        SiteUtil.createSite(drone, siteName, "description", "Public");
-        
-        SitePage page = drone.getCurrentPage().render();
-        documentLibPage = page.getSiteNav().selectSiteDocumentLibrary().render();
-        UploadFilePage uploadForm = documentLibPage.getNavigation().selectFileUpload().render();
-        documentLibPage = uploadForm.uploadFile(file.getCanonicalPath()).render();
-        detailsPage = documentLibPage.selectFile(file.getName()).render();
-    }
+        @AfterClass(groups = { "alfresco-one" })
+        public void teardown()
+        {
+                //        SiteUtil.deleteSite(drone, siteName);
+        }
 
-    @AfterClass(groups = { "alfresco-one" })
-    public void teardown()
-    {
-//        SiteUtil.deleteSite(drone, siteName);
-    }
+        @Test(groups = { "alfresco-one" })
+        public void getCurrentVersionDetails() throws Exception
+        {
+                versionDetails = detailsPage.getCurrentVersionDetails();
+                Assert.assertEquals(versionDetails.getVersionNumber(), "1.0", "Verifying Version Number");
+                Assert.assertEquals(versionDetails.getFileName(), file.getName(), "Verifying File Name");
+                Assert.assertTrue(!versionDetails.getLastModified().isEmpty());
+                Assert.assertTrue(versionDetails.getUserName().getDescription().contains("Administrator"), "Verifying user name");
+                Assert.assertEquals(versionDetails.getComment(), "(No Comment)", "Verifying Version comment");
+        }
 
-    @Test(groups = { "alfresco-one" })
-    public void getCurrentVersionDetails() throws Exception
-    {
-        versionDetails = detailsPage.getCurrentVersionDetails();
-        Assert.assertEquals(versionDetails.getVersionNumber(), "1.0", "Verifying Version Number");
-        Assert.assertEquals(versionDetails.getFileName(), file.getName(), "Verifying File Name");
-        Assert.assertTrue(!versionDetails.getLastModified().isEmpty());
-        Assert.assertTrue(versionDetails.getUserName().getDescription().contains("Administrator"), "Verifying user name");
-        Assert.assertEquals(versionDetails.getComment(), "(No Comment)", "Verifying Version comment");
-    }
+        @Test(groups = { "alfresco-one" })
+        public void getOlderVersionDetails() throws Exception
+        {
+                UpdateFilePage updatePage = detailsPage.selectUploadNewVersion().render();
+                if (logger.isTraceEnabled())
+                        logger.trace("---selected new version to upload----");
+                updatePage.selectMinorVersionChange();
+                updatePage.setComment(comment1);
+                updatePage.uploadFile(file1.getCanonicalPath());
+                detailsPage = updatePage.submit().render();
 
-    @Test(groups = { "alfresco-one" })
-    public void getOlderVersionDetails() throws Exception
-    {
-        UpdateFilePage updatePage = detailsPage.selectUploadNewVersion().render();
-        if (logger.isTraceEnabled()) logger.trace("---selected new version to upload----");
-        updatePage.selectMinorVersionChange();
-        updatePage.setComment(comment1);
-        updatePage.uploadFile(file1.getCanonicalPath());
-        detailsPage = updatePage.submit().render();
+                updatePage = detailsPage.selectUploadNewVersion().render();
+                if (logger.isTraceEnabled())
+                        logger.trace("---selected new version to upload----");
+                updatePage.selectMajorVersionChange();
+                updatePage.setComment(comment2);
+                updatePage.uploadFile(file2.getCanonicalPath());
+                detailsPage = updatePage.submit().render();
 
-        updatePage = detailsPage.selectUploadNewVersion().render();
-        if (logger.isTraceEnabled()) logger.trace("---selected new version to upload----");
-        updatePage.selectMajorVersionChange();
-        updatePage.setComment(comment2);
-        updatePage.uploadFile(file2.getCanonicalPath());
-        detailsPage = updatePage.submit().render();
+                versionDetails = detailsPage.getCurrentVersionDetails();
+                Assert.assertEquals(versionDetails.getVersionNumber(), "2.0", "Verifying Version Number");
+                Assert.assertEquals(versionDetails.getFileName(), file.getName(), "Verifying File Name");
+                Assert.assertFalse(versionDetails.getLastModified().isEmpty());
+                Assert.assertTrue(versionDetails.getUserName().getDescription().toLowerCase().contains("admin"), "Verifying user name");
+                Assert.assertEquals(versionDetails.getComment(), comment2, "Verifying Version comment");
+                Assert.assertTrue(versionDetails.getFullDetails().startsWith("Administrator"));
+                Assert.assertTrue(versionDetails.getFullDetails().contains(comment2));
 
-        versionDetails = detailsPage.getCurrentVersionDetails();
-        Assert.assertEquals(versionDetails.getVersionNumber(), "2.0", "Verifying Version Number");
-        Assert.assertEquals(versionDetails.getFileName(), file.getName(), "Verifying File Name");
-        Assert.assertFalse(versionDetails.getLastModified().isEmpty());
-        Assert.assertTrue(versionDetails.getUserName().getDescription().toLowerCase().contains("admin"), "Verifying user name");
-        Assert.assertEquals(versionDetails.getComment(), comment2, "Verifying Version comment");
-        Assert.assertTrue(versionDetails.getFullDetails().startsWith("Administrator"));
-        Assert.assertTrue(versionDetails.getFullDetails().contains(comment2));
+                List<VersionDetails> olderVersions = detailsPage.getOlderVersionDetails();
+                Assert.assertEquals(olderVersions.size(), 2);
 
-        List<VersionDetails> olderVersions = detailsPage.getOlderVersionDetails();
-        Assert.assertEquals(olderVersions.size(), 2);
+                Assert.assertEquals(olderVersions.get(0).getVersionNumber(), "1.1", "Verifying Version Number");
+                Assert.assertEquals(olderVersions.get(0).getFileName(), file.getName(), "Verifying File Name");
+                Assert.assertFalse(StringUtils.isEmpty(olderVersions.get(0).getLastModified()), "Verifying Last modified");
+                Assert.assertTrue(olderVersions.get(0).getUserName().getDescription().toLowerCase().contains("admin"), "Verifying user name");
+                Assert.assertEquals(olderVersions.get(0).getComment(), comment1, "Verifying Version comment");
 
-        Assert.assertEquals(olderVersions.get(0).getVersionNumber(), "1.1", "Verifying Version Number");
-        Assert.assertEquals(olderVersions.get(0).getFileName(), file.getName(), "Verifying File Name");
-        Assert.assertFalse(StringUtils.isEmpty(olderVersions.get(0).getLastModified()), "Verifying Last modified");
-        Assert.assertTrue(olderVersions.get(0).getUserName().getDescription().toLowerCase().contains("admin"), "Verifying user name");
-        Assert.assertEquals(olderVersions.get(0).getComment(), comment1, "Verifying Version comment");
-
-        Assert.assertEquals(olderVersions.get(1).getVersionNumber(), "1.0", "Verifying Version Number");
-        Assert.assertEquals(olderVersions.get(1).getFileName(), file.getName(), "Verifying File Name");
-        Assert.assertFalse(StringUtils.isEmpty(olderVersions.get(1).getLastModified()), "Verifying Last modified");
-        Assert.assertTrue(olderVersions.get(1).getUserName().getDescription().toLowerCase().contains("admin"), "Verifying user name");
-        Assert.assertEquals(olderVersions.get(1).getComment(), "(No Comment)", "Verifying Version comment");
-    }
+                Assert.assertEquals(olderVersions.get(1).getVersionNumber(), "1.0", "Verifying Version Number");
+                Assert.assertEquals(olderVersions.get(1).getFileName(), file.getName(), "Verifying File Name");
+                Assert.assertFalse(StringUtils.isEmpty(olderVersions.get(1).getLastModified()), "Verifying Last modified");
+                Assert.assertTrue(olderVersions.get(1).getUserName().getDescription().toLowerCase().contains("admin"), "Verifying user name");
+                Assert.assertEquals(olderVersions.get(1).getComment(), "(No Comment)", "Verifying Version comment");
+        }
 }
