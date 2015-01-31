@@ -26,6 +26,7 @@ import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
@@ -491,11 +492,11 @@ public class SyncInfoPage extends SharePage
         }
         catch (NoSuchElementException nse)
         {
-            throw new NoSuchElementException("Show details element not found", nse);
+            throw new PageOperationException("Show details element not found", nse);
         }
         catch (TimeoutException nse)
         {
-            throw new TimeoutException("Timeout for finding Show Details element", nse);
+            throw new PageOperationException("Timeout for finding Show Details element", nse);
         }
     }
 
@@ -512,11 +513,11 @@ public class SyncInfoPage extends SharePage
         }
         catch (NoSuchElementException nse)
         {
-            throw new NoSuchElementException("Error element not found", nse);
+            throw new PageOperationException("Error element not found", nse);
         }
         catch (TimeoutException nse)
         {
-            throw new TimeoutException("Timeout for finding Error header element", nse);
+            throw new PageOperationException("Timeout for finding Error header element", nse);
         }
     }
 
@@ -533,11 +534,11 @@ public class SyncInfoPage extends SharePage
         }
         catch (NoSuchElementException nse)
         {
-            throw new NoSuchElementException("Technical report element not found", nse);
+            throw new PageOperationException("Not able to find Sync Info Location.");
         }
         catch (TimeoutException nse)
         {
-            throw new TimeoutException("Timeout for finding Technical report element", nse);
+            throw new PageOperationException("Not able to find Sync Info Location.");
         }
     }
 
