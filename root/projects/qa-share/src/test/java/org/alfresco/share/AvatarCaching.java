@@ -427,8 +427,8 @@ public class AvatarCaching extends AbstractUtils
     @Test(groups = { "Share", "NonGrid" })
     public void AONE_13955()
     {
-        final String AVATAR_THUMBNAIL_ENTERPRISE_REGEXP = "https?://.+/share/proxy/alfresco/slingshot/profile/avatar/workspace/SpacesStore/\\w+\\-\\w+\\-\\w+\\-\\w+\\-\\w+/thumbnail/avatar\\?c=queue&ph=true";
-        final String AVATAR_THUMBNAIL_CLOUD_REGEXP = "https?://.+/share/\\w+\\.\\w+/proxy/alfresco/slingshot/profile/avatar/workspace/SpacesStore/\\w+\\-\\w+\\-\\w+\\-\\w+\\-\\w+/thumbnail/avatar\\?c=queue&ph=true";
+        final String AVATAR_THUMBNAIL_ENTERPRISE_REGEXP = "https?://.+/share/proxy/alfresco/api/node/workspace/SpacesStore/\\w+\\-\\w+\\-\\w+\\-\\w+\\-\\w+/content/thumbnails/avatar\\?c=queue&ph=true";
+        final String AVATAR_THUMBNAIL_CLOUD_REGEXP = "https?://.+/share/\\w+\\.\\w+/proxy/alfresco/api/node/workspace/SpacesStore/\\w+\\-\\w+\\-\\w+\\-\\w+\\-\\w+/content/thumbnails/avatar\\?c=queue&ph=true";
 
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
@@ -438,7 +438,8 @@ public class AvatarCaching extends AbstractUtils
         proxyServer.newHar(serverAddress);
         DashBoardPage dashBoardPage = ShareUser.login(customDrone, testUser2, DEFAULT_PASSWORD).render();
         PeopleFinderPage peopleFinderPage = dashBoardPage.getNav().selectPeople();
-        peopleFinderPage.searchFor(testUser);
+        peopleFinderPage.searchFor(testUser).render();
+        webDriverWait(customDrone, 2000);
         Har har = proxyServer.getHar();
         if (alfrescoVersion.isCloud())
         {
@@ -451,6 +452,7 @@ public class AvatarCaching extends AbstractUtils
 
         proxyServer.newHar(serverAddress);
         peopleFinderPage.searchFor(testUser).render();
+        webDriverWait(customDrone, 2000);
         har = proxyServer.getHar();
         if (alfrescoVersion.isCloud())
         {
@@ -481,8 +483,8 @@ public class AvatarCaching extends AbstractUtils
     @Test(groups = { "Share", "NonGrid" })
     public void AONE_13956()
     {
-        final String AVATAR_THUMBNAIL_ENTERPRISE_REGEXP = "https?://.+/share/proxy/alfresco/slingshot/profile/avatar/workspace/SpacesStore/\\w+\\-\\w+\\-\\w+\\-\\w+\\-\\w+/thumbnail/avatar\\?c=force";
-        final String AVATAR_THUMBNAIL_CLOUD_REGEXP = "https?://.+/share/\\w+\\.\\w+/proxy/alfresco/slingshot/profile/avatar/workspace/SpacesStore/\\w+\\-\\w+\\-\\w+\\-\\w+\\-\\w+/thumbnail/avatar\\?c=force";
+        final String AVATAR_THUMBNAIL_ENTERPRISE_REGEXP = "https?://.+/share/proxy/alfresco/api/node/workspace/SpacesStore/\\w+\\-\\w+\\-\\w+\\-\\w+\\-\\w+/content/thumbnails/avatar\\?c=force";
+        final String AVATAR_THUMBNAIL_CLOUD_REGEXP = "https?://.+/share/\\w+\\.\\w+/proxy/alfresco/api/node/workspace/SpacesStore/\\w+\\-\\w+\\-\\w+\\-\\w+\\-\\w+/content/thumbnails/avatar\\?c=force";
 
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
@@ -502,7 +504,8 @@ public class AvatarCaching extends AbstractUtils
         }
 
         proxyServer.newHar(serverAddress);
-        myProfilePage.getNav().selectMyProfile().render();
+        myProfilePage.openEditProfilePage().clickCancel();
+        webDriverWait(customDrone, 2000);
         har = proxyServer.getHar();
         if (alfrescoVersion.isCloud())
         {
