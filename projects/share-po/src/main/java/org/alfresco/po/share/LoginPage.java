@@ -14,11 +14,8 @@
  */
 package org.alfresco.po.share;
 
-import java.util.concurrent.TimeoutException;
-
 import org.alfresco.po.share.user.CloudForgotPasswordPage;
 import org.alfresco.po.share.user.Language;
-import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
@@ -201,14 +198,15 @@ public class LoginPage extends SharePage
     }
 
     public void loginAs(final String username, final String password, final Language language)
-    {
+    {       
         if (username == null || password == null)
         {
             throw new IllegalArgumentException("Input param can not be null");
         }
 
         boolean isCloud = alfrescoVersion.isCloud();
-        if (isCloud)
+        boolean languageSelect = drone.findAndWait(LANGUAGE_SELECT).isDisplayed();
+        if (languageSelect)
         {
             changeLanguage(language);
         }
