@@ -155,14 +155,50 @@ public class NewWorkflowPageTest extends AbstractTest
     public void getTaskDetailsHeader() throws Exception
     {
         myTasksPage = documentDetailsPage.getNav().selectMyTasks().render();
+        TaskDetails details = myTasksPage.getTaskLabels(siteName);
+        List<String> taskLabels = details.getTaskLabels();
+        assertTrue(taskLabels.contains("Due:"));
+        assertTrue(taskLabels.contains("Started:"));
+        assertTrue(taskLabels.contains("Status:"));
+        assertTrue(taskLabels.contains("Type:"));
+        assertTrue(taskLabels.contains("Description:"));
+        assertTrue(taskLabels.contains("Started by:"));
+            
         taskDetailsPage = myTasksPage.selectViewTasks(siteName).render();
-
         Assert.assertEquals(taskDetailsPage.getTaskDetailsHeader(), "Details: "+siteName+" (Task)");
+        
+        List<String> formLabels = taskDetailsPage.getAllLabels();       
+        assertTrue(formLabels.contains("Message:"));
+        assertTrue(formLabels.contains("Owner:"));
+        assertTrue(formLabels.contains("Priority:"));
+        assertTrue(formLabels.contains("Due:"));
+        assertTrue(formLabels.contains("Identifier:"));
+        assertTrue(formLabels.contains("Status:"));
+        assertTrue(formLabels.contains("Items:"));
+        assertTrue(formLabels.contains("Comment:"));
+        
+        myTasksPage = documentDetailsPage.getNav().selectMyTasks().render();
+        TaskHistoryPage historyPage = myTasksPage.selectTaskHistory(siteName).render();
+        
+        List<String> formLabelsHistory = historyPage.getAllLabels();       
+        assertTrue(formLabelsHistory.contains("Completed on:"));
+        assertTrue(formLabelsHistory.contains("Completed by:"));
+        assertTrue(formLabelsHistory.contains("Outcome:"));
+        assertTrue(formLabelsHistory.contains("Title:"));
+        assertTrue(formLabelsHistory.contains("Description:"));
+        assertTrue(formLabelsHistory.contains("Due:"));
+        assertTrue(formLabelsHistory.contains("Completed:"));
+        assertTrue(formLabelsHistory.contains("Started:"));
+        assertTrue(formLabelsHistory.contains("Priority:"));
+        assertTrue(formLabelsHistory.contains("Status:"));
+        assertTrue(formLabelsHistory.contains("Message:"));
     }
 
     @Test(groups = "Enterprise4.2", dependsOnMethods = "getTaskDetailsHeader")
     public void getTaskDetailsInfo() throws Exception
     {
+        myTasksPage = documentDetailsPage.getNav().selectMyTasks().render();
+        taskDetailsPage = myTasksPage.selectViewTasks(siteName).render();
         TaskInfo taskInfo = taskDetailsPage.getTaskDetailsInfo();
 
         Assert.assertEquals(taskInfo.getMessage(), siteName);
