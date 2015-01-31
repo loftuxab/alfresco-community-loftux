@@ -35,6 +35,15 @@
 		</classes>
 	</test>
 
+    <test name="RepositoryFolderTests1" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.repository.RepositoryFolderTests1">
+                <methods>
+                    <include name="dataPrep_AONE_3569" />
+                </methods>
+            </class>
+        </classes>
+    </test>
 	<!--  
 	
 	
