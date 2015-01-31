@@ -425,7 +425,7 @@
          var proxy = window.location.protocol + "//" + window.location.host + Alfresco.constants.URL_CONTEXT + "proxy/" + this.options.proxy + "/",
             nodeRefAsLink = this.options.nodeRef.replace(":/", ""),
             noCache = "noCache=" + new Date().getTime();
-         download = download ? "a=true\" target=\"_blank": "a=false";
+         download = download ? "a=true" : "a=false";
          return proxy + this.options.api + "/node/" + nodeRefAsLink + "/content/" + encodeURIComponent(this.options.name) + "?c=force&" + noCache + "&" + download;
       },
 
