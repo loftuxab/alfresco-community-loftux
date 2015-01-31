@@ -391,7 +391,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Returns a map of validation messages for all the fields in the form.
-     *
+     * 
      * @return The validation message or an empty string if there is no message.
      */
     public Map<Fields, String> getMessages()
@@ -483,7 +483,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * click on All Properties button on Edit Properties pop-up
-     *
+     * 
      * @return {@link EditDocumentPropertiesPage} page response
      */
     public HtmlPage selectAllProperties()
@@ -494,7 +494,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param publisher
      */
     public void setPublisher(String publisher)
@@ -512,7 +512,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param contributor
      */
     public void setContributor(String contributor)
@@ -530,7 +530,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param type
      */
     public void setType(String type)
@@ -548,7 +548,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param identifier
      */
     public void setIdentifier(String identifier)
@@ -566,7 +566,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param source
      */
     public void setSource(String source)
@@ -584,7 +584,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param coverage
      */
     public void setCoverage(String coverage)
@@ -602,7 +602,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param rights
      */
     public void setRights(String rights)
@@ -620,7 +620,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param subject
      */
     public void setSubject(String subject)
@@ -634,5 +634,25 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     public String getSubject()
     {
         return getValue(INPUT_SUBJECT_SELECTOR);
+    }
+
+    /**
+     * Option for folder.
+     * Enters a value in the rendition configuration. Option enabled if WQS is installed.
+     * 
+     * @param subject
+     */
+    public void setRenditionConfig(String rendConfig)
+    {
+        setInput(drone.findAndWait(REDITION_CONFIG), rendConfig);
+    }
+
+    /**
+     * Option for folder.
+     * Get value seen on the rendition configuration. Option enabled if WQS is installed.
+     */
+    public String getRenditionConfig()
+    {
+        return getValue(REDITION_CONFIG);
     }
 }
