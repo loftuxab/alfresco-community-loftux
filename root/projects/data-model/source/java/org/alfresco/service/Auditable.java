@@ -24,6 +24,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.alfresco.api.AlfrescoPublicApi;
+
 /**
  * Annotation to defined key and parameter names for the auditing API.
  * 
@@ -36,6 +38,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@AlfrescoPublicApi
 public @interface Auditable
 {
     /**
