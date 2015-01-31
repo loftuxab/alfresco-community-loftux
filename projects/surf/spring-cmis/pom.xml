@@ -16,18 +16,5 @@
         <version>5.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    
-    <repositories>
-        <repository>
-            <id>apache.snapshots</id>
-            <name>Apache Snapshots Repository</name>
-            <url>http://repository.apache.org/content/groups/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
 
 </project>

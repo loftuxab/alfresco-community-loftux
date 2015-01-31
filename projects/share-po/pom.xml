@@ -17,21 +17,7 @@
         <testng.suite.filename>src/test/resources/testng_share_po.xml</testng.suite.filename>
         <argLine>-Xms512m -Xmx1024m</argLine>
     </properties>
-    <repositories>
-        <repository>
-            <id>alfresco-public-snapshots</id>
-            <releases>
-                <enabled>false</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-             </snapshots>
-             <name>Alfresco Public Snapshots Repository</name>
-             <url>https://artifacts.alfresco.com/nexus/content/repositories/public-snapshots/</url>
-        </repository>
-    </repositories>
+
     
     <dependencies>
         <dependency>
