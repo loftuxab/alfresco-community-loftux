@@ -53,7 +53,7 @@ public class MyDashboardViewTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2820() throws Exception
     {
-        String testName = getTestName() + "6";
+        String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
 
         // Create User
@@ -64,7 +64,7 @@ public class MyDashboardViewTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2820() throws Exception
     {
-        String testName = getTestName() + "6";
+        String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -75,9 +75,7 @@ public class MyDashboardViewTests extends AbstractUtils
         // ---- Expected results ----
         // The dashbord is modified.
         ShareUserDashboard.removeDashletFromUserDashboard(drone, Dashlets.MY_DOCUMENTS);
-
-        MyDocumentsDashlet myDocuments = ShareUserDashboard.getDashlet(drone, Dashlets.MY_DOCUMENTS).render();
-
+        
         // ---- Step 2 ----
         // ---- Step action ---
         // Login as admin and delete the user "qwerty".
@@ -109,7 +107,7 @@ public class MyDashboardViewTests extends AbstractUtils
         MyTasksDashlet myTasks = ShareUserDashboard.getDashlet(drone, Dashlets.MY_TASKS).render();
         Assert.assertTrue(myTasks.isHelpIconDisplayed());
 
-        myDocuments = ShareUserDashboard.getDashlet(drone, Dashlets.MY_DOCUMENTS).render();
+        MyDocumentsDashlet myDocuments = ShareUserDashboard.getDashlet(drone, Dashlets.MY_DOCUMENTS).render();
         Assert.assertTrue(myDocuments.isHelpIconDisplayed());
     }
 }
