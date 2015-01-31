@@ -26,6 +26,7 @@ import java.util.*;
 
 @Listeners(FailedTestListener.class)
 @SuppressWarnings("unused")
+@Test(groups = { "TestBug" })
 public class AdvanceSearchTest2 extends AbstractUtils
 {
     private static Log logger = LogFactory.getLog(AdvanceSearchTest2.class);
