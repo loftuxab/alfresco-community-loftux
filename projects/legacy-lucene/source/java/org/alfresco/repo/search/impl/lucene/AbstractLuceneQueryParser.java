@@ -1236,12 +1236,15 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
             Locale locale = new Locale(queryText.substring(1, position));
             String token = queryText.substring(position + 1);
             boolean found = false;
-            for(Locale current : Locale.getAvailableLocales())
+            if (!locale.toString().isEmpty())
             {
-                if(current.toString().equalsIgnoreCase(locale.toString()))
+                for(Locale current : Locale.getAvailableLocales())
                 {
-                    found = true;
-                    break;
+                    if(current.toString().equalsIgnoreCase(locale.toString()))
+                    {
+                        found = true;
+                        break;
+                    }
                 }
             }
             if(found)
