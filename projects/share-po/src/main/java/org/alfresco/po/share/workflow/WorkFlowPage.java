@@ -451,7 +451,7 @@ public abstract class WorkFlowPage extends SharePage implements WorkFlow
      * 
      * @param date
      */
-    public void selectDateFromCalendar(String date)
+    public void selectDateFromCalendar(String date) throws InterruptedException
     {
         if (StringUtils.isEmpty(date))
         {
@@ -502,7 +502,9 @@ public abstract class WorkFlowPage extends SharePage implements WorkFlow
                 // Wait for the title to show the month
                 drone.waitUntilVisible(By.cssSelector("a.calnav"), dueDate.toString(DateTimeFormat.forPattern("MMMM yyyy")),
                         SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+                Thread.sleep(1000);
                 calenderElement = drone.findAndWait(By.cssSelector("table[id$='_workflowDueDate-cntrl']>tbody"));
+
 
                 List<WebElement> allDays = calenderElement.findElements(By.cssSelector("a.selector"));
 
@@ -524,6 +526,7 @@ public abstract class WorkFlowPage extends SharePage implements WorkFlow
         {
             throw new PageOperationException("Timed out on waiting for: ", te);
         }
+
     }
 
     /**

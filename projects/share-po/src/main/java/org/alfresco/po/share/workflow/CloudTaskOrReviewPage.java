@@ -598,6 +598,16 @@ public class CloudTaskOrReviewPage extends WorkFlowPage
         return getElementText(DESTINATION_FOLDER);
     }
 
+    public String getRequiredApprovalPercentageField()
+    {
+        return drone.find(REQUIRED_APPROVAL_PERCENTAGE).getAttribute("value");
+    }
+
+    public Boolean isRequiredApprovalPercentageFieldPresent()
+    {
+        return drone.find(REQUIRED_APPROVAL_PERCENTAGE).isEnabled();
+    }
+
     /**
      * Method to check Destination network, site, folder,
      * Destination select button, Assignee label and Assignee select button
