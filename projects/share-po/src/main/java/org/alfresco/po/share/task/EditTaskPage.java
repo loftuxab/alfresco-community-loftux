@@ -26,6 +26,8 @@ import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -45,7 +47,7 @@ import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 /**
  * This class represents the Edit task page which can be navigated from My Tasks
  * page > Edit Task.
- *
+ * 
  * @author Abhijeet Bharade
  * @since v1.6.2
  */
@@ -61,9 +63,11 @@ public class EditTaskPage extends SharePage
     private static final RenderElement EDIT_TASK_HEADER_ELEMENT = getVisibleRenderElement(By.cssSelector("div.task-edit-header h1"));
     private static final RenderElement SAVE_BUTTON_ELEMENT = getVisibleRenderElement(SAVE_AND_CLOSE.by);
     private static final RenderElement CANCEL_BUTTON_ELEMENT = getVisibleRenderElement(CANCEL.by);
-    
-    private static final String ACCEPT_BUTTON = "button[id*='accept-button']";
 
+    private static final String ACCEPT_BUTTON = "button[id*='accept-button']";
+    private static final By ALL_FIELD_LABELS = By.cssSelector("span[class$='viewmode-label']");
+
+    private final Log logger = LogFactory.getLog(this.getClass());
 
     public enum Button
     {
@@ -95,7 +99,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * (non-Javadoc)
-     *
+     * 
      * @see org.alfresco.webdrone.HtmlPage#render(org.alfresco.webdrone.RenderTime)
      */
     @SuppressWarnings("unchecked")
@@ -132,7 +136,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Selects the Status drop down list.
-     *
+     * 
      * @return {@link TaskStatus} - status selected from dropdown.
      */
     public TaskStatus getSelectedStatusFromDropDown()
@@ -144,7 +148,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Selects the Task done button.
-     *
+     * 
      * @return {@link org.alfresco.po.share.MyTasksPage} - instance of my task page.
      */
     public HtmlPage selectTaskDoneButton()
@@ -158,7 +162,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Selects the Reject button.
-     *
+     * 
      * @return {@link org.alfresco.po.share.MyTasksPage} - instance of my task page.
      */
     public HtmlPage selectRejectButton()
@@ -180,7 +184,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Selects the Status drop down list.
-     *
+     * 
      * @return {@link org.alfresco.po.share.MyTasksPage} - instance of my task page.
      */
     public HtmlPage selectApproveButton()
@@ -202,7 +206,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Selects the Save button
-     *
+     * 
      * @return {@link org.alfresco.po.share.MyTasksPage} - instance of my task page.
      */
     public HtmlPage selectSaveButton()
@@ -224,7 +228,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Enter comment
-     *
+     * 
      * @param comment
      */
     public void enterComment(String comment)
@@ -258,7 +262,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Method to get Info section of Edit Task page
-     *
+     * 
      * @return
      */
     public TaskInfo getTaskDetailsInfo()
@@ -294,7 +298,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Method to get the list of Items in a Task
-     *
+     * 
      * @return {@link List< TaskItem >}
      */
     public List<TaskItem> getTaskItems()
@@ -321,7 +325,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Method to get the List of TaskItem object for a given File Name
-     *
+     * 
      * @param fileName
      * @return {@link List< TaskItem >}
      */
@@ -352,7 +356,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Method to get Status Drop down options
-     *
+     * 
      * @return
      */
     public List<TaskStatus> getStatusOptions()
@@ -376,7 +380,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Method to select Cancel button on Edit Task Page
-     *
+     * 
      * @return {@link org.alfresco.po.share.MyTasksPage} or {@link TaskDetailsPage}
      */
     public HtmlPage selectCancelButton()
@@ -398,7 +402,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Method to check if Reassign button is displayed or not
-     *
+     * 
      * @return True if displayed
      */
     public boolean isReAssignButtonDisplayed()
@@ -412,7 +416,7 @@ public class EditTaskPage extends SharePage
         }
         return false;
     }
-    
+
     /**
      * Mimics the action of clicking the Accept Button.
      * 
@@ -437,7 +441,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Return is all buttons displayed on page.
-     *
+     * 
      * @return
      */
     public boolean isButtonsDisplayed(Button button)
@@ -454,7 +458,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Method to select given file from the given site.
-     *
+     * 
      * @param fileName
      * @param siteName
      */
@@ -475,7 +479,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Mimics the click Add Items button.
-     *
+     * 
      * @return {@link SelectContentPage}
      */
     public SelectContentPage clickAddItems()
@@ -503,7 +507,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Mimics the click Reassign Button button.
-     *
+     * 
      * @return {@link ReassignPage}
      */
     public ReassignPage clickReassign()
@@ -515,7 +519,7 @@ public class EditTaskPage extends SharePage
     /**
      * Method to reassign task for another user.
      * test is EditTaskPageTest.selectReassign
-     *
+     * 
      * @param userName
      */
     public MyTasksPage selectReassign(String userName)
@@ -531,7 +535,7 @@ public class EditTaskPage extends SharePage
 
     /**
      * Method mimic click interaction with Claim button.
-     *
+     * 
      * @return
      */
     public EditTaskPage selectClaim()
@@ -540,29 +544,55 @@ public class EditTaskPage extends SharePage
         waitUntilAlert();
         return this.render();
     }
-    
-    
 
     /**
      * Method to check if COMMENT_TEXTAREA is present
      * 
      * @return boolean
      */
-	public boolean isCommentTextAreaDisplayed() {
-		return drone.isElementDisplayed(By.cssSelector(COMMENT_TEXTAREA));
+    public boolean isCommentTextAreaDisplayed()
+    {
+        return drone.isElementDisplayed(By.cssSelector(COMMENT_TEXTAREA));
 
-	}
-	
+    }
+
     /**
-     * Method to read comment from COMMENT_TEXTAREA 
+     * Method to read comment from COMMENT_TEXTAREA
      * 
      * @return String
      */
-	public String readCommentFromCommentTextArea() {
+    public String readCommentFromCommentTextArea()
+    {
 
-		WebElement commentBox = drone.find(By.cssSelector(COMMENT_TEXTAREA));
-		return commentBox.getAttribute("value");
+        WebElement commentBox = drone.find(By.cssSelector(COMMENT_TEXTAREA));
+        return commentBox.getAttribute("value");
 
-	}
+    }
 
+    /**
+     * Method to get All labels from Workflow Form
+     * 
+     * @return
+     */
+    public List<String> getAllLabels()
+    {
+        List<String> labels = new ArrayList<String>();
+        try
+        {
+            List<WebElement> webElements = drone.findAll(ALL_FIELD_LABELS);
+            for (WebElement label : webElements)
+            {
+                labels.add(label.getText());
+            }
+            return labels;
+        }
+        catch (NoSuchElementException nse)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("No labels found", nse);
+            }
+        }
+        return labels;
+    }
 }
