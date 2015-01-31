@@ -65,7 +65,7 @@ public class EditingItemsViaAWE extends AbstractUtils
     public void dataPrep_AONE() throws Exception
     {
         String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
-        String siteName = getSiteName(testName);
+        String siteName = getSiteName(testName) + "sasa3";
 
         // User
         String[] testUserInfo = new String[] { testUser };
@@ -89,7 +89,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         SiteWebQuickStartDashlet wqsDashlet = siteDashBoard.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
         wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
         wqsDashlet.clickImportButtton();
-        assertTrue(wqsDashlet.isImportMessage());
+        wqsDashlet.waitForImportMessage();
 
     }
     
