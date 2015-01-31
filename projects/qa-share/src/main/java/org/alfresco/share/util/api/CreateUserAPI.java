@@ -412,6 +412,10 @@ public class CreateUserAPI extends AlfrescoHttpClient
             {
                 role = "SiteConsumer";
             }
+            else if (role.equalsIgnoreCase("Manager"))
+            {
+                role = "SiteManager";
+            }
         }
 
         // Invite User
