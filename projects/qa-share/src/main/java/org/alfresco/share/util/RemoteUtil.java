@@ -148,4 +148,82 @@ public class RemoteUtil extends AbstractUtils
     {
         return String.format("`cygpath -u '%s'`", winPath);
     }
+
+    public static boolean isFileExist(String file_path)
+    {
+        String output;
+        initConnection();
+
+
+                output = commandProcessor.executeCommand("ls -d " + file_path);
+                if (output.contains(file_path) && !output.contains("No such file or directory"))
+                    return true;
+
+
+        System.out.println("File is not exist");
+        return false;
+    }
+
+    public static boolean isFileEmpty(String file_path)
+    {
+        String output;
+        initConnection();
+
+        output = commandProcessor.executeCommand("ls -s " + file_path);
+        if (output.contains(0 + " " + file_path))
+        {
+            return true;
+        }
+
+        else
+        {
+            return false;
+        }
+    }
+
+    public static void checkForStrings(String searchText, String filepath, String resultsFilePath) 
+    {
+        initConnection();
+        commandProcessor.executeCommand("strings " + filepath + " | grep " + searchText + " > " + resultsFilePath);
+
+    }
+
+    public static void mountNfs(String shareUrl, String nfsServerPort, String mountServerPort) throws Exception
+    {
+        String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+
+        initConnection();
+        commandProcessor.executeCommand("mkdir /tmp/alf");
+        commandProcessor
+            .executeCommand("mount -o nolock,port=" + nfsServerPort + ",mountport=" + mountServerPort + ",proto=tcp " + server + ":/Alfresco /tmp/alf");
+        logger.info("NFS mounted!");
+        commandProcessor.disconnect();
+
+    }
+
+    public static void createUserOnServer(String username, String password) throws Exception
+    {
+        initConnection();
+        commandProcessor.executeCommand("useradd -u 1000 -g 500 " + username);
+        commandProcessor.executeCommand("echo -e " + "\"" + password + "\n" + password + "\"" + "| passwd " + username);
+        logger.info("User created!");
+        commandProcessor.disconnect();
+
+    }
+
+    public static void unmountNfs (String pathToNFS) throws Exception
+    {
+        initConnection();
+        commandProcessor.executeCommand("umount " + pathToNFS);
+        logger.info("NFS unmounted!");
+        commandProcessor.disconnect();
+    }
+
+    public static void deleteUserOnServer (String username) throws Exception
+    {
+        initConnection();
+        commandProcessor.executeCommand("userdel -f -r " + username);
+        logger.info("User deleted!");
+        commandProcessor.disconnect();
+    }
 }

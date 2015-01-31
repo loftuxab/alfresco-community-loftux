@@ -1038,4 +1038,58 @@ public class FtpUtil extends AbstractUtils
         return size;
     }
 
+    public static boolean downloadContent(String shareUrl, String user, String password, String contentName, String remoteFolderPath)
+    {
+
+        InputStream inputStream;
+        OutputStream outputStream;
+        boolean result = false;
+
+        try
+        {
+            FTPClient ftpClient = connectServer(shareUrl, user, password);
+            logger.info("Connected to ftp? " + ftpClient.isConnected());
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+            ftpClient.changeWorkingDirectory(remoteFolderPath);
+            ftpClient.setControlKeepAliveTimeout(1200);
+            if (ftpClient.isConnected())
+                try
+                {
+                    inputStream = ftpClient.retrieveFileStream(contentName);
+                    outputStream = new FileOutputStream(downloadDirectory + contentName);
+
+                    if (inputStream != null)
+                    {
+                        byte[] buffer = new byte[4096];
+                        int l;
+                        while ((l = inputStream.read(buffer)) != -1)
+                        {
+                            outputStream.write(buffer, 0, l);
+                        }
+                        logger.info("Content uploaded!");
+                        inputStream.close();
+                        outputStream.flush();
+                        outputStream.close();
+                        ftpClient.logout();
+                        ftpClient.disconnect();
+                        result = true;
+                    }
+                    else
+                    {
+                        logger.error(ftpClient.getReplyString());
+                    }
+                }
+                catch (IOException ex)
+                {
+                    throw new RuntimeException(ex.getMessage());
+                }
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+
+        return result;
+    }
+
 }

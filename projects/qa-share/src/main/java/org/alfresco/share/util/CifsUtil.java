@@ -714,4 +714,48 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
         r.keyRelease(KeyEvent.VK_V);
     }
 
+    public static boolean downloadContent(String shareUrl, String username, String password, String cifsPath, String fileName)
+    {
+        boolean successful = false;
+        try
+        {
+
+            String user = username + ":" + password;
+            String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(user);
+
+            SmbFile sFile = new SmbFile("smb://" + server + "/" + cifsPath + "/" + fileName, auth);
+
+                FileOutputStream fileOutputStream = null;
+                SmbFileInputStream smbfileInputStream = null;
+                try
+                {
+                    fileOutputStream = new FileOutputStream(downloadDirectory + fileName);
+                    smbfileInputStream = new SmbFileInputStream(sFile);
+
+                    byte[] buf = new byte[16 * 1024 * 1024];
+                    int len;
+                    while ((len = smbfileInputStream.read(buf)) != -1)
+                    {
+                        fileOutputStream.write(buf, 0, len);
+                    }
+                    smbfileInputStream.close();
+                    fileOutputStream.close();
+                    successful = true;
+
+                }
+                catch (IOException ex)
+                {
+                    throw new RuntimeException(ex.getMessage());
+                }
+
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+
+        return successful;
+    }
+
 }

@@ -37,7 +37,7 @@ public class SystemAdminConsole extends AbstractUtils
         logger.info("Start Tests in: " + testName);
     }
 
-    @Test(groups = { "Sanity", "EnterpriseOnly" })
+    @Test(groups = { "Sanity", "EnterpriseOnly" }, timeOut = 300000)
     public void AONE_8097()
     {
 
@@ -138,7 +138,7 @@ public class SystemAdminConsole extends AbstractUtils
 
     }
 
-    @Test(groups = { "Sanity", "EnterpriseOnly", "Cluster" })
+    @Test(groups = { "Sanity", "EnterpriseOnly", "Cluster" }, timeOut = 300000)
     public void AONE_8104()
     {
         // Admin user is logged into the Share

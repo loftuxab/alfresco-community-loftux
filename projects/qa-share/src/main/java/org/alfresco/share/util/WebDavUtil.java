@@ -31,6 +31,15 @@ import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.client.methods.*;
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
+import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
+import org.apache.jackrabbit.webdav.client.methods.PutMethod;
+
 
 import java.io.*;
 import java.util.ArrayList;
@@ -111,6 +120,46 @@ public class WebDavUtil extends AbstractUtils
         }
         return false;
     }
+
+    public static boolean downloadContent(String shareUrl, String userName, String password, String remoteContentName, String remoteFolderPath)
+    {
+        boolean result = false;
+
+
+        try
+        {
+            HttpClient client = connectServer(shareUrl, userName, password);
+            GetMethod getMethod = new GetMethod(serverUrl + "/" + remoteFolderPath + remoteContentName);
+            client.executeMethod(getMethod);
+            InputStream inputStream = getMethod.getResponseBodyAsStream();
+            OutputStream outputStream = new FileOutputStream(downloadDirectory + remoteContentName);
+
+
+            if (inputStream != null)
+            {
+
+                byte[] buffer = new byte[4096];
+                int l;
+                while ((l = inputStream.read(buffer)) != -1)
+                {
+                    outputStream.write(buffer, 0, l);
+                }
+
+                logger.info("Content uploaded!");
+                inputStream.close();
+//                outputStream.flush();
+                outputStream.close();
+                getMethod.releaseConnection();
+                result = true;
+            }
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
+        return result;
+    }
+
 
     /**
      * Method to delete either a folder or a file
