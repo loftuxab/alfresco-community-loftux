@@ -1,4 +1,4 @@
-package org.alfresco.po.alfresco;
+package org.alfresco.po.share.wqs;
 
 import java.util.ArrayList;
 import java.util.List;

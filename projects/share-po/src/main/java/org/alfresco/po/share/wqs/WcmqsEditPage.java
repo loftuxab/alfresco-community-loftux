@@ -1,4 +1,4 @@
-package org.alfresco.po.alfresco;
+package org.alfresco.po.share.wqs;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -27,6 +27,7 @@ public class WcmqsEditPage extends SharePage
     private static final By TEMPLATENAME_INPUT = By.cssSelector("input[id='wef-panel-wefPanel_prop_ws_templateName']");
     private static final By SUBMIT_BUTTON = By.cssSelector("button[id='wef-panel-wefPanel-form-submit-button']");
     private static final By CANCEL_BUTTON = By.cssSelector("button[id='wef-panel-wefPanel-form-cancel-button']");
+    private static final By MANDATORY_INDICATOR=By.cssSelector("span.mandatory-indicator");
     
     private static final By NOTIFICATION_BALLOON = By.cssSelector("div.balloon>div>div");
 
@@ -198,9 +199,44 @@ public class WcmqsEditPage extends SharePage
         }
     }
 
+    public boolean isNameFieldDisplayed()
+    {
+        return drone.isElementDisplayed(NAME_INPUT);
+    }
+    
+    public boolean isNameFieldMandatory()
+    {
+        return drone.isElementDisplayed(MANDATORY_INDICATOR);
+    }
+    
+    public boolean isDescriptionFieldDisplayed()
+    {
+        return drone.isElementDisplayed(DESCRIPTION_INPUT);
+    }
+    
+    public boolean isTitleFieldDisplayed()
+    {
+        return drone.isElementDisplayed(TITLE_INPUT);
+    }
+    
+    public boolean isContentFrameDisplayed()
+    {
+        return drone.isElementDisplayed(By.id(CONTENT_IFRAME));
+    }
+    
+    public boolean isTemplateNameDisplayed()
+    {
+        return drone.isElementDisplayed(TEMPLATENAME_INPUT);
+    }
+    
     public boolean isSubmitButtonDisplayed()
     {
         return drone.isElementDisplayed(SUBMIT_BUTTON);
+    }
+    
+    public boolean isCancelButtonDisplayed()
+    {
+        return drone.isElementDisplayed(CANCEL_BUTTON);
     }
     
     public String getNotificationMessage()
