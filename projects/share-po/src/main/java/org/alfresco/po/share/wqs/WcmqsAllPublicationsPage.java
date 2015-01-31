@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
-public class WcmqsAllPublicationsPage extends SharePage
+public class WcmqsAllPublicationsPage extends WcmqsAbstractPage
 {
 
     @RenderWebElement
@@ -29,6 +29,7 @@ public class WcmqsAllPublicationsPage extends SharePage
     private final By PUBLICATION_ELEMENT_DATE_AUTHOR = By.cssSelector(".newslist-date");
     private final By PUBLICATION_ELEMENT_DESCRIPTION = By.cssSelector(".publications-list-detail>p");
     private final By PUBLICATION_ELEMENT_TAGSECTION = By.cssSelector(".tag-list");
+
 
 
     /**

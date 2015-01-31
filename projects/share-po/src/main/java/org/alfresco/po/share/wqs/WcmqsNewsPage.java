@@ -24,7 +24,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author bogdan.bocancea
  */
 
-public class WcmqsNewsPage extends SharePage
+public class WcmqsNewsPage extends WcmqsAbstractPage
 {
 
     private final By DELETE_LINK = By.cssSelector("a[class=alfresco-content-delete]");
@@ -57,7 +57,6 @@ public class WcmqsNewsPage extends SharePage
     protected static By RIGHT_TITLES_NEWS =By.cssSelector("div[id='right'] ul");
 
     @RenderWebElement
-    private final By PAGE_LOGO = By.cssSelector("#logo>a");
     private final By NEWS_MENU = By.cssSelector("a[href$='news/']");
 
     /**
@@ -378,22 +377,5 @@ public class WcmqsNewsPage extends SharePage
 
         return titles;
     }
-    
-//    public boolean checkIfNewsExists(String title)
-//    {
-//        boolean check = false;
-//        try
-//        {
-//            drone.waitForElement(By.xpath(String.format("//h2[contains(text(),\"%s\")]", title)),
-//                    SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
-//            check = true;
-//        }
-//        catch (NoSuchElementException nse)
-//        {
-//            return false;
-//        }
-//
-//        return check;
-//    }
 
 }

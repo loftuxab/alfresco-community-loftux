@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
-public class WcmqsPublicationPage extends SharePage
+public class WcmqsPublicationPage extends WcmqsAbstractPage
 {
 
         public static final List<String> PUBLICATION_PAGES = Arrays.asList(
