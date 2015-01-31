@@ -178,11 +178,6 @@
     <installer.java.version>1.8.0_25</installer.java.version>
     <installer.postgresql.version>9.3.5</installer.postgresql.version>
     <installer.libreoffice.version>4.2.5-alfresco</installer.libreoffice.version>
-
-    <manifest.major.version>5</manifest.major.version>
-    <manifest.minor.version>1</manifest.minor.version>
-    <manifest.servicepack.version>0</manifest.servicepack.version>
-    <manifest.implementation.version>${project.version}</manifest.implementation.version>
   </properties>
   
   <!-- Define versions of very common components -->
@@ -482,6 +477,28 @@
 				</execution>
 			</executions>
 		</plugin>
+
+        <!-- If version.properties can be found, read it to set version properties for manifest -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0-alpha-2</version>
+            <executions>
+                <execution>
+                    <id>read-version-properties</id>
+                    <phase>initialize</phase>
+                    <goals>
+                        <goal>read-project-properties</goal>
+                    </goals>
+                    <configuration>
+                        <files>
+                            <file>${highest.basedir}/projects/repository/config/alfresco/version.properties</file>
+                        </files>
+                        <quiet>true</quiet>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
 
     <!-- Defining version and some configuration of Maven plugins -->
@@ -617,8 +634,8 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Version>${manifest.major.version}.${manifest.minor.version}.${manifest.servicepack.version}</Specification-Version>
-                            <Implementation-Version>${manifest.implementation.version}</Implementation-Version>
+                            <Specification-Version>${version.major}.${version.minor}.${version.revision}</Specification-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                             <Build-Date>${maven.build.timestamp}</Build-Date>
                         </manifestEntries>
                     </archive>
@@ -634,8 +651,8 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Version>${manifest.major.version}.${manifest.minor.version}.${manifest.servicepack.version}</Specification-Version>
-                            <Implementation-Version>${manifest.implementation.version}</Implementation-Version>
+                            <Specification-Version>${version.major}.${version.minor}.${version.revision}</Specification-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                             <Build-Date>${maven.build.timestamp}</Build-Date>
                         </manifestEntries>
                     </archive>
@@ -833,7 +850,19 @@
 									<ignore />
 								</action>
 							</pluginExecution>
-
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>org.codehaus.mojo</groupId>
+									<artifactId>properties-maven-plugin</artifactId>
+									<versionRange>[1.0-alpha-2,)</versionRange>
+									<goals>
+										<goal>read-project-properties</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<ignore/>
+								</action>
+							</pluginExecution>
         					<pluginExecution>
         						<pluginExecutionFilter>
         							<groupId>org.apache.maven.plugins</groupId>
