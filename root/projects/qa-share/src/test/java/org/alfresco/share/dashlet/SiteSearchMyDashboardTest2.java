@@ -18,6 +18,12 @@
  */
 package org.alfresco.share.dashlet;
 
+import static java.util.Arrays.asList;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.alfresco.po.share.dashlet.SearchLimit;
 import org.alfresco.po.share.dashlet.SiteSearchDashlet;
 import org.alfresco.po.share.dashlet.SiteSearchItem;
@@ -35,19 +41,13 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static java.util.Arrays.asList;
 
 /**
  * Created by olga.lokhach

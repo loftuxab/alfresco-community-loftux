@@ -1,5 +1,7 @@
 package org.alfresco.share.sanity;
 
+import java.util.Calendar;
+
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.calendar.CalendarPage;
@@ -8,15 +10,13 @@ import org.alfresco.share.util.ActivityType;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.Calendar;
 
 /**
  * @author Sergey Kardash

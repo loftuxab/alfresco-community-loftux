@@ -31,7 +31,7 @@ import org.alfresco.po.share.reports.AdhocAnalyzerPage;
 import org.alfresco.po.share.reports.CreateEditAdhocReportPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SiteFinderPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.po.thirdparty.pentaho.PentahoUserConsolePage;
 import org.alfresco.share.util.AbstractUtils;

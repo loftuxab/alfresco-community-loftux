@@ -5,7 +5,7 @@ import org.alfresco.po.share.dashlet.MyDocumentsDashlet;
 import org.alfresco.po.share.dashlet.MySitesDashlet;
 import org.alfresco.po.share.dashlet.MyTasksDashlet;
 import org.alfresco.po.share.enums.Dashlets;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;

@@ -7,9 +7,16 @@
  */
 package org.alfresco.share.cloudsync;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import org.alfresco.po.share.SharePopup;
 import org.alfresco.po.share.enums.UserRole;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.ConfirmDeletePage;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractCloudSyncTest;
 import org.alfresco.share.util.ShareUser;
@@ -17,17 +24,13 @@ import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertEquals;
 
 /**
  * @author Ranjith Manyam

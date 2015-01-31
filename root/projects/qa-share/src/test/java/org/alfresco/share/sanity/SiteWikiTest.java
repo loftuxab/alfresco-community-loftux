@@ -1,5 +1,13 @@
 package org.alfresco.share.sanity;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
@@ -7,24 +15,19 @@ import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.po.share.site.wiki.WikiPageList;
 import org.alfresco.po.share.site.wiki.WikiTreeMenuNavigation;
+import org.alfresco.po.share.site.wiki.WikiTreeMenuNavigation.PagesMenu;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ActivityType;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.alfresco.po.share.site.wiki.WikiTreeMenuNavigation.PagesMenu;
-import static org.testng.Assert.*;
 
 /**
  * This class includes Site Wiki Sanity tests

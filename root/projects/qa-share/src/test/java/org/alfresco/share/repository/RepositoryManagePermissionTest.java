@@ -17,31 +17,45 @@
  */
 package org.alfresco.share.repository;
 
-import org.alfresco.po.share.FactorySharePage;
-import org.alfresco.po.share.RepositoryPage;
-import org.alfresco.po.share.enums.UserRole;
-import org.alfresco.po.share.search.FacetedSearchPage;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
-import org.alfresco.po.share.site.document.ManagePermissionsPage.ButtonType;
-import org.alfresco.po.share.site.document.ManagePermissionsPage.UserSearchPage;
-import org.alfresco.share.search.SearchKeys;
-import org.alfresco.share.util.*;
-import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.HtmlPage;
-import org.alfresco.webdrone.WebDroneImpl;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
-import org.testng.log4testng.Logger;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.alfresco.po.share.FactorySharePage;
+import org.alfresco.po.share.RepositoryPage;
+import org.alfresco.po.share.enums.UserRole;
+import org.alfresco.po.share.search.FacetedSearchPage;
+import org.alfresco.po.share.site.document.ConfirmDeletePage;
+import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.ManagePermissionsPage;
+import org.alfresco.po.share.site.document.ManagePermissionsPage.ButtonType;
+import org.alfresco.po.share.site.document.ManagePermissionsPage.UserSearchPage;
+import org.alfresco.po.share.site.document.SortField;
+import org.alfresco.po.share.site.document.UserProfile;
+import org.alfresco.share.search.SearchKeys;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserRepositoryPage;
+import org.alfresco.share.util.ShareUserSearchPage;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.SiteUtil;
+import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
+import org.alfresco.webdrone.HtmlPage;
+import org.alfresco.webdrone.WebDroneImpl;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
+import org.testng.log4testng.Logger;
 
 /**
  * @author nshah

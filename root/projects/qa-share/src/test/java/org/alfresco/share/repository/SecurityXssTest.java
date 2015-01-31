@@ -50,7 +50,7 @@ import org.alfresco.po.share.workflow.WorkFlowType;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserRepositoryPage;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;

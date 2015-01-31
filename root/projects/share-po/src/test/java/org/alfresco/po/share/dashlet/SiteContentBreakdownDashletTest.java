@@ -15,24 +15,24 @@
 
 package org.alfresco.po.share.dashlet;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * SiteContentBreakdownDashlet test class for site content breakdown report dashlet page object

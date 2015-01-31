@@ -18,21 +18,24 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import org.alfresco.po.share.enums.Dashlets;
-import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
-import org.alfresco.po.share.site.CustomizeSitePage;
-import org.alfresco.po.share.site.wiki.WikiPageList;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import static org.alfresco.po.share.site.SitePageType.WIKI;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.alfresco.po.share.site.SitePageType.WIKI;
-import static org.testng.Assert.*;
+import org.alfresco.po.share.enums.Dashlets;
+import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
+import org.alfresco.po.share.site.CustomizeSitePage;
+import org.alfresco.po.share.site.wiki.WikiPageList;
+import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Tests for Wiki dashlet web elements

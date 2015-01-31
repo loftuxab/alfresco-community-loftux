@@ -22,7 +22,7 @@ package org.alfresco.po.alfresco;
 
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.ShareUtil;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;

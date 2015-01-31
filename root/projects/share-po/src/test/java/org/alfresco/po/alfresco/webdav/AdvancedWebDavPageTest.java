@@ -1,22 +1,12 @@
 package org.alfresco.po.alfresco.webdav;
 
 import org.alfresco.po.share.AbstractTest;
-import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
-import org.alfresco.po.share.admin.AdminConsolePage;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Sergey Kardash

@@ -1,17 +1,6 @@
 package org.alfresco.po.share.site.calendar;
 
-import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
-import org.alfresco.po.share.site.CustomizeSitePage;
-import org.alfresco.po.share.site.SitePageType;
-import org.alfresco.po.share.site.calendar.CalendarPage.ActionEventVia;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +8,18 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import static org.testng.Assert.assertNotNull;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
+import org.alfresco.po.share.site.CustomizeSitePage;
+import org.alfresco.po.share.site.SitePageType;
+import org.alfresco.po.share.site.calendar.CalendarPage.ActionEventVia;
+import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Holds tests for Calendar page web elements

@@ -17,6 +17,9 @@
  */
 package org.alfresco.share.repository;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.UserRole;
@@ -28,16 +31,13 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.ShareUserRepositoryPage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author cganesh

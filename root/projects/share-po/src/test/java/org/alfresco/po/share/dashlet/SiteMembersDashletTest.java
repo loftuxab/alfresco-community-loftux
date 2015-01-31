@@ -18,24 +18,28 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import org.alfresco.po.share.*;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.alfresco.po.share.AlfrescoVersion;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.SiteMember;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.SiteMembersPage;
 import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.util.List;
-
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Integration test to verify Site members dashlet page elements are in place.

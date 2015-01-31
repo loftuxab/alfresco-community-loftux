@@ -1,32 +1,42 @@
 package org.alfresco.po.share.adminconsole;
 
+import static org.alfresco.po.share.adminconsole.replicationjobs.RepeatEveryValue.MINUTE;
+import static org.alfresco.po.share.adminconsole.replicationjobs.ReplicationJobStatus.FAILED;
+import static org.alfresco.po.share.adminconsole.replicationjobs.ReplicationJobStatus.NEW;
+import static org.alfresco.po.share.adminconsole.replicationjobs.ReplicationJobStatus.RUNNING;
+import static org.alfresco.po.share.site.document.ConfirmDeletePage.Action.Delete;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.adminconsole.replicationjobs.*;
+import org.alfresco.po.share.adminconsole.replicationjobs.DeleteJobPage;
+import org.alfresco.po.share.adminconsole.replicationjobs.NewReplicationJobPage;
+import org.alfresco.po.share.adminconsole.replicationjobs.ReplicationJob;
+import org.alfresco.po.share.adminconsole.replicationjobs.ReplicationJobStatus;
+import org.alfresco.po.share.adminconsole.replicationjobs.ReplicationJobsPage;
 import org.alfresco.po.share.site.NewFolderPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.CreatePlainTextContentPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.po.share.workflow.CompanyHome;
 import org.alfresco.po.share.workflow.Content;
 import org.alfresco.po.share.workflow.SelectContentPage;
 import org.alfresco.po.share.workflow.Site;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.alfresco.po.share.adminconsole.replicationjobs.RepeatEveryValue.MINUTE;
-import static org.alfresco.po.share.adminconsole.replicationjobs.ReplicationJobStatus.*;
-import static org.alfresco.po.share.site.document.ConfirmDeletePage.Action.Delete;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Marina.Nenadovets

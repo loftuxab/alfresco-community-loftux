@@ -23,7 +23,7 @@ import static org.testng.Assert.assertTrue;
 
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.ShareUtil;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 

@@ -14,13 +14,16 @@
  */
 package org.alfresco.po.share.site.document;
 
+import java.io.File;
+import java.util.List;
+
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UpdateFilePage;
 import org.alfresco.po.share.site.UploadFilePage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,9 +32,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.List;
 
 /**
  * This class Tests the Version Details bean

@@ -18,17 +18,17 @@
  */
 package org.alfresco.po.share.workflow;
 
+import java.util.List;
+
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
 
 /**
  * Unit test to verify selectDateFromCalendar method in WorkFlowPage.

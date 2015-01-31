@@ -1,10 +1,17 @@
 package org.alfresco.share.site.wikipage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SiteFinderPage;
 import org.alfresco.po.share.site.SitePageType;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditHtmlDocumentPage;
+import org.alfresco.po.share.site.document.InlineEditPage;
+import org.alfresco.po.share.site.document.MimeType;
+import org.alfresco.po.share.site.document.TinyMceEditor;
 import org.alfresco.po.share.site.document.TinyMceEditor.FormatType;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.po.share.site.wiki.WikiPage.FONT_ATTR;
@@ -13,16 +20,13 @@ import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /** 
  * @author nshah

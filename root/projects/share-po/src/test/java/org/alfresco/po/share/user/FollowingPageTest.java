@@ -19,15 +19,24 @@
 
 package org.alfresco.po.share.user;
 
-import org.alfresco.po.share.*;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.util.List;
 
-import static org.testng.Assert.*;
+import org.alfresco.po.share.AbstractTest;
+import org.alfresco.po.share.AlfrescoVersion;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.PeopleFinderPage;
+import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.ShareUtil;
+import org.alfresco.test.FailedTestListener;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Integration test to verify I'm Following page elements are in place.

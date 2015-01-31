@@ -1,25 +1,44 @@
 package org.alfresco.share.sanity;
 
+import static org.alfresco.po.share.enums.CloudSyncStatus.ATTEMPTED;
+import static org.alfresco.po.share.enums.CloudSyncStatus.PENDING;
+import static org.alfresco.po.share.enums.CloudSyncStatus.SYNCED;
+import static org.alfresco.po.share.site.document.ContentType.PLAINTEXT;
+import static org.alfresco.po.share.site.document.ContentType.XML;
+import static org.alfresco.share.util.ShareUser.createContent;
+import static org.alfresco.share.util.ShareUser.editTextDocument;
+import static org.alfresco.share.util.ShareUser.openDocumentLibrary;
+import static org.alfresco.share.util.ShareUser.openSiteDashboard;
+import static org.alfresco.share.util.ShareUser.openSitesDocumentLibrary;
+import static org.alfresco.share.util.ShareUser.refreshDocumentLibrary;
+import static org.alfresco.share.util.ShareUser.uploadFileInFolder;
+import static org.alfresco.share.util.ShareUser.uploadFileInFolder1;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.SyncInfoPage;
+import org.alfresco.po.share.site.document.VersionDetails;
 import org.alfresco.share.util.AbstractCloudSyncTest;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
-import static org.alfresco.po.share.enums.CloudSyncStatus.*;
-import static org.alfresco.po.share.site.document.ContentType.PLAINTEXT;
-import static org.alfresco.po.share.site.document.ContentType.XML;
-import static org.alfresco.share.util.ShareUser.*;
-import static org.testng.Assert.*;
 
 /**
  * @author Marina.Nenadovets

@@ -1,27 +1,46 @@
 package org.alfresco.share.search;
 
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.admin.ActionsSet;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.enums.ViewType;
-import org.alfresco.po.share.search.*;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.share.util.*;
+import org.alfresco.po.share.search.AdvanceSearchPage;
+import org.alfresco.po.share.search.FacetedSearchPage;
+import org.alfresco.po.share.search.SearchResult;
+import org.alfresco.po.share.search.SiteResultsPage;
+import org.alfresco.po.share.search.SortType;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserSearchPage;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.WebDroneType;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.*;
-
-import static org.testng.Assert.assertTrue;
 
 @Listeners(FailedTestListener.class)
 @SuppressWarnings("unused")

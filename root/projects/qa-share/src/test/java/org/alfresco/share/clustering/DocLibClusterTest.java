@@ -1,5 +1,14 @@
 package org.alfresco.share.clustering;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPageWithRules;
@@ -7,7 +16,17 @@ import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractIfSelector;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.ActionSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.WhenSelectorImpl;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.AddCommentForm;
+import org.alfresco.po.share.site.document.ConfirmDeletePage;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentAspect;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.TinyMceEditor;
+import org.alfresco.po.share.site.document.TreeMenuNavigation;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
@@ -17,8 +36,8 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSearchPage;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageOperationException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -26,13 +45,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.testng.collections.CollectionUtils;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.testng.Assert.*;
 
 // import javax.management.openmbean.CompositeDataSupport;
 // import javax.management.openmbean.TabularDataSupport;

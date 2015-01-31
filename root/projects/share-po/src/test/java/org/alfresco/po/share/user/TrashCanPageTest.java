@@ -19,6 +19,12 @@
 
 package org.alfresco.po.share.user;
 
+import static org.testng.Assert.assertEquals;
+
+import java.io.File;
+import java.util.Calendar;
+import java.util.List;
+
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.site.NewFolderPage;
@@ -26,19 +32,13 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SiteFinderPage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.Calendar;
-import java.util.List;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * TrashCanPage Test

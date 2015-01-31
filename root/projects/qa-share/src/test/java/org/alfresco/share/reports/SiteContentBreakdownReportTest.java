@@ -16,8 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package org.alfresco.share.reports;
 
 import java.io.File;
@@ -31,7 +29,7 @@ import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;

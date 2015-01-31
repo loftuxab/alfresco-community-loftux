@@ -18,6 +18,17 @@
  */
 package org.alfresco.po.share.task;
 
+import static org.alfresco.po.share.task.EditTaskPage.Button.ADD;
+import static org.alfresco.po.share.task.EditTaskPage.Button.CANCEL;
+import static org.alfresco.po.share.task.EditTaskPage.Button.REASSIGN;
+import static org.alfresco.po.share.task.EditTaskPage.Button.SAVE_AND_CLOSE;
+import static org.alfresco.po.share.task.EditTaskPage.Button.TASK_DONE;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.util.List;
+
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.SharePage;
@@ -27,19 +38,12 @@ import org.alfresco.po.share.site.SiteFinderPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.List;
-
-import static org.alfresco.po.share.task.EditTaskPage.Button.*;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Tests the page object - <code>EditTaskPage</code>

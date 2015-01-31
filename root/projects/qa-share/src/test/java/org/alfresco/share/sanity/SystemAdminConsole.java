@@ -1,22 +1,24 @@
 package org.alfresco.share.sanity;
 
-import org.alfresco.po.share.*;
-import org.alfresco.po.share.systemsummary.SystemSummaryPage;
-import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
+
+import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
-
+import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
+import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.share.site.document.DocumentDetailsActionsTest;
-import org.alfresco.share.util.*;
-
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-import java.util.List;
-import static org.testng.Assert.*;
 
 /**
  * 

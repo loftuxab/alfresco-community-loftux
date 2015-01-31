@@ -19,6 +19,15 @@
 
 package org.alfresco.share.api;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.alfresco.po.share.task.TaskDetailsPage;
 import org.alfresco.po.share.workflow.NewWorkflowPage;
 import org.alfresco.po.share.workflow.TaskHistoryPage;
@@ -30,7 +39,7 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.share.util.api.WorkflowAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,12 +48,6 @@ import org.json.simple.JSONObject;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.testng.Assert.*;
 
 @Listeners(FailedTestListener.class)
 @Test(groups = {"ProductBug"})

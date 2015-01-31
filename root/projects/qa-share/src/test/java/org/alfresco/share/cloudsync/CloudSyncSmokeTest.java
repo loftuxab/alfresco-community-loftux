@@ -1,26 +1,42 @@
 package org.alfresco.share.cloudsync;
 
+import static org.alfresco.po.share.site.document.ContentType.PLAINTEXT;
+import static org.alfresco.po.share.site.document.ContentType.XML;
+import static org.alfresco.share.util.ShareUser.createContent;
+import static org.alfresco.share.util.ShareUser.createContentInCurrentFolder;
+import static org.alfresco.share.util.ShareUser.createFolderInFolder;
+import static org.alfresco.share.util.ShareUser.editTextDocument;
+import static org.alfresco.share.util.ShareUser.openDocumentLibrary;
+import static org.alfresco.share.util.ShareUser.openSiteDashboard;
+import static org.alfresco.share.util.ShareUser.openSitesDocumentLibrary;
+import static org.alfresco.share.util.ShareUser.refreshDocumentLibrary;
+import static org.alfresco.share.util.ShareUser.uploadFileInFolder;
+import static org.alfresco.share.util.ShareUser.uploadFileInFolder1;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.SyncInfoPage;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.user.CloudSyncPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractCloudSyncTest;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import static org.alfresco.po.share.site.document.ContentType.PLAINTEXT;
-import static org.alfresco.po.share.site.document.ContentType.XML;
-import static org.alfresco.share.util.ShareUser.*;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Marina.Nenadovets

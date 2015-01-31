@@ -18,6 +18,22 @@
  */
 package org.alfresco.share.sanity;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.MY_ACTIVITIES;
+import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
+import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.ALL;
+import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.MOST_ACTIVE;
+import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.MY_TOPICS;
+import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.NEW;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.util.List;
+
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.ActivityShareLink;
 import org.alfresco.po.share.dashlet.MyActivitiesDashlet;
@@ -28,26 +44,26 @@ import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SiteNavigation;
 import org.alfresco.po.share.site.SitePageType;
-import org.alfresco.po.share.site.discussions.*;
+import org.alfresco.po.share.site.discussions.DiscussionsPage;
+import org.alfresco.po.share.site.discussions.NewTopicForm;
+import org.alfresco.po.share.site.discussions.ReplyDirectoryInfo;
+import org.alfresco.po.share.site.discussions.TopicDirectoryInfo;
+import org.alfresco.po.share.site.discussions.TopicViewPage;
+import org.alfresco.po.share.site.discussions.TopicsListFilter;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.RandomUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
-
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.MY_ACTIVITIES;
-import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
-import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.*;
-import static org.testng.Assert.*;
 
 /**
  * @author Aliaksei Boole

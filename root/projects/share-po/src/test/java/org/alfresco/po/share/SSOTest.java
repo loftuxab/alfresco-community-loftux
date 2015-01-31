@@ -19,8 +19,8 @@
 
 package org.alfresco.po.share;
 
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.thirdparty.pentaho.PentahoUserConsolePage;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.exception.PageException;
 import org.apache.log4j.Logger;

@@ -25,7 +25,7 @@ import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.user.CloudSyncPage;
 import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.HtmlPage;
 import org.openqa.selenium.By;
 import org.testng.Assert;

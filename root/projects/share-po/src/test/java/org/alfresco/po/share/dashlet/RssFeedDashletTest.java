@@ -18,18 +18,21 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import org.alfresco.po.share.ShareLink;
-import org.alfresco.po.share.enums.Dashlets;
-import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
-import static org.testng.Assert.*;
+import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.enums.Dashlets;
+import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
+import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Tests for RSS Feed dashlet web elements

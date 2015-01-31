@@ -18,29 +18,40 @@
  */
 package org.alfresco.share.site.document;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
+
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.enums.ViewType;
 import org.alfresco.po.share.site.UpdateFilePage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.ConfirmDeletePage;
 import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
+import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.ManagePermissionsPage;
+import org.alfresco.po.share.site.document.SelectAspectsPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.WebDroneType;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.HtmlPage;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
-
-import static org.testng.Assert.*;
 
 /**
  * Test the FilmStrip view of Document Library. Share Refresh > FilmStrip View

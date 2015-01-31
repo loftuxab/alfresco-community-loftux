@@ -4,18 +4,21 @@
 
 package org.alfresco.share.site.document;
 
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.share.util.*;
+import java.util.Map;
+
+import org.alfresco.po.share.site.document.DetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.Map;
 
 @Listeners(FailedTestListener.class)
 public class DocumentDetailsPropertiesTest extends AbstractUtils

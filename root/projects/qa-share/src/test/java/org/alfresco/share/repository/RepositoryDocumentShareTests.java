@@ -19,6 +19,10 @@
 
 package org.alfresco.share.repository;
 
+import static org.testng.Assert.assertFalse;
+
+import java.io.File;
+
 import org.alfresco.po.share.enums.ViewType;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.ShareLinkPage;
@@ -26,16 +30,12 @@ import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserRepositoryPage;
 import org.alfresco.share.util.ShareUserSitePage;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-
-import static org.testng.Assert.assertFalse;
 
 /**
  * Repository Document Share Tests

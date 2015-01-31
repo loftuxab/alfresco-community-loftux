@@ -18,36 +18,39 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import org.alfresco.po.share.ShareLink;
-import org.alfresco.po.share.dashlet.MyActivitiesDashlet.LinkType;
-import org.alfresco.po.share.site.document.DocumentDetailsPage;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
-import org.alfresco.po.thirdparty.firefox.RssFeedPage;
-import org.alfresco.webdrone.RenderTime;
-import org.alfresco.webdrone.exception.PageException;
-import org.testng.Assert;
-import org.testng.annotations.*;
+import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.FOURTEEN_DAYS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.SEVEN_DAYS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.TODAY;
+import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.TWENTY_EIGHT_DAYS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.ALL_ITEMS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.COMMENTS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.CONTENT;
+import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.MEMBERSHIPS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.STATUS_UPDATES;
+import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.EVERYONES_ACTIVITIES;
+import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.IM_FOLLOWING;
+import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.MY_ACTIVITIES;
+import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.OTHERS_ACTIVITIES;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.MY_ACTIVITIES;
-import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.OTHERS_ACTIVITIES;
-import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.EVERYONES_ACTIVITIES;
-import static org.alfresco.po.share.dashlet.SiteActivitiesUserFilter.IM_FOLLOWING;
-import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.ALL_ITEMS;
-import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.STATUS_UPDATES;
-import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.COMMENTS;
-import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.CONTENT;
-import static org.alfresco.po.share.dashlet.SiteActivitiesTypeFilter.MEMBERSHIPS;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.TODAY;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.SEVEN_DAYS;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.FOURTEEN_DAYS;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.TWENTY_EIGHT_DAYS;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertEquals;
+import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.dashlet.MyActivitiesDashlet.LinkType;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.po.thirdparty.firefox.RssFeedPage;
+import org.alfresco.test.FailedTestListener;
+import org.alfresco.webdrone.RenderTime;
+import org.alfresco.webdrone.exception.PageException;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Integration test site activity dashlet page elements.

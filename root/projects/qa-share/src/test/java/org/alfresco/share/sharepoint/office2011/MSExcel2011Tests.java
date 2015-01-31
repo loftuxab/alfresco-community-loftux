@@ -19,7 +19,7 @@ import java.io.File;
 
 import org.alfresco.application.mac.MicrosoftExcel2011;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.share.util.DocumentLibraryUtil;
 import org.alfresco.share.util.FileBaseUtils;
 import org.alfresco.share.util.ShareUser;

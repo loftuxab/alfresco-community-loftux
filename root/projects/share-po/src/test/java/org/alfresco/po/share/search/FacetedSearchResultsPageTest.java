@@ -19,19 +19,23 @@
 package org.alfresco.po.share.search;
 
 
-import org.alfresco.po.share.*;
+import java.util.List;
+
+import org.alfresco.po.share.AbstractTest;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.NewUserPage;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.site.datalist.DataListPage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
 
 
 /**

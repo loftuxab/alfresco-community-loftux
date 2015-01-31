@@ -1,5 +1,8 @@
 package org.alfresco.po.share.wqs;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
@@ -9,20 +12,19 @@ import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePage;
-import org.alfresco.po.share.site.blog.BlogPageTest;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.test.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 /**
  * Created by rdorobantu on 1/21/2015.
  */
+@Listeners(FailedTestListener.class)
 public class WcmqsBlogPageTest extends AbstractTest
 {
     private static final Logger logger = Logger.getLogger(WcmqsBlogPageTest.class);

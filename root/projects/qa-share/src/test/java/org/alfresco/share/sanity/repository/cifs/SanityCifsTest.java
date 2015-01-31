@@ -1,24 +1,30 @@
 package org.alfresco.share.sanity.repository.cifs;
 
-import com.cobra.ldtp.Ldtp;
+import java.io.File;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.explorer.WindowsExplorer;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.CifsUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.utilities.Application;
 import org.alfresco.webdrone.exception.PageException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.cobra.ldtp.Ldtp;
 
 @Listeners(FailedTestListener.class)
 public class SanityCifsTest extends AbstractUtils

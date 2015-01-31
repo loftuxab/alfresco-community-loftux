@@ -1,33 +1,56 @@
 package org.alfresco.share.integrations;
 
-import org.alfresco.po.share.*;
-import org.alfresco.po.share.adminconsole.NodeBrowserPage;
-import org.alfresco.po.share.search.*;
-import org.alfresco.po.share.site.SitePage;
-import org.alfresco.po.share.site.UpdateFilePage;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.share.util.*;
-import org.alfresco.webdrone.WebDroneImpl;
-import org.alfresco.webdrone.exception.PageOperationException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
-import org.apache.commons.io.FileUtils;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.alfresco.po.share.site.document.ContentType.PLAINTEXT;
+import static org.alfresco.share.util.ShareUser.createContent;
+import static org.alfresco.share.util.ShareUser.openDocumentLibrary;
+import static org.alfresco.share.util.ShareUser.openUserDashboard;
+import static org.alfresco.share.util.SiteUtil.createSite;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.alfresco.po.share.site.document.ContentType.PLAINTEXT;
-import static org.alfresco.share.util.ShareUser.*;
-import static org.alfresco.share.util.SiteUtil.createSite;
-import static org.testng.Assert.*;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.adminconsole.NodeBrowserPage;
+import org.alfresco.po.share.search.SearchBox;
+import org.alfresco.po.share.search.SearchResultPage;
+import org.alfresco.po.share.site.SitePage;
+import org.alfresco.po.share.site.UpdateFilePage;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.InlineEditPage;
+import org.alfresco.po.share.site.document.MimeType;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.CifsUtil;
+import org.alfresco.share.util.FtpUtil;
+import org.alfresco.share.util.JmxUtils;
+import org.alfresco.share.util.NodeBrowserPageUtil;
+import org.alfresco.share.util.RemoteUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserSearchPage;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.SshCommandProcessor;
+import org.alfresco.share.util.WebDavUtil;
+import org.alfresco.share.util.WebDroneType;
+import org.alfresco.test.FailedTestListener;
+import org.alfresco.webdrone.WebDroneImpl;
+import org.alfresco.webdrone.exception.PageOperationException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 
 /**

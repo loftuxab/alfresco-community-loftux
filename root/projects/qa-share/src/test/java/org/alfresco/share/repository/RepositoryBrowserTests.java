@@ -19,24 +19,35 @@
 
 package org.alfresco.share.repository;
 
-import org.alfresco.po.share.RepositoryPage;
-import org.alfresco.po.share.enums.ViewType;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu;
-import org.alfresco.po.share.site.document.TreeMenuNavigation.TreeMenu;
-import org.alfresco.share.util.*;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.testng.Assert.*;
+import org.alfresco.po.share.RepositoryPage;
+import org.alfresco.po.share.enums.ViewType;
+import org.alfresco.po.share.site.document.DetailsPage;
+import org.alfresco.po.share.site.document.DocumentAspect;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.LibraryOption;
+import org.alfresco.po.share.site.document.SelectAspectsPage;
+import org.alfresco.po.share.site.document.TreeMenuNavigation;
+import org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu;
+import org.alfresco.po.share.site.document.TreeMenuNavigation.TreeMenu;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserRepositoryPage;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.test.FailedTestListener;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Repository Tests

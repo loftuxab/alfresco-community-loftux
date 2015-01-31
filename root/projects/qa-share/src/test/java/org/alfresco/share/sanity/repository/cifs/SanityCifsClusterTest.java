@@ -1,19 +1,8 @@
 package org.alfresco.share.sanity.repository.cifs;
 
-import com.cobra.ldtp.Ldtp;
-import org.alfresco.application.windows.MicorsoftOffice2010;
-import org.alfresco.po.share.ShareUtil;
-import org.alfresco.po.share.systemsummary.AdminConsoleLink;
-import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
-import org.alfresco.po.share.systemsummary.SystemSummaryPage;
-import org.alfresco.share.util.*;
-import org.alfresco.utilities.Application;
-import org.alfresco.webdrone.exception.PageException;
-import org.alfresco.webdrone.exception.PageOperationException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.testng.Assert;
-import org.testng.annotations.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,9 +14,31 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.alfresco.application.windows.MicorsoftOffice2010;
+import org.alfresco.po.share.ShareUtil;
+import org.alfresco.po.share.systemsummary.AdminConsoleLink;
+import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
+import org.alfresco.po.share.systemsummary.SystemSummaryPage;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.CifsUtil;
+import org.alfresco.share.util.FtpUtil;
+import org.alfresco.share.util.JmxUtils;
+import org.alfresco.share.util.RemoteUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.TelnetUtil;
+import org.alfresco.utilities.Application;
+import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.cobra.ldtp.Ldtp;
 
 /**
  * @author Sergey Kardash

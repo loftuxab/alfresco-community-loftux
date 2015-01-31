@@ -16,7 +16,7 @@ import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
 import org.alfresco.po.share.site.document.ManagePermissionsPage.ButtonType;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
 import org.alfresco.share.calendar.timezone.CalendarTabsTests;
 import org.alfresco.share.util.AbstractUtils;

@@ -18,6 +18,20 @@
  */
 package org.alfresco.share.sanity;
 
+import static org.testng.Assert.assertTrue;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.search.SearchResult;
 import org.alfresco.po.share.search.SortType;
 import org.alfresco.po.share.site.document.ContentDetails;
@@ -28,7 +42,7 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSearchPage;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,12 +50,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.testng.Assert.assertTrue;
 
 /**
  * Class includes: Tests from TestLink in Area: Sanity Tests

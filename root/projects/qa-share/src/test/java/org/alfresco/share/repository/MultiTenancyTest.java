@@ -19,6 +19,20 @@
 
 package org.alfresco.share.repository;
 
+import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
+import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
+import static org.alfresco.po.share.site.document.Categories.CATEGORY_ROOT;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
+
 import org.alfresco.po.alfresco.LoginAlfrescoPage;
 import org.alfresco.po.alfresco.MyAlfrescoPage;
 import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
@@ -52,18 +66,43 @@ import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractIfSelector;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.ActionSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.WhenSelectorImpl;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.DocumentAction;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.ManagePermissionsPage;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.ModelAndMessagesConsole;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.systemsummary.TenantConsole;
 import org.alfresco.po.share.util.PageUtils;
-import org.alfresco.po.share.workflow.*;
-import org.alfresco.share.util.*;
+import org.alfresco.po.share.workflow.NewWorkflowPage;
+import org.alfresco.po.share.workflow.Priority;
+import org.alfresco.po.share.workflow.StartWorkFlowPage;
+import org.alfresco.po.share.workflow.WorkFlowFormDetails;
+import org.alfresco.po.share.workflow.WorkFlowType;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.AlfrescoUtil;
+import org.alfresco.share.util.CategoryManagerPageUtil;
+import org.alfresco.share.util.FtpUtil;
+import org.alfresco.share.util.JmxUtils;
+import org.alfresco.share.util.MailUtil;
+import org.alfresco.share.util.NodeBrowserPageUtil;
+import org.alfresco.share.util.RandomUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserAdmin;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserRepositoryPage;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.ShareUserWorkFlow;
+import org.alfresco.share.util.SiteUtil;
+import org.alfresco.share.util.TagManagerPageUtil;
+import org.alfresco.share.util.WebDavUtil;
 import org.alfresco.share.util.api.AlfrescoHttpClient;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -84,17 +123,6 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
-import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
-import static org.alfresco.po.share.site.document.Categories.CATEGORY_ROOT;
-import static org.testng.Assert.*;
 
 /**
  * Created by Olga Lokhach

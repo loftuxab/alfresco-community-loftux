@@ -18,19 +18,22 @@
  */
 package org.alfresco.po.share.dashlet;
 
+import static org.alfresco.po.share.util.SiteUtil.prepareJpg;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-
-import static org.alfresco.po.share.util.SiteUtil.prepareJpg;
-import static org.testng.Assert.*;
 
 /**
  * Tests for Image Preview dashlet web elements
