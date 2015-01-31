@@ -7,10 +7,9 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import java.util.List;
-
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -23,6 +22,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 /**
  * My site dashlet object, holds all element of the HTML page relating to share's my site dashlet on dashboard page.
@@ -43,8 +44,7 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
     private static final String MY_SITES_BUTTON = "div[class*='my-sites'] div span span button";
     private static final String SITES_TYPE = "div[class*='my-sites'] div.bd ul li a";
     private static final String DELETE_CONFIRM = "div#prompt div.ft span span button";
-    private static final String DELETE_RE_CONFIRM = "div#prompt div.ft span span button";
-
+    private static final By CREATE_SITE = By.cssSelector("div[class*='my-sites'] div span span a");
     private static final String FAVORITE_SYMB_IN_ROW = "a[class*='favourite-action']";
 
     /**
@@ -252,9 +252,7 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
                 {
                     drone.mouseOverOnElement(webElement);
                     webElement.findElement(By.cssSelector(DELETE_SYMB_IN_ROW)).click();
-                    confirmDelete();
-                    drone.refresh();// Temporary will be removed once ConfirmDeletePAge is been included.
-                    return FactorySharePage.resolvePage(drone);
+                    return confirmDelete();
                 }
             }
 
@@ -267,22 +265,48 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
     }
 
     /**
-     * Action of selecting ok on confirm delete pop up dialog.
+     * Confirm delete dialog acceptance action.
      */
-    private void confirmDelete()
+    private HtmlPage confirmDelete()
     {
         try
         {
-            WebElement confirmDelete = drone.find(By.cssSelector(DELETE_CONFIRM));
-            confirmDelete.click();
-            confirmDelete = drone.find(By.cssSelector(DELETE_RE_CONFIRM));
-            confirmDelete.click();
+            List<WebElement> elements = drone.findAndWaitForElements(By.cssSelector(DELETE_CONFIRM));
+            WebElement delete = findButton("Delete", elements);
+            delete.click();
         }
         catch (NoSuchElementException nse)
         {
             logger.error("Delete dialouge not present");
         }
+        return finalConfirmation();
+    }
 
+    /**
+     * Final step to confirm delete dialog acceptance action.
+     */
+
+    private HtmlPage finalConfirmation()
+    {
+        try
+        {
+            List<WebElement> elements = drone.findAndWaitForElements(By.cssSelector(DELETE_CONFIRM));
+            WebElement button = findButton("Yes", elements);
+            button.click();
+        }
+        catch (NoSuchElementException nse)
+        {
+            logger.error("Delete dialouge not present");
+        }
+        if (canResume())
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Site message indicating site deleted has been displayed");
+            }
+        }
+
+        return FactorySharePage.resolvePage(drone);
     }
 
     /**
@@ -346,6 +370,67 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
         {
             logger.error("My Site  Dashlet is not present", nse);
         }
+    }
+
+    /**
+     * Method to verify Create Site is displayed
+     */
+    public boolean isCreateSiteButtonDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(CREATE_SITE).isDisplayed();
+        }
+        catch (TimeoutException elementException)
+        {
+
+        }
+        return false;
+    }
+
+    /**
+     * Click on Create Site button
+     */
+    public CreateSitePage clickCreateSiteButton()
+    {
+        try
+        {
+            drone.find(CREATE_SITE).click();
+            return drone.getCurrentPage().render();
+        }
+        catch (NoSuchElementException nse)
+        {
+            logger.error("Unable to find the New Topic icon.", nse);
+
+        }
+        throw new PageOperationException("Unable to click the New Topic icon");
+    }
+
+    /**
+     * Method to check if a site name is displayed in My Sites Dashlet
+     *
+     * @param taskName
+     * @return True if Site exists
+     */
+    public boolean isSitePresent(String siteName)
+    {
+        List<ShareLink> siteLinks = getSites();
+        try
+        {
+            for (ShareLink siteLink : siteLinks)
+            {
+                if (siteLink.getDescription().contains(siteName))
+                {
+                    return true;
+                }
+            }
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Time out while finding user", e);
+            return false;
+        }
+        return false;
     }
 
 }

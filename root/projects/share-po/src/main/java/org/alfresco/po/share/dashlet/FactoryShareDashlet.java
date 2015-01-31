@@ -146,7 +146,7 @@ public final class FactoryShareDashlet
             {
                 return new AdhocAnalyzerDashlet(drone);
             }
-            if ("my-profile".equalsIgnoreCase(name))
+            if ("my-profile".equalsIgnoreCase(name)|| Dashlets.MY_PROFILE.getDashletName().equalsIgnoreCase(name))
             {
                 return new MyProfileDashlet(drone);
             }
@@ -157,6 +157,10 @@ public final class FactoryShareDashlet
             if ("site-wqs".equalsIgnoreCase(name) || Dashlets.WEB_QUICK_START.getDashletName().equalsIgnoreCase(name))
             {
                 return new SiteWebQuickStartDashlet(drone);
+            }
+            if ("editing-content".equalsIgnoreCase(name) || Dashlets.CONTENT_I_AM_EDITING.getDashletName().equalsIgnoreCase(name))
+            {
+                return new EditingContentDashlet(drone);
             }
             throw new PageException(String.format("%s does not match any known dashlet name", name));
         }
