@@ -8,7 +8,7 @@
         </run>
     </groups>
 
-    <test name="dataprep-HybridWorkflowSanityTest" verbose="1">
+    <!--test name="dataprep-HybridWorkflowSanityTest" verbose="1">
         <classes>
             <class name="org.alfresco.share.workflow.HybridWorkflowSanityTest" />
         </classes>
@@ -42,6 +42,6 @@
         <classes>
             <class name="org.alfresco.share.workflow.WorkFlowActionsTest" />
         </classes>
-    </test>
+    </test-->
 
 </suite>
