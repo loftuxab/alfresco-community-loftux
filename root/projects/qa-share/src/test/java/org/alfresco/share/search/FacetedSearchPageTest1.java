@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
  *
  * @author charu
  */
-
+@Test(groups = { "TestBug" })
 public class FacetedSearchPageTest1 extends AbstractUtils
 {
 
