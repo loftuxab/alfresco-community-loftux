@@ -35,6 +35,8 @@ public class MyMeetingWorkSpaceDashlet extends AbstractDashlet implements Dashle
     private static final String DELETE_CONFIRM = "div#prompt div.ft span span button";
     private static final String DELETE_RE_CONFIRM = "div#prompt div.ft span span button";
     private static final String NO_MEETINGS_DISPLAYED = "div.dashlet-padding>h3";
+    private static final String FAVORITE_SITE = "a[class$='favourite-site fav-site6']";
+    private static final String FAVORITE_SITE_ENABLED = "a[class$='favourite-site fav-site6 enabled']";
 
     /**
      * Constructor.
@@ -163,8 +165,6 @@ public class MyMeetingWorkSpaceDashlet extends AbstractDashlet implements Dashle
         return false;
     }
 
-
-
     /**
      * Delete site from the delete symbol of My Meeting Workspaces Dashlets.
      * 
@@ -237,6 +237,65 @@ public class MyMeetingWorkSpaceDashlet extends AbstractDashlet implements Dashle
         }
 
         return present;
+    }
+
+    /**
+     * Delete site from the delete symbol of My Meeting Workspaces Dashlets.
+     * 
+     * @param siteName
+     * @return
+     */
+    public void selectFavoriteSite(String siteName)
+    {
+        if (siteName == null)
+        {
+            throw new UnsupportedOperationException("Name of the site is required");
+        }
+        try
+        {
+            List<WebElement> elements = drone.findAll(By.cssSelector(ROW_OF_SITE));
+            for (WebElement webElement : elements)
+            {
+                if (webElement.findElement(By.cssSelector(SITE_NAME_IN_ROW)).getText().equals(siteName))
+                {
+                    webElement.findElement(By.cssSelector(FAVORITE_SITE)).click();
+                }
+            }
+        }
+        catch (NoSuchElementException nse)
+        {
+            logger.error("Element not found", nse);
+        }
+    }
+
+    /**
+     * Checks the site is favourite.
+     * 
+     * @param siteName Site Name checked for is in Favourite.
+     * @return
+     */
+    public boolean isSiteFavourite(String siteName)
+    {
+        if (siteName == null)
+        {
+            throw new UnsupportedOperationException("Name of the site is required");
+        }
+        try
+        {
+            List<WebElement> elements = drone.findAll(By.cssSelector(ROW_OF_SITE));
+            for (WebElement webElement : elements)
+            {
+                if (webElement.findElement(By.cssSelector(SITE_NAME_IN_ROW)).getText().equals(siteName))
+                {
+                    return webElement.findElement(By.cssSelector(FAVORITE_SITE_ENABLED)).isDisplayed();
+                }
+            }
+        }
+        catch (NoSuchElementException nse)
+        {
+            logger.error("Element not found", nse);
+        }
+        return false;
     }
 
 }
