@@ -36,7 +36,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
     protected static int retryCount;
     protected static long timeToWait;
     protected static String syncLocation;
-    protected static DestinationAndAssigneeBean desAndAssBean;
+    protected DestinationAndAssigneeBean desAndAssBean;
     DocumentLibraryPage doclibPrem;
     DocumentLibraryPage doclibCl;
     String[] subFolders = { "subfolder1", "subfolder2" };
@@ -65,7 +65,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         syncLocation = DOMAIN_PREMIUM + ">" + siteB + ">" + DEFAULT_FOLDER_NAME;
         desAndAssBean = new DestinationAndAssigneeBean();
         desAndAssBean.setNetwork(DOMAIN_PREMIUM);
-        desAndAssBean.setSiteName(siteA);
+        desAndAssBean.setSiteName(siteB);
         desAndAssBean.setSyncToPath(DEFAULT_FOLDER_NAME);
     }
 
@@ -107,6 +107,10 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
     public void AONE_15582() throws Exception
     {
         String mixedCaseUserName = getUserNameWithMixedCase("admin", hybridDomainPremium);
+        desAndAssBean = new DestinationAndAssigneeBean();
+        desAndAssBean.setNetwork(DOMAIN_PREMIUM);
+        desAndAssBean.setSiteName(siteA);
+        desAndAssBean.setSyncToPath(DEFAULT_FOLDER_NAME);
         ShareUser.login(drone, adminUserPrem);
         disconnectCloudSync(drone);
         doclibPrem = openSitesDocumentLibrary(drone, siteA).render().getFileDirectoryInfo(folderName).clickOnTitle().render();
@@ -211,7 +215,6 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
     @Test(groups = "Hybrid")
     public void AONE_15583() throws Exception
     {
-        desAndAssBean.setSiteName(siteB);
         //Sync all three sync sets to Cloud
         //https://issues.alfresco.com/jira/browse/ALF-14513
         //https://issues.alfresco.com/jira/browse/ALF-15265 - cannot sync folder from selected items menu
