@@ -533,7 +533,7 @@ public abstract class SharePage extends Page
                 }
                 break;
             }
-            return FactorySharePage.resolvePage(drone);
+            return drone.getCurrentPage();
         }
         catch (NoSuchElementException te)
         {

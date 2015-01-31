@@ -18,6 +18,9 @@
  */
 package org.alfresco.po.share;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import org.alfresco.po.share.ShareUtil.RequiredAlfrescoVersion;
 import org.alfresco.po.share.admin.AdminConsolePage;
 import org.alfresco.po.share.adminconsole.CategoryManagerPage;
@@ -29,7 +32,6 @@ import org.alfresco.po.share.search.AdvanceSearchContentPage;
 import org.alfresco.po.share.search.FacetedSearchConfigPage;
 import org.alfresco.po.share.search.FacetedSearchHeaderSearchForm;
 import org.alfresco.po.share.search.FacetedSearchPage;
-import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SiteFinderPage;
@@ -168,12 +170,13 @@ public class Navigation extends SharePage
      *
      * @return HtmlPage people finder page object
      */
-    public CreateSitePage selectCreateSite()
+    public HtmlPage selectCreateSite()
     {
         String selector = isDojoSupport() ? "td#HEADER_SITES_MENU_CREATE_SITE_text" : "ul.create-site-menuitem>li>a";
         selectSitesDropdown();
         drone.findAndWait(By.cssSelector(selector)).click();
-        return new CreateSitePage(drone);
+        drone.waitForElement(By.cssSelector("div[id*='createSite-instance-dialog_c']"), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+        return drone.getCurrentPage();
     }
 
     /**
