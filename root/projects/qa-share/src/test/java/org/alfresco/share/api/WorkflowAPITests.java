@@ -47,6 +47,7 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 @Listeners(FailedTestListener.class)
+@Test(groups = {"ProductBug"})
 public class WorkflowAPITests extends WorkflowAPI
 {
 
@@ -61,7 +62,7 @@ public class WorkflowAPITests extends WorkflowAPI
     private static Log logger = LogFactory.getLog(WorkflowAPITests.class);
 
     @Override
-    @BeforeClass(alwaysRun = true, groups = {"ProductBug"})
+    @BeforeClass(alwaysRun = true)
     public void beforeClass() throws Exception
     {
         super.beforeClass();
