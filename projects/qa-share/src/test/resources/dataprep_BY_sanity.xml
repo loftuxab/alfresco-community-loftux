@@ -74,7 +74,11 @@
 
     <test name="Solr sanity tests Suite">
         <classes>
-            <class name="org.alfresco.share.sanity.SolrTest"/>
+            <class name="org.alfresco.share.sanity.SolrTest">
+                <methods>
+                    <include name="dataPrep_AONE_8266"/>
+                </methods>
+            </class>
         </classes>
     </test>
 	
