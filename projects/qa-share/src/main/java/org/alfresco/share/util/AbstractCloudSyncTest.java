@@ -19,7 +19,9 @@
 
 package org.alfresco.share.util;
 
+import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.enums.CloudSyncStatus;
 import org.alfresco.po.share.site.CreateNewFolderInCloudPage;
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
@@ -39,8 +41,14 @@ import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.Seconds;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.alfresco.po.share.enums.CloudSyncStatus.*;
 
 /**
  * This class is responsible for holding all common methods related hybrid
@@ -80,9 +88,9 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
         if (hybridEnabled)
         {
             setupHybridDrone();
-            CreateUserAPI.createActivateUserAsTenantAdmin(hybridDrone, ADMIN_USERNAME, adminUserFree);
-            CreateUserAPI.createActivateUserAsTenantAdmin(hybridDrone, ADMIN_USERNAME, adminUserPrem);
-            CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, hybridDomainPremium, "1000");
+            CreateUserAPI.createActivateUserAsTenantAdmin(hybridDrone, SUPERADMIN_USERNAME, adminUserFree);
+            CreateUserAPI.createActivateUserAsTenantAdmin(hybridDrone, SUPERADMIN_USERNAME, adminUserPrem);
+            CreateUserAPI.upgradeCloudAccount(hybridDrone, SUPERADMIN_USERNAME, hybridDomainPremium, "1000");
         }
     }
 
@@ -271,7 +279,9 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
             if (!(contentName == null || contentName.isEmpty()))
             {
-                desAndAssPage = ((DestinationAndAssigneePage) (docLibpage.getFileDirectoryInfo(contentName).selectSyncToCloud())).render();
+                docLibpage.getFileDirectoryInfo(contentName).selectSyncToCloud().render();
+                drone.waitUntilElementPresent(By.cssSelector("div.hd, .dijitDialogTitleBar"), TimeUnit.MILLISECONDS.toSeconds(maxWaitTime));
+                desAndAssPage = (DestinationAndAssigneePage)FactorySharePage.resolvePage(drone);
             }
             else
             {
@@ -349,7 +359,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
      */
     public static CloudSyncPage navigateToCloudSync(WebDrone drone)
     {
-        SharePage sharePage = ShareUser.getSharePage(drone);
+        SharePage sharePage = ShareUser.getSharePage(drone).render();
 
         MyProfilePage myProfilePage = sharePage.getNav().selectMyProfile().render();
         return myProfilePage.getProfileNav().selectCloudSyncPage().render();
@@ -619,4 +629,56 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
         return false;
     }
 
+    public static CloudSyncStatus getCloudSyncStatus(WebDrone driver, String fileName)
+    {
+        DocumentLibraryPage docLibPage = (DocumentLibraryPage) getSharePage(driver);
+        docLibPage.render();
+        SyncInfoPage syncInfoPage;
+        String status;
+
+        try
+        {
+            RenderTime t = new RenderTime(maxWaitTimeCloudSync);
+            while (true)
+            {
+                t.start();
+                try
+                {
+                    logger.info("NodeRef for File being checked: " + ShareUserSitePage.getFileDirectoryInfo(driver, fileName).getNodeRef());
+                    syncInfoPage = docLibPage.getFileDirectoryInfo(fileName).clickOnViewCloudSyncInfo().render();
+                    status = syncInfoPage.getCloudSyncStatus();
+                    syncInfoPage.clickOnCloseButton();
+
+                    // if
+                    // (status.contains(driver.getLanguageValue("sync.status.pending.text")))
+                    if (status.contains(PENDING.getValue()))
+                    {
+                        webDriverWait(driver, 1000);
+                        // Expected to work for RepoPage too
+                        docLibPage = refreshSharePage(driver).render();
+                        docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();
+                    }
+                    else if (status.contains(ATTEMPTED.getValue()))
+                    {
+                        return ATTEMPTED;
+                    }
+                    else if(status.contains(SYNCED.getValue()))
+                    {
+                        return SYNCED;
+                    }
+                }
+                finally
+                {
+                    t.end();
+                }
+            }
+        }
+        catch (PageException e)
+        {
+        }
+        catch (PageRenderTimeException exception)
+        {
+        }
+        return PENDING;
+    }
 }

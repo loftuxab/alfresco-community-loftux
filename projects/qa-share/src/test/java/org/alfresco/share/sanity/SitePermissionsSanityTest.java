@@ -234,7 +234,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         drone.navigateTo(siteUrl);
 
         //Navigate to Document Library, set any view as default
-        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone);
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         assertTrue(documentLibraryPage.getNavigation().isSetDefaultViewVisible());
         documentLibraryPage.getNavigation().selectSetCurrentViewToDefault();
         ViewType actualViewType = documentLibraryPage.getNavigation().getViewType();
@@ -1536,7 +1536,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_PERMISSION_DOC), "Manage Permissions action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_ASPECTS), "Manage aspects action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(CHNAGE_TYPE), "Change type action isn't available");
-        assertTrue(documentDetailsPage.isDocumentActionPresent(PUBLISH_ACTION), "Publish action isn't available");
 
         //Verify icons near document section
         assertTrue(documentDetailsPage.isEditPropertiesIconDisplayed(), "Edit properties icon isn't displayed");
@@ -1690,7 +1689,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
     /**
      * Check Edit others content for Collaborator
      */
-    @Test(groups = "Sanity", dependsOnMethods = "AONE_15210")
+    @Test(groups = "Sanity"/*, dependsOnMethods = "AONE_15210"*/)
     public void AONE_15221() throws Exception
     {
         /** Start Test */
@@ -1739,7 +1738,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertTrue(documentDetailsPage.isDocumentActionPresent(START_WORKFLOW), "Start Workflow action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_ASPECTS), "Manage aspects action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(CHNAGE_TYPE), "Change type action isn't available");
-        assertTrue(documentDetailsPage.isDocumentActionPresent(PUBLISH_ACTION), "Publish action isn't available");
 
         //Verify icons near document section
         assertTrue(documentDetailsPage.isEditPropertiesIconDisplayed(), "Edit properties icon isn't displayed");
@@ -1756,7 +1754,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertTrue(documentLibraryPage.getFileDirectoryInfo(editedItem).isShareLinkVisible());
 
         //Edit collaborator's Folder
-        ShareUser.editProperties(drone, folderName, editedFolder, editedFolder, editedFolder);
+        ShareUser.editProperties(drone, folderName, editedFolder, editedFolder, editedFolder).render();
 
         //Add a comment to the folder
         FolderDetailsPage folderDetailsPage = ShareUser.openFolderDetailPage(drone, editedFolder);
