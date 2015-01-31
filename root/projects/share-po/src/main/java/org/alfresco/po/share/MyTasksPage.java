@@ -350,13 +350,30 @@ public class MyTasksPage extends SharePage
                 taskDetails.setTaskLabels(labels);
 
                 drone.mouseOverOnElement(taskRow);
-                taskDetails.setEditTaskDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'task-edit')]/a/span")).isDisplayed());
-                taskDetails.setViewTaskDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'task-view')]/a/span")).isDisplayed());
-                taskDetails.setViewWorkFlowDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'workflow-view')]/a/span")).isDisplayed());
+                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'task-edit')]/a/span")).size()!=0){
+                    taskDetails.setEditTaskDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'task-edit')]/a/span")).isDisplayed());
+                } else {
+                    taskDetails.setEditTaskDisplayed(false);
+                }
 
-                if (taskRow.findElement(By.cssSelector("div[class^='ended']>span")).isDisplayed())
-                {
-                    taskDetails.setEndDate(taskRow.findElement(By.cssSelector("div[class^='ended']>span")).getText());
+                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'task-view')]/a/span")).size()!=0){
+                    taskDetails.setViewTaskDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'task-view')]/a/span")).isDisplayed());
+                } else {
+                    taskDetails.setViewTaskDisplayed(false);
+                }
+
+                if (taskRow.findElements(By.xpath(".//div[contains(@class, 'workflow-view')]/a/span")).size()!=0){
+                    taskDetails.setViewWorkFlowDisplayed(taskRow.findElement(By.xpath(".//div[contains(@class, 'workflow-view')]/a/span")).isDisplayed());
+                } else {
+                    taskDetails.setViewWorkFlowDisplayed(false);
+                }
+
+
+                if (taskRow.findElements(By.cssSelector("div[class^='ended']>span")).size()!=0){
+                    if (taskRow.findElement(By.cssSelector("div[class^='ended']>span")).isDisplayed())
+                    {
+                        taskDetails.setEndDate(taskRow.findElement(By.cssSelector("div[class^='ended']>span")).getText());
+                    }
                 }
             }
             else
