@@ -41,6 +41,7 @@ public class MyDocumentsDashlet extends AbstractDashlet implements Dashlet
     protected MyDocumentsDashlet(WebDrone drone)
     {
         super(drone, By.cssSelector(DASHLET_DIV_CONTAINER_PLACEHOLDER));
+        setResizeHandle(By.xpath(".//div[contains (@class, 'yui-resize-handle')]"));
     }
 
     @SuppressWarnings("unchecked")
@@ -112,4 +113,5 @@ public class MyDocumentsDashlet extends AbstractDashlet implements Dashlet
         }
         return this;
     }
+    
 }

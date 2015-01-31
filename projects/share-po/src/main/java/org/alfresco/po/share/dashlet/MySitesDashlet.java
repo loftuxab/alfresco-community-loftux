@@ -53,6 +53,8 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
     protected MySitesDashlet(WebDrone drone)
     {
         super(drone, By.cssSelector(DASHLET_CONTAINER_PLACEHOLDER));
+        
+        setResizeHandle(By.xpath(".//div[contains (@class, 'yui-resize-handle')]"));
     }
 
     @SuppressWarnings("unchecked")
