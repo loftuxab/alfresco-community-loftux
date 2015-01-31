@@ -576,7 +576,7 @@
          [
             { key: "avatar", label: "Avatar", sortable: false, formatter: this.fnRenderCellAvatar(), width: this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT ? 36 : 70 },
             { key: "person", label: "Description", sortable: false, formatter: this.fnRenderCellDescription() },
-            { key: "actions", label: "Actions", sortable: false, formatter: this.fnRenderCellActions(), width: 80 }
+            { key: "actions", label: "Actions", sortable: false, formatter: this.fnRenderCellActions(), width: 120 }
          ];
 
          // DataTable definition
