@@ -14,6 +14,8 @@ import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -22,13 +24,16 @@ import java.util.List;
 @Listeners(FailedTestListener.class)
 public class CreatingItemsViaAWE extends AbstractUtils
 {
-        public static final String WCMQS_URL = "http://localhost:8080/wcmqs/";
-        public static final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
-        public static final String QUICK_START_EDITORIAL = "Quick Start Editorial";
+        private String wqsURL;
+        private String ipAddress;
+        private String hostName;
+        private static final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
+        private static final String QUICK_START_EDITORIAL = "Quick Start Editorial";
 
         public static final String ROOT = "root";
 
         private static final Logger logger = Logger.getLogger(EditingItemsViaAWE.class);
+        private static final int MAX_WAIT_TIME_MINUTES = 4;
 
         private String testName;
         private String siteName;
@@ -38,8 +43,22 @@ public class CreatingItemsViaAWE extends AbstractUtils
         @BeforeClass(alwaysRun = true)
         public void setup() throws Exception
         {
-                super.setup();
+
                 testName = this.getClass().getSimpleName();
+                siteName = testName;
+                hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
+                try
+                {
+                        ipAddress = InetAddress.getByName(hostName).toString().replaceAll(".*/", "");
+                        logger.info("Ip address from Alfresco server was obtained");
+                }
+                catch (UnknownHostException | SecurityException e)
+                {
+                        logger.error("Ip address from Alfresco server could not be obtained");
+                }
+
+                wqsURL = siteName + ":8080/wcmqs";
+                logger.info(" wcmqs url : " + wqsURL);
                 logger.info("Start Tests from: " + testName);
         }
 
@@ -52,7 +71,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
         @AfterMethod(alwaysRun = true)
         public void tearDown()
         {
-                drone.quit();
+                super.tearDown();
         }
 
         private void navigateToWcmqsHome(String wcmqsURL)
@@ -110,6 +129,48 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 Assert.assertNotNull(editPage.getArticleDetails());
         }
 
+        /**
+         * Method that waits for the blog post to appear on the page for maximum minutesToWait
+         * and then opens it.
+         *
+         * @param blogPage
+         * @param blogPostTitle
+         * @param minutesToWait
+         */
+
+        private void waitAndOpenBlogPost(WcmqsBlogPage blogPage, String blogPostTitle, int minutesToWait)
+        {
+                int waitInMilliSeconds = 3000;
+                int maxTimeWaitInMilliSeconds = 60000 * minutesToWait;
+                boolean newsArticleFound = false;
+
+                while (!newsArticleFound && maxTimeWaitInMilliSeconds > 0)
+                {
+                        try
+                        {
+                                blogPage.openBlogPost(blogPostTitle);
+                                newsArticleFound = true;
+                        }
+                        catch (Exception e)
+                        {
+                                synchronized (this)
+                                {
+                                        try
+                                        {
+                                                this.wait(waitInMilliSeconds);
+                                        }
+                                        catch (InterruptedException ex)
+                                        {
+                                        }
+                                }
+                                drone.refresh();
+                                maxTimeWaitInMilliSeconds = maxTimeWaitInMilliSeconds - waitInMilliSeconds;
+                        }
+
+                }
+
+        }
+
         private void fillInNameAndContentFieldsForBlogPost(WcmqsEditPage editPage, String blogPostName, String blogPostTitle, String blogPostContent)
         {
                 // ---- Step 5 ----
@@ -127,8 +188,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 editPage.clickSubmitButton();
 
                 WcmqsBlogPage newBlogPage = new WcmqsBlogPage(drone).render();
-                // Wait a lot here (more than 4 minutes)
-                newBlogPage.openBlogPost(blogPostTitle);
+                waitAndOpenBlogPost(newBlogPage, blogPostTitle, MAX_WAIT_TIME_MINUTES);
                 WcmqsBlogPostPage newBlogPost = new WcmqsBlogPostPage(drone).render();
 
                 foundTitle = newBlogPost.getTitle();
@@ -168,28 +228,43 @@ public class CreatingItemsViaAWE extends AbstractUtils
         @Test(groups = { "DataPrepWQS" })
         public void dataPrep_AONE() throws Exception
         {
-                testUser = getUserNameForDomain(testName, DOMAIN_FREE);
-                siteName = getSiteName(testName);
-
+                // User login
                 // ---- Step 1 ----
                 // ---- Step Action -----
                 // WCM Quick Start is installed; - is not required to be executed automatically
+                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 2 ----
                 // ---- Step Action -----
                 // Site "My Web Site" is created in Alfresco Share;
-                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
                 ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
 
                 // ---- Step 3 ----
                 // ---- Step Action -----
                 // WCM Quick Start Site Data is imported;
                 SiteDashboardPage siteDashBoard = ShareUserDashboard.addDashlet(drone, siteName, Dashlets.WEB_QUICK_START);
-
                 SiteWebQuickStartDashlet wqsDashlet = siteDashBoard.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
                 wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
                 wqsDashlet.clickImportButtton();
                 wqsDashlet.waitForImportMessage();
+
+                //Change property for quick start to sitename
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder("Alfresco Quick Start");
+                EditDocumentPropertiesPage documentPropertiesPage = documentLibPage.getFileDirectoryInfo("Quick Start Editorial").selectEditProperties()
+                        .render();
+                documentPropertiesPage.setSiteHostname(siteName);
+                documentPropertiesPage.clickSave();
+
+                //Change property for quick start live to ip address
+                documentLibPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
+                documentPropertiesPage.setSiteHostname(ipAddress);
+                documentPropertiesPage.clickSave();
+
+                //setup new entry in hosts to be able to access the new wcmqs site
+                String setHostAddress = "cmd.exe /c echo " + ipAddress + " " + siteName + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
+                Runtime.getRuntime().exec(setHostAddress);
+
         }
 
         @Test(groups = "WQS")
@@ -200,7 +275,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String blogPostContent = testName + "_" + System.currentTimeMillis() + "_content";
                 siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
                 WcmqsEditPage editPage = createBlogPost(blogPostPage);
                 verifyAllFields(editPage);
@@ -214,9 +289,8 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String blogPostName = testName + "_" + System.currentTimeMillis() + "_name.html";
                 String blogPostTitle = testName + "_" + System.currentTimeMillis() + "_title";
                 String blogPostContent = testName + "_" + System.currentTimeMillis() + "_content";
-                siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
                 WcmqsEditPage editPage = createBlogPost(blogPostPage);
                 verifyAllFields(editPage);
@@ -232,7 +306,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String blogPostContent = testName + "_" + System.currentTimeMillis() + "_content";
                 siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
                 WcmqsEditPage editPage = createBlogPost(blogPostPage);
                 verifyAllFields(editPage);
@@ -274,6 +348,48 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 return editPage;
         }
 
+        /**
+         * Method that waits for the news article to appear on the page for maximum minutesToWait
+         * and then opens
+         *
+         * @param newsPage
+         * @param newsArticleTitle
+         * @param minutesToWait
+         */
+
+        private void waitAndOpenNewsArticle(WcmqsNewsPage newsPage, String newsArticleTitle, int minutesToWait)
+        {
+                int waitInMilliSeconds = 3000;
+                int maxTimeWaitInMilliSeconds = 60000 * minutesToWait;
+                boolean newsArticleFound = false;
+
+                while (!newsArticleFound && maxTimeWaitInMilliSeconds > 0)
+                {
+                        try
+                        {
+                                newsPage.clickNewsByTitle(newsArticleTitle);
+                                newsArticleFound = true;
+                        }
+                        catch (Exception e)
+                        {
+                                synchronized (this)
+                                {
+                                        try
+                                        {
+                                                this.wait(waitInMilliSeconds);
+                                        }
+                                        catch (InterruptedException ex)
+                                        {
+                                        }
+                                }
+                                drone.refresh();
+                                maxTimeWaitInMilliSeconds = maxTimeWaitInMilliSeconds - waitInMilliSeconds;
+                        }
+
+                }
+
+        }
+
         private void fillInNameAndContentForNewsArticle(WcmqsEditPage editPage, String newsArticleName, String newsArticleTitle, String newsArticleContent)
         {
                 // ---- Step 5 ----
@@ -292,8 +408,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
 
                 WcmqsNewsPage newNewsPage = new WcmqsNewsPage(drone).render();
                 newNewsPage = newNewsPage.openNewsPageFolder(WcmqsNewsPage.GLOBAL);
-                // Wait a lot here (more than 4 minutes)
-                newNewsPage.clickNewsByTitle(newsArticleTitle);
+                waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
                 WcmqsNewsArticleDetails newNewsArticleDetails = new WcmqsNewsArticleDetails(drone).render();
 
                 foundTitle = newNewsArticleDetails.getTitleOfNewsArticle();
@@ -339,7 +454,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
                 siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.GLOBAL, WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
                 WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
                 verifyAllFields(editPage);
@@ -355,7 +470,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
                 siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.GLOBAL, WcmqsNewsPage.FTSE_1000);
                 WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
                 verifyAllFields(editPage);
@@ -371,7 +486,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
                 siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.COMPANIES, WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
                 WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
                 verifyAllFields(editPage);
@@ -387,7 +502,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
                 siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.COMPANIES, WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
                 WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
                 verifyAllFields(editPage);
@@ -403,7 +518,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
                 siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.MARKETS, WcmqsNewsPage.INVESTORS_FEAR);
                 WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
                 verifyAllFields(editPage);
@@ -419,7 +534,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
                 siteName = getSiteName(testName);
 
-                navigateToWcmqsHome(WCMQS_URL);
+                navigateToWcmqsHome(wqsURL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.MARKETS, WcmqsNewsPage.HOUSE_PRICES);
                 WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
                 verifyAllFields(editPage);
