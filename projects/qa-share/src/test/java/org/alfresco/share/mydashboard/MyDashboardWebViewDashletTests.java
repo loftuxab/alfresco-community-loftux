@@ -35,7 +35,7 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2898() throws Exception
     {
-        String testName = getTestName() + "22";
+        String testName = getTestName() + "30";
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -52,9 +52,9 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2898() throws Exception
     {
-        String testName = getTestName()+ "22";
+        String testName = getTestName() + "30";
         String testUser = getUserNameFreeDomain(testName);
-        String url = "https://www.google.com/";
+        String url = "http://www.google.com/";
         String linkTitle = "Google";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -93,7 +93,16 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
         // Verify dashlet title is displayed as title link;
         // ---- Expected results ----
         // Dashlet title is displayed as title link;
-        webDashlet.render(4000);
+        for (int i = 1; i < 1000; i++)
+        {
+            if (!webDashlet.getWebViewDashletTitle().isEmpty())
+            {
+                break;
+            }
+            
+            i++;
+        }
+
         String newTitle = webDashlet.getWebViewDashletTitle();
         Assert.assertTrue(newTitle.equals(linkTitle));
 
@@ -103,7 +112,6 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
         // ---- Expected results ----
         // The website is opened in a separate window.
         webDashlet.clickTitle();
-
         Set<String> windowHandles = drone.getWindowHandles();
         Assert.assertEquals(2, windowHandles.size());
     }
