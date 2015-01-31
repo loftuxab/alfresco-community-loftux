@@ -151,7 +151,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertEquals(myWorkFlowsPage.getSubTitle(), "Completed Workflows");
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "selectCompletedWorkFlows")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "selectCompletedWorkFlows")
     public void selectStartWorkflowButton() throws InterruptedException
     {
         StartWorkFlowPage startWorkFlowPage = myWorkFlowsPage.selectStartWorkflowButton().render();
@@ -162,7 +162,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertTrue(myWorkFlowsPage.isWorkFlowPresent(workFlow1));
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "selectStartWorkflowButton")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "selectStartWorkflowButton")
     public void getWorkFlowDetails()
     {
         List<WorkFlowDetails> workFlowDetailsList = myWorkFlowsPage.getWorkFlowDetails(workFlow1);
@@ -175,19 +175,19 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertEquals(workFlowDetailsList.get(0).getDescription(), WorkFlowDescription.ASSIGN_NEW_TASK_TO_YOUR_SELF_OR_COLLEAGUE);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "getWorkFlowDetails", expectedExceptions = IllegalArgumentException.class)
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "getWorkFlowDetails", expectedExceptions = IllegalArgumentException.class)
     public void selectWorkFlowWithNullData()
     {
         myWorkFlowsPage.selectWorkFlow(null);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "selectWorkFlowWithNullData", expectedExceptions = PageException.class)
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "selectWorkFlowWithNullData", expectedExceptions = PageException.class)
     public void selectWorkFlowWithIncorrectData()
     {
         myWorkFlowsPage.selectWorkFlow(String.valueOf(System.currentTimeMillis()));
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "selectWorkFlowWithIncorrectData")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "selectWorkFlowWithIncorrectData")
     public void selectWorkFlowWithValidData()
     {
         workFlowDetailsPage = myWorkFlowsPage.selectWorkFlow(workFlow1).render();
@@ -195,14 +195,14 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertEquals(workFlowDetailsPage.getWorkFlowStatus(), "Workflow is in Progress");
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "selectWorkFlowWithValidData")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "selectWorkFlowWithValidData")
     public void getWorkFlowDetailsHeader()
     {
         String workFlowDetailsHeader = "Details: " + workFlow1 + " (Task)";
         assertEquals(workFlowDetailsPage.getPageHeader(), workFlowDetailsHeader);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "getWorkFlowDetailsHeader")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "getWorkFlowDetailsHeader")
     public void verifyTaskDetails()
     {
         myTasksPage = workFlowDetailsPage.getNav().selectMyTasks().render();
@@ -222,7 +222,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertTrue(taskDetails.isEditTaskDisplayed());
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyTaskDetails")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyTaskDetails")
     public void selectEditTask()
     {
         myWorkFlowsPage = myWorkFlowsPage.getNav().selectWorkFlowsIHaveStarted().render();
@@ -231,7 +231,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertTrue(editTaskPage.isBrowserTitle("Edit Task"));
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "selectEditTask")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "selectEditTask")
     public void completeWorkFlow()
     {
         editTaskPage.selectStatusDropDown(TaskStatus.COMPLETED);
@@ -248,7 +248,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertEquals(workFlowDetailsPage.getWorkFlowStatus(), "Workflow is Complete");
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "completeWorkFlow")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "completeWorkFlow")
     public void verifyCompletedWorkFlowDetails()
     {
         myWorkFlowsPage = workFlowDetailsPage.getNav().selectWorkFlowsIHaveStarted().render();
@@ -271,14 +271,14 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertTrue(workFlowDetailsList.get(0).isDeleteWorkFlowDisplayed());
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyCompletedWorkFlowDetails")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyCompletedWorkFlowDetails")
     public void verifyGetWorkFlowCount()
     {
         myWorkFlowsPage = drone.getCurrentPage().render();
         assertEquals(myWorkFlowsPage.getDisplayedWorkFlowCount(), 1);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyGetWorkFlowCount")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyGetWorkFlowCount")
     public void verifyWorkFlowFilterCount()
     {
         myWorkFlowsPage = drone.getCurrentPage().render();
@@ -300,7 +300,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         workFlowFilters.select(NEW_WORKFLOW);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyWorkFlowFilterCount")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyWorkFlowFilterCount")
     public void selectCancelWorkFlow() throws Exception
     {
         myWorkFlowsPage = myWorkFlowsPage.selectActiveWorkFlows().render();
@@ -330,7 +330,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         return date.toString(DateTimeFormat.forPattern("dd MMMM, yyyy"));
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "selectCancelWorkFlow")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "selectCancelWorkFlow")
     public void selectStartWorkflowButtonWithDueDateNone() throws InterruptedException
     {
         dueDate = "";
@@ -342,7 +342,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertTrue(myWorkFlowsPage.isWorkFlowPresent(workFlow3));
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "selectStartWorkflowButtonWithDueDateNone")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "selectStartWorkflowButtonWithDueDateNone")
     public void verifyTaskDetailsWithDueDateNone()
     {
         myTasksPage = workFlowDetailsPage.getNav().selectMyTasks().render();
@@ -359,7 +359,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertEquals(taskDetails.getStartedBy(), uname + "@test.com");
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyTaskDetailsWithDueDateNone")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyTaskDetailsWithDueDateNone")
     public void verifyTaskButtonsPresent()
     {
         myTasksPage = workFlowDetailsPage.getNav().selectMyTasks().render();
@@ -371,14 +371,14 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertTrue(myTasksPage.isTaskWorkflowButtonEnabled(workFlow3), "Task Workflow View button is not present.");
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyTaskButtonsPresent")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyTaskButtonsPresent")
     public void verifyTaskCountMethod()
     {
         myTasksPage = drone.getCurrentPage().render();
         assertEquals(myTasksPage.getTasksCount(), 1);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyTaskCountMethod")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyTaskCountMethod")
     public void verifyTaskFilter()
     {
         myTasksPage = drone.getCurrentPage().render();
@@ -398,7 +398,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         taskFilters.select(UNASSIGNED);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyTaskFilter", expectedExceptions = PageOperationException.class)
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyTaskFilter", expectedExceptions = PageOperationException.class)
     public void verifyTaskFilterByWorkFlowTypeWithException()
     {
         myTasksPage = drone.getCurrentPage().render();
@@ -407,7 +407,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         taskFilters.select(NEW_WORKFLOW);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyTaskFilterByWorkFlowTypeWithException", expectedExceptions = PageOperationException.class)
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyTaskFilterByWorkFlowTypeWithException", expectedExceptions = PageOperationException.class)
     public void verifyTaskFilterByStartedWithException()
     {
         myTasksPage = drone.getCurrentPage().render();
@@ -416,7 +416,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         taskFilters.select(LAST_28_DAYS);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "verifyTaskFilterByStartedWithException")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "verifyTaskFilterByStartedWithException")
     public void checkFilterTitle()
     {
         myTasksPage = drone.getCurrentPage().render();
@@ -428,7 +428,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertTrue(myTasksPage.isFilterTitle("High Priority Tasks"));
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "checkFilterTitle")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "checkFilterTitle")
     public void checkTaskCount()
     {
         TaskFilters taskFilters = myTasksPage.getTaskFilters();
@@ -436,7 +436,7 @@ public class MyWorkFlowsPageTest extends AbstractTest
         assertEquals(myTasksPage.getTaskCount(workFlow3), 1);
     }
 
-    @Test(groups = "Enterprise4.2", dependsOnMethods = "checkTaskCount")
+    @Test(groups = {"Enterprise4.2", "TestBug"}, dependsOnMethods = "checkTaskCount")
     public void checkTaskCountForFake()
     {
         assertEquals(myTasksPage.getTaskCount("azazazazazazaaza"), 0);
