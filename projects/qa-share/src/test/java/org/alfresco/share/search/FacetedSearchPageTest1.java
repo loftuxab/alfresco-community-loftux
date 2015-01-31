@@ -109,7 +109,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = { "alfresco-one", "NonGrid" })
-    public void ALF_3251() throws Exception
+    public void AONE_16054() throws Exception
     {
         trace("Starting searchAndClickDownloadActionTest");        
         
@@ -197,7 +197,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3252() throws Exception
+    public void AONE_16055() throws Exception
     {
         trace("Starting searchAndClickViewInBrowserActionTest");      
                 
@@ -255,7 +255,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3253() throws Exception
+    public void AONE_16056() throws Exception
     {
         trace("Starting searchAndClickEditOfflineActionTest");      
                 
@@ -310,7 +310,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3254() throws Exception
+    public void AONE_16057() throws Exception
     {
         trace("Starting searchAndClickDeleteDocumentActionTest");      
                 
@@ -380,7 +380,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3255() throws Exception
+    public void AONE_16058() throws Exception
     {
         trace("Starting searchAndClickManagePermissionsActionTest");      
                 
@@ -426,7 +426,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3256() throws Exception
+    public void AONE_16059() throws Exception
     {
         trace("Starting searchAndVerifyFolderActionsTest");     
             
@@ -476,7 +476,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     // This test fails since Jira id ACE-1656 has been raised 
     
     @Test(groups = "Enterprise-only")
-    public void ALF_3257() throws Exception
+    public void AONE_16048() throws Exception
     {
         trace("Starting searchForContentInUserHomeFolderTest");        
         
@@ -567,7 +567,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     //This test is the verify only the same tenant user can view the file created by respective tenant
     
     @Test(groups = "CloudOnly")
-    public void ALF_3258() throws Exception
+    public void AONE_16066() throws Exception
     {
         trace("Starting searchAndVerifyMultiTenantTest");        
         

@@ -107,7 +107,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "alfresco-one")
-    public void ALF_1() throws Exception
+    public void AONE_16719() throws Exception
     {
         trace("Starting selectCopyFoldertoFolderTest");
 
@@ -218,7 +218,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "alfresco-one")
-    public void ALF_2() throws Exception
+    public void AONE_16730() throws Exception
     {
         trace("Starting selectCopyFiletoFolderCancelTest");
 
@@ -329,7 +329,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "alfresco-one")
-    public void ALF_3() throws Exception
+    public void AONE_16731() throws Exception
     {
         trace("Starting selectCopyFiletoSiteFolderTest");
 
@@ -438,7 +438,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "EnterpriseOnly")
-    public void ALF_4() throws Exception
+    public void AONE_16733() throws Exception
     {
         trace("Starting selectCopyFiletoRepoTest");
 
@@ -581,7 +581,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "alfresco-one")
-    public void ALF_5() throws Exception
+    public void AONE_16734() throws Exception
     {
         trace("Starting selectMoveFoldertoFolderTest");
 
@@ -691,7 +691,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "alfresco-one")
-    public void ALF_6() throws Exception
+    public void AONE_16736() throws Exception
     {
         trace("Starting selectMoveFiletoFolderCancelTest");
 
@@ -801,7 +801,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "alfresco-one")
-    public void ALF_7() throws Exception
+    public void AONE_16737() throws Exception
     {
         trace("Starting selectMoveFiletoSiteFolderTest");
 
@@ -910,7 +910,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "EnterpriseOnly")
-    public void ALF_8() throws Exception
+    public void AONE_16738() throws Exception
     {
         trace("Starting selectMoveFileAndFoldertoRepoTest");
 
@@ -1050,7 +1050,7 @@ public class FacetedSearchPageTest2 extends AbstractUtils
      */
 
     @Test(groups = "alfresco-one")
-    public void ALF_9() throws Exception
+    public void AONE_16739() throws Exception
     {
         trace("Starting validateNextAndBackButtonTest");
 
@@ -1096,16 +1096,22 @@ public class FacetedSearchPageTest2 extends AbstractUtils
         copyAndMoveContentFromSearchPage.selectDestination("Repository").render();
         copyAndMoveContentFromSearchPage.selectFolderInRepo("Sites").render();
         Assert.assertTrue(copyAndMoveContentFromSearchPage.isNextButtonEnabled(), "Next Button is enabled");
+        Assert.assertFalse(copyAndMoveContentFromSearchPage.isBackButtonEnabled(), "Back Button is disabled");
 
         copyAndMoveContentFromSearchPage.selectNextButton();
-
-        Assert.assertFalse(copyAndMoveContentFromSearchPage.isNextButtonEnabled(), "Next Button is disabled");
+        
         Assert.assertTrue(copyAndMoveContentFromSearchPage.isBackButtonEnabled(), "Back Button is disabled");
         copyAndMoveContentFromSearchPage.selectBackButton();
         Assert.assertFalse(copyAndMoveContentFromSearchPage.isBackButtonEnabled(), "Back Button is disabled");
         Assert.assertTrue(copyAndMoveContentFromSearchPage.isNextButtonEnabled(), "Next Button is disabled");
 
         copyAndMoveContentFromSearchPage.clickClose().render();
+        
+        ShareUser.openUserDashboard(drone);
+        for (int site = 1; site <= 30; site++)
+        {
+            SiteUtil.deleteSite(drone, this.siteName + site);
+        }       
 
         trace("validateNextAndBackButtonTest complete");
     }
@@ -1125,23 +1131,13 @@ public class FacetedSearchPageTest2 extends AbstractUtils
 
         // Navigate to the document library page and delete all content
         SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName));
+        
         // ShareUser.openUserDashboard(drone);
         SiteUtil.deleteSite(drone, siteName);
-        // SiteUtil.deleteSite(drone, siteName1);
-        /*
-         * ShareUser.openDocumentLibrary(drone);
-         * ShareUser.deleteAllContentFromDocumentLibrary(drone);
-         * SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName1));
-         * ShareUser.openDocumentLibrary(drone);
-         * ShareUser.deleteAllContentFromDocumentLibrary(drone);
-         */
-        // Logout
-        // Create site
-        ShareUser.openUserDashboard(drone);
-        for (int site = 1; site <= 30; site++)
-        {
-            SiteUtil.deleteSite(drone, this.siteName + site);
-        }
+        
+        SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName1));
+        SiteUtil.deleteSite(drone, siteName1);        
+        
         ShareUser.logout(drone);
 
         super.tearDown();
