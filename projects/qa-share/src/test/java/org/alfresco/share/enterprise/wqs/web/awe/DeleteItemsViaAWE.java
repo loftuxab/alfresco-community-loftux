@@ -128,7 +128,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 // 2. Blog post is opened;
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
-                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU);
+                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
 
                 WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
                 wcmqsBlogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
@@ -207,7 +207,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 // 2. Blog post is opened;
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
-                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU);
+                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
 
                 WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
                 wcmqsBlogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
@@ -286,7 +286,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // 2. Blog post is opened;
 
                 WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
-                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU);
+                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
 
                 WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
                 wcmqsBlogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);

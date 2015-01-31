@@ -94,7 +94,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 // Blog post is opened;
 
                 WcmqsHomePage homePage = new WcmqsHomePage(drone).render();
-                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
                 WcmqsBlogPage blogPage = new WcmqsBlogPage(drone).render();
                 blogPage.openBlogPost(blogPost);
 
