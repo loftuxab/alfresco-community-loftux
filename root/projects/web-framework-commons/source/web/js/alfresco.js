@@ -5336,7 +5336,7 @@ Alfresco.util.createInsituEditor = function(p_context, p_params, p_callback)
                   if (e.keyCode == 13 && this.value.length > 0)
                   {
                      Event.stopEvent(e); // Prevent the surrounding form from being submitted
-                     _this._createTag(this.value, false);
+                     _this._createTag(this.value, false, e);
                   }
                });
 
