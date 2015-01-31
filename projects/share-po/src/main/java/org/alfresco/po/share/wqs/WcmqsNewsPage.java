@@ -1,5 +1,11 @@
 package org.alfresco.po.share.wqs;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
@@ -10,12 +16,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * The news page that is opened for a folder (Global Economy, Companies, Markets .... )
@@ -173,7 +173,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
     {
         try
         {
-            return drone.findAndWait(By.xpath(String.format("//h4/a[contains(@href,'%s')]//.././/./.././p", newsName))).getText();
+            return drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]//.././/./.././p", newsName))).getText();
         }
         catch (TimeoutException e)
         {
@@ -192,7 +192,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
     {
         try
         {
-            return drone.findAndWait(By.xpath(String.format("//h4/a[contains(@href,'%s')]", newsName))).getText();
+            return drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", newsName))).getText();
         }
         catch (TimeoutException e)
         {

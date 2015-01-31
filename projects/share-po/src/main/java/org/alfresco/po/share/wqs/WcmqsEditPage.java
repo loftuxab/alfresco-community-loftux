@@ -4,6 +4,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.site.document.TinyMceEditor;
 import org.alfresco.webdrone.RenderTime;
@@ -24,11 +25,12 @@ public class WcmqsEditPage extends SharePage
     private static final By TITLE_INPUT = By.cssSelector("input[id='wef-panel-wefPanel_prop_cm_title']");
     private static final By DESCRIPTION_INPUT = By.cssSelector("textarea[id='wef-panel-wefPanel_prop_cm_description']");
     private static final String CONTENT_IFRAME = "wef-panel-wefPanel_prop_cm_content_ifr";
+    private static final String CONTENT_TEXTAREA = "wef-panel-wefPanel_prop_cm_content";
     private static final By TEMPLATENAME_INPUT = By.cssSelector("input[id='wef-panel-wefPanel_prop_ws_templateName']");
     private static final By SUBMIT_BUTTON = By.cssSelector("button[id='wef-panel-wefPanel-form-submit-button']");
     private static final By CANCEL_BUTTON = By.cssSelector("button[id='wef-panel-wefPanel-form-cancel-button']");
-    private static final By MANDATORY_INDICATOR=By.cssSelector("span.mandatory-indicator");
-    
+    private static final By MANDATORY_INDICATOR = By.cssSelector("span.mandatory-indicator");
+
     private static final By NOTIFICATION_BALLOON = By.cssSelector("div.balloon>div>div");
 
     private final TinyMceEditor contentTinyMceEditor;
@@ -76,18 +78,17 @@ public class WcmqsEditPage extends SharePage
         drone.findAndWait(NAME_INPUT, SECONDS.convert(maxPageLoadingTime, MILLISECONDS)).sendKeys(newName);
 
     }
-    
+
     /**
      * Method for move focus to title input
      * 
-     * @param 
+     * @param
      * @return
      */
     public void moveFocusToTitle()
     {
-         drone.find(TITLE_INPUT).click();
+        drone.find(TITLE_INPUT).click();
     }
-
 
     /**
      * Method for edit name by sending keys
@@ -101,7 +102,7 @@ public class WcmqsEditPage extends SharePage
         drone.findAndWait(NAME_INPUT, SECONDS.convert(maxPageLoadingTime, MILLISECONDS)).sendKeys(key);
 
     }
-    
+
     /**
      * Method for edit title
      * 
@@ -163,11 +164,19 @@ public class WcmqsEditPage extends SharePage
 
     public WcmqsArticleDetails getArticleDetails()
     {
-        String name = drone.findAndWait(NAME_INPUT).getAttribute("value");
-        String title = drone.findAndWait(TITLE_INPUT).getAttribute("value");
-        String description = drone.findAndWait(DESCRIPTION_INPUT).getText();
-        String content = getContentTinyMCEEditor().getText();
-        String templateName = drone.findAndWait(TEMPLATENAME_INPUT).getAttribute("value");
+        String name = drone.find(NAME_INPUT).getAttribute("value");
+        String title = drone.find(TITLE_INPUT).getAttribute("value");
+        String description = drone.find(DESCRIPTION_INPUT).getAttribute("value");
+        String content;
+        if (AlfrescoVersion.Enterprise42.equals(alfrescoVersion) || AlfrescoVersion.Enterprise43.equals(alfrescoVersion))
+        {
+            content = getContentTextarea();
+        }
+        else
+        {
+            content = getContentTinyMCEEditor().getText();
+        }
+        String templateName = drone.find(TEMPLATENAME_INPUT).getAttribute("value");
         return new WcmqsArticleDetails(name, title, description, content, templateName);
     }
 
@@ -181,6 +190,16 @@ public class WcmqsEditPage extends SharePage
         contentTinyMceEditor.setTinyMce(CONTENT_IFRAME);
         return contentTinyMceEditor;
     }
+    
+    /**
+     * Get the value of ContentTextarea object.
+     * 
+     * @return
+     */
+    public String getContentTextarea()
+    {
+        return drone.find(By.id(CONTENT_TEXTAREA)).getAttribute("value");
+    }
 
     /**
      * Method for inserting text into the Reply form
@@ -191,7 +210,14 @@ public class WcmqsEditPage extends SharePage
     {
         try
         {
-            contentTinyMceEditor.addContent(txtLines);
+            if (AlfrescoVersion.Enterprise42.equals(alfrescoVersion) || AlfrescoVersion.Enterprise43.equals(alfrescoVersion))
+            {
+                drone.find(By.id(CONTENT_TEXTAREA)).sendKeys(txtLines);
+            }
+            else
+            {
+                contentTinyMceEditor.addContent(txtLines);
+            }
         }
         catch (TimeoutException toe)
         {
@@ -203,53 +229,60 @@ public class WcmqsEditPage extends SharePage
     {
         return drone.isElementDisplayed(NAME_INPUT);
     }
-    
+
     public boolean isNameFieldMandatory()
     {
         return drone.isElementDisplayed(MANDATORY_INDICATOR);
     }
-    
+
     public boolean isDescriptionFieldDisplayed()
     {
         return drone.isElementDisplayed(DESCRIPTION_INPUT);
     }
-    
+
     public boolean isTitleFieldDisplayed()
     {
         return drone.isElementDisplayed(TITLE_INPUT);
     }
-    
+
     public boolean isContentFrameDisplayed()
     {
-        return drone.isElementDisplayed(By.id(CONTENT_IFRAME));
+        if (AlfrescoVersion.Enterprise42.equals(alfrescoVersion) || AlfrescoVersion.Enterprise43.equals(alfrescoVersion))
+        {
+            return drone.isElementDisplayed(By.id(CONTENT_TEXTAREA));
+        }
+        else
+        {
+            return drone.isElementDisplayed(By.id(CONTENT_IFRAME));
+        }
     }
-    
+
     public boolean isTemplateNameDisplayed()
     {
         return drone.isElementDisplayed(TEMPLATENAME_INPUT);
     }
-    
+
     public boolean isSubmitButtonDisplayed()
     {
         return drone.isElementDisplayed(SUBMIT_BUTTON);
     }
-    
+
     public boolean isCancelButtonDisplayed()
     {
         return drone.isElementDisplayed(CANCEL_BUTTON);
     }
-    
+
     public String getNotificationMessage()
     {
-        try 
+        try
         {
-            WebElement notifBalloon=drone.findAndWait(NOTIFICATION_BALLOON);
-            return notifBalloon.getText();            
+            WebElement notifBalloon = drone.findAndWait(NOTIFICATION_BALLOON);
+            return notifBalloon.getText();
         }
         catch (TimeoutException toe)
         {
             throw new PageException("Time out finding notification balloon.", toe);
         }
-        
+
     }
 }
