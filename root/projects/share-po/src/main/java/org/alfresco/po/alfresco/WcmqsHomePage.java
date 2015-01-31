@@ -10,6 +10,7 @@ import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
@@ -91,7 +92,7 @@ public class WcmqsHomePage extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find and click " + menuOption + " menu. " + e.toString());
+            throw new PageOperationException("Exceeded time to find and click " + menuOption + " menu. " + e.toString());
         }
     }
 
@@ -105,7 +106,7 @@ public class WcmqsHomePage extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find and click first article. " + e.toString());
+            throw new PageOperationException("Exceeded time to find and click first article. " + e.toString());
         }
 
         return new WcmqsNewsArticleDetails(drone);
@@ -125,12 +126,11 @@ public class WcmqsHomePage extends SharePage
             drone.mouseOver(news);
 
             drone.findAndWait(By.cssSelector(String.format("a[href$='/wcmqs/news/%s/']", folderName))).click();
-            ;
 
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find news links. " + e.toString());
+            throw new PageOperationException("Exceeded time to find news links. " + e.toString());
         }
 
         return new WcmqsNewsPage(drone);

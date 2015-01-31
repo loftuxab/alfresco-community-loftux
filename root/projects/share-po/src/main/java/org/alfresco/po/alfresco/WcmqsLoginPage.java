@@ -7,6 +7,7 @@ import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
@@ -103,7 +104,7 @@ public class WcmqsLoginPage extends SharePage
         }
         catch (UnsupportedOperationException uso)
         {
-            throw new UnsupportedOperationException("Can not navigate to Wcmqs Home Page");
+            throw new PageOperationException("Can not navigate to Wcmqs Home Page");
         }
     }
 

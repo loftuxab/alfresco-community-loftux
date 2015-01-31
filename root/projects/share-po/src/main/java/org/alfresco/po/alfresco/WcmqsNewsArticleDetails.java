@@ -5,6 +5,7 @@ import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 
@@ -60,7 +61,7 @@ public class WcmqsNewsArticleDetails extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find edit button. " + e.toString());
+            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
         }
     }
 
@@ -72,7 +73,7 @@ public class WcmqsNewsArticleDetails extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find edit button. " + e.toString());
+            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
         }
     }
 
@@ -84,7 +85,7 @@ public class WcmqsNewsArticleDetails extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find edit button. " + e.toString());
+            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
         }
     }
 
@@ -96,7 +97,7 @@ public class WcmqsNewsArticleDetails extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find title of the article. " + e.toString());
+            throw new PageOperationException("Exceeded time to find title of the article. " + e.toString());
         }
 
     }
@@ -109,7 +110,7 @@ public class WcmqsNewsArticleDetails extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find body of the article. " + e.toString());
+            throw new PageOperationException("Exceeded time to find body of the article. " + e.toString());
         }
 
     }
@@ -122,7 +123,7 @@ public class WcmqsNewsArticleDetails extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find deatils of the article. " + e.toString());
+            throw new PageOperationException("Exceeded time to find deatils of the article. " + e.toString());
         }
 
     }

@@ -9,6 +9,7 @@ import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -99,7 +100,7 @@ public class WcmqsNewsPage extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find news links. " + e.toString());
+            throw new PageOperationException("Exceeded time to find news links. " + e.toString());
         }
 
     }
@@ -121,7 +122,7 @@ public class WcmqsNewsPage extends SharePage
         }
         catch (TimeoutException e)
         {
-
+            throw new PageOperationException("Exceeded time to find news link. " + e.toString());
         }
 
         return present;
@@ -142,7 +143,7 @@ public class WcmqsNewsPage extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find news links. " + e.toString());
+            throw new PageOperationException("Exceeded time to find news link. " + e.toString());
         }
 
     }
@@ -161,7 +162,7 @@ public class WcmqsNewsPage extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find the title:" + e.toString());
+            throw new PageOperationException("Exceeded time to find the title:" + e.toString());
         }
 
     }
@@ -180,7 +181,7 @@ public class WcmqsNewsPage extends SharePage
         }
         catch (TimeoutException e)
         {
-            throw new TimeoutException("Exceeded time to find news links. " + e.toString());
+            throw new PageOperationException("Exceeded time to find news link. " + e.toString());
         }
 
     }
