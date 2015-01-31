@@ -845,4 +845,11 @@ public interface FileDirectoryInfo
 
     String getDescriptionFromInfo();
 
+    
+    /***
+     * 
+     * This method clicks on Preview Web Asset for the selected document
+     */
+    public void selectPreviewWebAsset();
+
 }
