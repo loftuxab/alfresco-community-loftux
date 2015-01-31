@@ -156,8 +156,8 @@ public class PerformanceTest extends CmisUtils
         try
         {
         FtpUtil.configFtpPort();
-        bigDataFile = getFileWithSize(BIG_DATA_FILE, 2048);
-        logger.info("2 GB file created! File[" + bigDataFile.getAbsolutePath() + "]=" + (bigDataFile.length() / 1024 / 1024 / 1024) + " gb.");
+        bigDataFile = getFileWithSize(BIG_DATA_FILE, 2047);
+        logger.info("2 GB file created! File[" + bigDataFile.getAbsolutePath() + "]=" + ((float)bigDataFile.length() / 1024 / 1024 / 1024) + " gb.");
 
         CreateActivateUser(drone, ADMIN_USERNAME, testUser);
         login(drone, testUser, DEFAULT_PASSWORD);
@@ -190,7 +190,7 @@ public class PerformanceTest extends CmisUtils
             documentDetailsPage.clickOnDownloadLinkForUnsupportedDocument();
             documentDetailsPage.waitForFile(2400000, downloadDirectory + BIG_DATA_FILE);
             assertTrue(downloadedBigDataFile.exists(), "Big data file don't download");
-            assertEquals(downloadedBigDataFile.length(), 1024 * 1024 * 1024 * 2l, "File does not fully downloaded.");
+            assertEquals(downloadedBigDataFile.length(), 1024 * 1024 * 2047, "File does not fully downloaded.");
         }
         finally
         {
