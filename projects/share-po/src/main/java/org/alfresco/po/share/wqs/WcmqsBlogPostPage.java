@@ -5,7 +5,6 @@ import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -38,7 +37,6 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 
         @RenderWebElement
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
-
         private final By VISITOR_NAME = By.cssSelector("input[name='visitorName']");
         private final By VISITOR_EMAIL = By.cssSelector("input[name='visitorEmail']");
         private final By VISITOR_WEBSITE = By.cssSelector("input[name='visitorWebsite']");
@@ -152,19 +150,17 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
          */
         public boolean isDeleteConfirmationWindowDisplayed()
         {
-                boolean check = false;
                 try
                 {
 
                         drone.waitForElement(DELETE_CONFIRM_WINDOW, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
                         WebElement importMessage = drone.find(By.id("prompt_c"));
-                        check = true;
+                        return true;
                 }
-                catch (NoSuchElementException nse)
+                catch (TimeoutException e)
                 {
                 }
-
-                return check;
+                return false;
         }
 
         public void confirmArticleDelete()
