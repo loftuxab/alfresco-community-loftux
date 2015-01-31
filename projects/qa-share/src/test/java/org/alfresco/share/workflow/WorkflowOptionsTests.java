@@ -68,7 +68,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         super.setup();
         testName = this.getClass().getSimpleName();
         testDomain = DOMAIN_HYBRID;
-        testSelectDestFolders = "testDifferenFolders" + "T";
+        testSelectDestFolders = "testDifferenFolders" + "T4";
     }
 
     public void dataPrep(String testName) throws Exception
@@ -105,7 +105,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     public void AONE_15630() throws Exception
     {
         String testName = getTestName() + "101";
-        String user1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
@@ -123,7 +123,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
         // Login as User1 (OP)
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        
+
         // Create Site
         SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC).render();
 
@@ -226,7 +226,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15631() throws Exception
     {
-        dataPrep(getTestName()+ "101");
+        dataPrep(getTestName() + "101");
     }
 
     /**
@@ -235,8 +235,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15631() throws Exception
     {
-        String testName = getTestName()+ "101";
-        String user1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String testName = getTestName() + "101";
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
@@ -360,7 +360,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15632() throws Exception
     {
-        dataPrep(getTestName()+ "101");
+        dataPrep(getTestName() + "101");
     }
 
     /**
@@ -369,8 +369,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15632() throws Exception
     {
-        String testName = getTestName()+ "101";
-        String user1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String testName = getTestName() + "101";
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
@@ -471,7 +471,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // The document is still synced to Cloud. The Synced label and no Workflow label is present for the document on Document Library page.
         documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName).render();
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is synced");
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow(), "File is part of workflow" );
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow(), "File is part of workflow");
 
         ShareUser.logout(drone);
 
@@ -491,7 +491,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15633() throws Exception
     {
-        dataPrep(getTestName()+ "101");
+        dataPrep(getTestName() + "101");
     }
 
     /**
@@ -500,8 +500,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15633() throws Exception
     {
-        String testName = getTestName()+ "101";
-        String user1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String testName = getTestName() + "101";
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
@@ -523,7 +523,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
             // Login as User1 (OP)
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-            
+
             // Create Site
             SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
 
@@ -593,7 +593,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
             Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF), "Task is displayed");
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF),"Task is not displayed");
+            Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not displayed");
 
             // ---- Step 7 ----
             // ---- Step action ---
@@ -679,7 +679,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15634() throws Exception
     {
-        dataPrep(getTestName()+ "101");
+        dataPrep(getTestName() + "101");
     }
 
     /**
@@ -688,8 +688,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15634() throws Exception
     {
-        String testName = getTestName()+ "101";
-        String user1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String testName = getTestName() + "101";
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
@@ -783,7 +783,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, cloudReviewApproveWF, TaskStatus.COMPLETED, EditTaskAction.APPROVE);
 
             // Verify tasks are NOT displayed in Active Tasks list any more
-            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewApproveWF), "Task is present" );
+            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewApproveWF), "Task is present");
 
             // Verify tasks are displayed in Completed Tasks list
             myTasksPage = myTasksPage.selectCompletedTasks().render();
@@ -882,7 +882,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     public void AONE_15635() throws Exception
     {
         String testName = getTestName() + "101";
-        String user1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
@@ -1072,7 +1072,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     public void AONE_15636() throws Exception
     {
         String testName = getTestName() + "101";
-        String user1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
@@ -1097,7 +1097,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
             // Create Site
             SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
-            
+
             // Open Document library, Upload 2 files
             siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
 
@@ -1226,7 +1226,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     public void AONE_15637() throws Exception
     {
         String testName = getTestName() + "101";
-        String user1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "-CL";
@@ -1242,7 +1242,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         {
             // Login as User1 (Cloud)
             ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-            
+
             // Create Site
             ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
             ShareUser.logout(hybridDrone);
@@ -1366,7 +1366,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15643() throws Exception
     {
-        dataPrep(getTestName()+ "T");
+        dataPrep(getTestName() + "T");
     }
 
     /**
@@ -1375,8 +1375,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15643() throws Exception
     {
-        String testName = getTestName()+ "T";
-        String opUser1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String testName = getTestName() + "T";
+        String opUser1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser1 = getUserNameForDomain(testName + "CL", testDomain);
         String cloudSiteName = getSiteName(testName + "cloud" + System.currentTimeMillis());
         String opSiteName = getSiteName(testName) + System.currentTimeMillis();
@@ -1439,7 +1439,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
         WorkFlowDetailsPage detailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName1).render();
         Assert.assertEquals(detailsPage.getWorkFlowDetailsGeneralInfo().getPriority(), Priority.HIGH);
-
         ShareUser.logout(drone);
 
         // ---- Step 4, 5 ----
@@ -1449,17 +1448,22 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // 4/5. High Priority is set.
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
-        MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
+        MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
         Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1), "Task is not present");
         Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.HIGH, "Task is not set to High");
 
+        myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+        myTasks = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName1, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
+        myTasks = myTasks.selectCompletedTasks().render();
+        Assert.assertTrue(myTasks.isTaskPresent(workFlowName1), "Task is not present");
+        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.HIGH, "Task is not set to High");
         ShareUser.logout(hybridDrone);
     }
 
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15644() throws Exception
     {
-        dataPrep(getTestName()+ "T");
+        dataPrep(getTestName() + "T");
     }
 
     /**
@@ -1468,11 +1472,11 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15644() throws Exception
     {
-        String testName = getTestName()+ "T";
-  
-        String opUser1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String testName = getTestName() + "T";
+
+        String opUser1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser1 = getUserNameForDomain(testName + "CL", testDomain);
-        
+
         String cloudSiteName = getSiteName(testName + "cloud" + System.currentTimeMillis());
         String opSiteName = getSiteName(testName) + System.currentTimeMillis();
         String opFileName1 = getFileName(testName) + System.currentTimeMillis() + "Medium";
@@ -1534,7 +1538,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
         WorkFlowDetailsPage detailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName1).render();
         Assert.assertEquals(detailsPage.getWorkFlowDetailsGeneralInfo().getPriority(), Priority.MEDIUM, "Priority is not set to Medium");
-
         ShareUser.logout(drone);
 
         // ---- Step 4, 5 ----
@@ -1544,27 +1547,32 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // 4/5. Medium priority is set.
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
-        MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1));
-        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.MEDIUM, "Priority is not set to Medium");
+        MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1), "Task is not present");
+        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.MEDIUM, "Task is not set to Medium");
 
+        myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+        myTasks = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName1, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
+        myTasks = myTasks.selectCompletedTasks().render();
+        Assert.assertTrue(myTasks.isTaskPresent(workFlowName1), "Task is not present");
+        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.MEDIUM, "Task is not set to Medium");
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 400000)
+    @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15645() throws Exception
     {
-        dataPrep(getTestName()+ "T");
+        dataPrep(getTestName() + "T");
     }
 
     /**
      * AONE-15645:Priority - Low
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15645() throws Exception
     {
-        String testName = getTestName()+ "T";
-        String opUser1 = getUserNameForDomain(testName+ "OP", testDomain);
+        String testName = getTestName() + "T";
+        String opUser1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser1 = getUserNameForDomain(testName + "CL", testDomain);
         String cloudSiteName = getSiteName(testName + "cloud" + System.currentTimeMillis());
         String opSiteName = getSiteName(testName) + System.currentTimeMillis();
@@ -1626,7 +1634,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
         WorkFlowDetailsPage detailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName1).render();
         Assert.assertEquals(detailsPage.getWorkFlowDetailsGeneralInfo().getPriority(), Priority.LOW, "Priority is not set to Low");
-
         ShareUser.logout(drone);
 
         // ---- Step 4, 5 ----
@@ -1636,8 +1643,14 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // 4/5. Low priority is set.
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
-        MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
+        MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
         Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1), "Task is not present");
+        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.LOW, "Task is not set to Low");
+
+        myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+        myTasks = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName1, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
+        myTasks = myTasks.selectCompletedTasks().render();
+        Assert.assertTrue(myTasks.isTaskPresent(workFlowName1), "Task is not present");
         Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.LOW, "Task is not set to Low");
         ShareUser.logout(hybridDrone);
     }
@@ -1645,7 +1658,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15652() throws Exception
     {
-        String testName = getTestName()+ "T";
+        String testName = getTestName() + "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { opUser1 };
 
@@ -1694,12 +1707,12 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     }
 
     /**
-     * AONE-15652:Select Destination - different networks
+     * AONE-15652: Select Destination - different networks
      */
     @Test(groups = "Hybrid", timeOut = 400000)
     public void AONE_15652() throws Exception
     {
-        String testName = getTestName()+ "T";
+        String testName = getTestName() + "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
         String opSiteName = getSiteName(testName + "OP");
         String fileName = getFileName(testName) + ".doc";
@@ -1715,7 +1728,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
         // Select "Cloud Task or Review" from select a workflow dropdown
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ((CloudTaskOrReviewPage) startWorkFlowPage.getWorkflowPage(WorkFlowType.CLOUD_TASK_OR_REVIEW)).render();
-
         DestinationAndAssigneePage destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
 
         // ---- Step 1 ----
@@ -1723,14 +1735,14 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // Verify the list of available networks.
         // ---- Expected results ----
         // network1 and network2 are available.
-        Assert.assertTrue(destinationPage.isNetworkDisplayed(DOMAIN_HYBRID), "Network is not displayed");
-        Assert.assertTrue(destinationPage.isNetworkDisplayed(invitedDomain1), "Network is not displayed");
+        Assert.assertTrue(destinationPage.isNetworkDisplayed(DOMAIN_HYBRID), "Network " + DOMAIN_HYBRID + " is not displayed");
+        Assert.assertTrue(destinationPage.isNetworkDisplayed(invitedDomain1), "Network " + invitedDomain1 + " is not displayed");
     }
 
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15653() throws Exception
     {
-        String testName = getTestName()+ "T";
+        String testName = getTestName() + "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
         String cloudUser2 = getUserNameForDomain(testName + "user2", invitedDomain1);
@@ -1793,7 +1805,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", timeOut = 400000)
     public void AONE_15653() throws Exception
     {
-        String testName = getTestName()+ "T";
+        String testName = getTestName() + "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
         String cloudSiteName1 = getSiteName(testName + "4");
@@ -1878,7 +1890,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         docLibPage = docLibPage.render();
 
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName2).isCloudSynced(), "Verifying the File2 is synced");
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName2).isPartOfWorkflow(), fileName2 +  " is not part of workflow");
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName2).isPartOfWorkflow(), fileName2 + " is not part of workflow");
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -1888,7 +1900,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName3);
         destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
 
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName1),"Site " + cloudSiteName1 + "is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName1), "Site " + cloudSiteName1 + "is not displayed");
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName2), "Site " + cloudSiteName2 + "is not displayed");
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName3), "Site " + cloudSiteName3 + "is not displayed");
 
@@ -1918,11 +1930,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         cloudCollaboratorSite = getSiteName(testSelectDestFolders + "Collaborator");
         cloudContributorSite = getSiteName(testSelectDestFolders + "Contributor");
         cloudConsumerSite = getSiteName(testSelectDestFolders + "Consumer");
-
         String folder1 = getFolderName(testSelectDestFolders + "Collaborator");
         String folder2 = getFolderName(testSelectDestFolders + "Contributor");
         String folder3 = getFolderName(testSelectDestFolders + "Consumer");
-
         String[] userInfo1 = new String[] { opUser1 };
         String[] cloudUserInfo1 = new String[] { cloudUser1 };
         String[] cloudUserInfo2 = new String[] { cloudUser2 };
@@ -1945,6 +1955,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
             // Create User4 (Cloud)
             CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo4);
+
+            CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, invitedDomain1, "1000");
 
             // Login as User2 (Cloud)
             ShareUser.login(hybridDrone, cloudUser2, DEFAULT_PASSWORD);
@@ -2087,9 +2099,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         cloudContributorSite = getSiteName(testSelectDestFolders + "Contributor");
         cloudConsumerSite = getSiteName(testSelectDestFolders + "Consumer");
         String opSiteName2 = getSiteName(testSelectDestFolders + System.currentTimeMillis() + "15655");
-
         String folder2 = getFolderName(testSelectDestFolders + "Contributor");
-
         String fileName4 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "1.doc";
         String fileName5 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "2.doc";
         String fileName6 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "3.doc";
@@ -2124,7 +2134,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // 1. user2siteCollaborator, user3siteContributor, user4siteConsumer are available.
         // 2. Performed correctly.
         // 3. Performed correctly. No notifications are displayed.
-        // 4.Performed correctly. No notifications are displayed. Workflow is created. The document is synced to the chosen site. The user has Contributor 
+        // 4.Performed correctly. No notifications are displayed. Workflow is created. The document is synced to the chosen site. The user has Contributor
         // permissions.
         docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder2, fileName4, cloudCollaboratorSite, docLibPage).render();
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName4).isPartOfWorkflow(), fileName4 + " is not part of workflow");
@@ -2160,13 +2170,10 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         cloudContributorSite = getSiteName(testSelectDestFolders + "Contributor");
         cloudConsumerSite = getSiteName(testSelectDestFolders + "Consumer");
         String opSiteName3 = getSiteName(testSelectDestFolders + System.currentTimeMillis() + "consumer");
-
         String folder3 = getFolderName(testSelectDestFolders + "Consumer");
-
         String fileName7 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "1.doc";
         String fileName8 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "2.doc";
         String fileName9 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "3.doc";
-
         String[] fileInfo7 = { fileName7, DOCLIB };
         String[] fileInfo8 = { fileName8, DOCLIB };
         String[] fileInfo9 = { fileName9, DOCLIB };
@@ -2191,7 +2198,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName7);
 
         DestinationAndAssigneePage destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
-
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite));
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite));
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite));
@@ -2202,7 +2208,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // Select Destination window is opened.
         destinationPage.selectNetwork(invitedDomain1);
-        
+
         // ---- Step 2 ----
         // ---- Step action ---
         // Choose user2siteCollaborator > folder3.
@@ -2248,9 +2254,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
         // Select StartWorkflow for cloud user1 on contributor site for folder3
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName9);
-
         destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
-
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite), cloudCollaboratorSite + " is not displayed");
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite), cloudContributorSite + " is not displayed");
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite), cloudConsumerSite + " is not displayed");
