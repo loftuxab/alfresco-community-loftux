@@ -63,5 +63,10 @@
        <packages>
            <package name="org.alfresco.po.share.site.document.download" />
        </packages>
+    </test>   
+    <test name="Links Page Test">
+        <classes>
+            <class name="org.alfresco.po.share.user.CloudForgotPasswordPageTest"/>
+        </classes>
     </test>
 </suite>

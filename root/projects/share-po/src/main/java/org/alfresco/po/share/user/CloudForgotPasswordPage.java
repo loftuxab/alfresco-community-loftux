@@ -1,5 +1,6 @@
 package org.alfresco.po.share.user;
 
+import org.alfresco.po.share.LoginPage;
 import org.alfresco.po.share.ShareDialogue;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
@@ -7,6 +8,7 @@ import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -18,6 +20,8 @@ public class CloudForgotPasswordPage extends ShareDialogue
     private static final By SEND_INSTRUCTIONS_BUTTON = By.cssSelector("button[id$='_default-submit-button']");
     @RenderWebElement
     private static final By CANCEL_BUTTON = By.cssSelector("button[id$='_default-cancel-button']");
+
+    private static final By CONFIRMATION_RESET_PASSWORD = By.cssSelector("div[id$='default-confirmation-container']");
 
     /**
      * Constructor.
@@ -83,12 +87,25 @@ public class CloudForgotPasswordPage extends ShareDialogue
         try
         {
             WebElement button = drone.findAndWait(CANCEL_BUTTON);
-            button.submit();
-            return new CloudSignInPage(drone);
+            button.click();
+            return new LoginPage(drone);
         }
         catch (TimeoutException te)
         {
             throw new PageOperationException("Element not found", te);
         }
+    }
+
+    public boolean isConfirmationResetPassword()
+    {
+        try
+        {
+            return drone.findAndWait(CONFIRMATION_RESET_PASSWORD).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+
     }
 }
