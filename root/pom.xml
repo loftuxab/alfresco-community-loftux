@@ -1070,15 +1070,14 @@
     <profile>
         <id>mariadb</id>
         <properties>
-            <db.master.url>jdbc:mariadb://localhost/</db.master.url>
-            <db.driver>org.mariadb.jdbc.Driver</db.driver>
-            <db.url>jdbc:mariadb://localhost/${db.name}</db.url>
+            <db.master.url>jdbc:mysql://localhost/</db.master.url>
+            <db.driver>org.gjt.mm.mysql.Driver</db.driver>
+            <db.url>jdbc:mysql://localhost/${db.name}</db.url>
         </properties>
         <dependencies>
             <dependency>
-                <groupId>org.mariadb.jdbc</groupId>
-                <artifactId>mariadb-java-client</artifactId>
-                <version>1.1.7</version>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
             </dependency>
         </dependencies>
         <build>
