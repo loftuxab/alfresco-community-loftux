@@ -79,8 +79,15 @@ public class PerformanceTest extends CmisUtils
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
+        super.beforeClass();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
+    }
+
+    @Override
+    public void beforeClass()
+    {
+       // To change the behavior of initialization.
     }
 
     @Test(groups = { "DataPrepPerformance", "Share", "NonGrid", "EnterpriseOnly" })
@@ -188,7 +195,7 @@ public class PerformanceTest extends CmisUtils
             DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(customDrone, siteName);
             DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(BIG_DATA_FILE);
             documentDetailsPage.clickOnDownloadLinkForUnsupportedDocument();
-            documentDetailsPage.waitForFile(2400000, downloadDirectory + BIG_DATA_FILE);
+            documentDetailsPage.waitForFile(300000, downloadDirectory + BIG_DATA_FILE);
             assertTrue(downloadedBigDataFile.exists(), "Big data file don't download");
             assertEquals(downloadedBigDataFile.length(), 1024 * 1024 * 2047, "File does not fully downloaded.");
         }
@@ -200,7 +207,7 @@ public class PerformanceTest extends CmisUtils
                 downloadedBigDataFile.delete();
             }
             super.tearDown();
-            super.setup();
+            super.beforeClass();
         }
     }
 
