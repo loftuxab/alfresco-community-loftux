@@ -42,6 +42,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 @Listeners(FailedTestListener.class)
+@Test(groups = {"TestBug" })
 public class ViewWorkflowPageTest extends AbstractTest
 {
     private String siteName;
