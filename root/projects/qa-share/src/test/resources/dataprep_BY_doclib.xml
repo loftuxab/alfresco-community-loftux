@@ -10,7 +10,7 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <test name="Trashcan tests Suite">
+    <!--test name="Trashcan tests Suite">
         <classes>
             <class name="org.alfresco.share.user.trashcan.TrashcanTest2"/>
         </classes>
@@ -28,6 +28,19 @@
                 <methods>
                     <include name="dataPrep_AONE_13976"/>
                     <include name="dataPrep_AONE_13983"/>
+                </methods>
+            </class>
+        </classes>
+    </test-->
+
+    <test name="Trashcan tests Suite">
+        <classes>
+            <class name="org.alfresco.share.user.trashcan.TrashCanTest">
+                <methods>
+                    <include name="dataPrep_AONE_15088"/>
+                    <include name="dataPrep_AONE_15089"/>
+                    <include name="dataPrep_AONE_15090"/>
+                    <include name="dataPrep_AONE_15091"/>
                 </methods>
             </class>
         </classes>
