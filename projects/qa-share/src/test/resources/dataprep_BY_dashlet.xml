@@ -13,7 +13,7 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <!--test name="SiteSearchMyDashboardTest2">
+    <test name="SiteSearchMyDashboardTest2">
         <classes>
             <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest2">
                 <methods>
@@ -21,7 +21,7 @@
                 </methods>
             </class>
         </classes>
-    </test-->
+    </test>
 
     <test name="SavedSearchMyDashboardAdvancedTest" verbose="1">
         <classes>
