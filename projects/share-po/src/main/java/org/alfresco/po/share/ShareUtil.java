@@ -33,7 +33,8 @@ public class ShareUtil
     private static final String ADMIN_SYSTEMSUMMARY_PAGE = "alfresco/service/enterprise/admin";
     private static final String BULK_IMPORT_PAGE = "alfresco/service/bulkfsimport";
     private static final String BULK_IMPORT_IN_PLACE_PAGE = "alfresco/service/bulkfsimport/inplace";
-    private static final String WEB_SCRIPTs_PAGE = "alfresco/service/index";
+    private static final String WEB_SCRIPTS_PAGE = "alfresco/service/index";
+    private static final String TENANT_ADMIN_CONSOLE_PAGE = "alfresco/s/enterprise/admin/admin-tenantconsole";
 
     /**
      * A simple Enum to request the required Alfresco version.
@@ -217,23 +218,21 @@ public class ShareUtil
     }
 
 
-    public static HtmlPage navigateToWebScriptsHome(final WebDrone drone, final String... userInfo)
+    public static HtmlPage navigateToWebScriptsHome(final WebDrone drone,final String... userInfo) throws Exception
+    {
+        return navigateToAlfresco(drone, WEB_SCRIPTS_PAGE, userInfo);
+    }
+    public static HtmlPage navigateToTenantAdminConsole(final WebDrone drone,final String... userInfo) throws Exception
+    {
+        return navigateToAlfresco(drone, TENANT_ADMIN_CONSOLE_PAGE, userInfo);
+    }
+    public static HtmlPage navigateToAlfresco(final WebDrone drone, final String path,final String... userInfo) throws Exception
     {
         String currentUrl = drone.getCurrentUrl();
         String protocolVar = PageUtils.getProtocol(currentUrl);
         String consoleUrlVar = PageUtils.getAddress(currentUrl);
-        currentUrl = String.format("%s%s:%s@%s/" + WEB_SCRIPTs_PAGE, protocolVar, userInfo[0], userInfo[1], consoleUrlVar);
-        try 
-        {
-            drone.navigateTo(currentUrl);
-        }
-        catch (Exception e) 
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Following exception was occurred" + e + ". Param currentUrl was " + currentUrl);
-            }
-        }
+        currentUrl = String.format("%s%s:%s@%s/" + path, protocolVar, userInfo[0], userInfo[1], consoleUrlVar);
+        drone.navigateTo(currentUrl);
         return drone.getCurrentPage().render();
     }
 }
