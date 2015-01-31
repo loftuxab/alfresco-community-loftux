@@ -27,26 +27,18 @@ import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.By;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.KeyEvent;
-import java.io.*;
-import java.util.Iterator;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import static org.testng.Assert.*;
@@ -710,16 +702,12 @@ public class RepositoryFtpTest extends AbstractUtils
         String testFolder4 = folderName + "_4";
         String fileName1 = getFileName(testName) + "_1";
         File file1 = newFile(fileName1, fileName1);
+        String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+        FTPClient ftpClient = new FTPClient();
 
-        String[] arguments = new String[8];
-
-        for (int i = 0; i < 8; i++)
-            arguments[i] = "";
-
-        String command1 = "cd /Alfresco" + SLASH + testFolder1 + SLASH + testFolder2 + SLASH + testFolder3 + SLASH + testFolder4 + SLASH;
-        String command2 = "ls";
-        String command3 = "cd /";
-        String command4 = "cd /Alfresco" + SLASH + testFolder1 + SLASH + testFolder2 + SLASH;
+        String command1 = "/Alfresco" + SLASH + testFolder1 + SLASH + testFolder2 + SLASH + testFolder3 + SLASH + testFolder4 + SLASH;
+        String command2 = "/";
+        String command3 = "/Alfresco" + SLASH + testFolder1 + SLASH + testFolder2 + SLASH;
 
         // User login
         ShareUser.login(drone, ADMIN_PASSWORD, ADMIN_USERNAME);
@@ -736,22 +724,38 @@ public class RepositoryFtpTest extends AbstractUtils
             .navigateToFolderInRepository(drone, REPO + SLASH + testFolder1 + SLASH + testFolder2 + SLASH + testFolder3 + SLASH + testFolder4);
         ShareUserRepositoryPage.uploadFileInRepository(drone, file1);
 
-        // Execute cd /alfresco/testFolder1/testFolder2/testFolder3/testFolder4/ command
-        arguments[0] = command1;
-        assertTrue(execFTP(arguments).contains("230 User logged in, proceed"));
-        assertTrue(execFTP(arguments).contains(command1 + "250 Requested file action OK"));
 
-        // Execute ls command
-        arguments[1] = command2;
-        assertTrue(execFTP(arguments).contains(fileName1 + "226 Closing data connection"));
+        try
+        {
+            //Connect to FTP
+            ftpClient.connect(server, Integer.parseInt(ftpPort));
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+            assertTrue(ftpClient.getReplyString().contains("230 User logged in, proceed"));
 
-        // Execute cd / command
-        arguments[2] = command3;
-        assertTrue(execFTP(arguments).contains(command3 + "250 Requested file action OK"));
+            // Execute cd /alfresco/testFolder1/testFolder2/testFolder3/testFolder4/ command
+            ftpClient.changeWorkingDirectory(command1);
+            assertTrue(ftpClient.getReplyString().contains("250 Requested file action OK"));
 
-        // Execute cd /alfresco/testFolder1/testFolder2/ command
-        arguments[3] = command4;
-        assertTrue(execFTP(arguments).contains(command4 + "250 Requested file action OK"));
+            // Execute ls command
+            String[] files = ftpClient.listNames();
+            assertTrue(files[0].contains(fileName1));
+            assertTrue(ftpClient.getReplyString().contains("226 Closing data connection"));
+
+            // Execute cd / command
+            ftpClient.changeWorkingDirectory(command2);
+            assertTrue(ftpClient.getReplyString().contains("250 Requested file action OK"));
+
+            // Execute cd /alfresco/testFolder1/testFolder2/ command
+            ftpClient.changeWorkingDirectory(command3);
+            assertTrue(ftpClient.getReplyString().contains("250 Requested file action OK"));
+
+        }
+        finally
+        {
+            ftpClient.logout();
+            ftpClient.disconnect();
+        }
 
     }
 
@@ -768,18 +772,12 @@ public class RepositoryFtpTest extends AbstractUtils
         String testFolder2 = folderName + "_2";
         String fileName1 = getFileName(testName) + "_1";
         File file1 = newFile(fileName1, fileName1);
+        String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+        FTPClient ftpClient = new FTPClient();
 
-        String[] arguments = new String[8];
-
-        for (int i = 0; i < 8; i++)
-            arguments[i] = "";
-
-        String command1 = "dir ";
-        String command2 = "cd /Alfresco";
-        String command3 = "cd " + testFolder1;
-        String command4 = "pwd";
-        String command5 = "dir /Alfresco" + SLASH + testFolder1;
-        String command6 = command5 + SLASH + testFolder2;
+        String command1 = "/Alfresco";
+        String command2 = "/Alfresco/" + testFolder1;
+        String command3 = command2 + SLASH + testFolder2;
 
         // User login
         ShareUser.login(drone, ADMIN_PASSWORD, ADMIN_USERNAME);
@@ -791,45 +789,89 @@ public class RepositoryFtpTest extends AbstractUtils
         ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + testFolder1 + SLASH + testFolder2);
         ShareUserRepositoryPage.uploadFileInRepository(drone, file1);
 
-        // Execute dir command
-        arguments[0] = command1;
-        assertTrue(execFTP(arguments).contains("230 User logged in, proceed"));
-        assertTrue(execFTP(arguments).contains("Alfresco" + "226 Closing data connection"));
+        try
+        {
+            //Connect to FTP
+            ftpClient.connect(server, Integer.parseInt(ftpPort));
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+            assertTrue(ftpClient.getReplyString().contains("230 User logged in, proceed"));
 
-        // Execute cd /Alfresco command
-        arguments[1] = command2;
-        assertTrue(execFTP(arguments).contains(command2 + "250 Requested file action OK"));
+            // Execute dir command
+            assertTrue(canListDirectory(ftpClient, "Alfresco"));
+            assertTrue(ftpClient.getReplyString().contains("226 Closing data connection"));
 
-        // Execute dir command
-        arguments[2] = command1;
-        assertTrue(execFTP(arguments).contains(testFolder1 + "226 Closing data connection"));
+            // Execute cd /Alfresco command
+            ftpClient.changeWorkingDirectory(command1);
+            assertTrue(ftpClient.getReplyString().contains("250 Requested file action OK"));
 
-        // Execute cd /testFolder1
-        arguments[3] = command3;
-        assertTrue(execFTP(arguments).contains(command3 + "250 Requested file action OK"));
+            // Execute dir command
+            assertTrue(canListDirectory(ftpClient, testFolder1));
+            assertTrue(ftpClient.getReplyString().contains("226 Closing data connection"));
 
-        // Execute dir command
-        arguments[4] = command1;
-        assertTrue(execFTP(arguments).contains(testFolder2 + "226 Closing data connection"));
+            // Execute cd /testFolder1
+            ftpClient.changeWorkingDirectory(testFolder1);
+            assertTrue(ftpClient.getReplyString().contains("250 Requested file action OK"));
 
-        // Execute cd /testFolder2
-        arguments[5] = command1 + testFolder2;
-        assertTrue(execFTP(arguments).contains(fileName1 + "226 Closing data connection"));
+            // Execute dir command
+            assertTrue(canListDirectory(ftpClient, testFolder2));
+            assertTrue(ftpClient.getReplyString().contains("226 Closing data connection"));
 
-        // Execute pwd
-        arguments[6] = command4;
-        assertTrue(execFTP(arguments).contains(command4 + "257 \"" + "/Alfresco/" + testFolder1));
+            // Execute dir /testFolder2
+            FTPFile [] files = ftpClient.listDirectories(testFolder2);
+            for (FTPFile file : files)
+            {
+                if (file.getName().equals(fileName1))
+                {
+                    logger.info (fileName1 + " is found");
+                }
+                else
+                {
+                    fail ("Can't list "+ testFolder2);
+                }
+            }
 
-        // Execute dir /Alfresco/testFolder1
-        arguments[4] = "";
-        arguments[7] = command5;
-        assertTrue(execFTP(arguments).contains(testFolder2 + "226 Closing data connection"));
+            assertTrue(ftpClient.getReplyString().contains("226 Closing data connection"));
 
-        // Execute dir /Alfresco/testFolder1/testFolder2
-        arguments[5] = "";
-        arguments[7] = command6;
-        assertTrue(execFTP(arguments).contains(fileName1 + "226 Closing data connection"));
+            // Execute pwd
+            ftpClient.printWorkingDirectory();
+            assertTrue(ftpClient.getReplyString().contains("/Alfresco/" + testFolder1));
 
+            // Execute dir /Alfresco/testFolder1
+            files = ftpClient.listDirectories(command2);
+            for (FTPFile file : files)
+            {
+                if (file.getName().equals(testFolder2))
+                {
+                    logger.info (testFolder2 + " is found");
+                }
+                else
+                {
+                    fail ("Can't list "+ command2);
+                }
+            }
+            assertTrue(ftpClient.getReplyString().contains("226 Closing data connection"));
+
+            // Execute dir /Alfresco/testFolder1/testFolder2
+            files = ftpClient.listDirectories(command3);
+            for (FTPFile file : files)
+            {
+                if (file.getName().equals(fileName1))
+                {
+                    logger.info (fileName1 + " is found");
+                }
+                else
+                {
+                    fail ("Can't list "+ command3);
+                }
+            }
+            assertTrue(ftpClient.getReplyString().contains("226 Closing data connection"));
+        }
+        finally
+        {
+            ftpClient.logout();
+            ftpClient.disconnect();
+        }
     }
 
     /**
@@ -941,180 +983,17 @@ public class RepositoryFtpTest extends AbstractUtils
         assertTrue(documentLibraryPage.isFileVisible(fileName3));
 
     }
+  private boolean canListDirectory (FTPClient ftpClient, String remoteObject) throws IOException
+  {
 
-    /**
-     * AONE-6448: Connect to FTP via Firefox
-     */
-
-    @Test
-    public void AONE_6448() throws Exception
-    {
-        String ftpUrl = "ftp://%s:%s@%s";
-        String serverIP = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "") + ":" + ftpPort;
-        ftpUrl = String.format(ftpUrl, ADMIN_USERNAME, ADMIN_PASSWORD, serverIP);
-
-        // Navigate to ftp://login:pass@server_ip
-        drone.navigateTo(ftpUrl);
-        String handle1 = drone.getWindowHandle();
-        assertTrue(drone.findAndWait(By.cssSelector(".up")).getAttribute("href").contains(ftpUrl));
-        assertTrue(getDrone().findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
-
-        //  Navigate to ftp://server_ip
-        ftpUrl = "ftp://%s";
-        ftpUrl = String.format(ftpUrl, serverIP);
-        drone.executeJavaScript("myWindow = window.open(\"" + ftpUrl + "\"" + ","+ "\"myWindow\"," + "\""+"[top=500, left=500, width=800, height=600]"+"\""+"); myWindow.focus(); myWindow.moveTo(0, 0);");
-        sleep();
-
-        //  Fill Login and Pass fields and click 'Ok' button;
-        try
-        {
-            Robot robot = new Robot();
-            type(ADMIN_USERNAME);
-            robot.keyPress(KeyEvent.VK_TAB);
-            type(ADMIN_PASSWORD);
-            robot.keyPress(KeyEvent.VK_ENTER);
-        }
-        catch (AWTException ex)
-        {
-            logger.error(ex);
-        }
-
-        Set<String> windowIds = drone.getWindowHandles();
-        Iterator<String> iter= windowIds.iterator();
-        String windowId1=iter.next();
-        String windowId2=iter.next();
-        if (windowId1.equals(handle1)){
-            drone.switchToWindow(windowId2);
-        }
-        assertTrue(drone.findAndWait(By.cssSelector(".up")).getAttribute("href").contains(ftpUrl), String.format("displayed: %s, Expected: %s",
-            drone.findAndWait(By.cssSelector(".up")).getAttribute("href"), ftpUrl));
-        assertTrue(getDrone().findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
-        String handle2 = drone.getWindowHandle();
-
-        // Navigate to ftp://login@server_ip
-        ftpUrl = "ftp://%s@%s";
-        ftpUrl = String.format(ftpUrl, ADMIN_USERNAME, serverIP);
-        drone.executeJavaScript("myWindow1 = window.open(\"" + ftpUrl + "\"" + ","+ "\"myWindow1\"," + "\""+"[top=500, left=500, width=800, height=600]"+"\""+"); myWindow1.focus(); myWindow1.moveTo(0, 0);");
-        sleep();
-
-        // Fill Password field and click 'Ok' button;
-        try
-        {
-            Robot robot = new Robot();
-            robot.setAutoWaitForIdle(true);
-            type(ADMIN_PASSWORD);
-            robot.keyPress(KeyEvent.VK_ENTER);
-        }
-        catch (AWTException ex)
-        {
-            logger.error(ex);
-        }
-
-        windowIds = drone.getWindowHandles();
-        iter= windowIds.iterator();
-        windowId1=iter.next();
-        windowId2=iter.next();
-        String windowId3=iter.next();
-        if (windowId1.equals(handle1) && windowId2.equals(handle2)){
-            drone.switchToWindow(windowId3);
-        }
-        assertTrue(drone.findAndWait(By.cssSelector(".up")).getAttribute("href").contains(ftpUrl),String.format("displayed: %s, Expected: %s",
-            drone.findAndWait(By.cssSelector(".up")).getAttribute("href"), ftpUrl));
-        assertTrue(getDrone().findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
-    }
-
-    private void writeToClipboard(String s)
-    {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable transferable = new StringSelection(s);
-        clipboard.setContents(transferable, null);
-    }
-
-    private void type(String text)
-    {
-        writeToClipboard(text);
-        pasteClipboard();
-    }
-
-    private void pasteClipboard()
-    {
-        try
-        {
-            Robot robot = new Robot();
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            robot.keyPress(KeyEvent.VK_V);
-            robot.delay(50);
-            robot.keyRelease(KeyEvent.VK_V);
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-        }
-        catch (AWTException ex)
-        {
-            logger.error(ex);
-        }
-    }
-
-    private String execFTP(String[] arguments)
-    {
-
-        String host = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
-        StringBuilder content = new StringBuilder();
-        BufferedReader reader;
-        String inputLine;
-
-        try
-        {
-            File tmpDir = new File(DATA_FOLDER);
-            File file = File.createTempFile("ftp", ".tmp", tmpDir);
-            file.deleteOnExit();
-            Writer writer = new FileWriter(file);
-            DefaultExecutor executor = new DefaultExecutor();
-            CommandLine cmdLine = new CommandLine("ftp");
-            if (System.getProperty("os.name").contains("Windows"))
-            {
-                writer.write(
-                    "verbose\n" + "open " + host + " " + ftpPort + "\n" + ADMIN_USERNAME + "\n" + ADMIN_PASSWORD + "\n" + arguments[0] + "\n" + arguments[1]
-                        + "\n"
-                        + arguments[2] + "\n" + arguments[3] + "\n" + arguments[4] + "\n" + arguments[5] + "\n" + arguments[6] + "\n" + arguments[7] + "\n"
-                        + "\nquit"
-                );
-                cmdLine.addArgument("-s:" + file);
-            }
-            else
-            {
-                writer.write(
-                    "open " + host + " " + ftpPort + "\n" + "user " + ADMIN_USERNAME + ADMIN_PASSWORD + arguments[0] + "\n" + arguments[1] + "\n"
-                        + arguments[2] + "\n" + arguments[3] + "\n" + arguments[4] + "\n" + arguments[5] + "\n" + arguments[6] + "\n" + arguments[7] + "\n"
-                        + "\nquit"
-                );
-                cmdLine.addArgument("-n <" + file);
-            }
-            writer.close();
-
-            ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
-            executor.setStreamHandler(new PumpStreamHandler(stdOut));
-            executor.execute(cmdLine);
-            reader = new BufferedReader(new StringReader(stdOut.toString()));
-            while ((inputLine = reader.readLine()) != null)
-            {
-                content.append(inputLine);
-            }
-            reader.close();
-        }
-        catch (IOException ex)
-        {
-            throw new RuntimeException(ex.getMessage());
-        }
-        return content.toString();
-    }
-    private static void sleep()
-    {
-        try
-        {
-            Thread.sleep(5000);
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-    }
+      FTPFile [] files = ftpClient.listDirectories();
+      for (FTPFile file : files)
+      {
+          if (file.getName().equals(remoteObject))
+      {
+          return true;
+      }
+      }
+      return false;
+  }
 }
