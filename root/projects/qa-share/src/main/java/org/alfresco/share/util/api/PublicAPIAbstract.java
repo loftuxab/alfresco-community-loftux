@@ -121,7 +121,6 @@ public abstract class PublicAPIAbstract extends AbstractUtils
         processesClient = workflowApiClient.processesClient();
         deploymentsClient = workflowApiClient.deploymentsClient();
         // syncClient = desktopSynApiClient.sync();
-
         setTenantDomain();
 
     }

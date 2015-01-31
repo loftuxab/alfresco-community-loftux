@@ -14,7 +14,6 @@
  */
 package org.alfresco.share.util.api;
 
-import org.alfresco.opencmis.CMISDispatcherRegistry.Binding;
 import org.alfresco.po.share.site.document.DocumentAspect;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.filestore.FileContentWriter;
@@ -43,6 +42,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.alfresco.opencmis.CMISDispatcherRegistry.Binding.atom;
+import static org.alfresco.opencmis.CMISDispatcherRegistry.Binding.browser;
+
 /**
  * Cmis Utils
  *
@@ -68,20 +70,18 @@ public class CmisUtils extends PublicAPIAbstract
         switch (cmisBinding)
         {
             case ATOMPUB10:
-                cmisSession = publicApiClient.createPublicApiCMISSession(Binding.atom, "1.0");
+                cmisSession = publicApiClient.createPublicApiCMISSession(atom, "1.0");
                 logger.info("Binding: atom 1.0");
                 break;
             case ATOMPUB11:
-                cmisSession = publicApiClient.createPublicApiCMISSession(Binding.atom, "1.1");
+                cmisSession = publicApiClient.createPublicApiCMISSession(atom, "1.1");
                 logger.info("Binding: atom 1.1");
                 break;
             case BROWSER11:
-                cmisSession = publicApiClient.createPublicApiCMISSession(Binding.browser, "1.1");
+                cmisSession = publicApiClient.createPublicApiCMISSession(browser, "1.1");
                 logger.info("Binding: browser 1.1");
                 break;
             default:
-                // cmisSession =
-                // publicApiClient.createPublicApiCMISSession(Binding.atom, "1.0");
                 logger.info("Binding: Not specified");
         }
 

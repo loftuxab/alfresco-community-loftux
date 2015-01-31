@@ -1428,6 +1428,24 @@ public abstract class AbstractUtils
     }
 
     /**
+     * Helper to consistently get the categoryName.
+     *
+     * @param partCategoryName String Part Name of the category for uniquely identifying /
+     *                    mapping test data with the test
+     * @return String categoryName
+     */
+    protected static String getCategoryName(String partCategoryName)
+    {
+        String category = "";
+
+        // Tag names are displayed in lower case to convert to lower case to help matching in tests.
+        category = String.format("category%s-%s", UNIQUE_TESTDATA_STRING, partCategoryName).toLowerCase();
+
+        return category;
+    }
+
+
+    /**
      * Method to get the DependsOnMethod name
      *
      * @param cls

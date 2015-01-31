@@ -152,4 +152,10 @@
         </classes>
     </test>
 
+    <test name="PerformanceTest">
+        <classes>
+            <class name="org.alfresco.share.PerformanceTest"/>
+        </classes>
+    </test>
+
 </suite>
