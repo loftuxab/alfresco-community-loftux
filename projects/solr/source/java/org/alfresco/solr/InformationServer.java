@@ -44,7 +44,7 @@ import org.json.JSONException;
  * @author Ahmed Owian
  *
  */
-public interface InformationServer
+public interface InformationServer extends InformationServerCollectionProvider
 {
     public static final String PROP_PREFIX_PARENT_TYPE = "alfresco.metadata.ignore.datatype.";
 
@@ -89,10 +89,6 @@ public interface InformationServer
     TrackerStats getTrackerStats();
 
     Map<String, Set<String>> getModelErrors();
-
-    IOpenBitSet getOpenBitSetInstance();
-
-    <T> ISimpleOrderedMap<T> getSimpleOrderedMapInstance();
 
     DictionaryComponent getDictionaryService(String alternativeDictionary);
 
