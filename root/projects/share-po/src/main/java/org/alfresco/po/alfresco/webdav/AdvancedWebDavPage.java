@@ -52,7 +52,15 @@ public class AdvancedWebDavPage extends SharePage
      */
     public boolean isOpened()
     {
-        return drone.findAndWait(DIRECTORY_LISTING).isDisplayed();
+        try
+        {
+            return drone.find(DIRECTORY_LISTING).isDisplayed();
+        }
+        catch (Exception e)
+        {
+        }
+        return false;
+
     }
 
     /**
@@ -80,7 +88,14 @@ public class AdvancedWebDavPage extends SharePage
      */
     public boolean checkDirectoryDisplayed(String directoryName)
     {
-        return drone.findAndWait(By.xpath(String.format(DIRECTORY_LINK, directoryName))).isDisplayed();
+        try
+        {
+            return drone.find(By.xpath(String.format(DIRECTORY_LINK, directoryName))).isDisplayed();
+        }
+        catch (Exception e)
+        {
+        }
+        return false;
     }
 
     /**
@@ -98,7 +113,14 @@ public class AdvancedWebDavPage extends SharePage
      */
     public boolean checkUpToLevelDisplayed()
     {
-        return drone.findAndWait(UP_TO_LEVEL).isDisplayed();
+        try
+        {
+            return drone.find(UP_TO_LEVEL).isDisplayed();
+        }
+        catch (Exception e)
+        {
+        }
+        return false;
     }
 
 }
