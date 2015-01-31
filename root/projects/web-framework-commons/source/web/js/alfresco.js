@@ -11044,16 +11044,20 @@ Alfresco.util.RENDERLOOPSIZE = 25;
              */
             onFormSubmitFailure: function FormManager_onFormSubmitFailure(response)
             {
-         var failureMsg = null;
-         if (response.json && response.json.message && response.json.message.indexOf("Failed to persist field 'prop_cm_name'") !== -1)
-         {
-            failureMsg = this.msg("message.details.failure.name");
-         }
+               var failureMsg = null;
+               if (response.json && response.json.message && response.json.message.indexOf("Failed to persist field 'prop_cm_name'") !== -1)
+               {
+                    failureMsg = this.msg("message.details.failure.name");
+               }
+               else if (response.json && response.json.message && response.json.message.indexOf("PropertyValueSizeIsMoreMaxLengthException") !== -1)
+               {
+                    failureMsg = this.msg("message.details.failure.more.max.length");
+               }
                Alfresco.util.PopupManager.displayPrompt(
-                     {
-                        title: this.msg(this.options.failureMessageKey),
-            text: failureMsg ? failureMsg : (response.json && response.json.message ? response.json.message : this.msg("message.details.failure"))
-                     });
+               {
+                    title: this.msg(this.options.failureMessageKey),
+                    text: failureMsg ? failureMsg : (response.json && response.json.message ? response.json.message : this.msg("message.details.failure"))
+               });
             },
 
             /**
