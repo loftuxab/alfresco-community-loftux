@@ -78,6 +78,7 @@ public class PerformanceTest extends CmisUtils
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
+        super.setup();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
     }
