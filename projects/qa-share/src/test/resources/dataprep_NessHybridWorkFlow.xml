@@ -8,13 +8,19 @@
 			<exclude name="NonGrid" />
 		</run>
 	</groups>
-	
+
+	<test name="CompleteWorkflowTests" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.workflow.CompletedWorkflowSyncedTests" />
+		</classes>
+	</test>
+
 	<test name="IncompleteWorkflowTests" verbose="1">
 		<classes>
 			<class name="org.alfresco.share.workflow.IncompleteWorkflowTests" />
 		</classes>
 	</test>
-	
+
 	<test name="WorkflowOptionsTests" verbose="1">
 		<classes>
 			<class name="org.alfresco.share.workflow.WorkflowOptionsTests" />
