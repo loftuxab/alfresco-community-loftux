@@ -27,7 +27,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.Runtime.getRuntime;
 
 /**
  * @author Marina.Nenadovets
@@ -86,6 +85,8 @@ public class FtpsUtil extends AbstractUtils
         {
             throw new ShareException("Exception occurred when generation keystore");
         }
+        File keyStoreFile = new File(pathToKeyStoreFile + SLASH + KEYSTORENAME);
+        FTPSClient ftpsClient = new FTPSClient();
         return new File(pathToKeyStoreFile + SLASH + KEYSTORENAME);
     }
 
@@ -106,43 +107,51 @@ public class FtpsUtil extends AbstractUtils
         {
             TRUSTSTORENAME = trustStoreName;
         }
-        String line;
-        //exporting keystore to alfresco.cer file first
-        String cmdline = "keytool -export" +
-            " -alias " + ALIAS +
-            " -keystore " + keyStore.getAbsolutePath() +
-            " -storepass " + PASS +
-            " -rfc -file alfresco.cer";
-        Process p = getRuntime().exec(cmdline);
-        p.waitFor();
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        while ((line = in.readLine()) != null)
+
+        CommandLine cmdLine = new CommandLine("keytool");
+        cmdLine.addArgument("-export");
+        cmdLine.addArgument("-alias");
+        cmdLine.addArgument(ALIAS);
+        cmdLine.addArgument("-keystore");
+        cmdLine.addArgument(keyStore.getAbsolutePath());
+        cmdLine.addArgument("-storepass");
+        cmdLine.addArgument(PASS);
+        cmdLine.addArgument("-rfc");
+        cmdLine.addArgument("-file");
+        cmdLine.addArgument(pathToKeyStoreFile + SLASH + "alfresco.cer");
+        DefaultExecutor executor = new DefaultExecutor();
+        int value = executor.execute(cmdLine);
+        if(value == 0)
         {
-            System.out.println(line);
-            if (line.contains("error"))
-            {
-                throw new ShareException("Unable to generate keystore.");
-            }
+            logger.info("Keystore was imported to alfresco.cer file");
+        }
+        else
+        {
+            throw new ShareException("Exception occurred when importing certificate");
         }
 
-        //now generating truststore
-        cmdline = "keytool -import" +
-            " -alias " + ALIAS +
-            " -storepass " + PASS +
-            "-file alfresco.cer" +
-            " -keystore " + pathToKeyStoreFile + SLASH + TRUSTSTORENAME;
-        p = getRuntime().exec(cmdline);
-        p.waitFor();
-        in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        while ((line = in.readLine()) != null)
+        //generating truststore
+        CommandLine cmdLine1 = new CommandLine("keytool");
+        cmdLine1.addArgument("-import");
+        cmdLine1.addArgument("-alias");
+        cmdLine1.addArgument(ALIAS);
+        cmdLine1.addArgument("-storepass");
+        cmdLine1.addArgument(PASS);
+        cmdLine1.addArgument("-file");
+        cmdLine1.addArgument(pathToKeyStoreFile + SLASH + "alfresco.cer");
+        cmdLine1.addArgument("-keystore");
+        cmdLine1.addArgument(pathToKeyStoreFile + SLASH + TRUSTSTORENAME);
+        cmdLine1.addArgument("-noprompt");
+        executor = new DefaultExecutor();
+        value = executor.execute(cmdLine1);
+        if(value == 0)
         {
-            System.out.println(line);
-            if (line.contains("error"))
-            {
-                throw new ShareException("Unable to generate keystore.");
-            }
+            logger.info("Generated truststore " + TRUSTSTORENAME);
         }
-        logger.info("Generated truststore " + TRUSTSTORENAME);
+        else
+        {
+            throw new ShareException("Exception occurred when generation truststore");
+        }
         return new File(pathToKeyStoreFile + SLASH + TRUSTSTORENAME);
     }
 
@@ -165,6 +174,33 @@ public class FtpsUtil extends AbstractUtils
         {
             String trustStrFilePathOnSys = trustStore.getAbsolutePath();
             JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", trustStrFilePathOnSys);
+            JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", PASS);
+            JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+        }
+        logger.info("FTPS is on.");
+    }
+
+    /**
+     * Method to enable ftps based on keystores' paths
+     *
+     * @param pathToKeyStoreFile
+     * @param pathToTrustStoreFile
+     * @throws Exception
+     */
+    public static void enableFtps(String pathToKeyStoreFile, String pathToTrustStoreFile) throws Exception
+    {
+        JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.enabled", true);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", true);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", pathToKeyStoreFile);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", PASS);
+        if (pathToTrustStoreFile == null)
+        {
+            JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+        }
+        else
+        {
+            JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", pathToTrustStoreFile);
             JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", PASS);
             JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
         }

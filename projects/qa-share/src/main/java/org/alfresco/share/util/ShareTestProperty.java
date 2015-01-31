@@ -84,6 +84,8 @@ public class ShareTestProperty
     private String apiKey;
     private String apiSecretKey;
     private String replicationEndPointHost;
+    private String keystorePath;
+    private String truststorePath;
 
     public ShareTestProperty(final String shareUrl, final String apiUrl, final String gridUrl, final String username, final String password, String alfrescoVersion,
             String cloudUrlForHybrid, final String pentahoUserConsoleUrl, final String downloadDirectory, final String googleUserName, final String googlePassword,
@@ -93,7 +95,7 @@ public class ShareTestProperty
             final String uniqueTestDataString, final String adminUsername, final String adminPassword, final String superadminUsername,
             final String superadminPassword, final int httpSecurePort, final String headerKey, final String mimeTypes, final String jmxrmiPort, final String jmxrmiUser, final String jmxrmiPassword, final String nodePort, final String licenseShare, final String maxWaitTimeCloudSync,
             final String blogUrl, final String blogUsername, final String blogPassword, final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String replicationEndPointHost,
-            final String layer7Disabled, final String apiKey, final String apiSecretKey)
+            final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath)
     {
         this.shareUrl = shareUrl;
         this.apiUrl = apiUrl;
@@ -146,6 +148,8 @@ public class ShareTestProperty
         this.layer7Disabled = layer7Disabled;
         this.apiKey = apiKey;
         this.apiSecretKey = apiSecretKey;
+        this.keystorePath = keystorePath;
+        this.truststorePath = truststorePath;
     }
 
     public String getMaxWaitTimeCloudSync()
@@ -613,4 +617,13 @@ public class ShareTestProperty
         return apiSecretKey;
     }
 
+    public String getKeystorePath()
+    {
+        return  keystorePath;
+    }
+
+    public String getTruststorePath()
+    {
+        return  truststorePath;
+    }
 }

@@ -1,6 +1,7 @@
 package org.alfresco.share.repository;
 
 import org.alfresco.po.share.enums.UserRole;
+import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.util.PageUtils;
@@ -51,8 +52,15 @@ public class RepositoryFtpsTest extends FtpsUtil
         server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
         logger.info("Starting Tests: " + testName);
         FtpsUtil.setCustomFtpPort(drone, ftpPort);
-        File keyStore = FtpsUtil.generateKeyStore(getRandomString(6));
-        FtpsUtil.enableFtps(keyStore, null);
+        if(!(keystorePath == null))
+        {
+            FtpsUtil.enableFtps(keystorePath, truststorePath);
+        }
+        else
+        {
+            File keyStore = FtpsUtil.generateKeyStore(getRandomString(6));
+            FtpsUtil.enableFtps(keyStore, null);
+        }
     }
 
     /**
@@ -68,9 +76,21 @@ public class RepositoryFtpsTest extends FtpsUtil
         FtpsUtil.disableFtps();
 
         //generating keystore and truststore
-        File keyStoreFile = FtpsUtil.generateKeyStore(keyStoreName);
-        File trustStoreFile = FtpsUtil.generateTrustStore(keyStoreFile, trustStoreName);
-        FtpsUtil.enableFtps(keyStoreFile, trustStoreFile);
+        //when alfresco is running on remote host - files must be pre-generated
+        if(!(keystorePath == null) & !(truststorePath == null))
+        {
+            FtpsUtil.enableFtps(keystorePath, truststorePath);
+        }
+        else if (!(keystorePath == null) & truststorePath == null)
+        {
+            throw new ShareException("Please, specify truststorePath in the properties file.");
+        }
+        else
+        {
+            File keyStoreFile = FtpsUtil.generateKeyStore(keyStoreName);
+            File trustStoreFile = FtpsUtil.generateTrustStore(keyStoreFile, trustStoreName);
+            FtpsUtil.enableFtps(keyStoreFile, trustStoreFile);
+        }
 
         //log in and check ftps is on
         TrustManager trustManager = TrustManagerUtils.getValidateServerCertificateTrustManager();
@@ -95,8 +115,16 @@ public class RepositoryFtpsTest extends FtpsUtil
         FtpsUtil.disableFtps();
 
         //generating keystore only
-        File keyStoreFile = FtpsUtil.generateKeyStore(keyStoreName);
-        FtpsUtil.enableFtps(keyStoreFile, null);
+        //when alfresco is running on remote host - file must be pre-generated
+        if(!(keystorePath == null))
+        {
+            FtpsUtil.enableFtps(keystorePath, null);
+        }
+        else
+        {
+            File keyStoreFile = FtpsUtil.generateKeyStore(keyStoreName);
+            FtpsUtil.enableFtps(keyStoreFile, null);
+        }
 
         //log in and check ftps is on
         TrustManager trustManager = TrustManagerUtils.getValidateServerCertificateTrustManager();
@@ -143,8 +171,17 @@ public class RepositoryFtpsTest extends FtpsUtil
     @Test
     public void AONE_6457() throws Exception
     {
-        File keyStore = FtpsUtil.generateKeyStore(getRandomString(6));
-        FtpsUtil.enableFtps(keyStore, null);
+        //generating keystore only
+        //when alfresco is running on remote host - file must be pre-generated
+        if(!(keystorePath == null))
+        {
+            FtpsUtil.enableFtps(keystorePath, null);
+        }
+        else
+        {
+            File keyStoreFile = FtpsUtil.generateKeyStore(getRandomString(6));
+            FtpsUtil.enableFtps(keyStoreFile, null);
+        }
 
         //log in through FTP
         FTPClient ftpClient = new FTPClient();
