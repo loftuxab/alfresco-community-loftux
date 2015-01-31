@@ -4,6 +4,7 @@ import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
+import org.alfresco.po.share.admin.ActionsSet;
 import org.alfresco.po.share.search.FacetedSearchPage;
 import org.alfresco.po.share.search.SearchBox;
 import org.alfresco.po.share.site.document.ContentDetails;
@@ -177,11 +178,13 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         
         // Check the results
         Assert.assertTrue(facetedSearchPage.getResults().size() > 0, "After searching for text there should be some search results");
-        
-        Assert.assertTrue(facetedSearchPage.getResultByName(name).getActions().hasActionByName(actionName1));
-        Assert.assertTrue(facetedSearchPage.getResultByName(name1).getActions().hasActionByName(actionName2));        
-        Assert.assertFalse(facetedSearchPage.getResultByName(name2).getActions().hasActionByName(actionName3));        
-        Assert.assertFalse(facetedSearchPage.getResultByName(name3).getActions().hasActionByName(actionName4));        
+
+        ActionsSet actionsSet = facetedSearchPage.getResultByName(name).getActions();
+
+        Assert.assertTrue(actionsSet.hasActionByName(actionName1));
+        Assert.assertTrue(facetedSearchPage.getResultByName(name1).getActions().hasActionByName(actionName2));
+        Assert.assertFalse(facetedSearchPage.getResultByName(name2).getActions().hasActionByName(actionName3));
+        Assert.assertFalse(facetedSearchPage.getResultByName(name3).getActions().hasActionByName(actionName4));
         Assert.assertFalse(facetedSearchPage.getResultByName(name4).getActions().hasActionByName(actionName5));
 
         trace("searchAndClickDownloadActionTest complete" );
@@ -263,6 +266,11 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         // Login as user1
         userLogin1();
 
+        drone.deleteCookies();
+        drone.refresh();
+        drone.getCurrentPage().render();
+        userLogin1();
+
         // Do a search 
         doretrySearch(name);
 
@@ -311,6 +319,11 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         String name = "e-fs-test1.txt";
         
         // Login as user1
+        userLogin1();
+
+        drone.deleteCookies();
+        drone.refresh();
+        drone.getCurrentPage().render();
         userLogin1();
 
         // Do a search
@@ -376,6 +389,11 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         String name1 = "c-fs-test1.txt";
         
         // Login as user1
+        userLogin1();
+
+        drone.deleteCookies();
+        drone.refresh();
+        drone.getCurrentPage().render();
         userLogin1();
 
         // Do a search
@@ -469,6 +487,11 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         String actionName5 = "Manage Permissions";      
                 
         // Login as user1
+        userLogin1();
+
+        drone.deleteCookies();
+        drone.refresh();
+        drone.getCurrentPage().render();
         userLogin1();
 
         String testName = getTestName();
