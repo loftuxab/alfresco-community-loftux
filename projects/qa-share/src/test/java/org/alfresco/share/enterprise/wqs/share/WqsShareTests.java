@@ -1,28 +1,42 @@
 package org.alfresco.share.enterprise.wqs.share;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.testng.Assert.assertTrue;
+
 import java.io.File;
 import java.util.List;
 
+import org.alfresco.po.alfresco.WcmqsArticleDetails;
+import org.alfresco.po.alfresco.WcmqsEditPage;
 import org.alfresco.po.alfresco.WcmqsHomePage;
+import org.alfresco.po.alfresco.WcmqsLoginPage;
+import org.alfresco.po.alfresco.WcmqsNewsArticleDetails;
 import org.alfresco.po.alfresco.WcmqsNewsPage;
 import org.alfresco.po.alfresco.WcmqsAllPublicationsPage;
 import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
 import org.alfresco.po.share.dashlet.WebQuickStartOptions;
 import org.alfresco.po.share.enums.Dashlets;
+import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.SiteType;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.EditHtmlDocumentPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.InlineEditPage;
 import org.alfresco.po.share.site.document.MimeType;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
@@ -37,6 +51,11 @@ public class WqsShareTests extends AbstractUtils
     String newsName;;
     String wcmqsURL = "http://localhost:8080/wcmqs";
     String siteName;
+    public static final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
+    public static final String QUICK_START_EDITORIAL = "Quick Start Editorial";
+    public static final String ROOT = "root";
+    public static final String NEWS = "news";
+    public static final String INDEX_HTML = "index.html";
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -45,7 +64,7 @@ public class WqsShareTests extends AbstractUtils
         super.setup();
         testName = this.getClass().getSimpleName();
         newsName = "cont2" + getFileName(testName) + ".html";
-        siteName = getSiteName(testName) + "5";
+        siteName = getSiteName(testName) + "5555";
         logger.info("Start tests:" + testName);
     }
 
@@ -65,8 +84,220 @@ public class WqsShareTests extends AbstractUtils
         SiteWebQuickStartDashlet wqsDashlet = siteDashboardPage.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
         wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
         wqsDashlet.clickImportButtton();
+        wqsDashlet.waitForImportMessage();
+        
+        ShareUser.logout(drone);
     }
 
+    
+   
+    
+    
+    @Test(groups = "AlfrescoOne")
+    public void AONE_5595() throws Exception
+    {
+        // --- Step 1 ---
+        // --- Step action ---
+        // Click Create site link;
+        // --- Expected results ---
+        // Create Site window is opened;
+
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "-op", DOMAIN_HYBRID);
+        String[] userInfo1 = new String[] { user1 };
+
+        String siteName = testName + "SiteName";
+        String siteURL = testName + "SiteURL";
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        SharePage page = ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+
+        CreateSitePage createSitePage = page.getNav().selectCreateSite().render();
+        assertTrue(createSitePage.isCreateSiteDialogDisplayed());
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Fill in mandatory fields:
+        // Name: My Web Site URL Name: MyWebSite Type: Collaboration site Visibility: Public
+        // --- Expected results ---
+        // Data is entered successfully;
+
+        createSitePage.setSiteName(siteName);
+        createSitePage.setSiteURL(siteURL);
+        createSitePage.selectSiteType(SiteType.COLLABORATION);
+        createSitePage.selectSiteVisibility(false, false);
+
+        Assert.assertEquals(createSitePage.getSiteName(), siteName);
+        Assert.assertEquals(createSitePage.getSiteUrl(), siteURL);
+        Assert.assertEquals(createSitePage.getSiteType().get(0), "Collaboration Site");
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Click OK button;
+        // --- Expected results ---
+        // Site is created, Site dashboard page is opened;
+
+        SiteDashboardPage siteDashboardPage = createSitePage.selectOk().render();
+        assertTrue(siteDashboardPage.isSiteTitle(siteName));
+
+        // --- Step 4 ---
+        // --- Step action ---
+        // Add "WCM Quick Start" dashlet to site dashboard
+        // --- Expected results ---
+        // Dashlet is added to dashboard;
+
+        CustomiseSiteDashboardPage customiseSiteDashboardPage = siteDashboardPage.getSiteNav().selectCustomizeDashboard().render();
+        siteDashboardPage = customiseSiteDashboardPage.addDashlet(Dashlets.WEB_QUICK_START, 1).render();
+
+        List<String> dashletTitles = siteDashboardPage.getTitlesList();
+        Assert.assertTrue(dashletTitles.contains("Web Quick Start"));
+
+        // --- Step 5 ---
+        // --- Step action ---
+        // Click 'Import Web Site Data' link on WCM Quick Start dashlet
+        // --- Expected results ---
+        // "Web Site data import successful" notification is dislpayed;
+
+        SiteWebQuickStartDashlet wqsDashlet = siteDashboardPage.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
+        wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
+        wqsDashlet.clickImportButtton();
+
+        assertTrue(wqsDashlet.isImportMessageDisplayed());
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = { "AlfrescoOne" })
+    public void AONE_5598() throws Exception
+    {
+    
+        // ---- PREP 2 ----
+        // ---- Step Action -----
+        // Site "My Web Site" is created in Alfresco Share;
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+//        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+//
+//        // ---- PREP 3 ----
+//        // ---- Step Action -----
+//        // WCM Quick Start Site Data is imported;
+//        SiteDashboardPage siteDashBoard = ShareUserDashboard.addDashlet(drone, siteName, Dashlets.WEB_QUICK_START);
+//
+//        SiteWebQuickStartDashlet wqsDashlet = siteDashBoard.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
+//        wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
+//        wqsDashlet.clickImportButtton();
+//        wqsDashlet.waitForImportMessage();
+
+        // ---- Step 1 ----
+        // ---- Step Action
+        // Navigate to any folder, where content is situated(e.g. Alfresco Quick Start > Quick Start Editorial);
+        // ---- Expected results ----
+        // Folder is opened successfully;
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(NEWS).render();
+
+        // ---- Step 2 ----
+        // ---- Step Action
+        // Click "Preview web asset" for any file;
+        // ---- Expected Results ----
+        // File opened correctly in new/tab window;
+
+        int initial = drone.getWindowHandles().size();
+        
+        FileDirectoryInfo selection = documentLibraryPage.getFileDirectoryInfo(INDEX_HTML);
+        selection.selectPreviewWebAsset();
+
+        drone.waitForWindowsCount(initial + 1, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+        String newHandle = (String) drone.getWindowHandles().toArray()[initial];
+        drone.switchToWindow(newHandle);
+        
+        assertTrue(drone.getCurrentUrl().endsWith(INDEX_HTML));
+        ShareUser.logout(drone);
+        
+    }
+    
+    
+    @Test(groups = { "AlfrescoOne" })
+    public void AONE_5600() throws Exception
+    {
+        String expectedSiteConfiguration = "isEditorial=true";
+        String siteName = getSiteName(testName) + System.currentTimeMillis();
+        String testName = getTestName();
+
+        String newsArticleTitle;
+        String newsArticleName;
+
+        // ---- PREP 2 ----
+        // ---- Step Action -----
+        // Site "My Web Site" is created in Alfresco Share;
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+
+        // ---- Step 3 ----
+        // ---- Step Action -----
+        // WCM Quick Start Site Data is imported;
+        SiteDashboardPage siteDashBoard = ShareUserDashboard.addDashlet(drone, siteName, Dashlets.WEB_QUICK_START);
+
+        SiteWebQuickStartDashlet wqsDashlet = siteDashBoard.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
+        wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
+        wqsDashlet.clickImportButtton();
+        wqsDashlet.waitForImportMessage();
+
+        // ---- Step 1 ----
+        // ---- Step Action ----
+        // Navigate to Quick Start Editorial folder;
+        // ---- Expected Results ----
+        // Folder is opened successfully;
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone);
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START);
+
+        // ---- Step 2 ----
+        // ---- Step Action ----
+        // Click "Edit Metadata" link;
+        // ---- Expected Results ----
+        // Edit Metadata window is opened successfully;
+
+        FileDirectoryInfo quickStartFileDirectoryInfo = documentLibraryPage.getFileDirectoryInfo(QUICK_START_EDITORIAL);
+        EditDocumentPropertiesPage editDocumentPropertiesPage = quickStartFileDirectoryInfo.selectEditProperties().render();
+        // ---- Step 3 ----
+        // ---- Step Action ----
+        // Verify Site Configuration field data;
+        // ---- Expected Results ----
+        // Site Configuration field contains "isEditorial=true" data;
+
+        String siteConfiguration = editDocumentPropertiesPage.getSiteConfiguration();
+        Assert.assertTrue(siteConfiguration.contains(expectedSiteConfiguration));
+
+        // ---- Step 4 ----
+        // ---- Step Action ----
+        // Navigate WCMQS site, edit any item and save changes;
+        // ---- Expected Results ----
+        // Site is opened successfully, item's changes saved correctly;
+
+        drone.navigateTo(wcmqsURL);
+        WcmqsHomePage wqsPage = new WcmqsHomePage(drone).render();
+
+        WcmqsNewsArticleDetails wcmqsNewsArticle = wqsPage.selectFirstArticleFromLeftPanel().render();
+        WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone).render();
+        wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+        WcmqsEditPage wcmqsEditPage = wcmqsNewsArticle.clickEditButton();
+        WcmqsArticleDetails wcmqsArticleDetails = wcmqsEditPage.getArticleDetails();
+        newsArticleName = wcmqsArticleDetails.getName();
+
+        wcmqsEditPage.editTitle(testName);
+        wcmqsEditPage.clickSubmitButton();
+
+        WcmqsNewsPage wcmqsNewsPage = new WcmqsNewsPage(drone);
+        newsArticleTitle = wcmqsNewsPage.getNewsTitle(newsArticleName);
+        Assert.assertTrue(newsArticleTitle.contains(testName));
+    }
+    
     @Test(groups = "EnterpriseOnly")
     public void AONE_5602() throws Exception
     {
