@@ -39,7 +39,7 @@ public class CommentDirectoryInfo extends HtmlElement
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find " + EDIT_LINK);
+            throw new ShareException("Unable to find " + EDIT_LINK, te);
         }
     }
 
@@ -63,7 +63,7 @@ public class CommentDirectoryInfo extends HtmlElement
      *
      * @return boolean
      */
-    public boolean isEditDisplayed ()
+    public boolean isEditDisplayed()
     {
         try
         {
@@ -81,7 +81,7 @@ public class CommentDirectoryInfo extends HtmlElement
      *
      * @return boolean
      */
-    public boolean isDeleteDisplayed ()
+    public boolean isDeleteDisplayed()
     {
         try
         {

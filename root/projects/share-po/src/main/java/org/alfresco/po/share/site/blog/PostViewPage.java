@@ -1,15 +1,11 @@
 package org.alfresco.po.share.site.blog;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.base.CharMatcher;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
@@ -17,7 +13,11 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import com.google.common.base.CharMatcher;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 /**
  * Page object to represent Post View page
@@ -84,7 +84,7 @@ public class PostViewPage extends BlogPage
         }
         catch (NoSuchElementException nse)
         {
-            logger.error("Unable to find comment button");
+            throw new PageOperationException("Unable to find comment button", nse);
         }
         return new BlogCommentForm(drone);
     }
@@ -106,18 +106,16 @@ public class PostViewPage extends BlogPage
         {
             return new PostViewPage(drone).render();
         }
-        throw new ShareException("Comment wasn't added");
+        throw new PageOperationException("Comment wasn't added");
     }
 
     private boolean isCommentPresent(String comment)
     {
         boolean isPresent = false;
         List<WebElement> allComments = drone.findAll(COMMENT_CONTENT);
-        for (WebElement allTheComments: allComments)
+        for (WebElement allTheComments : allComments)
         {
-           isPresent = allTheComments.getText().equalsIgnoreCase(comment);
-            if (isPresent)
-                return isPresent;
+            isPresent = allTheComments.getText().equalsIgnoreCase(comment);
         }
         return isPresent;
     }
@@ -127,7 +125,7 @@ public class PostViewPage extends BlogPage
      *
      * @return int
      */
-    public int getCommentCount ()
+    public int getCommentCount()
     {
         try
         {
@@ -146,7 +144,7 @@ public class PostViewPage extends BlogPage
         {
             return drone.findAndWait(locator, 2000).isEnabled();
         }
-        catch (TimeoutException e)
+        catch (TimeoutException te)
         {
             return false;
         }
@@ -177,7 +175,7 @@ public class PostViewPage extends BlogPage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find " + BACK_LINK);
+            throw new PageOperationException("Unable to find " + BACK_LINK, te);
         }
         return drone.getCurrentPage().render();
     }
@@ -192,14 +190,11 @@ public class PostViewPage extends BlogPage
         try
         {
             String actualTitle = drone.find(POST_TITLE).getText();
-            if (title.equals(actualTitle))
-                return true;
-            else
-                return false;
+            return title.equals(actualTitle);
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Timed out finding the post");
+            throw new PageOperationException("Timed out finding the post", te);
         }
     }
 
@@ -212,11 +207,11 @@ public class PostViewPage extends BlogPage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find " + EDIT_LINK);
+            throw new PageOperationException("Unable to find " + EDIT_LINK, te);
         }
     }
 
-    private CommentDirectoryInfo getCommentDirectoryInfo (String title)
+    private CommentDirectoryInfo getCommentDirectoryInfo(String title)
     {
         if (title == null || title.isEmpty())
         {
@@ -230,13 +225,13 @@ public class PostViewPage extends BlogPage
             row = drone.findAndWait(By.xpath(String.format("//div[@class='comment-content']/p[text()='%s']/../..", title)), WAIT_TIME_3000);
             drone.mouseOverOnElement(row);
         }
-        catch (NoSuchElementException e)
+        catch (NoSuchElementException nse)
         {
-            throw new PageException(String.format("File directory info with title %s was not found", title), e);
+            throw new PageException(String.format("File directory info with title %s was not found", title), nse);
         }
-        catch (TimeoutException e)
+        catch (TimeoutException te)
         {
-            throw new PageException(String.format("File directory info with title %s was not found", title), e);
+            throw new PageException(String.format("File directory info with title %s was not found", title), te);
         }
         return new CommentDirectoryInfo(drone, row);
     }
@@ -246,28 +241,20 @@ public class PostViewPage extends BlogPage
      *
      * @param oldComment
      * @param newComment
-     *
      * @return PostViewPage
      */
-    public PostViewPage editBlogComment (String oldComment, String newComment)
+    public PostViewPage editBlogComment(String oldComment, String newComment)
     {
-        try
+        getCommentDirectoryInfo(oldComment).clickEdit();
+        BlogCommentForm blogCommentForm = new BlogCommentForm(drone);
+        blogCommentForm.insertText(newComment);
+        blogCommentForm.clickAddComment();
+        waitUntilAlert();
+        if (isCommentPresent(newComment))
         {
-            getCommentDirectoryInfo(oldComment).clickEdit();
-            BlogCommentForm blogCommentForm = new BlogCommentForm(drone);
-            blogCommentForm.insertText(newComment);
-            blogCommentForm.clickAddComment();
-            waitUntilAlert();
-            if(isCommentPresent(newComment))
-            {
-                return new PostViewPage(drone).render();
-            }
-            throw new ShareException("Comment wasn't be edited");
+            return new PostViewPage(drone).render();
         }
-        catch (TimeoutException te)
-        {
-            throw new ShareException("Unable to edit the comment");
-        }
+        throw new PageOperationException("Comment can't be edited");
     }
 
     private void clickDelete()
@@ -278,7 +265,7 @@ public class PostViewPage extends BlogPage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find " + DELETE_LINK);
+            throw new PageOperationException("Unable to find " + DELETE_LINK, te);
         }
     }
 
@@ -287,7 +274,6 @@ public class PostViewPage extends BlogPage
      *
      * @param newTitle
      * @param newLines
-     *
      * @return PostViewPage
      */
     public PostViewPage editBlogPostAndUpdate(String newTitle, String newLines, List<String> tags)
@@ -309,7 +295,6 @@ public class PostViewPage extends BlogPage
      *
      * @param newTitle
      * @param newLines
-     *
      * @return PostViewPage
      */
     public PostViewPage editBlogPostAndPublishInternally(String newTitle, String newLines, List<String> tags)
@@ -332,7 +317,6 @@ public class PostViewPage extends BlogPage
      * @param newTitle
      * @param newLines
      * @param tags
-     *
      * @return PostViewPage
      */
     public PostViewPage editBlogPostAndPublishExternally(String newTitle, String newLines, List<String> tags)
@@ -345,40 +329,12 @@ public class PostViewPage extends BlogPage
             editPostForm.addTag(tags);
         }
         editPostForm.clickUpdateInternallyPublishExternally();
-        if(hasErrorMessage())
+        if (hasErrorMessage())
         {
             waitUntilAlert();
         }
         logger.info("Edited blog post" + newTitle + "and published it externally");
         return new PostViewPage(drone).render();
-    }
-
-    /**
-     * Method to verify whether prompt is displayed
-     *
-     * @return true if displayed
-     */
-    public boolean isPromptDisplayed()
-    {
-        boolean isPrompt;
-        try
-        {
-            isPrompt = drone.find(PROMPT_PANEL_ID).isDisplayed();
-        }
-        catch (NoSuchElementException nse)
-        {
-            isPrompt = false;
-        }
-        return isPrompt;
-    }
-
-    /**
-     * Method to click Ok button on prompt pop-up
-     */
-    public void clickOkOnPrompt()
-    {
-        WebElement okButton = drone.findAndWait(By.cssSelector(".default button"));
-        okButton.click();
     }
 
     /**
@@ -395,7 +351,7 @@ public class PostViewPage extends BlogPage
         }
         catch (NoSuchElementException nse)
         {
-            throw new ShareException("Unable to retrieve the prompt message");
+            throw new ShareException("Unable to retrieve the prompt message", nse);
         }
         return promptText;
     }
@@ -405,7 +361,7 @@ public class PostViewPage extends BlogPage
      *
      * @return BlogPage
      */
-    public BlogPage deleteBlogPostWithConfirm ()
+    public BlogPage deleteBlogPostWithConfirm()
     {
         try
         {
@@ -417,7 +373,7 @@ public class PostViewPage extends BlogPage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to delete a post");
+            throw new PageOperationException("Unable to delete a post", te);
         }
     }
 
@@ -427,7 +383,7 @@ public class PostViewPage extends BlogPage
      * @param commentTitle
      * @return PostViewPage
      */
-    public PostViewPage deleteCommentWithConfirm (String commentTitle)
+    public PostViewPage deleteCommentWithConfirm(String commentTitle)
     {
         try
         {
@@ -437,7 +393,7 @@ public class PostViewPage extends BlogPage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to delete the comment");
+            throw new PageOperationException("Unable to delete the comment", te);
         }
         logger.info("Deleted blog comment");
         return drone.getCurrentPage().render();
@@ -448,7 +404,7 @@ public class PostViewPage extends BlogPage
      *
      * @return true if displayed
      */
-    public boolean isEditPostDisplayed ()
+    public boolean isEditPostDisplayed()
     {
         return drone.isElementDisplayed(EDIT_LINK);
     }
@@ -458,34 +414,36 @@ public class PostViewPage extends BlogPage
      *
      * @return true if displayed
      */
-    public boolean isDeletePostDisplayed ()
+    public boolean isDeletePostDisplayed()
     {
         return drone.isElementDisplayed(DELETE_LINK);
     }
 
     /**
      * Method to verify whether edit comment is displayed
+     *
      * @param comment
      * @return true if displayed
      */
-    public boolean isEditCommentDisplayed (String comment)
+    public boolean isEditCommentDisplayed(String comment)
     {
         return getCommentDirectoryInfo(comment).isEditDisplayed();
     }
 
     /**
      * Method to verify whether delete comment is displayed
+     *
      * @param comment
      * @return true if displayed
      */
-    public boolean isDeleteCommentDisplayed (String comment)
+    public boolean isDeleteCommentDisplayed(String comment)
     {
         return getCommentDirectoryInfo(comment).isDeleteDisplayed();
     }
 
     /**
      * Method to retrieve tag added to Blog
-     * 
+     *
      * @return String
      */
     public String getTagName()
@@ -496,18 +454,23 @@ public class PostViewPage extends BlogPage
             {
                 String tagName = drone.findAndWait(TAG).getText();
                 if (!tagName.isEmpty())
+                {
                     return tagName;
+                }
                 else
+                {
                     throw new IllegalArgumentException("Cannot find tag");
-
+                }
             }
             else
+            {
                 return drone.find(TAG_NONE).getText();
+            }
 
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to retrieve the tag");
+            throw new PageOperationException("Unable to retrieve the tag", te);
         }
     }
 
@@ -517,14 +480,14 @@ public class PostViewPage extends BlogPage
         try
         {
             List<WebElement> listOfTags = drone.findAndWaitForElements(TAG);
-            for(WebElement listOfTheTags : listOfTags)
+            for (WebElement listOfTheTags : listOfTags)
             {
                 tagList.add(listOfTheTags.getText());
             }
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find the list of tags");
+            throw new PageOperationException("Unable to find the list of tags", te);
         }
         return tagList;
     }
@@ -537,7 +500,7 @@ public class PostViewPage extends BlogPage
      * @param tags
      * @return
      */
-    public boolean isPostCorrect(String postTitle, String postText, List <String> tags)
+    public boolean isPostCorrect(String postTitle, String postText, List<String> tags)
     {
         boolean isCorrect;
         if (tags == null)
@@ -562,7 +525,7 @@ public class PostViewPage extends BlogPage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find " + POST_TEXT);
+            throw new PageOperationException("Unable to find " + POST_TEXT, te);
         }
     }
 
@@ -577,16 +540,16 @@ public class PostViewPage extends BlogPage
         try
         {
             boolean isTagNone = drone.isElementDisplayed(TAG_NONE);
-            if(isTagNone)
+            if (isTagNone)
             {
-                throw new PageException("There is no tags!");
+                throw new PageOperationException("There is no tags!");
             }
             else
             {
                 List<WebElement> availableTags = drone.findAll(TAG);
-                for(WebElement eachTag : availableTags)
+                for (WebElement eachTag : availableTags)
                 {
-                    if(eachTag.getText().contentEquals(tagName))
+                    if (eachTag.getText().contentEquals(tagName))
                     {
                         eachTag.click();
                         drone.waitForPageLoad(5);
@@ -597,7 +560,7 @@ public class PostViewPage extends BlogPage
         }
         catch (NoSuchElementException nse)
         {
-            throw new PageException("Not able to find the tags");
+            throw new PageOperationException("Not able to find the tags", nse);
         }
         return drone.getCurrentPage().render();
     }
@@ -615,7 +578,7 @@ public class PostViewPage extends BlogPage
             checkNotNull(comment);
             return isCommentButtonsEnableAndDisplay(comment) && isCommentAvatarDisplay(comment) && isCommentatorNameDisplayAndEnable(comment);
         }
-        catch (NoSuchElementException e)
+        catch (NoSuchElementException nse)
         {
             return false;
         }
@@ -659,21 +622,21 @@ public class PostViewPage extends BlogPage
         try
         {
             status = drone.find(POST_STATUS).getText();
-            String [] parts = status.split("\\) ");
+            String[] parts = status.split("\\) ");
 
             for (String thePart : parts)
             {
                 thePart = CharMatcher.anyOf(charsToRemove).removeFrom(thePart);
                 postStatus.add(thePart);
             }
-            if(postStatus.isEmpty())
+            if (postStatus.isEmpty())
             {
                 throw new ShareException("The post has not status");
             }
         }
         catch (NoSuchElementException nse)
         {
-            throw new ShareException("Unable to find " + POST_STATUS);
+            throw new PageOperationException("Unable to find " + POST_STATUS, nse);
         }
         return postStatus;
     }
@@ -693,7 +656,7 @@ public class PostViewPage extends BlogPage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find " + UPDATE_EXTERNALLY);
+            throw new PageOperationException("Unable to find " + UPDATE_EXTERNALLY, te);
         }
         logger.info("Updated post externally");
         return drone.getCurrentPage().render();
@@ -714,7 +677,7 @@ public class PostViewPage extends BlogPage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find " + REMOVE_EXTERNALLY);
+            throw new PageOperationException("Unable to find " + REMOVE_EXTERNALLY, te);
         }
         logger.info("Removed post from external blog");
         return drone.getCurrentPage().render();
@@ -731,7 +694,7 @@ public class PostViewPage extends BlogPage
         {
             return drone.find(By.cssSelector("div.bd")).isDisplayed();
         }
-        catch (NoSuchElementException e)
+        catch (NoSuchElementException nse)
         {
             return false;
         }

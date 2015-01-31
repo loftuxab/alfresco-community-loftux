@@ -1,20 +1,20 @@
 package org.alfresco.po.share.site.blog;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.List;
-
 import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Abstract of Blog post Form
@@ -61,15 +61,8 @@ public abstract class AbstractPostForm extends SharePage
 
     private void setInput(final WebElement input, final String value)
     {
-        try
-        {
-            input.clear();
-            input.sendKeys(value);
-        }
-        catch (NoSuchElementException e)
-        {
-            logger.debug("Unable to find " + input);
-        }
+        input.clear();
+        input.sendKeys(value);
     }
 
     /**
@@ -79,7 +72,14 @@ public abstract class AbstractPostForm extends SharePage
      */
     protected void setTitleField(final String title)
     {
-        setInput(drone.findAndWait(TITLE_FIELD), title);
+        try
+        {
+            setInput(drone.findAndWait(TITLE_FIELD), title);
+        }
+        catch (TimeoutException te)
+        {
+            throw new PageOperationException("Unable to find " + TITLE_FIELD, te);
+        }
     }
 
     /**
@@ -91,12 +91,12 @@ public abstract class AbstractPostForm extends SharePage
     {
         try
         {
-             String setCommentJs = String.format("tinyMCE.activeEditor.setContent('%s');", txtLines);
-             drone.executeJavaScript(setCommentJs);
+            String setCommentJs = String.format("tinyMCE.activeEditor.setContent('%s');", txtLines);
+            drone.executeJavaScript(setCommentJs);
         }
         catch (TimeoutException toe)
         {
-            logger.error("Time out finding #tinymce", toe);
+            throw new PageOperationException("Time out finding #tinymce", toe);
         }
     }
 
@@ -105,15 +105,15 @@ public abstract class AbstractPostForm extends SharePage
      */
     protected PostViewPage clickSaveAsDraft()
     {
-        WebElement saveButton = drone.findAndWait(DEFAULT_SAVE);
         try
         {
+            WebElement saveButton = drone.findAndWait(DEFAULT_SAVE);
             saveButton.click();
             return new PostViewPage(drone).render();
         }
-        catch (NoSuchElementException e)
+        catch (TimeoutException te)
         {
-            throw new PageException("Unable to find Save button");
+            throw new PageException("Unable to find Save button", te);
         }
     }
 
@@ -128,9 +128,9 @@ public abstract class AbstractPostForm extends SharePage
             saveButton.click();
             return new PostViewPage(drone).render();
         }
-        catch (NoSuchElementException e)
+        catch (TimeoutException te)
         {
-            throw new PageException("Unable to find Save button");
+            throw new PageException("Unable to find Save button", te);
         }
     }
 
@@ -142,9 +142,9 @@ public abstract class AbstractPostForm extends SharePage
             saveButton.click();
             return new PostViewPage(drone).render();
         }
-        catch (NoSuchElementException e)
+        catch (TimeoutException te)
         {
-            throw new PageException("Unable to find Save button");
+            throw new PageException("Unable to find Save button", te);
         }
     }
 
@@ -161,7 +161,7 @@ public abstract class AbstractPostForm extends SharePage
         try
         {
             WebElement inputTag = drone.findAndWait(POST_TAG_INPUT);
-            for (String tagToAdd: tags)
+            for (String tagToAdd : tags)
             {
                 tagsToAdd += tagToAdd + " ";
             }
@@ -171,11 +171,11 @@ public abstract class AbstractPostForm extends SharePage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find " + POST_TAG_INPUT);
+            throw new PageOperationException("Unable to find " + POST_TAG_INPUT, te);
         }
         catch (NoSuchElementException nse)
         {
-            throw new ShareException("Unable to find " + ADD_TAG_BUTTON);
+            throw new PageOperationException("Unable to find " + ADD_TAG_BUTTON, nse);
         }
         return new NewPostForm(drone);
     }
@@ -188,15 +188,14 @@ public abstract class AbstractPostForm extends SharePage
      */
     public NewPostForm addTag(String tag)
     {
-
         checkNotNull(tag);
         WebElement inputTag = drone.findAndWait(POST_TAG_INPUT);
         inputTag.sendKeys(tag);
         WebElement addButton = drone.find(ADD_TAG_BUTTON);
         addButton.click();
-
         return new NewPostForm(drone);
     }
+
     /**
      * Method for removing tag
      * method validate by BlogPageTest.removeTag
@@ -213,11 +212,10 @@ public abstract class AbstractPostForm extends SharePage
             element.click();
             drone.waitUntilElementDisappears(By.xpath(tagXpath), 3000);
         }
-        catch (NoSuchElementException e)
+        catch (NoSuchElementException nse)
         {
             logger.debug("Unable to find tag");
-            throw new PageException("Unable to find tag " + tag + "");
+            throw new PageOperationException("Unable to find tag " + tag + "", nse);
         }
     }
-
 }
