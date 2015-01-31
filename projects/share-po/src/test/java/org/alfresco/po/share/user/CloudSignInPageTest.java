@@ -1,18 +1,14 @@
 /*
  * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
  * This file is part of Alfresco
- *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -104,7 +100,7 @@ public class CloudSignInPageTest extends AbstractTest
         assertTrue(drone.getTitle().contains("Cloud Document Management"), "Title not matched. Was found to be - " + drone.getTitle());
         closeWindowAndSwitchBack();
     }
-    
+
     /**
      * Log a user into Alfresco with valid credentials and then logout
      * 
@@ -117,7 +113,7 @@ public class CloudSignInPageTest extends AbstractTest
         Assert.assertEquals(cloudSignInPage.getPageTitle(), "Sign in to Alfresco in the cloud");
         Assert.assertTrue(cloudSignInPage.isForgotPasswordLinkDisplayed());
         Assert.assertEquals(cloudSignInPage.getForgotPasswordURL(), "https://my.alfresco.com/share/page/forgot-password");
- }
+    }
 
     /**
      * Closes the newly created win and swithes back to main
@@ -142,7 +138,7 @@ public class CloudSignInPageTest extends AbstractTest
     /**
      * Log a user into Alfresco with valid credentials and verify
      * the return page.
-     *
+     * 
      * @throws Exception
      *             if error
      */
@@ -161,6 +157,32 @@ public class CloudSignInPageTest extends AbstractTest
         documentLibraryPage.render();
     }
 
+    /**
+     * Log a user into Alfresco with invalid credentials and verify
+     * the message displayed
+     * 
+     * @throws Exception
+     *             if error
+     */
+    @Test(groups = { "Hybrid" }, dependsOnMethods = "loginAs")
+    public void loginWithInvalidCredentials() throws Exception
+    {
+        String fakePassword = "fakePass";
+
+        myProfilePage = dashBoardPage.getNav().selectMyProfile().render();
+        cloudSyncPage = myProfilePage.getProfileNav().selectCloudSyncPage().render();
+        if (cloudSyncPage.isDisconnectButtonDisplayed())
+        {
+            cloudSyncPage = cloudSyncPage.disconnectCloudAccount().render();
+        }
+        cloudSignInPage = cloudSyncPage.selectCloudSign().render();
+
+        cloudSignInPage.loginToCloud(cloudUserName, fakePassword);
+        cloudSignInPage.isAccountNotRecognised();
+        Assert.assertEquals(cloudSignInPage.getAccountNotRecognisedError(), "Email or password not recognised");
+
+    }
+
     @AfterClass
     public void tearDown()
     {
@@ -168,5 +190,3 @@ public class CloudSignInPageTest extends AbstractTest
         disconnectCloudSync(drone);
     }
 }
-
-
