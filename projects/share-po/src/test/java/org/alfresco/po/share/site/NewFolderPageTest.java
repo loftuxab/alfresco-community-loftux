@@ -80,13 +80,28 @@ public class NewFolderPageTest extends AbstractTest
         newFolderPage = newFolderPage.createNewFolderWithValidation("", folderName, folderName).render();
         Assert.assertTrue(newFolderPage.getMessage(NewFolderPage.Fields.NAME).length() > 0);
         newFolderPage.selectCancel();
-        
+
         newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
         documentLibPage = newFolderPage.createNewFolderWithValidation(folderName, folderName, folderName).render();
         Assert.assertNotNull(documentLibPage);
 
         newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
         documentLibPage = newFolderPage.createNewFolderWithValidation(folderName + "-1").render();
+        Assert.assertNotNull(documentLibPage);
+    }
+
+    @Test(groups = { "alfresco-one" })
+    public void getNotificationMessageTest() throws Exception
+    {
+        String folderName = "New Folder" + 1;
+
+        NewFolderPage newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
+        newFolderPage.typeName("?");
+        newFolderPage.selectSubmitButton();
+        Assert.assertTrue(newFolderPage.isNotificationMessagePresent());
+        Assert.assertNotEquals(newFolderPage.getNotificationMessage(), "");
+        newFolderPage.typeName(folderName);
+        newFolderPage.selectSubmitButton();
         Assert.assertNotNull(documentLibPage);
     }
 }
