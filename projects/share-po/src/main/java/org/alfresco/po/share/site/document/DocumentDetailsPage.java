@@ -263,7 +263,7 @@ public class DocumentDetailsPage extends DetailsPage
     {
         try
         {
-            return drone.find(By.cssSelector("span.editing")).isDisplayed();
+            return drone.findAndWait(By.cssSelector("span.editing")).isDisplayed();
         }
         catch (NoSuchElementException e)
         {
@@ -456,6 +456,26 @@ public class DocumentDetailsPage extends DetailsPage
                     throw new PageException("Edit offline file download error", e);
                 }
             }
+            return new DocumentEditOfflinePage(drone);
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageException("Unable to edit offline", nse);
+        }
+    }
+
+    /**
+     * Select the edit off line link.
+     * 
+     * @return {@link HtmlPage} edit off line page.
+     */
+    public HtmlPage selectEditOffLine()
+    {
+        try
+        {
+            WebElement link = drone.findAndWait(By.cssSelector(EDIT_OFFLINE_LINK));
+            link.click();
+
             return new DocumentEditOfflinePage(drone);
         }
         catch (NoSuchElementException nse)

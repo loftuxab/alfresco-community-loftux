@@ -99,4 +99,14 @@ public class InlineEditPage extends SitePage
     {
         setInput(drone.findAndWait(NAME), name);
     }
+    
+    /**
+     * Enters a value in to the properties form.
+     *
+     * @param name String name input
+     */
+    public void setTitle(final String name)
+    {
+        setInput(drone.findAndWait(TITLE), name);
+    }
 }
