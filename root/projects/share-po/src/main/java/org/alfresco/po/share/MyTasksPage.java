@@ -21,16 +21,14 @@ import org.alfresco.po.share.task.TaskFilters;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.TaskHistoryPage;
 import org.alfresco.po.share.workflow.ViewWorkflowPage;
-import org.alfresco.webdrone.ElementState;
-import org.alfresco.webdrone.RenderElement;
-import org.alfresco.webdrone.RenderTime;
-import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.*;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -253,10 +251,22 @@ public class MyTasksPage extends SharePage
         WebElement taskRow = findTaskRow(taskName);
         if (taskRow != null)
         {
+            drone.findAndWait(By.xpath("//a[text()='"+taskName+"']"));
+            try
+            {
             taskRow.click();
             WebElement lastTD = taskRow.findElement(By.cssSelector("td:last-of-type"));
             getDrone().mouseOverOnElement(lastTD);
             lastTD.findElement(action).click();
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                Actions mouseOver = new Actions(((WebDroneImpl)drone).getDriver());
+                mouseOver.moveToElement(drone.find(By.xpath("//a[text()='"+taskName+"']"))).
+                        moveToElement(taskRow.findElement(By.cssSelector("td:last-of-type")))
+                        .moveToElement(drone.find(action)).moveToElement(drone.find(action)).click().perform();
+            }
+
         }
         else
         {
