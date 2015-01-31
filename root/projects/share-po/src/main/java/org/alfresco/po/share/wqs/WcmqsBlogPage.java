@@ -20,6 +20,17 @@ public class WcmqsBlogPage extends SharePage
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
 //        private final By BLOGS_TITLE = By.cssSelector("div.interior-header");
 
+        public static final String ETHICAL_FUNDS = "Ethical funds";
+        public static final String COMPANY_ORGANISES_WORKSHOP = "Company organises workshop";
+        public static final String ANALYSTS_LATEST_THOUGHTS = "Our top analyst's latest thoughts";
+
+        public static final String BLOG_MENU = "Blog";
+        public static final String BLOG = "blog";
+
+        public static final String BLOG_1 = "blog1.html";
+        public static final String BLOG_2 = "blog2.html";
+        public static final String BLOG_3 = "blog3.html";
+
         /**
          * Constructor.
          *
