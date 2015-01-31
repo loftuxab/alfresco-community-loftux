@@ -25,6 +25,7 @@ public class RemoteUtil extends AbstractUtils
         commandProcessor.executeCommand("iptables -A INPUT -p tcp -s " + server + " -j DROP");
         commandProcessor.executeCommand("iptables -A OUTPUT -p tcp -s " + server + " -j DROP");
         logger.info("Temporarily apply a rule using iptables to drop all packets coming from (outcoming to) " + server + " to " + sshHost);
+        commandProcessor.disconnect();
     }
 
     public static void applyIptablesAllPorts()
@@ -34,6 +35,7 @@ public class RemoteUtil extends AbstractUtils
         commandProcessor.executeCommand("iptables -F");
         commandProcessor.executeCommand("iptables -A INPUT -p tcp -m tcp -m multiport ! --dports " + serverShhPort + " -j DROP");
         logger.info("Set iptables for all ports except port '" + serverShhPort + "' for host " + sshHost);
+        commandProcessor.disconnect();
     }
 
     public static void removeIpTables(String acceptPocketsNode)
@@ -45,6 +47,7 @@ public class RemoteUtil extends AbstractUtils
         commandProcessor.executeCommand("iptables -F");
         commandProcessor.executeCommand("service iptables stop");
         logger.info("Turn the filter off iptables to drop all packets coming from " + server + " to " + sshHost);
+        commandProcessor.disconnect();
     }
 
     public static void stopAlfresco(String alfrescoPath)
@@ -53,6 +56,7 @@ public class RemoteUtil extends AbstractUtils
         commandProcessor.executeCommand(alfrescoPath + "/./alfresco.sh stop");
         logger.info("Stop alfresco server " + sshHost);
         logger.info("Execute command: " + alfrescoPath + "/./alfresco.sh stop");
+        commandProcessor.disconnect();
     }
 
     public static void startAlfresco(String alfrescoPath)
@@ -61,6 +65,7 @@ public class RemoteUtil extends AbstractUtils
         commandProcessor.executeCommand(alfrescoPath + "/./alfresco.sh start");
         logger.info("Start alfresco server " + sshHost);
         logger.info("Execute command: " + alfrescoPath + "/./alfresco.sh start");
+        commandProcessor.disconnect();
     }
 
     public static void waitForAlfrescoStartup(String nodeURL, long starttime)

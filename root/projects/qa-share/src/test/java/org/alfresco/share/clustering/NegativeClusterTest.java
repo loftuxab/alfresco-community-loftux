@@ -56,6 +56,11 @@ public class NegativeClusterTest extends AbstractUtils
     private static final String regexUrl = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
     private static final Pattern DOMAIN_PATTERN = Pattern.compile("\\w+(\\.\\w+)*(\\.\\w{2,})");
+    final String fileName1 = "File_" + getRandomString(10) + "_1.txt";
+    final File file1 = getFileWithSize(fileName1, 1024);
+    private static final String TEST_TXT_FILE = "Test2.txt";
+    String fileLocation = DATA_FOLDER + TEST_TXT_FILE;
+    File fileTXT = newFile(fileLocation, TEST_TXT_FILE);
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -66,6 +71,7 @@ public class NegativeClusterTest extends AbstractUtils
 
         // testUser = getUserNameFreeDomain(testName);
         logger.info("Starting Tests: " + testName);
+        file1.deleteOnExit();
 
         // String[] testUserInfo = new String[] { testUser };
         // CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -171,403 +177,6 @@ public class NegativeClusterTest extends AbstractUtils
     }
 
     /**
-     * Test - AONE-9319:Stop the server B when uploading a big-sized file on server A
-     * <ul>
-     * <li>Upload a file of 1 GB on server A and at the moment stop the server B</li>
-     * <li>Server B is stopped. The file is being uploaded</li>
-     * <li>When the file is uploaded start the server B</li>
-     * <li>The server B is started succesfully. A cluster works correctly</li>
-     * </ul>
-     */
-    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000)
-    public void AONE_9319() throws Exception
-    {
-
-        String mainFolder = "Alfresco";
-        String path = mainFolder + "/";
-        final String fileName1 = getFileName(testName) + getRandomString(3) + "_1.txt";
-        final File file1 = getFileWithSize(fileName1, 1024);
-        file1.deleteOnExit();
-        long fileSize = file1.length();
-        String folderName = getFolderName(testName) + getRandomString(5);
-        final String folderPath = path + folderName + "/";
-        String alfrescoPath = JmxUtils.getAlfrescoServerProperty(node2Url, jmxGobalProperties, jmxDirLicense).toString();
-        ExecutorService executorService = java.util.concurrent.Executors.newCachedThreadPool();
-
-        try
-        {
-            setSshHost(node2Url);
-            logger.info("Set for ssh host: " + node2Url);
-
-            dronePropertiesMap.get(drone).setShareUrl(node1Url);
-
-            if (FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path))
-            {
-                FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder);
-            }
-            assertTrue(FtpUtil.createSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), "Can't create " + folderName + " folder");
-            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is not exist.");
-
-            Thread uploadThread = new Thread(new Runnable()
-            {
-                public void run()
-                {
-                    logger.info("1. Upload file start for " + node1Url);
-                    // Start upload a file of 1 GB on node 1
-                    assertTrue(FtpUtil.uploadContent(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, file1, folderPath), "Can't upload " + fileName1
-                            + " content A of 1 GB direct to node 1 via FTP");
-                    logger.info("4. Upload file end for " + node1Url);
-
-                }
-            });
-
-            List<Future> futures = new ArrayList<>();
-
-            // Start upload a file of 1 GB on node 1
-            futures.add(executorService.submit(uploadThread));
-
-            // upload
-            logger.info("wait 10 sec");
-            webDriverWait(drone, 10000);
-
-            // Server B is stopped
-            RemoteUtil.stopAlfresco(alfrescoPath);
-            logger.info("2. Wait alfresco stopped");
-
-            RemoteUtil.waitForAlfrescoShutdown(node2Url, 1000);
-
-            logger.info("3. Check port " + ftpPort + " for node " + node2Url);
-            assertFalse(TelnetUtil.connectServer(node2Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + " is accessible");
-
-            // The file is being uploaded
-            for (Future future : futures)
-            {
-                try
-                {
-                    if (!future.isDone())
-                        future.get();
-                }
-                catch (InterruptedException | ExecutionException e)
-                {
-                    logger.error(e);
-                }
-            }
-            executorService.shutdown();
-
-            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1
-                    + " content A of 1 GB is not exist. node 1 " + node1Url);
-
-            assertEquals(FtpUtil.getContentSize(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, fileName1), fileSize, "Document " + fileName1
-                    + " isn't uploaded correctly");
-
-            // start the server B
-            RemoteUtil.startAlfresco(alfrescoPath);
-            logger.info("5. Wait alfresco start");
-
-            RemoteUtil.waitForAlfrescoStartup(node2Url, 2000);
-
-            logger.info("6. Check port " + ftpPort + " for node " + node2Url);
-
-            // checkClusterNumbers();
-            assertTrue(TelnetUtil.connectServer(node2Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + "isn't accessible");
-
-            // Check that each node can see the document
-            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1 + " content A is not exist. node 1");
-            assertTrue(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1 + " content A is not exist. node 2");
-
-        }
-        finally
-        {
-            logger.info("Finally actions");
-            // Remove folder with documents
-            if (!TelnetUtil.connectServer(node2Url, ftpPort))
-            {
-                RemoteUtil.startAlfresco(alfrescoPath);
-                logger.info("Wait alfresco start");
-                RemoteUtil.waitForAlfrescoStartup(node2Url, 2000);
-            }
-            file1.deleteOnExit();
-            executorService.shutdown();
-            assertTrue(FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder), "Can't delete " + folderName + " folder");
-            assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is exist.");
-
-        }
-    }
-
-    /**
-     * Test - AONE-9320:Stop the server A when uploading a big-sized file on server A
-     * <ul>
-     * <li>Upload a file of 1 GB on server A and at the moment stop the server A</li>
-     * <li>Server A is stopped. The file isn't uploaded</li>
-     * <li>Start the server A</li>
-     * <li>The server A is started successfully. A cluster works correctly</li>
-     * </ul>
-     */
-    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000)
-    public void AONE_9320() throws Exception
-    {
-
-        String mainFolder = "Alfresco";
-        String path = mainFolder + "/";
-        final String fileName1 = getFileName(testName) + getRandomString(3) + "_1.txt";
-        final File file1 = getFileWithSize(fileName1, 1024);
-        file1.deleteOnExit();
-        String folderName = getFolderName(testName) + getRandomString(5);
-        final String folderPath = path + folderName + "/";
-        String alfrescoPath = JmxUtils.getAlfrescoServerProperty(node1Url, jmxGobalProperties, jmxDirLicense).toString();
-        ExecutorService executorService = java.util.concurrent.Executors.newCachedThreadPool();
-
-        try
-        {
-            setSshHost(node1Url);
-            logger.info("Set for ssh host: " + node1Url);
-
-            dronePropertiesMap.get(drone).setShareUrl(node1Url);
-
-            if (FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path))
-            {
-                FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder);
-            }
-            assertTrue(FtpUtil.createSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), "Can't create " + folderName + " folder");
-            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is not exist.");
-
-            Thread uploadThread = new Thread(new Runnable()
-            {
-                public void run()
-                {
-                    logger.info("1. Upload file start for " + node1Url);
-                    // Start upload a file of 1 GB on node 1
-                    assertTrue(FtpUtil.uploadContent(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, file1, folderPath), "Can't upload " + fileName1
-                            + " content A of 1 GB direct to node 1 via FTP");
-                    logger.info("4. Upload file end for " + node1Url);
-
-                }
-            });
-
-            List<Future> futures = new ArrayList<>();
-
-            // Start upload a file of 1 GB on node 1
-            futures.add(executorService.submit(uploadThread));
-
-            // upload
-            logger.info("wait 10 sec");
-            webDriverWait(drone, 10000);
-
-            // Server A is stopped
-            RemoteUtil.stopAlfresco(alfrescoPath);
-            logger.info("2. Wait alfresco stopped");
-            RemoteUtil.waitForAlfrescoShutdown(node1Url, 1000);
-
-            logger.info("3. Check port " + ftpPort + " for node " + node1Url);
-            assertFalse(TelnetUtil.connectServer(node1Url, ftpPort), "Check port " + ftpPort + " for node " + node1Url + " is accessible");
-
-            // The file isn't uploaded
-            for (Future future : futures)
-            {
-                try
-                {
-                    if (!future.isDone())
-                        future.get();
-                }
-                catch (InterruptedException | ExecutionException e)
-                {
-                    logger.error(e);
-                }
-            }
-            executorService.shutdown();
-
-            // start the server A
-            RemoteUtil.startAlfresco(alfrescoPath);
-            logger.info("5. Wait alfresco start");
-            RemoteUtil.waitForAlfrescoStartup(node1Url, 2000);
-
-            logger.info("6. Check port " + ftpPort + " for node " + node2Url);
-
-            // checkClusterNumbers();
-            assertTrue(TelnetUtil.connectServer(node1Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + "isn't accessible");
-
-            // TODO in accordance with issue MNT-12874
-            // Check that each node can see the document
-            assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1
-                    + " content A is exist. node 1. MNT-12874");
-            assertFalse(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1
-                    + " content A is exist. node 2. MNT-12874");
-
-        }
-        finally
-        {
-            logger.info("Finally actions");
-            // Remove folder with documents
-            if (!TelnetUtil.connectServer(node1Url, ftpPort))
-            {
-                RemoteUtil.startAlfresco(alfrescoPath);
-                logger.info("Wait alfresco start");
-                RemoteUtil.waitForAlfrescoStartup(node1Url, 2000);
-            }
-            file1.deleteOnExit();
-            executorService.shutdown();
-            assertTrue(FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder), "Can't delete " + folderName + " folder");
-            assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is exist.");
-
-        }
-    }
-
-    /**
-     * Test - AONE-9321:Stop both servers when uploading the big-sized files on this servers
-     * <ul>
-     * <li>Upload a file of 1 GB on both servers and at the moment stop both servers</li>
-     * <li>Servers are stopped. The files aren't uploaded</li>
-     * <li>Start both servers</li>
-     * <li>Both servers are started successfully. A cluster works correctly</li>
-     * </ul>
-     */
-    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000)
-    public void AONE_9321() throws Exception
-    {
-
-        String mainFolder = "Alfresco";
-        String path = mainFolder + "/";
-        final String fileName1 = getFileName(testName) + getRandomString(5) + "_1.txt";
-        final String fileName2 = getFileName(testName) + getRandomString(5) + "_2.txt";
-        final File file1 = getFileWithSize(fileName1, 1024);
-        final File file2 = getFileWithSize(fileName2, 1024);
-        file1.deleteOnExit();
-        file2.deleteOnExit();
-        String folderName = getFolderName(testName) + getRandomString(5);
-        final String folderPath = path + folderName + "/";
-        String alfrescoPath1 = JmxUtils.getAlfrescoServerProperty(node1Url, jmxGobalProperties, jmxDirLicense).toString();
-        String alfrescoPath2 = JmxUtils.getAlfrescoServerProperty(node2Url, jmxGobalProperties, jmxDirLicense).toString();
-        ExecutorService executorService = java.util.concurrent.Executors.newCachedThreadPool();
-
-        try
-        {
-            setSshHost(node1Url);
-            logger.info("Set for ssh host: " + node1Url);
-
-            dronePropertiesMap.get(drone).setShareUrl(node1Url);
-
-            if (FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path))
-            {
-                FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder);
-            }
-            assertTrue(FtpUtil.createSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), "Can't create " + folderName + " folder");
-            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is not exist.");
-
-            Thread uploadThread1 = new Thread(new Runnable()
-            {
-                public void run()
-                {
-                    logger.info("1. Upload file start for " + node1Url);
-                    // Start upload a file of 1 GB on node 1
-                    assertTrue(FtpUtil.uploadContent(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, file1, folderPath), "Can't upload " + fileName1
-                            + " content A of 1 GB direct to node 1 via FTP");
-                    logger.info("4. Upload file end for " + node1Url);
-
-                }
-            });
-
-            Thread uploadThread2 = new Thread(new Runnable()
-            {
-                public void run()
-                {
-                    logger.info("1. Upload file start for " + node2Url);
-                    // Start upload a file of 1 GB on node 1
-                    assertTrue(FtpUtil.uploadContent(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, file2, folderPath), "Can't upload " + fileName2
-                            + " content A of 1 GB direct to node 1 via FTP");
-                    logger.info("4. Upload file end for " + node2Url);
-
-                }
-            });
-
-            List<Future> futures = new ArrayList<>();
-
-            // Start upload a file of 1 GB on node 1
-            futures.add(executorService.submit(uploadThread1));
-            // Start upload a file of 1 GB on node 2
-            futures.add(executorService.submit(uploadThread2));
-
-            // upload
-            logger.info("wait 15 sec");
-            webDriverWait(drone, 15000);
-
-            // Server B is stopped
-            setSshHost(node2Url);
-            RemoteUtil.stopAlfresco(alfrescoPath2);
-            // Server A is stopped
-            setSshHost(node1Url);
-            RemoteUtil.stopAlfresco(alfrescoPath1);
-
-            logger.info("2. Wait alfresco stopped");
-            RemoteUtil.waitForAlfrescoShutdown(node2Url, 2000);
-            RemoteUtil.waitForAlfrescoShutdown(node1Url, 2000);
-
-            logger.info("3. Check port " + ftpPort + " for node " + node1Url);
-            logger.info("3. Check port " + ftpPort + " for node " + node2Url);
-            assertFalse(TelnetUtil.connectServer(node1Url, ftpPort), "Check port " + ftpPort + " for node " + node1Url + " is accessible");
-            assertFalse(TelnetUtil.connectServer(node2Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + " is accessible");
-
-            // The file is being uploaded
-            for (Future future : futures)
-            {
-                try
-                {
-                    if (!future.isDone())
-                        future.get();
-                }
-                catch (InterruptedException | ExecutionException e)
-                {
-                    logger.error(e);
-                }
-            }
-            executorService.shutdown();
-
-            // start the server B
-            setSshHost(node2Url);
-            RemoteUtil.startAlfresco(alfrescoPath2);
-            // start the server B
-            setSshHost(node1Url);
-            RemoteUtil.startAlfresco(alfrescoPath1);
-            logger.info("5. Wait alfresco start");
-            RemoteUtil.waitForAlfrescoStartup(node2Url, 2000);
-            RemoteUtil.waitForAlfrescoStartup(node1Url, 2000);
-
-            logger.info("6. Check port " + ftpPort + " for node " + node2Url);
-
-            // checkClusterNumbers();
-            assertTrue(TelnetUtil.connectServer(node2Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + "isn't accessible");
-            assertTrue(TelnetUtil.connectServer(node1Url, ftpPort), "Check port " + ftpPort + " for node " + node1Url + "isn't accessible");
-
-            // TODO in accordance with issue MNT-12874
-            // Check that each node can see the document
-            assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1
-                    + " content A is exist. node 1. MNT-12874");
-            assertFalse(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1
-                    + " content A is exist. node 2. MNT-12874");
-
-        }
-        finally
-        {
-            logger.info("Finally actions");
-            // Remove folder with documents
-            if (!TelnetUtil.connectServer(node2Url, ftpPort))
-            {
-                setSshHost(node2Url);
-                RemoteUtil.startAlfresco(alfrescoPath2);
-                setSshHost(node1Url);
-                RemoteUtil.startAlfresco(alfrescoPath1);
-                logger.info("Wait alfresco start");
-                RemoteUtil.waitForAlfrescoStartup(node2Url, 2000);
-                RemoteUtil.waitForAlfrescoStartup(node1Url, 2000);
-            }
-            file1.deleteOnExit();
-            file2.deleteOnExit();
-            executorService.shutdown();
-            assertTrue(FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder), "Can't delete " + folderName + " folder");
-            assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is exist.");
-        }
-    }
-
-    /**
      * Test - AONE-9322:Verify Clustering if the network connection is dropped
      * <ul>
      * <li>Server A and server B are working in cluster</li>
@@ -585,17 +194,15 @@ public class NegativeClusterTest extends AbstractUtils
 
         String mainFolder = "Alfresco";
         String path = mainFolder + "/";
-        final String fileName1 = getFileName(testName) + getRandomString(3) + "_1.txt";
-        final File file1 = getFileWithSize(fileName1, 1);
-        file1.deleteOnExit();
-        long fileSize = file1.length();
+        long fileSize = fileTXT.length();
         String folderName = getFolderName(testName) + getRandomString(5);
         final String folderPath = path + folderName + "/";
         ExecutorService executorService = java.util.concurrent.Executors.newCachedThreadPool();
 
         try
         {
-            setSshHost(node2Url);
+            // setSshHost(node2Url);
+            checkClusterNumbers();
 
             dronePropertiesMap.get(drone).setShareUrl(node2Url);
 
@@ -620,6 +227,7 @@ public class NegativeClusterTest extends AbstractUtils
             List<Future> futures = new ArrayList<>();
 
             // Switch off your network connection of server B
+            setSshHost(node2Url);
             futures.add(executorService.submit(iptablesThread1));
             futures.get(0).get();
             Assert.assertFalse(iptablesThread1.isAlive(), "iptables isn't applied");
@@ -649,6 +257,7 @@ public class NegativeClusterTest extends AbstractUtils
             RemoteUtil.waitForAlfrescoStartup(node2Url, 300);
 
             // Network connection is switched on again in 5 minute
+            setSshHost(node2Url);
             RemoteUtil.removeIpTables(node1Url);
             logger.info("Remove iptables");
 
@@ -656,23 +265,25 @@ public class NegativeClusterTest extends AbstractUtils
             checkClusterNumbers();
             assertTrue(TelnetUtil.connectServer(node2Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + "isn't accessible");
 
-            assertTrue(FtpUtil.uploadContent(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, file1, folderPath), "Can't upload " + fileName1
+            assertTrue(FtpUtil.uploadContent(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileTXT, folderPath), "Can't upload " + TEST_TXT_FILE
                     + " content A direct to node 1 via FTP");
 
             // Cluster works correctly without errors
-            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1 + " content A is not exist. node 1");
-            assertTrue(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1 + " content A is not exist. node 2");
-            assertEquals(FtpUtil.getContentSize(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, fileName1), fileSize, "Document " + fileName1
-                    + " isn't uploaded correctly");
-            assertEquals(FtpUtil.getContentSize(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, fileName1), fileSize, "Document " + fileName1
-                    + " isn't uploaded correctly");
+            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, TEST_TXT_FILE, folderPath), TEST_TXT_FILE
+                    + " content A is not exist. node 1");
+            assertTrue(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, TEST_TXT_FILE, folderPath), TEST_TXT_FILE
+                    + " content A is not exist. node 2");
+            assertEquals(FtpUtil.getContentSize(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, TEST_TXT_FILE), fileSize, "Document "
+                    + TEST_TXT_FILE + " isn't uploaded correctly");
+            assertEquals(FtpUtil.getContentSize(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, TEST_TXT_FILE), fileSize, "Document "
+                    + TEST_TXT_FILE + " isn't uploaded correctly");
 
         }
         finally
         {
             // Remove folder with documents
+            setSshHost(node2Url);
             RemoteUtil.removeIpTables(node1Url);
-            file1.deleteOnExit();
             executorService.shutdown();
             assertTrue(FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder), "Can't delete " + folderName + " folder");
             assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is exist.");
@@ -695,16 +306,13 @@ public class NegativeClusterTest extends AbstractUtils
      * <li>Cluster works correctly without errors</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000)
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000, dependsOnMethods = "AONE_9322", alwaysRun = true)
     public void AONE_9323() throws Exception
     {
 
         String mainFolder = "Alfresco";
         String path = mainFolder + "/";
-        final String fileName1 = getFileName(testName) + getRandomString(3) + "_1.txt";
-        final File file1 = getFileWithSize(fileName1, 1);
-        file1.deleteOnExit();
-        long fileSize = file1.length();
+        long fileSize = fileTXT.length();
         String folderName = getFolderName(testName) + getRandomString(5);
         final String folderPath = path + folderName + "/";
         ExecutorService executorService = java.util.concurrent.Executors.newCachedThreadPool();
@@ -712,7 +320,7 @@ public class NegativeClusterTest extends AbstractUtils
         try
         {
             checkClusterNumbers();
-            setSshHost(node2Url);
+            // setSshHost(node2Url);
 
             dronePropertiesMap.get(drone).setShareUrl(node2Url);
 
@@ -738,12 +346,13 @@ public class NegativeClusterTest extends AbstractUtils
             List<Future> futures = new ArrayList<>();
 
             // Switch off your network connection of server B
+            setSshHost(node2Url);
             futures.add(executorService.submit(iptablesThread1));
             futures.get(0).get();
             Assert.assertFalse(iptablesThread1.isAlive(), "iptables isn't applied");
             logger.info("3. iptables applied");
 
-            logger.info("wait 20 sec");
+            // logger.info("wait 20 sec");
             webDriverWait(drone, 20000);
 
             logger.info("4. Check port " + ftpPort + " for node " + node2Url);
@@ -766,10 +375,11 @@ public class NegativeClusterTest extends AbstractUtils
             // Upload a file on server A
             assertTrue(TelnetUtil.connectServer(node1Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + "isn't accessible");
 
-            assertTrue(FtpUtil.uploadContent(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, file1, folderPath), "Can't upload " + fileName1
+            assertTrue(FtpUtil.uploadContent(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileTXT, folderPath), "Can't upload " + TEST_TXT_FILE
                     + " content A direct to node 1 via FTP");
 
             // Network connection is switched on again in 5 minute
+            setSshHost(node2Url);
             RemoteUtil.removeIpTables(node1Url);
             logger.info("Remove iptables");
 
@@ -777,19 +387,21 @@ public class NegativeClusterTest extends AbstractUtils
             checkClusterNumbers();
 
             // Cluster works correctly without errors
-            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1 + " content A is not exist. node 1");
-            assertTrue(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1 + " content A is not exist. node 2");
-            assertEquals(FtpUtil.getContentSize(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, fileName1), fileSize, "Document " + fileName1
-                    + " isn't uploaded correctly");
-            assertEquals(FtpUtil.getContentSize(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, fileName1), fileSize, "Document " + fileName1
-                    + " isn't uploaded correctly");
+            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, TEST_TXT_FILE, folderPath), TEST_TXT_FILE
+                    + " content A is not exist. node 1");
+            assertTrue(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, TEST_TXT_FILE, folderPath), TEST_TXT_FILE
+                    + " content A is not exist. node 2");
+            assertEquals(FtpUtil.getContentSize(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, TEST_TXT_FILE), fileSize, "Document "
+                    + TEST_TXT_FILE + " isn't uploaded correctly");
+            assertEquals(FtpUtil.getContentSize(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, TEST_TXT_FILE), fileSize, "Document "
+                    + TEST_TXT_FILE + " isn't uploaded correctly");
 
         }
         finally
         {
             // Remove folder with documents
+            setSshHost(node2Url);
             RemoteUtil.removeIpTables(node1Url);
-            file1.deleteOnExit();
             executorService.shutdown();
             assertTrue(FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder), "Can't delete " + folderName + " folder");
             assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is exist.");
@@ -814,16 +426,13 @@ public class NegativeClusterTest extends AbstractUtils
      * <li>Cluster works correctly without errors</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000)
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000, dependsOnMethods = "AONE_9323", alwaysRun = true)
     public void AONE_9324() throws Exception
     {
 
         String mainFolder = "Alfresco";
         String path = mainFolder + "/";
-        final String fileName1 = getFileName(testName) + getRandomString(3) + "_1.txt";
-        final File file1 = getFileWithSize(fileName1, 1);
-        file1.deleteOnExit();
-        long fileSize = file1.length();
+        long fileSize = fileTXT.length();
         String folderName = getFolderName(testName) + getRandomString(5);
         final String folderPath = path + folderName + "/";
         ExecutorService executorService = java.util.concurrent.Executors.newCachedThreadPool();
@@ -833,7 +442,7 @@ public class NegativeClusterTest extends AbstractUtils
         try
         {
             checkClusterNumbers();
-            setSshHost(node2Url);
+            // setSshHost(node2Url);
 
             dronePropertiesMap.get(drone).setShareUrl(node1Url);
 
@@ -871,6 +480,7 @@ public class NegativeClusterTest extends AbstractUtils
             List<Future> futures = new ArrayList<>();
 
             // Switch off your network connection of server B
+            setSshHost(node2Url);
             futures.add(executorService.submit(iptablesThread1));
             futures.get(0).get();
             Assert.assertFalse(iptablesThread1.isAlive(), "iptables isn't applied");
@@ -895,8 +505,8 @@ public class NegativeClusterTest extends AbstractUtils
             // Upload a file on server A
             assertTrue(TelnetUtil.connectServer(node1Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + "isn't accessible");
 
-            assertTrue(FtpUtil.uploadContent(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, file1, folderPath), "Can't upload " + fileName1
-                    + " content A of 1 GB direct to node 1 via FTP");
+            assertTrue(FtpUtil.uploadContent(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileTXT, folderPath), "Can't upload " + TEST_TXT_FILE
+                    + " content A direct to node 1 via FTP");
 
             // Stop server B
             logger.info("4. Stop alfresco");
@@ -907,6 +517,7 @@ public class NegativeClusterTest extends AbstractUtils
             RemoteUtil.waitForAlfrescoShutdown(node2Url, 100);
 
             // Network connection is switched on again
+            setSshHost(node2Url);
             RemoteUtil.removeIpTables(node1Url);
             logger.info("6. Remove iptables");
 
@@ -920,19 +531,21 @@ public class NegativeClusterTest extends AbstractUtils
             checkClusterNumbers();
 
             // Cluster works correctly without errors
-            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1 + " content A is not exist. node 1");
-            assertTrue(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath), fileName1 + " content A is not exist. node 2");
-            assertEquals(FtpUtil.getContentSize(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, fileName1), fileSize, "Document " + fileName1
-                    + " isn't uploaded correctly");
-            assertEquals(FtpUtil.getContentSize(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, fileName1), fileSize, "Document " + fileName1
-                    + " isn't uploaded correctly");
+            assertTrue(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, TEST_TXT_FILE, folderPath), TEST_TXT_FILE
+                    + " content A is not exist. node 1");
+            assertTrue(FtpUtil.isObjectExists(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, TEST_TXT_FILE, folderPath), TEST_TXT_FILE
+                    + " content A is not exist. node 2");
+            assertEquals(FtpUtil.getContentSize(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, TEST_TXT_FILE), fileSize, "Document "
+                    + TEST_TXT_FILE + " isn't uploaded correctly");
+            assertEquals(FtpUtil.getContentSize(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, path + folderName, TEST_TXT_FILE), fileSize, "Document "
+                    + TEST_TXT_FILE + " isn't uploaded correctly");
 
         }
         finally
         {
             // Remove folder with documents
+            setSshHost(node2Url);
             RemoteUtil.removeIpTables(node1Url);
-            file1.deleteOnExit();
             executorService.shutdown();
             assertTrue(FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder), "Can't delete " + folderName + " folder");
             assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is exist.");
@@ -951,15 +564,12 @@ public class NegativeClusterTest extends AbstractUtils
      * <li>Verify that cluster works correctly</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000)
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000, dependsOnMethods = "AONE_9324", alwaysRun = true)
     public void AONE_9325() throws Exception
     {
 
         String mainFolder = "Alfresco";
         String path = mainFolder + "/";
-        final String fileName1 = getFileName(testName) + getRandomString(5) + "_1.txt";
-        final File file1 = getFileWithSize(fileName1, 1024);
-        file1.deleteOnExit();
         long fileSize = file1.length();
         String folderName = getFolderName(testName) + getRandomString(5);
         final String folderPath = path + folderName + "/";
@@ -967,7 +577,8 @@ public class NegativeClusterTest extends AbstractUtils
 
         try
         {
-            setSshHost(node2Url);
+            checkClusterNumbers();
+            // setSshHost(node2Url);
             logger.info("Set for ssh host: " + node1Url);
 
             dronePropertiesMap.get(drone).setShareUrl(node1Url);
@@ -1012,6 +623,7 @@ public class NegativeClusterTest extends AbstractUtils
             webDriverWait(drone, 15000);
 
             // Network connection is switched off
+            setSshHost(node2Url);
             futures.add(executorService.submit(iptablesThread1));
 
             futures.get(1).get();
@@ -1036,6 +648,7 @@ public class NegativeClusterTest extends AbstractUtils
             executorService.shutdown();
 
             // Network connection is switched on again
+            setSshHost(node2Url);
             RemoteUtil.removeIpTables(node1Url);
             logger.info("Remove iptables");
 
@@ -1058,8 +671,8 @@ public class NegativeClusterTest extends AbstractUtils
         {
             logger.info("Finally actions");
             // Remove folder with documents
+            setSshHost(node2Url);
             RemoteUtil.removeIpTables(node1Url);
-            file1.deleteOnExit();
             executorService.shutdown();
             assertTrue(FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder), "Can't delete " + folderName + " folder");
             assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is exist.");
@@ -1067,30 +680,28 @@ public class NegativeClusterTest extends AbstractUtils
     }
 
     /**
-     * Test - AONE-9325:Verify Cluster if the network connection is dropped when uploading a big-sized file
+     * Test - AONE-9326:Verify Cluster if the network connection is dropped when uploading a big-sized file
      * <ul>
-     * <li>Upload a file of 1 GB on server A and at the moment switch off your network connection of server B</li>
+     * <li>Upload a file of 1 GB on server A and at the moment switch off your network connection of server A</li>
      * <li>Network connection is switched off. The file is being uploaded.</li>
      * <li>When the file is uploaded switch it on network connection of server B</li>
      * <li>Verify that cluster works correctly</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000)
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 1000000, dependsOnMethods = "AONE_9325", alwaysRun = true)
     public void AONE_9326() throws Exception
     {
 
         String mainFolder = "Alfresco";
         String path = mainFolder + "/";
-        final String fileName1 = getFileName(testName) + getRandomString(5) + "_1.txt";
-        final File file1 = getFileWithSize(fileName1, 1024);
-        file1.deleteOnExit();
         String folderName = getFolderName(testName) + getRandomString(5);
         final String folderPath = path + folderName + "/";
         ExecutorService executorService = java.util.concurrent.Executors.newCachedThreadPool();
 
         try
         {
-            setSshHost(node1Url);
+            checkClusterNumbers();
+            // setSshHost(node1Url);
             logger.info("Set for ssh host: " + node1Url);
 
             dronePropertiesMap.get(drone).setShareUrl(node1Url);
@@ -1132,9 +743,17 @@ public class NegativeClusterTest extends AbstractUtils
             futures.add(executorService.submit(uploadThread1));
 
             // begin upload
-            webDriverWait(drone, 15000);
+            // webDriverWait(drone, 15000);
+            int count = 0;
+            while (!FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, fileName1, folderPath) && count < 10)
+            {
+                checkClusterNumbers();
+                count++;
+                logger.info("wait upload begin count:" + count);
+            }
 
             // Network connection is switched off
+            setSshHost(node1Url);
             futures.add(executorService.submit(iptablesThread1));
 
             futures.get(1).get();
@@ -1159,6 +778,7 @@ public class NegativeClusterTest extends AbstractUtils
             executorService.shutdown();
 
             // Network connection is switched on again
+            setSshHost(node1Url);
             RemoteUtil.removeIpTables(node2Url);
             logger.info("Remove iptables");
 
@@ -1181,8 +801,8 @@ public class NegativeClusterTest extends AbstractUtils
         {
             logger.info("Finally actions");
             // Remove folder with documents
+            setSshHost(node1Url);
             RemoteUtil.removeIpTables(node2Url);
-            file1.deleteOnExit();
             executorService.shutdown();
             assertTrue(FtpUtil.DeleteSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, mainFolder), "Can't delete " + folderName + " folder");
             assertFalse(FtpUtil.isObjectExists(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, folderName, path), folderName + " folder is exist.");
