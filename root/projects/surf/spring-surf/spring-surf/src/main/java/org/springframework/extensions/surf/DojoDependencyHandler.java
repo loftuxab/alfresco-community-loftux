@@ -556,7 +556,7 @@ public class DojoDependencyHandler
     public StringBuilder outputDependency(final String name, final String path, final DojoDependencies deps) throws IOException
     {
         final StringBuilder currentDep = new StringBuilder(4096);
-        if (!deps.getTextDeps().isEmpty())
+        if (deps != null && !deps.getTextDeps().isEmpty())
         {
             currentDep.append("require({cache:{");
             final Iterator<String> j = deps.getTextDeps().iterator();
