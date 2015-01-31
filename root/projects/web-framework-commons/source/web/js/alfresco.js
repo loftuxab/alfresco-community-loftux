@@ -2732,12 +2732,28 @@ Alfresco.util.createBalloon = function(p_context, p_params, showEvent, hideEvent
       Dom.addClass(wrapper, p_params.wrapperClass);
       Dom.addClass(arrow, p_params.arrowClass);
 
+      this.onClose = new YAHOO.util.CustomEvent("close" , this);
+      this.onShow = new YAHOO.util.CustomEvent("show" , this);
+
       if (p_params.closeButton)
       {
          var closeButton = document.createElement("div");
+         YUIDom.setAttribute(closeButton, "tabIndex", "0");
          closeButton.innerHTML = "x";
          Dom.addClass(closeButton, "closeButton");
          Event.addListener(closeButton, "click", this.hide, this, true);
+         this.onShow.subscribe(function(type, args)
+         {
+             closeButton.focus();
+         }, this, true);
+         // close on Enter or Escape
+         Event.addListener(closeButton, "keydown", function(e)
+         {
+            if (e.keyCode == 13 || e.keyCode == 27)
+            {
+               this.hide();
+            }
+         }, this, true);
          wrapper.appendChild(closeButton);
       }
 
@@ -2752,9 +2768,6 @@ Alfresco.util.createBalloon = function(p_context, p_params, showEvent, hideEvent
 
       this.balloon = balloon;
       this.content = content;
-
-      this.onClose = new YAHOO.util.CustomEvent("close" , this);
-      this.onShow = new YAHOO.util.CustomEvent("show" , this);
 
       // Register to enable hide all functionality.
       this.name = "Alfresco.widget.Balloon";
