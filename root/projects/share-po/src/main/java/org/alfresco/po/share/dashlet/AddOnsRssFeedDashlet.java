@@ -161,6 +161,9 @@ public class AddOnsRssFeedDashlet extends AbstractDashlet implements Dashlet
         return rssLinks;
     }
     
-    
+    public void waitUntilLoadingDisappears()
+    {
+        drone.waitUntilElementDisappears(By.cssSelector("div[class$='dashlet-padding'] > h3"), 30);
+    }
 
 }
