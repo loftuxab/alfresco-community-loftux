@@ -73,7 +73,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
     public void dataPrep(String testName) throws Exception
     {
-
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String[] userInfo1 = new String[] { user1 };
 
@@ -94,7 +93,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15630() throws Exception
+    public void dataPrep_AONE_15630() throws Exception
     {
         dataPrep(getTestName() + "101");
     }
@@ -102,7 +101,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15630:Keep content synced on cloud
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15630() throws Exception
     {
         String testName = getTestName() + "101";
@@ -110,12 +109,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
-
         String dueDate = getDueDateString();
 
         // Login as User1 (Cloud)
@@ -127,8 +123,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
         // Login as User1 (OP)
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        
         // Create Site
-        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC).render();
 
         // Open Document library, Upload a file
         siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
@@ -163,7 +160,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         Assert.assertTrue(checkIfContentIsSynced(drone, simpleTaskFile), "Verifying the Sync Status is \"Synced\"");
 
         // Login as CloudUser User
-        SharePage sharePage = ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        SharePage sharePage = ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD).render();
 
         // ---- Step 3 ----
         // ---- Step action ---
@@ -172,15 +169,15 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // Performed correctly. The task is moved to Completed filter. A new task appears in OP.
         // Navigate to MyTasks page
         MyTasksPage myTasksPage = sharePage.getNav().selectMyTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not displayed");
 
         // Edit each task and mark them as completed
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
 
         // Verify tasks are NOT displayed in Active Tasks list any more
-        Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF), "Task is present");
         myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not present");
 
         ShareUser.logout(hybridDrone);
 
@@ -193,12 +190,12 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // Performed correctly. The task is moved to Completed filter.
         myTasksPage = sharePage.getNav().selectMyTasks().render();
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF));
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF), "Task is not present");
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
 
         // Select Completed tasks and verify the tasks are displayed
         myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not present");
 
         // ---- Step 5 ----
         // ---- Step action ---
@@ -206,8 +203,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document is still synced to Cloud. The Synced label and no Workflow label is present for the document on Document Library page.
         documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName).render();
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow());
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow(), "File is part of workflow");
 
         ShareUser.logout(drone);
 
@@ -220,14 +217,14 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document is still synced to Cloud. The Synced label and no Workflow label is present for the document on Document Library page.
         documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSite).render();
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow());
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow(), "File is part of workflow");
 
         ShareUser.logout(hybridDrone);
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15631() throws Exception
+    public void dataPrep_AONE_15631() throws Exception
     {
         dataPrep(getTestName()+ "101");
     }
@@ -235,7 +232,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15631:Keep content on cloud and remove sync
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15631() throws Exception
     {
         String testName = getTestName()+ "101";
@@ -312,9 +309,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
 
         // Verify tasks are NOT displayed in Active Tasks list any more
-        Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF), "Task is present");
         myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not present");
 
         ShareUser.logout(hybridDrone);
 
@@ -327,12 +324,12 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // Performed correctly. The task is moved to Completed filter.
         myTasksPage = sharePage.getNav().selectMyTasks().render();
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF));
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF), "Task is not present");
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
 
         // Select Completed tasks and verify the tasks are displayed
         myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not present");
 
         // ---- Step 5 ----
         // ---- Step action ---
@@ -340,8 +337,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document is still synced to Cloud. The Synced label and no Workflow label is present for the document on Document Library page.
         documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName).render();
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow());
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow(), "File is part of workflow");
 
         ShareUser.logout(drone);
 
@@ -354,15 +351,14 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document is still synced to Cloud. The Synced label and no Workflow label is present for the document on Document Library page.
         documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSite).render();
-        Assert.assertTrue(documentLibraryPage.isFileVisible(simpleTaskFile));
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow());
-
+        Assert.assertTrue(documentLibraryPage.isFileVisible(simpleTaskFile), "File is not visible");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is synced");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow(), "File is part of workflow");
         ShareUser.logout(hybridDrone);
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15632() throws Exception
+    public void dataPrep_AONE_15632() throws Exception
     {
         dataPrep(getTestName()+ "101");
     }
@@ -370,7 +366,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15632:Delete content on cloud and remove sync
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15632() throws Exception
     {
         String testName = getTestName()+ "101";
@@ -440,16 +436,15 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // Performed correctly. The task is moved to Completed filter. A new task appears in OP.
         // Navigate to MyTasks page
         MyTasksPage myTasksPage = sharePage.getNav().selectMyTasks().render();
-        // Verify tasks are displayed in Active Tasks list
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not displayed");
 
         // Edit each task and mark them as completed
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
 
         // Verify tasks are NOT displayed in Active Tasks list any more
-        Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF), "Task is displayed");
         myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not displayed");
 
         ShareUser.logout(hybridDrone);
 
@@ -462,12 +457,12 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // Performed correctly. The task is moved to Completed filter.
         myTasksPage = sharePage.getNav().selectMyTasks().render();
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF));
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF), "Task is not displayed");
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
 
         // Select Completed tasks and verify the tasks are displayed
         myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not displayed");
 
         // ---- Step 5 ----
         // ---- Step action ---
@@ -475,8 +470,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document is still synced to Cloud. The Synced label and no Workflow label is present for the document on Document Library page.
         documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName).render();
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow());
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is synced");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow(), "File is part of workflow" );
 
         ShareUser.logout(drone);
 
@@ -489,13 +484,12 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document is still synced to Cloud. The Synced label and no Workflow label is present for the document on Document Library page.
         documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSite).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
-
+        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile), "File is visible");
         ShareUser.logout(hybridDrone);
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15633() throws Exception
+    public void dataPrep_AONE_15633() throws Exception
     {
         dataPrep(getTestName()+ "101");
     }
@@ -503,7 +497,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15633:Simple Cloud Task - action execution after completion in Cloud and OP
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15633() throws Exception
     {
         String testName = getTestName()+ "101";
@@ -529,6 +523,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
             // Login as User1 (OP)
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+            
             // Create Site
             SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
 
@@ -569,7 +564,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isPartOfWorkflow(), "Verifying the File1 is part of a workflow");
             Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "Verifying the File1 is synced");
             Assert.assertTrue(checkIfContentIsSynced(drone, simpleTaskFile), "Verifying the Sync Status is \"Synced\"");
-
             MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
 
             // Verify Workflow has been created successfully
@@ -597,9 +591,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             MyTasksPage myTasksPage = sharePage.getNav().selectMyTasks().render();
             Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-            Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF));
+            Assert.assertFalse(myTasksPage.isTaskPresent(simpleTaskWF), "Task is displayed");
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+            Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF),"Task is not displayed");
 
             // ---- Step 7 ----
             // ---- Step action ---
@@ -639,17 +633,17 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // Select Completed tasks and verify the tasks are displayed
             myTasksPage = myTasksPage.selectCompletedTasks().render();
 
-            Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
+            Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF), "Task is not displayed");
 
             // Navigate to Workflows I've Started page and verify tasks are not displayed under Active Workflows page
             myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
 
-            Assert.assertFalse(myWorkFlowsPage.isWorkFlowPresent(simpleTaskWF));
+            Assert.assertFalse(myWorkFlowsPage.isWorkFlowPresent(simpleTaskWF), "Task is displayed");
 
             // Select Completed Workflows and verify workflows are displayed
             myWorkFlowsPage = myWorkFlowsPage.selectCompletedWorkFlows().render();
 
-            Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(simpleTaskWF));
+            Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(simpleTaskWF), "Workflow is not displayed");
 
             // ---- Step 9 ----
             // ---- Step action ---
@@ -683,7 +677,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15634() throws Exception
+    public void dataPrep_AONE_15634() throws Exception
     {
         dataPrep(getTestName()+ "101");
     }
@@ -691,7 +685,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15634:Cloud Review Task - action execution after approval in Cloud and completion in OP
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15634() throws Exception
     {
         String testName = getTestName()+ "101";
@@ -785,15 +779,15 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // ---- Expected results ----
             // Performed correctly. The task is moved to Completed filter. A new task appears in OP.
             MyTasksPage myTasksPage = sharePage.getNav().selectMyTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewApproveWF));
+            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewApproveWF), "Task is not present");
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, cloudReviewApproveWF, TaskStatus.COMPLETED, EditTaskAction.APPROVE);
 
             // Verify tasks are NOT displayed in Active Tasks list any more
-            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewApproveWF));
+            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewApproveWF), "Task is present" );
 
             // Verify tasks are displayed in Completed Tasks list
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewApproveWF));
+            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewApproveWF), "Task is not present");
 
             // ---- Step 7 ----
             // ---- Step action ---
@@ -825,20 +819,20 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // ---- Expected results ----
             // Performed correctly. The task is moved to Completed filter.
             myTasksPage = sharePage.getNav().selectMyTasks().render();
-            Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, cloudReviewApproveWF));
+            Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, cloudReviewApproveWF), "Task is not present");
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, cloudReviewApproveWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewApproveWF));
+            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewApproveWF), "Task is present");
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewApproveWF));
+            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewApproveWF), "Task is not present");
 
             // Navigate to Workflows I've Started page and verify tasks are not displayed under Active Workflows page
             myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
 
-            Assert.assertFalse(myWorkFlowsPage.isWorkFlowPresent(cloudReviewApproveWF));
+            Assert.assertFalse(myWorkFlowsPage.isWorkFlowPresent(cloudReviewApproveWF), "Workflow is present");
 
             // Select Completed Workflows and verify workflows are displayed
             myWorkFlowsPage = myWorkFlowsPage.selectCompletedWorkFlows().render();
-            Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(cloudReviewApproveWF));
+            Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(cloudReviewApproveWF), "Workflow is not present");
 
             // ---- Step 9 ----
             // ---- Step action ---
@@ -876,7 +870,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15635() throws Exception
+    public void dataPrep_AONE_15635() throws Exception
     {
         dataPrep(getTestName() + "101");
     }
@@ -884,7 +878,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15635:Cloud Review Task - action execution after rejection in Cloud and completion in OP
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15635() throws Exception
     {
         String testName = getTestName() + "101";
@@ -980,13 +974,13 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // ---- Expected results ----
             // Performed correctly. The task is moved to Completed filter. A new task appears in OP.
             MyTasksPage myTasksPage = sharePage.getNav().selectMyTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewRejectWF));
+            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewRejectWF), "Task is not present");
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, cloudReviewRejectWF, TaskStatus.COMPLETED, EditTaskAction.REJECT);
-            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewRejectWF));
+            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewRejectWF), "Task is present");
 
             // Verify tasks are displayed in Completed Tasks list
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewRejectWF));
+            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewRejectWF), "Task is not present");
 
             // ---- Step 7 ----
             // ---- Step action ---
@@ -1018,19 +1012,19 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // ---- Expected results ----
             // Performed correctly. The task is moved to Completed filter.
             myTasksPage = sharePage.getNav().selectMyTasks().render();
-            Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, cloudReviewRejectWF));
+            Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, cloudReviewRejectWF), "Task is not present");
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, cloudReviewRejectWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewRejectWF));
+            Assert.assertFalse(myTasksPage.isTaskPresent(cloudReviewRejectWF), "Task is present");
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewRejectWF));
+            Assert.assertTrue(myTasksPage.isTaskPresent(cloudReviewRejectWF), "Task is not present");
 
             // Navigate to Workflows I've Started page and verify tasks are not displayed under Active Workflows page
             myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
-            Assert.assertFalse(myWorkFlowsPage.isWorkFlowPresent(cloudReviewRejectWF));
+            Assert.assertFalse(myWorkFlowsPage.isWorkFlowPresent(cloudReviewRejectWF), "Workflow is present");
 
             // Select Completed Workflows and verify workflows are displayed
             myWorkFlowsPage = myWorkFlowsPage.selectCompletedWorkFlows().render();
-            Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(cloudReviewRejectWF));
+            Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(cloudReviewRejectWF), "Workflow is not present");
 
             // ---- Step 9 ----
             // ---- Step action ---
@@ -1066,7 +1060,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid", enabled = true)
-    public void dataPrep_15636() throws Exception
+    public void dataPrep_AONE_15636() throws Exception
     {
         dataPrep(getTestName() + "101");
     }
@@ -1074,7 +1068,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15636:Lock on-premise content - ON
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15636() throws Exception
     {
         String testName = getTestName() + "101";
@@ -1103,6 +1097,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
             // Create Site
             SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+            
             // Open Document library, Upload 2 files
             siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
 
@@ -1176,11 +1171,11 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // ---- Expected results ----
             // Performed correctly.
             MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName1));
+            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName1), "Task is not present");
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName1, TaskStatus.COMPLETED, EditTaskAction.APPROVE);
-            Assert.assertFalse(myTasksPage.isTaskPresent(workFlowName1));
+            Assert.assertFalse(myTasksPage.isTaskPresent(workFlowName1), "Task is present");
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName1));
+            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName1), "Task is not present");
 
             ShareUser.logout(hybridDrone);
 
@@ -1193,11 +1188,11 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // ---- Expected results ----
             // Performed correctly.
             myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
-            Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName1));
+            Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName1), "Task is not present");
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, workFlowName1, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-            Assert.assertFalse(myTasksPage.isTaskPresent(workFlowName1));
+            Assert.assertFalse(myTasksPage.isTaskPresent(workFlowName1), "Task is present");
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName1));
+            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName1), "Task is not present");
 
             // ---- Step 7 ----
             // ---- Step action ---
@@ -1219,7 +1214,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15637() throws Exception
+    public void dataPrep_AONE_15637() throws Exception
     {
         dataPrep(getTestName() + "101");
     }
@@ -1227,7 +1222,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15637:Lock on-premise content - OFF
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15637() throws Exception
     {
         String testName = getTestName() + "101";
@@ -1247,6 +1242,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         {
             // Login as User1 (Cloud)
             ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+            
             // Create Site
             ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
             ShareUser.logout(hybridDrone);
@@ -1324,11 +1320,11 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // ---- Expected results ----
             // Performed correctly.
             MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName2));
+            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName2), "Task is not present");
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName2, TaskStatus.COMPLETED, EditTaskAction.APPROVE);
-            Assert.assertFalse(myTasksPage.isTaskPresent(workFlowName2));
+            Assert.assertFalse(myTasksPage.isTaskPresent(workFlowName2), "Task is present");
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName2));
+            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName2), "Task is not present");
 
             ShareUser.logout(hybridDrone);
 
@@ -1341,11 +1337,11 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             // ---- Expected results ----
             // Performed correctly.
             myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
-            Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName2));
+            Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName2), "Task is not present");
             myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, workFlowName2, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-            Assert.assertFalse(myTasksPage.isTaskPresent(workFlowName2));
+            Assert.assertFalse(myTasksPage.isTaskPresent(workFlowName2), "Task is present");
             myTasksPage = myTasksPage.selectCompletedTasks().render();
-            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName2));
+            Assert.assertTrue(myTasksPage.isTaskPresent(workFlowName2), "Task is not present");
 
             // ---- Step 7 ----
             // ---- Step action ---
@@ -1368,7 +1364,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15643() throws Exception
+    public void dataPrep_AONE_15643() throws Exception
     {
         dataPrep(getTestName()+ "T");
     }
@@ -1376,7 +1372,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15643: Priority - High
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15643() throws Exception
     {
         String testName = getTestName()+ "T";
@@ -1454,14 +1450,14 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // 4/5. High Priority is set.
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
         MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1));
-        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.HIGH);
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1), "Task is not present");
+        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.HIGH, "Task is not set to High");
 
         ShareUser.logout(hybridDrone);
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15644() throws Exception
+    public void dataPrep_AONE_15644() throws Exception
     {
         dataPrep(getTestName()+ "T");
     }
@@ -1469,7 +1465,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15644:Priority - Medium
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15644() throws Exception
     {
         String testName = getTestName()+ "T";
@@ -1537,7 +1533,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // Medium Priority is set.
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
         WorkFlowDetailsPage detailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName1).render();
-        Assert.assertEquals(detailsPage.getWorkFlowDetailsGeneralInfo().getPriority(), Priority.MEDIUM);
+        Assert.assertEquals(detailsPage.getWorkFlowDetailsGeneralInfo().getPriority(), Priority.MEDIUM, "Priority is not set to Medium");
 
         ShareUser.logout(drone);
 
@@ -1550,13 +1546,13 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
         MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
         Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1));
-        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.MEDIUM);
+        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.MEDIUM, "Priority is not set to Medium");
 
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15645() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut = 400000)
+    public void dataPrep_AONE_15645() throws Exception
     {
         dataPrep(getTestName()+ "T");
     }
@@ -1629,7 +1625,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // Low Priority is set.
         MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone);
         WorkFlowDetailsPage detailsPage = myWorkFlowsPage.selectWorkFlow(workFlowName1).render();
-        Assert.assertEquals(detailsPage.getWorkFlowDetailsGeneralInfo().getPriority(), Priority.LOW);
+        Assert.assertEquals(detailsPage.getWorkFlowDetailsGeneralInfo().getPriority(), Priority.LOW, "Priority is not set to Low");
 
         ShareUser.logout(drone);
 
@@ -1641,14 +1637,13 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // 4/5. Low priority is set.
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
         MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1));
-        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.LOW);
-
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1), "Task is not present");
+        Assert.assertEquals(myTasks.selectViewTasks(workFlowName1).render().getTaskDetailsInfo().getPriority(), Priority.LOW, "Task is not set to Low");
         ShareUser.logout(hybridDrone);
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15652() throws Exception
+    public void dataPrep_AONE_15652() throws Exception
     {
         String testName = getTestName()+ "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
@@ -1701,7 +1696,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15652:Select Destination - different networks
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 400000)
     public void AONE_15652() throws Exception
     {
         String testName = getTestName()+ "T";
@@ -1728,12 +1723,12 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // Verify the list of available networks.
         // ---- Expected results ----
         // network1 and network2 are available.
-        Assert.assertTrue(destinationPage.isNetworkDisplayed(DOMAIN_HYBRID));
-        Assert.assertTrue(destinationPage.isNetworkDisplayed(invitedDomain1));
+        Assert.assertTrue(destinationPage.isNetworkDisplayed(DOMAIN_HYBRID), "Network is not displayed");
+        Assert.assertTrue(destinationPage.isNetworkDisplayed(invitedDomain1), "Network is not displayed");
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15653() throws Exception
+    public void dataPrep_AONE_15653() throws Exception
     {
         String testName = getTestName()+ "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
@@ -1795,7 +1790,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15653:Select Destination - different sites
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 400000)
     public void AONE_15653() throws Exception
     {
         String testName = getTestName()+ "T";
@@ -1834,9 +1829,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // Verify the list of available sites
         // ---- Expected results ----
         // user1site, user2site, user3site are available.
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName1));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName2));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName3));
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName1), "Site " + cloudSiteName1 + "is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName2), "Site " + cloudSiteName2 + "is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName3), "Site " + cloudSiteName3 + "is not displayed");
 
         // ---- Step 2 ----
         // ---- Step action ---
@@ -1861,7 +1856,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         cloudTaskOrReviewPage.selectStartWorkflow().render();
         docLibPage = docLibPage.render();
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName1).isCloudSynced(), "Verifying the File1 is synced");
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName1).isPartOfWorkflow());
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName1).isPartOfWorkflow(), fileName1 + " is not part of workflow");
 
         // ---- Step 5 ----
         // ---- Step action ---
@@ -1871,9 +1866,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName2);
         destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
 
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName1));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName2));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName3));
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName1), "Site " + cloudSiteName1 + "is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName2), "Site " + cloudSiteName2 + "is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName3), "Site " + cloudSiteName3 + "is not displayed");
         selectDestinationAndSync(destinationPage, invitedDomain1, cloudSiteName2, DEFAULT_FOLDER_NAME);
 
         assigneePage = cloudTaskOrReviewPage.selectAssignmentPage().render();
@@ -1883,7 +1878,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         docLibPage = docLibPage.render();
 
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName2).isCloudSynced(), "Verifying the File2 is synced");
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName2).isPartOfWorkflow());
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName2).isPartOfWorkflow(), fileName2 +  " is not part of workflow");
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -1893,9 +1888,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName3);
         destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
 
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName1));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName2));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName3));
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName1),"Site " + cloudSiteName1 + "is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName2), "Site " + cloudSiteName2 + "is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudSiteName3), "Site " + cloudSiteName3 + "is not displayed");
 
         destinationPage.selectNetwork(invitedDomain1);
         destinationPage.selectSite(cloudSiteName3);
@@ -1912,8 +1907,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * Data preparation for tests: AONE-15654, AONE-15655, AONE-15656
      */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_selectDifferentFolders() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut = 400000)
+    public void dataPrep_AONE_selectDifferentFolders() throws Exception
     {
         String opUser1 = getUserNameForDomain(testSelectDestFolders, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain(testSelectDestFolders + "user1", invitedDomain1);
@@ -1962,7 +1957,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
             // Creating 3 folders with Collobarator,Contributor and Consumer roles for each folder.
             ShareUser.openSitesDocumentLibrary(hybridDrone, cloudCollaboratorSite);
-            //ShareUser.openSiteDocumentLibraryFromSearch(hybridDrone, cloudCollaboratorSite);
             createThreeFoldersWithContentRoles(hybridDrone, cloudUser1, folder1, folder2, folder3);
 
             ShareUser.logout(hybridDrone);
@@ -2016,7 +2010,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * AONE-15654:Select Destination - different folders - Collaborator
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15654() throws Exception
     {
         String opUser1 = getUserNameForDomain(testSelectDestFolders, DOMAIN_HYBRID);
@@ -2059,8 +2053,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // 3. Performed correctly. No notifications are displayed.
         // 4.Performed correctly. No notifications are displayed. Workflow is created. The document is synced to the chosen site. The user has Collaborator
         // permissions.
-        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder1, fileName1, cloudCollaboratorSite, docLibPage);
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName1).isPartOfWorkflow());
+        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder1, fileName1, cloudCollaboratorSite, docLibPage).render();
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName1).isPartOfWorkflow(), fileName1 + " is not part of workflow");
 
         // ---- Step 5 ----
         // ---- Step action ---
@@ -2068,8 +2062,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // Performed correctly. No notifications are displayed. Workflow is created. The document is synced to the chosen site. The user has Collaborator
         // permissions.
-        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder1, fileName2, cloudContributorSite, docLibPage);
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName2).isPartOfWorkflow());
+        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder1, fileName2, cloudContributorSite, docLibPage).render();
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName2).isPartOfWorkflow(), fileName2 + " is not part of workflow");
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -2077,15 +2071,14 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // Performed correctly. No notifications are displayed. Workflow is created. The document is synced to the chosen site. The user has Collaborator
         // permissions.
-        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder1, fileName3, cloudConsumerSite, docLibPage);
-
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName3).isPartOfWorkflow());
+        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder1, fileName3, cloudConsumerSite, docLibPage).render();
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName3).isPartOfWorkflow(), fileName3 + " is not part of workflow");
     }
 
     /**
      * AONE-15655:Select Destination - different folders - Contributor
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15655() throws Exception
     {
         String opUser1 = getUserNameForDomain(testSelectDestFolders, DOMAIN_HYBRID);
@@ -2133,8 +2126,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // 3. Performed correctly. No notifications are displayed.
         // 4.Performed correctly. No notifications are displayed. Workflow is created. The document is synced to the chosen site. The user has Contributor 
         // permissions.
-        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder2, fileName4, cloudCollaboratorSite, docLibPage);
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName4).isPartOfWorkflow());
+        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder2, fileName4, cloudCollaboratorSite, docLibPage).render();
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName4).isPartOfWorkflow(), fileName4 + " is not part of workflow");
 
         // ---- Step 5 ----
         // ---- Step action ---
@@ -2142,8 +2135,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // Performed correctly. No notifications are displayed. Workflow is created. The document is synced to the chosen site. The user has Contributor
         // permissions.
-        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder2, fileName5, cloudContributorSite, docLibPage);
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName5).isPartOfWorkflow());
+        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder2, fileName5, cloudContributorSite, docLibPage).render();
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName5).isPartOfWorkflow(), fileName5 + " is not part of workflow");
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -2151,14 +2144,14 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // ---- Expected results ----
         // Performed correctly. No notifications are displayed. Workflow is created. The document is synced to the chosen site. The user has Contributor
         // permissions.
-        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder2, fileName6, cloudConsumerSite, docLibPage);
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName6).isPartOfWorkflow());
+        docLibPage = startWorFlowOnContentWithRole(cloudUser1, folder2, fileName6, cloudConsumerSite, docLibPage).render();
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName6).isPartOfWorkflow(), fileName6 + " is not part of workflow");
     }
 
     /**
      * AONE-15656:Select Destination - different folders - Consumer
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15656() throws Exception
     {
         String opUser1 = getUserNameForDomain(testSelectDestFolders, DOMAIN_HYBRID);
@@ -2258,9 +2251,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
 
         destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
 
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite));
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite), cloudCollaboratorSite + " is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite), cloudContributorSite + " is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite), cloudConsumerSite + " is not displayed");
 
         // ---- Step 4 ----
         // ---- Step action ---
