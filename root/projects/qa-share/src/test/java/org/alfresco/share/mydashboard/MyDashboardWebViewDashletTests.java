@@ -2,6 +2,7 @@ package org.alfresco.share.mydashboard;
 
 import java.util.Set;
 
+import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.ConfigureWebViewDashletBoxPage;
 import org.alfresco.po.share.dashlet.WebViewDashlet;
 import org.alfresco.po.share.enums.Dashlets;
@@ -35,7 +36,7 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2898() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "2";
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -52,19 +53,20 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2898() throws Exception
     {
-        String testName = getTestName() ;
+        String testName = getTestName() + "2";
         String testUser = getUserNameFreeDomain(testName);
         String url = "http://www.google.com/";
         String linkTitle = "Google";
 
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        DashBoardPage dashBoard = ShareUser.login(drone, testUser, DEFAULT_PASSWORD).render();
 
         // ---- Step 1 ----
         // ---- Step action ---
         // Click Configure this dashlet icon
         // ---- Expected results ----
-        // Enter Feed URL form displays
-        WebViewDashlet webDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.WEB_VIEW).render();
+        // Enter Feed URL form displays        
+        //WebViewDashlet webDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.WEB_VIEW).render();
+        WebViewDashlet webDashlet = dashBoard.getDashlet("web-view").render();
         ConfigureWebViewDashletBoxPage configure = webDashlet.clickConfigure();
 
         // ---- Step 2 ----
