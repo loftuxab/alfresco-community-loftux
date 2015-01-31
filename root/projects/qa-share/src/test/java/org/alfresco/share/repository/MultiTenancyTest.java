@@ -158,11 +158,8 @@ public class MultiTenancyTest extends AbstractUtils
             assertTrue(alfrescoPage.userIsLoggedIn("admin"));
 
             //Open Tenant Administration Console
-            TenantAdminConsolePage tenantConsolePage = new TenantAdminConsolePage(drone);
-//TODO fixme
-            //            drone.navigateTo(tenantConsolePage.getTenantURL(shareUrl));
-//            tenantConsolePage.render();
-//            assertTrue(tenantConsolePage.isOpened(), String.format("Page %s does not opened", tenantConsolePage));
+            TenantAdminConsolePage tenantConsolePage = ShareUtil.navigateToTenantAdminConsole(drone, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+            Assert.assertNotNull(tenantConsolePage);
         }
     }
 
