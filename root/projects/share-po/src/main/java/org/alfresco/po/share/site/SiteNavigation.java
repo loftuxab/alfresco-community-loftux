@@ -49,7 +49,7 @@ public class SiteNavigation extends AbstractSiteNavigation
 {
     private Log logger = LogFactory.getLog(SiteNavigation.class);
 
-    protected final String siteMembersCSS;
+    protected final String siteMembersCSS = "#HEADER_SITE_MEMBERS_text";
     private final String documentLibLink;
     private final By customizeDashboardLink;
 
@@ -59,7 +59,6 @@ public class SiteNavigation extends AbstractSiteNavigation
     protected SiteNavigation(WebDrone drone)
     {
         super(drone);
-        siteMembersCSS = drone.getElement("site.members");
         documentLibLink = getAlfrescoVersion().isDojoSupported() ? LABEL_DOCUMENTLIBRARY_PLACEHOLDER : String.format(SITE_LINK_NAV_PLACEHOLER, 3);
         customizeDashboardLink = getAlfrescoVersion().isDojoSupported() ? By.id("HEADER_CUSTOMIZE_SITE_DASHBOARD") : CUSTOMISE_DASHBOARD_BTN;
     }
