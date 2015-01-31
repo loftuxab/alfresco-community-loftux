@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2005-2015 Alfresco Software Limited
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.alfresco.share.enterprise.wqs.web.publications;
 
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
@@ -18,6 +33,10 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.synesis.TestNgXmlBuilder;
+import ru.synesis.enums.TestsType;
+import ru.synesis.properties.BuildProp;
+import ru.synesis.properties.TestLinkProp;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -39,6 +58,23 @@ public class PublicationActions extends AbstractUtils
         @BeforeClass(alwaysRun = true)
         public void setup() throws Exception
         {
+                TestLinkProp testLinkProp = new TestLinkProp("AlfrescoOne", "Ent5.0-AuthSubSystem-v5");
+                BuildProp buildProp = new BuildProp("testsuite.xml", TestsType.TEST);
+                TestNgXmlBuilder testNgXmlBuilder = new TestNgXmlBuilder();
+
+                testLinkProp = new TestLinkProp("AlfrescoOne", "Ent5.0-COSB-v5");
+                buildProp = new BuildProp("testsuiteCOSB-v5.xml", TestsType.TEST);
+                testNgXmlBuilder = new TestNgXmlBuilder();
+                testLinkProp.setBuildName("COSB-IE11-Win8.1-Office2013-Ness");
+                buildProp.setThreadCount("5");
+                buildProp.setTestName("COSB-v5");
+                buildProp.setSuiteName("Automated Tests");
+                testNgXmlBuilder.setProperties(testLinkProp, buildProp);
+                testNgXmlBuilder.build();
+                buildProp.setTestsType(TestsType.DATA_PREP);
+                buildProp.setXmlFileName("testsuite-dataPrepCOSB-v5.xml");
+                testNgXmlBuilder.setProperties(testLinkProp, buildProp);
+                testNgXmlBuilder.build();
                 super.setup();
 
                 testName = this.getClass().getSimpleName();
