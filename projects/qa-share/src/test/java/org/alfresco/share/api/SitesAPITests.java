@@ -15,6 +15,7 @@
 
 package org.alfresco.share.api;
 
+import mx4j.tools.config.DefaultConfigurationBuilder;
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.MySitesDashlet;
@@ -25,6 +26,7 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.blog.BlogPage;
 import org.alfresco.po.share.site.datalist.DataListPage;
+import org.alfresco.po.share.site.datalist.NewListForm;
 import org.alfresco.po.share.site.discussions.DiscussionsPage;
 import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
@@ -1264,7 +1266,8 @@ public class SitesAPITests extends SitesAPI
         // The site contains 6 containers
         LinksPage linksPage = siteDashPage.getSiteNav().selectLinksPage().render();
         linksPage.createLink(testName, testName);
-        DataListPage dataListPage = siteDashPage.getSiteNav().selectDataListPage().render();
+        NewListForm newListForm = (NewListForm)siteDashPage.getSiteNav().selectDataListPage().render();
+        DataListPage dataListPage = newListForm.clickCancel();
         dataListPage.createDataList(DataLists.CONTACT_LIST, testName, testName);
         params.clear();
         params.put(SKIP_COUNT, "0");
