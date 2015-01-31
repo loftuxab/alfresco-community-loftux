@@ -91,7 +91,6 @@ public class EditSimpleCloudTaskTests extends AbstractWorkflow
 
     private void dataPrep(String testName) throws Exception
     {
-
         String workFlowName = "Simple Cloud Task " + testName;
 
         String fileName = getFileName(testName) + "-1.txt";
@@ -127,7 +126,6 @@ public class EditSimpleCloudTaskTests extends AbstractWorkflow
         }
 
         ShareUser.logout(drone);
-
     }
 
     @Test(groups = "DataPrepHybrid")

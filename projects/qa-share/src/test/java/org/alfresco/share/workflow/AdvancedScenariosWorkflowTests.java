@@ -267,7 +267,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15721() throws Exception
     {
-        String testName = getTestName() + "1";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain(testName, partnerDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -305,7 +305,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15721() throws Exception
     {
-        String testName = getTestName() + "1";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain(testName, partnerDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -355,7 +355,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15722() throws Exception
     {
-        String testName = getTestName() + "11";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { opUser1 };
         String trailDomainName = "trial11.test";
@@ -421,7 +421,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15722() throws Exception
     {
-        String testName = getTestName() + "11";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String trailDomainName = "trial11.test";
         String cloudUser1 = getUserNameForDomain(testName, trailDomainName);
@@ -545,7 +545,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15723() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "ts14";
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { opUser1 };
         String trailDomainName = "trial15723.test";
@@ -611,7 +611,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15723() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "ts14";
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String trailDomainName = "trial15723.test";
         String cloudUser1 = getUserNameForDomain(testName, trailDomainName);
@@ -663,7 +663,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15724() throws Exception
     {
-        String testName = getTestName() + "5";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudUser2 = getUserNameForDomain("r2" + testName, invitedDomain1);
@@ -710,7 +710,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15724() throws Exception
     {
-        String testName = getTestName() + "5";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudUser2 = getUserNameForDomain("r2" + testName, invitedDomain1);
@@ -764,13 +764,12 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         // user2@hello.test. Invite them to the site in order to have them participate in the cloud-workflow.
         String error = cloudTaskOrReviewPage.getWorkFlowCouldNotBeStartedPromptMessage();
         Assert.assertTrue(error.contains(errorMessage));
-
     }
 
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15725() throws Exception
     {
-        String testName = getTestName() + "1";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudUser2 = getUserNameForDomain("r2" + testName, invitedDomain1);
@@ -848,7 +847,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15725() throws Exception
     {
-        String testName = getTestName() + "1";
+        String testName = getTestName();
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudUser2 = getUserNameForDomain("r2" + testName, invitedDomain1);
         String cloudUser3 = getUserNameForDomain("r3" + testName, invitedDomain1);
@@ -1017,7 +1016,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15730() throws Exception
     {
-        String testName = getTestName() + "11";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -1053,7 +1052,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15730() throws Exception
     {
-        String testName = getTestName() + "11";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -1284,6 +1283,9 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         editPage.selectTaskDoneButton();
         ShareUser.logout(hybridDrone);
 
+        hybridDrone.closeWindow();
+        setupHybridDrone();
+
         // Login as User1 (OP) in FRENCH
         setCustomDroneWithLanguage(BrowserLanguages.FRENCH);
         ShareUser.login(customDrone, opUser1, DEFAULT_PASSWORD);
@@ -1418,7 +1420,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15731() throws Exception
     {
-        String testName = getTestName() + "4";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -1454,7 +1456,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15731() throws Exception
     {
-        String testName = getTestName() + "4";
+        String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -1519,13 +1521,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         cloudTaskOrReviewPage.selectTask(TaskType.CLOUD_REVIEW_TASK);
         labels = cloudTaskOrReviewPage.getAllLabels();
         verifyLabelsFromCloudReviewPage(Language.JAPANESE, labels, TaskType.CLOUD_REVIEW_TASK);
-        // Assert.assertTrue(labels.contains("メッセージ:"));
-        // Assert.assertTrue(labels.contains("期限:"));
-        // Assert.assertTrue(labels.contains("優先度:"));
-        // Assert.assertTrue(labels.contains("レビュア:*"));
-        // Assert.assertTrue(labels.contains("完了後:*"));
-        // Assert.assertTrue(labels.contains("社内コンテンツをロック"));
-        // Assert.assertTrue(labels.contains("アイテム:*"));
+
         customDrone.closeWindow();
 
         // set language in browser to SPANISH
@@ -1545,7 +1541,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         userNames.add(cloudUser1);
 
         // Select "Cloud Task or Review" from select a workflow dropdown
-        cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
+        CloudTaskOrReviewPage cloudTaskOrReviewPage1 = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
         formDetails.setDueDate(dueDate);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -1555,7 +1551,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(workFlowName);
         formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
         formDetails.setApprovalPercentage(100);
-        cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
+        cloudTaskOrReviewPage1.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
         isSynced(fileName, opSiteName);
 
         // verify task is received in French
@@ -1671,52 +1667,20 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         details = myTasksPage.getTaskLabels(workFlowName);
         taskLabels = details.getTaskLabels();
         verifyLabelsMyTaskPage(Language.JAPANESE, taskLabels);
-        // Assert.assertTrue(taskLabels.contains("期限:"));
-        // Assert.assertTrue(taskLabels.contains("開始日:"));
-        // Assert.assertTrue(taskLabels.contains("ステータス:"));
-        // Assert.assertTrue(taskLabels.contains("タイプ:"));
-        // Assert.assertTrue(taskLabels.contains("説明:"));
-        // Assert.assertTrue(taskLabels.contains("開始者:"));
 
         detailsPage = myTasksPage.selectViewTasks(workFlowName).render();
         viewLabels = detailsPage.getAllLabels();
         verifyLabelsViewTaskPage(Language.JAPANESE, viewLabels);
-        // Assert.assertTrue(viewLabels.contains("メッセージ:"));
-        // Assert.assertTrue(viewLabels.contains("所有者:"));
-        // Assert.assertTrue(viewLabels.contains("優先:"));
-        // Assert.assertTrue(viewLabels.contains("期限:"));
-        // Assert.assertTrue(viewLabels.contains("ステータス:"));
-        // Assert.assertTrue(viewLabels.contains("アイテム:"));
-        // Assert.assertTrue(viewLabels.contains("コメント:"));
 
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
         editPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
         editLabels = editPage.getAllLabels();
         verifyLabelsEditTaskPage(Language.JAPANESE, editLabels);
-        // Assert.assertTrue(editLabels.contains("メッセージ:"));
-        // Assert.assertTrue(editLabels.contains("所有者:"));
-        // Assert.assertTrue(editLabels.contains("優先:"));
-        // Assert.assertTrue(editLabels.contains("期限:"));
 
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
         historyPage = myTasksPage.selectTaskHistory(workFlowName).render();
         historyLabels = historyPage.getAllLabels();
         verifyLabelsHistoryTaskPage(Language.JAPANESE, historyLabels);
-
-        // Assert.assertTrue(historyLabels.contains("完了日:"));
-        // Assert.assertTrue(historyLabels.contains("完了者:"));
-        // Assert.assertTrue(historyLabels.contains("結果:"));
-        // Assert.assertTrue(historyLabels.contains("タイトル:"));
-        // Assert.assertTrue(historyLabels.contains("説明:"));
-        // Assert.assertTrue(historyLabels.contains("開始者:"));
-        // Assert.assertTrue(historyLabels.contains("期限:"));
-        // Assert.assertTrue(historyLabels.contains("完了済み:"));
-        // Assert.assertTrue(historyLabels.contains("開始済み:"));
-        // Assert.assertTrue(historyLabels.contains("優先:"));
-        // Assert.assertTrue(historyLabels.contains("ステータス:"));
-        // Assert.assertTrue(historyLabels.contains("メッセージ:"));
-        // Assert.assertTrue(historyLabels.contains("Eメール通知の送信:"));
-        // Assert.assertTrue(historyLabels.contains("アイテム:"));
 
         hybridDrone.closeWindow();
         setupHybridDrone();
@@ -1842,50 +1806,20 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         opDetails = opMyTasksPage.getTaskLabels(workFlowName);
         opTaskLabels = opDetails.getTaskLabels();
         verifyLabelsMyTaskPage(Language.JAPANESE, opTaskLabels);
-        // Assert.assertTrue(opTaskLabels.contains("期限:"));
-        // Assert.assertTrue(opTaskLabels.contains("開始日:"));
-        // Assert.assertTrue(opTaskLabels.contains("ステータス:"));
-        // Assert.assertTrue(opTaskLabels.contains("タイプ:"));
-        // Assert.assertTrue(opTaskLabels.contains("説明:"));
-        // Assert.assertTrue(opTaskLabels.contains("開始者:"));
 
         opDetailsPage = opMyTasksPage.selectViewTasks(workFlowName).render();
         viewLabelsOP = opDetailsPage.getAllLabels();
         verifyLabelsViewTaskPage(Language.JAPANESE, viewLabelsOP);
-        // Assert.assertTrue(viewLabelsOP.contains("メッセージ:"));
-        // Assert.assertTrue(viewLabelsOP.contains("所有者:"));
-        // Assert.assertTrue(viewLabelsOP.contains("優先:"));
-        // Assert.assertTrue(viewLabelsOP.contains("期限:"));
-        // Assert.assertTrue(viewLabelsOP.contains("ステータス:"));
-        // Assert.assertTrue(viewLabelsOP.contains("アイテム:"));
 
         opMyTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(customDrone);
         opEditPage = opMyTasksPage.navigateToEditTaskPage(workFlowName).render();
         opEditLabels = opEditPage.getAllLabels();
         verifyLabelsEditTaskPage(Language.JAPANESE, opEditLabels);
-        // Assert.assertTrue(opEditLabels.contains("メッセージ:"));
-        // Assert.assertTrue(opEditLabels.contains("所有者:"));
-        // Assert.assertTrue(opEditLabels.contains("優先:"));
-        // Assert.assertTrue(opEditLabels.contains("期限:"));
 
         opMyTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(customDrone);
         opViewWorkflow = opMyTasksPage.selectViewWorkflow(workFlowName).render();
         opHistoryWorkflowPage = opViewWorkflow.getAllLabels();
         verifyLabelsHistoryTaskPage(Language.JAPANESE, opHistoryWorkflowPage);
-
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("完了日:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("完了者:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("結果:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("タイトル:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("説明:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("開始者:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("期限:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("完了済み:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("開始済み:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("優先:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("ステータス:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("メッセージ:"));
-        // Assert.assertTrue(opHistoryWorkflowPage.contains("アイテム:"));
         customDrone.closeWindow();
     }
 
