@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 public class IncompleteWorkflowTests extends AbstractWorkflow
 {
     private String testDomain;
-    private String incompleteWorkflow = "incomplete_workflow10";
+    private String incompleteWorkflow = "incomplete_workflow20";
     private static Log logger = LogFactory.getLog(CifsMSOffice2010Tests.class);
 
     @Override
@@ -135,9 +135,12 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         editDocumentProperties.setDescription(modifiedDescription + user1);
         editDocumentProperties.selectSave().render();
 
-        waitForSync(simpleTaskFile);
+        DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
+        docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
+        waitForSync(simpleTaskFile, opSiteName);
 
         ShareUser.logout(drone);
+
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         // ---- Step 3 ----
@@ -145,10 +148,29 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // Cloud Verify the document.
         // ---- Expected results ----
         // Changes appeared to Cloud. The changed content is correctly displayed.
-        editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile);
-        Assert.assertTrue((modifiedTitle + user1).equals(editDocumentProperties.getDocumentTitle()),
+        ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
+
+        int counter = 1;
+        int retryRefreshCount = 4;
+        EditDocumentPropertiesPage editDocumentPropertiescl = new EditDocumentPropertiesPage(hybridDrone);
+        while (counter <= retryRefreshCount)
+        {
+            editDocumentPropertiescl = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile).render();
+            if (!editDocumentPropertiescl.getDocumentTitle().isEmpty())
+            {
+                break;
+            }
+            else
+            {
+                logger.info("Wait a few seconds for the data to be synced into OP");
+                Thread.sleep(10000);
+                counter++;
+            }
+        }
+
+        Assert.assertTrue((modifiedTitle + user1).equals(editDocumentPropertiescl.getDocumentTitle()),
                 "Document Title modified by OP User is not present for Cloud.");
-        Assert.assertTrue((modifiedDescription + user1).equals(editDocumentProperties.getDescription()),
+        Assert.assertTrue((modifiedDescription + user1).equals(editDocumentPropertiescl.getDescription()),
                 "Document Description modified by OP User is not present for Cloud.");
 
     }
@@ -205,7 +227,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
 
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile);
+        waitForSync(simpleTaskFile, opSiteName);
 
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -281,7 +303,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
 
-        String modifiedContent = testName + "modified content in OP";
+        String modifiedContent = testName + " modified content in OP";
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -313,6 +335,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
+        // waitForSync(simpleTaskFile);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -327,9 +350,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         documentDetailsPage = inlineEditPage.save(contentDetails).render();
-        ShareUser.openSitesDocumentLibrary(drone, opSiteName);
-
-        waitForSync(simpleTaskFile);
+         
+        DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
+        docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
+        waitForSync(simpleTaskFile, opSiteName);
 
         ShareUser.logout(drone);
 
@@ -340,10 +364,30 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // Cloud Verify the document.
         // ---- Expected results ----
         // Changes appeared to Cloud. The changed content is correctly displayed.
-        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
-        documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
-        inlineEditPage = documentDetailsPage.selectInlineEdit().render();
-        Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContent));
+        DocumentLibraryPage documentLibraryPageCL;
+        DocumentDetailsPage documentDetailsPageCL;
+        EditTextDocumentPage inlineEditPageCL = new EditTextDocumentPage(hybridDrone);
+
+        int counter = 1;
+        int retryRefreshCount = 4;
+        while (counter <= retryRefreshCount)
+        {
+            documentLibraryPageCL = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
+            documentDetailsPageCL = documentLibraryPageCL.selectFile(simpleTaskFile);
+            inlineEditPageCL = documentDetailsPageCL.selectInlineEdit().render();
+            if (inlineEditPageCL.getDetails().getContent().contains(modifiedContent))
+            {
+                break;
+            }
+            else
+            {
+                logger.info("Wait a few seconds for the data to be synced into Cloud");
+                Thread.sleep(10000);
+                counter++;
+            }
+        }
+
+        Assert.assertTrue(inlineEditPageCL.getDetails().getContent().contains(modifiedContent));
     }
 
     /**
@@ -397,7 +441,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
 
-        waitForSync(simpleTaskFile);
+        waitForSync(simpleTaskFile, opSiteName);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -501,7 +545,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
 
-        waitForSync(simpleTaskFile);
+        waitForSync(simpleTaskFile, opSiteName);
 
         // ---- Step 1, 2 ----
         // ---- Step action ---
@@ -575,7 +619,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
 
-        waitForSync(simpleTaskFile);
+        waitForSync(simpleTaskFile, opSiteName);
 
         // ---- Step 1, 2 ----
         // ---- Step action ---
@@ -649,7 +693,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile);
+        waitForSync(simpleTaskFile, opSiteName);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -721,7 +765,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile);
+        waitForSync(simpleTaskFile, opSiteName);
 
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -751,11 +795,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 .contains(cloudSite));
     }
 
-    private void waitForSync(String fileName)
+    private void waitForSync(String fileName, String siteName)
     {
         int counter = 1;
         int retryRefreshCount = 4;
-
         while (counter <= retryRefreshCount)
         {
             if (checkIfContentIsSynced(drone, fileName))
@@ -766,7 +809,14 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
             {
                 drone.refresh();
                 counter++;
+                
+                if(counter == 2 || counter == 3)
+                {
+                    DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                    docLib.getFileDirectoryInfo(fileName).selectRequestSync().render();
+                }
             }
         }
     }
+
 }
