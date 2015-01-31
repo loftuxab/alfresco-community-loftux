@@ -32,446 +32,445 @@ import java.util.Locale;
 
 /**
  * Sync Info Details Page
- *
+ * 
  * @author Chiran
  * @since 1.7.1
  */
 public class SyncInfoPage extends SharePage
 {
-        public static final By PROMPT_BUTTONS = By.cssSelector("div[id$='prompt']>div.ft>span>span>span.first-child");
-        public static final By REMOVE_CHECKBOX = By.cssSelector("input[id$='requestDeleteRemote']");
-        public static final By STATUS_HEADING = By.cssSelector(".cloud-sync-status-heading");
-        private static final By CLOSE_BUTTON = By.cssSelector("div[style*='visible'] div.info-balloon .closeButton");
-        private static final By IS_CLOUD_SYNC_STATUS = By.cssSelector("div[style*='visible'] div.cloud-sync-status-heading+p");
-        private static final By SYNC_LOCATION_PRESENT = By.cssSelector("p.location span:not(.document-link) a");
-        private static final By REQ_SYNC_BUTTON = By.cssSelector("div[style*='visible'] div.cloud-sync-status-buttons>span:first-child>span>button");
-        private static final By REQ_UNSYNC_BUTTON = By.cssSelector("div[style*='visible'] div.cloud-sync-status-buttons>span:last-child>span>button");
-        private static final By SYNC_LOCATION = By.cssSelector("div[style*='visible'] .cloud-sync-details-info>p>span[class^='folder-link']>a");
-        private static final By SYNC_DOCUMENT_NAME = By.cssSelector(".view-in-cloud");
-        private static final By SYNC_PERIOD = By.cssSelector(".cloud-sync-details-info>p>span[title]");
-        private static final String DATE_FORMAT = "EEE dd MMM yyyy HH:mm:ss";
-        private static final By INDIRECT_SYNC_LOCATION = By.cssSelector(".cloud-sync-indirect-root .view-in-cloud");
-        private static final By FAILED_SYNC = By.cssSelector("div[style*='visible'] .cloud-sync-details-failed-detailed");
-        private static final By UNABLE_RETRIEVE_LOCATION = By.xpath("//p[text()='Unable to retrieve location']");
-        private static Log logger = LogFactory.getLog(FileDirectoryInfo.class);
+    public static final By PROMPT_BUTTONS = By.cssSelector("div[id$='prompt']>div.ft>span>span>span.first-child");
+    public static final By REMOVE_CHECKBOX = By.cssSelector("input[id$='requestDeleteRemote']");
+    public static final By STATUS_HEADING = By.cssSelector(".cloud-sync-status-heading");
+    private static final By CLOSE_BUTTON = By.cssSelector("div[style*='visible'] div.info-balloon .closeButton");
+    private static final By IS_CLOUD_SYNC_STATUS = By.cssSelector("div[style*='visible'] div.cloud-sync-status-heading+p");
+    private static final By SYNC_LOCATION_PRESENT = By.cssSelector("p.location span:not(.document-link) a");
+    private static final By REQ_SYNC_BUTTON = By.cssSelector("div[style*='visible'] div.cloud-sync-status-buttons>span:first-child>span>button");
+    private static final By REQ_UNSYNC_BUTTON = By.cssSelector("div[style*='visible'] div.cloud-sync-status-buttons>span:last-child>span>button");
+    private static final By SYNC_LOCATION = By.cssSelector("div[style*='visible'] .cloud-sync-details-info>p>span[class^='folder-link']>a");
+    private static final By SYNC_DOCUMENT_NAME = By.cssSelector(".view-in-cloud");
+    private static final By SYNC_PERIOD = By.cssSelector(".cloud-sync-details-info>p>span[title]");
+    private static final String DATE_FORMAT = "EEE dd MMM yyyy HH:mm:ss";
+    private static final By INDIRECT_SYNC_LOCATION = By.cssSelector(".cloud-sync-indirect-root .view-in-cloud");
+    private static final By FAILED_SYNC = By.cssSelector("div[style*='visible'] .cloud-sync-details-failed-detailed");
+    private static final By UNABLE_RETRIEVE_LOCATION = By.xpath("//p[text()='Unable to retrieve location']");
+    private static Log logger = LogFactory.getLog(FileDirectoryInfo.class);
 
-        public SyncInfoPage(WebDrone drone)
+    public SyncInfoPage(WebDrone drone)
+    {
+        super(drone);
+    }
+
+    @SuppressWarnings("unchecked")
+    public SyncInfoPage render(RenderTime timer)
+    {
+        renderLoop: while (true)
         {
-                super(drone);
+            timer.start();
+            try
+            {
+                List<WebElement> statusElements = drone.findAll(STATUS_HEADING);
+                for (WebElement status : statusElements)
+                {
+                    if (status.isDisplayed())
+                    {
+                        break renderLoop;
+                    }
+                }
+            }
+            catch (NoSuchElementException nse)
+            {
+            }
+            finally
+            {
+                timer.end();
+            }
+        }
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public SyncInfoPage render(long time)
+    {
+        return render(new RenderTime(time));
+    }
+
+    @SuppressWarnings("unchecked")
+    public SyncInfoPage render()
+    {
+        return render(new RenderTime(maxPageLoadingTime));
+    }
+
+    /**
+     * Sync pop up close button is present or not.
+     * 
+     * @return
+     */
+    public boolean isCloseButtonPresent()
+    {
+        try
+        {
+            return drone.findAndWait(CLOSE_BUTTON).isDisplayed();
+        }
+        catch (TimeoutException nse)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Status details of synced artifact is present or not.
+     * 
+     * @return
+     */
+    public boolean isSyncStatusPresent()
+    {
+        try
+        {
+            return drone.find(IS_CLOUD_SYNC_STATUS).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+        }
+        return false;
+    }
+
+    /**
+     * Location of synced artifact is present or not.
+     * 
+     * @return
+     */
+    public boolean isSyncLocationPresent()
+    {
+        try
+        {
+            return drone.find(SYNC_LOCATION_PRESENT).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+        }
+        return false;
+    }
+
+    /**
+     * Request sync button is present or not.
+     * 
+     * @return
+     */
+    public boolean isRequestSyncButtonPresent()
+    {
+        try
+        {
+            return drone.findAndWait(REQ_SYNC_BUTTON, WAIT_TIME_3000).isDisplayed();
+        }
+        catch (TimeoutException nse)
+        {
+            logger.error("Time out finding unsync button!!", nse);
+        }
+        return false;
+    }
+
+    /**
+     * Unsync button present or not.
+     * 
+     * @return
+     */
+    public boolean isUnsyncButtonPresent()
+    {
+        try
+        {
+            return drone.findAndWait(REQ_UNSYNC_BUTTON, WAIT_TIME_3000).isDisplayed();
+        }
+        catch (TimeoutException nse)
+        {
+            logger.error("Time out finding unsync button!!", nse);
+        }
+        return false;
+    }
+
+    /**
+     * Click on sync pop up button to close pop up.
+     * 
+     * @return
+     */
+    public HtmlPage clickOnCloseButton()
+    {
+        try
+        {
+            drone.findAndWait(CLOSE_BUTTON).click();
+            return FactorySharePage.getUnknownPage(drone);
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Unable to find Close button on Sync Info page", e);
+            throw new PageException("Not able to click on Sync Info close button.");
+        }
+        catch (ElementNotVisibleException env)
+        {
+            logger.info("Nothing to close");
+            return FactorySharePage.resolvePage(drone);
+        }
+    }
+
+    /**
+     * Get Sync status of the artifact.
+     * 
+     * @return
+     */
+    public String getCloudSyncStatus()
+    {
+        try
+        {
+            return drone.find(IS_CLOUD_SYNC_STATUS).getText();
+        }
+        catch (NoSuchElementException nse)
+        {
+            return drone.findAndWait(By.cssSelector("div.cloud-sync-status-heading+p")).getText();
+        }
+    }
+
+    /**
+     * Get location of synced document.(i.e. premiumnet>sitename>Documents)
+     * 
+     * @return
+     */
+    public String getCloudSyncLocation()
+    {
+        StringBuilder location = new StringBuilder("");
+        try
+        {
+            List<WebElement> elements;
+            drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3);
+            elements = drone.findAll(SYNC_LOCATION);
+
+            if (elements.size() == 0)
+            {
+                elements = drone.findAll(SYNC_LOCATION_PRESENT);
+            }
+            int i = elements.size();
+            for (WebElement webElement : elements)
+            {
+                location.append(webElement.getText());
+                while (i > 1)
+                {
+                    location.append(">");
+                    i--;
+                    break;
+                }
+            }
+            return location.toString();
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Exceeded the time to find css.", e);
         }
 
-        @SuppressWarnings("unchecked")
-        public SyncInfoPage render(RenderTime timer)
+        throw new PageException("Not able to find Sync Info Location.");
+    }
+
+    /**
+     * Get name of the synced document.
+     * 
+     * @return
+     */
+    public String getCloudSyncDocumentName()
+    {
+        try
         {
-                renderLoop:
-                while (true)
-                {
-                        timer.start();
-                        try
-                        {
-                                List<WebElement> statusElements = drone.findAll(STATUS_HEADING);
-                                for (WebElement status : statusElements)
-                                {
-                                        if (status.isDisplayed())
-                                        {
-                                                break renderLoop;
-                                        }
-                                }
-                        }
-                        catch (NoSuchElementException nse)
-                        {
-                        }
-                        finally
-                        {
-                                timer.end();
-                        }
-                }
-                return this;
+            return drone.findAndWait(SYNC_DOCUMENT_NAME).getText();
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Exceeded the time to find css.", e);
         }
 
-        @SuppressWarnings("unchecked")
-        public SyncInfoPage render(long time)
+        throw new PageException("Not able to find Sync Info Location.");
+    }
+
+    /**
+     * Get Date of sync happened.
+     * 
+     * @return
+     */
+    public Date getSyncPeriodDetails()
+    {
+        try
         {
-                return render(new RenderTime(time));
+            String syncPeriod = drone.findAndWait(SYNC_PERIOD).getAttribute("title");
+            return new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH).parse(syncPeriod);
         }
-
-        @SuppressWarnings("unchecked")
-        public SyncInfoPage render()
+        catch (TimeoutException toe)
         {
-                return render(new RenderTime(maxPageLoadingTime));
+            logger.error("Time out finding element for sync time period");
         }
-
-        /**
-         * Sync pop up close button is present or not.
-         *
-         * @return
-         */
-        public boolean isCloseButtonPresent()
+        catch (ParseException e)
         {
-                try
-                {
-                        return drone.findAndWait(CLOSE_BUTTON).isDisplayed();
-                }
-                catch (TimeoutException nse)
-                {
-                        return false;
-                }
+            logger.error("Parse error no date exist");
         }
+        throw new PageException();
+    }
 
-        /**
-         * Status details of synced artifact is present or not.
-         *
-         * @return
-         */
-        public boolean isSyncStatusPresent()
+    /**
+     * Unsync button present or not.
+     * 
+     * @param removeContentFromCloud
+     * @return
+     * @see true: Remove content from cloud.
+     *      false: Remove sync with Cloud.
+     */
+    public void selectUnsyncRemoveContentFromCloud(boolean removeContentFromCloud)
+    {
+        try
         {
-                try
+            List<WebElement> buttons = drone.findAndWaitForElements(REQ_UNSYNC_BUTTON);
+            for (WebElement button : buttons)
+            {
+                if ("Unsync".equals(button.getText()))
                 {
-                        return drone.find(IS_CLOUD_SYNC_STATUS).isDisplayed();
+                    button.click();
+                    break;
                 }
-                catch (NoSuchElementException nse)
-                {
-                }
-                return false;
+            }
+            if (removeContentFromCloud)
+            {
+                selectCheckBoxToRemoveContenFromCloud();
+            }
+            clickButtonFromPopup(ButtonType.REMOVE);
+            return;
         }
-
-        /**
-         * Location of synced artifact is present or not.
-         *
-         * @return
-         */
-        public boolean isSyncLocationPresent()
+        catch (TimeoutException nse)
         {
-                try
-                {
-                        return drone.find(SYNC_LOCATION_PRESENT).isDisplayed();
-                }
-                catch (NoSuchElementException nse)
-                {
-                }
-                return false;
+            logger.error("Time out finding unsync button!!", nse);
         }
+        throw new PageException();
+    }
 
-        /**
-         * Request sync button is present or not.
-         *
-         * @return
-         */
-        public boolean isRequestSyncButtonPresent()
+    /**
+     * Click check box to remove content.
+     */
+    private void selectCheckBoxToRemoveContenFromCloud()
+    {
+        try
         {
-                try
-                {
-                        return drone.findAndWait(REQ_SYNC_BUTTON, WAIT_TIME_3000).isDisplayed();
-                }
-                catch (TimeoutException nse)
-                {
-                        logger.error("Time out finding unsync button!!", nse);
-                }
-                return false;
+            drone.findAndWait(REMOVE_CHECKBOX).click();
+            return;
         }
-
-        /**
-         * Unsync button present or not.
-         *
-         * @return
-         */
-        public boolean isUnsyncButtonPresent()
+        catch (TimeoutException nse)
         {
-                try
-                {
-                        return drone.findAndWait(REQ_UNSYNC_BUTTON, WAIT_TIME_3000).isDisplayed();
-                }
-                catch (TimeoutException nse)
-                {
-                        logger.error("Time out finding unsync button!!", nse);
-                }
-                return false;
+            logger.error("Time out finding check box button!!");
         }
+        throw new PageException();
+    }
 
-        /**
-         * Click on sync pop up button to close pop up.
-         *
-         * @return
-         */
-        public HtmlPage clickOnCloseButton()
+    /**
+     * Click Button to Remove or Cancel unsync operation.
+     * 
+     * @param buttonType
+     */
+    private void clickButtonFromPopup(ButtonType buttonType)
+    {
+        try
         {
-                try
+            List<WebElement> buttons = drone.findAndWaitForElements(PROMPT_BUTTONS);
+            for (WebElement button : buttons)
+            {
+                if ("Remove sync".equals(button.getText()) && ButtonType.REMOVE.equals(buttonType))
                 {
-                        drone.findAndWait(CLOSE_BUTTON).click();
-                        return FactorySharePage.getUnknownPage(drone);
+                    button.click();
+                    break;
                 }
-                catch (TimeoutException e)
+                else if ("Cancel".equals(button.getText()) && ButtonType.CANCEL.equals(buttonType))
                 {
-                        logger.error("Unable to find Close button on Sync Info page", e);
-                        throw new PageException("Not able to click on Sync Info close button.");
+                    button.click();
+                    break;
                 }
-                catch (ElementNotVisibleException env)
-                {
-                        logger.info("Nothing to close");
-                        return FactorySharePage.resolvePage(drone);
-                }
+            }
+            return;
         }
-
-        /**
-         * Get Sync status of the artifact.
-         *
-         * @return
-         */
-        public String getCloudSyncStatus()
+        catch (TimeoutException nse)
         {
-                try
-                {
-                        return drone.find(IS_CLOUD_SYNC_STATUS).getText();
-                }
-                catch (NoSuchElementException nse)
-                {
-                        return drone.findAndWait(By.cssSelector("div.cloud-sync-status-heading+p")).getText();
-                }
+            logger.error("Time out finding buttons!!", nse);
         }
+        throw new PageException();
+    }
 
-        /**
-         * Get location of synced document.(i.e. premiumnet>sitename>Documents)
-         *
-         * @return
-         */
-        public String getCloudSyncLocation()
+    /**
+     * @return
+     */
+    public boolean isUnSyncIconPresentInDetailsPage()
+    {
+        try
         {
-                StringBuilder location = new StringBuilder("");
-                try
-                {
-                        List<WebElement> elements;
-                        drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3);
-                        elements = drone.findAll(SYNC_LOCATION);
-
-                        if (elements.size() == 0)
-                        {
-                                elements = drone.findAll(SYNC_LOCATION_PRESENT);
-                        }
-                        int i = elements.size();
-                        for (WebElement webElement : elements)
-                        {
-                                location.append(webElement.getText());
-                                while (i > 1)
-                                {
-                                        location.append(">");
-                                        i--;
-                                        break;
-                                }
-                        }
-                        return location.toString();
-                }
-                catch (TimeoutException e)
-                {
-                        logger.error("Exceeded the time to find css.", e);
-                }
-
-                throw new PageException("Not able to find Sync Info Location.");
+            return drone.find(By.cssSelector(".document-unsync-link")).isDisplayed();
         }
-
-        /**
-         * Get name of the synced document.
-         *
-         * @return
-         */
-        public String getCloudSyncDocumentName()
+        catch (NoSuchElementException nse)
         {
-                try
-                {
-                        return drone.findAndWait(SYNC_DOCUMENT_NAME).getText();
-                }
-                catch (TimeoutException e)
-                {
-                        logger.error("Exceeded the time to find css.", e);
-                }
-
-                throw new PageException("Not able to find Sync Info Location.");
         }
+        return false;
 
-        /**
-         * Get Date of sync happened.
-         *
-         * @return
-         */
-        public Date getSyncPeriodDetails()
+    }
+
+    public String getCloudSyncIndirectLocation()
+    {
+        try
         {
-                try
-                {
-                        String syncPeriod = drone.findAndWait(SYNC_PERIOD).getAttribute("title");
-                        return new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH).parse(syncPeriod);
-                }
-                catch (TimeoutException toe)
-                {
-                        logger.error("Time out finding element for sync time period");
-                }
-                catch (ParseException e)
-                {
-                        logger.error("Parse error no date exist");
-                }
-                throw new PageException();
+            return drone.find(INDIRECT_SYNC_LOCATION).getAttribute("text");
         }
-
-        /**
-         * Unsync button present or not.
-         *
-         * @param removeContentFromCloud
-         * @return
-         * @see true: Remove content from cloud.
-         * false: Remove sync with Cloud.
-         */
-        public void selectUnsyncRemoveContentFromCloud(boolean removeContentFromCloud)
+        catch (NoSuchElementException nse)
         {
-                try
-                {
-                        List<WebElement> buttons = drone.findAndWaitForElements(REQ_UNSYNC_BUTTON);
-                        for (WebElement button : buttons)
-                        {
-                                if ("Unsync".equals(button.getText()))
-                                {
-                                        button.click();
-                                        break;
-                                }
-                        }
-                        if (removeContentFromCloud)
-                        {
-                                selectCheckBoxToRemoveContenFromCloud();
-                        }
-                        clickButtonFromPopup(ButtonType.REMOVE);
-                        return;
-                }
-                catch (TimeoutException nse)
-                {
-                        logger.error("Time out finding unsync button!!", nse);
-                }
-                throw new PageException();
+            return drone.find(By.cssSelector(".cloud-sync-details-info p:nth-of-type(1)")).getAttribute("text");
         }
+    }
 
-        /**
-         * Click check box to remove content.
-         */
-        private void selectCheckBoxToRemoveContenFromCloud()
+    public boolean isFailedInfoDisplayed()
+    {
+        try
         {
-                try
-                {
-                        drone.findAndWait(REMOVE_CHECKBOX).click();
-                        return;
-                }
-                catch (TimeoutException nse)
-                {
-                        logger.error("Time out finding check box button!!");
-                }
-                throw new PageException();
+            drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3000);
+            return drone.find(FAILED_SYNC).isDisplayed();
         }
-
-        /**
-         * Click Button to Remove or Cancel unsync operation.
-         *
-         * @param buttonType
-         */
-        private void clickButtonFromPopup(ButtonType buttonType)
+        catch (NoSuchElementException nse)
         {
-                try
-                {
-                        List<WebElement> buttons = drone.findAndWaitForElements(PROMPT_BUTTONS);
-                        for (WebElement button : buttons)
-                        {
-                                if ("Remove sync".equals(button.getText()) && ButtonType.REMOVE.equals(buttonType))
-                                {
-                                        button.click();
-                                        break;
-                                }
-                                else if ("Cancel".equals(button.getText()) && ButtonType.CANCEL.equals(buttonType))
-                                {
-                                        button.click();
-                                        break;
-                                }
-                        }
-                        return;
-                }
-                catch (TimeoutException nse)
-                {
-                        logger.error("Time out finding buttons!!", nse);
-                }
-                throw new PageException();
+            return drone.find(By.cssSelector(".cloud-sync-details-failed-detailed")).isDisplayed();
         }
+    }
 
-        /**
-         * @return
-         */
-        public boolean isUnSyncIconPresentInDetailsPage()
+    /**
+     * Unsync button enabled.
+     * 
+     * @return
+     */
+    public boolean isUnsyncButtonEnabled()
+    {
+        try
         {
-                try
-                {
-                        return drone.find(By.cssSelector(".document-unsync-link")).isDisplayed();
-                }
-                catch (NoSuchElementException nse)
-                {
-                }
-                return false;
 
-        }
-
-        public String getCloudSyncIndirectLocation()
-        {
-                try
-                {
-                        return drone.find(INDIRECT_SYNC_LOCATION).getAttribute("text");
-                }
-                catch (NoSuchElementException nse)
-                {
-                        return drone.find(By.cssSelector(".cloud-sync-details-info p:nth-of-type(1)")).getAttribute("text");
-                }
-        }
-
-        public boolean isFailedInfoDisplayed()
-        {
-                try
-                {
-                        drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3000);
-                        return drone.find(FAILED_SYNC).isDisplayed();
-                }
-                catch (NoSuchElementException nse)
-                {
-                        return drone.find(By.cssSelector(".cloud-sync-details-failed-detailed")).isDisplayed();
-                }
-        }
-
-        /**
-         * Unsync button enabled.
-         *
-         * @return
-         */
-        public boolean isUnsyncButtonEnabled()
-        {
-                try
-                {
-
-                        return drone.findAndWait(REQ_UNSYNC_BUTTON, WAIT_TIME_3000).isEnabled();
-
-                }
-
-                catch (TimeoutException nse)
-                {
-                        logger.error("Time out finding unsync button!!", nse);
-                }
-                return false;
-        }
-
-        public boolean isUnableToRetrieveLocation()
-        {
-                try
-                {
-                        return drone.find(UNABLE_RETRIEVE_LOCATION).isDisplayed();
-                }
-                catch (NoSuchElementException nse)
-                {
-
-                }
-                return false;
+            return drone.findAndWait(REQ_UNSYNC_BUTTON, WAIT_TIME_3000).isEnabled();
 
         }
 
-        public enum ButtonType
+        catch (TimeoutException nse)
         {
-                CANCEL, REMOVE;
+            logger.error("Time out finding unsync button!!", nse);
         }
+        return false;
+    }
+
+    public boolean isUnableToRetrieveLocation()
+    {
+        try
+        {
+            return drone.find(UNABLE_RETRIEVE_LOCATION).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+
+        }
+        return false;
+
+    }
+
+    public enum ButtonType
+    {
+        CANCEL, REMOVE;
+    }
 }
