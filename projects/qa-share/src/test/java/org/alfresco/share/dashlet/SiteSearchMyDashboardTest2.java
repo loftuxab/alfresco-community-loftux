@@ -134,7 +134,7 @@ public class SiteSearchMyDashboardTest2 extends AbstractUtils
         String[] testUserInfo = new String[] { userName, firstName, LAST_NAME };
 
         // User
-       // CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
         // User login
         ShareUser.login(drone, userName, DEFAULT_PASSWORD);
