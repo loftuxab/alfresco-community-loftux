@@ -41,7 +41,6 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
         private final By BLOG_POST_DATE = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(1)");
         private final By BLOG_POST_CREATOR = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(2)");
         private final By BlOG_POST_COMMENTS_LINK = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(3)>a");
-        private final By TAG_LIST = By.cssSelector(".tag-list>li>a");
         public static final String ETHICAL_FUNDS = "Ethical funds";
         public static final String COMPANY_ORGANISES_WORKSHOP = "Company organises workshop";
         public static final String ANALYSTS_LATEST_THOUGHTS = "latest thoughts";
@@ -217,29 +216,6 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
                 catch (TimeoutException e)
                 {
                         throw new PageOperationException("Exceeded time to find news link. " + e.toString());
-                }
-        }
-
-        /**
-         * Method to get all tags in taglist as text
-         *
-         * @return List<String>
-         */
-        public List<String> getTagList()
-        {
-                try
-                {
-                        ArrayList<String> taglist = new ArrayList<String>();
-                        List<WebElement> tags = drone.findAndWaitForElements(TAG_LIST);
-                        for (WebElement tag : tags)
-                        {
-                                taglist.add(tag.getText());
-                        }
-                        return taglist;
-                }
-                catch (TimeoutException e)
-                {
-                        throw new PageOperationException("Exceeded time to find the tags " + e.toString());
                 }
         }
 

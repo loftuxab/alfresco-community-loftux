@@ -1,5 +1,8 @@
 package org.alfresco.po.share.wqs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -32,6 +35,8 @@ public abstract class WcmqsAbstractPage extends SharePage
     public final static String BLOG_MENU_STR = "blog";
     public static final String PUBLICATIONS_MENU_STR = "publications";
     public static final String HOME_MENU_STR = "home";
+    private final By TAG_LIST = By.cssSelector("div.blog-categ");
+
     private static Log logger = LogFactory.getLog(WcmqsAbstractPage.class);
 
     public WcmqsAbstractPage(WebDrone drone)
@@ -263,7 +268,7 @@ public abstract class WcmqsAbstractPage extends SharePage
 
     /**
      * Method to click a news title
-     *
+     * 
      * @param newsTitle - the title of the news in wcmqs site
      * @return
      */
@@ -282,9 +287,9 @@ public abstract class WcmqsAbstractPage extends SharePage
 
     /**
      * Method to click a news title
-     *
+     * 
      * @param newsTitle - the title of the news in wcmqs site
-     * @param section   - the class of the section where you want to search
+     * @param section - the class of the section where you want to search
      * @return
      */
     public void clickLinkByTitle(String newsTitle, String section)
@@ -302,7 +307,7 @@ public abstract class WcmqsAbstractPage extends SharePage
 
     /**
      * Method to click on a document from any publication root page
-     *
+     * 
      * @param documentTitle
      */
     public void clickImageLink(String documentTitle)
@@ -316,8 +321,7 @@ public abstract class WcmqsAbstractPage extends SharePage
             throw new PageOperationException("Exceeded time to find Document link. " + e.toString());
         }
     }
-    
-    
+
     /**
      * Method to get text from the search field
      * 
@@ -327,6 +331,54 @@ public abstract class WcmqsAbstractPage extends SharePage
     {
         return drone.findAndWait(SEARCH_FIELD).getAttribute("value");
     }
-    
+
+    /**
+     * Method to check if image link for a title is displayed
+     * 
+     * @param documentTitle
+     */
+    public boolean isImageLinkForTitleDisplayed(String documentTitle)
+    {
+        try
+        {
+            return drone.findAndWait(By.xpath(String.format("//a[contains(text(),\"%s\")]/../..//img", documentTitle))).isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find Document link. " + e.toString());
+        }
+
+    }
+
+    /**
+     * Method to get all tags in section tag list as text
+     * 
+     * @return List<String>  Contains "None" in case of empty list
+     */
+    public List<String> getTagList()
+    {
+        try
+        {
+            ArrayList<String> taglist = new ArrayList<String>();
+            WebElement sectionTags = drone.findAndWait(TAG_LIST);
+            List<WebElement> tags = sectionTags.findElements(By.cssSelector("a"));
+            if (tags.size() == 0)
+            {
+                taglist.add("None");
+            }
+            else
+            {
+                for (WebElement tag : tags)
+                {
+                    taglist.add(tag.getText());
+                }
+            }
+            return taglist;
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find the tags " + e.toString());
+        }
+    }
 
 }
