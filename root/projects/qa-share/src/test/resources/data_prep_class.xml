@@ -3,11 +3,11 @@
 	<test name="Workflow" verbose="1" parallel="classes" thread-count="5">
 		<groups>
 			<run>
-				<exclude name="DataPrep.*" />
+				<include name="DataPrepCloudSync1" />
 			</run>
 		</groups>
 		<classes>
-			<class name="org.alfresco.share.dashlet.SavedSearchMyDashboardBasicTest" />
+			<class name="org.alfresco.share.cloudsync.CloudSyncAccessTest" />
 		</classes>
 	</test>
 </suite>
