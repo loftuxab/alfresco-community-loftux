@@ -89,11 +89,11 @@ public class UserContentsPageTest extends AbstractTest
     @Test(groups = { "alfresco-one" })
     public void getContentNoContent()
     {
-        assertTrue(userContentPage.isNoContentAddMessagePresent()); 
+        assertTrue(userContentPage.isNoContentAddMessagePresent());
         assertTrue(userContentPage.isNoContentModifiedMessagePresent());
     }
 
-    @Test(dependsOnMethods = "getContentNoContent", groups = { "alfresco-one" })
+    @Test(dependsOnMethods = "getContentNoContent", groups = { "alfresco-one", "TestBug" })
     public void getContents() throws IOException
     {
         SiteUtil.createSite(drone, siteName1, "description", "Public");
@@ -113,7 +113,7 @@ public class UserContentsPageTest extends AbstractTest
         // edit the document
         documentLibPage = documentLibPage.getFileDirectoryInfo(fileName).selectEditOffline().render();
         assertTrue(documentLibPage.getFileDirectoryInfo(fileName).isEdited());
-        
+
         // cancel edit
         documentLibPage = documentLibPage.getFileDirectoryInfo(fileName).selectCancelEditing().render();
         assertFalse(documentLibPage.getFileDirectoryInfo(fileName).isEdited());
@@ -147,7 +147,7 @@ public class UserContentsPageTest extends AbstractTest
         }
     }
 
-    @Test(dependsOnMethods = "getContents", groups = { "alfresco-one" })
+    @Test(dependsOnMethods = "getContents", groups = { "alfresco-one", "TestBug" })
     public void getAddedContentName()
     {
         List<UserContentItems> contentItems = userContentPage.getContentAdded(fileName);
@@ -156,7 +156,7 @@ public class UserContentsPageTest extends AbstractTest
         assertEquals(addedContent.getContentName(), fileName);
     }
 
-    @Test(dependsOnMethods = "getContents", groups = { "alfresco-one" })
+    @Test(dependsOnMethods = "getContents", groups = { "alfresco-one", "TestBug" })
     public void getModifiedContentName()
     {
         List<UserContentItems> contentItemsMod = userContentPage.getContentModified(fileName);
@@ -165,11 +165,9 @@ public class UserContentsPageTest extends AbstractTest
         assertEquals(modifiedContent.getContentName(), fileName);
     }
 
-   
-    
-    @Test(dependsOnMethods = "getAddedContentName", groups = { "alfresco-one" })
+    @Test(dependsOnMethods = "getAddedContentName", groups = { "alfresco-one", "TestBug" })
     public void clickContentAdded()
-    {    
+    {
         detailsPage = addedContent.clickOnContentName().render();
         assertTrue(detailsPage.isSite(siteName1));
         Assert.assertTrue(detailsPage.isTitlePresent(siteName1));
@@ -179,16 +177,16 @@ public class UserContentsPageTest extends AbstractTest
         Assert.assertEquals(editPage.getName(), fileName);
     }
 
-    @Test(dependsOnMethods = "getModifiedContentName", groups = { "alfresco-one" })
+    @Test(dependsOnMethods = "getModifiedContentName", groups = { "alfresco-one", "TestBug" })
     public void clickcontentModified()
     {
         // navigate to my profile -> Content
         MyProfilePage myprofile1 = dashboardPage.getNav().selectMyProfile().render();
         UserContentPage userContentPage1 = myprofile1.getProfileNav().selectContent().render();
-        
+
         List<UserContentItems> contentItemsMod = userContentPage1.getContentModified(fileName);
         modifiedContent = contentItemsMod.get(0);
-        
+
         detailsPage = modifiedContent.clickOnContentName().render();
         assertTrue(detailsPage.isSite(siteName1));
         Assert.assertTrue(detailsPage.isTitlePresent(siteName1));
