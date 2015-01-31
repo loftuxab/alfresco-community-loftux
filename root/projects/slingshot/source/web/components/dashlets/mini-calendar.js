@@ -184,7 +184,9 @@
                   var displayStartTime = startTime,
                      displayEndTime = endTime,
                      endText = "";
-                  if (item.endAt.iso8601.split("T")[0] !== item.startAt.iso8601.split("T")[0])
+		  var startDateTimeZone = formatDate(fromISO8601(item.startAt.iso8601), "dd-mm-yyyy"),
+                        endDateTimeZone = formatDate(fromISO8601(item.endAt.iso8601), "dd-mm-yyyy");
+                  if (endDateTimeZone !== startDateTimeZone)
                   {
                      // Don't include start and end times on all day multi-day events. (but do on timed multi day events)
                      if (formatDate(fromISO8601(item.startAt.iso8601), "HH:MM") === "00:00" && formatDate(fromISO8601(item.endAt.iso8601), "HH:MM") === "00:00")
