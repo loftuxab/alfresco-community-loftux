@@ -5,6 +5,7 @@
         <run>
             <include name="DataPrep.*" />
             <exclude name="NonGrid" />
+            <exclude name="Hybrid" />
         </run>
     </groups>
 
@@ -43,5 +44,11 @@
             <class name="org.alfresco.share.workflow.WorkFlowActionsTest" />
         </classes>
     </test-->
+
+    <test name="dataprep-CloudSyncSmokeTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.cloudsync.CloudSyncSmokeTest" />
+        </classes>
+    </test>
 
 </suite>
