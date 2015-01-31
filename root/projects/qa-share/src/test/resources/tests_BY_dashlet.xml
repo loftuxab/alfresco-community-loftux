@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="Dashlet Tests for Sprint BY" thread-count="1">
+<suite name="Dashlet Tests for Sprint BY" thread-count="3">
 
     <groups>
         <run>
@@ -35,11 +35,35 @@
         </classes>
     </test>-->
 
-    <test name="SiteSearchMyDashboardTest2" verbose="1">
+    <!--test name="SiteSearchMyDashboardTest2" verbose="1">
         <classes>
             <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest2" >
                 <methods>
                     <include name="AONE_14838"/>
+                </methods>
+            </class>
+        </classes>
+    </test-->
+
+    <test name="SavedSearchMyDashboardAdvancedTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SavedSearchMyDashboardAdvancedTest">
+                <methods>
+                    <include name="AONE_14688"/>
+                    <include name="AONE_14691"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <test name="SavedSearchSiteDashboardAdvancedTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SavedSearchSiteDashboardAdvancedTest">
+                <methods>
+                    <include name="AONE_14732"/>
+                    <include name="AONE_14735"/>
+                    <exclude name=".*"/>
                 </methods>
             </class>
         </classes>

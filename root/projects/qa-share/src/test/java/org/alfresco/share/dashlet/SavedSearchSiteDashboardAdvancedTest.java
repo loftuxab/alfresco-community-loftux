@@ -1314,6 +1314,12 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName2));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName3));
 
+        items = ShareUserDashboard.searchSavedSearchDashlet(drone, "fm:commentCount:1..1");
+        Assert.assertEquals(items.size(), 1);
+        Assert.assertFalse(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName1));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName2));
+        Assert.assertFalse(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName3));
+
         ShareUser.logout(drone);
     }
 
@@ -1420,11 +1426,14 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String siteName = getSiteName(testName);
         String fileName1 = getFileName(testName)+"-1.txt";
         String fileName2 = getFileName(testName)+"-2.txt";
+        String fileName3 = getFileName(testName)+"-3.txt";
 
         String file1Content = "this is an item";
         String file2Content = "this the best item";
+        String file3Content = "this the best ever";
         String[] fileInfo1 = {fileName1, DOCLIB, file1Content};
         String[] fileInfo2 = {fileName2, DOCLIB, file2Content};
+        String[] fileInfo3 = {fileName3, DOCLIB, file3Content};
 
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -1434,6 +1443,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         // Create Files
         ShareUser.uploadFileInFolder(drone, fileInfo1);
         ShareUser.uploadFileInFolder(drone, fileInfo2);
+        ShareUser.uploadFileInFolder(drone, fileInfo3);
 
         ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SAVED_SEARCH);
         ShareUser.logout(drone);
@@ -1447,6 +1457,7 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         String siteName = getSiteName(testName);
         String fileName1 = getFileName(testName)+"-1.txt";
         String fileName2 = getFileName(testName)+"-2.txt";
+        String fileName3 = getFileName(testName)+"-3.txt";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, siteName);
@@ -1455,6 +1466,13 @@ public class SavedSearchSiteDashboardAdvancedTest extends AbstractUtils
         Assert.assertEquals(items.size(), 2);
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName1));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName2));
+        Assert.assertFalse(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName3));
+
+        items = ShareUserDashboard.searchSavedSearchDashlet(drone, "\"this[^] ever[$]\"");
+        Assert.assertEquals(items.size(), 1);
+        Assert.assertFalse(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName1));
+        Assert.assertFalse(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName2));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName3));
 
         ShareUser.logout(drone);
     }
