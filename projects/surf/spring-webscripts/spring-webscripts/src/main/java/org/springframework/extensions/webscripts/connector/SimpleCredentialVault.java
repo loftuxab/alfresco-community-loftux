@@ -67,6 +67,10 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
             // Remap endpoint allow an endpoint to share another endpoint credentials
             // @see ConnectorService.getConnectorSession()
             EndpointDescriptor desc = this.remote.getEndpointDescriptor(endpointId);
+            if (desc == null)
+            {
+                throw new IllegalArgumentException("Unknown endpoint ID: " + endpointId);
+            }
             String remapId = desc.getParentId();
             if (remapId != null)
             {
