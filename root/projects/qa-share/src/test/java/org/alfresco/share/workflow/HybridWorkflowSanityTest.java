@@ -50,7 +50,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
     /**
      * AONE-15732:Enable Hybrid Workflow functionality
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 300000)
     public void AONE_15732() throws Exception
     {
         try
@@ -71,7 +71,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
     /**
      * AONE-15733:Create Simple Cloud Task
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15733() throws Exception
     {
 
@@ -634,7 +634,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15734() throws Exception
     {
         String testName = getTestName();
@@ -737,7 +737,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
     /**
      * AONE-15735:Create Cloud Review
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15735() throws Exception
     {
         String testName = getTestName();
@@ -998,7 +998,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15736() throws Exception
     {
         String testName = getTestName();
@@ -1192,7 +1192,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
     /**
      * AONE-15737: Reject Cloud Review Task
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15737() throws Exception
     {
         String testName = getTestName();
@@ -1424,7 +1424,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
     /**
      * AONE-15738: Cancel Workflow
      */
-    @Test(groups = { "Hybrid" })
+    @Test(groups = { "Hybrid" }, timeOut = 600000)
     public void AONE_15738() throws Exception
     {
         String testName = getTestName();
@@ -1576,7 +1576,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
     /**
      * AONE-15739: Required approval percentage
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15739() throws Exception
     {
         String testName = getTestName();
@@ -1753,7 +1753,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15740() throws Exception
     {
 
@@ -2000,7 +2000,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15741() throws Exception
     {
         String testName = getTestName();
@@ -2123,7 +2123,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = { "Hybrid" })
+    @Test(groups = { "Hybrid" }, timeOut = 600000)
     public void AONE_15742() throws Exception
     {
 
@@ -2258,7 +2258,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
     }
 
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 600000)
     public void AONE_15743() throws Exception
     {
         String testName = getTestName();
