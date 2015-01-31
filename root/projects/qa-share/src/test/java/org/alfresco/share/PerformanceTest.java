@@ -79,7 +79,6 @@ public class PerformanceTest extends CmisUtils
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
-        beforeClass();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
     }
@@ -155,14 +154,14 @@ public class PerformanceTest extends CmisUtils
 
         try
         {
-        FtpUtil.configFtpPort();
-        bigDataFile = getFileWithSize(BIG_DATA_FILE, 2047);
-        logger.info("2 GB file created! File[" + bigDataFile.getAbsolutePath() + "]=" + ((float)bigDataFile.length() / 1024 / 1024 / 1024) + " gb.");
+            FtpUtil.configFtpPort();
+            bigDataFile = getFileWithSize(BIG_DATA_FILE, 2047);
+            logger.info("2 GB file created! File[" + bigDataFile.getAbsolutePath() + "]=" + ((float) bigDataFile.length() / 1024 / 1024 / 1024) + " gb.");
 
-        CreateActivateUser(drone, ADMIN_USERNAME, testUser);
-        login(drone, testUser, DEFAULT_PASSWORD);
-        createSite(drone, siteName, siteName);
-        assertTrue(FtpUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, bigDataFile, "Alfresco/Sites/" + siteName + "/documentLibrary/"), " File[" + bigDataFile.getAbsolutePath() + "] don't upload via FTP.");
+            CreateActivateUser(drone, ADMIN_USERNAME, testUser);
+            login(drone, testUser, DEFAULT_PASSWORD);
+            createSite(drone, siteName, siteName);
+            assertTrue(FtpUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, bigDataFile, "Alfresco/Sites/" + siteName + "/documentLibrary/"), " File[" + bigDataFile.getAbsolutePath() + "] don't upload via FTP.");
         }
         finally
         {
@@ -183,6 +182,7 @@ public class PerformanceTest extends CmisUtils
 
         try
         {
+            super.tearDown();
             super.setupCustomDrone(DownLoadDrone);
             login(customDrone, testUser, DEFAULT_PASSWORD);
             DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(customDrone, siteName);
@@ -199,6 +199,8 @@ public class PerformanceTest extends CmisUtils
             {
                 downloadedBigDataFile.delete();
             }
+            super.tearDown();
+            super.setup();
         }
     }
 
@@ -305,6 +307,7 @@ public class PerformanceTest extends CmisUtils
         TagPage tagPage = editDocumentPropertiesPage.getTag();
         webDriverWait(drone, 3000);
         int allTagsCount = tagPage.getAllTagsCount();
+        logger.info("AONE_11817: tag_count =" + allTagsCount);
         assertTrue(allTagsCount > 119, "More than 120 tags don't created.");
         tagName = getTagName(testName + 999);
         tagPage.enterTagValue(tagName);
@@ -367,7 +370,7 @@ public class PerformanceTest extends CmisUtils
         String testUser = getUserNameFreeDomain(testName);
         DashBoardPage dashBoardPage = login(drone, testUser).render();
         FacetedSearchPage facetedSearchPage = dashBoardPage.getSearch().search(LONG_FILE_NAME).render();
-        assertTrue(facetedSearchPage.isItemPresentInResultsList(DOCUMENT_LIBRARY, LONG_FILE_NAME), "Needed document found.");
+        assertTrue(facetedSearchPage.isItemPresentInResultsList(DOCUMENT_LIBRARY, LONG_FILE_NAME), "Needed document don't found. MNT-12826");
         assertEquals(facetedSearchPage.getResultCount(), 2, "Not all files found.");
     }
 
@@ -425,4 +428,5 @@ public class PerformanceTest extends CmisUtils
     {
         super.tearDown();
     }
+
 }

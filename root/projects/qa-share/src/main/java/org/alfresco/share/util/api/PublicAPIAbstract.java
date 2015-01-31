@@ -67,7 +67,7 @@ public abstract class PublicAPIAbstract extends AbstractUtils
     protected static Comments commentsClient;
     private static final String regexUrl = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})";
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void beforeClass() throws Exception
     {
         super.setup();
