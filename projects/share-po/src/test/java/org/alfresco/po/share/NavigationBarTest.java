@@ -23,10 +23,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.alfresco.po.share.admin.AdminConsolePage;
 import org.alfresco.po.share.admin.ManageSitesPage;
 import org.alfresco.po.share.search.AdvanceSearchContentPage;
@@ -43,9 +41,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 /**
  * Alfresco Share navigation bar integration test.
- * 
+ *
  * @author Michael Suzuki
  * @since 1.0
  */
@@ -53,61 +53,65 @@ import org.testng.annotations.Test;
 @SuppressWarnings("unused")
 public class NavigationBarTest extends AbstractTest
 {
-    private SharePage page;    
+    private SharePage page;
     private String siteName;
 
     private static final String pentahoBusinessAnalystGroup = "ANALYTICS_BUSINESS_ANALYSTS";
     private String businessAnalystsUserName = "BusinessAnalystUser_" + System.currentTimeMillis();
-    
-    
-    @BeforeClass(groups={"alfresco-one"}, alwaysRun=true)
+
+
+    @BeforeClass(groups = { "alfresco-one" }, alwaysRun = true)
     public void setup() throws Exception
     {
-        siteName = String.format("test-%d-site-crud",System.currentTimeMillis());
+        siteName = String.format("test-%d-site-crud", System.currentTimeMillis());
         page = loginAs(username, password);
     }
-    
+
     /**
      * Selects My Sites from Sites menu and checks that User Sites List is Displayed
+     *
      * @throws Exception
      */
-    @Test(groups={"alfresco-one"}, priority=1)
+    @Test(groups = { "alfresco-one" }, priority = 1)
     public void navigateToMySites() throws Exception
     {
         UserSitesPage userSitesPage = page.getNav().selectMySites().render();
         assertEquals(userSitesPage.getPageTitle(), "User Sites List");
-    }  
-    
-   
+    }
+
+
     /**
      * Navigate to people finder from the dashboard page
-     * and back to dash board page by selecting the 
+     * and back to dash board page by selecting the
      * navigation icons.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods = "navigateToMySites",groups={"alfresco-one"}, priority=2)
+    @Test(dependsOnMethods = "navigateToMySites", groups = { "alfresco-one" }, priority = 2)
     public void navigateToPeopleFinder() throws Exception
     {
         PeopleFinderPage peoplePage = page.getNav().selectPeople().render();
         assertEquals(peoplePage.getPageTitle(), "People Finder");
     }
-    
+
     /**
      * Test navigating to site finder page.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods = "navigateToPeopleFinder",groups={"alfresco-one"}, priority=3)
+    @Test(dependsOnMethods = "navigateToPeopleFinder", groups = { "alfresco-one" }, priority = 3)
     public void navigateToSearchForSites() throws Exception
     {
         page = page.getNav().selectSearchForSites().render();
         assertEquals(page.getPageTitle(), "Site Finder");
     }
-    
+
     /**
      * Test navigating to create site page.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods = "navigateToSearchForSites",groups={"alfresco-one"}, priority=4)
+    @Test(dependsOnMethods = "navigateToSearchForSites", groups = { "alfresco-one" }, priority = 4)
     public void navigateToCreateSite() throws Exception
     {
         assertTrue(page.getNav().isCreateSitePresent());
@@ -115,34 +119,37 @@ public class NavigationBarTest extends AbstractTest
         assertTrue(createSitePage.isCreateSiteDialogDisplayed());
         createSitePage.cancel();
     }
-    
+
     /**
      * Test navigating to my profile page.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods= "navigateToCreateSite" ,groups={"alfresco-one"}, priority=5)
+    @Test(dependsOnMethods = "navigateToCreateSite", groups = { "alfresco-one" }, priority = 5)
     public void navigateToMyProfile() throws Exception
     {
         MyProfilePage myProfilePage = page.getNav().selectMyProfile().render();
         assertTrue(myProfilePage.titlePresent());
     }
-    
+
     /**
      * Test navigating to change password page.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods= "navigateToMyProfile",groups={"alfresco-one"}, priority=6)
+    @Test(dependsOnMethods = "navigateToMyProfile", groups = { "alfresco-one" }, priority = 6)
     public void navigateChangePassword() throws Exception
     {
         ChangePasswordPage changePasswordPage = page.getNav().selectChangePassword().render();
         assertTrue(changePasswordPage.formPresent());
     }
-    
-     /**
+
+    /**
      * Test navigating to change password page.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods= "navigateChangePassword",groups={"alfresco-one"}, priority=7)
+    @Test(dependsOnMethods = "navigateChangePassword", groups = { "alfresco-one" }, priority = 7)
     public void navigateDashBoard() throws Exception
     {
         DashBoardPage dash = page.getNav().selectMyDashBoard().render();
@@ -150,33 +157,35 @@ public class NavigationBarTest extends AbstractTest
         dash.getTitle().contains("Dashboard");
         assertTrue(dash.getTitle().contains("Dashboard"));
     }
-    
+
     /**
      * Test repository link, note that this is for non cloud product.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods= "navigateDashBoard",groups = "Enterprise-only", priority=8)
+    @Test(dependsOnMethods = "navigateDashBoard", groups = "Enterprise-only", priority = 8)
     public void navigateToRepository() throws Exception
     {
         AlfrescoVersion version = drone.getProperties().getVersion();
-        if(version.isCloud())
+        if (version.isCloud())
         {
             throw new SkipException("This feature is not supported in cloud so skip it");
         }
         RepositoryPage repoPage = page.getNav().selectRepository().render();
         assertTrue(repoPage.isBrowserTitle("Repository"));
     }
-    
+
     /**
      * Test advance search link.
      * Note supported in cloud.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods= "navigateToRepository",groups= "Enterprise-only", priority=9)
+    @Test(dependsOnMethods = "navigateToRepository", groups = "Enterprise-only", priority = 9)
     public void advanceSearch() throws Exception
     {
-    	AlfrescoVersion version = drone.getProperties().getVersion();
-        if(version.isCloud())
+        AlfrescoVersion version = drone.getProperties().getVersion();
+        if (version.isCloud())
         {
             throw new SkipException("This feature is not supported in cloud so skip it");
         }
@@ -184,26 +193,26 @@ public class NavigationBarTest extends AbstractTest
         assertEquals(searchPage.getPageTitle(), "Advanced Search");
     }
 
-    @Test(dependsOnMethods = "advanceSearch", groups = {"Enterprise-only"}, expectedExceptions = UnsupportedOperationException.class, priority=10)
+    @Test(dependsOnMethods = "advanceSearch", groups = { "Enterprise-only" }, expectedExceptions = UnsupportedOperationException.class, priority = 10)
     public void testSelectNetworkDropdownInEnterprise() throws Exception
     {
         page.getNav().selectNetworkDropdown();
     }
-    
-    @Test(dependsOnMethods = "testSelectNetworkDropdownInEnterprise", groups = {"Enterprise-only"}, expectedExceptions = UnsupportedOperationException.class, priority=11)
+
+    @Test(dependsOnMethods = "testSelectNetworkDropdownInEnterprise", groups = { "Enterprise-only" }, expectedExceptions = UnsupportedOperationException.class, priority = 11)
     public void testSelectNetworkInEnterprise() throws Exception
     {
         String strInvitedUser = username.substring(username.lastIndexOf("@") + 1, username.length());
-       page.getNav().selectNetwork(strInvitedUser);
+        page.getNav().selectNetwork(strInvitedUser);
     }
-    
-    @Test(groups ="Cloud-only", priority=12)
+
+    @Test(groups = "Cloud-only", priority = 12)
     public void testNetworkDropdown()
     {
         Assert.assertNotNull(page.getNav().selectNetworkDropdown());
     }
 
-    @Test(dependsOnMethods = "testNetworkDropdown", groups = "Cloud-only", priority=13)
+    @Test(dependsOnMethods = "testNetworkDropdown", groups = "Cloud-only", priority = 13)
     public void testSelectNetwork()
     {
         page = drone.getCurrentPage().render();
@@ -211,42 +220,43 @@ public class NavigationBarTest extends AbstractTest
         Assert.assertNotNull(page.getNav().selectNetwork(strInvitedUser).render());
     }
 
-    @Test(dependsOnMethods = "testSelectNetwork", groups = "Cloud-only", expectedExceptions = IllegalArgumentException.class, priority=14)
+    @Test(dependsOnMethods = "testSelectNetwork", groups = "Cloud-only", expectedExceptions = IllegalArgumentException.class, priority = 14)
     public void testSelectNetworkWithNull()
     {
         page.getNav().selectNetwork(null);
     }
 
-    @Test(dependsOnMethods = "testSelectNetworkWithNull", groups = "Cloud-only", expectedExceptions = IllegalArgumentException.class, priority=15)
+    @Test(dependsOnMethods = "testSelectNetworkWithNull", groups = "Cloud-only", expectedExceptions = IllegalArgumentException.class, priority = 15)
     public void testSelectNetworkWithEmpty()
     {
         page.getNav().selectNetwork("");
     }
 
-    @Test(dependsOnMethods = "testSelectNetworkWithEmpty", groups = "Cloud-only", priority=16)
+    @Test(dependsOnMethods = "testSelectNetworkWithEmpty", groups = "Cloud-only", priority = 16)
     public void testgetNetworks()
     {
         List<String> userNetworks = page.getNav().getUserNetworks();
         assertTrue(userNetworks.size() > 0);
     }
-    
+
     /**
      * Test navigating to Account Settings Page.
+     *
      * @throws Exception if error
      */
-    @Test(dependsOnMethods= "testgetNetworks",groups={"Cloud-only"}, priority=17)
+    @Test(dependsOnMethods = "testgetNetworks", groups = { "Cloud-only" }, priority = 17)
     public void navigateAccountSettings() throws Exception
     {
         AccountSettingsPage accountSettingsPage = page.getNav().selectAccountSettingsPage().render();
         assertEquals(accountSettingsPage.getPageTitle(), "Account Settings");
     }
-    
+
     /**
      * Navigate to admin tools from the dashboard page.
-     * 
+     *
      * @throws Exception if error
      */
-    @Test(groups = {"Enterprise-only"}, priority=18)
+    @Test(groups = { "Enterprise-only" }, priority = 18)
     public void navigateToAdminTools() throws Exception
     {
         AdminConsolePage adminConsolePage = page.getNav().selectAdminTools().render();
@@ -255,10 +265,10 @@ public class NavigationBarTest extends AbstractTest
 
     /**
      * Navigate to manage sites from the dashboard page by Repo Admin
-     * 
+     *
      * @throws Exception if error
      */
-    @Test(groups = { "Enterprise-only" }, priority=19)
+    @Test(groups = { "Enterprise-only" }, priority = 19)
     public void navigateToManageSites() throws Exception
     {
         ManageSitesPage manageSitesPage = page.getNav().selectManageSitesPage().render();
@@ -267,19 +277,19 @@ public class NavigationBarTest extends AbstractTest
 
     /**
      * Navigate to manage sites from the dashboard page by Repo Admin
-     * 
+     *
      * @throws Exception if error
      */
-    @Test (groups = { "Enterprise-only" }, priority=20)
+    @Test(groups = { "Enterprise-only" }, priority = 20)
     public void navigateToManageSitesSiteAdmin() throws Exception
     {
         String siteAdmin = "SITE_ADMINISTRATORS";
         UserSearchPage userPage = page.getNav().getUsersPage().render();
         NewUserPage newPage = userPage.selectNewUser().render();
-        String userinfo = "user" + System.currentTimeMillis() + "@test.com";
-        newPage.createEnterpriseUserWithGroup(userinfo, userinfo, userinfo, userinfo, userinfo, siteAdmin);
+        String userInfo = "user" + System.currentTimeMillis() + "@test.com";
+        newPage.createEnterpriseUserWithGroup(userInfo, userInfo, userInfo, userInfo, userInfo, siteAdmin);
         ShareUtil.logout(drone);
-        ShareUtil.loginAs(drone, shareUrl, userinfo, userinfo);
+        ShareUtil.loginAs(drone, shareUrl, userInfo, userInfo);
         ManageSitesPage manageSitesPage = page.getNav().selectManageSitesSiteAdmin().render();
         assertEquals(manageSitesPage.getPageTitle(), "Sites Manager");
 
@@ -288,6 +298,12 @@ public class NavigationBarTest extends AbstractTest
     @Test(groups= "Enterprise-only", priority=21)
     public void noRecentSites() throws Exception
     {   
+        UserSearchPage userPage = page.getNav().getUsersPage().render();
+        NewUserPage newPage = userPage.selectNewUser().render();
+        String userInfo = "user" + System.currentTimeMillis() + "@test.com";
+        newPage.createEnterpriseUser(userInfo, userInfo, userInfo, userInfo, userInfo);
+        ShareUtil.logout(drone);
+        ShareUtil.loginAs(drone, shareUrl, userInfo, userInfo);
         try
         {
             page.getNav().getRecentSitesPresent();
@@ -299,14 +315,15 @@ public class NavigationBarTest extends AbstractTest
             assertTrue(e.getMessage().startsWith(patternString), "Exception Message should Start with " + patternString);
         }
     }
-    
+
     /**
      * Test newly created site from favourite..
+     *
      * @throws Exception if error
      */
-    @Test(groups= "Enterprise-only", priority=22)
+    @Test(groups = "Enterprise-only", priority = 22)
     public void removeAndAddSiteFromFavourite() throws Exception
-    {        
+    {
         CreateSitePage createSitePage = page.getNav().selectCreateSite().render();
         SiteDashboardPage site = createSitePage.createNewSite(siteName).render();
         assertTrue(site.getNav().getRecentSitesPresent().size() > 0 );   
@@ -320,45 +337,46 @@ public class NavigationBarTest extends AbstractTest
         assertTrue(site.getNav().getFavouriteSites().contains(siteName));
         drone.refresh();
     }
-    @Test(groups= "Enterprise-only", enabled=false, expectedExceptions={UnsupportedOperationException.class}, priority=23)
+
+    @Test(groups = "Enterprise-only", enabled = false, expectedExceptions = { UnsupportedOperationException.class }, priority = 23)
     public void removeAndSiteFromFavouriteInDashBoardPage() throws Exception
-    {   
-        CustomiseUserDashboardPage usereDashBoradPage = page.getNav().selectCustomizeUserDashboard().render();
-        usereDashBoradPage.getNav().isSiteFavourtie();
+    {
+        CustomiseUserDashboardPage userDashBoardPage = page.getNav().selectCustomizeUserDashboard().render();
+        userDashBoardPage.getNav().isSiteFavourtie();
     }
-    
+
     /**
      * Test for opening of Adhoc Analyze page under reporting menu by pentaho business analyst
-     * 
+     *
      * Uncomment when pentaho is ready
-     * 
+     *
      * @throws Exception
      */
     /**
-   @Test(groups= "Enterprise-only", priority=999)
-    public void navigateToAnalyze() throws Exception
-    {   
-        //logout as admin and log in as pentaho business analyst
-        ShareUtil.logout(drone);
-        DashBoardPage dashBoard = loginAs(username, password);
-        UserSearchPage userSearchpage = dashBoard.getNav().getUsersPage().render();
-        NewUserPage newPage = userSearchpage.selectNewUser().render();
-        newPage.createEnterpriseUserWithGroup(businessAnalystsUserName, businessAnalystsUserName, businessAnalystsUserName, businessAnalystsUserName + "@test.com", UNAME_PASSWORD, pentahoBusinessAnalystGroup);
-        logout(drone);
-        SharePage page = loginAs(businessAnalystsUserName, UNAME_PASSWORD);
-        AdhocAnalyzerPage adhocAnalyzePage = page.getNav().selectAnalyze().render();
-        Assert.assertEquals(adhocAnalyzePage.getPageTitle(), "My Reports");       
-        ShareUtil.logout(drone);
-    }
-    
-    @Test(groups= "Enterprise-only", dependsOnMethods= "navigateToAnalyze")
-    public void navigateToSiteAnalyze() throws Exception
-    {   
-        //log in as pentaho business analyst
-        SharePage page = loginAs(businessAnalystsUserName, UNAME_PASSWORD);
-        AdhocAnalyzerPage adhocAnalyzePage = page.getNav().selectAnalyzeSite().render();
-        Assert.assertEquals(adhocAnalyzePage.getPageTitle(), "Site Reports");       
-        ShareUtil.logout(drone);
-    }
-    **/
- }
+     @Test(groups= "Enterprise-only", priority=999)
+     public void navigateToAnalyze() throws Exception
+     {
+     //logout as admin and log in as pentaho business analyst
+     ShareUtil.logout(drone);
+     DashBoardPage dashBoard = loginAs(username, password);
+     UserSearchPage userSearchpage = dashBoard.getNav().getUsersPage().render();
+     NewUserPage newPage = userSearchpage.selectNewUser().render();
+     newPage.createEnterpriseUserWithGroup(businessAnalystsUserName, businessAnalystsUserName, businessAnalystsUserName, businessAnalystsUserName + "@test.com", UNAME_PASSWORD, pentahoBusinessAnalystGroup);
+     logout(drone);
+     SharePage page = loginAs(businessAnalystsUserName, UNAME_PASSWORD);
+     AdhocAnalyzerPage adhocAnalyzePage = page.getNav().selectAnalyze().render();
+     Assert.assertEquals(adhocAnalyzePage.getPageTitle(), "My Reports");
+     ShareUtil.logout(drone);
+     }
+
+     @Test(groups= "Enterprise-only", dependsOnMethods= "navigateToAnalyze")
+     public void navigateToSiteAnalyze() throws Exception
+     {
+     //log in as pentaho business analyst
+     SharePage page = loginAs(businessAnalystsUserName, UNAME_PASSWORD);
+     AdhocAnalyzerPage adhocAnalyzePage = page.getNav().selectAnalyzeSite().render();
+     Assert.assertEquals(adhocAnalyzePage.getPageTitle(), "Site Reports");
+     ShareUtil.logout(drone);
+     }
+     **/
+}
