@@ -46,7 +46,7 @@ import static org.apache.chemistry.opencmis.commons.enums.VersioningState.MAJOR;
 import static org.testng.Assert.assertTrue;
 
 /**
- * @author MAryia Zaichanka
+ * @author Maryia Zaichanka
  */
 public class FolderTemplateCreationTest2 extends CmisUtils
 {
@@ -70,7 +70,7 @@ public class FolderTemplateCreationTest2 extends CmisUtils
         // To change the behavior of initialization.
     }
 
-    @Test(groups = {"EnterpriseOnly" })
+    @Test(groups = {"EnterpriseOnly", "NonGrid" })
     public void AONE_15042() throws Exception
     {
         String testName = getTestName();
@@ -94,7 +94,7 @@ public class FolderTemplateCreationTest2 extends CmisUtils
 
     }
 
-    @Test(groups = {"EnterpriseOnly" })
+    @Test(groups = {"EnterpriseOnly", "NonGrid" })
     public void AONE_15043() throws Exception
     {
         String testName = getTestName();
