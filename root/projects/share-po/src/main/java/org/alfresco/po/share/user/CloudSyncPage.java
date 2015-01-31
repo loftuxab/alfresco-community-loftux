@@ -23,10 +23,7 @@ import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 
 /**
@@ -156,6 +153,10 @@ public class CloudSyncPage extends SharePage
         try
         {
             drone.findAndWait(SIGN_IN_BUTTON).click();
+        }
+        catch (StaleElementReferenceException ser)
+        {
+            selectCloudSign();
         }
         catch (NoSuchElementException e)
         {

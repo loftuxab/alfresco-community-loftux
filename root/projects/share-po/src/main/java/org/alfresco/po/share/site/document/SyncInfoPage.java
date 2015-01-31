@@ -14,11 +14,6 @@
  */
 package org.alfresco.po.share.site.document;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.HtmlPage;
@@ -32,6 +27,12 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * Sync Info Details Page
  * 
@@ -44,7 +45,7 @@ public class SyncInfoPage extends SharePage
     private static Log logger = LogFactory.getLog(FileDirectoryInfo.class);
     private static final By CLOSE_BUTTON = By.cssSelector("div[style*='visible'] div.info-balloon .closeButton");
     private static final By IS_CLOUD_SYNC_STATUS = By.cssSelector("div[style*='visible'] div.cloud-sync-status-heading+p");
-    private static final By SYNC_LOCATION_PRESENT = By.cssSelector("p.location");
+    private static final By SYNC_LOCATION_PRESENT = By.cssSelector("p.location span:not(.document-link) a");
     private static final By REQ_SYNC_BUTTON = By.cssSelector("div[style*='visible'] div.cloud-sync-status-buttons>span:first-child>span>button");
     private static final By REQ_UNSYNC_BUTTON = By.cssSelector("div[style*='visible'] div.cloud-sync-status-buttons>span:last-child>span>button");
     private static final By SYNC_LOCATION = By.cssSelector("div[style*='visible'] .cloud-sync-details-info>p>span[class^='folder-link']>a");
@@ -54,6 +55,8 @@ public class SyncInfoPage extends SharePage
     public static final By PROMPT_BUTTONS = By.cssSelector("div[id$='prompt']>div.ft>span>span>span.first-child");
     public static final By REMOVE_CHECKBOX = By.cssSelector("input[id$='requestDeleteRemote']");
     public static final By STATUS_HEADING = By.cssSelector(".cloud-sync-status-heading");
+    private static final By INDIRECT_SYNC_LOCATION = By.cssSelector(".cloud-sync-indirect-root .view-in-cloud");
+    private static final By FAILED_SYNC = By.cssSelector("div[style*='visible'] .cloud-sync-details-failed-detailed");
 
     public enum ButtonType
     {
@@ -220,14 +223,12 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(IS_CLOUD_SYNC_STATUS).getText();
+            return drone.find(IS_CLOUD_SYNC_STATUS).getText();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException nse)
         {
-            logger.error("Exceeded the time to find css.", e);
+            return drone.find(By.cssSelector("div.cloud-sync-status-heading+p")).getText();
         }
-
-        throw new PageException("Not able to find Sync Info status.");
     }
 
     /**
@@ -240,7 +241,14 @@ public class SyncInfoPage extends SharePage
         StringBuilder location = new StringBuilder("");
         try
         {
-            List<WebElement> elements = drone.findAndWaitForElements(SYNC_LOCATION);
+            List<WebElement> elements;
+            drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3000);
+            elements = drone.findAll(SYNC_LOCATION);
+
+            if(elements.size()==0)
+            {
+                elements = drone.findAll(SYNC_LOCATION_PRESENT);
+            }
             int i = elements.size();
             for (WebElement webElement : elements)
             {
@@ -291,7 +299,7 @@ public class SyncInfoPage extends SharePage
         try
         {
             String syncPeriod = drone.findAndWait(SYNC_PERIOD).getAttribute("title");
-            return new SimpleDateFormat(DATE_FORMAT).parse(syncPeriod);
+            return new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH).parse(syncPeriod);
         }
         catch (TimeoutException toe)
         {
@@ -403,5 +411,30 @@ public class SyncInfoPage extends SharePage
         }
         return false;
 
+    }
+
+    public String getCloudSyncIndirectLocation()
+    {
+        try
+        {
+            return drone.find(INDIRECT_SYNC_LOCATION).getAttribute("text");
+        }
+        catch (NoSuchElementException nse)
+        {
+            return drone.find(By.cssSelector(".cloud-sync-details-info p:nth-of-type(1)")).getAttribute("text");
+        }
+    }
+
+    public boolean isFailedInfoDisplayed()
+    {
+        try
+        {
+            drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3000);
+            return drone.find(FAILED_SYNC).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+           return drone.find(By.cssSelector(".cloud-sync-details-failed-detailed")).isDisplayed();
+        }
     }
 }

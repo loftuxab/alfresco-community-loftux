@@ -94,7 +94,7 @@ public class EditTextDocumentPage extends CreatePlainTextContentPage
     public ContentDetails getDetails()
     {
         ContentDetails details = null;
-        WebElement element = drone.find(NAME);
+        WebElement element = drone.findAndWait(NAME);
         if (element != null)
         {
             details = new ContentDetails();
@@ -106,7 +106,7 @@ public class EditTextDocumentPage extends CreatePlainTextContentPage
                 details.setTitle(element.getAttribute("value"));
             }
 
-            element = drone.find(DESCRIPTION);
+            element = drone.findAndWait(DESCRIPTION);
             if (element != null)
             {
                 details.setDescription(element.getText());
