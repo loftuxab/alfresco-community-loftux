@@ -30,6 +30,7 @@ import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.repo.webdav.LockInfo;
+import org.alfresco.repo.webdav.LockInfoImpl;
 import org.alfresco.repo.webdav.WebDAV;
 import org.alfresco.repo.webdav.WebDAVLockService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
@@ -265,8 +266,23 @@ public class AlfrescoCheckOutCheckInServiceHandler implements CheckOutCheckInSer
                     
                     if (lockAfterSucess)
                     {
+                        // MNT-13110 fix
+                        // lock working copy, we should use the same lock token as for original document,
+                        // lock token was already provided to client when file was opened via "Edit Online" in LOCK request,
+                        // so it should not be changed until document is closed in office app, 
+                        // otherwise client will think that lock was taken by another user and will stop work correctly.
                         String userName = AuthenticationUtil.getFullyAuthenticatedUser();
-                        webDAVlockService.lock(workingCopy, userName, WebDAV.TIMEOUT_24_HOURS);
+                        
+                        LockInfo workingCopyLockInfo = new LockInfoImpl();
+                        
+                        workingCopyLockInfo.setTimeoutSeconds(WebDAV.TIMEOUT_24_HOURS);
+                        // use original nodeRef's id to generate the same opaque lock token
+                        workingCopyLockInfo.setExclusiveLockToken(WebDAV.makeLockToken(documentFileInfo.getNodeRef(), userName));
+                        workingCopyLockInfo.setDepth(WebDAV.getDepthName(WebDAV.DEPTH_INFINITY));
+                        workingCopyLockInfo.setScope(WebDAV.XML_EXCLUSIVE);
+                        workingCopyLockInfo.setOwner(userName);
+                        
+                        webDAVlockService.lock(workingCopy, lockInfo);
                     }
 
                     return workingCopy;
