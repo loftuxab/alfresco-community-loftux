@@ -809,6 +809,8 @@ public interface FileDirectoryInfo
      * @return
      */
     public String getThumbnailURL();
+    public void declareRecord();
+    public boolean isTypeRecord();
 
     /**
      * This method verifies the Geolocation Metadata icon is present or not.
@@ -819,7 +821,6 @@ public interface FileDirectoryInfo
 
     /**
      * This method verifies the EXIF icon is present or not.
-     *
      * @return boolean
      */
     public boolean isEXIFIconDisplayed();
