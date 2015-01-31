@@ -316,5 +316,17 @@ public abstract class WcmqsAbstractPage extends SharePage
             throw new PageOperationException("Exceeded time to find Document link. " + e.toString());
         }
     }
+    
+    
+    /**
+     * Method to get text from the search field
+     * 
+     * @return search field content
+     */
+    public String getTextFromSearchField()
+    {
+        return drone.findAndWait(SEARCH_FIELD).getAttribute("value");
+    }
+    
 
 }
