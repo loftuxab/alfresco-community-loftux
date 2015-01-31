@@ -33,7 +33,7 @@
         </classes>
     </test-->
 
-    <test name="Trashcan tests Suite">
+    <!--test name="Trashcan tests Suite">
         <classes>
             <class name="org.alfresco.share.user.trashcan.TrashcanTest2">
                 <methods>
@@ -44,7 +44,7 @@
                 </methods>
             </class>
         </classes>
-    </test>
+    </test-->
 
     <test name="Template tests Suite">
         <classes>

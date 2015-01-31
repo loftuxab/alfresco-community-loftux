@@ -141,4 +141,10 @@
         </classes>
     </test>
 
+    <test name="Solr sanity tests Suite">
+        <classes>
+            <class name="org.alfresco.share.sanity.SolrTest"/>
+        </classes>
+    </test>
+
 </suite>
