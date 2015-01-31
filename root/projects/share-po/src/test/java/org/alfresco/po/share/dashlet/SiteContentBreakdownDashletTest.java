@@ -132,7 +132,7 @@ public class SiteContentBreakdownDashletTest extends AbstractSiteDashletTest
     /**
      * Checks files mime types and counts on the pie chart
      */
-    @Test(dependsOnMethods = "instantiateDashlet")
+    @Test(dependsOnMethods = "instantiateDashlet", groups="TestBug")
     public void testMimeTypesAndCounts() throws Exception
     {
         List<String> mimeTypes = siteContentBreakdownDashlet.getTooltipFileTypes();
