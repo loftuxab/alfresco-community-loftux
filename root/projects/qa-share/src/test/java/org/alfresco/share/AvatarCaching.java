@@ -137,6 +137,7 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
+        editProfilePage.getNav().selectMyDashBoard();
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
         File file = newFile(TEST_FILE, "gogno from hell");
@@ -194,6 +195,7 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
+        editProfilePage.getNav().selectMyDashBoard();
         ShareUser.openUserDashboard(customDrone);
         ShareUserDashboard.addDashlet(customDrone, MY_PROFILE);
     }
@@ -250,6 +252,7 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
+        editProfilePage.getNav().selectMyDashBoard();
         ShareUser.openUserDashboard(customDrone);
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
@@ -340,6 +343,7 @@ public class AvatarCaching extends AbstractUtils
         EditProfilePage editProfilePage = myProfilePage.openEditProfilePage();
         File avatar = new File(DATA_FOLDER + SLASH + AVATAR_FILE);
         editProfilePage.uploadAvatar(avatar);
+        editProfilePage.getNav().selectMyDashBoard();
         ShareUser.openUserDashboard(customDrone);
         SiteUtil.createSite(customDrone, siteName, siteName);
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
