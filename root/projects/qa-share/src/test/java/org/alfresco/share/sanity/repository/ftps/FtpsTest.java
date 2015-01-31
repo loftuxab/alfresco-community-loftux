@@ -196,17 +196,17 @@ public class FtpsTest extends FtpsUtil
 
         //Try to rename space - OK
         isSuccess = FtpsUtil.renameFile(server, testUser, DEFAULT_PASSWORD, remotePathToRepo, folderName, folderNewName);
-        assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, folderNewName, remotePathToRepo));
-        assertTrue(isSuccess, "Folder " + folderName + " wasn't renamed");
+        assertTrue(isSuccess && FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, folderNewName, remotePathToRepo), "Folder " + folderName +
+            " wasn't renamed");
 
         //Try to rename content in this space - OK
         isSuccess = FtpsUtil.renameFile(server, testUser, DEFAULT_PASSWORD, folderPath, fileName, fileNewName);
-        assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath));
-        assertTrue(isSuccess, "File " + fileName + " wasn't renamed");
+        assertTrue(isSuccess && FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath), "File " + fileName + " wasn't renamed");
 
         //Try to edit content - OK
         isSuccess = FtpsUtil.editContent(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath);
-        assertTrue(isSuccess && FtpsUtil.getContent(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath).equals(testUser));
+        assertTrue(isSuccess && FtpsUtil.getContent(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath).equals(testUser), "Content of " + fileNewName +
+        " wasn't edited");
 
         //Try to delete content - code 450
         assertEquals(FtpsUtil.deleteContentWithoutRights(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath), 450, "Incorrect reply code was received");
@@ -223,7 +223,7 @@ public class FtpsTest extends FtpsUtil
         assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, newFileName, folderPath), "New content " + fileNewName + " wasn't created");
 
         //Try to delete space - code 550
-        assertEquals(FtpsUtil.deleteSpaceWithoutRights(server, testUser, DEFAULT_PASSWORD, folderNewName, remotePathToRepo), 550);
+        assertEquals(FtpsUtil.deleteSpaceWithoutRights(server, testUser, DEFAULT_PASSWORD, folderNewName, remotePathToRepo), 550, "Incorrect reply code");
         assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, folderNewName, remotePathToRepo), fileNewName + " was deleted");
     }
 
@@ -265,16 +265,16 @@ public class FtpsTest extends FtpsUtil
 
         //Try to create new space - OK
         isSuccess = FtpsUtil.createSpace(server, testUser, DEFAULT_PASSWORD, newSubFolder, folderPath);
-        assertTrue(isSuccess, "New folder " + newSubFolder + " wasn't created");
-        assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, newSubFolder, folderPath), "New folder " + newSubFolder + " wasn't created");
+        assertTrue(isSuccess && FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, newSubFolder, folderPath), "New folder " + newSubFolder +
+            " wasn't created");
 
         //Try to create new content - OK
         isSuccess = FtpsUtil.uploadContent(server, testUser, DEFAULT_PASSWORD, newFile, folderPath);
-        assertTrue(isSuccess, "New content " + newFile + " wasn't created");
-        assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, newFileName, folderPath), "New content " + fileNewName + " wasn't created");
+        assertTrue(isSuccess && FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, newFileName, folderPath), "New content " + fileNewName +
+            " wasn't created");
 
         //Try to delete space - code 550
-        assertEquals(FtpsUtil.deleteSpaceWithoutRights(server, testUser, DEFAULT_PASSWORD, folderName, remotePathToRepo), 550);
+        assertEquals(FtpsUtil.deleteSpaceWithoutRights(server, testUser, DEFAULT_PASSWORD, folderName, remotePathToRepo), 550, "Incorrect reply code");
         assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, folderName, remotePathToRepo), fileName + " was deleted");
     }
 
@@ -300,17 +300,17 @@ public class FtpsTest extends FtpsUtil
 
         //Try to rename space - OK
         isSuccess = FtpsUtil.renameFile(server, testUser, DEFAULT_PASSWORD, remotePathToRepo, folderName, folderNewName);
-        assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, folderNewName, remotePathToRepo));
-        assertTrue(isSuccess, "Folder " + folderName + " wasn't renamed");
+        assertTrue(isSuccess && FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, folderNewName, remotePathToRepo), "Folder " + folderName +
+            " wasn't renamed");
 
         //Try to rename content in this space - OK
         isSuccess = FtpsUtil.renameFile(server, testUser, DEFAULT_PASSWORD, folderPath, fileName, fileNewName);
-        assertTrue(FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath));
-        assertTrue(isSuccess, "File " + fileName + " wasn't renamed");
+        assertTrue(isSuccess && FtpsUtil.isObjectExists(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath), "File " + fileName + " wasn't renamed");
 
         //Try to edit content - OK
         isSuccess = FtpsUtil.editContent(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath);
-        assertTrue(isSuccess && FtpsUtil.getContent(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath).equals(testUser));
+        assertTrue(isSuccess && FtpsUtil.getContent(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath).equals(testUser), "Content of " + fileNewName
+            + " wasn't edited");
 
         //Try to delete content - code 450
         assertEquals(FtpsUtil.deleteContentWithoutRights(server, testUser, DEFAULT_PASSWORD, fileNewName, folderPath), 450, "Incorrect reply code received");
@@ -393,6 +393,8 @@ public class FtpsTest extends FtpsUtil
         String subFolder2 = getFolderName(getRandomString(5));
         String [] fileInfo1 = {testName, REPO + SLASH + folder1 + SLASH + subFolder1};
         String [] fileInfo2 = {testName, REPO + SLASH + folder1 + SLASH + subFolder2};
+        String targetPath = remotePathToRepo + "/" + folder1;
+        String destinationPath = remotePathToRepo + "/" + folder2;
 
         ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
         ShareUserRepositoryPage.openRepositoryDetailedView(drone).render();
@@ -406,7 +408,7 @@ public class FtpsTest extends FtpsUtil
         ShareUserRepositoryPage.uploadFileInFolderInRepository(drone, fileInfo2);
 
         //Move Folder1 from the space, where it is located, to other space by FTPS
-        FtpsUtil.moveFolder(server, ADMIN_USERNAME, ADMIN_PASSWORD, remotePathToRepo + "/" + folder1, subFolder1, remotePathToRepo + "/" + folder2);
+        FtpsUtil.moveFolder(server, ADMIN_USERNAME, ADMIN_PASSWORD, targetPath , subFolder1, destinationPath);
 
         //Log in to Alfresco client and navigate to the space, were moved by FTPS Folder1 was located
         RepositoryPage repoPage = ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folder1).render();
@@ -417,7 +419,7 @@ public class FtpsTest extends FtpsUtil
         assertTrue(repoPage.isItemVisble(testName), "File wasn't moved");
 
         //Copy Folder2 from the space, where it is located, to other space by FTPS
-        FtpsUtil.copyFolder(server, ADMIN_USERNAME, ADMIN_PASSWORD, remotePathToRepo + "/" + folder1, subFolder2, remotePathToRepo + "/" + folder2);
+        FtpsUtil.copyFolder(server, ADMIN_USERNAME, ADMIN_PASSWORD, targetPath, subFolder2, destinationPath);
 
         //Navigate to the space, were Folder2 was copied - it has all added items
         repoPage = ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folder1).render();
