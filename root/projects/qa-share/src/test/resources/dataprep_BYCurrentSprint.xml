@@ -352,6 +352,7 @@
     <suite-file path="dataprep_BY_dashlet.xml"/>
     <suite-file path="dataprep_BY_contentRules.xml"/>
     <suite-file path="dataprep_BY_doclib.xml"/>
+    <suite-file path="dataprep_BY_doclib2.xml"/>
 
 
 </suite-files>
