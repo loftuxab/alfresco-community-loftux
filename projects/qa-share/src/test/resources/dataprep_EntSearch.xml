@@ -12,12 +12,6 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <test name="SearchBy tests">
-        <classes>
-            <class name="org.alfresco.share.peoplefinder.SearchByTests"/>
-        </classes>
-    </test>
-
     <test name="Advance search tests">
         <classes>
             <class name="org.alfresco.share.search.AdvanceSearchTest"/>
