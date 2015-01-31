@@ -10,13 +10,14 @@ import org.alfresco.po.share.wqs.*;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
-import org.alfresco.share.util.api.CreateUserAPI;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Created by svidrascu on 11/19/2014.
@@ -25,8 +26,9 @@ public class DeleteItemsViaAWE extends AbstractUtils
 {
         private String testName;
         private String wqsURL;
-        private String testUser;
         private String siteName;
+        private String ipAddress;
+        private String hostName;
 
         private final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
         private final String QUICK_START_EDITORIAL = "Quick Start Editorial";
@@ -38,24 +40,28 @@ public class DeleteItemsViaAWE extends AbstractUtils
         @BeforeClass(alwaysRun = true)
         public void setup() throws Exception
         {
+                super.setup();
+
                 testName = this.getClass().getSimpleName();
-                siteName = testName
-                //                        +"site"
+                siteName = testName;
+                hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
+                try
+                {
+                        ipAddress = InetAddress.getByName(hostName).toString().replaceAll(".*/", "");
+                        logger.info("Ip address from Alfresco server was obtained");
+                }
+                catch (UnknownHostException | SecurityException e)
+                {
+                        logger.error("Ip address from Alfresco server could not be obtained");
+                }
+
                 ;
-                testUser = getUserNameFreeDomain(testName);
-                //                wqsURL = siteName + ":8080/wcmqs";
-                wqsURL = "http://deleteitemsviaawe:8080/wcmqs/";
+                wqsURL = siteName + ":8080/wcmqs";
                 logger.info(" wcmqs url : " + wqsURL);
                 logger.info("Start Tests from: " + testName);
         }
 
-        @BeforeMethod(alwaysRun = true, groups = { "WQS" })
-        public void testSetup() throws Exception
-        {
-                super.setup();
-        }
-
-        @AfterMethod(alwaysRun = true)
+        @AfterClass(alwaysRun = true)
         public void tearDown()
         {
                 super.tearDown();
@@ -65,13 +71,11 @@ public class DeleteItemsViaAWE extends AbstractUtils
         public void dataPrep_AONE() throws Exception
         {
                 // User login
-                String[] testUserInfo = new String[] { testUser };
-                CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
-
                 // ---- Step 1 ----
                 // ---- Step Action -----
                 // WCM Quick Start is installed; - is not required to be executed automatically
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+
                 // ---- Step 2 ----
                 // ---- Step Action -----
                 // Site "My Web Site" is created in Alfresco Share;
@@ -96,11 +100,11 @@ public class DeleteItemsViaAWE extends AbstractUtils
 
                 //Change property for quick start live to ip address
                 documentLibPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
-                documentPropertiesPage.setSiteHostname(wcmqs);
+                documentPropertiesPage.setSiteHostname(ipAddress);
                 documentPropertiesPage.clickSave();
 
                 //setup new entry in hosts to be able to access the new wcmqs site
-                String setHostAddress = "cmd.exe /c echo " + wcmqs + " " + siteName + " >> %WINDIR%\\System32\\Drivers\\Etc\\Hosts";
+                String setHostAddress = "cmd.exe /c echo " + ipAddress + " " + siteName + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
                 Runtime.getRuntime().exec(setHostAddress);
 
         }
@@ -149,7 +153,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsBlogPostPage.cancelArticleDelete();
-                wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.ETHICAL_FUNDS);
+                Assert.assertTrue(wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.ETHICAL_FUNDS));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -165,14 +169,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsBlogPostPage.confirmArticleDelete();
-                wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.ETHICAL_FUNDS);
+                Assert.assertTrue(wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.ETHICAL_FUNDS));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
                 documentLibPage.selectFolder(QUICK_START_EDITORIAL);
@@ -208,8 +212,8 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
                 wcmqsBlogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
 
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 3 ----
                 // ---- Step action ---
@@ -228,7 +232,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsBlogPostPage.cancelArticleDelete();
-                wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+                Assert.assertTrue(wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -244,20 +248,19 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsBlogPostPage.confirmArticleDelete();
-                wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+                Assert.assertTrue(wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP), "Article was not deleted!");
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog2.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                drone.navigateTo(shareUrl);
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
                 documentLibPage.selectFolder(QUICK_START_EDITORIAL);
                 documentLibPage.selectFolder(ROOT_FOLDER);
                 documentLibPage.selectFolder(WcmqsBlogPage.BLOG);
-
                 Assert.assertFalse(documentLibPage.isFileVisible(WcmqsBlogPage.BLOG_2), "Company organizes workshop page hasn't been deleted correctly");
 
         }
@@ -288,8 +291,8 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
                 wcmqsBlogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
 
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 3 ----
                 // ---- Step action ---
@@ -308,7 +311,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsBlogPostPage.cancelArticleDelete();
-                wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+                Assert.assertTrue(wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -324,14 +327,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsBlogPostPage.confirmArticleDelete();
-                wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+                Assert.assertTrue(wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog3.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                drone.navigateTo(shareUrl);
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
                 documentLibPage.selectFolder(QUICK_START_EDITORIAL);
@@ -365,8 +368,8 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.GLOBAL);
 
                 wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 3 ----
                 // ---- Step action ---
@@ -384,7 +387,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsNewsPage.cancelArticleDelete();
-                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
+                Assert.assertTrue(wcmqsNewsPage.checkIfNewsExists(WcmqsNewsPage.EUROPE_DEPT_CONCERNS));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -400,14 +403,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsNewsPage.confirmArticleDelete();
-                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
+                Assert.assertTrue(wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.EUROPE_DEPT_CONCERNS));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                drone.navigateTo(shareUrl);
 
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
@@ -444,8 +447,8 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.GLOBAL);
 
                 wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.FTSE_1000);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 3 ----
                 // ---- Step action ---
@@ -463,7 +466,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsNewsPage.cancelArticleDelete();
-                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.FTSE_1000);
+                Assert.assertTrue(wcmqsNewsPage.checkIfNewsExists(WcmqsNewsPage.FTSE_1000));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -479,14 +482,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsNewsPage.confirmArticleDelete();
-                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.FTSE_1000);
+                Assert.assertTrue(wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.FTSE_1000));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                drone.navigateTo(shareUrl);
 
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
@@ -523,8 +526,8 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.COMPANIES);
 
                 wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 3 ----
                 // ---- Step action ---
@@ -542,7 +545,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsNewsPage.cancelArticleDelete();
-                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
+                Assert.assertTrue(wcmqsNewsPage.checkIfNewsExists(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -558,14 +561,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsNewsPage.confirmArticleDelete();
-                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
+                Assert.assertTrue(wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                drone.navigateTo(shareUrl);
 
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
@@ -601,8 +604,8 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.COMPANIES);
 
                 wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 3 ----
                 // ---- Step action ---
@@ -620,7 +623,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsNewsPage.cancelArticleDelete();
-                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
+                Assert.assertTrue(wcmqsNewsPage.checkIfNewsExists(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -636,14 +639,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsNewsPage.confirmArticleDelete();
-                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
+                Assert.assertTrue(wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                drone.navigateTo(shareUrl);
 
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
@@ -680,8 +683,8 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.MARKETS);
 
                 wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.INVESTORS_FEAR);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 3 ----
                 // ---- Step action ---
@@ -699,7 +702,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsNewsPage.cancelArticleDelete();
-                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.INVESTORS_FEAR);
+                Assert.assertTrue(wcmqsNewsPage.checkIfNewsExists(WcmqsNewsPage.INVESTORS_FEAR));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -715,14 +718,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsNewsPage.confirmArticleDelete();
-                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.INVESTORS_FEAR);
+                Assert.assertTrue(wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.INVESTORS_FEAR));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                drone.navigateTo(shareUrl);
 
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
@@ -759,8 +762,8 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.MARKETS);
 
                 wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.HOUSE_PRICES);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+                //                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                //                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
 
                 // ---- Step 3 ----
                 // ---- Step action ---
@@ -778,7 +781,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsNewsPage.cancelArticleDelete();
-                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.HOUSE_PRICES);
+                Assert.assertTrue(wcmqsNewsPage.checkIfNewsExists(WcmqsNewsPage.HOUSE_PRICES));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -794,14 +797,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsNewsPage.confirmArticleDelete();
-                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.HOUSE_PRICES);
+                Assert.assertTrue(wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.HOUSE_PRICES));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
                 // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
                 // ---- Expected results ----
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
-                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                drone.navigateTo(shareUrl);
 
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
                 documentLibPage.selectFolder(ALFRESCO_QUICK_START);
