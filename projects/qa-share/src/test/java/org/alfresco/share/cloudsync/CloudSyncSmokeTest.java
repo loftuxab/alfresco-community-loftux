@@ -50,8 +50,8 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         testName = this.getClass().getSimpleName();
         logger.info("Start Tests in " + testName);
         super.setup();
-        siteA = getSiteName(testName);
-        siteB = getSiteName(testName) + "SY";
+        siteA = getSiteName(testName) +"A";
+        siteB = getSiteName(testName) + "B";
         fileName = getFileName(testName);
         folderName = getFolderName(testName);
         fileNamePlain = fileName + "plainText";
