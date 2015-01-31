@@ -555,6 +555,7 @@
             {
                 container: this.id + '-button-' + userName,
                 label: this.msg("site-members.uninvite"),
+                disabled: oRecord.getData("isMemberOfGroup"),
                 onclick:
                 {
                    fn: this.doRemove,
