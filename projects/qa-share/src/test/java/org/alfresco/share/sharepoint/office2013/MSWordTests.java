@@ -66,7 +66,7 @@ public class MSWordTests extends AbstractUtils
         {
                 super.setup();
 
-                testName = this.getClass().getSimpleName() + 1114;
+                testName = this.getClass().getSimpleName();
                 testUser = getUserNameFreeDomain(testName);
                 siteName = getSiteName(testName);
 
@@ -169,15 +169,43 @@ public class MSWordTests extends AbstractUtils
                 String path = getPathSharepoint(drone);
                 word.operateOnSaveAsWithSharepoint(l, path, siteName, docFileName_9808, testUser, DEFAULT_PASSWORD);
 
+                l=word.getAbstractUtil().setOnWindow(docFileName_9808);
                 String actualName = word.getAbstractUtil().findWindowName(docFileName_9808);
-                Assert.assertTrue(actualName.contains(docFileName_9808) && actualName.contains("Word"), "File not found");
+                Assert.assertTrue(actualName.contains(docFileName_9808) && actualName.contains("Word"), "File not found");     
+                
+                // 1. Don't make any changes;
+                // 2. Select File->Info;
+                word.goToFile(l);
+                word.getAbstractUtil().clickOnObject(l, "Info");
+                
+                // 3. Expand Versions menu and click Check Out;
+                word.getAbstractUtil().clickOnObject(l, "ManageVersions");
+                l.waitTime(2);
+                l.keyPress("tab");
+                l.keyPress("enter");
+                l.click("Check Out");
+                
+                // 4. Click Check In;
+                Ldtp l1 = word.getAbstractUtil().setOnWindow(docFileName_9808);
+                word.goToFile(l1);
+                word.getAbstractUtil().clickOnObject(l1, "Info");
+                word.getAbstractUtil().clickOnObject(l1, "CheckIn");
+                
+                // 5. Enter any comment and click OK button;
+                String commentFromWord = "comment for 9643";
+                word.operateOnCheckIn(l1, commentFromWord, false);
 
-                // User login.
+                String actualName2 = word.getAbstractUtil().findWindowName(docFileName_9808);
+                Assert.assertTrue(actualName2.contains("[Read-Only]"), "Word is NOT opened in read only mode");
+
+                // 6. Log into Share;
                 ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
+                // 7. Go to site Document library where document was saved;
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-                // verify that the document is visible in document library
+                // Expected results
+                // 7. The saved document is present;
                 Assert.assertTrue(documentLibPage.isFileVisible(docFileName_9808 + fileType), "The saved document is not displayed.");
 
         }
@@ -205,11 +233,16 @@ public class MSWordTests extends AbstractUtils
                 Assert.assertTrue(actualName.contains(docFileName_9809) && actualName.contains("Word"), "File not found");
 
                 Ldtp l1 = word.getAbstractUtil().setOnWindow(docFileName_9809);
+
+                // Checkout the document
+                word.checkOutOffice(l1);                        
+
+                Ldtp l2 = word.getAbstractUtil().setOnWindow(docFileName_9809);
                 // edit document
 
                 String newContent = testName;
-                word.editOffice(l1, newContent);
-                word.saveOffice(l1);
+                word.editOffice(l2, newContent);
+                word.saveOffice(l2);
 
                 // User login.
                 ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -219,7 +252,7 @@ public class MSWordTests extends AbstractUtils
                 Map<String, Object> properties = detailsPage.getProperties();
                 Assert.assertEquals(properties.get("Name"), docFileName_9809 + " (Working Copy)" + fileType);
                 String documentContent = detailsPage.getDocumentBody();
-                Assert.assertTrue(documentContent.contains(newContent), "Changes are present in the document.");
+                Assert.assertTrue(documentContent.contains(newContent), "Changes are not present in the document.");
 
                 // Excel Document is present in I'm Editing section;
                 FileDirectoryInfo fileInfo = ShareUserSitePage.getFileDirectoryInfo(drone, docFileName_9809 + fileType);
@@ -288,7 +321,7 @@ public class MSWordTests extends AbstractUtils
                 Assert.assertTrue(detailsPage.isCheckedOut(), "The document is not checkout");
                 Assert.assertEquals(detailsPage.getDocumentVersion(), fileVersion);
                 String documentContent = detailsPage.getDocumentBody();
-                Assert.assertTrue(documentContent.contains(newContent), "Changes are present in the document.");
+                Assert.assertTrue(documentContent.contains(newContent), "Changes are not present in the document.");
 
         }
 
@@ -467,7 +500,8 @@ public class MSWordTests extends AbstractUtils
 
                 // 1. Make some changes to the workbook;
                 Ldtp l2 = word.getAbstractUtil().setOnWindow(docFileName_9814);
-                word.editOffice(l2, "new input data");
+                String newContent = "new input data";
+                word.editOffice(l2, newContent);
 
                 // 2. Cick File->Info button;
                 // 3. Click Check In button;
@@ -505,6 +539,9 @@ public class MSWordTests extends AbstractUtils
                 Assert.assertTrue(detailsPage.isVersionHistoryPanelPresent(), "Version History section is not present");
                 String commentFromShare = detailsPage.getCommentsOfLastCommit();
                 Assert.assertEquals(commentFromShare, commentFromWord);
+                
+                String documentContent = detailsPage.getDocumentBody();
+                Assert.assertTrue(documentContent.contains(newContent), "Changes are not present in the document.");
 
         }
 
@@ -566,7 +603,7 @@ public class MSWordTests extends AbstractUtils
                 DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9815 + fileType).render();
 
                 String documentContent = detailsPage.getDocumentBody();
-                Assert.assertTrue(documentContent.contains(newContent), "Changes are present in the document.");
+                Assert.assertTrue(documentContent.contains(newContent), "Changes are not present in the document.");
 
                 // 8. Changes are applied to the original file; Version is increased to
                 // new major one.
@@ -643,53 +680,90 @@ public class MSWordTests extends AbstractUtils
 
         }
 
-        @Test(groups = "alfresco-one")
-        public void AONE_9824() throws Exception
-        {
-                // 1. MS Office Word 2013 is opened;
-                Ldtp l = word.openOfficeApplication();
-                word.navigateToOpenSharePointBrowse(l);
-
-                String path = getPathSharepoint(drone);
-
-                // Type url into File name field (e.g. http://<host>:7070/alfresco);
-                // Select the workbook from site Document Library you would like to
-                // open;
-                // Click Open button;
-
-                word.operateOnOpen(l, path, siteName, docFileName_9824, testUser, DEFAULT_PASSWORD);
-
-                String actualName = word.getAbstractUtil().findWindowName(docFileName_9824);
-
-                Assert.assertTrue(actualName.contains(docFileName_9824) && actualName.contains("Word"), "File not found");
-
-                Ldtp l1 = word.getAbstractUtil().setOnWindow(docFileName_9824);
-
-                // Checkout and check In the document
-                word.checkOutOffice(l1);
-
-                // Make some changes to the workbook;
-                word.editOffice(l1, "new input data");
-
-                // Save the document
-                word.goToFile(l1);
-                word.getAbstractUtil().clickOnObject(l1, "Info");
-                word.getAbstractUtil().clickOnObject(l1, "mnuSave");
-
-                // Cick File->Info button;
-                // Click Check In button;
-                String commentFromWord = "comment from word file check in";
-                word.checkInOffice(l1, commentFromWord, false);
-
-                // Word Document is opened in read-only mode;
-                actualName = word.getAbstractUtil().findWindowName(docFileName_9824);
-                Assert.assertTrue(actualName.contains("[Read-Only]"), "Word is NOT opened in read only mode");
-
-                // This step cannot be automated. The LDTP tool cannot perform actions on Read Only window
-                // 4. Click Edit Workbook button;
-                // 4. The uploaded version is opened;
-
-        }
+//        Keep manual - an Allow popup cannot be catch by WebDriver
+//        @Test(groups = "alfresco-one")
+//        public void AONE_9824() throws Exception
+//        {
+//                // 1. MS Office Word 2013 is opened;
+//                Ldtp l = word.openOfficeApplication();
+//                word.navigateToOpenSharePointBrowse(l);
+//
+//                String path = getPathSharepoint(drone);
+//
+//                // Type url into File name field (e.g. http://<host>:7070/alfresco);
+//                // Select the workbook from site Document Library you would like to
+//                // open;
+//                // Click Open button;
+//
+//                word.operateOnOpen(l, path, siteName, docFileName_9824, testUser, DEFAULT_PASSWORD);
+//
+//                String actualName = word.getAbstractUtil().findWindowName(docFileName_9824);
+//
+//                Assert.assertTrue(actualName.contains(docFileName_9824) && actualName.contains("Word"), "File not found");
+//
+//                Ldtp l1 = word.getAbstractUtil().setOnWindow(docFileName_9824);
+//
+//                // Checkout and check In the document
+//                word.checkOutOffice(l1);
+//
+//                // Make some changes to the workbook;
+//                word.editOffice(l1, "new input data");
+//
+//                // Save the document
+//                word.goToFile(l1);
+//                word.getAbstractUtil().clickOnObject(l1, "Info");
+//                word.getAbstractUtil().clickOnObject(l1, "mnuSave");
+//
+//                // Cick File->Info button;
+//                // Click Check In button;
+//                String commentFromWord = "comment from word file check in";
+//                word.checkInOffice(l1, commentFromWord, false);
+//
+//                // Word Document is opened in read-only mode;
+//                actualName = word.getAbstractUtil().findWindowName(docFileName_9824);
+//                Assert.assertTrue(actualName.contains("[Read-Only]"), "Word is NOT opened in read only mode");
+//                word.closeOfficeApplication(docFileName_9824);
+//
+//                // 6. User logged into share;              
+//                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+//                documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+//                Assert.assertTrue(documentLibPage.isFileVisible(docFileName_9824 + fileType), "The saved document is not displayed.");
+//                
+//                // 1. Update the document;
+//                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9824 + fileType);
+//                detailsPage.selectOnlineEdit().render();     
+//                
+//                Ldtp ldtp1 = word.getAbstractUtil().getLdtp();
+//                word.operateOnSecurity(ldtp1, testUser, DEFAULT_PASSWORD);  
+//                
+//                ldtp1 = word.getAbstractUtil().setOnWindow(docFileName_9824);
+//                word.editOffice(ldtp1, "edit via Share");
+//                // Save the document
+//                word.goToFile(ldtp1);
+//                word.getAbstractUtil().clickOnObject(ldtp1, "Info");
+//                word.getAbstractUtil().clickOnObject(ldtp1, "mnuSave");
+//                              
+//                // 2. In MS Word click File-INfo;
+//                word.goToFile(ldtp1);
+//                word.getAbstractUtil().clickOnObject(ldtp1, "Info");
+//                
+//                // 3. Expand Versions menu and select Refresh server versions list;
+//                word.getAbstractUtil().clickOnObject(ldtp1, "ManageVersions");
+//                ldtp1.waitTime(2);
+//                ldtp1.keyPress("tab");
+//                ldtp1.keyPress("enter");
+//                ldtp1.click("Check Out");
+//                ldtp1.click("Refresh Server Versions List");
+//                
+//                // 3. New version created via Share is added to the list;
+//                String fileVersion = "1.1";
+//                String fileVersionObject = "btn" + fileVersion.replace(".", "");
+//
+//                Assert.assertTrue(word.getAbstractUtil().isObjectDisplayed(ldtp1, fileVersionObject), "Object with version " + fileVersion + " is not displayed");
+//
+//                // 4. Click Edit Document button;  - Step not implemented because no Edit Document button is present either in Share or MS Word
+//
+//        }
 
         @Test(groups = "alfresco-one")
         public void AONE_9825() throws Exception
@@ -743,7 +817,7 @@ public class MSWordTests extends AbstractUtils
                 Assert.assertEquals(version, "2.0");
 
                 String documentContent = detailsPage.getDocumentBody();
-                Assert.assertFalse(documentContent.contains(newValue), "Changes are not applied to the document.");
+                Assert.assertFalse(documentContent.contains(newValue), "Changes are  applied to the document.");
 
                 String emptyComment = detailsPage.getCommentsOfLastCommit();
                 Assert.assertEquals(emptyComment, "(No Comment)");
@@ -802,7 +876,7 @@ public class MSWordTests extends AbstractUtils
                 Assert.assertEquals(version, "2.0");
 
                 String documentContent = detailsPage.getDocumentBody();
-                Assert.assertFalse(documentContent.contains(newValue), "Changes are not applied to the document.");
+                Assert.assertFalse(documentContent.contains(newValue), "Changes are applied to the document.");
 
                 String fileComment = detailsPage.getCommentsOfLastCommit();
                 Assert.assertEquals(fileComment, commentFromW);
