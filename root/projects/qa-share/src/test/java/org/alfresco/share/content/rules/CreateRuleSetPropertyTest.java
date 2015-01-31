@@ -1,5 +1,6 @@
 package org.alfresco.share.content.rules;
 
+import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPageWithRules;
@@ -102,6 +103,290 @@ public class CreateRuleSetPropertyTest extends AbstractUtils
         // Select any type, e.g. "Items are created or enter this folder" value from "When" drop-down
         WhenSelectorImpl whenSelectorIml = createRulePage.getWhenOptionObj();
         whenSelectorIml.selectInbound();
+
+        // Select 'All items' from "If" drop-down select control
+        AbstractIfSelector ifSelector = createRulePage.getIfOptionObj();
+        ifSelector.selectIFOption(0);
+
+        // Select "Set property value" from "Perform Action" drop-down select
+        ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
+        actionSelectorEnterpImpl.selectSetPropertyValue(allFolder, value);
+
+        //  Select any property and click "Create" button
+        createRulePage.fillSetValueField(toText);
+        FolderRulesPageWithRules folderRulesPageWithRules = createRulePage.clickCreate().render();
+        Assert.assertTrue(folderRulesPageWithRules.isPageCorrect(folderName), "Rule page with rule isn't correct");
+
+    }
+
+    @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_14867() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String folderName = getFolderName(testName);
+        String siteName = getSiteName(testName);
+
+
+        // Create User
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        ShareUser.logout(drone);
+
+        // Login as user
+        DashBoardPage dashboard = ShareUser.login(drone, testUserInfo).render();
+
+        // Create Site
+        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
+        ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create Folder
+        dashboard.getNav().selectMyFilesPage().render();
+        ShareUserSitePage.createFolder(drone, folderName, null);
+        ShareUser.logout(drone);
+
+
+    }
+
+    @Test(groups = { "EnterpriseOnly" })
+    public void AONE_14867() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String folderName = getFolderName(testName);
+        String ruleName = "Rule " + getRandomString(5);
+        String allFolder = "All";
+        String value = "act:actionDescription";
+        String toText = getRandomString(5);
+
+        // Login
+        DashBoardPage dashboard = ShareUser.login(drone, testUser, DEFAULT_PASSWORD).render();
+        MyFilesPage myFilesPage = dashboard.getNav().selectMyFilesPage().render();
+
+        // Create the rule for folder
+        FolderRulesPage folderRulesPage = myFilesPage.getFileDirectoryInfo(folderName).selectManageRules().render();
+        Assert.assertTrue(folderRulesPage.isPageCorrect(folderName), "Rule page isn't correct");
+
+        // Fill "Name" field with correct data
+        CreateRulePage createRulePage = folderRulesPage.openCreateRulePage().render();
+        createRulePage.fillNameField(ruleName);
+
+        // Select any type, e.g. "Items are created or enter this folder" value from "When" drop-down
+        WhenSelectorImpl whenSelectorIml = createRulePage.getWhenOptionObj();
+        whenSelectorIml.selectInbound();
+
+        // Select 'All items' from "If" drop-down select control
+        AbstractIfSelector ifSelector = createRulePage.getIfOptionObj();
+        ifSelector.selectIFOption(0);
+
+        // Select "Set property value" from "Perform Action" drop-down select
+        ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
+        actionSelectorEnterpImpl.selectSetPropertyValue(allFolder, value);
+
+        //  Select any property and click "Create" button
+        createRulePage.fillSetValueField(toText);
+        FolderRulesPageWithRules folderRulesPageWithRules = createRulePage.clickCreate().render();
+        Assert.assertTrue(folderRulesPageWithRules.isPageCorrect(folderName), "Rule page with rule isn't correct");
+
+    }
+
+    @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_14869() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String folderName = getFolderName(testName);
+        String siteName = getSiteName(testName);
+
+
+        // Create User
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        ShareUser.logout(drone);
+
+        // Login as user
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
+        ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create Folder
+        ShareUserSitePage.createFolder(drone, folderName, null);
+        ShareUser.logout(drone);
+
+
+    }
+
+    @Test(groups = { "EnterpriseOnly" })
+    public void AONE_14869() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+        String folderName = getFolderName(testName);
+        String ruleName = "Rule " + getRandomString(5);
+        String allFolder = "All";
+        String value = "download:done";
+        String toText = getRandomString(5);
+
+        // Login
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create the rule for folder
+        FolderRulesPage folderRulesPage = docLibPage.getFileDirectoryInfo(folderName).selectManageRules().render();
+        Assert.assertTrue(folderRulesPage.isPageCorrect(folderName), "Rule page isn't correct");
+
+        // Fill "Name" field with correct data
+        CreateRulePage createRulePage = folderRulesPage.openCreateRulePage().render();
+        createRulePage.fillNameField(ruleName);
+
+        // Select any type, e.g. "Items are created or enter this folder" value from "When" drop-down
+        WhenSelectorImpl whenSelectorIml = createRulePage.getWhenOptionObj();
+        whenSelectorIml.selectInbound();
+
+        // Select 'All items' from "If" drop-down select control
+        AbstractIfSelector ifSelector = createRulePage.getIfOptionObj();
+        ifSelector.selectIFOption(0);
+
+        // Select "Set property value" from "Perform Action" drop-down select
+        ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
+        actionSelectorEnterpImpl.selectSetPropertyValue(allFolder, value);
+
+        //  Select any property and click "Create" button
+        createRulePage.fillSetValueField(toText);
+        FolderRulesPageWithRules folderRulesPageWithRules = createRulePage.clickCreate().render();
+        Assert.assertTrue(folderRulesPageWithRules.isPageCorrect(folderName), "Rule page with rule isn't correct");
+
+    }
+
+    @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_14870() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String folderName = getFolderName(testName);
+        String siteName = getSiteName(testName);
+
+
+        // Create User
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        ShareUser.logout(drone);
+
+        // Login as user
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
+        ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create Folder
+        ShareUserSitePage.createFolder(drone, folderName, null);
+        ShareUser.logout(drone);
+
+
+    }
+
+    @Test(groups = { "EnterpriseOnly" })
+    public void AONE_14870() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+        String folderName = getFolderName(testName);
+        String ruleName = "Rule " + getRandomString(5);
+        String allFolder = "All";
+        String value = "cm:companyaddress1";
+        String toText = getRandomString(5);
+
+        // Login
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create the rule for folder
+        FolderRulesPage folderRulesPage = docLibPage.getFileDirectoryInfo(folderName).selectManageRules().render();
+        Assert.assertTrue(folderRulesPage.isPageCorrect(folderName), "Rule page isn't correct");
+
+        // Fill "Name" field with correct data
+        CreateRulePage createRulePage = folderRulesPage.openCreateRulePage().render();
+        createRulePage.fillNameField(ruleName);
+
+        // Select any type, e.g. "Items are updated" value from "When" drop-down
+        WhenSelectorImpl whenSelectorIml = createRulePage.getWhenOptionObj();
+        whenSelectorIml.selectUpdate();
+
+        // Select 'All items' from "If" drop-down select control
+        AbstractIfSelector ifSelector = createRulePage.getIfOptionObj();
+        ifSelector.selectIFOption(0);
+
+        // Select "Set property value" from "Perform Action" drop-down select
+        ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
+        actionSelectorEnterpImpl.selectSetPropertyValue(allFolder, value);
+
+        //  Select any property and click "Create" button
+        createRulePage.fillSetValueField(toText);
+        FolderRulesPageWithRules folderRulesPageWithRules = createRulePage.clickCreate().render();
+        Assert.assertTrue(folderRulesPageWithRules.isPageCorrect(folderName), "Rule page with rule isn't correct");
+
+    }
+
+    @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_14871() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String folderName = getFolderName(testName);
+        String siteName = getSiteName(testName);
+
+
+        // Create User
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        ShareUser.logout(drone);
+
+        // Login as user
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
+        ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create Folder
+        ShareUserSitePage.createFolder(drone, folderName, null);
+        ShareUser.logout(drone);
+
+
+    }
+
+    @Test(groups = { "EnterpriseOnly" })
+    public void AONE_14871() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+        String folderName = getFolderName(testName);
+        String ruleName = "Rule " + getRandomString(5);
+        String allFolder = "All";
+        String value = "blg:id";
+        String toText = getRandomString(5);
+
+        // Login
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // Create the rule for folder
+        FolderRulesPage folderRulesPage = docLibPage.getFileDirectoryInfo(folderName).selectManageRules().render();
+        Assert.assertTrue(folderRulesPage.isPageCorrect(folderName), "Rule page isn't correct");
+
+        // Fill "Name" field with correct data
+        CreateRulePage createRulePage = folderRulesPage.openCreateRulePage().render();
+        createRulePage.fillNameField(ruleName);
+
+        // Select any type, e.g. "Items are deleted or leave this folder" value from "When" drop-down
+        WhenSelectorImpl whenSelectorIml = createRulePage.getWhenOptionObj();
+        whenSelectorIml.selectOutbound();
 
         // Select 'All items' from "If" drop-down select control
         AbstractIfSelector ifSelector = createRulePage.getIfOptionObj();
