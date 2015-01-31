@@ -26,6 +26,7 @@ public class WcmqsHomePage extends WcmqsAbstractPage
     private final By BLOG_MENU = By.cssSelector("a[href$='blog/']");
     private final By CONTACT_MENU = By.cssSelector("div.link-menu");
     private final By FIRST_ARTICLE = By.cssSelector("div[id='left'] div.interior-content ul>li:nth-child(1)>h4>a");
+    private final By BANNER = By.cssSelector("div.slideshow-rm");
 
     private final By PUBLICATIONS_MENU = By.cssSelector("a[href$='publications/']");
     private final By RESEARCH_REPORTS = By.cssSelector("a[href$='research-reports/']");
@@ -164,6 +165,19 @@ public class WcmqsHomePage extends WcmqsAbstractPage
         }
 
         return folders;
+    }
+    
+    /**
+     * Method to wait for a slide title in banner and then click it
+     * 
+     * @param newsName - the title of the slide declared in share!
+     * @return
+     */
+    public void waitForAndClickSlideInBanner(String slideName)
+    {
+        By banner=By.xpath(String.format("//div/a[contains(@href,'%s')]", slideName));
+        drone.waitUntilElementPresent(banner, 5);
+        drone.find(banner).click();
     }
 
     public boolean isResearchReportsDisplayed()
