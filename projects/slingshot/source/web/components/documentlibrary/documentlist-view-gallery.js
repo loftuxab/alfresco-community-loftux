@@ -690,10 +690,32 @@
       {
          var galleryItemSelectDiv = this.getRowItemSelectElement(galleryItem);
          var jsNode = oRecord.getData("jsNode"),
-            nodeRef = jsNode.nodeRef;
+             nodeRef = jsNode.nodeRef,
+             name = oRecord.getData("displayName"),
+             checkbox = document.createElement("input"),
+             label = document.createElement("label");
          
          var checkboxId = this.getRowItemSelectId(oRecord);
-         galleryItemSelectDiv.innerHTML = '<input id="' + checkboxId + '" type="checkbox" name="fileChecked" value="'+ nodeRef + '"' + (scope.selectedFiles[nodeRef] ? ' checked="checked">' : '>');
+         
+         checkbox.id = checkboxId;
+         checkbox.type = "checkbox";
+         checkbox.name = "fileChecked";
+         checkbox.value = nodeRef;
+         checkbox.checked = scope.selectedFiles[nodeRef] ? true : false;
+         
+         label.id = "label_for_" + checkbox.id;
+         label.style.fontSize="0em";
+         label.innerHTML = (checkbox.checked ? scope.msg("checkbox.uncheck") : scope.msg("checkbox.check")) + " " + name;
+         label.setAttribute("for", checkbox.id);
+         galleryItemSelectDiv.appendChild(label);
+         galleryItemSelectDiv.appendChild(checkbox);
+         YAHOO.Bubbling.on("selectedFilesChanged", function(e)
+         {
+            if (Dom.get(label.id))
+            {
+              Dom.get(label.id).innerHTML = (scope.selectedFiles[nodeRef] ? scope.msg("checkbox.uncheck") : scope.msg("checkbox.check")) + " " + name;
+            }
+         });
       }
    };
    
