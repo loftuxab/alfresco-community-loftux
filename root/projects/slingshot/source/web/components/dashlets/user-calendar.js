@@ -166,7 +166,7 @@
       renderCellIcon: function UserCalendar_renderCellIcon(elCell, oRecord, oColumn, oData)
       {
          Dom.setStyle(elCell, "width", oColumn.width + "px");
-         var desc = '<div class="icon"><img src="' + Alfresco.constants.URL_RESCONTEXT + '/components/calendar/images/calendar-16.png" alt="event"/></div>';
+         var desc = '<div class="icon"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/calendar/images/calendar-16.png" alt="event"/></div>';
          elCell.innerHTML = desc;
       },
 
