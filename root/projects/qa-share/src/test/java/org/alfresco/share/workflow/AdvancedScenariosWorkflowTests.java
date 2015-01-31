@@ -69,7 +69,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15718() throws Exception
+    public void dataPrep_AONE_15718() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -105,14 +105,12 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Set up the cloud sync
         signInToAlfrescoInTheCloud(drone, cloudUser1, DEFAULT_PASSWORD);
-
-        ShareUser.logout(drone);
     }
 
     /**
      * AONE-15718:Reviewer/Assignee has no write permissions to the folder
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 500000)
     public void AONE_15718() throws Exception
     {
         String testName = getTestName();
@@ -143,9 +141,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         // Adding reviewers
         userNames.add(cloudUser2);
         userNames.add(cloudUser1);
-
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-
         formDetails.setMessage(workFlowName1);
         formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -164,20 +160,18 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         ShareUser.login(hybridDrone, cloudUser2, DEFAULT_PASSWORD);
         ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1));
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1), "Task is not displayed");
         ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite1Name);
-        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(hybridDrone, opFileName);
+        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(hybridDrone, opFileName).render();
 
         // TODO: Add step: Verify the cloud user is not having the edit options on sync document as he is the consumer on this content.
-        Assert.assertFalse(detailsPage.isEditOfflineLinkDisplayed());
-        Assert.assertFalse(detailsPage.isUploadNewVersionDisplayed());
-
+        Assert.assertFalse(detailsPage.isEditOfflineLinkDisplayed(), "Edit offline is displayed");
+        Assert.assertFalse(detailsPage.isUploadNewVersionDisplayed(), "Upload new version is displayed");
         ShareUser.logout(hybridDrone);
-
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15720() throws Exception
+    public void dataPrep_AONE_15720() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -214,7 +208,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15720:Cloud Trial Standard Network - Start Workflow
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 500000)
     public void AONE_15720() throws Exception
     {
         String testName = getTestName();
@@ -239,13 +233,11 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         ShareUser.uploadFileInFolder(drone, opFileInfo).render();
 
         // Start Cloud Task or Review workflow
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone);
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone).render();
 
         // Adding reviewers
         userNames.add(cloudUser1);
-
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-
         formDetails.setMessage(workFlowName1);
         formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -259,13 +251,12 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Fill the form details and start workflow
         MyWorkFlowsPage myWorkFlowsPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
-        Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(workFlowName1));
-
+        Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(workFlowName1), "Workflow is not displayed");
         ShareUser.logout(drone);
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15721() throws Exception
+    public void dataPrep_AONE_15721() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -286,7 +277,6 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Create Site
         ShareUser.createSite(hybridDrone, cloudSite1Name, SITE_VISIBILITY_PUBLIC);
-
         ShareUser.logout(hybridDrone);
 
         // Login as User1 (OP)
@@ -294,15 +284,12 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Set up the cloud sync
         signInToAlfrescoInTheCloud(drone, cloudUser1, DEFAULT_PASSWORD);
-
-        ShareUser.logout(drone);
-
     }
 
     /**
      * AONE-15721:Partner Cloud account - Start Workflow
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 500000)
     public void AONE_15721() throws Exception
     {
         String testName = getTestName();
@@ -327,13 +314,11 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         ShareUser.uploadFileInFolder(drone, opFileInfo).render();
 
         // Start Cloud Task or Review workflow
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone);
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone).render();
 
         // Adding reviewers
         userNames.add(cloudUser1);
-
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-
         formDetails.setMessage(workFlowName1);
         formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -347,13 +332,12 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Fill the form details and start workflow
         MyWorkFlowsPage myWorkFlowsPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
-        Assert.assertNotNull(myWorkFlowsPage.isWorkFlowPresent(workFlowName1));
-
+        Assert.assertNotNull(myWorkFlowsPage.isWorkFlowPresent(workFlowName1), "Workflow is not displyed");
         ShareUser.logout(drone);
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15722() throws Exception
+    public void dataPrep_AONE_15722() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -418,7 +402,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15722: Downgrade Cloud account - Incomplete Workflow
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 600000)
     public void AONE_15722() throws Exception
     {
         String testName = getTestName();
@@ -443,8 +427,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         Assert.assertTrue((modifiedTitle + opUser1).equals(editDocumentProperties.getDocumentTitle()),
                 "Document Title modified by OP User is not present for Cloud.");
         editDocumentProperties.selectCancel();
-        Assert.assertTrue(isSynced(fileName, opSiteName));
-
+        Assert.assertTrue(isSynced(fileName, opSiteName), "Document is not synced");
         ShareUser.logout(drone);
 
         // login cloud user
@@ -478,8 +461,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         editDocumentProperties.selectSave().render();
 
         // The changes are applied but cannot be synced.
-        Assert.assertTrue(verifySyncFailed(fileName, opSiteName));
-
+        Assert.assertTrue(verifySyncFailed(fileName, opSiteName), "Sync is not failed");
         ShareUser.logout(drone);
 
         // login cloud user
@@ -498,7 +480,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         // but cannot be synced.
         ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
         ShareUser.openSiteDocumentLibraryFromSearch(drone, opSiteName).render();
-        Assert.assertTrue(verifySyncFailed(fileName, opSiteName));
+        Assert.assertTrue(verifySyncFailed(fileName, opSiteName), "Sync is not failed");
         ShareUser.logout(drone);
 
         // Step 7: Cloud Verify the created in the pre-condition workflow on Tasks I've Started page.
@@ -507,7 +489,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Step 8: Verify the task on My Tasks page
         MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        Assert.assertTrue(myTasks.isTaskPresent(workFlowName));
+        Assert.assertTrue(myTasks.isTaskPresent(workFlowName), "Task is missing");
 
         String weekDay;
         SimpleDateFormat dayFormat = new SimpleDateFormat("d MMM, yyyy", Locale.US);
@@ -519,10 +501,8 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         // Step 9: Verify the task details page.
         TaskDetailsPage taskDetails = myTasks.selectViewTasks(workFlowName);
         TaskInfo taskDetailsInfo = taskDetails.getTaskDetailsInfo();
-        Assert.assertTrue(taskDetailsInfo.getDueDateString().equals(weekDay));
-        // Assert.assertTrue(taskDetails.getComment().equalsIgnoreCase(comment));
-
-        Assert.assertTrue(taskDetailsInfo.getPriority().equals(Priority.MEDIUM));
+        Assert.assertTrue(taskDetailsInfo.getDueDateString().equals(weekDay), "Due date is incorrect");
+        Assert.assertTrue(taskDetailsInfo.getPriority().equals(Priority.MEDIUM), "Priority is not set to medium");
 
         // Step 10: Verify the task in My Tasks dashlet on User Dashboard page
         DashBoardPage dashBoard = ShareUser.openUserDashboard(hybridDrone).render();
@@ -530,7 +510,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         List<ShareLink> tasks = taskDashlet.getTasks();
         String theTask = tasks.get(0).getDescription();
-        Assert.assertTrue(theTask.contains(workFlowName));
+        Assert.assertTrue(theTask.contains(workFlowName), "Task " + workFlowName + " is missing");
 
         // Step 11: Try to complete workflow in Cloud
         myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
@@ -539,11 +519,11 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Workflow cannot be completed or another friendly behavior occurs.
         // TODO: BUG ALF-20442
-        Assert.assertTrue(myTasks.isTaskPresent(workFlowName));
+        Assert.assertTrue(myTasks.isTaskPresent(workFlowName), "Task is missing");
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15723() throws Exception
+    public void dataPrep_AONE_15723() throws Exception
     {
         String testName = getTestName() + "ts14";
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -600,7 +580,6 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
         formDetails.setMessage(workFlowName);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
-
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
         isSynced(fileName, opSiteName);
     }
@@ -608,7 +587,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15723: Upgrade Cloud account - Incomplete Workflow
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15723() throws Exception
     {
         String testName = getTestName() + "ts14";
@@ -637,7 +616,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, trailDomainName, "1000");
 
         ShareUser.openSiteDocumentLibraryFromSearch(drone, opSiteName).render();
-        Assert.assertTrue(isSynced(fileName, opSiteName));
+        Assert.assertTrue(isSynced(fileName, opSiteName), "File: " + fileName + " is not synced");
 
         // Step 3: Perform any changes to the synced document.
         editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, fileName).render();
@@ -645,23 +624,23 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         editDocumentProperties.selectSave().render();
 
         // The changes are applied and synced successfully.
-        Assert.assertTrue(isSynced(fileName, opSiteName));
+        Assert.assertTrue(isSynced(fileName, opSiteName), "File: " + fileName + " is not synced");
 
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
 
         // Step 4: Try to complete workflow in Cloud.
         MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        Assert.assertTrue(myTasks.isTaskPresent(workFlowName));
+        Assert.assertTrue(myTasks.isTaskPresent(workFlowName), "Task is not displayed");
         myTasks.navigateToEditTaskPage(workFlowName).render();
         ShareUserWorkFlow.completeTask(hybridDrone, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE).render();
         myTasks.selectCompletedTasks().render();
 
         // Workflow can be completed.
-        Assert.assertTrue(myTasks.isTaskPresent(workFlowName));
+        Assert.assertTrue(myTasks.isTaskPresent(workFlowName), "Task is not displayed");
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15724() throws Exception
+    public void dataPrep_AONE_15724() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -707,7 +686,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15724: Check workflow creation with non-members of site
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 200000)
     public void AONE_15724() throws Exception
     {
         String testName = getTestName();
@@ -720,10 +699,8 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         String workFlowName = testName + System.currentTimeMillis();
         String dueDate = getDueDateString();
-
         String errorMessage = "The folowing user(s) are not part of the site you selected as destination: " + cloudUser2
                 + ". Invite them to the site in order to have them participate in the cloud-workflow.";
-
         List<String> userNames = new ArrayList<String>();
 
         // Login as User1 (OP)
@@ -763,11 +740,11 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         // The workflow can not be started. Following message is displayed: The following user(s) are not part of the site you selected as destination:
         // user2@hello.test. Invite them to the site in order to have them participate in the cloud-workflow.
         String error = cloudTaskOrReviewPage.getWorkFlowCouldNotBeStartedPromptMessage();
-        Assert.assertTrue(error.contains(errorMessage));
+        Assert.assertTrue(error.contains(errorMessage), "Error is not displayed");
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15725() throws Exception
+    public void dataPrep_AONE_15725() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -844,7 +821,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         isSynced(opFileName, opSiteName);
     }
 
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 300000)
     public void AONE_15725() throws Exception
     {
         String testName = getTestName();
@@ -870,19 +847,19 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
 
         // The task is available for the user as he is a reviewer.
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1));
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1), "Task is not displayed");
 
         // Step 4: Cloud Login as user3@network.
         ShareUser.login(hybridDrone, cloudUser3, DEFAULT_PASSWORD);
         ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
         // The task is unavailable for the user as he is not a reviewer.
-        Assert.assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName1, false));
+        Assert.assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName1, false), "Task is available");
         ShareUser.logout(hybridDrone);
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15726() throws Exception
+    public void dataPrep_AONE_15726() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -954,7 +931,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         isSynced(opFileName, opSiteName);
     }
 
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 300000)
     public void AONE_15726() throws Exception
     {
         String testName = getTestName();
@@ -969,7 +946,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         // Step 1: Cloud Login as user1@network.
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
         MyTasksPage myTasks = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1));
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName1), "Task is not available");
 
         // Step 2: Open view history page.
         TaskHistoryPage taskHistoryPage = myTasks.selectTaskHistory(workFlowName1).render();
@@ -980,8 +957,8 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         String user2 = tasks.get(1).getAssignedTo();
 
         // Both user1's and user2's tasks are displayed.
-        Assert.assertTrue(user1.contains(cloudUser1));
-        Assert.assertTrue(user2.contains(cloudUser2));
+        Assert.assertTrue(user1.contains(cloudUser1), cloudUser1 + " is not displayed");
+        Assert.assertTrue(user2.contains(cloudUser2), cloudUser2 + " is not displayed");
 
         // Step 4: Complete (Approve or Reject action) both user1's and user2's tasks.
         EditTaskPage editTaskPage = selectEditLinkOnUserTask(cloudUser1, taskHistoryPage);
@@ -1001,20 +978,21 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         // Step 5: OP Verify the appeared task.
         ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
-        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName1));
+        Assert.assertTrue(ShareUser.checkIfTaskIsPresent(drone, workFlowName1), "Task is not available");
 
         TaskDetailsPage taskDetailsPage = myTasksPage.selectViewTasks(workFlowName1).render();
 
         // The task contains two reviews with comments. Both comments are marked as made by user1.
-        Assert.assertTrue(taskDetailsPage.getTaskDetailsHeader().contains(workFlowName1 + " (Document was approved on the cloud)"));
-        Assert.assertTrue(taskDetailsPage.getComment().contains(cloudUser1 + " LName: " + user1Comments));
-        Assert.assertTrue(taskDetailsPage.getComment().contains(cloudUser1 + " LName: " + user2Comments));
-        Assert.assertFalse(taskDetailsPage.getComment().contains(cloudUser2));
-        Assert.assertTrue(taskDetailsPage.getComment().contains("(Approved)"));
+        Assert.assertTrue(taskDetailsPage.getTaskDetailsHeader().contains(workFlowName1 + " (Document was approved on the cloud)"),
+                "Details header is not displyed");
+        Assert.assertTrue(taskDetailsPage.getComment().contains(cloudUser1 + " LName: " + user1Comments), "Comment for " + cloudUser1 + " is not displyed");
+        Assert.assertTrue(taskDetailsPage.getComment().contains(cloudUser1 + " LName: " + user2Comments), "Comment for " + cloudUser2 + " is not displyed");
+        Assert.assertFalse(taskDetailsPage.getComment().contains(cloudUser2), "User " + cloudUser2 + " is displyed");
+        Assert.assertTrue(taskDetailsPage.getComment().contains("(Approved)"), "Incorrect comment");
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15730() throws Exception
+    public void dataPrep_AONE_15730() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -1049,7 +1027,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15730:L10N for Simple Cloud Task
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 990000)
     public void AONE_15730() throws Exception
     {
         String testName = getTestName();
@@ -1418,7 +1396,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15731() throws Exception
+    public void dataPrep_AONE_15731() throws Exception
     {
         String testName = getTestName();
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
@@ -1453,7 +1431,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15731:L10N for Cloud Review Task
      */
-    @Test(groups = "Hybrid")
+    @Test(groups = "Hybrid", timeOut = 990000)
     public void AONE_15731() throws Exception
     {
         String testName = getTestName();
@@ -1886,70 +1864,110 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
     private void verifyLabelsFromCloudReviewPage(Language language, List<String> cloudReviewTaskLabels, TaskType taskType)
     {
-        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.message")));
-        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.due")));
-        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.priority")));
+        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.message")),
+                "Wrong label in cloud review task page for language:" + language);
+        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.due")),
+                "Wrong label in cloud review task page for language:" + language);
+        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.priority")),
+                "Wrong label in cloud review task page for language:" + language);
         if (taskType.equals(TaskType.SIMPLE_CLOUD_TASK))
         {
-            Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil
-                    .getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.assignament")));
+            Assert.assertTrue(
+                    cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.assignament")),
+                    "Wrong label in cloud review task page for language:" + language);
         }
         else
         {
-            Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.reviewers")));
+            Assert.assertTrue(
+                    cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.reviewers")),
+                    "Wrong label in cloud review task page for language:" + language);
         }
 
-        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil
-                .getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.afterCompletion")));
-        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.lock")));
-        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.items")));
+        Assert.assertTrue(
+                cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.afterCompletion")),
+                "Wrong label in cloud review task page for language:" + language);
+        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.lock")),
+                "Wrong label in cloud review task page for language:" + language);
+        Assert.assertTrue(cloudReviewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "cloudTaskReview.items")),
+                "Wrong label in cloud review task page for language:" + language);
     }
 
     private void verifyLabelsMyTaskPage(Language language, List<String> myTaskLabels)
     {
-        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.due")));
-        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.started")));
-        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.status")));
-        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.type")));
-        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.description")));
-        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.startedBy")));
+        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.due")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.started")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.status")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.type")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.description")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(myTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "myTaskPage.startedBy")),
+                "Wrong label for language:" + language);
     }
 
     private void verifyLabelsViewTaskPage(Language language, List<String> viewTaskLabels)
     {
-        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.message")));
-        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.owner")));
-        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.priority")));
-        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.due")));
-        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.identifier")));
-        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.status")));
-        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.items")));
+        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.message")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.owner")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.priority")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.due")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.identifier")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.status")),
+                "Wrong label for language:" + language);
+        Assert.assertTrue(viewTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "viewTask.items")),
+                "Wrong label for language:" + language);
     }
 
     private void verifyLabelsEditTaskPage(Language language, List<String> editTaskLabels)
     {
-        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.message")));
-        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.owner")));
-        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.priority")));
-        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.due")));
-        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.identifier")));
+        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.message")),
+                "Wrong label in edit task page for language:" + language);
+        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.owner")),
+                "Wrong label in edit task page for language:" + language);
+        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.priority")),
+                "Wrong label in edit task page for language:" + language);
+        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.due")),
+                "Wrong label in edit task page for language:" + language);
+        Assert.assertTrue(editTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "editTask.identifier")),
+                "Wrong label in edit task page for language:" + language);
     }
 
     private void verifyLabelsHistoryTaskPage(Language language, List<String> historyTaskLabels)
     {
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.completedOn")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.completedBy")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.outcome")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.title")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.description")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.startedBy")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.due")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.completed")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.started")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.priority")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.status")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.message")));
-        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.items")));
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.completedOn")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.completedBy")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.outcome")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.title")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.description")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.startedBy")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.due")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.completed")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.started")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.priority")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.status")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.message")),
+                "Wrong label in history task page for language:" + language);
+        Assert.assertTrue(historyTaskLabels.contains(PropertiesUtil.getPropertyValue(getFileWithWorkflowLabels(language), "taskHistory.items")),
+                "Wrong label in history task page for language:" + language);
 
     }
 
