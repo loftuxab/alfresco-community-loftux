@@ -8,6 +8,8 @@ import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.PrintCommandListener;
@@ -45,7 +47,7 @@ public class FtpsUtil extends AbstractUtils
     private static String PASS = "alfresco";
     private static String KEYSTORENAME;
     private static String TRUSTSTORENAME;
-    private static final String pathToKeyStoreFile = DATA_FOLDER + SLASH + "ftps";
+    private static final String pathToKeyStoreFile = DATA_FOLDER + "ftps";
 
 
     /**
@@ -57,28 +59,34 @@ public class FtpsUtil extends AbstractUtils
     public static File generateKeyStore(String keystoreName) throws Exception
     {
         KEYSTORENAME = keystoreName;
-        String line;
-        String cmdline = "keytool -genkeypair" +
-            " -dname \"cn=" + "Test Name" + ", ou=" + "QA" + ", o=" + "SomeCompany" + ", L=" + "Ghost Town" + ", ST=" + "Uruguay" + ", c=" + "UY" + "\"" +
-            " -keyalg " + ALGORITHM +
-            " -alias " + ALIAS +
-            " -keypass " + PASS +
-            " -keystore " + pathToKeyStoreFile + SLASH + KEYSTORENAME +
-            " -storepass " + PASS +
-            " -validity " + VALIDITY;
-        Process p = getRuntime().exec(cmdline);
-        p.waitFor();
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        while ((line = in.readLine()) != null)
+
+        CommandLine cmdLine = new CommandLine("keytool");
+        cmdLine.addArgument("-genkeypair");
+        cmdLine.addArgument("-dname");
+        cmdLine.addArgument("cn=Test Name, ou=QA, o=SomeCompany, L=Ghost Town, ST=Uruguay, c=UY");
+        cmdLine.addArgument("-keyalg");
+        cmdLine.addArgument(ALGORITHM);
+        cmdLine.addArgument("-alias");
+        cmdLine.addArgument(ALIAS);
+        cmdLine.addArgument("-keypass");
+        cmdLine.addArgument(PASS);
+        cmdLine.addArgument("-keystore");
+        cmdLine.addArgument(System.getProperty("java.io.tmpdir") + SLASH + KEYSTORENAME);
+        cmdLine.addArgument("-storepass");
+        cmdLine.addArgument(PASS);
+        cmdLine.addArgument("-validity");
+        cmdLine.addArgument(String.valueOf(VALIDITY));
+        DefaultExecutor executor = new DefaultExecutor();
+        int value = executor.execute(cmdLine);
+        if(value == 0)
         {
-            System.out.println(line);
-            if (line.contains("error"))
-            {
-                throw new ShareException("Unable to generate keystore.");
-            }
+            logger.info("Generated keystore " + KEYSTORENAME);
         }
-        logger.info("Generated keystore " + KEYSTORENAME);
-        return new File(pathToKeyStoreFile + SLASH + KEYSTORENAME);
+        else
+        {
+            throw new ShareException("Exception occurred when generation keystore");
+        }
+        return new File(System.getProperty("java.io.tmpdir") + SLASH + KEYSTORENAME);
     }
 
     /**

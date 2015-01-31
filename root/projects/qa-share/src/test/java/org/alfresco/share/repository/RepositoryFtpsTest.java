@@ -274,7 +274,7 @@ public class RepositoryFtpsTest extends FtpsUtil
     {
         String testName = getTestName();
         String fileName = getFileName(testName);
-        file = getFileWithSize(DATA_FOLDER + SLASH + fileName, 20);
+        file = getFileWithSize(DATA_FOLDER + fileName, 20);
         FtpsUtil.restrictPort(String.valueOf(55000), String.valueOf(55004));
 
         //Connect to FTP using "FTP over TLS" protocol;
@@ -948,7 +948,7 @@ public class RepositoryFtpsTest extends FtpsUtil
 
     private void deleteKeystores()
     {
-        File ftpsFolder = new File(DATA_FOLDER + SLASH + "ftps");
+        File ftpsFolder = new File(DATA_FOLDER + "ftps");
         try
         {
             FileUtils.cleanDirectory(ftpsFolder);
