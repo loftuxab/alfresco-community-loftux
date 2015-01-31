@@ -59,7 +59,7 @@ public class ProcessesAPITests extends ProcessesAPI
     private static Log logger = LogFactory.getLog(ProcessesAPITests.class);
 
     @Override
-    @BeforeClass(alwaysRun = true)
+    @BeforeClass(alwaysRun = true, groups = {"ProductBug"})
     public void beforeClass() throws Exception
     {
         super.beforeClass();
