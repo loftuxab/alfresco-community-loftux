@@ -41,7 +41,7 @@ public class EditCloudReviewTaskTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid", timeOut = 500000)
-    public void dataPrep_15622() throws Exception
+    public void dataPrep_AONE_15622() throws Exception
     {
         testName = getTestName() + "A";
         String cloudSite = getSiteName(testName + "CL");
@@ -226,7 +226,7 @@ public class EditCloudReviewTaskTests extends AbstractWorkflow
     }
 
     @Test(groups = "DataPrepHybrid", timeOut = 500000)
-    public void dataPrep_15623() throws Exception
+    public void dataPrep_AONE_15623() throws Exception
     {
 
         testName = getTestName() + "A";
