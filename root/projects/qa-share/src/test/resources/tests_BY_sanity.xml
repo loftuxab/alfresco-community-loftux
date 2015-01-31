@@ -89,7 +89,7 @@
         <classes>
             <class name="org.alfresco.share.sanity.SiteDataListsTest"/>
         </classes>
-    </test-->
+    </test>
 
     <test name="Task sanity tests Suite">
         <classes>
@@ -97,7 +97,7 @@
         </classes>
     </test>
 
-	<!--test name="Blog sanity tests Suite">
+	<test name="Blog sanity tests Suite">
         <classes>
             <class name="org.alfresco.share.sanity.SiteBlogTest"/>
         </classes>
@@ -111,17 +111,23 @@
                 </methods>
             </class>
         </classes>
-    </test>-->
+    </test>>
 	
-	<!--<test name="Search sanity tests Suite">-->
-        <!--<classes>-->
-            <!--<class name="org.alfresco.share.sanity.SearchTest"/>-->
-        <!--</classes>-->
-    <!--</test>-->
+	<test name="Search sanity tests Suite">
+        <classes>
+            <class name="org.alfresco.share.sanity.SearchTest"/>
+        </classes>
+    </test>
 
     <test name="MultiTenancy sanity tests Suite">
         <classes>
             <class name="org.alfresco.share.sanity.repository.bulkimport.SanityMTTest"/>
+        </classes>
+    </test-->
+
+    <test name="Ftps sanity tests Suite">
+        <classes>
+            <class name="org.alfresco.share.sanity.repository.ftps.FtpsTest"/>
         </classes>
     </test>
 

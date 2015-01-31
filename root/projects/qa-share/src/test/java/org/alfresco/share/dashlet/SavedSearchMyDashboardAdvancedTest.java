@@ -1380,7 +1380,7 @@ public class SavedSearchMyDashboardAdvancedTest extends AbstractUtils
     @Test(groups = { "DataPrepEnterpriseOnly" })
     public void dataPrep_AONE_14691() throws Exception
     {
-        String testName = getTestName() + "55";
+        String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
         String fileName1 = getFileName(testName) + "-1.txt";
@@ -1411,7 +1411,7 @@ public class SavedSearchMyDashboardAdvancedTest extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_14691() throws Exception
     {
-        String testName = getTestName() + "55";
+        String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String fileName1 = getFileName(testName) + "-1.txt";
         String fileName2 = getFileName(testName) + "-2.txt";
