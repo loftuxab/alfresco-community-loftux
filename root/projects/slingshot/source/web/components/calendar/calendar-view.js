@@ -527,18 +527,13 @@
 
          this.currentDate = displayDate = date;
 
-         if (this.eventDialog)
-         {
-            this.eventDialog.dialog.destroy();
-            delete this.eventDialog;
-         }
-
          var editInfo = new Alfresco.EventInfo(this.id);
 
          this.eventDialog = editInfo.initEditDialog(
          {
             actionUrl: Alfresco.constants.PROXY_URI + "calendar/create",
             ajaxSubmitMethod: Alfresco.util.Ajax.POST,
+            destroyOnHide: true,
             displayDate: displayDate,
             templateRequestParams:
             {
