@@ -48,14 +48,14 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
     {
         super.setup();
         testName = this.getClass().getSimpleName();
-        siteName = getSiteName(testName) + "2";
+        siteName = getSiteName(testName) + System.currentTimeMillis();
         fileName = getFileName(testName);
         fileNamePlain = fileName + "plainText";
         editedFileNamePlain = fileNamePlain + "edited";
         fileNameXml = fileName + "xml";
         editedContentXml = fileNameXml + "edited";
         folderName = getFolderName(testName);
-        retryCount = 5;
+        retryCount = 10;
         timeToWait = 25000;
         newFiles = new String[] { "file1", "file2", "file3", "file4"};
         syncLocation = DOMAIN_PREMIUM + ">" + siteName + ">" + DEFAULT_FOLDER_NAME;
