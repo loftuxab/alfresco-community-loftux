@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
 import org.alfresco.po.alfresco.TenantAdminConsolePage;
 import org.alfresco.po.alfresco.WebScriptsPage;
 import org.alfresco.po.share.admin.AdminConsolePage;
@@ -230,6 +231,7 @@ public class FactorySharePage implements PageFactory
         pages.put("inplace", InPlaceBulkImportPage.class);
         pages.put("index", WebScriptsPage.class);
         pages.put("admin-tenantconsole", TenantAdminConsolePage.class);
+        pages.put("admin-repoconsole", RepositoryAdminConsolePage.class);
         pages.put("user-content", UserContentPage.class);
         pages.put("replication-jobs", ReplicationJobsPage.class);
         pages.put("replication-job", NewReplicationJobPage.class);
