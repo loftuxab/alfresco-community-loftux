@@ -4,8 +4,7 @@ import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
 import org.alfresco.po.share.dashlet.WebQuickStartOptions;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.SiteDashboardPage;
-import org.alfresco.po.share.site.document.DocumentDetailsPage;
-import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.*;
 import org.alfresco.po.share.wqs.*;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
@@ -15,15 +14,18 @@ import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
+import java.util.List;
+
 /**
  * Created by Lucian Tuca on 11/17/2014.
  */
 @Listeners(FailedTestListener.class)
 public class CreatingItemsViaAWE extends AbstractUtils
 {
-        public static final String WCMQS_URL = "http://lucian:8080/wcmqs/";
+        public static final String WCMQS_URL = "http://localhost:8080/wcmqs/";
         public static final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
         public static final String QUICK_START_EDITORIAL = "Quick Start Editorial";
+
         public static final String ROOT = "root";
 
         private static final Logger logger = Logger.getLogger(EditingItemsViaAWE.class);
@@ -335,6 +337,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleName = testName + "_" + System.currentTimeMillis() + "_name.html";
                 String newsArticleTitle = testName + "_" + System.currentTimeMillis() + "_title";
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
+                siteName = getSiteName(testName);
 
                 navigateToWcmqsHome(WCMQS_URL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.GLOBAL, WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
@@ -350,6 +353,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleName = testName + "_" + System.currentTimeMillis() + "_name.html";
                 String newsArticleTitle = testName + "_" + System.currentTimeMillis() + "_title";
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
+                siteName = getSiteName(testName);
 
                 navigateToWcmqsHome(WCMQS_URL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.GLOBAL, WcmqsNewsPage.FTSE_1000);
@@ -365,6 +369,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleName = testName + "_" + System.currentTimeMillis() + "_name.html";
                 String newsArticleTitle = testName + "_" + System.currentTimeMillis() + "_title";
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
+                siteName = getSiteName(testName);
 
                 navigateToWcmqsHome(WCMQS_URL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.COMPANIES, WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
@@ -380,6 +385,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleName = testName + "_" + System.currentTimeMillis() + "_name.html";
                 String newsArticleTitle = testName + "_" + System.currentTimeMillis() + "_title";
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
+                siteName = getSiteName(testName);
 
                 navigateToWcmqsHome(WCMQS_URL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.COMPANIES, WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
@@ -395,6 +401,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleName = testName + "_" + System.currentTimeMillis() + "_name.html";
                 String newsArticleTitle = testName + "_" + System.currentTimeMillis() + "_title";
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
+                siteName = getSiteName(testName);
 
                 navigateToWcmqsHome(WCMQS_URL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.MARKETS, WcmqsNewsPage.INVESTORS_FEAR);
@@ -410,6 +417,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 String newsArticleName = testName + "_" + System.currentTimeMillis() + "_name.html";
                 String newsArticleTitle = testName + "_" + System.currentTimeMillis() + "_title";
                 String newsArticleContent = testName + "_" + System.currentTimeMillis() + "_content";
+                siteName = getSiteName(testName);
 
                 navigateToWcmqsHome(WCMQS_URL);
                 WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.MARKETS, WcmqsNewsPage.HOUSE_PRICES);
@@ -419,5 +427,71 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 verifyInDocumentLibraryForNewsArticle(newsArticleName, newsArticleContent, WcmqsNewsPage.COMPANIES);
         }
 
+        @Test(groups = "WQS")
+        public void AONE_5640() throws Exception
+        {
+                String articleName = testName + System.currentTimeMillis() + "_name.html";
+                String articleTitle = testName + System.currentTimeMillis() + "_title";
+                String articleDescription = testName + System.currentTimeMillis() + "_description";
+                String articleContent = testName + System.currentTimeMillis() + "_content";
+                siteName = getSiteName(testName);
+
+                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 1 ----
+                // ---- Step Actions ----
+                // Create an HTML article in Quick Start Editorial > root > news > global(e.g. article10.html).
+                // ---- Expected results ----
+                // HTML article is successfully created;
+                DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.NEWS).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.GLOBAL).render();
+
+                ContentDetails contentDetails = new ContentDetails();
+                contentDetails.setName(articleName);
+                contentDetails.setTitle(articleTitle);
+                contentDetails.setDescription(articleDescription);
+                contentDetails.setContent(articleContent);
+                DocumentLibraryPage articlePage = ShareUser.createContentInCurrentFolder(drone, contentDetails, ContentType.HTML, documentLibraryPage);
+                Assert.assertNotNull(articlePage);
+
+                // ---- Step 2 ----
+                // ---- Step actions ----
+                // Navigate to Quick Start Editorial > root > news > global > collections > section.articles.
+                // ---- Expected results ----
+                // Section.articles folder is opened;
+                ShareUser.openSiteDashboard(drone, siteName);
+                documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.NEWS).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.GLOBAL).render();
+                documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.COLLECTIONS);
+                Assert.assertNotNull(documentLibraryPage);
+
+                // Wait 2 minutes to allow refresh query to execute
+                webDriverWait(drone, 1000 * 120);
+
+                // ---- Step 3 ----
+                // ---- Step actions ----
+                // Click Edit Metadata button;
+                // ---- Expected results
+                // Edit metadata form is opened;
+                FileDirectoryInfo folderInfo = documentLibraryPage.getFileDirectoryInfo(WcmqsNewsPage.SECTION_ARTICLES);
+                EditDocumentPropertiesPage editDocumentPropertiesPage = folderInfo.selectEditProperties().render();
+                Assert.assertNotNull(editDocumentPropertiesPage);
+
+                // ---- Step 4 ----
+                // ---- Step actions ----
+                // Verify the presense of arcticle10.html in Web Assets section;
+                // ---- Expected results ----
+                // Article10.html file is present in Web Assets section;
+                List<String> foundAssets = editDocumentPropertiesPage.getWebAssets();
+                Assert.assertTrue(foundAssets.contains(articleName));
+        }
 }
 
