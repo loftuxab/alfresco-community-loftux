@@ -148,6 +148,10 @@ public class VtiFilter implements Filter
         }
         catch (SiteMemberMappingException e)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("An exception occurred during authenticating request.", e);
+            }
             httpResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
             httpResponse.getOutputStream().close();
             return;
