@@ -109,6 +109,8 @@
         <constructor-arg name="layer7Disabled" value="${layer7Disabled}" />
         <constructor-arg name="apiKey" value="${apiKey}" />
         <constructor-arg name="apiSecretKey" value="${apiSecretKey}" />
+        <constructor-arg name="keystorePath" value="${keystorePath}" />
+        <constructor-arg name="truststorePath" value="${truststorePath}" />
     </bean>
 
     <!-- -->
@@ -172,6 +174,8 @@
         <constructor-arg name="layer7Disabled" value="${layer7Disabled}" />
         <constructor-arg name="apiKey" value="${apiKey}" />
         <constructor-arg name="apiSecretKey" value="${apiSecretKey}" />
+        <constructor-arg name="keystorePath" value="${keystorePath}" />
+        <constructor-arg name="truststorePath" value="${truststorePath}" />
     </bean>
 
     <util:constant id="englishLocale" static-field="java.util.Locale.ENGLISH" />
