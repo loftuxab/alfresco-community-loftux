@@ -71,6 +71,7 @@ public class DocumentLibraryPage extends SitePage
     private static String CATEGORY_ROOT_SPACER = "//span[text()='Category Root']/ancestor-or-self::table[contains(@class, 'depth0')]";
     private static By CATEGORY_ROOT_SPACER_LINK = By.xpath(CATEGORY_ROOT_SPACER + "//a");
     private static final String CHECK_BOX = "input[id^='checkbox-yui']";
+    private static final By DOCUMENT_LIBRARY = By.cssSelector("a[href$='documentlibrary']");
 
     public enum Optype
     {
@@ -1556,5 +1557,18 @@ public class DocumentLibraryPage extends SitePage
             return false;
         }
 
+    }
+    
+    
+    /**
+     * Click on Document Library
+     * 
+     * @param drone
+     * @return
+     */
+    public static DocumentLibraryPage selectDocumentLibrary(WebDrone drone)
+    {
+        drone.findAndWait(DOCUMENT_LIBRARY).click();
+        return new DocumentLibraryPage(drone);
     }
 }
