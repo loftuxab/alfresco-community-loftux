@@ -1532,7 +1532,8 @@
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + webscriptPath + "/node/" + nodeRef.uri +
                   "?filter=" + encodeURIComponent(this.currentFilter.filterId) +
-                  "&view=" + this.actionsView + "&noCache=" + new Date().getTime(),
+                  "&view=" + this.actionsView + "&noCache=" + new Date().getTime() +
+                  "&libraryRoot=" + encodeURIComponent(this.options.rootNode.toString()),
             successCallback:
             {
                fn: function DL_insituCallback_refreshSuccess(response)
