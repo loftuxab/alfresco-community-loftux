@@ -279,6 +279,7 @@ public class SanityCifsClusterTest extends AbstractUtils
         String fileName2 = getRandomString(5) + "_B" + ".txt";
         String fileName3 = "WordDocument.docx";
         String fileName3Name = "WordDocument";
+        String fileName3Type = "docx";
 
         final String remotePath = "Alfresco" + "/" + folderName + "/";
         String dataPath = DATA_FOLDER + fileName3;
@@ -329,6 +330,48 @@ public class SanityCifsClusterTest extends AbstractUtils
             assertTrue(CifsUtil.checkItem(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, remotePath, fileName1), "Document 'A' isn't seen on node B");
             assertTrue(CifsUtil.checkItem(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, remotePath, fileName2), "Document 'B' isn't seen on node B");
             assertTrue(CifsUtil.checkItem(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, remotePath, fileName3), "Document 'C' isn't seen on node B");
+
+            String fullPath = networkDrive + cifsPath;
+            String fullPath1 = networkDrive2 + cifsPath;
+            MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
+
+            // 23 Open document 'C.doc' for editing on node 1 via CIFS
+            Ldtp ldtp = word.openFileFromCMD(fullPath, fileName3, ADMIN_USERNAME, ADMIN_PASSWORD, false);
+            word.getAbstractUtil().waitForWindow("frm" + fileName3Name + " - Microsoft Word");
+            if (word.getAbstractUtil().isWindowPresented("frm" + fileName3Name + " - Microsoft Word"))
+            {
+                word.getAbstractUtil().setOnWindow("frm" + fileName3Name + " - Microsoft Word");
+            }
+            else if (word.getAbstractUtil().isWindowPresented("frm" + fileName3 + " - Microsoft Word"))
+            {
+                word.getAbstractUtil().setOnWindow("frm" + fileName3 + " - Microsoft Word");
+            }
+
+            // 24 Open document 'C.doc' for editing on node 2 via CIFS
+            word.openFileFromCMD(fullPath1, fileName3, ADMIN_USERNAME, ADMIN_PASSWORD, false);
+            word.getAbstractUtil().waitForWindow("frmFile In Use");
+            ldtp = word.getAbstractUtil().setOnWindow("frmFile In Use");
+
+            Assert.assertTrue(word.getAbstractUtil().isObjectDisplayed(ldtp, "rbtnOpenaReadOnlycopy"), "'rbtnOpenaReadOnlycopy' isn't displayed");
+            word.getAbstractUtil().clickOnObject(ldtp, "btnOK");
+
+            logger.info("Click OK button for 'frmFile In Use' window");
+
+            word.getAbstractUtil().waitForWindow("frm" + fileName3 + " [Read-Only] - Microsoft Word");
+            if (word.getAbstractUtil().isWindowPresented("frm" + fileName3Name + " [Read-Only] - Microsoft Word"))
+            {
+                ldtp = word.getAbstractUtil().setOnWindow("frm" + fileName3Name + " [Read-Only] - Microsoft Word");
+            }
+            else if (word.getAbstractUtil().isWindowPresented("frm" + fileName3 + " [Read-Only] - Microsoft Word"))
+            {
+                ldtp = word.getAbstractUtil().setOnWindow("frm" + fileName3 + " [Read-Only] - Microsoft Word");
+            }
+
+            // 26 Document 'C.doc' is opened in Read only mode on node 2
+            Assert.assertTrue(word.getAbstractUtil().isObjectDisplayed(ldtp, "pane" + fileName3Name + fileName3Type + "[Read-Only]")
+                    || word.getAbstractUtil().isObjectDisplayed(ldtp, "pane" + fileName3Name + "[Read-Only]"), "'[Read-Only] - Microsoft Word' isn't displayed");
+
+            Runtime.getRuntime().exec("taskkill /F /IM WINWORD.EXE");
 
             // 8. Rename and update document 'A' to document 'AA" on node 2 via CIFS
             assertTrue(CifsUtil.renameItem(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, remotePath, fileName1, fileNameRename1),
@@ -466,33 +509,11 @@ public class SanityCifsClusterTest extends AbstractUtils
             assertTrue(TelnetUtil.connectServer(node2Url, ftpPort), "Check port " + ftpPort + " for node " + node2Url + "isn't accessible");
 
             // Check that each node can see the document
-            assertTrue(CifsUtil.checkItem(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, remotePath, fileName1GB),"Document '"+fileName1GB+"' isn't seen on node A");
-            assertTrue(CifsUtil.checkItem(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, remotePath, fileName1GB),"Document '"+fileName1GB+"' isn't seen on node B");
+            assertTrue(CifsUtil.checkItem(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, remotePath, fileName1GB), "Document '" + fileName1GB
+                    + "' isn't seen on node A");
+            assertTrue(CifsUtil.checkItem(node2Url, ADMIN_USERNAME, ADMIN_PASSWORD, remotePath, fileName1GB), "Document '" + fileName1GB
+                    + "' isn't seen on node B");
 
-            String fullPath = networkDrive + cifsPath;
-            String fullPath1 = networkDrive2 + cifsPath;
-            MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
-
-            //23 Open document 'C.doc' for editing on node 1 via CIFS
-            word.openFileFromCMD(fullPath, fileName3, ADMIN_USERNAME, ADMIN_PASSWORD, false);
-            word.getAbstractUtil().setOnWindow(fileName3Name);
-
-            //24 Open document 'C.doc' for editing on node 2 via CIFS
-            word.openFileFromCMD(fullPath1, fileName3, ADMIN_USERNAME, ADMIN_PASSWORD, false);
-            word.getAbstractUtil().waitForWindow("frmFile In Use");
-            Ldtp ldtp = word.getAbstractUtil().setOnWindow("frmFile In Use");
-
-            Assert.assertTrue(word.getAbstractUtil().isObjectDisplayed(ldtp, "rbtnOpenaReadOnlycopy"), "'rbtnOpenaReadOnlycopy' isn't displayed");
-            word.getAbstractUtil().clickOnObject(ldtp, "btnOK");
-
-            logger.info("Click OK button for 'frmFile In Use' window");
-
-            word.getAbstractUtil().waitForWindow("frm" + fileName3Name + " [Read-Only] - Microsoft Word");
-            ldtp = word.getAbstractUtil().setOnWindow("frm" + fileName3Name + " [Read-Only] - Microsoft Word");
-
-            //26 Document 'C.doc' is opened in Read only mode on node 2
-            Assert.assertTrue(word.getAbstractUtil().isObjectDisplayed(ldtp, "pane" + fileName3Name + "[Read-Only]"),
-                    "'[Read-Only] - Microsoft Word' isn't displayed");
         }
         finally
         {
