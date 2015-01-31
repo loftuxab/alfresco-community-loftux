@@ -56,7 +56,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
         editedContentXml = fileNameXml + "edited";
         folderName = getFolderName(testName);
         retryCount = 10;
-        timeToWait = 25000;
+        timeToWait = 30000;
         newFiles = new String[] { "file1", "file2", "file3", "file4"};
         syncLocation = DOMAIN_PREMIUM + ">" + siteName + ">" + DEFAULT_FOLDER_NAME;
         SYNCED_STATUS = SYNCED.getValue();
