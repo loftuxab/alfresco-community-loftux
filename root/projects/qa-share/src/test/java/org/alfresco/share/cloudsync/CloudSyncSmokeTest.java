@@ -1,10 +1,7 @@
 package org.alfresco.share.cloudsync;
 
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
-import org.alfresco.po.share.site.document.ContentDetails;
-import org.alfresco.po.share.site.document.ContentType;
-import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.site.document.SyncInfoPage;
+import org.alfresco.po.share.site.document.*;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.user.CloudSyncPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
@@ -45,6 +42,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
     String [] subFolders = {"subfolder1", "subfolder2"};
     String [] subFiles = {"subFile1", "subFile2"};
     String [] content = {"content1", "content2"};
+    protected static String [] newFiles;
 
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
@@ -52,7 +50,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         super.setup();
         testName = this.getClass().getSimpleName();
         siteA = getSiteName(testName);
-        siteB = getSiteName(testName) + "SY";
+        siteB = getSiteName(testName) + "SY3";
         fileName = getFileName(testName);
         folderName = getFolderName(testName);
         fileNamePlain = fileName + "plainText";
@@ -60,6 +58,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         fileNameXml = fileName + "xml";
         editedContentXml = fileNameXml + "edited";
         folderName = getFolderName(testName);
+        newFiles = new String[] { "file1", "file2", "file3", "file4"};
         retryCount = 5;
         timeToWait = 25000;
         syncLocation = DOMAIN_PREMIUM + ">" + siteB + ">" + DEFAULT_FOLDER_NAME;
@@ -242,6 +241,204 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
             doclibCl.isFileVisible(folderName), "Items are not available in Cloud");
         assertTrue(checkIfContentIsSynced(hybridDrone, fileNameXml) && checkIfContentIsSynced(hybridDrone, fileNamePlain)
             && checkIfContentIsSynced(hybridDrone, folderName), "Items are not synced on Cloud side");
+    }
+
+    @Test(groups = { "Hybrid" })
+    public void AONE_15430() throws Exception
+    {
+        int i;
+        //1st sync set: change file properties in On-premise
+        ShareUser.login(drone, adminUserPrem);
+        EditDocumentPropertiesPage editPagePrem = openSitesDocumentLibrary(drone, siteB).getFileDirectoryInfo(fileNamePlain).selectEditProperties().render();
+        editPagePrem.setName(editedFileNamePlain);
+        editPagePrem.clickSave();
+        getSharePage(drone).render();
+
+        //The changes are synced to Cloud
+        ShareUser.login(hybridDrone, adminUserPrem);
+        DocumentLibraryPage docLibCl = openSitesDocumentLibrary(hybridDrone, siteB);
+        assertTrue(waitAndCheckIfVisible(hybridDrone, docLibCl, editedFileNamePlain), "File properties were not edited in Cloud");
+
+        //1st sync set: change file properties in Cloud
+        EditDocumentPropertiesPage editPageCloud = docLibCl.getFileDirectoryInfo(editedFileNamePlain).selectEditProperties().render();
+        editPageCloud.setDescription(editedFileNamePlain);
+        editPageCloud.selectSave();
+        getSharePage(hybridDrone).render();
+
+        //The properties are changed in Cloud and are synced to On-premise
+        DocumentLibraryPage docLibPrem = ShareUser.openSitesDocumentLibrary(drone, siteB).render();
+        i = 0;
+        EditDocumentPropertiesPage doc1Prop = docLibPrem.getFileDirectoryInfo(editedFileNamePlain).selectEditProperties();
+        String actualDesc = doc1Prop.getDescription();
+        while (!actualDesc.equals(editedFileNamePlain))
+        {
+            doc1Prop.clickOnCancel();
+            webDriverWait(drone, timeToWait);
+            openSiteDashboard(drone, siteB).render();
+            docLibPrem = openSitesDocumentLibrary(drone, siteB).render();
+            actualDesc = docLibPrem.getFileDirectoryInfo(editedFileNamePlain).selectEditProperties().getDescription();
+            i++;
+            if(i > retryCount)
+                break;
+        }
+        assertTrue(actualDesc.equals(editedFileNamePlain), "File properties were not edited On-Premise");
+
+        //2nd sync set: change file content in On-premise
+        DocumentDetailsPage detailsPrem = docLibPrem.getFileDirectoryInfo(fileNameXml).clickOnTitle().render();
+        detailsPrem = editTextDocument(drone, fileNameXml, fileNameXml, editedContentXml).render();
+        i = 0;
+        String actualContent = detailsPrem.selectInlineEdit().getDetails().getContent();
+        while(!actualContent.contains(editedContentXml))
+        {
+            openSiteDashboard(drone, siteB).render();
+            detailsPrem = (DocumentDetailsPage)openDocumentLibrary(drone).render().getFileDirectoryInfo(fileNameXml).clickOnTitle();
+            actualContent = detailsPrem.selectInlineEdit().getDetails().getContent();
+            i++;
+            if(i > retryCount)
+                break;
+        }
+        assertTrue(actualContent.contains(editedContentXml), "Document wasn't edited On-Prem");
+
+        //The content is changed in On-premise and the changes are synced to Cloud
+        docLibCl = openSitesDocumentLibrary(hybridDrone, siteB).render();
+        DocumentDetailsPage detailsCl = docLibCl.selectFile(fileNameXml).render();
+        i = 0;
+        actualContent = detailsCl.selectInlineEdit().getDetails().getContent();
+        while (!actualContent.contains(editedContentXml))
+        {
+            webDriverWait(hybridDrone, timeToWait);
+            openSiteDashboard(hybridDrone, siteB).render();
+            openDocumentLibrary(hybridDrone).render();
+            detailsCl = docLibCl.selectFile(fileNameXml).render();
+            actualContent = detailsCl.selectInlineEdit().getDetails().getContent();
+            i++;
+            if(i > retryCount)
+                break;
+        }
+        assertTrue(actualContent.contains(editedContentXml), "File content wasn't edited on Cloud");
+
+        //2nd sync set: change file content in Cloud
+        openSitesDocumentLibrary(hybridDrone, siteB).getFileDirectoryInfo(fileNameXml).clickOnTitle();
+        detailsCl = editTextDocument(hybridDrone, fileNameXml, fileNameXml, editedContentXml + "1").render();
+        getSharePage(hybridDrone).render();
+        EditTextDocumentPage editPage = detailsCl.selectInlineEdit().render();
+        boolean isEdited = editPage.getDetails().getContent().contains(editedContentXml + "1");
+        if(!isEdited)
+        {
+            refreshSharePage(hybridDrone).render();
+            isEdited = editPage.getDetails().getContent().contains(editedContentXml + "1");
+        }
+        assertTrue(isEdited, "File content wasn't edited in Cloud");
+
+        //The content is changed in Cloud and the changes are synced to On-premise
+        docLibPrem = openSitesDocumentLibrary(drone, siteB).render();
+        detailsPrem = docLibPrem.selectFile(fileNameXml).render();
+        i = 0;
+        actualContent = detailsPrem.selectInlineEdit().getDetails().getContent();
+        while (!actualContent.contains(editedContentXml + "1"))
+        {
+            webDriverWait(drone, timeToWait);
+            openSitesDocumentLibrary(drone, siteB).render();
+            detailsPrem = docLibPrem.selectFile(fileNameXml).render();
+            actualContent = detailsPrem.selectInlineEdit().getDetails().getContent();
+            i++;
+            if(i > retryCount)
+                break;
+        }
+        assertTrue(actualContent.contains(editedContentXml + "1"), "Content wasn't changed On-Premise");
+
+        //3rd sync set: add files to the folder in On-premise. Click Request Sync
+        uploadFileInFolder1(drone, newFiles[0], folderName);
+        uploadFileInFolder1(drone, newFiles[1], folderName);
+        openDocumentLibrary(drone).render();
+        docLibPrem = requestSyncToCloud(drone, siteB, folderName).render();
+        docLibPrem.getFileDirectoryInfo(folderName).clickOnTitle().render();
+
+        //The sync is requested. The new files are added in On-premise and indirectly synced to Cloud.
+        // For indirectly synced content/folder the 'synced indirectly' icon is displayed.
+        assertTrue(docLibPrem.getFileDirectoryInfo(newFiles[0]).isIndirectlySyncedIconPresent() && docLibPrem.getFileDirectoryInfo(newFiles[1])
+            .isIndirectlySyncedIconPresent(), "Indirectly synced icon isn't displayed");
+        //boolean isSynced = checkIfContentIsSynced(drone, newFiles[0]);
+        SyncInfoPage syncInf1 = docLibPrem.getFileDirectoryInfo(newFiles[0]).clickOnViewCloudSyncInfo().render();
+        assertTrue(syncInf1.getCloudSyncLocation().equals(syncLocation + ">" + folderName), "File " +
+            "wasn't synced");
+        syncInf1.clickOnCloseButton();
+
+        //isSynced = checkIfContentIsSynced(drone, newFiles[1]);
+        SyncInfoPage syncInf2 = docLibPrem.getFileDirectoryInfo(newFiles[1]).clickOnViewCloudSyncInfo().render();
+        assertTrue(syncInf2.getCloudSyncLocation().equals(syncLocation + ">" + folderName), "File " +
+            "wasn't synced");
+        syncInf2.clickOnCloseButton();
+
+        docLibCl = openSitesDocumentLibrary(hybridDrone, siteB).render();
+        docLibCl.getFileDirectoryInfo(folderName).clickOnTitle().render();
+        i = 0;
+        while(!(docLibCl.isFileVisible(newFiles[0]) && docLibCl.isFileVisible(newFiles[1])))
+        {
+            webDriverWait(hybridDrone, timeToWait);
+            docLibCl = refreshDocumentLibrary(hybridDrone);
+            i++;
+            if(i > retryCount)
+                break;
+        }
+        assertTrue(docLibCl.isFileVisible(newFiles[0]) && docLibCl.isFileVisible(newFiles[1]), "Files were not added to Cloud");
+        assertTrue(docLibCl.getFileDirectoryInfo(newFiles[0]).isIndirectlySyncedIconPresent() && docLibCl.getFileDirectoryInfo(newFiles[1])
+            .isIndirectlySyncedIconPresent(), "Indirectly synced icons are not displayed on Cloud side");
+        boolean isSynced = checkIfContentIsSynced(hybridDrone, newFiles[0]);
+        SyncInfoPage syncInf3 = docLibCl.getFileDirectoryInfo(newFiles[0]).clickOnViewCloudSyncInfo().render();
+        assertTrue(isSynced && syncInf3.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " +
+            newFiles[0]);
+
+        syncInf3.clickOnCloseButton().render();
+        isSynced = checkIfContentIsSynced(hybridDrone, newFiles[1]);
+        SyncInfoPage syncInf4 = docLibCl.getFileDirectoryInfo(newFiles[1]).clickOnViewCloudSyncInfo().render();
+        assertTrue(isSynced && syncInf4.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " +
+            newFiles[1]);
+        syncInf4.clickOnCloseButton().render();
+
+        //3rd sync set: add new files to synced Cloud folder
+        docLibCl = openSitesDocumentLibrary(hybridDrone, siteB).render();
+        String [] fileInfo = { newFiles[2], folderName};
+        String [] fileInfo2 = { newFiles[3], folderName};
+        uploadFileInFolder(hybridDrone, fileInfo).render();
+        uploadFileInFolder(hybridDrone, fileInfo2).render();
+        //https://issues.alfresco.com/jira/browse/CLOUD-2229
+        //assertTrue(checkIfContentIsSynced(hybridDrone, newFiles[2]) && checkIfContentIsSynced(hybridDrone, newFiles[3]), "Files were not synced");
+        syncInf3 = docLibCl.getFileDirectoryInfo(newFiles[2]).clickOnViewCloudSyncInfo().render();
+        assertTrue(syncInf3.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " + newFiles[2]);
+        syncInf3.clickOnCloseButton();
+
+        syncInf4 = docLibCl.getFileDirectoryInfo(newFiles[3]).clickOnViewCloudSyncInfo().render();
+        assertTrue(syncInf4.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " + newFiles[3]);
+        syncInf4.clickOnCloseButton();
+
+        //The new files are added in Cloud and are indirectly synced to On-premise. For indirectly synced content the 'synced indirectly' icon is displayed.
+        ShareUser.login(drone, adminUserPrem).render();
+        docLibPrem = openSitesDocumentLibrary(drone, siteB).getFileDirectoryInfo(folderName).clickOnTitle().render();
+        i = 0;
+        while(!(docLibPrem.isFileVisible(newFiles[2]) && docLibPrem.isFileVisible(newFiles[3])))
+        {
+            webDriverWait(drone, timeToWait);
+            docLibPrem = (DocumentLibraryPage) refreshSharePage(drone);
+            i++;
+            if(i > retryCount)
+                break;
+        }
+
+        assertTrue(docLibPrem.isFileVisible(newFiles[2]) && docLibPrem.isFileVisible(newFiles[3]), "Files were not added to On-Prem");
+        assertTrue(docLibPrem.getFileDirectoryInfo(newFiles[2]).isIndirectlySyncedIconPresent() && docLibPrem.getFileDirectoryInfo(newFiles[3])
+            .isIndirectlySyncedIconPresent(), "Indirectly synced icons are not displayed On-Prem side");
+        syncInf1 = docLibPrem.getFileDirectoryInfo(newFiles[2]).clickOnViewCloudSyncInfo().render();
+        isSynced = checkIfContentIsSynced(drone, newFiles[2]);
+        assertTrue(syncInf1.getCloudSyncIndirectLocation().equals(folderName) && isSynced,
+            "Incorrect sync info for " + newFiles[2]);
+        syncInf1.clickOnCloseButton();
+
+        isSynced = checkIfContentIsSynced(drone, newFiles[3]);
+        syncInf2 = docLibPrem.getFileDirectoryInfo(newFiles[3]).clickOnViewCloudSyncInfo().render();
+        assertTrue(syncInf2.getCloudSyncIndirectLocation().equals(folderName) && isSynced,
+            "Incorrect sync info for " + newFiles[3]);
+        syncInf2.clickOnCloseButton();
     }
 
     private boolean waitAndCheckIfVisible (WebDrone driver, DocumentLibraryPage docLib, String contentName)
