@@ -11,6 +11,13 @@
    <@createWidgets group="dashlets"/>
 </@>
 
+<#function checkHttpPrefix userUrl>
+   <#if userUrl?matches("((.*)://(.*))")><#return ""></#if>
+   <#if userUrl?matches("^((.*):(\\d{1,})((/.*){0,}))")><#return "http://"></#if>
+   <#if userUrl?index_of(":") == -1><#return "http://"><#else><#return ""></#if>
+   <#return "http://"> 
+</#function>
+
 <@markup id="html">
    <@uniqueIdDiv>
       <#assign site=page.url.templateArgs.site>
@@ -38,7 +45,7 @@
                         <#if !link.url?? || link.url?string?length<1>
                            ${link.name?html} - ${msg("link.noUrl")}
                         <#else>
-                           <a <#if !link.internal>target="_blank"</#if> href="<#if link.url?substring(0,1) == "/" || link.url?index_of("://") == -1>http://</#if>${link.url?html}" class="theme-color-1">${link.title?html}</a>
+                           <a <#if !link.internal>target="_blank"</#if> href="${checkHttpPrefix(link.url)}${link.url?html}" class="theme-color-1">${link.title?html}</a>
                         </#if>
                      </div>
                      <div class="actions">
