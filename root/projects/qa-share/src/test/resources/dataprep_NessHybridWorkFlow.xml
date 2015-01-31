@@ -1,13 +1,24 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Classes" verbose="1" preserve-order="true" parallel="classes"
 	thread-count="1">
-
 	<groups>
 		<run>
 			<include name="DataPrep.*" />
 			<exclude name="NonGrid" />
 		</run>
 	</groups>
+
+	<test name="HybridSyncNegativeTests3" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.cloudsync.HybridSyncNegativeTests3" />
+		</classes>
+	</test>
+
+	<test name="HybridSyncNegativeTests2" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.cloudsync.HybridSyncNegativeTests2" />
+		</classes>
+	</test>
 
 	<test name="Advanced Workflow Scenarios" verbose="1">
 		<classes>

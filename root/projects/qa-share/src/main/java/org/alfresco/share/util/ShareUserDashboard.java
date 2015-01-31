@@ -25,8 +25,8 @@ public class ShareUserDashboard extends AbstractUtils
 {
     private static Log logger = LogFactory.getLog(ShareUserDashboard.class);
     protected static final String DEFAULT_FOLDER = "Documents";
-    public static final By CREATE_SITE_BUTTON = By.cssSelector("#page_x002e_full-width-dashlet_x002e_user_x007e_admin_x007e_dashboard_x0023_default-createSite-button");
-
+    public static final By CREATE_SITE_BUTTON = By
+            .cssSelector("#page_x002e_full-width-dashlet_x002e_user_x007e_admin_x007e_dashboard_x0023_default-createSite-button");
 
     public ShareUserDashboard()
     {
@@ -65,7 +65,6 @@ public class ShareUserDashboard extends AbstractUtils
         return siteDashBoard;
     }
 
-    
     /**
      * This method is used to add the given dashlet to user dashboard page.
      * User should be logged in already.
@@ -94,7 +93,6 @@ public class ShareUserDashboard extends AbstractUtils
         return dashBoard;
     }
 
-    
     /**
      * Removes dashlet from the site dash board page
      * 
@@ -121,8 +119,7 @@ public class ShareUserDashboard extends AbstractUtils
         siteDashBoard = customiseSiteDashBoard.remove(dashlet).render();
         return siteDashBoard;
     }
-    
-    
+
     /**
      * Method to set the Search term and use defaults for non-mandatory fields
      * 
@@ -137,7 +134,7 @@ public class ShareUserDashboard extends AbstractUtils
 
     /**
      * Method to set the Search term, search limit and use defaults for Title
-     *
+     * 
      * @param drone
      * @param searchTerm
      * @param searchLimit
@@ -216,12 +213,12 @@ public class ShareUserDashboard extends AbstractUtils
     {
         SharePage currentPage = ShareUser.getSharePage(drone);
 
-        if(currentPage instanceof SiteDashboardPage)
+        if (currentPage instanceof SiteDashboardPage)
         {
             SiteDashboardPage siteDashBoard = (SiteDashboardPage) currentPage;
             return siteDashBoard.getDashlet("saved-search").render();
         }
-        else if(currentPage instanceof DashBoardPage)
+        else if (currentPage instanceof DashBoardPage)
         {
             DashBoardPage dashBoardPage = (DashBoardPage) currentPage;
             return dashBoardPage.getDashlet("saved-search").render();
@@ -234,7 +231,7 @@ public class ShareUserDashboard extends AbstractUtils
 
     /**
      * Method to get Site Search Dashlet
-     *
+     * 
      * @param drone
      * @return {@link SiteSearchDashlet}
      */
@@ -242,12 +239,12 @@ public class ShareUserDashboard extends AbstractUtils
     {
         SharePage currentPage = ShareUser.getSharePage(drone);
 
-        if(currentPage instanceof SiteDashboardPage)
+        if (currentPage instanceof SiteDashboardPage)
         {
             SiteDashboardPage siteDashBoard = (SiteDashboardPage) currentPage;
             return siteDashBoard.getDashlet("site-search").render();
         }
-        else if(currentPage instanceof DashBoardPage)
+        else if (currentPage instanceof DashBoardPage)
         {
             DashBoardPage dashBoardPage = (DashBoardPage) currentPage;
             return dashBoardPage.getDashlet("site-search").render();
@@ -261,6 +258,7 @@ public class ShareUserDashboard extends AbstractUtils
     /**
      * This method is used to get the Site Notice Dashlet page object from the site dashboard page.
      * User should be present on site dashboard page.
+     * 
      * @param driver
      * @param siteName
      * @return {@link SiteNoticeDashlet}
@@ -281,7 +279,7 @@ public class ShareUserDashboard extends AbstractUtils
 
         return siteDashBoard.getDashlet(SITE_NOTICE).render();
     }
-    
+
     /**
      * This method is used to get the My Discussions Dashlet page object from the site dashboard page.
      * User should be present on site dashboard page.
@@ -292,11 +290,10 @@ public class ShareUserDashboard extends AbstractUtils
     {
         SiteDashboardPage siteDashBoard = null;
         SharePage thisPage = ShareUser.getSharePage(driver);
-        
-        
+
         if (thisPage instanceof SiteDashboardPage)
         {
-            siteDashBoard = (SiteDashboardPage) thisPage; 
+            siteDashBoard = (SiteDashboardPage) thisPage;
             return siteDashBoard.getDashlet(MY_DISCUSSIONS).render();
         }
         else if (!(thisPage instanceof SiteDashboardPage))
@@ -308,9 +305,9 @@ public class ShareUserDashboard extends AbstractUtils
         {
             throw new PageOperationException("Cannot open My Discussion Dashlet on site dashboard page");
         }
- 
+
     }
-    
+
     /**
      * This method is used to get the MyDiscussionsDashlet page object from the user dashboard page.
      * User should be present on user dashboard page.
@@ -330,9 +327,9 @@ public class ShareUserDashboard extends AbstractUtils
         {
             throw new PageOperationException("Cannot open My Discussion Dashlet on user or site dashboard page");
         }
-        
+
     }
-    
+
     /**
      * This method is used to get the Site Content Breakdown Dashlet page object from the site dashboard page.
      * User should be present on site dashboard page.
@@ -343,11 +340,10 @@ public class ShareUserDashboard extends AbstractUtils
     {
         SiteDashboardPage siteDashBoard = null;
         SharePage thisPage = ShareUser.getSharePage(driver);
-        
-        
+
         if (thisPage instanceof SiteDashboardPage)
         {
-            siteDashBoard = (SiteDashboardPage) thisPage; 
+            siteDashBoard = (SiteDashboardPage) thisPage;
             return siteDashBoard.getDashlet(SITE_CONTENT_BREAKDOWN_REPORT).render();
         }
         else if (!(thisPage instanceof SiteDashboardPage))
@@ -359,7 +355,7 @@ public class ShareUserDashboard extends AbstractUtils
         {
             throw new PageOperationException("Cannot open Site Content Breakdown Dashlet on site dashboard page");
         }
- 
+
     }
 
     /**
@@ -383,7 +379,7 @@ public class ShareUserDashboard extends AbstractUtils
         }
 
     }
-    
+
     /**
      * This method is used to get the Top Site Contributor Report Dashlet page object from the site dashboard page.
      * User should be present on site dashboard page.
@@ -394,11 +390,10 @@ public class ShareUserDashboard extends AbstractUtils
     {
         SiteDashboardPage siteDashBoard = null;
         SharePage thisPage = ShareUser.getSharePage(driver);
-        
-        
+
         if (thisPage instanceof SiteDashboardPage)
         {
-            siteDashBoard = (SiteDashboardPage) thisPage; 
+            siteDashBoard = (SiteDashboardPage) thisPage;
             return siteDashBoard.getDashlet(TOP_SITE_CONTRIBUTOR_REPORT).render();
         }
         else if (!(thisPage instanceof SiteDashboardPage))
@@ -410,11 +405,12 @@ public class ShareUserDashboard extends AbstractUtils
         {
             throw new PageOperationException("Cannot open Top Site Contributor Dashlet on site dashboard page");
         }
- 
+
     }
 
     /**
      * Method to check if a given file name is displayed in search result results or not
+     * 
      * @param items
      * @param itemName
      * @return True if Item is displayed
@@ -427,9 +423,10 @@ public class ShareUserDashboard extends AbstractUtils
         }
         return false;
     }
-    
+
     /**
      * Method to get the 1st searchResult with the given contentName
+     * 
      * @param items
      * @param itemName
      * @return SiteSearchItem
@@ -437,7 +434,7 @@ public class ShareUserDashboard extends AbstractUtils
     public static SiteSearchItem getSearchResultItem(List<SiteSearchItem> items, String itemName)
     {
         SiteSearchItem searchItem = null;
-        
+
         if (items.isEmpty())
         {
             // No results
@@ -456,7 +453,7 @@ public class ShareUserDashboard extends AbstractUtils
         }
         return searchItem;
     }
-   
+
     /**
      * Method to perform search in Site-Search-Dashlet
      * Util assumes user is logged in and Site Dashboard is open
@@ -476,6 +473,7 @@ public class ShareUserDashboard extends AbstractUtils
     /**
      * Method to perform search in Site-Search-Dashlet with Search limit
      * Util assumes user is logged in and Site Dashboard is open
+     * 
      * @param drone
      * @param searchTerm
      * @param searchLimit
@@ -492,7 +490,7 @@ public class ShareUserDashboard extends AbstractUtils
     /**
      * Method to perform search in Saved-Search-Dashlet
      * Util assumes user is logged in and Site Dashboard/MyDashboard is open
-     *
+     * 
      * @param drone
      * @param searchTerm
      * @return List<SiteSearchItem> Search Results displayed
@@ -507,6 +505,7 @@ public class ShareUserDashboard extends AbstractUtils
     /**
      * Method to perform search in Saved-Search-Dashlet
      * Util assumes user is logged in and Site Dashboard/MyDashboard is open
+     * 
      * @param drone
      * @param searchTerm
      * @param searchLimit
@@ -521,6 +520,7 @@ public class ShareUserDashboard extends AbstractUtils
 
     /**
      * Method to get the 1st searchResult with the given contentName
+     * 
      * @param items
      * @param itemName
      * @return SiteSearchItem
@@ -544,7 +544,7 @@ public class ShareUserDashboard extends AbstractUtils
         }
         throw new PageOperationException("Unable to select item");
     }
-    
+
     /**
      * Waits for the dashlet entries to appear in the my discussions dashlet
      * 
@@ -553,15 +553,15 @@ public class ShareUserDashboard extends AbstractUtils
      * @param entryPresent
      * @return
      */
-    public static Boolean searchMyDiscussionDashletWithRetry(WebDrone driver, String [] entries, Boolean entryPresent)
+    public static Boolean searchMyDiscussionDashletWithRetry(WebDrone driver, String[] entries, Boolean entryPresent)
     {
         Boolean found = true;
         Boolean resultAsExpected = false;
 
         Dashboard sharePage = (Dashboard) getSharePage(driver).render();
-        
+
         MyDiscussionsDashlet myDiscussionsDashlet = sharePage.getDashlet(MY_DISCUSSIONS).render();
-        
+
         // Repeat search until the element is found or Timeout is hit
         for (int searchCount = 1; searchCount <= retrySearchCount; searchCount++)
         {
@@ -573,13 +573,12 @@ public class ShareUserDashboard extends AbstractUtils
 
             sharePage = (Dashboard) getCurrentPage(driver).render();
             myDiscussionsDashlet = sharePage.getDashlet(MY_DISCUSSIONS).render();
-            webDriverWait(driver,3000);
+            webDriverWait(driver, 3000);
 
             for (String entry : entries)
             {
-                found =  found && myDiscussionsDashlet.isTopicTitleDisplayed(entry);
+                found = found && myDiscussionsDashlet.isTopicTitleDisplayed(entry);
             }
-            
 
             resultAsExpected = (entryPresent.equals(found));
             if (resultAsExpected)
@@ -590,10 +589,11 @@ public class ShareUserDashboard extends AbstractUtils
 
         return resultAsExpected;
     }
-    
+
     /**
      * Adds container to site in customize site page.
      * Assumes user is logged in and Site dashboard is open
+     * 
      * @param drone
      * @param siteName
      * @param pageTypesToAdd
@@ -614,7 +614,7 @@ public class ShareUserDashboard extends AbstractUtils
     /**
      * This method is used to get the specified Dashlet from the user dashboard or site dashboard page.
      * User should be on DashBoardPage.
-     *
+     * 
      * @return Dashlet
      */
     public static Dashlet getDashlet(WebDrone driver, Dashlets DashletName)
@@ -630,7 +630,7 @@ public class ShareUserDashboard extends AbstractUtils
             throw new PageOperationException("Cannot get the Dashlet: " + DashletName.getDashletName());
         }
     }
-    
+
     /**
      * Removes dashlet from the user dashboard page
      * 
