@@ -58,6 +58,10 @@ public class SearchTests extends AbstractUtils
     private String publicationTechno5711;
     private String publicationTrance5711;
 
+    private String tagHouse = "House2";
+    private String tagTechno = "techno2";
+    private String tagTrance = "trance2";
+
     @Override
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
@@ -185,28 +189,41 @@ public class SearchTests extends AbstractUtils
         documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublH5711.html", publicationHouse5711, "Publ H5711");
         documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTe5711.html", publicationTechno5711, "Publ Te5711");
         documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTr5711.html", publicationTrance5711, "Publ Tr5711");
-        
+
         // Several articles are created in News, Publications, Blogs components:
         // * blogs with tags: post1 with tag "house", post2 with tag "techno",post3 with tag "trance"
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogH5711.html", blogHouse5711, "Blog H5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTe5711.html", blogTechno5711, "Blog Te5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTr5711.html", blogTrance5711, "Blog Tr5711");
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogH5712.html", "blog content H5712", "Blog H5712");
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTe5712.html", "blog content Te5712", "Blog Te5712");
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTr5712.html", "blog content Tr5712", "Blog Tr5712");
+        navigateToFolder(documentLibPage, "blog").render();
+        documentLibPage.getFileDirectoryInfo("BlogH5712.html").addTag(tagHouse);
+        documentLibPage.getFileDirectoryInfo("BlogTe5712.html").addTag(tagTechno);
+        documentLibPage.getFileDirectoryInfo("BlogTr5712.html").addTag(tagTrance);
 
         // * news articles with tags: news1 with tag "house", news2 with tag "techno", news3 with tag "trance"
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsH5711.html", newsHouse5711, "News H5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTe5711.html", newsTechno5711, "News Te5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTr5711.html", newsTrance5711, "News Tr5711");
+        ShareUser.openDocumentLibrary(drone);
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsH5712.html", "news content H5712", "News H5712");
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTe5712.html", "news content Te5712", "News Te5712");
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTr5712.html", "news content Tr5712", "News Tr5712");
+        navigateToFolder(documentLibPage, "news").render();
+        documentLibPage.getFileDirectoryInfo("NewsH5712.html").addTag(tagHouse);
+        documentLibPage.getFileDirectoryInfo("NewsTe5712.html").addTag(tagTechno);
+        documentLibPage.getFileDirectoryInfo("NewsTr5712.html").addTag(tagTrance);
 
-        //  * publication articles with tag: paper1 with tag "house", paper2 with tag "techno", paper3 with tag "trance"
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublH5711.html", publicationHouse5711, "Publ H5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTe5711.html", publicationTechno5711, "Publ Te5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTr5711.html", publicationTrance5711, "Publ Tr5711");
+        // * publication articles with tag: paper1 with tag "house", paper2 with tag "techno", paper3 with tag "trance"
+        ShareUser.openDocumentLibrary(drone);
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublH5712.html", "publ content H5712", "Publ H5712");
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTe5712.html", "publ content Te5712", "Publ Te5712");
+        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTr5712.html", "publ content Tr5712", "Publ Tr5712");
+        documentLibPage = navigateToFolder(documentLibPage, "publications").render();
+        documentLibPage.getFileDirectoryInfo("PublH5712.html").addTag(tagHouse);
+        documentLibPage.getFileDirectoryInfo("PublTe5712.html").addTag(tagTechno);
+        documentLibPage.getFileDirectoryInfo("PublTr5712.html").addTag(tagTrance);
 
-
-        // setup new entry in hosts to be able to access the new wcmqs site
-        String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
-                + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
-        Runtime.getRuntime().exec(setHostAddress);
+        // // setup new entry in hosts to be able to access the new wcmqs site
+        // String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
+        // + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
+        // Runtime.getRuntime().exec(setHostAddress);
     }
 
     /*
@@ -588,15 +605,15 @@ public class SearchTests extends AbstractUtils
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results block is empty");
         Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles block is not displayed.");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results block does not contain title: "
-                + "Blog H5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5711"), "Search Results block contains title: " + "Blog Te5711");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News H5711"), "Search Results block does not contain title: "
-                + "News H5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("News Te5711"), "Search Results block contains title: " + "News Te5711");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ H5711"), "Search Results block does not contain title: "
-                + "Publ H5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ Te5711"), "Search Results block contains title: " + "Publ Te5711");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results block does not contain title: "
+                + "Blog H5712");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5712"), "Search Results block contains title: " + "Blog Te5712");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News H5712"), "Search Results block does not contain title: "
+                + "News H5712");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("News Te5712"), "Search Results block contains title: " + "News Te5712");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ H5712"), "Search Results block does not contain title: "
+                + "Publ H5712");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ Te5712"), "Search Results block contains title: " + "Publ Te5712");
 
         // ---- Step 4 ----
         // ---- Step action ----
@@ -619,15 +636,15 @@ public class SearchTests extends AbstractUtils
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results block is empty");
         Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles block is not displayed.");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5711"), "Search Results block does not contain title: "
-                + "Blog Te5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results block contains title: " + "Blog H5711");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News Te5711"), "Search Results block does not contain title: "
-                + "News Te5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("News H5711"), "Search Results block contains title: " + "News H5711");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ Te5711"), "Search Results block does not contain title: "
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5712"), "Search Results block does not contain title: "
+                + "Blog Te5712");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results block contains title: " + "Blog H5712");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News Te5712"), "Search Results block does not contain title: "
+                + "News Te5712");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("News H5712"), "Search Results block contains title: " + "News H5712");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ Te5712"), "Search Results block does not contain title: "
                 + "Publ Te5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ H5711"), "Search Results block contains title: " + "Publ H5711");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ H5712"), "Search Results block contains title: " + "Publ H5712");
 
         // ---- Step 6 ----
         // ---- Step action ----
@@ -650,30 +667,75 @@ public class SearchTests extends AbstractUtils
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results block is empty");
         Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles block is not displayed.");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Tr5711"), "Search Results block does not contain title: "
-                + "Blog Tr5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results block contains title: " + "Blog H5711");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News Tr5711"), "Search Results block does not contain title: "
-                + "News Tr5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("News H5711"), "Search Results block contains title: " + "News H5711");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ Tr5711"), "Search Results block does not contain title: "
-                + "Publ Tr5711");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ H5711"), "Search Results block contains title: " + "Publ H5711");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Tr5712"), "Search Results block does not contain title: "
+                + "Blog Tr5712");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results block contains title: " + "Blog H5712");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News Tr5712"), "Search Results block does not contain title: "
+                + "News Tr5712");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("News H5712"), "Search Results block contains title: " + "News H5712");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ Tr5712"), "Search Results block does not contain title: "
+                + "Publ Tr5712");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Publ H5712"), "Search Results block contains title: " + "Publ H5712");
+
+    }
+
+    /*
+     * AONE-5714 Empty search
+     */
+    @Test(groups = { "WQS", "EnterpriseOnly" })
+    public void AONE_5714() throws Exception
+    {
+        String searchedText = "";
+        
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Navigate to http://host:8080/wcmqs
+        // ---- Expected results ----
+        // Sample site is opened;
+
+        drone.navigateTo(wqsURL);
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Empty Search field;
+        // ---- Expected results ----
+        // Data is entered successfully;
+
+        WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+        wcmqsHomePage.render();
+        wcmqsHomePage.searchText(searchedText);
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Click Search button near Search field;
+        // ---- Expected results ----
+        // No items are found;
+
+        WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
+        wcmqsSearchPage.render();
+        Assert.assertNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results block is not empty");
+        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles block is not displayed.");
 
     }
 
     private DocumentLibraryPage navigateToFolderFromRootAndCreateContent(DocumentLibraryPage documentLibPage, String folderName, String fileName, String fileContent, String fileTitle)
             throws Exception
     {
-        documentLibPage.selectFolder(ALFRESCO_QUICK_START);
-        documentLibPage.selectFolder(QUICK_START_EDITORIAL);
-        documentLibPage.selectFolder(ROOT);
-        documentLibPage.selectFolder(folderName);
+        navigateToFolder(documentLibPage, folderName);
         ContentDetails contentDetails1 = new ContentDetails();
         contentDetails1.setName(fileName);
         contentDetails1.setTitle(fileTitle);
         contentDetails1.setContent(fileContent);
         documentLibPage = ShareUser.createContentInCurrentFolder(drone, contentDetails1, ContentType.PLAINTEXT, documentLibPage);
+        return documentLibPage;
+    }
+
+    private DocumentLibraryPage navigateToFolder(DocumentLibraryPage documentLibPage, String folderName)
+    {
+        documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+        documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+        documentLibPage.selectFolder(ROOT);
+        documentLibPage.selectFolder(folderName);
         return documentLibPage;
     }
 
