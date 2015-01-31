@@ -16,6 +16,8 @@ import org.alfresco.po.share.wqs.WcmqsNewsPage;
 import org.alfresco.po.share.wqs.WcmqsAllPublicationsPage;
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.dashlet.AdvancedTinyMceEditor;
+import org.alfresco.po.share.dashlet.InsertOrEditLinkPage;
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
 import org.alfresco.po.share.dashlet.WebQuickStartOptions;
 import org.alfresco.po.share.enums.Dashlets;
@@ -55,6 +57,7 @@ public class WqsShareTests extends AbstractUtils
     String siteName;
     public static final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
     public static final String QUICK_START_EDITORIAL = "Quick Start Editorial";
+    public static final String QUICK_START_LIVE = "Quick Start Live";
     public static final String ROOT = "root";
     public static final String NEWS = "news";
     public static final String INDEX_HTML = "slide1.html";
@@ -68,7 +71,7 @@ public class WqsShareTests extends AbstractUtils
         newsName = "cont2" + getFileName(testName) + ".html";
         siteName = getSiteName(testName);
         logger.info("Start tests:" + testName);
-        
+
         wcmqsURL = wcmqs;
         logger.info(" wcmqs url : " + wcmqsURL);
     }
@@ -82,10 +85,11 @@ public class WqsShareTests extends AbstractUtils
     @AfterMethod(alwaysRun = true)
     public void tearDown()
     {
-        try{
+        try
+        {
             drone.quit();
         }
-        catch(UnreachableBrowserException e)
+        catch (UnreachableBrowserException e)
         {
             logger.error("Browser communication failed.");
         }
@@ -113,86 +117,114 @@ public class WqsShareTests extends AbstractUtils
     }
 
     /** AONE-5595:Creating web site in Share */
-     @Test(groups = {"WQSShare", "EnterpriseOnly"})
-     public void AONE_5595() throws Exception
-     {
-     // --- Step 1 ---
-     // --- Step action ---
-     // Click Create site link;
-     // --- Expected results ---
-     // Create Site window is opened;
-    
-     String testName = getTestName();
-     String user1 = getUserNameForDomain(testName + "-op1", DOMAIN_HYBRID);
-     String[] userInfo1 = new String[] { user1 };
-    
-     String siteName = testName + "SiteName";
-     String siteURL = testName + "SiteURL";
-    
-     // Create User1 (On-premise)
-     CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-     SharePage page = ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-    
-     CreateSitePage createSitePage = page.getNav().selectCreateSite().render();
-     assertTrue(createSitePage.isCreateSiteDialogDisplayed());
-    
-     // --- Step 2 ---
-     // --- Step action ---
-     // Fill in mandatory fields:
-     // Name: My Web Site URL Name: MyWebSite Type: Collaboration site Visibility: Public
-     // --- Expected results ---
-     // Data is entered successfully;
-    
-     createSitePage.setSiteName(siteName);
-     createSitePage.setSiteURL(siteURL);
-     createSitePage.selectSiteType(SiteType.COLLABORATION);
-     createSitePage.selectSiteVisibility(false, false);
-    
-     Assert.assertEquals(createSitePage.getSiteName(), siteName);
-     Assert.assertEquals(createSitePage.getSiteUrl(), siteURL);
-     Assert.assertEquals(createSitePage.getSiteType().get(0), "Collaboration Site");
-    
-     // --- Step 3 ---
-     // --- Step action ---
-     // Click OK button;
-     // --- Expected results ---
-     // Site is created, Site dashboard page is opened;
-    
-     SiteDashboardPage siteDashboardPage = createSitePage.selectOk().render();
-     assertTrue(siteDashboardPage.isSiteTitle(siteName));
-    
-     // --- Step 4 ---
-     // --- Step action ---
-     // Add "WCM Quick Start" dashlet to site dashboard
-     // --- Expected results ---
-     // Dashlet is added to dashboard;
-    
-     CustomiseSiteDashboardPage customiseSiteDashboardPage = siteDashboardPage.getSiteNav().selectCustomizeDashboard().render();
-     siteDashboardPage = customiseSiteDashboardPage.addDashlet(Dashlets.WEB_QUICK_START, 1).render();
-    
-     List<String> dashletTitles = siteDashboardPage.getTitlesList();
-     Assert.assertTrue(dashletTitles.contains("Web Quick Start"));
-    
-     // --- Step 5 ---
-     // --- Step action ---
-     // Click 'Import Web Site Data' link on WCM Quick Start dashlet
-     // --- Expected results ---
-     // "Web Site data import successful" notification is dislpayed;
-    
-     SiteWebQuickStartDashlet wqsDashlet = siteDashboardPage.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
-     wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
-     wqsDashlet.clickImportButtton();
-    
-     assertTrue(wqsDashlet.isImportMessageDisplayed());
-    
-     ShareUser.logout(drone);
-     }
-    
-     /** AONE-5598:Verify correct work of "Preview web asset" function */
-     @Test(groups = {"WQSShare", "EnterpriseOnly"})
-    public void AONE_5598() throws Exception
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
+    public void AONE_5595() throws Exception
     {
+        // --- Step 1 ---
+        // --- Step action ---
+        // Click Create site link;
+        // --- Expected results ---
+        // Create Site window is opened;
 
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "-op1", DOMAIN_HYBRID);
+        String[] userInfo1 = new String[] { user1 };
+
+        String siteName = testName + "SiteName";
+        String siteURL = testName + "SiteURL";
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+        SharePage page = ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+
+        CreateSitePage createSitePage = page.getNav().selectCreateSite().render();
+        assertTrue(createSitePage.isCreateSiteDialogDisplayed());
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Fill in mandatory fields:
+        // Name: My Web Site URL Name: MyWebSite Type: Collaboration site Visibility: Public
+        // --- Expected results ---
+        // Data is entered successfully;
+
+        createSitePage.setSiteName(siteName);
+        createSitePage.setSiteURL(siteURL);
+        createSitePage.selectSiteType(SiteType.COLLABORATION);
+        createSitePage.selectSiteVisibility(false, false);
+
+        Assert.assertEquals(createSitePage.getSiteName(), siteName);
+        Assert.assertEquals(createSitePage.getSiteUrl(), siteURL);
+        Assert.assertEquals(createSitePage.getSiteType().get(0), "Collaboration Site");
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Click OK button;
+        // --- Expected results ---
+        // Site is created, Site dashboard page is opened;
+
+        SiteDashboardPage siteDashboardPage = createSitePage.selectOk().render();
+        assertTrue(siteDashboardPage.isSiteTitle(siteName));
+
+        // --- Step 4 ---
+        // --- Step action ---
+        // Add "WCM Quick Start" dashlet to site dashboard
+        // --- Expected results ---
+        // Dashlet is added to dashboard;
+
+        CustomiseSiteDashboardPage customiseSiteDashboardPage = siteDashboardPage.getSiteNav().selectCustomizeDashboard().render();
+        siteDashboardPage = customiseSiteDashboardPage.addDashlet(Dashlets.WEB_QUICK_START, 1).render();
+
+        List<String> dashletTitles = siteDashboardPage.getTitlesList();
+        Assert.assertTrue(dashletTitles.contains("Web Quick Start"));
+
+        // --- Step 5 ---
+        // --- Step action ---
+        // Click 'Import Web Site Data' link on WCM Quick Start dashlet
+        // --- Expected results ---
+        // "Web Site data import successful" notification is dislpayed;
+
+        SiteWebQuickStartDashlet wqsDashlet = siteDashboardPage.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
+        wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
+        wqsDashlet.clickImportButtton();
+
+        assertTrue(wqsDashlet.isImportMessageDisplayed());
+
+        ShareUser.logout(drone);
+    }
+
+    /** AONE-5596:Opening sample site for preview */
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
+    public void AONE_5596() throws Exception
+    {
+        // ---- Step 1 ----
+        // ---- Step Action -----
+        // Navigate to http://host:8080/wcmqs
+        // Expected Result
+        // Sample site is opened;
+        drone.navigateTo(wcmqsURL);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        homePage.render();
+
+        // ---- Step 2 ----
+        // ---- Step Action -----
+        // Verify sample site;;
+        // Expected Result
+        // The following items are displayed:
+        // * Alfresco logo
+        // * Search field with Search button
+        // * Contact link
+        // * Toolbar with the following components: Home, News (Global Economy, Companies, Markets), Publications (Research Reports, White Papers), Blog
+        // * Articles
+        Assert.assertTrue(homePage.isSearchFieldWithButtonDisplay(), "Search field with Search button is not displayed");
+        Assert.assertTrue(homePage.isAlfrescoLogoDisplay(), "Alfresco logo is not displayed"); 
+        Assert.assertTrue(homePage.isContactLinkDisplay(), "Contact link is not displayed");
+        Assert.assertTrue(homePage.isPageMenuDisplay(), "Page Menu is not displayed");
+    }
+    
+    /** AONE-5597:Verifying imported items */
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
+    public void AONE_5597() throws Exception
+    {
         // ---- Step 1 ----
         // ---- Step Action
         // Navigate to any folder, where content is situated(e.g. Alfresco Quick Start > Quick Start Editorial);
@@ -220,6 +252,54 @@ public class WqsShareTests extends AbstractUtils
         drone.switchToWindow(newHandle);
 
         assertTrue(drone.getCurrentUrl().endsWith(INDEX_HTML));
+        ShareUser.logout(drone);
+    }
+
+    /** AONE-5598:Verify correct work of "Preview web asset" function */
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
+    public void AONE_5598() throws Exception
+    {
+
+        // ---- Step 1 ----
+        // ---- Step Action
+        // Open Document library component;
+        // ---- Expected results ----
+        // Document library is opened;
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+
+        // ---- Step 2 ----
+        // ---- Step Action
+        // Verify imported items;
+        // ---- Expected Results ----
+        // Folder "Alfresco Quick Start" is displayed, it contains:
+        // * Quick Start Editorial folder (contains folder root with inside site folders and files)
+        // * Quick Start live folder (empty)
+        Assert.assertTrue(documentLibraryPage.isFileVisible(ALFRESCO_QUICK_START), ALFRESCO_QUICK_START +" folder is not displayed.");
+        
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
+        Assert.assertTrue(documentLibraryPage.isFileVisible(QUICK_START_EDITORIAL), QUICK_START_EDITORIAL +" folder is not displayed.");
+        Assert.assertTrue(documentLibraryPage.isFileVisible(QUICK_START_LIVE), QUICK_START_LIVE +" folder is not displayed.");
+        
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
+        Assert.assertTrue(documentLibraryPage.isFileVisible(ROOT), "Folder "+ROOT+" is not displayed.");
+        
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
+        Assert.assertTrue(documentLibraryPage.isFileVisible("blog"), "Folder blog is not displayed.");
+        Assert.assertTrue(documentLibraryPage.isFileVisible("collections"), "Folder collections is not displayed.");
+        Assert.assertTrue(documentLibraryPage.isFileVisible("contact"), "Folder contact is not displayed.");
+        Assert.assertTrue(documentLibraryPage.isFileVisible("news"), "Folder news is not displayed.");
+        Assert.assertTrue(documentLibraryPage.isFileVisible("publications"), "Folder publications is not displayed.");
+        Assert.assertTrue(documentLibraryPage.isFileVisible("index.html"), "File index.html is not displayed.");
+        Assert.assertTrue(documentLibraryPage.isFileVisible("logo.jpg"), "File logo.jpg is not displayed.");
+        
+        documentLibraryPage=documentLibraryPage.getNavigation().clickCrumbsParentLinkName().render();
+        Assert.assertTrue(documentLibraryPage.isFileVisible(ALFRESCO_QUICK_START), ALFRESCO_QUICK_START +" folder is not displayed.");
+        
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();  
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_LIVE).render();
+        Assert.assertTrue(documentLibraryPage.isFileUploadInstructionDisplayed(), "File upload instruction is displayed thus there are no files or folder on the page");
+        
         ShareUser.logout(drone);
 
     }
@@ -257,9 +337,8 @@ public class WqsShareTests extends AbstractUtils
         Assert.assertTrue(siteConfiguration.contains(expectedSiteConfiguration));
     }
 
-    
     /** AONE-5600:Editing Site's Data */
-    @Test(groups = {"WQSShare", "EnterpriseOnly"})
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
     public void AONE_5600() throws Exception
     {
         String testName = getTestName();
@@ -290,6 +369,90 @@ public class WqsShareTests extends AbstractUtils
         newsArticleTitle = wcmqsNewsPage.getNewsTitle(newsArticleName);
         Assert.assertTrue(newsArticleTitle.contains(testName));
     }
+    
+    /** AONE-5601:Adding hyperlinks to content via inline-edit */
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
+    public void AONE_5601() throws Exception
+    {
+        String testName = getTestName();
+        String siteName = getSiteName(testName);
+
+        //create site and import finance data in wqs dashlet
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC).render(); 
+        SiteDashboardPage siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName);
+
+        CustomiseSiteDashboardPage customiseSiteDashboardPage = siteDashboardPage.getSiteNav().selectCustomizeDashboard().render();
+        siteDashboardPage = customiseSiteDashboardPage.addDashlet(Dashlets.WEB_QUICK_START, 1).render();
+
+        SiteWebQuickStartDashlet wqsDashlet = siteDashboardPage.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
+        wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
+        wqsDashlet.clickImportButtton();
+        wqsDashlet.waitForImportMessage();
+        
+        // --- Step 1 ---
+        // --- Step action ---
+        // In Share, go to root/news folder;
+        // --- Expected results ---
+        // Folder is opened;
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+        
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();        
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();     
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(NEWS).render();
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // On index.html, click More, then Inline Edit;
+        // --- Expected results ---
+        // New page/window is opened;
+        FileDirectoryInfo quickStartFileDirectoryInfo = documentLibraryPage.getFileDirectoryInfo(INDEX_HTML);
+        InlineEditPage inlineEditPage = quickStartFileDirectoryInfo.selectInlineEdit().render();
+
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Enter random text; 
+        // --- Expected results ---
+        // Text is entered;
+        String randomText="random text";
+        inlineEditPage.insertTextInContent(randomText);
+        AdvancedTinyMceEditor tinyMceEditor = inlineEditPage.getContentTinyMCEEditor();
+        Assert.assertTrue(tinyMceEditor.getText().contains(randomText));
+
+        // --- Step 4 ---
+        // --- Step action ---
+        // Select some text, then click the link button, in the popup dialog, enter a valid url and click Insert. Then clieck Save button.
+        // --- Expected results ---
+        // The text is now link;
+        tinyMceEditor.selectTextFromEditor();
+        InsertOrEditLinkPage insertOrEditLinkPage = tinyMceEditor.clickInsertOrEditLink();
+        
+        insertOrEditLinkPage.setLinkUrl("http://www.alfresco.com/");
+        insertOrEditLinkPage.setTitle("Aldresco site");
+        insertOrEditLinkPage.clickOKButton();
+        Assert.assertEquals(randomText, tinyMceEditor.getText());
+        Assert.assertTrue(tinyMceEditor.getContent().contains("<a href=\"http://www.alfresco.com/\" data-mce-href=\"http://www.alfresco.com/\">" + randomText + "</a>"), "tinyMceEditor.getContent() is: " + tinyMceEditor.getContent());
+              
+        EditHtmlDocumentPage editDocPage = (EditHtmlDocumentPage) inlineEditPage.getInlineEditDocumentPage(MimeType.HTML);
+        editDocPage.saveText();
+        
+        // --- Step 5 ---
+        // --- Step action ---
+        // Come back to news folder, click More, then Inline Edit on index.html;t
+        // --- Expected results ---
+        // Link for text is displayed;
+        documentLibraryPage = drone.getCurrentPage().render();
+        FileDirectoryInfo quickStartFileDirectoryInfo2 = documentLibraryPage.getFileDirectoryInfo(INDEX_HTML);
+        InlineEditPage inlineEditPage2 = quickStartFileDirectoryInfo2.selectInlineEdit().render();
+        
+        AdvancedTinyMceEditor tinyMceEditor2 = inlineEditPage2.getContentTinyMCEEditor();
+        Assert.assertEquals(randomText, tinyMceEditor2.getText());
+        Assert.assertTrue(tinyMceEditor2.getContent().contains("<a href=\"http://www.alfresco.com/\" data-mce-href=\"http://www.alfresco.com/\">" + randomText + "</a>"), "tinyMceEditor.getContent() is: " + tinyMceEditor2.getContent());
+
+        ShareUser.logout(drone);
+    }
 
     @Test(dependsOnMethods = "dataPrep", groups = { "DataPrepWQS", "EnterpriseOnly" })
     public void dataPrep_5602() throws Exception
@@ -318,7 +481,7 @@ public class WqsShareTests extends AbstractUtils
     }
 
     /** AONE-5602:Verifying correct work of date/time function */
-    @Test(groups = {"WQSShare", "EnterpriseOnly"})
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
     public void AONE_5602() throws Exception
     {
         // ---- Step 2 ----
@@ -395,7 +558,7 @@ public class WqsShareTests extends AbstractUtils
     }
 
     /** AONE-5603:Edit offline a web quick start publication */
-    @Test(groups = {"WQSShare", "EnterpriseOnly"})
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
     public void AONE_5603() throws Exception
     {
         drone.navigateTo(wcmqsURL);
@@ -457,7 +620,7 @@ public class WqsShareTests extends AbstractUtils
     }
 
     /** AONE-5604:Editing Web Site. No cache changes. */
-    @Test(groups = {"WQSShare", "EnterpriseOnly"})
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
     public void AONE_5604() throws Exception
     {
         String modifiedTitle = testName + "_newTitle";
@@ -540,7 +703,7 @@ public class WqsShareTests extends AbstractUtils
     }
 
     /** AONE-5605:All WQS submenu items are displayed with normal zoom. */
-    @Test(groups = {"WQSShare", "EnterpriseOnly"})
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
     public void AONE_5605() throws Exception
     {
         drone.navigateTo(wcmqsURL);
@@ -567,7 +730,7 @@ public class WqsShareTests extends AbstractUtils
     }
 
     /** AONE-5606:Verify uploading a file when transformation fails in a folder inside a WQS site */
-    @Test(groups = {"WQSShare", "EnterpriseOnly"})
+    @Test(groups = { "WQSShare", "EnterpriseOnly" })
     public void AONE_5606() throws Exception
     {
         String folder1 = "Folder5606";
