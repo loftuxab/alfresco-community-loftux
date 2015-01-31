@@ -200,7 +200,7 @@ public class BlogPage extends SitePage
     public boolean isNewPostEnabled()
     {
         String someButton = drone.findAndWait(NEW_POST_BTN).getAttribute("class");
-        return someButton.contains("yui-button-disabled");
+        return !someButton.contains("yui-button-disabled");
     }
 
     /**
