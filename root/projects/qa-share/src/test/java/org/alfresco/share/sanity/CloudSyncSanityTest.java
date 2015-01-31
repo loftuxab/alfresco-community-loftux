@@ -134,7 +134,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test
+    @Test(dependsOnMethods = "AONE_8217")
     public void AONE_8218() throws Exception
     {
         int i = 0;
@@ -348,7 +348,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test
+    @Test(dependsOnMethods = "AONE_8218")
     public void AONE_8219() throws Exception
     {
         //1st sync set: unsync and DO NOT remove the files from Cloud
@@ -417,7 +417,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test
+    @Test(dependsOnMethods = "AONE_8219")
     public void AONE_8220() throws Exception
     {
         String newFolderInCloud = "new_fol";
