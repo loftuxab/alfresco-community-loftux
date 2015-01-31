@@ -391,7 +391,7 @@
             <exclude name=".*"/>
         </methods>
     </class>
-    <class name="org.alfresco.share.user.trashcan.TrashcanTest3">
+    <!--<class name="org.alfresco.share.user.trashcan.TrashcanTest3">
         <methods>
             <include name="AONE_14183"/>
             <include name="AONE_14187"/>
@@ -406,7 +406,7 @@
             <include name="AONE_14197"/>
             <exclude name=".*"/>
         </methods>
-    </class>
+    </class>-->
 
 </classes>
 </test>
