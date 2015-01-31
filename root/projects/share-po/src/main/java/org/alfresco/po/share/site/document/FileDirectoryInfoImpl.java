@@ -122,6 +122,9 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
 
     protected By DETAIL_WINDOW = By.xpath("//div[@class='alf-detail-thumbnail']/../../..");
 
+    protected String DECLARE_AS_RECORD = "div.rm-create-record>a";
+    protected String IN_COMPLETE_RECORD = "div.info-banner";
+
     public FileDirectoryInfoImpl(String nodeRef, WebElement webElement, WebDrone drone)
     {
         super(webElement, drone);
@@ -2704,7 +2707,6 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         throw new UnsupportedOperationException("Not implemented in current view.");
     }
 
-    /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface.isGeoLocationIconDisplayed()
      */
@@ -2730,7 +2732,6 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface.isEXIFIconDisplayed()
-     */
     @Override
     public boolean isEXIFIconDisplayed()
     {
@@ -2834,10 +2835,8 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         return "";
     }
 
-    /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#selectLocateFile()
-     */
     @Override
     public void selectLocateFile()
     {
@@ -2859,7 +2858,6 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#selectEditOfflineAndCloseFileWindow()
-     */
     @Override
     public DocumentLibraryPage selectEditOfflineAndCloseFileWindow()
     {
@@ -2892,5 +2890,45 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
             throw new PageException("Robot not working");
         }
         throw new PageException("Unable to find Edit Offline link");
+        
+            
+    }
+    
+    @Override
+    public void declareRecord(){
+        
+        try
+        {
+            WebElement declare_record = drone.findAndWait(By.cssSelector(DECLARE_AS_RECORD));
+            declare_record.click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Unable to find element");
+        }
+        
+    }
+    
+
+    public boolean isTypeRecord(){
+        boolean isTypeRecord = false;
+        WebElement rec = findElement(By.cssSelector(IN_COMPLETE_RECORD));
+        String rec_text = rec.getText();
+       
+        try
+        {
+            if(rec_text != null && rec_text.contains("Incomplete Record")){
+                isTypeRecord = true;
+            }
+        }
+        catch (Exception e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+            
+        return isTypeRecord;
+        
+            
     }
 }
