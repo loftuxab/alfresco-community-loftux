@@ -30,7 +30,6 @@ import org.testng.annotations.Test;
 public class IncompleteWorkflowTests extends AbstractWorkflow
 {
     private String testDomain;
-    private String incompleteWorkflow = "incomplete_workflow";
     private static Log logger = LogFactory.getLog(IncompleteWorkflowTests.class);
 
     @Override
@@ -42,12 +41,14 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         testDomain = DOMAIN_HYBRID;
     }
 
-    private void dataPrep(String testName) throws Exception
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15680() throws Exception
     {
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String[] userInfo1 = new String[] { user1 };
 
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
         // Create User1 (On-premise)
@@ -63,32 +64,20 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
     }
 
     /**
-     * Data preparation for Incomplete Workflow tests
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_createUsers() throws Exception
-    {
-        dataPrep(incompleteWorkflow);
-    }
-
-    /**
      * AONE-15680:Incomplete workflow - modify properties (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 700000)
     public void AONE_15680() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
-
         String modifiedTitle = testName + "modified";
         String modifiedDescription = simpleTaskFile + " modified";
 
@@ -121,7 +110,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
-
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
 
         // ---- Step 1 ----
@@ -136,9 +124,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
-
+        ShareUser.refreshSharePage(drone);
         waitForSync(simpleTaskFile, opSiteName);
-
         ShareUser.logout(drone);
 
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -163,7 +150,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
             else
             {
                 logger.info("Wait a few seconds for the data to be synced into OP");
-                Thread.sleep(10000);
+                wait(7);
                 counter++;
             }
         }
@@ -172,27 +159,45 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 "Document Title modified by OP User is not present for Cloud.");
         Assert.assertTrue((modifiedDescription + user1).equals(editDocumentPropertiescl.getDescription()),
                 "Document Description modified by OP User is not present for Cloud.");
+    }
 
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15681() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
     /**
      * AONE-15681:Incomplete workflow - modify properties (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 500000)
     public void AONE_15681() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
-
         String modifiedTitle = testName + "modified";
         String modifiedDescription = simpleTaskFile + " modified";
 
@@ -211,7 +216,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         // Open Document library, Upload a file
         siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
         ShareUser.uploadFileInFolder(drone, fileInfo).render();
 
         // Select "Cloud Task or Review" from select a workflow drop down
@@ -225,10 +229,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
-
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
         waitForSync(simpleTaskFile, opSiteName);
-
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
@@ -260,7 +262,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         int counter = 1;
         int retryRefreshCount = 4;
-
         while (counter <= retryRefreshCount)
         {
             editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, simpleTaskFile).render();
@@ -271,7 +272,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
             else
             {
                 logger.info("Wait a few seconds for the data to be synced into OP");
-                Thread.sleep(10000);
+                wait(8);
                 counter++;
             }
         }
@@ -280,20 +281,41 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 "Document Title modified by Cloud User is not present for OP.");
         Assert.assertTrue((modifiedDescription + cloudUser).equals(editDocumentProperties.getDescription()),
                 "Document Description modified by CLoud User is not present for OP.");
-
         ShareUser.logout(drone);
 
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15682() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
     /**
      * AONE-15682:Incomplete workflow - modify content (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 600000)
     public void AONE_15682() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
 
@@ -352,11 +374,9 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
-
+        ShareUser.refreshSharePage(drone);
         waitForSync(simpleTaskFile, opSiteName);
-
         ShareUser.logout(drone);
-
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         // ---- Step 3 ----
@@ -382,32 +402,51 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
             else
             {
                 logger.info("Wait a few seconds for the data to be synced into Cloud");
-                Thread.sleep(10000);
+                wait(8);
                 counter++;
             }
         }
 
-        Assert.assertTrue(inlineEditPageCL.getDetails().getContent().contains(modifiedContent));
+        Assert.assertTrue(inlineEditPageCL.getDetails().getContent().contains(modifiedContent), "Content is not updated");
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15683() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
     /**
      * AONE-15683:Incomplete workflow - modify content (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 500000)
     public void AONE_15683() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
-
         String modifiedContentOnCloud = testName + "modified content in CLOUD";
 
         // Login as User1 (Cloud)
@@ -440,7 +479,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-
         waitForSync(simpleTaskFile, opSiteName);
 
         // ---- Step 1 ----
@@ -460,7 +498,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
         documentLibraryPage.selectFile(simpleTaskFile);
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
-        Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud));
+        Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Content is not updated");
 
         ShareUser.logout(hybridDrone);
 
@@ -486,30 +524,50 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
             else
             {
                 logger.info("Wait a few seconds for the data to be synced into OP");
-                Thread.sleep(10000);
+                wait(8);
                 counter++;
             }
         }
 
-        Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud));
+        Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Content is not updated");
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15684() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
     /**
      * AONE-15684:Incomplete workflow - move (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15684() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
         String folderName = getFolderName(testName);
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
 
@@ -534,7 +592,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         // Select "Cloud Task or Review" from select a workflow drop down
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
-
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
         formDetails.setDueDate(dueDate);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -544,7 +601,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-
         waitForSync(simpleTaskFile, opSiteName);
 
         // ---- Step 1, 2 ----
@@ -564,26 +620,46 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // The document is still synced.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
         ShareUser.logout(hybridDrone);
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15685() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
     /**
      * AONE-15685:Incomplete workflow - move (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15685() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
         String folderName = getFolderName(testName);
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
 
@@ -618,7 +694,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-
         waitForSync(simpleTaskFile, opSiteName);
 
         // ---- Step 1, 2 ----
@@ -639,21 +714,44 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // The document is still synced. Another location is displayed in the Sync details section.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation()
-                .contains(folderName));
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "Cloud is not synced");
+        Assert.assertTrue(
+                documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation().contains(folderName),
+                "Wrong location");
         ShareUser.logout(hybridDrone);
     }
 
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15686() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+    }
+
     /**
-     * AONE-15688:Incomplete workflow - unsync (OP)
+     * AONE-15686:Incomplete workflow - remove (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15686() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
 
@@ -699,34 +797,53 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // ---- Step action ---
         // OP Remove the synced document.
         // ---- Expected results ----
-        // The content is not removed. It cannot be removed because it is the part of workflow. Friendly behavior occurs (a message).
-        // TODO: Modify step 1 in TestLink accordingly to the Assert !
+        // The content cannot be removed. Delete Document link is absent in Document Details page and Delete link is absent in Selected Items.
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent());
-
         ShareUser.logout(drone);
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
 
         // ---- Step 3 ----
         // ---- Step action ---
         // Cloud Verify the document.
         // ---- Expected results ----
         // The document is still synced.
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent());
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
         ShareUser.logout(hybridDrone);
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15687() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
     /**
      * AONE-15687:Incomplete workflow - remove (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15687() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
 
@@ -767,7 +884,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
         waitForSync(simpleTaskFile, opSiteName);
-
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
@@ -778,9 +894,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // The content is not removed. It cannot be removed because it is the part of workflow. Friendly behavior occurs (a message).
         // TODO: Modify step 1 in TestLink accordingly to the Assert !
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent());
-
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent(), "Delete button is displayed");
         ShareUser.logout(hybridDrone);
 
         // ---- Step 2 ----
@@ -790,26 +905,47 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // The document is still synced. The correct location is displayed in the Sync details section.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage opDocumentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation()
-                .contains(cloudSite));
+        Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
+        Assert.assertTrue(
+                opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation().contains(cloudSite),
+                "Wrong location");
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15688() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
     /**
      * AONE-15688:Incomplete workflow - unsync (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15688() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
 
@@ -828,12 +964,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         // Open Document library, Upload a file
         siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
         ShareUser.uploadFileInFolder(drone, fileInfo).render();
 
         // Select "Cloud Task or Review" from select a workflow drop down
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
-
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
         formDetails.setDueDate(dueDate);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -851,8 +985,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // ---- Expected results ----
         // The content is not unsynced. Unsync option is absent. It is impossible to unsync the document which is the part of the incomplete workflow.
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent());
-
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent(), "Unsync button is displayed");
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
@@ -862,20 +995,42 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // Cloud Verify the document.
         // ---- Expected results ----
         // The document is still synced.
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent());
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent(), "Button unsync is displayed");
         ShareUser.logout(hybridDrone);
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15689() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String[] userInfo1 = new String[] { user1 };
+
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (On-premise)
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login to User1, set up the cloud sync
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
     /**
      * AONE-15689:Incomplete workflow - unsync (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15689() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String user1 = getUserNameForDomain(testName + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
 
@@ -900,12 +1055,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         // Open Document library, Upload a file
         siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
         ShareUser.uploadFileInFolder(drone, fileInfo).render();
 
         // Select "Cloud Task or Review" from select a workflow drop down
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
-
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
         formDetails.setDueDate(dueDate);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -916,7 +1069,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
         waitForSync(simpleTaskFile, opSiteName);
-
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
@@ -926,10 +1078,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // ---- Expected results ----
         // The content is not unsynced. Unsync option is absent. It is impossible to unsync the document which is the part of the incomplete workflow
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent());
-
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent(), "Unsync button is displayed");
         ShareUser.logout(hybridDrone);
 
         // ---- Step 2 ----
@@ -939,9 +1089,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // The document is still synced. The correct location is displayed in the Sync details section.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage opDocumentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
-        Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation()
-                .contains(cloudSite));
+        Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
+        Assert.assertTrue(
+                opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation().contains(cloudSite),
+                "Wrong location");
     }
 
     private void waitForSync(String fileName, String siteName)
@@ -966,6 +1117,18 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 }
             }
         }
+    }
+
+    private static void wait(int seconds)
+    {
+        long time0;
+        long time1;
+        time0 = System.currentTimeMillis();
+        do
+        {
+            time1 = System.currentTimeMillis();
+        }
+        while (time1 - time0 < seconds * 1000);
     }
 
 }
