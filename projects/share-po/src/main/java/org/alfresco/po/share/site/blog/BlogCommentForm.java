@@ -31,6 +31,7 @@ public class BlogCommentForm extends SharePage
         super(drone);
         tinyMceEditor = new TinyMceEditor(drone);
     }
+
     @SuppressWarnings("unchecked")
     @Override
     public BlogCommentForm render(RenderTime timer)
@@ -50,6 +51,7 @@ public class BlogCommentForm extends SharePage
     {
         return render(new RenderTime(time));
     }
+
     /**
      * Method to click Add Comment button
      *
@@ -66,11 +68,11 @@ public class BlogCommentForm extends SharePage
         }
         catch (NoSuchElementException nse)
         {
-            throw new ShareException("Unable to find " + ADD_COMMENT_BUTTON);
+            throw new ShareException("Unable to find " + ADD_COMMENT_BUTTON, nse);
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Timed out finding " + ADD_COMMENT_BUTTON);
+            throw new ShareException("Timed out finding " + ADD_COMMENT_BUTTON, te);
         }
     }
 

@@ -1,7 +1,5 @@
 package org.alfresco.po.share.site.blog;
 
-import org.alfresco.po.share.enums.ViewType;
-import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
@@ -17,7 +15,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
@@ -86,13 +83,9 @@ public class BlogPage extends SitePage
         {
             drone.findAndWait(NEW_POST_BTN).click();
         }
-        catch (NoSuchElementException e)
-        {
-            logger.debug("Unable to locate New Post button");
-        }
         catch (TimeoutException te)
         {
-            logger.debug("The operation has timed out");
+            throw new PageOperationException("Unable to find " + NEW_POST_BTN, te);
         }
         return new NewPostForm(drone);
     }
@@ -105,22 +98,10 @@ public class BlogPage extends SitePage
      */
     public PostViewPage createPostInternally(String titleField)
     {
-        try
-        {
-            BlogPage blogPage = new BlogPage(drone);
-            NewPostForm newPostForm = blogPage.clickNewPost();
-
-            newPostForm.setTitleField(titleField);
-            newPostForm.clickPublishInternally();
-        }
-        catch (TimeoutException te)
-        {
-            logger.debug("The operation has timed out");
-        }
-        catch (NoSuchElementException nse)
-        {
-            logger.debug("Unable to find the elements");
-        }
+        BlogPage blogPage = new BlogPage(drone);
+        NewPostForm newPostForm = blogPage.clickNewPost();
+        newPostForm.setTitleField(titleField);
+        newPostForm.clickPublishInternally();
         return new PostViewPage(drone).render();
     }
 
@@ -132,21 +113,14 @@ public class BlogPage extends SitePage
      */
     public PostViewPage createPostInternally(String titleField, String txtLines)
     {
-        try
-        {
-            BlogPage blogPage = new BlogPage(drone);
-            NewPostForm newPostForm = blogPage.clickNewPost();
-            waitUntilAlert();
-            newPostForm.setTitleField(titleField);
-            newPostForm.insertText(txtLines);
-            newPostForm.clickPublishInternally();
-            waitUntilAlert(7);
-            return new PostViewPage(drone).render();
-        }
-        catch (TimeoutException te)
-        {
-            throw new ShareException("Post wasn't created");
-        }
+        BlogPage blogPage = new BlogPage(drone);
+        NewPostForm newPostForm = blogPage.clickNewPost();
+        waitUntilAlert();
+        newPostForm.setTitleField(titleField);
+        newPostForm.insertText(txtLines);
+        newPostForm.clickPublishInternally();
+        waitUntilAlert(7);
+        return new PostViewPage(drone).render();
     }
 
     /**
@@ -157,22 +131,15 @@ public class BlogPage extends SitePage
      */
     public PostViewPage createPostInternally(String titleField, String txtLines, String tagName)
     {
-        try
-        {
-            BlogPage blogPage = new BlogPage(drone);
-            NewPostForm newPostForm = blogPage.clickNewPost();
-            waitUntilAlert();
-            newPostForm.setTitleField(titleField);
-            newPostForm.insertText(txtLines);
-            newPostForm.addTag(tagName);
-            newPostForm.clickPublishInternally();
-            waitUntilAlert(5);
-            return new PostViewPage(drone).render();
-        }
-        catch (TimeoutException te)
-        {
-            throw new ShareException("Post wasn't created");
-        }
+        BlogPage blogPage = new BlogPage(drone);
+        NewPostForm newPostForm = blogPage.clickNewPost();
+        waitUntilAlert();
+        newPostForm.setTitleField(titleField);
+        newPostForm.insertText(txtLines);
+        newPostForm.addTag(tagName);
+        newPostForm.clickPublishInternally();
+        waitUntilAlert(5);
+        return new PostViewPage(drone).render();
     }
 
     /**
@@ -183,22 +150,15 @@ public class BlogPage extends SitePage
      */
     public PostViewPage createPostInternally(String titleField, String txtLines, List<String> tags)
     {
-        try
-        {
-            BlogPage blogPage = new BlogPage(drone);
-            NewPostForm newPostForm = blogPage.clickNewPost();
-            waitUntilAlert();
-            newPostForm.setTitleField(titleField);
-            newPostForm.insertText(txtLines);
-            newPostForm.addTag(tags);
-            newPostForm.clickPublishInternally();
-            waitUntilAlert(5);
-            return new PostViewPage(drone).render();
-        }
-        catch (TimeoutException te)
-        {
-            throw new ShareException("Post wasn't created");
-        }
+        BlogPage blogPage = new BlogPage(drone);
+        NewPostForm newPostForm = blogPage.clickNewPost();
+        waitUntilAlert();
+        newPostForm.setTitleField(titleField);
+        newPostForm.insertText(txtLines);
+        newPostForm.addTag(tags);
+        newPostForm.clickPublishInternally();
+        waitUntilAlert(5);
+        return new PostViewPage(drone).render();
     }
 
     /**
@@ -209,53 +169,30 @@ public class BlogPage extends SitePage
      */
     public PostViewPage saveAsDraft(String titleField, String txtLines)
     {
-        try
-        {
-            BlogPage blogPage = new BlogPage(drone);
-            NewPostForm newPostForm = blogPage.clickNewPost();
-
-            newPostForm.setTitleField(titleField);
-            newPostForm.insertText(txtLines);
-            return newPostForm.clickSaveAsDraft().render(3000);
-
-        }
-        catch (TimeoutException te)
-        {
-            throw new ShareException("the operation has timed out");
-        }
-        catch (NoSuchElementException nse)
-        {
-            throw new ShareException("Unable to find the button");
-        }
+        BlogPage blogPage = new BlogPage(drone);
+        NewPostForm newPostForm = blogPage.clickNewPost();
+        newPostForm.setTitleField(titleField);
+        newPostForm.insertText(txtLines);
+        return newPostForm.clickSaveAsDraft().render(3000);
     }
-       
+
 
     /**
      * Method to Configure External Blog (wordpress, typepad)
-     *
-     * @param option
-     * @param name
-     * @param desc
-     * @param url
-     * @param userName
-     * @param password
-     * @return Blog page
-     *//*
-    public void configureExternalBlog(ConfigureBlogPage.TypeOptions option, String name, String desc, String url,
-        String userName, String password)
-    {
-        ConfigureBlogPage configureBlogPage = clickConfigureBlog();
-        configureBlogPage.selectTypeOption(option);
-        configureBlogPage.inputNameField(name);
-        configureBlogPage.inputDescriptionField(desc);
-        configureBlogPage.inputURL(url);
-        configureBlogPage.inputUserName(userName);
-        configureBlogPage.inputPassword(password);
-        configureBlogPage.clickOk();
-        waitUntilAlert(7);
-    }
-
-    /**
+     * public void configureExternalBlog(ConfigureBlogPage.TypeOptions option, String name, String desc, String url,
+     * String userName, String password)
+     * {
+     * ConfigureBlogPage configureBlogPage = clickConfigureBlog();
+     * configureBlogPage.selectTypeOption(option);
+     * configureBlogPage.inputNameField(name);
+     * configureBlogPage.inputDescriptionField(desc);
+     * configureBlogPage.inputURL(url);
+     * configureBlogPage.inputUserName(userName);
+     * configureBlogPage.inputPassword(password);
+     * configureBlogPage.clickOk();
+     * waitUntilAlert(7);
+     * }
+     * /**
      * Method to verify whether configure External Blog is enabled
      *
      * @return true if enabled
@@ -263,12 +200,7 @@ public class BlogPage extends SitePage
     public boolean isNewPostEnabled()
     {
         String someButton = drone.findAndWait(NEW_POST_BTN).getAttribute("class");
-        if (someButton.contains("yui-button-disabled"))
-        {
-            return false;
-        }
-        else
-            return true;
+        return someButton.contains("yui-button-disabled");
     }
 
     /**
@@ -286,12 +218,12 @@ public class BlogPage extends SitePage
             thePost.click();
             waitUntilAlert();
         }
-        catch (TimeoutException e)
+        catch (TimeoutException te)
         {
-            throw new ShareException("Unable to click the link");
+            throw new PageOperationException("Unable to click the link", te);
         }
         return drone.getCurrentPage().render();
-    }   
+    }
 
     /**
      * Method to retrieve the posts count
@@ -325,9 +257,7 @@ public class BlogPage extends SitePage
     public boolean isPostPresented(String postName)
     {
         boolean isDisplayed;
-
         checkNotNull(postName);
-
         try
         {
             WebElement theItem = drone.find(By.xpath(String.format(POST_TITLE, postName)));
@@ -337,9 +267,9 @@ public class BlogPage extends SitePage
         {
             isDisplayed = false;
         }
-        catch (TimeoutException e)
+        catch (TimeoutException te)
         {
-            throw new PageException(String.format("Blog info with title %s was not found", postName), e);
+            throw new PageException(String.format("Blog info with title %s was not found", postName), te);
         }
         return isDisplayed;
     }
@@ -352,28 +282,16 @@ public class BlogPage extends SitePage
      */
     public PostViewPage saveAsDraft(String titleField, String txtLines, List<String> tagName)
     {
-        try
+        logger.info("Creating draft post " + titleField);
+        BlogPage blogPage = new BlogPage(drone);
+        NewPostForm newPostForm = blogPage.clickNewPost();
+        newPostForm.setTitleField(titleField);
+        newPostForm.insertText(txtLines);
+        if (tagName != null)
         {
-            logger.info("Creating draft post " + titleField);
-            BlogPage blogPage = new BlogPage(drone);
-            NewPostForm newPostForm = blogPage.clickNewPost();
-
-            newPostForm.setTitleField(titleField);
-            newPostForm.insertText(txtLines);
-            if (tagName != null)
-            {
-                newPostForm.addTag(tagName);
-            }
-            return newPostForm.clickSaveAsDraft().render(3000);
+            newPostForm.addTag(tagName);
         }
-        catch (TimeoutException te)
-        {
-            throw new ShareException("the operation has timed out");
-        }
-        catch (NoSuchElementException nse)
-        {
-            throw new ShareException("Unable to find the button");
-        }
+        return newPostForm.clickSaveAsDraft().render(3000);
     }
 
     /**
@@ -407,14 +325,13 @@ public class BlogPage extends SitePage
         }
         if (tag == null)
         {
-
             tagXpath = String.format(TAG_NONE, title);
             try
             {
                 element = drone.findAndWait(By.xpath(tagXpath));
                 isDisplayed = element.getText().contains("None");
             }
-            catch (NoSuchElementException ex)
+            catch (TimeoutException ex)
             {
                 if (logger.isDebugEnabled())
                 {
@@ -426,14 +343,13 @@ public class BlogPage extends SitePage
         }
         else
         {
-
             tagXpath = String.format(TAG_NAME, title, tag);
             try
             {
                 element = drone.findAndWait(By.xpath(tagXpath));
                 isDisplayed = element.isDisplayed();
             }
-            catch (NoSuchElementException te)
+            catch (TimeoutException te)
             {
                 if (logger.isDebugEnabled())
                 {
@@ -457,28 +373,21 @@ public class BlogPage extends SitePage
      */
     public PostViewPage editPost(String oldTitle, String newTitle, String txtLines, String tagName, boolean removeTag)
     {
-        try
+        EditPostForm editPostForm = getPostDirectoryInfo(oldTitle).editPost();
+        editPostForm.setTitleField(newTitle);
+        editPostForm.insertText(txtLines);
+        if (!removeTag)
         {
-            EditPostForm editPostForm = getPostDirectoryInfo(oldTitle).editPost();
-            editPostForm.setTitleField(newTitle);
-            editPostForm.insertText(txtLines);
-            if (!removeTag)
-            {
-                editPostForm.addTag(tagName);
-            }
-            else
-            {
-                editPostForm.removeTag(tagName);
-            }
-            editPostForm.clickSaveAsDraft();
-            waitUntilAlert();
-            logger.info("Edited post " + oldTitle);
-            return new PostViewPage(drone).render();
+            editPostForm.addTag(tagName);
         }
-        catch (TimeoutException te)
+        else
         {
-            throw new ShareException("Timed out finding buttons");
+            editPostForm.removeTag(tagName);
         }
+        editPostForm.clickSaveAsDraft();
+        waitUntilAlert();
+        logger.info("Edited post " + oldTitle);
+        return new PostViewPage(drone).render();
     }
 
     public PostDirectoryInfo getPostDirectoryInfo(final String title)
@@ -495,13 +404,13 @@ public class BlogPage extends SitePage
             row = drone.findAndWait(By.xpath(String.format("//a[text()='%s']/../../../..", title)), WAIT_TIME_3000);
             drone.mouseOverOnElement(row);
         }
-        catch (NoSuchElementException e)
+        catch (NoSuchElementException nse)
         {
-            throw new PageException(String.format("Post directory info with title %s was not found", title), e);
+            throw new PageException(String.format("Post directory info with title %s was not found", title), nse);
         }
-        catch (TimeoutException e)
+        catch (TimeoutException te)
         {
-            throw new PageException(String.format("Post directory info with title %s was not found", title), e);
+            throw new PageException(String.format("Post directory info with title %s was not found", title), te);
         }
         return new PostDirectoryInfoImpl(drone, row);
     }
