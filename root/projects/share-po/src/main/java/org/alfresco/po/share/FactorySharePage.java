@@ -17,6 +17,7 @@ package org.alfresco.po.share;
 import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
 import org.alfresco.po.alfresco.TenantAdminConsolePage;
 import org.alfresco.po.alfresco.WebScriptsPage;
+import org.alfresco.po.alfresco.webdav.WebDavPage;
 import org.alfresco.po.share.admin.AdminConsolePage;
 import org.alfresco.po.share.admin.ManageSitesPage;
 import org.alfresco.po.share.adminconsole.CategoryManagerPage;
@@ -233,6 +234,7 @@ public class FactorySharePage implements PageFactory
         pages.put("status", StatusBulkImportPage.class);
         pages.put("inplace", InPlaceBulkImportPage.class);
         pages.put("index", WebScriptsPage.class);
+        pages.put("webdav", WebDavPage.class);
         pages.put("admin-tenantconsole", TenantAdminConsolePage.class);
         pages.put("admin-repoconsole", RepositoryAdminConsolePage.class);
         pages.put("user-content", UserContentPage.class);

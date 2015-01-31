@@ -37,6 +37,7 @@ public class ShareUtil
     private static final String WEB_SCRIPTS_PAGE = "alfresco/service/index";
     private static final String TENANT_ADMIN_CONSOLE_PAGE = "alfresco/s/enterprise/admin/admin-tenantconsole";
     private static final String REPO_ADMIN_CONSOLE_PAGE = "alfresco/s/enterprise/admin/admin-repoconsole";
+    private static final String WEBDAV_PAGE = "alfresco/webdav";
 
     /**
      * A simple Enum to request the required Alfresco version.
@@ -252,6 +253,19 @@ public class ShareUtil
     {
         return navigateToAlfresco(drone, REPO_ADMIN_CONSOLE_PAGE, userInfo);
     }
+
+    /**
+     * Helper method to extract alfresco repository admin console url and direct webdrone to location.
+     * @param drone
+     * @param userInfo
+     * @return
+     * @throws Exception
+     */
+    public static HtmlPage navigateToWebDav(final WebDrone drone,final String... userInfo) throws Exception
+    {
+        return navigateToAlfresco(drone, WEBDAV_PAGE, userInfo);
+    }
+
     /**
      * Base helper method that extracts the url to required alfresco admin location.
      * Once extracted it formats it with the username and password to allow access to the page.
