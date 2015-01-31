@@ -18,13 +18,13 @@
         <classes>
             <class name="org.alfresco.share.repository.MultiTenancyTest"/>
         </classes>
-    </test>
+    </test>-->
 
     <test name="RepositoryFtpTest">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryFtpTest"/>
         </classes>
-    </test>-->
+    </test>
     <test name="RepositoryFtpsTest">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryFtpsTest"/>
