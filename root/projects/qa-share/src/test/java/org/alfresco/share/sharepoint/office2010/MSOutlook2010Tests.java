@@ -2,8 +2,10 @@ package org.alfresco.share.sharepoint.office2010;
 
 import static org.testng.Assert.assertTrue;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Properties;
+import java.util.Locale;
 
 import org.alfresco.application.util.Application;
 import org.alfresco.po.share.CustomiseUserDashboardPage;
@@ -58,13 +60,15 @@ public class MSOutlook2010Tests extends AbstractUtils
     MicorsoftOffice2010 outlook = new MicorsoftOffice2010(Application.OUTLOOK, "2010");
     private String next_site;
     private String sharePointPath;
+    String errorMessage = "Your attempt to create a Meeting Workspace or link to an existing one can't be completed Reason Site name is not specified Please fill up subject field";
+    String linkErrorMsj = "Your attempt to create a Meeting Workspace or link to an existing one can't be completed Reason Subject should be specified Please enter a subject";
 
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
         super.setup();
 
-        next_site = "40";
+        next_site = "2";
 
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName) + next_site;
@@ -72,7 +76,7 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         xss_location = "IMG STYLE=xss:expr/*XSS*/session(alert(XSS))";
         xss_site = "DIV STYLE=width:expression(alert(XSS))" + next_site;
-        
+
         Runtime.getRuntime().exec("taskkill /F /IM OUTLOOK.EXE");
         sharePointPath = outlook.getSharePointPath();
 
@@ -96,13 +100,11 @@ public class MSOutlook2010Tests extends AbstractUtils
     @Test(groups = "alfresco-one")
     public void AONE_9691() throws Exception
     {
-
         String testName = getTestName();
         String location = testName + " - Room";
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, linkSite, location, testUser, DEFAULT_PASSWORD, true, false);
@@ -122,6 +124,16 @@ public class MSOutlook2010Tests extends AbstractUtils
         Assert.assertEquals(eventInfo.getWhatDetail(), linkSite);
         Assert.assertEquals(eventInfo.getWhereDetail(), location);
 
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+        Assert.assertTrue(eventInfo.getStartDateTime().contains(weekDay));
+        Assert.assertTrue(eventInfo.getEndDateTime().contains(weekDay));
+        Assert.assertTrue(eventInfo.getDescriptionDetail().isEmpty());
+        Assert.assertEquals(eventInfo.getTagName(), "(None)");
+
     }
 
     @Test(groups = "alfresco-one")
@@ -129,7 +141,7 @@ public class MSOutlook2010Tests extends AbstractUtils
     {
         String testName = getTestName();
         String location = testName + " - Room";
-        String subject = testName + next_site;
+        String subject = testName + next_site + "1";
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
@@ -151,6 +163,17 @@ public class MSOutlook2010Tests extends AbstractUtils
         InformationEventForm eventInfo = calendarPage.clickOnEvent(CalendarPage.EventType.MONTH_TAB_ALL_DAY_EVENT, subject).render();
         Assert.assertEquals(eventInfo.getWhatDetail(), subject);
         Assert.assertEquals(eventInfo.getWhereDetail(), location);
+
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+        Assert.assertTrue(eventInfo.getStartDateTime().contains(weekDay));
+        Assert.assertTrue(eventInfo.getEndDateTime().contains(weekDay));
+        Assert.assertTrue(eventInfo.getDescriptionDetail().isEmpty());
+        Assert.assertEquals(eventInfo.getTagName(), "(None)");
+
     }
 
     @Test(groups = "alfresco-one")
@@ -159,13 +182,56 @@ public class MSOutlook2010Tests extends AbstractUtils
         String testName = getTestName();
         String location = testName + " - Room";
         String siteName = "";
+        Ldtp security = new Ldtp("Windows Security");
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
+        l.click("btnMeeting");
 
-        // create new meeting workspace
-        outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, false, false);
+        // set focus on new window
+        String windowNameUntitled = outlook.abstractUtil.waitForWindow("Untitled");
+        Ldtp l1 = new Ldtp(windowNameUntitled);
+        l.activateWindow(windowNameUntitled);
+
+        l1.click("btnMeetingWorkspace");
+
+        l1.click("hlnkChangesettings");
+        l1.waitTime(2);
+        l1.selectItem("cboWebsiteDropdown", "Other...");
+
+        String windowNameServer = outlook.abstractUtil.waitForWindow("Other Workspace Server");
+        Ldtp l2 = new Ldtp(windowNameServer);
+        l.activateWindow(windowNameServer);
+
+        l2.deleteText("txtServerTextbox", 0);
+        l2.enterString("txtServerTextbox", sharePointPath);
+
+        l2.click("btnOK");
+        l2.waitTime(3);
+        outlook.operateOnSecurity(security, testUser, DEFAULT_PASSWORD);
+
+        windowNameUntitled = outlook.abstractUtil.waitForWindow("Untitled");
+        Ldtp l3 = new Ldtp(windowNameUntitled);
+        l3.activateWindow(windowNameUntitled);
+
+        l3.click("btnOK");
+        l3.enterString("txtLocation", location);
+
+        l3.click("btnCreate");
+        l3.waitTime(4);
+        outlook.operateOnSecurity(security, testUser, DEFAULT_PASSWORD);
+
+        String errorWindow = outlook.abstractUtil.waitForWindow("Microsoft Outlook");
+        Ldtp error = new Ldtp(errorWindow);
+        error.waitTime(5);
+        error.activateWindow(errorWindow);
+
+        String objects[] = error.getObjectList();
+        String errorMessageObject = objects[2];
+        errorMessageObject = errorMessageObject.replace("pane", "");
+        String errorNoSpaces = errorMessage.replaceAll("\\s", "");
+        Assert.assertTrue(errorMessageObject.equals(errorNoSpaces));
 
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -187,12 +253,52 @@ public class MSOutlook2010Tests extends AbstractUtils
         String testName = getTestName();
         String location = testName + " - Room";
         String subject = "";
+        Ldtp security = new Ldtp("Windows Security");
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
-        // create new meeting workspace
-        outlook.operateOnLinkToExistingWorkspace(l, sharePointPath, linkSite, subject, location, testUser, DEFAULT_PASSWORD, false);
+        l.click("btnMeeting");
+
+        // set focus on new window
+        String windowNameUntitled = outlook.abstractUtil.waitForWindow("Untitled");
+        Ldtp l1 = new Ldtp(windowNameUntitled);
+        l.activateWindow(windowNameUntitled);
+
+        l1.click("btnMeetingWorkspace");
+
+        l1.waitTime(2);
+        l1.click("hlnkChangesettings");
+        l1.click("rbtnLinktoanexistingworkspace");
+
+        l1.mouseLeftClick("cboWorkspaceDropdown");
+        l1.waitTime(4);
+        outlook.operateOnSecurity(security, testUser, DEFAULT_PASSWORD);
+
+        l1.selectItem("cboWorkspaceDropdown", linkSite);
+
+        l1.click("btnOK");
+
+        windowNameUntitled = outlook.abstractUtil.waitForWindow("Untitled");
+        Ldtp allDay = new Ldtp(windowNameUntitled);
+        allDay.activateWindow(windowNameUntitled);
+        allDay.enterString("txtLocation", location);
+
+        // click Link button
+        allDay.click("btnLink");
+        allDay.waitTime(4);
+        outlook.operateOnSecurity(security, testUser, DEFAULT_PASSWORD);
+
+        String errorWindow = outlook.abstractUtil.waitForWindow("Microsoft Outlook");
+        Ldtp error = new Ldtp(errorWindow);
+        error.waitTime(5);
+        error.activateWindow(errorWindow);
+
+        String objects[] = error.getObjectList();
+        String errorMessageObject = objects[2];
+        errorMessageObject = errorMessageObject.replace("pane", "");
+        String errorNoSpaces = linkErrorMsj.replaceAll("\\s", "");
+        Assert.assertTrue(errorMessageObject.equals(errorNoSpaces));
 
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -216,7 +322,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
@@ -249,7 +354,6 @@ public class MSOutlook2010Tests extends AbstractUtils
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
-
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, linkSite, location, testUser, DEFAULT_PASSWORD, true, false);
 
@@ -279,7 +383,6 @@ public class MSOutlook2010Tests extends AbstractUtils
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
-
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, xss_site, xss_location, testUser, DEFAULT_PASSWORD, true, false);
 
@@ -308,7 +411,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // Linking to existing workspace with XSS
         outlook.operateOnLinkToExistingWorkspace(l, sharePointPath, xss_site, xss_site_new, xss_location_new, testUser, DEFAULT_PASSWORD, true);
@@ -357,6 +459,16 @@ public class MSOutlook2010Tests extends AbstractUtils
         Assert.assertEquals(eventInfo.getWhatDetail(), event);
         Assert.assertEquals(eventInfo.getWhereDetail(), location);
 
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+        Assert.assertTrue(eventInfo.getStartDateTime().contains(weekDay));
+        Assert.assertTrue(eventInfo.getEndDateTime().contains(weekDay));
+        Assert.assertTrue(eventInfo.getDescriptionDetail().isEmpty());
+        Assert.assertEquals(eventInfo.getTagName(), "(None)");
+
     }
 
     @Test(groups = { "DataPrepMSOutlook" })
@@ -374,7 +486,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
@@ -407,6 +518,7 @@ public class MSOutlook2010Tests extends AbstractUtils
         Ldtp l2 = outlook.getAbstractUtil().setOnWindow("Untitled");
 
         outlook.getAbstractUtil().clickOnObject(l2, "btnMeetingWorkspace");
+
         outlook.getAbstractUtil().clickOnObject(l2, "hlnkChangesettings");
         outlook.getAbstractUtil().clickOnObject(l2, "rbtnLinktoanexistingworkspace");
         outlook.getAbstractUtil().clickOnObject(l2, "cboWorkspaceDropdown");
@@ -500,7 +612,6 @@ public class MSOutlook2010Tests extends AbstractUtils
     @Test(groups = "alfresco-one")
     public void AONE_9702() throws Exception
     {
-
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         SiteDashboardPage siteDashBoard = SiteUtil.openSiteFromSearch(drone, linkSite);
 
@@ -519,7 +630,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         l2.selectItem("cboWorkspaceDropdown", linkSite);
         l2.click("hlnkViewworkspace");
-
         Boolean isSite = siteDashBoard.isSiteTitle(linkSite);
         Assert.assertTrue(isSite);
 
@@ -528,11 +638,9 @@ public class MSOutlook2010Tests extends AbstractUtils
     @Test(groups = "alfresco-one")
     public void AONE_9703() throws Exception
     {
-
         String testName = getTestName() + next_site;
         String location = testName + " - Room";
         String siteName = getSiteName(testName);
-
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
@@ -581,7 +689,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
@@ -683,7 +790,6 @@ public class MSOutlook2010Tests extends AbstractUtils
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
-
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
 
@@ -748,7 +854,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
@@ -817,7 +922,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
@@ -966,7 +1070,6 @@ public class MSOutlook2010Tests extends AbstractUtils
         String toUser = getUserNameFreeDomain(testName);
 
         Ldtp security = new Ldtp("Windows Security");
-
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
