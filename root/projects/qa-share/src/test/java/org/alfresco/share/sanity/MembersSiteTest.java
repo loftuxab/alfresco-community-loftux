@@ -22,8 +22,13 @@ import org.alfresco.po.share.*;
 import org.alfresco.po.share.dashlet.MyTasksDashlet;
 import org.alfresco.po.share.dashlet.SiteMembersDashlet;
 import org.alfresco.po.share.site.*;
+import org.alfresco.po.share.systemsummary.AdminConsoleLink;
+import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
+import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,8 +37,10 @@ import org.dom4j.Document;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.jbpm.mail.Mail;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -43,6 +50,8 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
 import static org.alfresco.po.share.enums.UserRole.*;
@@ -66,6 +75,11 @@ public class MembersSiteTest extends AbstractUtils
     private String rejectInvUrlInEmail;
     private String currentUrl;
 
+    private static String node1Url;
+    //private static String node2Url;
+    private static List<String> clusterMembers;
+    private static final String regexUrl = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
+
     @Override
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
@@ -73,6 +87,23 @@ public class MembersSiteTest extends AbstractUtils
         super.setup();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
+
+        SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, jmxShareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+
+        RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
+
+        Assert.assertTrue(clusteringPage.isClusterEnabled(), "Cluster isn't enabled");
+
+        clusterMembers = clusteringPage.getClusterMembers();
+        /*if (clusterMembers.size() >= 2)
+        {
+            node1Url = shareUrl.replaceFirst(regexUrl, clusterMembers.get(0) + ":" + nodePort);
+            node2Url = shareUrl.replaceFirst(regexUrl, clusterMembers.get(1) + ":" + nodePort);
+        }
+        else
+        {
+            throw new PageOperationException("Number of cluster members is less than two");
+        }*/
     }
 
     @Test(groups = "DataPrepSanity")
@@ -182,7 +213,11 @@ public class MembersSiteTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
         if (!isAlfrescoVersionCloud(drone))
         {
-            MailUtil.configOutBoundEmail();
+            //MailUtil.configOutBoundEmail();
+            for(int i = 0; i < clusterMembers.size(); i++){
+                node1Url = shareUrl.replaceFirst(regexUrl, clusterMembers.get(i) + ":" + nodePort);
+                MailUtil.configOutBoundEmailForCluster(node1Url);
+            }
         }
     }
 
@@ -217,7 +252,7 @@ public class MembersSiteTest extends AbstractUtils
         assertFalse(inviteMembersPage.isAddButtonEnabledFor(testUser1), String.format("Add button enabled for invited user[%s].", testUser1));
 
         foundUsers = inviteMembersPage.searchUser(MailUtil.MAIL_BOT_BASE_NAME + "*");
-        assertTrue(foundUsers.size() > 3, "3 user not found!");
+        assertTrue(foundUsers.size() >= 3, "3 user not found!");
         assertFalse(inviteMembersPage.isAddButtonEnabledFor(testUser1), String.format("Add button enabled for invited user[%s].", testUser1));
         assertFalse(inviteMembersPage.isAddButtonEnabledFor(testUser2), String.format("Add button disabled. Can't add user[%s] to site", testUser2));
         assertTrue(inviteMembersPage.isAddButtonEnabledFor(testUser3), String.format("Add button disabled. Can't add user[%s] to site", testUser3));

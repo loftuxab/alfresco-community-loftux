@@ -29,7 +29,7 @@ import java.util.Properties;
 /**
  * @author Aliaksei Boole
  */
-public class MailUtil
+public class MailUtil extends AbstractUtils
 {
     private static Store store;
     private static Folder inbox;
@@ -293,6 +293,21 @@ public class MailUtil
         JmxUtils.setAlfrescoServerProperty(JMX_OUTBOUND_OBJ_NAME, SMTP_TLS, true);
         JmxUtils.invokeAlfrescoServerProperty(JMX_OUTBOUND_OBJ_NAME, SMTP_START);
     }
+
+    public static void configOutBoundEmailForCluster(String jmxUrl)
+    {
+        JmxUtils.invokeAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_STOP);
+        JmxUtils.setAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_MAIL_HOST, SMTP_MAIL_SERVER);
+        JmxUtils.setAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_MAIL_PORT, SMTP_PORT);
+        JmxUtils.setAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_MAIL_USERNAME, MAIL_OUTBOUND_ALFRESCO);
+        JmxUtils.setAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_MAIL_FROM, MAIL_OUTBOUND_ALFRESCO);
+        JmxUtils.setAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_MAIL_PASSWORD, PASSWORD_OUTBOUND_ALFRESCO);
+        JmxUtils.setAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_MAIL_AUTH, true);
+        JmxUtils.setAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_TLS, true);
+        JmxUtils.invokeAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_START);
+    }
+
+
 
     /**
      * Check that mail get and present in mail box(after 60 sec waiting)

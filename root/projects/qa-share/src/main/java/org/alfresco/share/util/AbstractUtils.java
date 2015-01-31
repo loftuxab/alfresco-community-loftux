@@ -131,6 +131,7 @@ public abstract class AbstractUtils
     private static Log logger = LogFactory.getLog(AbstractUtils.class);
     protected static ApplicationContext ctx;
     protected static String shareUrl;
+    protected static String jmxShareUrl;
 
     protected static String pathSharepoint;
     protected static String wcmqs;
@@ -325,6 +326,7 @@ public abstract class AbstractUtils
         ctx = new ClassPathXmlApplicationContext(contextXMLList.toArray(new String[contextXMLList.size()]));
         testProperties = (ShareTestProperty) ctx.getBean("shareTestProperties");
         shareUrl = testProperties.getShareUrl();
+        jmxShareUrl = testProperties.getJmxShareUrl();
         pathSharepoint = testProperties.getPathSharepoint();
         wcmqs = testProperties.getWcmqs();
         cloudUrlForHybrid = testProperties.getCloudUrlForHybrid();

@@ -53,6 +53,7 @@
 
     <bean id="shareTestProperties" class="org.alfresco.share.util.ShareTestProperty">
         <constructor-arg name="shareUrl" value="${share.target}" />
+        <constructor-arg name="jmxShareUrl" value="${jmx.share.target}" />
         <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" />
         <constructor-arg name="wcmqs" value="${share.wcmqs.path}" /> 
         <constructor-arg name="apiUrl" value="${api.target}" />
@@ -119,6 +120,7 @@
     <!-- -->
     <bean id="hybridShareTestProperties" class="org.alfresco.share.util.ShareTestProperty">
         <constructor-arg name="shareUrl" value="${share.hybrid.target}" />
+        <constructor-arg name="jmxShareUrl" value="${jmx.share.target}" />
         <constructor-arg name="apiUrl" value="${api.hybrid.target}" />
         <constructor-arg name="gridUrl" value="null" />
         <constructor-arg name="username" value="${test.hybrid.username}" />

@@ -33,6 +33,7 @@ public class ShareTestProperty
 {
     private static final Log logger = LogFactory.getLog(ShareTestProperty.class);
     private String shareUrl; // Not final to allow test AbstractUtilsTest to set this
+    private String jmxShareUrl;
     private final String apiUrl;
     private final String cloudUrlForHybrid;
     private final String pentahoUserConsoleUrl;
@@ -88,7 +89,7 @@ public class ShareTestProperty
     private String keystorePath;
     private String truststorePath;
 
-    public ShareTestProperty(final String shareUrl, final String apiUrl, final String gridUrl, final String username, final String password, String alfrescoVersion,
+    public ShareTestProperty(final String shareUrl, String jmxShareUrl, final String apiUrl, final String gridUrl, final String username, final String password, String alfrescoVersion,
             String cloudUrlForHybrid, final String pentahoUserConsoleUrl, final String downloadDirectory, final String googleUserName, final String googlePassword,
             final String serviceAccountEmail, final String serviceAccountPKCS12FileName, final String googleDriveUserName, final String googleDrivePassword,
             final String serviceDriveAccountEmail, final String serviceDriveAccountPKCS12FileName, final boolean hybridEnabled,
@@ -99,6 +100,7 @@ public class ShareTestProperty
             final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath)
     {
         this.shareUrl = shareUrl;
+        this.jmxShareUrl = jmxShareUrl;
         this.apiUrl = apiUrl;
         this.cloudUrlForHybrid = cloudUrlForHybrid;
         this.gridUrl = gridUrl;
@@ -167,6 +169,11 @@ public class ShareTestProperty
     public String getShareUrl()
     {
         return shareUrl;
+    }
+
+    public String getJmxShareUrl()
+    {
+        return jmxShareUrl;
     }
 
     public String getPentahoUserConsoleUrl()
@@ -407,6 +414,11 @@ public class ShareTestProperty
     public void setShareUrl(String shareUrl)
     {
         this.shareUrl = shareUrl;
+    }
+
+    public void setJmxShareUrl(String jmxShareUrl)
+    {
+        this.jmxShareUrl = jmxShareUrl;
     }
 
     /**
