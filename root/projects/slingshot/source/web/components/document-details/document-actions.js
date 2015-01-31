@@ -311,6 +311,15 @@
                text: this.msg("message.edit-cancel.success", displayName)
             });
          }
+		 
+         if (window.location.hash == "#unlockDocument")
+         {
+            window.location.hash = "";
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.unlock-document.success", displayName)
+            });
+         }
 	 
          if (window.location.hash == "#newVersionUpload")
          {
@@ -405,6 +414,59 @@
             {
                method: Alfresco.util.Ajax.POST,
                name: "cancel-checkout/node/{nodeRef}",
+               params:
+               {
+                  nodeRef: nodeRef.uri
+               }
+            }
+         });
+
+         YAHOO.Bubbling.fire("editingCanceled",
+         {
+            record: asset
+         });
+      },
+	  
+      /**
+       * Unlock document.
+       *
+       * @override
+       * @method onActionCancelEditing
+       * @param asset {object} 
+       */
+      onActionUnlockDocument: function DocumentActions_onActionUnlockDocument(asset)
+      {
+         var displayName = asset.displayName,
+            nodeRef = new Alfresco.util.NodeRef(asset.nodeRef);
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               callback:
+               {
+                  fn: function DocumentActions_oACE_success(data)
+                  {
+                      var oldNodeRef = this.recordData.jsNode.nodeRef.nodeRef,
+                      newNodeRef = data.json.results[0].nodeRef;
+                      this.recordData.jsNode.setNodeRef(newNodeRef);
+                      window.location = this.getActionUrls(this.recordData).documentDetailsUrl + "#unlockDocument";
+                      if (oldNodeRef == newNodeRef)
+                      {
+                          window.location.reload();
+                      }
+                  },
+                  scope: this
+               }
+            },
+            failure:
+            {
+               message: this.msg("message.unlock-document.failure", displayName)
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               name: "unlock-document/node/{nodeRef}",
                params:
                {
                   nodeRef: nodeRef.uri

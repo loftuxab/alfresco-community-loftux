@@ -1548,6 +1548,42 @@
             record: record
          });
       },
+	  
+     /**
+       * Unlock document
+       *
+       * @method onActionUnlockDocument
+       * @param record {object} 
+       */
+      onActionUnlockDocument: function dlA_onActionUnlockDocument(record)
+      {
+         var displayName = record.displayName;
+
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               event:
+               {
+                  name: "metadataRefresh"
+               },
+               message: this.msg("message.unlock-document.success", displayName)
+            },
+            failure:
+            {
+               message: this.msg("message.unlock-document.failure", displayName)
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               name: "unlock-document/node/{nodeRef}",
+               params:
+               {
+                  nodeRef: record.jsNode.nodeRef.uri
+               }
+            }
+         });
+      },
 
       /**
        * Copy single document or folder.
