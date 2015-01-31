@@ -56,6 +56,7 @@ public abstract class AbstractEditProperties extends ShareDialogue
     protected static final By USER_NAME = By.cssSelector("input[id$='username']");
     protected static final By PASSWORD = By.cssSelector("input[id$='password']");
     protected static final By INPUT_SITE_CONFIGURATION_SELECTOR = By.cssSelector("textarea[id$='siteConfig']");
+    protected static final By INPUT_SITE_HOSTNAME_SELECTOR = By.cssSelector("input[id$='hostName']");
     
     protected static final By REDITION_CONFIG = By.cssSelector("textarea[id$='prop_ws_renditionConfig']");
 

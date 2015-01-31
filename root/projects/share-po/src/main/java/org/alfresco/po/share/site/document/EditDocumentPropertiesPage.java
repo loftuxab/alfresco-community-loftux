@@ -41,7 +41,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 {
     public enum Fields
     {
-        NAME, TITLE, DESCRIPTION, AUTHOR, PUBLISHER, CONTRIBUTOR, TYPE, IDENTIFIER, SOURCE, COVERAGE, RIGHTS, SUBJECT, SITE_CONFIGURATION;
+        NAME, TITLE, DESCRIPTION, AUTHOR, PUBLISHER, CONTRIBUTOR, TYPE, IDENTIFIER, SOURCE, COVERAGE, RIGHTS, SUBJECT, SITE_CONFIGURATION, HOSTNAME
     }
 
     private final String tagName;
@@ -645,8 +645,8 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     /**
      * Option for folder.
      * Enters a value in the rendition configuration. Option enabled if WQS is installed.
-     * 
-     * @param subject
+     *
+     * @param rendConfig
      */
     public void setRenditionConfig(String rendConfig)
     {
@@ -678,5 +678,23 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     public String getSiteConfiguration()
     {
         return drone.find(INPUT_SITE_CONFIGURATION_SELECTOR).getText();
+    }
+
+    /**
+     * Enters a value in to the properties form.
+     *
+     * @param Hostname
+     */
+    public void setSiteHostname(String Hostname)
+    {
+        setInput(drone.find(INPUT_SITE_HOSTNAME_SELECTOR), Hostname);
+    }
+
+    /**
+     * Get text seen on the Site Configuration textarea.
+     */
+    public String getSiteHostname()
+    {
+        return drone.find(INPUT_SITE_HOSTNAME_SELECTOR).getText();
     }
 }
