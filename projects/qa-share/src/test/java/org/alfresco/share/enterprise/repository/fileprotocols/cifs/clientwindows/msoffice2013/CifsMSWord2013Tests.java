@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 
@@ -26,6 +27,7 @@ import org.alfresco.windows.application.MicrosoftOffice2013;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -65,32 +67,28 @@ public class CifsMSWord2013Tests extends AbstractUtils
     String cifsPath;
 
     @BeforeClass(alwaysRun = true)
-    public void createUser() throws Exception{
+    public void createUser() throws Exception
+    {
         super.setup();
-        
+
         testName = this.getClass().getSimpleName();
-        testUser = getUserNameFreeDomain(testName)+1;
+        testUser = getUserNameFreeDomain(testName) + 1;
         cifsPath = word.getCIFSPath();
         networkDrive = word.getMapDriver();
         networkPath = word.getMapPath();
-        
 
-        // create user
-        String[] testUser1 = new String[] { testUser };
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
+        try
+        {
+            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        }
+        catch (Exception e)
+        {
 
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-        
+            // create user
+            String[] testUser1 = new String[] { testUser };
+            CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
+        }
 
-        
-        super.tearDown();
-    }
-    
-
-    @BeforeMethod(alwaysRun = true)
-    public void beforeMethod() throws Exception{
-        super.setup();         
-        
         // word files
         docFileName_6283 = "AONE-6283";
         docFileName_6284 = "AONE-6284";
@@ -99,32 +97,61 @@ public class CifsMSWord2013Tests extends AbstractUtils
         docxFileName_6287 = "AONE-6287";
         docxFileName_6288 = "AONE-6288";
 
-        mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
 
         Runtime.getRuntime().exec(mapConnect);
-        logger.info("----------Mapping succesfull " + testUser);
+        if (checkDirOrFileExists(7, 200, networkDrive + cifsPath))
+        {
+            logger.info("----------Mapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("----------Mapping was not done " + testUser);
+        }
+
+        super.tearDown();
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod() throws Exception
+    {
+        super.setup();
 
     }
-    
+
     @AfterMethod(alwaysRun = true)
     public void teardownMethod() throws Exception
     {
-        super.tearDown();
 
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM WINWORD.EXE");
-        
 
-        Runtime.getRuntime().exec("net use * /d /y");
-        logger.info("--------Unmapping succesfull " + testUser);
+        super.tearDown();
+
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDownClass() throws IOException
+    {
+
+        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
+
+        if (checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
+        {
+            logger.info("--------Unmapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("--------Unmapping was not done correctly " + testUser);
+        }
 
     }
 
     @Test(groups = { "DataPrepWord" })
     public void dataPrep_6285() throws Exception
     {
-        
-        testName = getTestName()+"t2";
+
+        testName = getTestName();
         siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -145,8 +172,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "DataPrepWord" })
     public void dataPrep_6286() throws Exception
     {
-        
-        testName = getTestName()+"t2";
+
+        testName = getTestName();
         siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -167,8 +194,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "DataPrepWord" })
     public void dataPrep_6287() throws Exception
     {
-        
-        String testName = getTestName()+"t2";
+
+        String testName = getTestName();
         String siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -189,8 +216,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "DataPrepWord" })
     public void dataPrep_6288() throws Exception
     {
-        
-        String testName = getTestName()+"t2";
+
+        String testName = getTestName();
         String siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -211,8 +238,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "DataPrepWord" })
     public void dataPrep_6283() throws Exception
     {
-        
-        String testName = getTestName()+"t2";
+
+        String testName = getTestName();
         String siteName = getSiteName(testName);
 
         // Login
@@ -240,7 +267,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6283() throws IOException
     {
-        String testName = getTestName()+"t2";
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String first_modification = testName + "1";
         String second_modification = testName + "2";
@@ -252,9 +279,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // ---- Step Action -----
         // Open .docx document for editing.
         // The document is opened in write mode.
-        Ldtp ldtp = word.openFileFromCMD(fullPath, docFileName_6283 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        Ldtp ldtp = word.openFileFromCMD(fullPath, docFileName_6283 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docFileName_6283);
-        
+
         // ---- Step 2 ----
         // ---- Step Action -----
         // Add any data.
@@ -270,11 +297,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // tmp files are left.
         word.saveOffice(ldtp);
         ldtp.waitTime(3);
-        word.exitOfficeApplication(ldtp,docFileName_6283);
+        word.exitOfficeApplication(ldtp, docFileName_6283);
         ldtp.waitTime(2);
-        int nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // ---- Step 4 ----
         // ---- Step Action -----
         // Verify the document's metadata and version history in the Share.
@@ -303,7 +328,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // 6. Open the document for editing again.
         // Expected Result
         // 6. The document is opened in write mode.
-        ldtp = word.openFileFromCMD(fullPath, docFileName_6283 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = word.openFileFromCMD(fullPath, docFileName_6283 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docFileName_6283);
         // ---- Step 7 ----
         // ---- Step Action -----
@@ -319,10 +344,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // All changes are present and displayed correctly
         word.saveOffice(ldtp);
         ldtp.waitTime(3);
-        word.exitOfficeApplication(ldtp,docFileName_6283);
+        word.exitOfficeApplication(ldtp, docFileName_6283);
         ldtp.waitTime(2);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 9 ----
         // ---- Step Action -----
@@ -351,7 +375,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // 6. Open the document for editing again.
         // Expected Result
         // 6. The document is opened in write mode.
-        ldtp = word.openFileFromCMD(fullPath, docFileName_6283 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = word.openFileFromCMD(fullPath, docFileName_6283 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docFileName_6283);
         // ---- Step 12 ----
         // ---- Step Action -----
@@ -367,10 +391,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // All changes are present and displayed correctly
         word.saveOffice(ldtp);
         ldtp.waitTime(3);
-        word.exitOfficeApplication(ldtp,docFileName_6283);
+        word.exitOfficeApplication(ldtp, docFileName_6283);
         ldtp.waitTime(2);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 14 ----
         // ---- Step Action -----
@@ -400,7 +423,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
     public void dataPrep_6284() throws Exception
     {
 
-        String testName = getTestName()+"t2";
+        String testName = getTestName();
         String siteName = getSiteName(testName);
 
         // Login
@@ -428,7 +451,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6284() throws IOException, AWTException
     {
-        String testName = getTestName()+"t2";
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String first_modification = testName + "1";
         String second_modification = testName + "2";
@@ -440,7 +463,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // ---- Step Action -----
         // Open .docx document for editing.
         // The document is opened in write mode.
-        Ldtp ldtp = word.openFileFromCMD(fullPath, docFileName_6284 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        Ldtp ldtp = word.openFileFromCMD(fullPath, docFileName_6284 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docFileName_6284);
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -459,11 +482,10 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(ldtp);
         ldtp.waitTime(3);
-        word.exitOfficeApplication(ldtp,docFileName_6284);
+        word.exitOfficeApplication(ldtp, docFileName_6284);
         ldtp.waitTime(2);
 
-        int nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -493,7 +515,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // 6. Open the document for editing again.
         // Expected Result
         // 6. The document is opened in write mode.
-        ldtp = word.openFileFromCMD(fullPath, docFileName_6284 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = word.openFileFromCMD(fullPath, docFileName_6284 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docFileName_6284);
         // ---- Step 7 ----
         // ---- Step Action -----
@@ -510,11 +532,10 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // All changes are present and displayed correctly
         word.saveOffice(ldtp);
         ldtp.waitTime(3);
-        word.exitOfficeApplication(ldtp,docFileName_6284);
+        word.exitOfficeApplication(ldtp, docFileName_6284);
         ldtp.waitTime(2);
 
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 9 ----
         // ---- Step Action -----
@@ -543,7 +564,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // 6. Open the document for editing again.
         // Expected Result
         // 6. The document is opened in write mode.
-        ldtp = word.openFileFromCMD(fullPath, docFileName_6284 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = word.openFileFromCMD(fullPath, docFileName_6284 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docFileName_6284);
         // ---- Step 12 ----
         // ---- Step Action -----
@@ -560,11 +581,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // All changes are present and displayed correctly
         word.saveOffice(ldtp);
         ldtp.waitTime(3);
-        word.exitOfficeApplication(ldtp,docFileName_6284);
-        sleep();
-
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        word.exitOfficeApplication(ldtp, docFileName_6284);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 14 ----
         // ---- Step Action -----
@@ -594,7 +612,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6287() throws Exception
     {
-        String testName = getTestName()+"t2";
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String edit2 = "New text2";
         String edit3 = "New text3";
@@ -610,7 +628,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // --- Expected results --
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
-        
+
         int noOfFilesBeforeSave = 0;
         l1 = word.openFileFromCMD(localPath, docxFileName_6287 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docxFileName_6287);
@@ -619,12 +637,10 @@ public class CifsMSWord2013Tests extends AbstractUtils
         word.saveAsOffice(l1, fullPath + docxFileName_6287);
         word.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         word.getAbstractUtil().waitForWindow(docxFileName_6287);
-        word.exitOfficeApplication(l1,docxFileName_6287);
+        word.exitOfficeApplication(l1, docxFileName_6287);
         l1.waitTime(2);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -671,7 +687,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = word.openFileFromCMD(fullPath, docxFileName_6287 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = word.openFileFromCMD(fullPath, docxFileName_6287 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6287);
         String actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(docxFileName_6287), "Microsoft Excel - " + docxFileName_6287 + " window is not active.");
@@ -691,10 +707,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(3);
-        word.exitOfficeApplication(l1,docxFileName_6287);
+        word.exitOfficeApplication(l1, docxFileName_6287);
         l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 7 ---
         // --- Step action ---
@@ -725,7 +740,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = word.openFileFromCMD(fullPath, docxFileName_6287 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = word.openFileFromCMD(fullPath, docxFileName_6287 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6287);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(docxFileName_6287), "Microsoft Excel - " + docxFileName_6287 + " window is not active.");
@@ -746,10 +761,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6287);
         word.saveOffice(l1);
         l1.waitTime(3);
-        word.exitOfficeApplication(l1,docxFileName_6287);
+        word.exitOfficeApplication(l1, docxFileName_6287);
         l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 12 ---
         // --- Step action ---
@@ -780,7 +794,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6288() throws Exception
     {
-        String testName = getTestName()+"t2";
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String edit2 = "New text2";
         String edit3 = "New text3";
@@ -796,20 +810,19 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // --- Expected results --
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
-        
+
         int noOfFilesBeforeSave = 0;
         l1 = word.openFileFromCMD(localPath, docxFileName_6288 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docxFileName_6288);
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6288);
-        
-        word.saveAsOffice(l1, fullPath + docxFileName_6287);
-        word.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
-        word.getAbstractUtil().waitForWindow(docxFileName_6287);
-        word.exitOfficeApplication(l1,docxFileName_6287);
-        l1.waitTime(2);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        word.saveAsOffice(l1, fullPath + docxFileName_6288);
+        word.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
+        word.getAbstractUtil().waitForWindow(docxFileName_6288);
+        word.exitOfficeApplication(l1, docxFileName_6288);
+        l1.waitTillGuiNotExist(docxFileName_6288, 3);
+
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -856,7 +869,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = word.openFileFromCMD(fullPath, docxFileName_6288 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = word.openFileFromCMD(fullPath, docxFileName_6288 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6288);
         String actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(docxFileName_6288), "Microsoft Excel - " + docxFileName_6288 + " window is active.");
@@ -877,10 +890,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(3);
-        word.exitOfficeApplication(l1,docxFileName_6288);
-        sleep();
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave+1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+        word.exitOfficeApplication(l1, docxFileName_6288);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 7 ---
         // --- Step action ---
@@ -911,7 +922,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = word.openFileFromCMD(fullPath, docxFileName_6288 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = word.openFileFromCMD(fullPath, docxFileName_6288 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6288);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(docxFileName_6288), "Microsoft Excel - " + docxFileName_6288 + " window is active.");
@@ -933,11 +944,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6288);
         word.saveOffice(l1);
         l1.waitTime(3);
-        word.exitOfficeApplication(l1,docxFileName_6288);
-        sleep();
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        word.exitOfficeApplication(l1, docxFileName_6288);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -967,7 +975,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6285() throws Exception
     {
-        String testName = getTestName()+"t2";
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String addText = "First text";
         String edit1 = "New text1";
@@ -989,7 +997,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         word.saveAsOffice(l1, fullPath + docxFileName_6285);
         word.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         word.getAbstractUtil().waitForWindow(docxFileName_6285);
-        word.exitOfficeApplication(l1,docxFileName_6285);
+        word.exitOfficeApplication(l1, docxFileName_6285);
         l1.waitTime(2);
 
         // ---- Step 2 ----
@@ -997,7 +1005,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = word.openFileFromCMD(fullPath, docxFileName_6285 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = word.openFileFromCMD(fullPath, docxFileName_6285 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docxFileName_6285);
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6285);
 
@@ -1016,10 +1024,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(3);
-        word.exitOfficeApplication(l1,docxFileName_6285);
+        word.exitOfficeApplication(l1, docxFileName_6285);
         l1.waitTime(2);
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -1068,7 +1075,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = word.openFileFromCMD(fullPath, docxFileName_6285 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = word.openFileFromCMD(fullPath, docxFileName_6285 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docxFileName_6285);
         // ---- Step 8 ----
         // ---- Step Action -----
@@ -1085,10 +1092,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(3);
-        word.exitOfficeApplication(l1,docxFileName_6285);
+        word.exitOfficeApplication(l1, docxFileName_6285);
         l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -1121,7 +1127,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = word.openFileFromCMD(fullPath, docxFileName_6285 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = word.openFileFromCMD(fullPath, docxFileName_6285 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docxFileName_6285);
         // ---- Step 13 ----
         // ---- Step Action -----
@@ -1138,10 +1144,9 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(3);
-        word.exitOfficeApplication(l1,docxFileName_6285);
+        word.exitOfficeApplication(l1, docxFileName_6285);
         l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -1175,7 +1180,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6286() throws Exception
     {
-        String testName = getTestName()+"t2";
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String addText = "First text";
         String edit1 = "New text1";
@@ -1198,7 +1203,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         word.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         word.getAbstractUtil().waitForWindow(docxFileName_6286);
         l2 = word.getAbstractUtil().setOnWindow(docxFileName_6286);
-        word.exitOfficeApplication(l2,docxFileName_6286);
+        word.exitOfficeApplication(l2, docxFileName_6286);
         l2.waitTime(2);
 
         // ---- Step 2 ----
@@ -1206,7 +1211,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l2 = word.openFileFromCMD(fullPath, docxFileName_6286 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l2 = word.openFileFromCMD(fullPath, docxFileName_6286 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docxFileName_6286);
         l2 = word.getAbstractUtil().setOnWindow(docxFileName_6286);
 
@@ -1226,10 +1231,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l2);
         l2.waitTime(3);
-        word.exitOfficeApplication(l2,docxFileName_6286);
-        sleep();
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        word.exitOfficeApplication(l2, docxFileName_6286);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -1277,7 +1280,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l2 = word.openFileFromCMD(fullPath, docxFileName_6286 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l2 = word.openFileFromCMD(fullPath, docxFileName_6286 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docxFileName_6286);
         // ---- Step 8 ----
         // ---- Step Action -----
@@ -1295,10 +1298,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l2);
         l2.waitTime(3);
-        word.exitOfficeApplication(l2,docxFileName_6286);
-        sleep();
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        word.exitOfficeApplication(l2, docxFileName_6286);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -1331,7 +1332,7 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l2 = word.openFileFromCMD(fullPath, docxFileName_6286 + docxFileType, testUser, DEFAULT_PASSWORD, true);
+        l2 = word.openFileFromCMD(fullPath, docxFileName_6286 + docxFileType, testUser, DEFAULT_PASSWORD, false);
         word.getAbstractUtil().waitForWindow(docxFileName_6286);
         // ---- Step 13 ----
         // ---- Step Action -----
@@ -1349,10 +1350,8 @@ public class CifsMSWord2013Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l2);
         l2.waitTime(3);
-        word.exitOfficeApplication(l2,docxFileName_6286);
-        sleep();
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        word.exitOfficeApplication(l2, docxFileName_6286);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, docxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -1382,15 +1381,6 @@ public class CifsMSWord2013Tests extends AbstractUtils
 
     }
 
-    private int getNumberOfFilesFromPath(String path)
-    {
-        int noOfFiles = 0;
-        File folder = new File(path);
-        noOfFiles = folder.listFiles().length;
-
-        return noOfFiles;
-    }
-
     private void uploadImageInOffice(String image) throws AWTException
     {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -1405,16 +1395,101 @@ public class CifsMSWord2013Tests extends AbstractUtils
         r.keyRelease(KeyEvent.VK_V);
     }
 
-    private void sleep()
+    private Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
     {
-        try
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
         {
-            Thread.sleep(3000);
+            File test = new File(path);
+            if (test.exists())
+            {
+                existence = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+            }
         }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
+        return existence;
     }
 
+    private Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
+    {
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+
+            }
+            else
+            {
+                existence = true;
+                break;
+            }
+        }
+        return existence;
+    }
+
+    private Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
+    {
+        long counter = 0;
+        boolean check = false;
+        boolean existence = true;
+        while (counter < TimeUnit.SECONDS.toMillis(timeout))
+        {
+            File test = new File(path);
+            for (File element : test.listFiles())
+            {
+                if (element.isHidden() && element.getName().contains(extension))
+                {
+                    existence = false;
+                    break;
+                }
+            }
+            if (existence)
+            {
+                check = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + 200;
+                existence = true;
+            }
+        }
+        return check;
+    }
 }
