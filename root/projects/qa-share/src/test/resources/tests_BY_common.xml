@@ -2,7 +2,7 @@
 <suite name="Common tests for Sprint BY" preserve-order="true">
 <test name="Common tests" parallel="classes" thread-count="5">
 <classes>
-    <class name="org.alfresco.share.user.trashcan.TrashcanTest2">
+    <!--class name="org.alfresco.share.user.trashcan.TrashcanTest2">
         <methods>
             <include name="AONE_14180"/>
             <include name="AONE_14181"/>
@@ -197,7 +197,7 @@
 <include name="AONE_14815"/>
 <exclude name=".*"/>
 </methods>
-</class>
+</class-->
     <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest">
         <methods>
             <include name="AONE_14818"/>
@@ -213,7 +213,7 @@
             <exclude name=".*"/>
         </methods>
     </class>
-<class name="org.alfresco.share.dashlet.SiteDashboardMyDiscussionTests">
+<!--class name="org.alfresco.share.dashlet.SiteDashboardMyDiscussionTests">
 <methods>
 <include name="AONE_14766"/>
 <include name="AONE_14755"/>
@@ -428,7 +428,7 @@
             <exclude name=".*"/>
         </methods>
     </class>
-    <!--<class name="org.alfresco.share.user.trashcan.TrashcanTest3">
+    <<class name="org.alfresco.share.user.trashcan.TrashcanTest3">
         <methods>
             <include name="AONE_14183"/>
             <include name="AONE_14187"/>
