@@ -837,7 +837,7 @@ public abstract class CMISActionValuesTest extends CmisUtils
     private void deleteUser(String userName)
     {
         CmisSession cmisSession = getCmisSession(binding, userName, DOMAIN);
-        List<CMISNode> results = cmisSession.query("SELECT * FROM cm:person where cm:userName = '" + deletableTestUser + "'", 
+        List<CMISNode> results = cmisSession.query("SELECT * FROM cm:person where cm:userName = '" + deletableTestUser.toLowerCase() + "'",
                 false, 0, Integer.MAX_VALUE);
         CMISNode node = results.get(0);
         String objectId = String.valueOf(node.getProperty("cmis:objectId"));

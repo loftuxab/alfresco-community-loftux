@@ -14,7 +14,7 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <test name="TrashcanTest3 tests Suite">
+    <!--<test name="TrashcanTest3 tests Suite">
         <classes>
             <class name="org.alfresco.share.user.trashcan.TrashcanTest3"/>
         </classes>
@@ -22,6 +22,11 @@
     <test name="RepositoryWebDavTests">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryWebDavTests"/>
+        </classes>
+    </test>-->
+    <test name="RepositoryCifsTests">
+        <classes>
+            <class name="org.alfresco.share.repository.RepositoryCifsTests"/>
         </classes>
     </test>
 </suite>

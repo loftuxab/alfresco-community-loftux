@@ -760,7 +760,7 @@ public class RepositoryWebDavTests extends AbstractUtils
                 + " folder");
 
         // Verify the possibility to upload new content by WebDav;
-        assertTrue(WebDavUtil.uploadContent(shareUrl, testUser2, DEFAULT_PASSWORD, newFile, remotePathToFolder + "/"), "Can't upload " + newFile + " content");
+        assertTrue(WebDavUtil.uploadContent(shareUrl, testUser2, DEFAULT_PASSWORD, newFile, remotePathToFolder + "/"), "Can't upload " + fileNewName + " content");
 
         // Verify the possibility to delete a folder by WebDav;
         assertFalse(WebDavUtil.deleteItem(shareUrl, testUser2, DEFAULT_PASSWORD, folderName, remotePath), "Can delete " + folderName + " folder");
@@ -849,7 +849,7 @@ public class RepositoryWebDavTests extends AbstractUtils
                 + " folder");
 
         // Verify the possibility to upload new content by WebDav;
-        assertFalse(WebDavUtil.uploadContent(shareUrl, testUser2, DEFAULT_PASSWORD, newFile, remotePathToFolder + "/"), "Can upload " + newFile + " content");
+        assertFalse(WebDavUtil.uploadContent(shareUrl, testUser2, DEFAULT_PASSWORD, newFile, remotePathToFolder + "/"), "Can upload " + fileNewName + " content");
 
         // Verify the possibility to delete a folder by WebDav;
         assertFalse(WebDavUtil.deleteItem(shareUrl, testUser2, DEFAULT_PASSWORD, folderName, remotePath), "Can delete " + folderName + " folder");
