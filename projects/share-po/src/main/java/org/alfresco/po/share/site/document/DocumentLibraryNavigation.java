@@ -888,6 +888,23 @@ public class DocumentLibraryNavigation extends SharePage
         }
     }
 
+    public void clickSelectedItemsButton(){
+        clickSelectedItems();
+    }
+
+    public Boolean isDeleteActionForIncompleteWorkflowDocumentPresent()
+    {
+        try
+        {
+            boolean isDeleteAction = drone.find(DELETE).isDisplayed();
+            return isDeleteAction;
+        }
+        catch(NoSuchElementException ex)
+        {
+            return false;
+        }
+    }
+
     /**
      * Click on copy to item of selected items drop down.
      * 
