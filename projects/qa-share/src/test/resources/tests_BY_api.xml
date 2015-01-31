@@ -15,33 +15,6 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <test name="Public API test">
-        <classes>
-
-            <!--class name="org.alfresco.share.api.SitesAPITests">
-                <methods>
-                    <include name="AONE_14259"/>
-                    <exclude name=".*"/>
-                </methods>
-            </class-->
-
-            <class name="org.alfresco.share.api.ProcessesAPITests">
-                <methods>
-                    <include name="AONE_14394"/>
-                    <include name="AONE_14379"/>
-                    <exclude name=".*"/>
-                </methods>
-            </class>
-
-            <class name="org.alfresco.share.api.CommentsAPITests">
-                <methods>
-                    <include name="AONE_14233"/>
-                    <include name="AONE_14222"/>
-                    <exclude name=".*"/>
-                </methods>
-            </class>
-        </classes>
-    </test>
 
     <test name="CommentsAPITests2">
         <classes>
