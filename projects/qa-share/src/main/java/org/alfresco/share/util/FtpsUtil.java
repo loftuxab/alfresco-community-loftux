@@ -85,8 +85,7 @@ public class FtpsUtil extends AbstractUtils
         {
             throw new ShareException("Exception occurred when generation keystore");
         }
-        File keyStoreFile = new File(pathToKeyStoreFile + SLASH + KEYSTORENAME);
-        FTPSClient ftpsClient = new FTPSClient();
+
         return new File(pathToKeyStoreFile + SLASH + KEYSTORENAME);
     }
 

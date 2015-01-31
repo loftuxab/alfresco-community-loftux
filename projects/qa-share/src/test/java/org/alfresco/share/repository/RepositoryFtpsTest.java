@@ -52,7 +52,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
         logger.info("Starting Tests: " + testName);
         FtpsUtil.setCustomFtpPort(drone, ftpPort);
-        if(!(keystorePath == null))
+        if(!keystorePath.isEmpty())
         {
             FtpsUtil.enableFtps(keystorePath, truststorePath);
         }
@@ -77,11 +77,11 @@ public class RepositoryFtpsTest extends FtpsUtil
 
         //generating keystore and truststore
         //when alfresco is running on remote host - files must be pre-generated
-        if(!(keystorePath == null) & !(truststorePath == null))
+        if(!keystorePath.isEmpty() & !truststorePath.isEmpty())
         {
             FtpsUtil.enableFtps(keystorePath, truststorePath);
         }
-        else if (!(keystorePath == null) & truststorePath == null)
+        else if (!keystorePath.isEmpty() & truststorePath.isEmpty())
         {
             throw new ShareException("Please, specify truststorePath in the properties file.");
         }
@@ -116,7 +116,7 @@ public class RepositoryFtpsTest extends FtpsUtil
 
         //generating keystore only
         //when alfresco is running on remote host - file must be pre-generated
-        if(!(keystorePath == null))
+        if(!truststorePath.isEmpty())
         {
             FtpsUtil.enableFtps(keystorePath, null);
         }
@@ -173,7 +173,7 @@ public class RepositoryFtpsTest extends FtpsUtil
     {
         //generating keystore only
         //when alfresco is running on remote host - file must be pre-generated
-        if(!(keystorePath == null))
+        if(!truststorePath.isEmpty())
         {
             FtpsUtil.enableFtps(keystorePath, null);
         }
