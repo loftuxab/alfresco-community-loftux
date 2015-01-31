@@ -999,5 +999,43 @@ public class FtpUtil extends AbstractUtils
         executorService.shutdown();
     }
 
+    /**
+     * Method to get file size
+     *
+     * @param shareUrl
+     * @param user
+     * @param password
+     * @param ftppath
+     * @param filename
+     * @return long type
+     */
+    public static long getContentSize(String shareUrl, String user, String password, String ftppath, String filename)
+    {
+
+        long size = 0;
+        FTPClient ftpClient;
+        try
+
+        {
+            ftpClient = connectServer(shareUrl, user, password);
+
+            ftpClient.changeWorkingDirectory(ftppath);
+            for (FTPFile file : ftpClient.listFiles())
+            {
+                if (file.isFile() || file.getName().equals(filename))
+                {
+                    size = file.getSize();
+                }
+
+            }
+            logger.info("File size = " + size / (1024 * 1024) + "mb");
+
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return size;
+    }
 
 }
