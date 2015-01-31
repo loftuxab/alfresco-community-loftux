@@ -119,30 +119,6 @@ public class WcmqsHomePage extends WcmqsAbstractPage
         }
 
         /**
-         * Method to navigate to news folders
-         *
-         * @param folderName - the Name of the folder from SHARE
-         * @return WcmqsNewsPage
-         */
-        public WcmqsNewsPage openNewsPageFolder(String folderName)
-        {
-                try
-                {
-                        WebElement news = drone.findAndWait(NEWS_MENU);
-                        drone.mouseOver(news);
-
-                        drone.findAndWait(By.cssSelector(String.format("a[href$='/wcmqs/news/%s/']", folderName))).click();
-
-                }
-                catch (TimeoutException e)
-                {
-                        throw new PageOperationException("Exceeded time to find news links. " + e.toString());
-                }
-
-                return new WcmqsNewsPage(drone);
-        }
-
-        /**
          * Method to get all the folders for a selected Primary folder (eg: News, Publications, Blog)
          *
          * @return List<ShareLink>
