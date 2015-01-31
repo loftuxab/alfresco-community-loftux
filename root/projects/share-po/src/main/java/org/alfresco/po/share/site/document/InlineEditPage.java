@@ -16,11 +16,14 @@ package org.alfresco.po.share.site.document;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
+import org.alfresco.po.share.dashlet.AdvancedTinyMceEditor;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -35,10 +38,14 @@ public class InlineEditPage extends SitePage
     protected static final By TITLE = By.cssSelector("input[id$='default_prop_cm_title']");
     protected static final By DESCRIPTION = By.cssSelector("textarea[id$='default_prop_cm_description']");
     protected static final By SUBMIT_BUTTON = By.cssSelector("button[id$='form-submit-button']");
+    protected static final String CONTENT_IFRAME="template_x002e_inline-edit_x002e_inline-edit_x0023_default_prop_cm_content_ifr";
+    
+    private final AdvancedTinyMceEditor contentTinyMceEditor;
 
     public InlineEditPage(WebDrone drone)
     {
         super(drone);
+        contentTinyMceEditor=new AdvancedTinyMceEditor(drone);
     }
 
     @SuppressWarnings("unchecked")
@@ -108,5 +115,34 @@ public class InlineEditPage extends SitePage
     public void setTitle(final String name)
     {
         setInput(drone.findAndWait(TITLE), name);
+    }
+    
+    /**
+     * Get TinyMCEEditor object to navigate TinyMCE functions.
+     * 
+     * @return
+     */
+    public AdvancedTinyMceEditor getContentTinyMCEEditor()
+    {
+        contentTinyMceEditor.setTinyMce(CONTENT_IFRAME);
+        return contentTinyMceEditor;
+    }
+    
+    /**
+     * Method for inserting text into the Reply form
+     * 
+     * @param txtLines
+     */
+    public void insertTextInContent(String txtLines)
+    {
+        try
+        {
+            contentTinyMceEditor.setTinyMce(CONTENT_IFRAME);
+            contentTinyMceEditor.addContent(txtLines);
+        }
+        catch (TimeoutException toe)
+        {
+            throw new PageException("Time out finding #tinymce content", toe);
+        }
     }
 }
