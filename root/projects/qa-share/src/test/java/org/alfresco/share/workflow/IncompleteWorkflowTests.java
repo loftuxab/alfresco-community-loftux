@@ -12,7 +12,6 @@ import org.alfresco.po.share.workflow.KeepContentStrategy;
 import org.alfresco.po.share.workflow.Priority;
 import org.alfresco.po.share.workflow.TaskType;
 import org.alfresco.po.share.workflow.WorkFlowFormDetails;
-import org.alfresco.share.enterprise.repository.fileprotocols.cifs.CifsMSOffice2010Tests;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.AbstractWorkflow;
 import org.alfresco.share.util.ShareUser;
@@ -31,8 +30,8 @@ import org.testng.annotations.Test;
 public class IncompleteWorkflowTests extends AbstractWorkflow
 {
     private String testDomain;
-    private String incompleteWorkflow = "incomplete_workflow22";
-    private static Log logger = LogFactory.getLog(CifsMSOffice2010Tests.class);
+    private String incompleteWorkflow = "incomplete_workflow";
+    private static Log logger = LogFactory.getLog(IncompleteWorkflowTests.class);
 
     @Override
     @BeforeClass(alwaysRun = true)
