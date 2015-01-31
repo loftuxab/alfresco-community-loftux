@@ -1281,8 +1281,17 @@ public class SitesAPITests extends SitesAPI
         // The site contains 6 containers
         LinksPage linksPage = siteDashPage.getSiteNav().selectLinksPage().render();
         linksPage.createLink(testName, testName);
-        NewListForm newListForm = (NewListForm)siteDashPage.getSiteNav().selectDataListPage().render();
-        DataListPage dataListPage = newListForm.clickCancel();
+        DataListPage dataListPage;
+        try
+        {
+            NewListForm newListForm = (NewListForm)siteDashPage.getSiteNav().selectDataListPage().render();
+            dataListPage = newListForm.clickCancel();
+        }
+        catch (ClassCastException e)
+        {
+            dataListPage = (DataListPage)siteDashPage.getSiteNav().selectDataListPage().render();
+        }
+
         dataListPage.createDataList(DataLists.CONTACT_LIST, testName, testName);
         params.clear();
         params.put(SKIP_COUNT, "0");
