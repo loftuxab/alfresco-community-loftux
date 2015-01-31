@@ -21,15 +21,15 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 /**
- * Represents the repository admin page found on alfresco.
+ * Represents the repository admin console page found on alfresco.
  * @author Michael Suzuki
  * @since 5.0
  */
 public class RepositoryAdminConsolePage extends AbstractAdminConsole
 {
 
-    private final static By INPUT_FIELD = By.name("tenant-cmd"); 
-    private final static By SUBMIT_BUTTON = By.cssSelector("input.inline"); 
+    private final static By INPUT_FIELD = By.name("repo-cmd"); 
+    
     public RepositoryAdminConsolePage(WebDrone drone)
     {
         super(drone);

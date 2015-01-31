@@ -35,34 +35,33 @@ import org.testng.annotations.Test;
  * @author Michael Suzuki
  * @since 5.0
  */
-public class TenantAdminConsolePageTest extends AbstractTest
+public class RepositoryAdminConsolePageTest extends AbstractTest
 {
-    TenantAdminConsolePage page;
+    RepositoryAdminConsolePage page;
     @BeforeClass
     public void setup() throws Exception
     {
         loginAs(username, password).render();
-        page = ShareUtil.navigateToTenantAdminConsole(drone, username, password).render();
+        page = ShareUtil.navigateToRepositoryAdminConsole(drone, username, password).render();
     }
     @Test(groups = "Enterprise-only")
     public void create() throws Exception
     {
-        TenantAdminConsolePage tacp = new TenantAdminConsolePage(drone);
-        Assert.assertNotNull(tacp);
+        RepositoryAdminConsolePage p = new RepositoryAdminConsolePage(drone);
+        Assert.assertNotNull(p);
     }
     @Test(expectedExceptions = IllegalArgumentException.class, groups = "Enterprise-only")
     public void createWithNull() throws Exception
     {
-        new TenantAdminConsolePage(null);
+        new RepositoryAdminConsolePage(null);
     }
-    @Test(groups = "Enterprise-only")
-    public void createTenant() throws Exception
-    {
-        String tenantName = "mike" + System.currentTimeMillis();
-        page.createTenant(tenantName, "password").render();
-        String expected = String.format("created tenant: %s", tenantName);
-        String result = page.getResult();
-        Assert.assertEquals(result,expected);
-    }
+//    @Test(groups = "Enterprise-only")
+//    public void createTenant() throws Exception
+//    {
+//        String tenantName = "mike" + System.currentTimeMillis();
+//        String expected = String.format("created tenant: %s", tenantName);
+//        String result = page.getResult();
+//        Assert.assertEquals(result,expected);
+//    }
 
 }

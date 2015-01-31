@@ -18,6 +18,7 @@
  */
 package org.alfresco.po.share;
 
+import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
 import org.alfresco.po.alfresco.TenantAdminConsolePage;
 import org.alfresco.po.alfresco.WebScriptsPage;
 import org.alfresco.po.share.admin.AdminConsolePage;
@@ -370,6 +371,8 @@ public class FactorySharePageTest
             page = resolvePage("http://localhost:8080/alfresco/s/enterprise/admin/admin-tenantconsole", "admin-tenantconsole", drone);
             Assert.assertTrue(page instanceof TenantAdminConsolePage);
             
+            page = resolvePage("http://localhost:8080/alfresco/s/enterprise/admin/admin-repoconsole", "admin-repoconsole", drone);
+            Assert.assertTrue(page instanceof RepositoryAdminConsolePage);
 
             long duration = System.currentTimeMillis() - start;
             logger.info("Total duration of test in milliseconds: " + duration);
