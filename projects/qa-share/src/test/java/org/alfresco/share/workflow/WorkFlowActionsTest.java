@@ -2,6 +2,7 @@ package org.alfresco.share.workflow;
 
 import org.alfresco.share.util.AbstractWorkflow;
 import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
@@ -65,6 +66,50 @@ public class WorkFlowActionsTest extends AbstractWorkflow
     {
         super.setup();
         testName = this.getClass().getSimpleName();
+        testDomain = DOMAIN_HYBRID;
+
+        opUser = getUserNameForDomain(testName + "opUser", testDomain);
+        cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+
+        folderName = getFolderName(testName);
+        // fileName = getFileName(testName) + "" + ".txt";
+        cloudSite = getSiteName(testName + "CL03");
+        opSite = getSiteName(testName + "OP03");
+    }
+    
+    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods ="setup")
+    public void dataPrep_createUsers() throws Exception {
+
+            String opUser = getUserNameForDomain(testName + "opUser", testDomain);
+            String[] userInfo1 = new String[] { opUser };
+            String cloudUser = getUserNameForDomain(testName + "cloudUser",
+                            testDomain);
+            String[] cloudUserInfo1 = new String[] { cloudUser };
+
+//          String opSite = getSiteName(testName) + "OP";
+//          String cloudSite = getSiteName(testName) + "CL";
+
+            folderName = getFolderName(testName);
+            // fileName = getFileName(testName) + ".txt";
+
+            CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+            // Create User1 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME,
+                            cloudUserInfo1);
+            CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME,
+                            testDomain, "1000");
+
+            // Login to User1, set up the cloud sync
+            ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+            signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+            ShareUser.createSite(drone, opSite, SITE_VISIBILITY_PUBLIC);
+            ShareUser.logout(drone);
+
+            ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+            ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
+            ShareUserSitePage.createFolder(hybridDrone, folderName, folderName);
+            ShareUser.logout(hybridDrone);
     }
 
     public void dataPrep(String testName) throws Exception
