@@ -74,7 +74,7 @@ public class MSExcel2011Tests extends MS2011BaseTest
         xls9766TestFile = getTestDataFile(SHAREPOINT, "AONE-9766.xlsx");
 
         xls9767TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9767.xlsx");
-        xls9768TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9768.xlsx");
+        xls9768TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE9768crash.xlsx");
         xls9769TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9769.xlsx");
         xls9770TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9770.xlsx");
         xls9771TestFile = getDuplicatedFile(xlsMacOfficeFile, "AONE-9771.xlsx");
@@ -101,7 +101,6 @@ public class MSExcel2011Tests extends MS2011BaseTest
         testFiles.add(xls9776TestFile);
         testFiles.add(xls9777TestFile);
     }
-
 
     /**
      * Preconditions
@@ -529,17 +528,19 @@ public class MSExcel2011Tests extends MS2011BaseTest
     @Test(groups = "Enterprise4.2", description = "Edit document - Save the changes")
     public void AONE_9768() throws Exception
     {
+        String testFile = xls9768TestFile.getName();
         openDocumentLibraryForTest();
         // we need to know first the current version of the document
-        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9768TestFile.getName()).render();
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(testFile).render();
         String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
 
         openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
-
-        getMDC().search(xls9768TestFile.getName());
+        appExcel2011.openApplication();
+        
+        getMDC().search(testFile);
         getMDC().editFirstDocument();
         appExcel2011.addCredentials(testUser, DEFAULT_PASSWORD);
-        appExcel2011.waitForWindow(xls9768TestFile.getName());
+        appExcel2011.waitForWindow(testFile);
         appExcel2011.edit("edit with some data");
 
         // ---- Step 1 ----
@@ -556,7 +557,7 @@ public class MSExcel2011Tests extends MS2011BaseTest
         // The changes are applied. A new minor version is created. The document is still locked.
         documentLibraryPage.getDrone().refresh();
         documentLibraryPage.getDrone().refresh();
-        
+
         // check we have a new minor version
         String currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
         Assert.assertNotEquals(oldVersion, currentVersion, "A new major version is created.");
@@ -567,16 +568,18 @@ public class MSExcel2011Tests extends MS2011BaseTest
         // Close the document and the MS Excel app.
         // ---- Expected results ----
         // The document is closed.
+        appExcel2011.closeFile(testFile);
+        appExcel2011.waitUntilFileCloses(testFile);
+        Assert.assertFalse(appExcel2011.isFileOpened(testFile));
         appExcel2011.exitApplication();
-        Assert.assertFalse(appExcel2011.isFileOpened(xls9768TestFile.getName()));
-
+        
         // ---- Step 4 ----
         // ---- Step action ----
         // Verify the document library of the site in the Share.
         // ---- Expected results ----
         // The document is unlocked and was not changed. No new version were created.
         documentLibraryPage.getDrone().refresh();
-        
+
         // check we have a new minor version
         currentVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
         Assert.assertNotEquals(oldVersion, currentVersion, "No new version were created.");
