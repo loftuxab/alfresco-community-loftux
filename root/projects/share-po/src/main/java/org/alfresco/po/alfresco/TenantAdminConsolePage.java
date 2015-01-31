@@ -17,6 +17,7 @@ package org.alfresco.po.alfresco;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.WebDroneUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -30,7 +31,6 @@ public class TenantAdminConsolePage extends AbstractAdminConsole
 {
 
     private final static By INPUT_FIELD = By.name("tenant-cmd"); 
-    private final static By SUBMIT_BUTTON = By.cssSelector("input.inline"); 
     public TenantAdminConsolePage(WebDrone drone)
     {
         super(drone);
@@ -84,5 +84,19 @@ public class TenantAdminConsolePage extends AbstractAdminConsole
         input.sendKeys(String.format("create %s %s", tenantName, password));
         drone.find(SUBMIT_BUTTON).click();
         return this;
+    }
+    /**
+     * Method for sending string to command input field.
+     *
+     * @param command String to pass.
+     * @return
+     */
+    public void sendCommands(final String command)
+    {
+        WebDroneUtil.checkMandotaryParam("command input", command);
+        WebElement input = drone.find(INPUT_FIELD);
+        input.clear();
+        input.sendKeys(String.format("%s", command));
+        drone.find(SUBMIT_BUTTON).click();
     }
 }

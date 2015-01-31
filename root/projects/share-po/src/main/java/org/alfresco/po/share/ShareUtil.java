@@ -17,6 +17,7 @@ package org.alfresco.po.share;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.WebDroneUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +36,7 @@ public class ShareUtil
     private static final String BULK_IMPORT_IN_PLACE_PAGE = "alfresco/service/bulkfsimport/inplace";
     private static final String WEB_SCRIPTS_PAGE = "alfresco/service/index";
     private static final String TENANT_ADMIN_CONSOLE_PAGE = "alfresco/s/enterprise/admin/admin-tenantconsole";
+    private static final String REPO_ADMIN_CONSOLE_PAGE = "alfresco/s/enterprise/admin/admin-repoconsole";
 
     /**
      * A simple Enum to request the required Alfresco version.
@@ -185,7 +187,7 @@ public class ShareUtil
      * @param uname - This should always be unique. So the user of this method needs to verify it is unique. 
      *                eg. - "testUser" + System.currentTimeMillis();
      * @return
-     * @throws Exception
+     * @throws Exception if error
      */
     public static boolean createEnterpriseUser(final WebDrone drone, final String uname, final String url, final String... userInfo) throws Exception
     {
@@ -217,17 +219,53 @@ public class ShareUtil
         }
     }
 
-
+    /**
+     * Helper method to extract alfresco webscript url and direct webdrone to location. 
+     * @param drone
+     * @param userInfo
+     * @return
+     * @throws Exception
+     */
     public static HtmlPage navigateToWebScriptsHome(final WebDrone drone,final String... userInfo) throws Exception
     {
         return navigateToAlfresco(drone, WEB_SCRIPTS_PAGE, userInfo);
     }
+    /**
+     * Helper method to extract alfresco tenant admin console url and direct webdrone to location. 
+     * @param drone
+     * @param userInfo
+     * @return
+     * @throws Exception
+     */
     public static HtmlPage navigateToTenantAdminConsole(final WebDrone drone,final String... userInfo) throws Exception
     {
         return navigateToAlfresco(drone, TENANT_ADMIN_CONSOLE_PAGE, userInfo);
     }
+    /**
+     * Helper method to extract alfresco repository admin console url and direct webdrone to location. 
+     * @param drone
+     * @param userInfo
+     * @return
+     * @throws Exception
+     */
+    public static HtmlPage navigateToRepositoryAdminConsole(final WebDrone drone,final String... userInfo) throws Exception
+    {
+        return navigateToAlfresco(drone, REPO_ADMIN_CONSOLE_PAGE, userInfo);
+    }
+    /**
+     * Base helper method that extracts the url to required alfresco admin location.
+     * Once extracted it formats it with the username and password to allow access to the page.
+     * @param drone
+     * @param path
+     * @param userInfo
+     * @return
+     * @throws Exception
+     */
     public static HtmlPage navigateToAlfresco(final WebDrone drone, final String path,final String... userInfo) throws Exception
     {
+        WebDroneUtil.checkMandotaryParam("WebDrone", drone);
+        WebDroneUtil.checkMandotaryParam("Path", path);
+        WebDroneUtil.checkMandotaryParam("Username and password", userInfo);
         String currentUrl = drone.getCurrentUrl();
         String protocolVar = PageUtils.getProtocol(currentUrl);
         String consoleUrlVar = PageUtils.getAddress(currentUrl);
