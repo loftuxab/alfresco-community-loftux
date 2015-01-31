@@ -257,7 +257,7 @@ public class WcmqsPublicationPage extends SharePage
         public File downloadFiles() throws Exception
         {
                 FileDownloader downloader = new FileDownloader(drone);
-                File downloadedFile = new File(downloader.getLocalDownloadPath() + "testfile");
+                File downloadedFile = new File(downloader.getLocalDownloadPath() + "testfile" + System.currentTimeMillis());
                 downloader.download(downloadFile(), downloadedFile);
                 synchronized (waitObject)
                 {
