@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
  * @author Richard Smith
  */
 @Listeners(FailedTestListener.class)
+@Test(groups = { "TestBug" })
 public class FacetedSearchConfigPageTest extends AbstractUtils
 {
 
