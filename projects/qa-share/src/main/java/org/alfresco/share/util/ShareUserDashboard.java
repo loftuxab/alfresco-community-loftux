@@ -655,7 +655,7 @@ public class ShareUserDashboard extends AbstractUtils
 
         CustomiseUserDashboardPage customiseUserDashBoard = dashBoard.getNav().selectCustomizeUserDashboard();
         customiseUserDashBoard.render();
-        customiseUserDashBoard.removeDashlet(dashlet);
+        dashBoard = customiseUserDashBoard.removeDashlet(dashlet).render();
         return dashBoard;
     }
 
