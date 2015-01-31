@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -57,6 +58,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected HashMap<String, ResourceLoaderDescriptor> resourceLoaders = null;
     protected HashMap<String, ResourceResolverDescriptor> resourceResolvers = null;
     protected HashMap<String, RuntimeConfigDescriptor> runtimeConfigs = null;
+    protected List<Pattern> resourcesDeniedPaths = null;
 
     protected boolean isTimerEnabled = false;
 
@@ -164,6 +166,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         
         resourceLoaders = new HashMap<String, ResourceLoaderDescriptor>();
         resourceResolvers = new HashMap<String, ResourceResolverDescriptor>();
+        resourcesDeniedPaths = new ArrayList<Pattern>();
 
         runtimeConfigs = new HashMap<String, RuntimeConfigDescriptor>();
         
@@ -189,7 +192,8 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.pageTypes.putAll(this.pageTypes);
         combinedElement.resourceLoaders.putAll(this.resourceLoaders);
         combinedElement.resourceResolvers.putAll(this.resourceResolvers);
-        combinedElement.runtimeConfigs.putAll(this.runtimeConfigs);       
+        combinedElement.resourcesDeniedPaths.addAll(this.resourcesDeniedPaths);
+        combinedElement.runtimeConfigs.putAll(this.runtimeConfigs);
 
         // override with things from the merging object
         combinedElement.formats.putAll(configElement.formats);
@@ -200,6 +204,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.pageTypes.putAll(configElement.pageTypes);
         combinedElement.resourceLoaders.putAll(configElement.resourceLoaders);
         combinedElement.resourceResolvers.putAll(configElement.resourceResolvers);
+        combinedElement.resourcesDeniedPaths.addAll(configElement.resourcesDeniedPaths);
         combinedElement.runtimeConfigs.putAll(configElement.runtimeConfigs);
         
         // other properties
@@ -448,7 +453,12 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     public ResourceLoaderDescriptor getResourceLoaderDescriptor(String id)
     {
         return (ResourceLoaderDescriptor) this.resourceLoaders.get(id);        
-    }    
+    }
+    
+    public List<Pattern> getResourcesDeniedPaths()
+    {
+        return resourcesDeniedPaths;
+    }
     
     // resource resolvers
     public String[] getResourceResolverIds()
@@ -1222,6 +1232,18 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             if (_enableAutoDeployModules != null)
             {
                 configElement.enableAutoDeployModules = Boolean.valueOf(_enableAutoDeployModules);
+            }
+        }
+        
+        // MNT-12724 case, externally specify paths that should be denied by ResourceController
+        Element denyAccessPathsElement = elem.element("deny-access-resource-paths");
+        if (denyAccessPathsElement != null)
+        {
+            List<Element> paths = denyAccessPathsElement.elements("resource-path-pattern");
+            
+            for (Element path : paths)
+            {
+                configElement.resourcesDeniedPaths.add(Pattern.compile(path.getTextTrim()));
             }
         }
         

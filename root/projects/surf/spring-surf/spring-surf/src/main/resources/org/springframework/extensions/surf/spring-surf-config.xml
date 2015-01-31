@@ -360,6 +360,10 @@
                </packages>
            </dojo-pages>
 
+            <!-- Specify the list of path patterns to deny access for (via ResourceController). -->
+            <deny-access-resource-paths>
+                <resource-path-pattern>^/WEB-INF/.*</resource-path-pattern>
+            </deny-access-resource-paths>
         </web-framework>
 
     </config>
