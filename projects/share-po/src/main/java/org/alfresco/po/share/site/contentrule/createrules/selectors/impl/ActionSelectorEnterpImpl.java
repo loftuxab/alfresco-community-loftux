@@ -1,5 +1,6 @@
 package org.alfresco.po.share.site.contentrule.createrules.selectors.impl;
 
+import org.alfresco.po.share.site.contentrule.SetPropertyValuePage;
 import org.alfresco.po.share.site.contentrule.createrules.EmailMessageForm;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractActionSelector;
 import org.alfresco.webdrone.WebDrone;
@@ -42,7 +43,8 @@ public class ActionSelectorEnterpImpl extends AbstractActionSelector
         EXTRACT_COMMON_METADATA_FIELDS(13),
         IMPORT(14),
         SPECIALISE_TYPE(15),
-        INCREMENT_COUNTER(16);
+        INCREMENT_COUNTER(16),
+        SET_PROPERTY_VALUE(17);
 
         private final int numberPosition;
 
@@ -195,6 +197,15 @@ public class ActionSelectorEnterpImpl extends AbstractActionSelector
     {
         super.selectAction(PerformActions.MOVE.numberPosition);
         super.selectDestinationName(destinationName, folders).selectOkButton();
+
+    }
+
+    public void selectSetPropertyValue(String folderName,String value)
+    {
+        super.selectAction(PerformActions.SET_PROPERTY_VALUE.numberPosition);
+        super.selectPropertyValue(folderName, value);
+        SetPropertyValuePage selectValuePage = new SetPropertyValuePage(getDrone());
+        selectValuePage.selectOkButton();
 
     }
 }
