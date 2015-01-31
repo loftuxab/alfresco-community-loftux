@@ -94,7 +94,7 @@ public class LiveSearchTest extends AbstractUtils
      * 6) Checks that all the links in live search results work properly
      * 7) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug"})
     public void AONE_14200()
     {
 
@@ -250,7 +250,7 @@ public class LiveSearchTest extends AbstractUtils
      * displayed in document search results
      * 11) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14201()
     {
 
@@ -468,7 +468,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that there are no people results
      * 6) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch"})
     public void AONE_14203()
     {
         testName = getTestName();
@@ -564,7 +564,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that there are no sites and people results returned
      * 6) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14204()
     {
         testName = getTestName();
@@ -674,7 +674,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that there are no sites and people results returned
      * 6) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14208()
     {
         testName = getTestName();
@@ -788,7 +788,7 @@ public class LiveSearchTest extends AbstractUtils
      * 4) Checks that there are no sites and people results returned
      * 5) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14209()
     {
         testName = getTestName();
@@ -889,7 +889,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that the site with name "n3w s1t3 creat3ed 99" is not returned in live search sites results
      */
 
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch" ,"TestBug"})
     public void AONE_14205()
     {
 
@@ -971,7 +971,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that the user with name "n3w.us3r.55" is not returned in live search sites results
      */
 
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14206()
     {
 
@@ -1066,7 +1066,7 @@ public class LiveSearchTest extends AbstractUtils
      * 4) Verify document with title file-1234-1 my is not displayed in document search results
      * 5) Verify there are no sites and people results
      */
-    @Test(groups = { "TestLiveSearch", "EnterpriseOnly" })
+    @Test(groups = { "TestLiveSearch", "EnterpriseOnly" ,"TestBug"})
     public void AONE_15127()
     {
         // live search term is document title
@@ -1164,7 +1164,7 @@ public class LiveSearchTest extends AbstractUtils
      * 4) Checks that the number of documents displayed is less than five and that More link is not displayed
      * 5) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14207()
     {
 
