@@ -10,7 +10,7 @@
     <listeners>
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
     </listeners>
-    <test name="HybridWorkflowSanityTest" verbose="1">
+    <!--test name="HybridWorkflowSanityTest" verbose="1">
         <classes>
             <class name="org.alfresco.share.workflow.HybridWorkflowSanityTest" />
         </classes>
@@ -43,6 +43,11 @@
     <test name="WorkFlowActionsTest" verbose="1">
         <classes>
             <class name="org.alfresco.share.workflow.WorkFlowActionsTest" />
+        </classes>
+    </test-->
+    <test name="Cloud sync sanity tests Suite">
+        <classes>
+            <class name="org.alfresco.share.sanity.CloudSyncSanityTest"/>
         </classes>
     </test>
 </suite>

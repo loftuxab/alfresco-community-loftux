@@ -16,7 +16,7 @@
         <share-po.version>${project.version}</share-po.version>
         <office.component>libreofficecomponent</office.component>
         <enable.hybrid>false</enable.hybrid>
-        <hybrid.url>https://myalf676a.alfresco.me/alfresco/a/{network}/</hybrid.url>
+        <hybrid.url>https://myalf1035a.alfresco.me/alfresco/a/{network}/</hybrid.url>
         <uniqueTestRunName>TestReports</uniqueTestRunName>
         <argLine>-Xms512m -Xmx1024m</argLine>
         <!-- Default suite allows a single test to be run via -Dtest=... in this case the suite will be ignored then anyway -->
