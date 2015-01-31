@@ -71,6 +71,12 @@
         </classes>
     </test>
 
+    <test name="FolderTemplateCreationTest">
+        <classes>
+            <class name="org.alfresco.share.site.document.FolderTemplateCreationTest"/>
+        </classes>
+    </test>
+
 </suite>
 
 
