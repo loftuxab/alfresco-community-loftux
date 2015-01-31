@@ -9,25 +9,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-
 
 /**
  * Page Object that hold all elements for web quick start dashlet page.
  * 
  * @author Cristina Axinte
- * 
  */
 
 public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
 {
     private Log logger = LogFactory.getLog(SiteActivitiesDashlet.class);
-    
+
     private static final By DASHLET_CONTAINER_PLACEHOLDER = By.cssSelector("div[class='dashlet']");
-    private static final By LOAD_DATA_SELECTOR= By.cssSelector("select[id$='load-data-options']");
-    private static final By IMPORT_BUTTON=By.cssSelector("button[id$='default-load-data-link']");
-    private static final By WQS_HELP_LINK=By.cssSelector("div.detail-list-item.last-item>a");
+    private static final By LOAD_DATA_SELECTOR = By.cssSelector("select[id$='load-data-options']");
+    private static final By IMPORT_BUTTON = By.cssSelector("button[id$='default-load-data-link']");
+    private static final By WQS_HELP_LINK = By.cssSelector("div.detail-list-item.last-item>a");
 
     /**
      * Constructor.
@@ -54,12 +54,10 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
     @Override
     public SiteWebQuickStartDashlet render(RenderTime timer)
     {
-        elementRender(timer,
-                getVisibleRenderElement(DASHLET_CONTAINER_PLACEHOLDER),
-                getVisibleRenderElement(DASHLET_TITLE));
+        elementRender(timer, getVisibleRenderElement(DASHLET_CONTAINER_PLACEHOLDER), getVisibleRenderElement(DASHLET_TITLE));
         return this;
     }
-    
+
     /**
      * 
      */
@@ -71,7 +69,7 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
         }
         try
         {
-            Select dataLoadDropDown=new Select(drone.findAndWait(LOAD_DATA_SELECTOR));
+            Select dataLoadDropDown = new Select(drone.findAndWait(LOAD_DATA_SELECTOR));
             dataLoadDropDown.selectByVisibleText(option.getDescription());
         }
         catch (TimeoutException e)
@@ -82,7 +80,7 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
             }
         }
     }
-    
+
     /**
      * 
      */
@@ -100,17 +98,17 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
             }
         }
     }
-    
+
     /**
      * Get the selected option applied for site wqs dashlet.
      * 
-     * @return 
+     * @return
      */
     public String getSelectedWebsiteData()
     {
         try
         {
-            Select websiteDataDropdown=new Select(drone.find(LOAD_DATA_SELECTOR));
+            Select websiteDataDropdown = new Select(drone.find(LOAD_DATA_SELECTOR));
             return websiteDataDropdown.getFirstSelectedOption().getText();
         }
         catch (NoSuchElementException e)
@@ -118,7 +116,7 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
             throw new PageException("Unable to locate filter elements from the dropdown", e);
         }
     }
-    
+
     public boolean isWQSHelpLinkDisplayed()
     {
         try
@@ -129,6 +127,29 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
         {
             return false;
         }
+    }
+
+    /**
+     * Verify the import message
+     * 
+     * @return
+     */
+    public boolean isImportMessage()
+    {
+        try
+        {
+
+            drone.waitForElement(By.xpath(".//span[contains(text(),'Website data import successful')]"), 6);
+            WebElement importMessage = drone.find(By.xpath(".//span[contains(text(),'Website data import successful')]"));
+            if (importMessage != null)
+                return true;
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+
+        return false;
     }
 
 }
