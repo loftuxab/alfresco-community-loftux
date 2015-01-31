@@ -707,6 +707,7 @@
          label.style.fontSize="0em";
          label.innerHTML = (checkbox.checked ? scope.msg("checkbox.uncheck") : scope.msg("checkbox.check")) + " " + name;
          label.setAttribute("for", checkbox.id);
+         galleryItemSelectDiv.innerHTML = '';
          galleryItemSelectDiv.appendChild(label);
          galleryItemSelectDiv.appendChild(checkbox);
          YAHOO.Bubbling.on("selectedFilesChanged", function(e)

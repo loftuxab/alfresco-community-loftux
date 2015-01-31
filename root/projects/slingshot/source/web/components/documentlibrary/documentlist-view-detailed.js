@@ -138,6 +138,7 @@
          label.style.fontSize="0em";
          label.innerHTML = (checkbox.checked ? scope.msg("checkbox.uncheck") : scope.msg("checkbox.check")) + " " + name;
          label.setAttribute("for", checkbox.id);
+         elCell.innerHTML = '';
          elCell.appendChild(label);
          elCell.appendChild(checkbox);
          Event.addListener(checkbox, "click", function(e)
