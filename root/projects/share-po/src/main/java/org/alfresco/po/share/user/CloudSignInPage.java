@@ -119,13 +119,13 @@ public class CloudSignInPage extends ShareDialogue
         {
             if (isCloudSyncPage())
             {
-                drone.findAndWait(By.xpath("//div[contains(@id,'user-cloud-auth') and contains(@class,'notifications')]" +
-                        "//button[contains(@id,'user-cloud-auth') and contains(@id,'default-button-delete-button')]"));
+                drone.findAndWait(By.xpath("//div[contains(@class,'notifications connected')]" +
+                        "//button[contains(@id,'user-cloud-auth') and contains(@id,'default-button-delete-button')]"), 30000);
                 return new CloudSyncPage(drone);
             }
             else
             {
-                drone.findAndWait(By.cssSelector("div[id$='cloud-folder-title']"));
+                drone.findAndWait(By.cssSelector("div[id$='cloud-folder-title']"), 30000);
                 return new DestinationAndAssigneePage(drone);
             }
         }
