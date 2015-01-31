@@ -596,7 +596,7 @@ public class SavedSearchMyDashboardBasicTest extends AbstractUtils {
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        // Configure Saved search with Title(Name)
+        // Configure Saved search with Description
         List<SiteSearchItem> items = ShareUserDashboard.searchSavedSearchDashlet(drone, description);
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "wiki"));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "blog"));
@@ -732,7 +732,7 @@ public class SavedSearchMyDashboardBasicTest extends AbstractUtils {
     }
 
     @Test(groups = {"DataPrepEnterpriseOnly"})
-    public void dataPrep_AONE_314660() throws Exception {
+    public void dataPrep_AONE_14660() throws Exception {
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String siteName = getSiteName(testName);
@@ -756,7 +756,7 @@ public class SavedSearchMyDashboardBasicTest extends AbstractUtils {
     }
 
     @Test(groups = {"EnterpriseOnly"})
-    public void AONE_314660() throws Exception {
+    public void AONE_14660() throws Exception {
         String testName = getTestName();
         String testUser = getUserNameForDomain(testName, siteDomain);
         String fileName = testName;
