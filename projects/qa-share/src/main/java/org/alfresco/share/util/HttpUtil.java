@@ -18,12 +18,6 @@
  */
 package org.alfresco.share.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +25,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
+
+import java.io.*;
 
 /**
  * Helper class to manage HttpClient based actions.
@@ -46,7 +42,7 @@ public class HttpUtil
 
     private static final String MIME_TYPE_JSON = "application/json";
 
-    private HttpUtil()
+    public HttpUtil()
     {
     }
 

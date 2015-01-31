@@ -23,6 +23,20 @@
         <testng.xml>src/test/resources/tests_debug.xml</testng.xml>
     </properties>
 
+    <pluginRepositories>
+        <!-- This is for xmltask -->
+        <pluginRepository>
+            <id>atlassian-developer-site</id>
+            <name>Atlassian Maven 2 Contributor Repository</name>
+            <url>http://maven.atlassian.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
     <distributionManagement>
         <repository>
             <id>alfresco-internal</id>
@@ -404,6 +418,13 @@
                                                               comment="Patched by auto-scripts">
                                                     <entry key="alfresco.cron" value="0/3 * * * * ? *"/>
                                                 </propertyfile>
+                                        <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask"/>
+                                        <echo>Patching share-config-custom.xml</echo>
+                                                <xmltask source="${basedir}/target/alf-installation/tomcat/shared/classes/alfresco/web-extension/share-config-custom.xml" dest="${basedir}/target/alf-installation/tomcat/shared/classes/alfresco/web-extension/share-config-custom.xml">
+                                                    <insert path="/alfresco-config/config[@condition='DocumentLibrary']">
+                                                        <![CDATA[ <filters><maximum-tag-count>120</maximum-tag-count></filters> ]]>
+                                                    </insert>
+                                                </xmltask>
                                     </target>
                                 </configuration>
                             </execution>
@@ -418,6 +439,11 @@
                                 <groupId>org.postgresql</groupId>
                                 <artifactId>postgresql</artifactId>
                                 <version>${dependency.postgresql.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>com.oopsconsultancy</groupId>
+                                <artifactId>xmltask</artifactId>
+                                <version>1.16</version>
                             </dependency>
                         </dependencies>
                     </plugin>
