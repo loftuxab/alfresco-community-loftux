@@ -19,10 +19,6 @@
 
 package org.alfresco.po.share.user;
 
-import java.io.File;
-import java.util.Calendar;
-import java.util.List;
-
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.site.NewFolderPage;
@@ -37,6 +33,12 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.util.Calendar;
+import java.util.List;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * TrashCanPage Test
@@ -325,6 +327,7 @@ public class TrashCanPageTest extends AbstractTest
         List<TrashCanItem>  item1 = trashCan.getTrashCanItemForContent(TrashCanValues.FILE,fileName4, "documentLibrary");
         trashCan= item1.get(0).selectTrashCanItemCheckBox();
         TrashCanRecoverConfirmDialog trashCanRecoverConfirmation = trashCan.selectedRecover().render();
+        assertEquals (trashCanRecoverConfirmation.getNotificationMessage(),"Successfully recovered 1 item(s), 0 failed.");
         trashCan = trashCanRecoverConfirmation.clickRecoverOK().render();
         List<TrashCanItem> trashCanItem = trashCan.getTrashCanItems();
         for (TrashCanItem itemTerm : trashCanItem)
@@ -347,6 +350,7 @@ public class TrashCanPageTest extends AbstractTest
             trashCan = item1.get(0).selectTrashCanItemCheckBox();
         }
         TrashCanDeleteConfirmationPage trashCanDeleteConfirmation = trashCan.selectedDelete().render();
+        assertEquals (trashCanDeleteConfirmation.getNotificationMessage(),"This will permanently delete the item(s). Are you sure?");
         TrashCanDeleteConfirmDialog trashCanConfrimDialog = (TrashCanDeleteConfirmDialog) trashCanDeleteConfirmation.clickOkButton().render();
         trashCan = trashCanConfrimDialog.clickDeleteOK().render();
         List<TrashCanItem> trashCanItemResults = trashCan.getTrashCanItems();
