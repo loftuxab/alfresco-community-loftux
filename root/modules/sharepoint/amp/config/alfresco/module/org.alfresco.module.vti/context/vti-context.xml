@@ -531,6 +531,7 @@
             <ref bean="vtiHandler"/>
         </property>
         <property name="lockService" ref="webDAVLockService"/>
+        <property name="urlHelper" ref="vtiUrlHelper"/>
     </bean>
 
     <bean id="server_version_method" class="org.alfresco.module.vti.web.fp.ServerVersionMethod" parent="abstractVtiMethod">
