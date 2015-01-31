@@ -52,12 +52,14 @@ public abstract class AbstractSiteNavigation extends HtmlElement
     protected static final By BLOG_LINK = By.cssSelector("#HEADER_SITE_BLOG-POSTLIST_text");
     protected static final By LINKS_LINK = By.cssSelector("#HEADER_SITE_LINKS_text");
     protected static final By DATA_LISTS_LINK = By.cssSelector("#HEADER_SITE_DATA-LISTS_text");
-    protected static final By MEMBERS_LINK = By.cssSelector("#HEADER_SITE_MEMBERS_text");
+    protected static final By SITE_MEMBERS = By.cssSelector("div#HEADER_SITE_MEMBERS");
+    protected static final By MEMBERS_LINK = By.cssSelector("span#HEADER_SITE_MEMBERS_text");
     protected static final By DOCLIB_LINK = By.cssSelector("#HEADER_SITE_DOCUMENTLIBRARY_text");
-    protected static final By SITE_MORE_PAGES = By.cssSelector("#HEADER_SITE_MORE_PAGES_text");
+    protected static final By SITE_MORE_PAGES = By.cssSelector("span#HEADER_SITE_MORE_PAGES_text");
     protected static final String SITE_LINK_NAV_PLACEHOLER = "div.site-navigation > span:nth-of-type(%d) > a";
     public static final String LABEL_DOCUMENTLIBRARY_TEXT = "span#HEADER_SITE_DOCUMENTLIBRARY_text";
     public static final String LABEL_DOCUMENTLIBRARY_PLACEHOLDER = "div#HEADER_SITE_DOCUMENTLIBRARY";
+    protected static final String SITE_CONFIG_MORE = "#HEADER_SITE_CONFIGURATION_DROPDOWN";
     private final String siteNavPlaceHolder;
     private final String dashboardLink;
     protected AlfrescoVersion alfrescoVersion;
@@ -137,6 +139,16 @@ public abstract class AbstractSiteNavigation extends HtmlElement
     public boolean isDashboardDisplayed()
     {
         return isLinkDisplayed(By.cssSelector(dashboardLink));
+    }
+    
+    /**
+     * Checks if site members is displayed.
+     *
+     * @return <code>true</code> if displayed <code>false</code> otherwise
+     */
+    public boolean isSelectSiteMembersDisplayed()
+    {
+        return isLinkDisplayed(SITE_MEMBERS);
     }
 
     /**

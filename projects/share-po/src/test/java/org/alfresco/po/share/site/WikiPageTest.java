@@ -73,15 +73,7 @@ public class WikiPageTest extends AbstractSiteDashletTest
     @Test
     public void selectCustomizeDashboard()
     {
-    	AlfrescoVersion version = drone.getProperties().getVersion();
-        if(Enterprise42.equals(version))
-        {
-            siteDashBoard.getSiteNav().selectConfigure();
-        }
-        else if(Enterprise41.equals(version))
-        {
-            siteDashBoard.getSiteNav().selectMore();
-        }
+        siteDashBoard.getSiteNav().selectConfigure();
         customizeSitePage = siteDashBoard.getSiteNav().selectCustomizeSite();
         List<SitePageType> addPageTypes = new ArrayList<SitePageType>();
         addPageTypes.add(SitePageType.WIKI);
