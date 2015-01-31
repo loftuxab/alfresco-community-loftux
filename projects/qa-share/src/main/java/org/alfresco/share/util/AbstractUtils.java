@@ -1662,4 +1662,28 @@ public abstract class AbstractUtils
     {
         return !Boolean.parseBoolean(layer7Disabled);
     }
+    
+    /**
+     * Returns any file from testdata folder
+     * 
+     * @param filename
+     * @return File
+     */
+    public File getTestDataFile(String folder, String filename)
+    {
+        return new File(FileBaseUtils.combinePaths(DATA_FOLDER, SLASH, folder, SLASH, filename));
+    }
+
+    /**
+     * Returns the url of a filename, from a DocumentLibrary site using the VTI routing
+     * Example: http://127.0.0.1:7070/<sitename>/documentLibrary/<filename>
+     * 
+     * @param sitename
+     * @param filename
+     * @return the full VTI routing path of the filename
+     */
+    public String getVTIDocumentLibraryFilePath(String sitename, String filename)
+    {
+        return pathSharepoint + sitename + "/" + DOCLIB_CONTAINER + "/" + filename;
+    }
 }
