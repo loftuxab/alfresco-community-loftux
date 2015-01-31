@@ -46,6 +46,7 @@ public class FtpUtil extends AbstractUtils
     private static final String FTP_STOP = "stop";
     private static final String FTP_START = "start";
     private static final String FTP_PORT = "ftp.port";
+    private static final String FTP_ENABLED = "ftp.enabled";
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
     private static final Pattern DOMAIN_PATTERN = Pattern.compile("\\w+(\\.\\w+)*(\\.\\w{2,})");
 
@@ -382,6 +383,7 @@ public class FtpUtil extends AbstractUtils
     {
         JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
         JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_PORT, ftpPort);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_ENABLED, true);
         JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
     }
 
@@ -395,7 +397,6 @@ public class FtpUtil extends AbstractUtils
         FileServersPage fileServersPage = sysSummaryPage.openConsolePage(AdminConsoleLink.FileServers).render();
         fileServersPage.configFtpPort(port);
     }
-
 
 
     public static boolean DeleteSpace(String shareUrl, String user, String password, String remoteSpaceName, String remoteFolderPath)
@@ -692,7 +693,6 @@ public class FtpUtil extends AbstractUtils
      * @param remoteFolderName
      * @param remoteFolderPath
      * @param destination
-     *
      */
 
     public static boolean copyFolder(String shareUrl, String user, String password, String remoteFolderPath, String remoteFolderName, String destination)
@@ -815,11 +815,10 @@ public class FtpUtil extends AbstractUtils
 
     private static void copyFolderContents(FTPClient ftpClient, String remoteFolderPath, String folderName, String destination)
     {
-      try
+        try
         {
             String newDestination = destination + ftpClient.printWorkingDirectory().replace(remoteFolderPath, "");
             boolean spaceexists = ftpClient.changeWorkingDirectory(ftpClient.printWorkingDirectory() + "/" + folderName);
-
 
             if (spaceexists)
             {
@@ -905,7 +904,6 @@ public class FtpUtil extends AbstractUtils
         }
 
     }
-
 
 
 }
