@@ -67,6 +67,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.config.ConfigService;
 import org.springframework.extensions.config.RemoteConfigElement;
+import org.springframework.extensions.config.RemoteConfigElement.ConnectorDescriptor;
 import org.springframework.extensions.config.RemoteConfigElement.EndpointDescriptor;
 import org.springframework.extensions.surf.RequestContext;
 import org.springframework.extensions.surf.RequestContextUtil;
@@ -165,6 +166,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     {
         if (logger.isDebugEnabled())
             logger.debug("Initializing the SSOAuthenticationFilter.");
+        
         // get reference to our ServletContext
         this.servletContext = args.getServletContext();
         
@@ -174,25 +176,22 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         
         // retrieve the connector service
         this.connectorService = (ConnectorService)context.getBean("connector.service");
-
+        
         ConfigService configService = (ConfigService)context.getBean("web.config");
         
         // Retrieve the remote configuration
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement(
-                "remote");
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
         if (remoteConfig == null)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("There is no remote configuration.");
+            logger.error("There is no Remote configuration element. This is required to use SSOAuthenticationFilter.");
             return;
         }
-
+        
         // get the endpoint id to use
         String endpoint = args.getInitParameter("endpoint");
         if (endpoint == null)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("There is no endpoint id in the configuration.");
+            logger.error("There is no 'endpoint' id in the SSOAuthenticationFilter init parameters. Cannot initialise filter.");
             return;
         }
         
@@ -201,30 +200,31 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         if (endpointDescriptor == null || !endpointDescriptor.getExternalAuth())
         {
             if (logger.isDebugEnabled())
-                logger.debug("Could not get endpoint descriptor for " + endpoint);
+                logger.debug("No External Auth endpoint configured for " + endpoint);
             return;
         }
-
-        // Save the endpoint, activating the filter
-        this.endpoint = endpoint;
-        if (logger.isDebugEnabled())
-            logger.debug("Endpoint is " + endpoint);
         
-        // Obtain the userHeader (if configured) from the alfresco connector
         try
         {
-            userHeader = connectorService.getConnector(endpoint).getConnectorSession().getParameter(SlingshotAlfrescoConnector.CS_PARAM_USER_HEADER);
+            Connector conn = this.connectorService.getConnector(endpoint);
+            
+            // Save the endpoint, activating the filter
+            this.endpoint = endpoint;
+            if (logger.isDebugEnabled())
+                logger.debug("Endpoint is " + endpoint);
+            
+            // Obtain the userHeader (if configured) from the alfresco connector
+            this.userHeader = conn.getConnectorSession().getParameter(SlingshotAlfrescoConnector.CS_PARAM_USER_HEADER);
             if (logger.isDebugEnabled())
                 logger.debug("userHeader is " + userHeader);
         }
         catch (ConnectorServiceException e)
         {
-            logger.error("Expected to find a connector for the endpoint "+endpoint, e);
+            logger.error("Unable to find connector " + endpointDescriptor.getConnectorId() + " for the endpoint " + endpoint, e);
         }
-
+        
         // retrieve the optional kerberos configuration
-        KerberosConfigElement krbConfig = (KerberosConfigElement) configService.getConfig("Kerberos").getConfigElement(
-                "kerberos");
+        KerberosConfigElement krbConfig = (KerberosConfigElement) configService.getConfig("Kerberos").getConfigElement("kerberos");
         if (krbConfig != null)
         {
             if (logger.isDebugEnabled())
@@ -465,6 +465,15 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             if (debug) logger.debug("Opera detected, redirecting to login page");
 
             redirectToLoginPage(req, res);
+            return;
+        }
+        
+        // If userHeader (X-Alfresco-Remote-User or similar) external auth - does not require a challenge/response
+        if (this.userHeader != null)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("userHeader external auth - skipping auth filter...");
+            chain.doFilter(sreq, sresp);
             return;
         }
         
@@ -742,8 +751,9 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             else if (logger.isDebugEnabled())
                 logger.debug("Validating repository session for  " + userId);
 
-            if(userId != null && !userId.equalsIgnoreCase(req.getRemoteUser()) && session.getAttribute(NTLM_AUTH_DETAILS) == null){
-            	session.removeAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH);
+            if (userId != null && !userId.equalsIgnoreCase(req.getRemoteUser()) && session.getAttribute(NTLM_AUTH_DETAILS) == null)
+            {
+                session.removeAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH);
             }
             Connector conn = connectorService.getConnector(this.endpoint, userId, session);
 
