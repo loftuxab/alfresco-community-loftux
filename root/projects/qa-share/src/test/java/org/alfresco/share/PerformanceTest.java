@@ -189,7 +189,6 @@ public class PerformanceTest extends CmisUtils
 
         try
         {
-            super.tearDown();
             super.setupCustomDrone(DownLoadDrone);
             login(customDrone, testUser, DEFAULT_PASSWORD);
             DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(customDrone, siteName);
@@ -206,8 +205,6 @@ public class PerformanceTest extends CmisUtils
             {
                 downloadedBigDataFile.delete();
             }
-            super.tearDown();
-            super.beforeClass();
         }
     }
 
