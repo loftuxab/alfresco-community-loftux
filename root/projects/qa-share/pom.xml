@@ -363,6 +363,7 @@
                 <!-- Configuration triggered by mvn antrun:run, used by Bamboo to stop
                     server -->
                 <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
                 <executions>
                     <execution>
                         <id>default-cli</id>
@@ -373,6 +374,22 @@
                                       dir="target/alf-installation" failonerror="true">
                                     <arg value="stop"/>
                                 </exec>
+                                <echo>Creating a data file to connect with PostgreSQL...</echo>
+                                <echo file="${basedir}/target/pgpass.conf">localhost:5432:*:alfresco:alfresco</echo>
+                                <echo>Making alfresco database dump...</echo>
+                                <echo file="${basedir}/target/pgdump.sh" append="false">
+                                    #! /bin/sh
+                                    export PGPASSFILE=${basedir}/target/pgpass.conf;
+                                    /usr/pgsql/bin/pg_dump -i -h localhost -p 5432 -U alfresco -F c -b -v -f '${basedir}/target/postgres-db.backup' alfresco
+                                </echo>
+                                <chmod file="${basedir}/target/pgdump.sh" perm="a+x" verbose="true"/>
+                                <exec executable="${basedir}/target/pgdump.sh" dir="target" failonerror="true"/>
+                                <echo>Zipping postgres dump...</echo>
+                                <zip destfile="${basedir}/target/postgres-db.zip" basedir="${basedir}/target" includes="postgres-db.backup" />
+                                <echo>Zipping content stores...</echo>
+                                <zip destfile="${basedir}/target/content-stores.zip"
+                                     basedir="${basedir}/target/alf-installation/alf_data"
+                                     includes="contentstore/**, contentstore.deleted/**" />
                             </target>
                         </configuration>
                     </execution>
@@ -389,6 +406,7 @@
                     <!-- Download and install the specified build of enterprise alfresco installer -->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
                         <executions>
                             <execution>
                                 <id>fetch-installer</id>
@@ -477,6 +495,7 @@
                     <!-- Starts/stop the installed Alfresco -->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
                         <executions>
                             <execution>
                                 <id>start-alfresco</id>
@@ -528,6 +547,7 @@
                     <!-- Enable hybrid in the installation -->
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
                         <executions>
                             <execution>
                                 <id>modify-properties</id>
@@ -565,6 +585,7 @@
                <!-- Download and install the latest enterprise alfresco installer -->
                <plugin>
                   <artifactId>maven-antrun-plugin</artifactId>
+                  <version>1.7</version>
                   <executions>
                      <execution>
                         <id>fetch-installer</id>
@@ -630,6 +651,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.7</version>
                     <executions>
                         <execution>
                             <id>modify-properties</id>
@@ -694,6 +716,7 @@
                </plugin>
                <plugin>
                   <artifactId>maven-antrun-plugin</artifactId>
+                  <version>1.7</version>
                   <executions>
                      <execution>
                         <id>fetch-installer</id>

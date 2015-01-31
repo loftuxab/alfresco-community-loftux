@@ -101,7 +101,7 @@ public class SiteMembershipExternalDomainAPITest extends SiteMembershipAPI
         SiteUtil.createSite(drone, modSite, SITE_VISIBILITY_MODERATED);
     }
 
-    @Test
+    @Test(groups = "CloudOnly")
     public void AONE_14325() throws Exception
     {
         try
