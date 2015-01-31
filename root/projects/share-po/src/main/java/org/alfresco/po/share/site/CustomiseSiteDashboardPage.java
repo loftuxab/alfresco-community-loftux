@@ -194,8 +194,20 @@ public class CustomiseSiteDashboardPage extends SharePage
      */
     public SiteDashboardPage addAllDashlets()
     {
+        String scrollJs = "window.scrollTo(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight,document.documentElement.clientHeight));";
         this.selectAddDashlets();
+        drone.executeJavaScript(scrollJs, "");
         removeAllDashletsWithOutConfirm();
+        int i = 0;
+        while(drone.findAll(AVAILABLE_DASHLETS).size() > 0)
+        {
+            removeAllDashletsWithOutConfirm();
+            i++;
+            if(i == 2)
+            {
+                break;
+            }
+        }
         waitUntilAlert();
         List<WebElement> dashlets = drone.findAll(AVAILABLE_DASHLETS);
         if (logger.isTraceEnabled())
@@ -210,7 +222,7 @@ public class CustomiseSiteDashboardPage extends SharePage
         {
             target = drone.find(By.cssSelector(String.format(COLUMN_FORMAT, currentColumn)));
             drone.dragAndDrop(source, target);
-            drone.executeJavaScript("window.scrollTo(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight,document.documentElement.clientHeight));", "");
+            drone.executeJavaScript(scrollJs, "");
 
             if (dashletCounter % MAX_DASHLETS_IN_COLUMN == 0)
             {
