@@ -11,7 +11,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Page object to hold Web View dashlet
- *
+ * 
  * @author Marina.Nenadovets
  */
 public class WebViewDashlet extends AbstractDashlet implements Dashlet
@@ -100,7 +100,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Method to click Configure icon
-     *
+     * 
      * @return ConfigureWebViewDashletBox page object
      */
     public ConfigureWebViewDashletBoxPage clickConfigure()
@@ -119,7 +119,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * return default text from dashlet. or throw Exception.
-     *
+     * 
      * @return
      */
     public String getDefaultMessage()
@@ -136,7 +136,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * return true if frame with url displayed.
-     *
+     * 
      * @param url
      * @return
      */
@@ -153,7 +153,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
             return false;
         }
     }
-    
+
     public void clickTitle()
     {
         try
@@ -166,5 +166,9 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
         }
     }
 
+    public String getWebViewDashletTitle()
+    {
+        return dashlet.findElement(DASHLET_TITLE_WEB).getText();
+    }
 
 }
