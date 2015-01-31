@@ -109,7 +109,7 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(CLOSE_BUTTON).isDisplayed();
+            return drone.find(CLOSE_BUTTON).isDisplayed();
         }
         catch (TimeoutException nse)
         {
@@ -160,7 +160,7 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(REQ_SYNC_BUTTON, WAIT_TIME_3000).isDisplayed();
+            return drone.find(REQ_SYNC_BUTTON).isDisplayed();
         }
         catch (TimeoutException nse)
         {
@@ -178,7 +178,7 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(REQ_UNSYNC_BUTTON, WAIT_TIME_3000).isDisplayed();
+            return drone.find(REQ_UNSYNC_BUTTON).isDisplayed();
         }
         catch (TimeoutException nse)
         {
@@ -443,9 +443,7 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-
-            return drone.findAndWait(REQ_UNSYNC_BUTTON, WAIT_TIME_3000).isEnabled();
-
+            return drone.find(REQ_UNSYNC_BUTTON).isEnabled();
         }
 
         catch (TimeoutException nse)
