@@ -55,9 +55,7 @@
 
 	
 -->
-	<!-- <test name="People Finer Search By Tests" verbose="1"> <classes> <class 
-		name="org.alfresco.share.peoplefinder.SearchByTests" /> </classes> </test> 
-		<test name="Site Activities Dashlet Test" verbose="1"> <classes> <class name="org.alfresco.share.dashlet.SiteActivitiesDashletTest" 
+	<!-- <test name="Site Activities Dashlet Test" verbose="1"> <classes> <class name="org.alfresco.share.dashlet.SiteActivitiesDashletTest"
 		/> </classes> </test> <test name="Access Shared Document Tests" verbose="1"> 
 		<classes> <class name="org.alfresco.share.site.document.AccessSharedDocumentTest" 
 		/> </classes> </test> -->
