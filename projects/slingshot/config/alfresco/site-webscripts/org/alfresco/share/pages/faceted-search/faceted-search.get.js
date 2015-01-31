@@ -722,7 +722,7 @@ var main = {
                      config: {
                         visibilityConfig: hideOnZeroResultsConfig,
                         widgets: facets,
-                        additionalCssClasses: "alfresco-Twister-container"
+                        additionalCssClasses: "rounded-border"
                      }
                   },
                   {
