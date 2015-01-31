@@ -1,16 +1,8 @@
 package org.alfresco.share.enterprise.repository.fileprotocols.cifs.clientwindows.msoffice2010;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.ImageIcon;
 
 import org.alfresco.application.util.Application;
 import org.alfresco.explorer.WindowsExplorer;
@@ -93,7 +85,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:admin admin";
 
         Runtime.getRuntime().exec(mapConnect);
-        if (checkDirOrFileExists(15, 200, networkDrive + cifsPath))
+        if (CifsUtil.checkDirOrFileExists(15, 200, networkDrive + cifsPath))
         {
             logger.info("----------Mapping succesfull " + testUser);
         }
@@ -137,7 +129,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
         Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
 
-        if (checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
+        if (CifsUtil.checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
         {
             logger.info("--------Unmapping succesfull " + testUser);
         }
@@ -211,7 +203,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(3);
             power.exitOfficeApplication(ldtp, fileName_6277);
-            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+            Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 4 ----
             // ---- Step Action -----
@@ -257,7 +249,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
             power.exitOfficeApplication(ldtp, fileName_6277);
-            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+            Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 9 ----
             // ---- Step Action -----
@@ -303,7 +295,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
             power.exitOfficeApplication(ldtp, fileName_6277);
-            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+            Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 14 ----
             // ---- Step Action -----
@@ -387,7 +379,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // The data is entered.
             ldtp = power.getAbstractUtil().setOnWindow(fileName_6278);
             ldtp.click("paneSlide");
-            uploadImageInOffice(image_1);
+            CifsUtil.uploadImageInOffice(image_1);
             ldtp.waitTime(2);
             ldtp.click("paneSlide");
             power.editOffice(ldtp, " " + first_modification + " ");
@@ -401,7 +393,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(3);
             power.exitOfficeApplication(ldtp, fileName_6278);
-            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+            Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 4 ----
             // ---- Step Action -----
@@ -442,7 +434,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             ldtp.click("btnNextSlide");
             ldtp.waitTime(1);
             ldtp.click("paneSlide");
-            uploadImageInOffice(image_2);
+            CifsUtil.uploadImageInOffice(image_2);
             ldtp.waitTime(2);
             ldtp.click("paneSlide");
             power.editOffice(ldtp, " " + second_modification + " ");
@@ -455,7 +447,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
             power.exitOfficeApplication(ldtp, fileName_6278);
-            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+            Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 9 ----
             // ---- Step Action -----
@@ -497,7 +489,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             ldtp.click("btnNextSlide");
             ldtp.waitTime(1);
             ldtp.click("paneSlide");
-            uploadImageInOffice(image_3);
+            CifsUtil.uploadImageInOffice(image_3);
             ldtp.waitTime(2);
             ldtp.click("paneSlide");
             power.editOffice(ldtp, " " + last_modification + " ");
@@ -510,7 +502,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
             power.exitOfficeApplication(ldtp, fileName_6278);
-            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+            Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 14 ----
             // ---- Step Action -----
@@ -682,7 +674,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6279);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -750,7 +742,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6279);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -803,7 +795,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6279);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -879,7 +871,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1.click("btnNewSlide");
         power.editOffice(l1, " " + edit1 + " ");
         l1.click("btnNewSlide");
-        uploadImageInOffice(image_1);
+        CifsUtil.uploadImageInOffice(image_1);
 
         // --- Step 4 ---
         // --- Step action ---
@@ -890,7 +882,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6280);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -950,7 +942,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1.click("paneSlide");
         power.editOffice(l1, " " + edit2 + " ");
         l1.click("btnNewSlide");
-        uploadImageInOffice(image_2);
+        CifsUtil.uploadImageInOffice(image_2);
 
         // --- Step 9 ---
         // --- Step action ---
@@ -961,7 +953,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6280);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -1007,7 +999,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1.click("paneSlide");
         power.editOffice(l1, " " + edit3 + " ");
         l1.click("btnNewSlide");
-        uploadImageInOffice(image_3);
+        CifsUtil.uploadImageInOffice(image_3);
 
         // --- Step 14 ---
         // --- Step action ---
@@ -1018,7 +1010,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6280);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -1079,7 +1071,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1.waitTime(4);
         power.exitOfficeApplication(l1, fileName_6281);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 2 ---
         // --- Step action ---
         // Verify the document's content.
@@ -1146,7 +1138,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6281);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1199,7 +1191,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6281);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1256,7 +1248,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1.waitTime(4);
         power.exitOfficeApplication(l1, fileName_6282);
 
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -1314,7 +1306,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // --- Expected results --
         // The data is entered.
         l1.click("paneSlide");
-        uploadImageInOffice(image_1);
+        CifsUtil.uploadImageInOffice(image_1);
         l1.click("paneSlide");
         power.editOffice(l1, " " + edit2 + " ");
 
@@ -1327,7 +1319,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6282);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1370,7 +1362,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1.click("btnNextSlide");
         l1.waitTime(2);
         l1.click("paneSlide");
-        uploadImageInOffice(image_2);
+        CifsUtil.uploadImageInOffice(image_2);
         l1.click("paneSlide");
         power.editOffice(l1, " " + edit3 + " ");
 
@@ -1383,7 +1375,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6282);
-        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+        Assert.assertTrue(CifsUtil.checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1407,115 +1399,6 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         String body3 = detailsPage.getDocumentBody();
         Assert.assertTrue(body3.contains(edit3));
-    }
-
-    private Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
-    {
-        long counter = 0;
-        boolean existence = false;
-        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
-        {
-            File test = new File(path);
-            if (test.exists())
-            {
-                existence = true;
-                break;
-            }
-            else
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + pollingTimeMILISECONDS;
-            }
-        }
-        return existence;
-    }
-
-    private Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
-    {
-        long counter = 0;
-        boolean existence = false;
-        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
-        {
-            File test = new File(path);
-            if (test.exists())
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + pollingTimeMILISECONDS;
-
-            }
-            else
-            {
-                existence = true;
-                break;
-            }
-        }
-        return existence;
-    }
-
-    private Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
-    {
-        long counter = 0;
-        boolean check = false;
-        boolean existence = true;
-        while (counter < TimeUnit.SECONDS.toMillis(timeout))
-        {
-            File test = new File(path);
-            for (File element : test.listFiles())
-            {
-                if (element.isHidden() && element.getName().contains(extension))
-                {
-                    existence = false;
-                    break;
-                }
-            }
-            if (existence)
-            {
-                check = true;
-                break;
-            }
-            else
-            {
-                try
-                {
-                    TimeUnit.MILLISECONDS.sleep(200);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                counter = counter + 200;
-                existence = true;
-            }
-        }
-        return check;
-    }
-
-    private void uploadImageInOffice(String image) throws AWTException
-    {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        ImageIcon icon = new ImageIcon(image);
-        CifsUtil clipboardImage = new CifsUtil(icon.getImage());
-        clipboard.setContents(clipboardImage, clipboardImage);
-
-        Robot r = new Robot();
-        r.keyPress(KeyEvent.VK_CONTROL);
-        r.keyPress(KeyEvent.VK_V);
-        r.keyRelease(KeyEvent.VK_CONTROL);
-        r.keyRelease(KeyEvent.VK_V);
     }
 
 }
