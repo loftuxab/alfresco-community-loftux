@@ -611,4 +611,21 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
     }
 
 
+    
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#selectPreviewWebAsset
+     */
+    @Override
+    public void selectPreviewWebAsset()
+    {
+        if (isFolder())
+        {
+            throw new UnsupportedOperationException("Option Preview Web Asset is only available to Content of type Document");
+        }
+
+        WebElement contentActions = selectAction();
+        getDrone().mouseOverOnElement(contentActions);
+        super.selectPreviewWebAsset();
+    }
 }
