@@ -155,7 +155,7 @@ public class ConfigureSavedSearchDialogBoxPageTest extends AbstractSiteDashletTe
         Assert.assertTrue(dashBoardPage != null);
     }
 
-    @Test(dependsOnMethods = "isHelpBalloonDisplayed")
+    @Test(dependsOnMethods = "isHelpBalloonDisplayed", groups="TestBug")
     public void dashBoardPageClickOKButton()
     {
         savedSearchDashlet = dashBoardPage.getDashlet("saved-search").render();
