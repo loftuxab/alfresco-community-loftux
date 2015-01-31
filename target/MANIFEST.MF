@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Build-Date: 20141209-1135
+Implementation-Version: 5.0.1-SNAPSHOT
+Built-By: P3700445
+Implementation-Vendor-Id: org.alfresco
+Created-By: IntelliJ IDEA
+Build-Jdk: 1.7.0_60
+Specification-Version: 5.0.0
+
