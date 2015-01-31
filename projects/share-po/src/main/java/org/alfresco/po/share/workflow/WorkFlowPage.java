@@ -405,7 +405,7 @@ public abstract class WorkFlowPage extends SharePage implements WorkFlow
     {
         try
         {
-            return drone.find(WORKFLOW_COULD_NOT_BE_STARTED_MESSAGE).getText();
+            return drone.findAndWait(WORKFLOW_COULD_NOT_BE_STARTED_MESSAGE).getText();
         }
         catch (NoSuchElementException nse)
         {
