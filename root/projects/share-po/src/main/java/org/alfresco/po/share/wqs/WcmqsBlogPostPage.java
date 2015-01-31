@@ -1,6 +1,5 @@
 package org.alfresco.po.share.wqs;
 
-import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
@@ -18,22 +17,34 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  */
 public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
 {
-        public static final By CREATE_ARTICLE = By.cssSelector("a[id='yui-gen5']");
-        public static final By TITLE = By.xpath(".//div/h2");
-        public static final By CONTENT = By.xpath(".//div/div[2]/p");
+        private final By CREATE_ARTICLE = By.cssSelector("a[id='yui-gen5']");
+        private final By TITLE = By.xpath(".//div/h2");
+        private final By CONTENT = By.xpath(".//div/div[2]/p");
         private final By DELETE_LINK = By.cssSelector("a[class=alfresco-content-delete]");
         private final By DELETE_CONFIRM_OK = By.xpath("//button[contains(text(),'Ok')]");
         private final By DELETE_CONFIRM_CANCEL = By.xpath("//button[contains(text(),'Cancel')]");
         private final By DELETE_CONFIRM_WINDOW = By.id("prompt_c");
+        private final By TOGGLE_EDIT_MARKERS = By.id("awe--show-hide-edit-markers-button");
+        private final By ORIENTATION = By.id("WEF-Ribbon--ribbon-placement-button");
+        private final By ORIENTATION_LEFT = By.cssSelector("div[class='bd']>ul[class='first-of-type']>li[index='1']>a");
+        private final By ORIENTATION_TOP = By.cssSelector("div[class='bd']>ul[class='first-of-type']>li[index='0']>a");
+        private final By ORIENTATION_RIGHT = By.cssSelector("div[class='bd']>ul[class='first-of-type']>li[index='2']>a");
+        private final By ALFRESCO_WEB_EDITOR = By.id("wef-ribbon-container");
+        private final By ALFRESCO_CONTENT_MARKERS = By.cssSelector("span[class='alfresco-content-marker']");
+        private final By AWE_CREATE = By.id("awe--quickcreate-button");
+        private final By AWE_CREATE_ARTICLE = By.cssSelector("div[class='bd']>ul[class='first-of-type']>li>a");
+        private final By AWE_EDIT = By.id("awe--quickedit-button");
+        private final By AWE_EDIT_ARTICLE = By.cssSelector("div[class='bd']>ul[class='first-of-type']>li>a");
+
         @RenderWebElement
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
-        
-        private final By VISITOR_NAME=By.cssSelector("input[name='visitorName']");
-        private final By VISITOR_EMAIL=By.cssSelector("input[name='visitorEmail']");
-        private final By VISITOR_WEBSITE=By.cssSelector("input[name='visitorWebsite']");
-        private final By FEEDBACK_COMMENT=By.cssSelector("textarea.bc-textarea");
-        private final By POST_BUTTON=By.cssSelector("input.bc-submit");
-        private final By ADD_SUCCESS_MESSAGE=By.cssSelector("div.contact-success");
+
+        private final By VISITOR_NAME = By.cssSelector("input[name='visitorName']");
+        private final By VISITOR_EMAIL = By.cssSelector("input[name='visitorEmail']");
+        private final By VISITOR_WEBSITE = By.cssSelector("input[name='visitorWebsite']");
+        private final By FEEDBACK_COMMENT = By.cssSelector("textarea.bc-textarea");
+        private final By POST_BUTTON = By.cssSelector("input.bc-submit");
+        private final By ADD_SUCCESS_MESSAGE = By.cssSelector("div.contact-success");
 
         /**
          * Constructor.
@@ -179,7 +190,7 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
                         throw new PageOperationException("Exceeded time to find delete button. " + e.toString());
                 }
         }
-        
+
         /**
          * Method that types the visitor name
          * @return String
@@ -195,7 +206,7 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
                         throw new PageOperationException("Exceeded time to find name field. " + e.toString());
                 }
         }
-        
+
         /**
          * Method that types the visitor email
          * @return String
@@ -204,14 +215,14 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         {
                 try
                 {
-                    drone.findAndWait(VISITOR_EMAIL).sendKeys(visitorEmail);
+                        drone.findAndWait(VISITOR_EMAIL).sendKeys(visitorEmail);
                 }
                 catch (TimeoutException e)
                 {
-                    throw new PageOperationException("Exceeded time to find email field. " + e.toString());
+                        throw new PageOperationException("Exceeded time to find email field. " + e.toString());
                 }
         }
-        
+
         /**
          * Method that types the visitor website
          * @return String
@@ -220,14 +231,14 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         {
                 try
                 {
-                    drone.findAndWait(VISITOR_WEBSITE).sendKeys(visitorWebsite);
+                        drone.findAndWait(VISITOR_WEBSITE).sendKeys(visitorWebsite);
                 }
                 catch (TimeoutException e)
                 {
-                    throw new PageOperationException("Exceeded time to find email field. " + e.toString());
+                        throw new PageOperationException("Exceeded time to find email field. " + e.toString());
                 }
         }
-        
+
         /**
          * Method that types the visitor comment
          * @return String
@@ -236,14 +247,14 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
         {
                 try
                 {
-                    drone.findAndWait(FEEDBACK_COMMENT).sendKeys(comment);
+                        drone.findAndWait(FEEDBACK_COMMENT).sendKeys(comment);
                 }
                 catch (TimeoutException e)
                 {
-                    throw new PageOperationException("Exceeded time to find email field. " + e.toString());
+                        throw new PageOperationException("Exceeded time to find email field. " + e.toString());
                 }
         }
-        
+
         /**
          * Method to click on Create article
          *
@@ -261,7 +272,7 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
                         throw new PageOperationException("Exceeded time to create article. " + e.toString());
                 }
         }
-        
+
         /**
          * Method to verify the add comment successful message
          *
@@ -269,19 +280,188 @@ public class WcmqsBlogPostPage extends WcmqsAbstractArticlePage
          */
         public boolean isAddCommentMessageDisplay()
         {
-            try{
-                WebElement message=drone.findAndWait(ADD_SUCCESS_MESSAGE);               
-                return message.isDisplayed();
-            }
-            catch (TimeoutException e)
-            {
-                return false;
-            }
+                try
+                {
+                        WebElement message = drone.findAndWait(ADD_SUCCESS_MESSAGE);
+                        return message.isDisplayed();
+                }
+                catch (TimeoutException e)
+                {
+                        return false;
+                }
         }
-        
+
         public WcmqsComment getCommentSection(String visitorName, String commentText)
         {
-            return new WcmqsComment(drone,visitorName,commentText);
+                return new WcmqsComment(drone, visitorName, commentText);
         }
+
+        public void clickToggleEditMarkers()
+        {
+                try
+                {
+                        drone.findAndWait(TOGGLE_EDIT_MARKERS).click();
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to click Edit Toggle Markers. " + e.toString());
+                }
+
+        }
+
+        public boolean isEditMarkersDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(ALFRESCO_CONTENT_MARKERS);
+                        return true;
+                }
+                catch (TimeoutException e)
+                {
+                        return false;
+                }
+
+        }
+
+        public void changeOrientationLeft()
+        {
+                try
+                {
+                        drone.findAndWait(ORIENTATION).click();
+                        drone.findAndWait(ORIENTATION_LEFT).click();
+
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to click change orientation to LEFT. " + e.toString());
+                }
+        }
+
+        public void changeOrientationTop()
+        {
+                try
+                {
+                        drone.findAndWait(ORIENTATION).click();
+                        drone.findAndWait(ORIENTATION_TOP).click();
+
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to click change orientation to TOP. " + e.toString());
+                }
+        }
+
+        public void changeOrientationRight()
+        {
+                try
+                {
+                        drone.findAndWait(ORIENTATION).click();
+                        drone.findAndWait(ORIENTATION_RIGHT).click();
+
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to click change orientation to RIGHT. " + e.toString());
+                }
+        }
+
+        public boolean isAWEOrientedLeft()
+        {
+                try
+                {
+                        WebElement awe = drone.findAndWait(ALFRESCO_WEB_EDITOR);
+                        String aweClass = awe.getAttribute("class");
+
+                        if (aweClass.endsWith("left"))
+                        {
+                                return true;
+                        }
+                        else
+                        {
+                                return false;
+                        }
+
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find Alfresco Web Editor. " + e.toString());
+                }
+        }
+
+        public boolean isAWEOrientedTop()
+        {
+                try
+                {
+                        WebElement awe = drone.findAndWait(ALFRESCO_WEB_EDITOR);
+                        String aweClass = awe.getAttribute("class");
+
+                        if (aweClass.endsWith("top"))
+                        {
+                                return true;
+                        }
+                        else
+                        {
+                                return false;
+                        }
+
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find Alfresco Web Editor. " + e.toString());
+                }
+        }
+
+        public boolean isAWEOrientedRight()
+        {
+                try
+                {
+                        WebElement awe = drone.findAndWait(ALFRESCO_WEB_EDITOR);
+                        String aweClass = awe.getAttribute("class");
+
+                        if (aweClass.endsWith("right"))
+                        {
+                                return true;
+                        }
+                        else
+                        {
+                                return false;
+                        }
+
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find Alfresco Web Editor. " + e.toString());
+                }
+        }
+
+        public WcmqsEditPage clickAWECreateArticle()
+        {
+                try
+                {
+                        drone.findAndWait(AWE_CREATE).click();
+                        drone.findAndWait(AWE_CREATE_ARTICLE).click();
+                        return new WcmqsEditPage(drone).render();
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to click AWE Create article" + e.toString());
+                }
+
+        }
+
+        public WcmqsEditPage clickAWEEditArticle()
+        {
+                try
+                {
+                        drone.findAndWait(AWE_EDIT).click();
+                        drone.findAndWait(AWE_EDIT_ARTICLE).click();
+                        return new WcmqsEditPage(drone).render();
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to click AWE Edit article" + e.toString());
+                }
+        }
+
 
 }

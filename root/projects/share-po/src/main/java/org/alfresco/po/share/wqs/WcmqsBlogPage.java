@@ -14,7 +14,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 /**
  * Created by Lucian Tuca on 11/18/2014.
  */
-public class WcmqsBlogPage extends SharePage
+public class WcmqsBlogPage extends WcmqsAbstractPage
 {
         @RenderWebElement
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
@@ -24,7 +24,7 @@ public class WcmqsBlogPage extends SharePage
         public static final String COMPANY_ORGANISES_WORKSHOP = "Company organises workshop";
         public static final String ANALYSTS_LATEST_THOUGHTS = "latest thoughts";
 
-        public static final String BLOG_MENU = "Blog";
+
         public static final String BLOG = "blog";
 
         public static final String BLOG_1 = "blog1.html";

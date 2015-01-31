@@ -27,10 +27,14 @@ public class WcmqsHomePage extends WcmqsAbstractPage
         private final By CONTACT_MENU = By.cssSelector("div.link-menu");
         private final By FIRST_ARTICLE = By.cssSelector("div[id='left'] div.interior-content ul>li:nth-child(1)>h4>a");
         private final By BANNER = By.cssSelector("div.slideshow-rm");
-
         private final By PUBLICATIONS_MENU = By.cssSelector("a[href$='publications/']");
         private final By RESEARCH_REPORTS = By.cssSelector("a[href$='research-reports/']");
         private final By WHITE_PAPERS = By.cssSelector("a[href$='white-papers/']");
+        private final By SLIDE_READ_MORE = By.cssSelector("div[class='slideshow-rm']>a");
+        private final By NEWS_AND_ANALYSIS_PANEL = By.cssSelector("div[id='left']");
+        private final By FEATURED_SECTION = By.cssSelector("div[class='h-box-1']>div[class='services-box']>h3");
+        private final By EXAMPLE_FEATURE_SECTION = By.cssSelector("div[class='h-box-2']>div[class='address-box']>div");
+        private final By LATEST_BLOG_ARTICLES = By.cssSelector("div[id='right']>div[class='latest-news']");
 
         // private final By BLOG_ARTICLE=By.cssSelector("div[id='left'] div.interior-content div.blog-entry:nth-child(2)>h2>a");
         // private final By RIGHT_PANEL = By.cssSelector("div[id='right']");
@@ -260,5 +264,71 @@ public class WcmqsHomePage extends WcmqsAbstractPage
 
                 return new WcmqsAllPublicationsPage(drone);
         }
+
+        public boolean isSlideReadMoreButtonDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(SLIDE_READ_MORE);
+                        return true;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find Read More. " + e.toString());
+                }
+        }
+
+        public boolean isNewsAndAnalysisSectionDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(NEWS_AND_ANALYSIS_PANEL);
+                        return true;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find News and Analysis. " + e.toString());
+                }
+        }
+
+        public boolean isFeaturedSectionDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(FEATURED_SECTION);
+                        return true;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find Featured Section. " + e.toString());
+                }
+        }
+
+        public boolean isExampleFeatureSectionDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(EXAMPLE_FEATURE_SECTION);
+                        return true;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find Example Feature Section. " + e.toString());
+                }
+        }
+
+        public boolean isLatestBlogArticlesDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(LATEST_BLOG_ARTICLES);
+                        return true;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find Latest Blog Articles. " + e.toString());
+                }
+        }
+
 
 }
