@@ -272,4 +272,26 @@ public class CloudSignInPage extends ShareDialogue
         }
         return "";
     }
+    
+    /**
+     * Verify if the Sign up Link is displayed
+     * 
+     * @return true if the link displayed else false.
+     */
+    public boolean isSignUpLinkDisplayed()
+    {
+        try
+        {
+            return drone.find(SIGN_UP_LINK).isDisplayed();
+        }
+        catch (NoSuchElementException e)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Sign up link is not visible", e);
+            }
+        }
+        return false;
+    }
+
 }
