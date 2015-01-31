@@ -63,10 +63,10 @@
                <#if field.disabled  && !(field.control.params.forceEditable?? && field.control.params.forceEditable == "true")>disabled="true"</#if>>
                <#list field.control.params.options?split(optionSeparator) as nameValue>
                   <#if nameValue?index_of(labelSeparator) == -1>
-                     <option value='${nameValue?html}'<#if nameValue == fieldValue?string || (fieldValue?is_number && fieldValue?c == nameValue)> selected="selected"</#if>>${nameValue?html}</option>
+                     <option value="${nameValue?html}"<#if nameValue == fieldValue?string || (fieldValue?is_number && fieldValue?c == nameValue)> selected="selected"</#if>>${nameValue?html}</option>
                   <#else>
                      <#assign choice=nameValue?split(labelSeparator)>
-                     <option value='${choice[0]?html}'<#if choice[0] == fieldValue?string || (fieldValue?is_number && fieldValue?c == choice[0])> selected="selected"</#if>>${msgValue(choice[1])?html}</option>
+                     <option value="${choice[0]?html}"<#if choice[0] == fieldValue?string || (fieldValue?is_number && fieldValue?c == choice[0])> selected="selected"</#if>>${msgValue(choice[1])?html}</option>
                   </#if>
                </#list>
          </select>
