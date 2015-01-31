@@ -3122,7 +3122,6 @@ display: none;
 .yui-resize {
 position: relative;
 zoom: 1;
-z-index: 0;
 }
 .yui-resize-wrap {
 zoom: 1;
