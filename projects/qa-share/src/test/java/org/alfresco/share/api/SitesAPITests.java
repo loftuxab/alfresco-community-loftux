@@ -15,7 +15,6 @@
 
 package org.alfresco.share.api;
 
-import mx4j.tools.config.DefaultConfigurationBuilder;
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.MySitesDashlet;
@@ -36,9 +35,10 @@ import org.alfresco.rest.api.tests.client.PublicApiClient.ListResponse;
 import org.alfresco.rest.api.tests.client.PublicApiException;
 import org.alfresco.rest.api.tests.client.RequestContext;
 import org.alfresco.rest.api.tests.client.data.*;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserDashboard;
+import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.share.util.api.FavouritesAPI;
 import org.alfresco.share.util.api.SitesAPI;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
@@ -47,7 +47,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.omg.CORBA.PUBLIC_MEMBER;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -125,10 +124,10 @@ public class SitesAPITests extends SitesAPI
         CustomizeSitePage customizeSitePage = siteDashBoard.getSiteNav().selectCustomizeSite().render();
         List<SitePageType> addPageTypes = new ArrayList<>();
         addPageTypes.add(SitePageType.BLOG);
-        //addPageTypes.add(SitePageType.WIKI);
+        addPageTypes.add(SitePageType.WIKI);
         customizeSitePage.addPages(addPageTypes);
 
-        //ShareUserDashboard.addPageToSite(drone, siteName, SitePageType.WIKI, SitePageType.BLOG);
+//        ShareUserDashboard.addPageToSite(drone, siteName, SitePageType.WIKI, SitePageType.BLOG);
 
         SiteDashboardPage siteDashPage = ShareUser.openSiteDashboard(drone, siteName);
         WikiPage wikiPage = siteDashPage.getSiteNav().selectSiteWikiPage().render();
@@ -179,6 +178,7 @@ public class SitesAPITests extends SitesAPI
             assertEquals(e.getHttpResponse().getStatusCode(), 401, e.getHttpResponse().toString());
         }
 
+        AlfrescoVersion version = drone.getProperties().getVersion();
         // Status: 200 for invited network
         if (version.isCloud())
         {
@@ -218,6 +218,7 @@ public class SitesAPITests extends SitesAPI
         }
 
         // Status: 200 for invited network
+        AlfrescoVersion version = drone.getProperties().getVersion();
         if (version.isCloud())
         {
             response = getSiteById(testUserAnotherDomain, DOMAIN, siteName);
@@ -1518,7 +1519,7 @@ public class SitesAPITests extends SitesAPI
         }
     }
 
-    @Test
+    @Test(groups = {"ProductBugs"})
     public void AONE_14248() throws Exception
     {
         FavouriteSite site = new FavouriteSite(siteName);
