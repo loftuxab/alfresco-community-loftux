@@ -537,12 +537,12 @@ public class SelectContentPage extends SharePage
     {
         try
         {
-            drone.find(navigatorButton).click();
-            drone.waitUntilElementClickable(navigateCompanyHome, 3);
-            drone.find(navigateCompanyHome).click();
+            drone.findAndWait(navigatorButton).click();
+            //drone.waitUntilElementClickable(navigateCompanyHome, 5);
+            drone.findAndWait(navigateCompanyHome).click();
             // waitUntilAlert();
         }
-        catch (NoSuchElementException te)
+        catch (TimeoutException te)
         {
             throw new ShareException("Unable to find buttons" + te);
         }
