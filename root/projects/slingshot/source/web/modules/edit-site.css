@@ -12,3 +12,9 @@
 {
    padding-left:2em;
 }
+
+.edit-site textarea
+{
+   resize: vertical;
+   overflow: auto;
+}
