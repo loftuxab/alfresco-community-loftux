@@ -12,7 +12,7 @@ public abstract class WcmqsAbstractArticlePage extends WcmqsAbstractPage
 {
     protected final By EDIT_LINK = By.cssSelector("a.alfresco-content-edit");
     protected final By CREATE_LINK = By.cssSelector("a.alfresco-content-new");
-    protected final By DELETE_LINK = By.cssSelector("alfresco-content-delete");
+    protected final By DELETE_LINK = By.cssSelector("a.alfresco-content-delete");
     
     public WcmqsAbstractArticlePage(WebDrone drone)
     {
@@ -47,6 +47,66 @@ public abstract class WcmqsAbstractArticlePage extends WcmqsAbstractPage
         {
             drone.findAndWait(EDIT_LINK).click();
             return new WcmqsEditPage(drone);
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+        }
+    }
+
+    public void clickCreateButton()
+    {
+        try
+        {
+            drone.findAndWait(CREATE_LINK).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+        }
+    }
+
+    public void clickDeleteButton()
+    {
+        try
+        {
+            drone.findAndWait(DELETE_LINK).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+        }
+    }
+    
+    public boolean isEditButtonDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(EDIT_LINK).isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+        }
+    }
+    
+    public boolean isCreateButtonDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(CREATE_LINK).isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find edit button. " + e.toString());
+        }
+    }
+    
+    public boolean isDeleteButtonDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(DELETE_LINK).isDisplayed();
         }
         catch (TimeoutException e)
         {
