@@ -20,4 +20,10 @@
         </classes>
     </test>
 
+    <test name="CreateRuleExecuteTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.content.rules.CreateRuleExecuteTest" />
+        </classes>
+    </test>
+
 </suite>
