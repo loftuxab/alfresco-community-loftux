@@ -7,6 +7,8 @@
  */
 package org.alfresco.po.share.site.document;
 
+import java.io.File;
+
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.site.SitePage;
@@ -22,8 +24,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
 
 /**
  * Unit tests to verify methods of Sync Info functions are working correctly.
@@ -137,6 +137,41 @@ public class SyncInfoPageTest extends AbstractDocumentTest
         syncInfoPage.render(1000);
         Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
         syncInfoPage.selectUnsyncRemoveContentFromCloud(false);
+    }
+
+    @Test(groups = "Hybrid", dependsOnMethods = "testSyncInfoPopup")
+    public void testSyncFailedInfoDetails() throws Exception
+    {
+        int i = 0;
+        SyncInfoPage syncInfoPage;
+        drone.refresh();
+        documentLibPage.render();
+        syncInfoPage = documentLibPage.getFileDirectoryInfo(file.getName()).clickOnViewCloudSyncInfo().render();
+        syncInfoPage.render(1000);
+        syncInfoPage.selectUnsyncRemoveContentFromCloud(false);
+
+        drone.refresh();
+        documentLibPage.render();
+        desAndAsgPage = (DestinationAndAssigneePage) documentLibPage.getFileDirectoryInfo(file.getName()).selectSyncToCloud().render();
+        documentLibPage = ((DocumentLibraryPage) desAndAsgPage.selectSubmitButtonToSync()).render();
+        documentLibPage.render();
+        while (i <= 15)
+        {
+            if (documentLibPage.getFileDirectoryInfo(file.getName()).isCloudSyncFailed())
+            {
+                syncInfoPage = new SyncInfoPage(drone);
+                syncInfoPage = documentLibPage.getFileDirectoryInfo(file.getName()).clickOnViewCloudSyncInfo().render();
+                syncInfoPage.clickShowDetails();
+                Assert.assertTrue(syncInfoPage.getSyncFailedErrorDetail().equals("Content with the same name already exists in the target folder."));
+                Assert.assertTrue(syncInfoPage.getTechnicalReport().contains("Content with the same name already exists in the target folder."));
+                break;
+            }
+            else
+            {
+                i++;
+                drone.refresh();
+            }
+        }
     }
 
     @AfterClass
