@@ -43,6 +43,7 @@ import org.alfresco.module.vti.metadata.model.Document;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.site.SiteModel;
+import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.repo.webdav.ActivityPostProducer;
@@ -86,6 +87,7 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
     private WebDAVActivityPoster activityPoster;
     private WebDavService davService;
     private WebDAVHelper davHelper;
+    private TenantService tenantService;
     
     /**
      * Set authentication component
@@ -115,6 +117,35 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
     public void setShareUtils(ShareUtils shareUtils)
     {
         this.shareUtils = shareUtils;
+    }
+
+    @Override
+    public void setActivityPoster(WebDAVActivityPoster activityPoster)
+    {
+        this.activityPoster = activityPoster;
+    }
+
+    public void setDavService(WebDavService davService)
+    {
+        this.davService = davService;
+    }
+
+    public void setDavHelper(WebDAVHelper davHelper)
+    {
+        this.davHelper = davHelper;
+    }
+
+    public WebDAVHelper getDavHelper()
+    {
+        return this.davHelper;
+    }
+
+    /**
+     * @param tenantService the tenantService to set
+     */
+    public void setTenantService(TenantService tenantService)
+    {
+        this.tenantService = tenantService;
     }
 
     /**
@@ -308,7 +339,12 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
                 };
 
                 resourceNodeRef = getTransactionService().getRetryingTransactionHelper().doInTransaction(cb);
-                newlyCreated = true;
+                
+                if (resourceNodeRef != null)
+                {
+                    newlyCreated = true;
+                }
+
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 response.setHeader(WebDAV.HEADER_LOCK_TOKEN, WebDAV.makeLockToken(resourceNodeRef, getUserName()));
                 response.setHeader(DAV_EXT_LOCK_TIMEOUT, lockTimeOut);
@@ -861,26 +897,5 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
         {
             throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }        
-    }
-
-    @Override
-    public void setActivityPoster(WebDAVActivityPoster activityPoster)
-    {
-        this.activityPoster = activityPoster;
-    }
-
-    public void setDavService(WebDavService davService)
-    {
-        this.davService = davService;
-    }
-
-    public void setDavHelper(WebDAVHelper davHelper)
-    {
-        this.davHelper = davHelper;
-    }
-
-    public WebDAVHelper getDavHelper()
-    {
-        return this.davHelper;
     }
 }
