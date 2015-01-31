@@ -2,14 +2,18 @@ package org.alfresco.po.alfresco;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -130,6 +134,34 @@ public class WcmqsHomePage extends SharePage
         }
 
         return new WcmqsNewsPage(drone);
+    }
+    
+    /**
+     * Method to get all the folders for a selected Primary folder (eg: News, Publications, Blog)
+     * 
+     * @return List<ShareLink>
+     */
+    public List<ShareLink> getAllFoldersFromMenu(String folderName)
+    {
+        List<ShareLink> folders = new ArrayList<ShareLink>();
+        try
+        {
+            WebElement folder = drone.findAndWait(BLOG_MENU);
+            drone.mouseOver(folder);
+            
+            List<WebElement>  firstFolders = drone.findAll(By.xpath(String.format(".//*[@id='myslidemenu']//a[contains(@href,'%s')]", folderName)));
+            
+            for (WebElement div : firstFolders)
+            {
+                folders.add(new ShareLink(div, drone));
+            }
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageException("Unable to access news site data", nse);
+        }
+
+        return folders;
     }
 
 }
