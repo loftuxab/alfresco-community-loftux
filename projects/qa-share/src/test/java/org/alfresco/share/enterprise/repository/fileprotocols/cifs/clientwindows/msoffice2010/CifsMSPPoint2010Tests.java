@@ -29,6 +29,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -78,13 +79,24 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName);
 
-        // word files
-        docFileName_6265 = "AONE-6265";
-        docFileName_6266 = "AONE-6266";
+        cifsPath = power.getCIFSPath();
 
-        // excel files
-        fileName_6271 = "AONE-6271";
-        fileName_6272 = "AONE-6272";
+        networkDrive = power.getMapDriver();
+        networkPath = power.getMapPath();
+
+        // create user
+        String[] testUser1 = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        super.tearDown();
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod() throws Exception
+    {
+        super.setup();
 
         // power point files
         fileName_6277 = "AONE-62771";
@@ -94,33 +106,20 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         fileName_6281 = "AONE-6281";
         fileName_6282 = "AONE-6282";
 
-        cifsPath = power.getCIFSPath();
-
-        networkDrive = power.getMapDriver();
-        networkPath = power.getMapPath();
         mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
-
-        // create user
-        String[] testUser1 = new String[] { testUser };
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
-
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         Runtime.getRuntime().exec(mapConnect);
         logger.info("----------Mapping succesfull " + testUser);
-
     }
 
     @AfterMethod(alwaysRun = true)
     public void teardownMethod() throws Exception
     {
+        super.tearDown();
+
         Runtime.getRuntime().exec("taskkill /F /IM POWERPNT.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
-    }
-    
-    @AfterClass(alwaysRun = true)
-    public void unmapDrive() throws Exception
-    {
+
         Runtime.getRuntime().exec("net use * /d /y");
         logger.info("--------Unmapping succesfull " + testUser);
     }
@@ -171,7 +170,6 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // Open .pptx document for editing.
             // The document is opened in write mode.
             Ldtp ldtp = power.openFileFromCMD(fullPath, fileName_6277 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
-
             // ---- Step 2 ----
             // ---- Step Action -----
             // Add any data.
@@ -188,8 +186,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // The document is saved. No errors occur in UI and in the log. No tmp files are left.
             power.saveOffice(ldtp);
             ldtp.waitTime(3);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
+            power.exitOfficeApplication(ldtp, fileName_6277);
+            // ldtp.waitTime(3);
 
             int nrFiles = getNumberOfFilesFromPath(fullPath);
             Assert.assertEquals(nrFiles, 1);
@@ -237,8 +235,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // All changes are present and displayed correctly
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
+            power.exitOfficeApplication(ldtp, fileName_6277);
+            // ldtp.waitTime(3);
             nrFiles = getNumberOfFilesFromPath(fullPath);
             Assert.assertEquals(nrFiles, 1);
 
@@ -285,8 +283,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // All changes are present and displayed correctly
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
+            power.exitOfficeApplication(ldtp, fileName_6277);
+            // ldtp.waitTime(3);
             nrFiles = getNumberOfFilesFromPath(fullPath);
             Assert.assertEquals(nrFiles, 1);
 
@@ -385,8 +383,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // tmp files are left.
             power.saveOffice(ldtp);
             ldtp.waitTime(3);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
+            power.exitOfficeApplication(ldtp, fileName_6278);
+            // ldtp.waitTime(3);
 
             int nrFiles = getNumberOfFilesFromPath(fullPath);
             Assert.assertEquals(nrFiles, 1);
@@ -442,8 +440,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // All changes are present and displayed correctly
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
+            power.exitOfficeApplication(ldtp, fileName_6278);
+            // ldtp.waitTime(3);
             nrFiles = getNumberOfFilesFromPath(fullPath);
             Assert.assertEquals(nrFiles, 1);
 
@@ -499,8 +497,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // All changes are present and displayed correctly
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
+            power.exitOfficeApplication(ldtp, fileName_6278);
+            // ldtp.waitTime(3);
             nrFiles = getNumberOfFilesFromPath(fullPath);
             Assert.assertEquals(nrFiles, 1);
 
@@ -646,8 +644,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         l1.waitTime(3);
         power.getAbstractUtil().waitForWindow(fileName_6279);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        power.exitOfficeApplication(l1, fileName_6279);
+        // l1.waitTime(3);
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -673,7 +671,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // files are left.
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
+        power.exitOfficeApplication(l1, fileName_6279);
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -742,8 +740,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // files are left.
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
+        power.exitOfficeApplication(l1, fileName_6279);
+        // l1.waitTime(2);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -797,8 +795,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // files are left.
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
+        power.exitOfficeApplication(l1, fileName_6279);
+        // l1.waitTime(2);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -857,8 +855,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         l1.waitTime(3);
         power.getAbstractUtil().waitForWindow(fileName_6280);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        power.exitOfficeApplication(l1, fileName_6280);
+        // l1.waitTime(3);
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -886,7 +884,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // files are left.
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
+        power.exitOfficeApplication(l1, fileName_6280);
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -958,8 +956,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // files are left.
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
+        power.exitOfficeApplication(l1, fileName_6280);
+        // l1.waitTime(2);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1017,8 +1015,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // files are left.
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
+        power.exitOfficeApplication(l1, fileName_6280);
+        // l1.waitTime(2);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1072,7 +1070,6 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
         int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = power.openFileFromCMD(localPath, fileName_6281 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
-
         l1 = power.getAbstractUtil().setOnWindow(fileName_6281);
         power.goToFile(l1);
         l1.waitTime(1);
@@ -1081,7 +1078,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6281, testUser, DEFAULT_PASSWORD);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6281);
         l1.waitTime(4);
-        power.exitOfficeApplication(l1);
+        power.exitOfficeApplication(l1, fileName_6281);
 
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
@@ -1152,7 +1149,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // files are left.
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
+        power.exitOfficeApplication(l1, fileName_6281);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -1207,7 +1204,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1 = power.getAbstractUtil().setOnWindow(fileName_6281);
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
+        power.exitOfficeApplication(l1, fileName_6281);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -1258,7 +1255,6 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
 
         int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = power.openFileFromCMD(localPath, fileName_6282 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
-
         l1 = power.getAbstractUtil().setOnWindow(fileName_6282);
         power.goToFile(l1);
         l1.waitTime(1);
@@ -1267,7 +1263,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6282, testUser, DEFAULT_PASSWORD);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6282);
         l1.waitTime(4);
-        power.exitOfficeApplication(l1);
+        power.exitOfficeApplication(l1, fileName_6282);
 
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
@@ -1342,8 +1338,8 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // files are left.
         power.saveOffice(l1);
         l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
+        power.exitOfficeApplication(l1, fileName_6282);
+        // l1.waitTime(2);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -1400,9 +1396,9 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(5);
-        power.exitOfficeApplication(l1);
         l1.waitTime(2);
+        power.exitOfficeApplication(l1, fileName_6282);
+        // l1.waitTime(2);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 

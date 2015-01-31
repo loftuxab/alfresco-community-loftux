@@ -29,6 +29,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -49,10 +50,6 @@ public class CifsMSWord2010Tests extends AbstractUtils
     String docxFileName_6268;
     String docxFileName_6269;
     String docxFileName_6270;
-    String fileName_6271;
-    String fileName_6272;
-    String fileName_6277;
-    String fileName_6278;
 
     String image_1 = DATA_FOLDER + CIFS_LOCATION + SLASH + "CifsPic1.jpg";
     String image_2 = DATA_FOLDER + CIFS_LOCATION + SLASH + "CifsPic2.jpg";
@@ -75,7 +72,24 @@ public class CifsMSWord2010Tests extends AbstractUtils
 
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName);
+        cifsPath = word.getCIFSPath();
+        networkDrive = word.getMapDriver();
+        networkPath = word.getMapPath();
 
+        // create user
+        String[] testUser1 = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        super.tearDown();
+
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod() throws Exception
+    {
+        super.setup();
         // word files
         docFileName_6265 = "AONE-6265";
         docFileName_6266 = "AONE-6266";
@@ -84,41 +98,19 @@ public class CifsMSWord2010Tests extends AbstractUtils
         docxFileName_6269 = "AONE-6269";
         docxFileName_6270 = "AONE-6270";
 
-        // excel files
-        fileName_6271 = "AONE-6271";
-        fileName_6272 = "AONE-6272";
-
-        // power point files
-        fileName_6277 = "AONE-6277";
-        fileName_6278 = "AONE-6278";
-
-        cifsPath = word.getCIFSPath();
-
-        networkDrive = word.getMapDriver();
-        networkPath = word.getMapPath();
         mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
-
-        // create user
-        String[] testUser1 = new String[] { testUser };
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
-
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         Runtime.getRuntime().exec(mapConnect);
         logger.info("----------Mapping succesfull " + testUser);
-
     }
 
     @AfterMethod(alwaysRun = true)
     public void teardownMethod() throws Exception
     {
+        super.tearDown();
         Runtime.getRuntime().exec("taskkill /F /IM WINWORD.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
-    }
 
-    @AfterClass(alwaysRun = true)
-    public void unmapDrive() throws Exception
-    {
         Runtime.getRuntime().exec("net use * /d /y");
         logger.info("--------Unmapping succesfull " + testUser);
     }
@@ -253,7 +245,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Open .docx document for editing.
         // The document is opened in write mode.
         Ldtp ldtp = word.openFileFromCMD(fullPath, docFileName_6265 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().setOnWindow(docFileName_6265);
         // ---- Step 2 ----
         // ---- Step Action -----
         // Add any data.
@@ -269,7 +261,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // tmp files are left.
         word.saveOffice(ldtp);
         ldtp.waitTime(2);
-        word.exitOfficeApplication(ldtp);
+        word.exitOfficeApplication(ldtp, docFileName_6265);
 
         int nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
@@ -303,7 +295,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = word.openFileFromCMD(fullPath, docFileName_6265 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().setOnWindow(docFileName_6265);
         // ---- Step 7 ----
         // ---- Step Action -----
         // Add any data.
@@ -318,7 +310,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // All changes are present and displayed correctly
         word.saveOffice(ldtp);
         ldtp.waitTime(2);
-        word.exitOfficeApplication(ldtp);
+        word.exitOfficeApplication(ldtp, docFileName_6265);
 
         nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
@@ -351,7 +343,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = word.openFileFromCMD(fullPath, docFileName_6265 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().setOnWindow(docFileName_6265);
         // ---- Step 12 ----
         // ---- Step Action -----
         // Add any data.
@@ -366,7 +358,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // All changes are present and displayed correctly
         word.saveOffice(ldtp);
         ldtp.waitTime(2);
-        word.exitOfficeApplication(ldtp);
+        word.exitOfficeApplication(ldtp, docFileName_6265);
 
         nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
@@ -439,7 +431,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Open .docx document for editing.
         // The document is opened in write mode.
         Ldtp ldtp = word.openFileFromCMD(fullPath, docFileName_6266 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().setOnWindow(docFileName_6266);
         // ---- Step 2 ----
         // ---- Step Action -----
         // Add any data.
@@ -456,7 +448,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(ldtp);
         ldtp.waitTime(5);
-        word.exitOfficeApplication(ldtp);
+        word.exitOfficeApplication(ldtp, docFileName_6266);
 
         int nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
@@ -490,7 +482,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = word.openFileFromCMD(fullPath, docFileName_6266 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().setOnWindow(docFileName_6266);
         // ---- Step 7 ----
         // ---- Step Action -----
         // Add any data.
@@ -506,7 +498,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // All changes are present and displayed correctly
         word.saveOffice(ldtp);
         ldtp.waitTime(5);
-        word.exitOfficeApplication(ldtp);
+        word.exitOfficeApplication(ldtp, docFileName_6266);
 
         nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
@@ -539,7 +531,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = word.openFileFromCMD(fullPath, docFileName_6266 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().setOnWindow(docFileName_6266);
         // ---- Step 12 ----
         // ---- Step Action -----
         // Add any data.
@@ -555,7 +547,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // All changes are present and displayed correctly
         word.saveOffice(ldtp);
         ldtp.waitTime(5);
-        word.exitOfficeApplication(ldtp);
+        word.exitOfficeApplication(ldtp, docFileName_6266);
 
         nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
@@ -606,7 +598,6 @@ public class CifsMSWord2010Tests extends AbstractUtils
 
         int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = word.openFileFromCMD(localPath, docxFileName_6269 + docxFileType, testUser, DEFAULT_PASSWORD, false);
-
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6269);
         word.goToFile(l1);
         l1.waitTime(1);
@@ -615,7 +606,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.operateOnSaveAsWithFullPath(l1, fullPath, docxFileName_6269, testUser, DEFAULT_PASSWORD);
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6269);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6269);
 
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
@@ -686,7 +677,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6269);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -740,7 +731,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6269);
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6269);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -791,16 +782,14 @@ public class CifsMSWord2010Tests extends AbstractUtils
 
         int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = word.openFileFromCMD(localPath, docxFileName_6270 + docxFileType, testUser, DEFAULT_PASSWORD, false);
-
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6270);
         word.goToFile(l1);
         l1.waitTime(1);
         word.getAbstractUtil().clickOnObject(l1, "SaveAs");
 
         word.operateOnSaveAsWithFullPath(l1, fullPath, docxFileName_6270, testUser, DEFAULT_PASSWORD);
-        l1 = word.getAbstractUtil().setOnWindow(docxFileName_6270);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6270);
 
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
@@ -851,7 +840,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // --- Expected results --
         // The document is opened in write mode.
         l1 = word.openFileFromCMD(fullPath, docxFileName_6270 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-        l1 = word.getAbstractUtil().setOnWindow(docxFileName_6269);
+        l1 = word.getAbstractUtil().setOnWindow(docxFileName_6270);
         String actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(docxFileName_6270), "Microsoft Excel - " + docxFileName_6270 + " window is active.");
 
@@ -871,7 +860,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6270);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -905,7 +894,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // --- Expected results --
         // The document is opened in write mode.
         l1 = word.openFileFromCMD(fullPath, docxFileName_6270 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-        l1 = word.getAbstractUtil().setOnWindow(docxFileName_6269);
+        l1 = word.getAbstractUtil().setOnWindow(docxFileName_6270);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(docxFileName_6270), "Microsoft Excel - " + docxFileName_6270 + " window is active.");
 
@@ -926,7 +915,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         l1 = word.getAbstractUtil().setOnWindow(docxFileName_6269);
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6270);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -981,7 +970,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.saveAsOffice(l1, fullPath + docxFileName_6267);
         word.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         word.getAbstractUtil().waitForWindow(docxFileName_6267);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6267);
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -1006,7 +995,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6267);
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1058,7 +1047,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = word.openFileFromCMD(fullPath, docxFileName_6267 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().setOnWindow(docxFileName_6267);
         // ---- Step 8 ----
         // ---- Step Action -----
         // Add any data.
@@ -1074,7 +1063,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6267);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1110,7 +1099,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = word.openFileFromCMD(fullPath, docxFileName_6267 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().setOnWindow(docxFileName_6267);
         // ---- Step 13 ----
         // ---- Step Action -----
         // Add any data.
@@ -1126,7 +1115,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6267);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1183,8 +1172,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         word.editOffice(l1, addText);
         word.saveAsOffice(l1, fullPath + docxFileName_6268);
         word.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
-        word.getAbstractUtil().findWindowName(docxFileName_6268);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6268);
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -1192,7 +1180,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = word.openFileFromCMD(fullPath, docxFileName_6268 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-        l1 = word.getAbstractUtil().setOnWindow(docxFileName_6268);
+        word.getAbstractUtil().setOnWindow(docxFileName_6268);
 
         // ---- Step 3 ----
         // ---- Step Action -----
@@ -1210,7 +1198,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6268);
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1261,7 +1249,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = word.openFileFromCMD(fullPath, docxFileName_6268 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().waitForWindow(docxFileName_6268);
         // ---- Step 8 ----
         // ---- Step Action -----
         // Add any data (5-10 mb).
@@ -1278,7 +1266,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6268);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1314,7 +1302,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = word.openFileFromCMD(fullPath, docxFileName_6268 + docxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        word.getAbstractUtil().waitForWindow(docxFileName_6268);
         // ---- Step 13 ----
         // ---- Step Action -----
         // Add any data (5-10 mb).
@@ -1331,7 +1319,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // files are left.
         word.saveOffice(l1);
         l1.waitTime(2);
-        word.exitOfficeApplication(l1);
+        word.exitOfficeApplication(l1, docxFileName_6268);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 

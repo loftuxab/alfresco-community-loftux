@@ -29,6 +29,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -77,9 +78,24 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName);
 
-        // word files
-        docFileName_6265 = "AONE-6265";
-        docFileName_6266 = "AONE-6266";
+        cifsPath = excel.getCIFSPath();
+
+        networkDrive = excel.getMapDriver();
+        networkPath = excel.getMapPath();
+
+        // create user
+        String[] testUser1 = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        super.tearDown();
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod() throws Exception
+    {
+        super.setup();
 
         // excel files
         fileName_6271 = "AONE-6271";
@@ -89,21 +105,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         fileName_6275 = "AONE-6275";
         fileName_6276 = "AONE-6276";
 
-        // power point files
-        fileName_6277 = "AONE-6277";
-        fileName_6278 = "AONE-6278";
-
-        cifsPath = excel.getCIFSPath();
-
-        networkDrive = excel.getMapDriver();
-        networkPath = excel.getMapPath();
         mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
-
-        // create user
-        String[] testUser1 = new String[] { testUser };
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
-
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         Runtime.getRuntime().exec(mapConnect);
         logger.info("----------Mapping succesfull " + testUser);
@@ -113,13 +115,10 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     @AfterMethod(alwaysRun = true)
     public void teardownMethod() throws Exception
     {
+        super.tearDown();
         Runtime.getRuntime().exec("taskkill /F /IM EXCEL.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
-    }
 
-    @AfterClass(alwaysRun = true)
-    public void unmapDrive() throws Exception
-    {
         Runtime.getRuntime().exec("net use * /d /y");
         logger.info("--------Unmapping succesfull " + testUser);
     }
@@ -168,7 +167,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // Open .xlsx document for editing.
         // The document is opened in write mode.
         Ldtp ldtp = excel.openFileFromCMD(fullPath, fileName_6271 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        excel.getAbstractUtil().setOnWindow(fileName_6271);
         // ---- Step 2 ----
         // ---- Step Action -----
         // Add any data.
@@ -183,8 +182,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp files are left.
         excel.saveOffice(ldtp);
         ldtp.waitTime(3);
-        excel.exitOfficeApplication(ldtp);
-        ldtp.waitTime(3);
+        excel.exitOfficeApplication(ldtp, fileName_6271);
+        // ldtp.waitTime(3);
 
         int nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
@@ -216,6 +215,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = excel.openFileFromCMD(fullPath, fileName_6271 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().setOnWindow(fileName_6271);
 
         // ---- Step 7 ----
         // ---- Step Action -----
@@ -231,8 +231,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // All changes are present and displayed correctly
         excel.saveOffice(ldtp);
         ldtp.waitTime(2);
-        excel.exitOfficeApplication(ldtp);
-        ldtp.waitTime(3);
+        excel.exitOfficeApplication(ldtp, fileName_6271);
+        // ldtp.waitTime(3);
         nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
 
@@ -262,6 +262,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = excel.openFileFromCMD(fullPath, fileName_6271 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().setOnWindow(fileName_6271);
 
         // ---- Step 12 ----
         // ---- Step Action -----
@@ -277,8 +278,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // All changes are present and displayed correctly
         excel.saveOffice(ldtp);
         ldtp.waitTime(2);
-        excel.exitOfficeApplication(ldtp);
-        ldtp.waitTime(3);
+        excel.exitOfficeApplication(ldtp, fileName_6271);
+        // ldtp.waitTime(3);
         nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
 
@@ -365,8 +366,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp files are left.
         excel.saveOffice(ldtp);
         ldtp.waitTime(3);
-        excel.exitOfficeApplication(ldtp);
-        ldtp.waitTime(3);
+        excel.exitOfficeApplication(ldtp, fileName_6272);
+        // ldtp.waitTime(3);
 
         int nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
@@ -398,6 +399,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = excel.openFileFromCMD(fullPath, fileName_6272 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().setOnWindow(fileName_6272);
 
         // ---- Step 7 ----
         // ---- Step Action -----
@@ -414,8 +416,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // All changes are present and displayed correctly
         excel.saveOffice(ldtp);
         ldtp.waitTime(2);
-        excel.exitOfficeApplication(ldtp);
-        ldtp.waitTime(3);
+        excel.exitOfficeApplication(ldtp, fileName_6272);
+        // ldtp.waitTime(3);
         nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
 
@@ -445,6 +447,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = excel.openFileFromCMD(fullPath, fileName_6272 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().setOnWindow(fileName_6272);
 
         // ---- Step 12 ----
         // ---- Step Action -----
@@ -461,8 +464,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // All changes are present and displayed correctly
         excel.saveOffice(ldtp);
         ldtp.waitTime(2);
-        excel.exitOfficeApplication(ldtp);
-        ldtp.waitTime(3);
+        excel.exitOfficeApplication(ldtp, fileName_6272);
+        // ldtp.waitTime(3);
         nrFiles = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(nrFiles, 1);
 
@@ -599,8 +602,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveAsOffice(l1, fullPath + fileName_6273);
         excel.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         l1.waitTime(2);
-        excel.getAbstractUtil().waitForWindow(fileName_6273);
-        excel.exitOfficeApplication(l1);
+        excel.exitOfficeApplication(l1, fileName_6273);
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -625,7 +627,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // files are left.
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
+        excel.exitOfficeApplication(l1, fileName_6273);
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -677,6 +679,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6273 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().setOnWindow(fileName_6272);
 
         // ---- Step 8 ----
         // ---- Step Action -----
@@ -693,8 +696,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // files are left.
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        excel.exitOfficeApplication(l1, fileName_6273);
+        // l1.waitTime(3);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -730,6 +733,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6273 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().setOnWindow(fileName_6273);
 
         // ---- Step 13 ----
         // ---- Step Action -----
@@ -746,8 +750,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // files are left.
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        excel.exitOfficeApplication(l1, fileName_6273);
+        // l1.waitTime(3);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -805,8 +809,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveAsOffice(l1, fullPath + fileName_6274);
         excel.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         l1.waitTime(3);
-        excel.getAbstractUtil().waitForWindow(fileName_6274);
-        excel.exitOfficeApplication(l1);
+        excel.exitOfficeApplication(l1, fileName_6274);
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -832,8 +835,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // files are left.
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
-        l1.waitTime(5);
+        excel.exitOfficeApplication(l1, fileName_6274);
+        // l1.waitTime(5);
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -885,6 +888,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6274 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().setOnWindow(fileName_6274);
 
         // ---- Step 8 ----
         // ---- Step Action -----
@@ -902,8 +906,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // files are left.
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        excel.exitOfficeApplication(l1, fileName_6274);
+        // l1.waitTime(3);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -939,6 +943,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6274 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().setOnWindow(fileName_6274);
 
         // ---- Step 13 ----
         // ---- Step Action -----
@@ -956,8 +961,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // files are left.
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        excel.exitOfficeApplication(l1, fileName_6274);
+        // l1.waitTime(3);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1020,7 +1025,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6275, testUser, DEFAULT_PASSWORD);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6275);
         l1.waitTime(3);
-        excel.exitOfficeApplication(l1);
+        excel.exitOfficeApplication(l1, fileName_6275);
 
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
@@ -1091,7 +1096,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // files are left.
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
+        excel.exitOfficeApplication(l1, fileName_6275);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -1145,7 +1150,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6275);
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
+        excel.exitOfficeApplication(l1, fileName_6275);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -1205,7 +1210,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6276, testUser, DEFAULT_PASSWORD);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6276);
         l1.waitTime(3);
-        excel.exitOfficeApplication(l1);
+        excel.exitOfficeApplication(l1, fileName_6276);
 
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
@@ -1278,8 +1283,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // files are left.
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
-        l1.waitTime(5);
+        excel.exitOfficeApplication(l1, fileName_6276);
+        // l1.waitTime(5);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -1334,8 +1339,8 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6276);
         excel.saveOffice(l1);
         l1.waitTime(2);
-        excel.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        excel.exitOfficeApplication(l1, fileName_6276);
+        // l1.waitTime(3);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -1386,5 +1391,5 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         r.keyRelease(KeyEvent.VK_CONTROL);
         r.keyRelease(KeyEvent.VK_V);
     }
-    
+
 }
