@@ -1,4 +1,4 @@
-package org.alfresco.share.enterprise.repository.fileprotocols.cifs.msoffice2010;
+package org.alfresco.share.enterprise.repository.fileprotocols.cifs.clientwindows.msoffice2010;
 
 import java.awt.AWTException;
 import java.awt.Robot;
