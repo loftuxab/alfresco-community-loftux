@@ -68,7 +68,7 @@ public class MSOutlook2010Tests extends AbstractUtils
     {
         super.setup();
 
-        next_site = "2";
+        next_site = "4";
 
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName) + next_site;
@@ -109,6 +109,18 @@ public class MSOutlook2010Tests extends AbstractUtils
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, linkSite, location, testUser, DEFAULT_PASSWORD, true, false);
 
+        String windowNameSite = outlook.abstractUtil.waitForWindow(linkSite);
+        Ldtp l1 = new Ldtp(windowNameSite);
+        l1.activateWindow(windowNameSite);
+
+        // "Go to workspace" link appears in Meeting Workspase sidebar.
+        Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "hlnkGotoworkspace"));
+
+        // paneMessage: is the pane that holds the new event informations
+        // Meeting Workspace: sub (link)
+        // Visit the workspace to learn more about this meeting or edit its contents" message is displayed in message field
+        Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "paneMessage"));
+
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
@@ -141,13 +153,25 @@ public class MSOutlook2010Tests extends AbstractUtils
     {
         String testName = getTestName();
         String location = testName + " - Room";
-        String subject = testName + next_site + "1";
+        String subject = testName + next_site;
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
         // create new meeting workspace
         outlook.operateOnLinkToExistingWorkspace(l, sharePointPath, linkSite, subject, location, testUser, DEFAULT_PASSWORD, true);
+
+        String windowNameSite = outlook.abstractUtil.waitForWindow(subject);
+        Ldtp l1 = new Ldtp(windowNameSite);
+        l1.activateWindow(windowNameSite);
+
+        // "Go to workspace" link appears in Meeting Workspase sidebar.
+        Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "hlnkGotoworkspace"));
+
+        // paneMessage: is the pane that holds the new event informations
+        // Meeting Workspace: sub (link)
+        // Visit the workspace to learn more about this meeting or edit its contents" message is displayed in message field
+        Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "paneMessage"));
 
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -444,6 +468,18 @@ public class MSOutlook2010Tests extends AbstractUtils
         // create new meeting workspace
         outlook.operateOnLinkToExistingWorkspace(l, sharePointPath, linkSite, event, location, testUser, DEFAULT_PASSWORD, true);
 
+        String windowNameSite = outlook.abstractUtil.waitForWindow(event);
+        Ldtp l1 = new Ldtp(windowNameSite);
+        l1.activateWindow(windowNameSite);
+
+        // "Go to workspace" link appears in Meeting Workspase sidebar.
+        Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "hlnkGotoworkspace"));
+
+        // paneNotes: is the pane that holds the new event informations
+        // Meeting Workspace: sub (link)
+        // Visit the workspace to learn more about this meeting or edit its contents" message is displayed in message field
+        Assert.assertTrue(outlook.getAbstractUtil().isObjectDisplayed(l1, "paneMessage"));
+
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
@@ -551,7 +587,6 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
-
     }
 
     @Test(groups = "alfresco-one")
@@ -630,9 +665,9 @@ public class MSOutlook2010Tests extends AbstractUtils
 
         l2.selectItem("cboWorkspaceDropdown", linkSite);
         l2.click("hlnkViewworkspace");
+
         Boolean isSite = siteDashBoard.isSiteTitle(linkSite);
         Assert.assertTrue(isSite);
-
     }
 
     @Test(groups = "alfresco-one")
@@ -656,7 +691,6 @@ public class MSOutlook2010Tests extends AbstractUtils
         // navigate to Calendar
         CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage();
         Assert.assertFalse(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_ALL_DAY_EVENT, siteName));
-
     }
 
     @Test(groups = { "DataPrepMSOutlook" })
