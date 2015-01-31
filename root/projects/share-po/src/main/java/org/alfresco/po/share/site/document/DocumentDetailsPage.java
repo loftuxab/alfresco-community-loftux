@@ -1756,28 +1756,19 @@ public class DocumentDetailsPage extends DetailsPage
     /**
      * Gets the popup message error when trying to edit offline a document
      * 
-     * @return String popup message
+     * @return boolean popup message
      */
-    public String getErrorEditOfflineDocument()
+    public boolean isErrorEditOfflineDocument(String fileName)
     {
-        try
-        {
-            WebElement link = drone.find(By.cssSelector(EDIT_OFFLINE_LINK));
-            link.click();
-        }
-        catch (NoSuchElementException e)
-        {
-            throw new PageException("Unable to edit offline", e);
-        }
 
-        try
+        String errorMessage = drone.findAndWait(By.xpath(ERROR_EDITING_DOCUMENT)).getText();
+        if (errorMessage.equals("You cannot edit '" + fileName + "'."))
         {
-            WebElement element = drone.findAndWait(By.xpath(ERROR_EDITING_DOCUMENT));
-            return element.getText();
+            return true;
         }
-        catch (NoSuchElementException e)
+        else
         {
-            throw new PageException("Unable to find the popup", e);
+            return false;
         }
 
     }
