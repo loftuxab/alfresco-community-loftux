@@ -843,6 +843,16 @@
                return this._launchOnlineEditorIE(controlProgID, record, appProgID);
             }
 
+            if ((YAHOO.env.ua.chrome > 0) && !Alfresco.util.isSharePointPluginInstalled())
+            {
+               var extn = Alfresco.util.getFileExtension(loc.file);
+               if (null !== extn)
+               {
+                  var protocolHandler = this.getProtocolForFileExtension(extn.toLowerCase());
+                  return this._launchOnlineEditorChrome(protocolHandler, record.onlineEditUrl);
+               }
+            }
+
             if (Alfresco.util.isSharePointPluginInstalled())
             {
                return this._launchOnlineEditorPlugin(record, appProgID);
@@ -859,6 +869,69 @@
 
          // No success in launching application via ActiveX control; launch the WebDAV URL anyway
          return window.open(record.onlineEditUrl, "_blank");
+      },
+
+      _launchOnlineEditorChrome: function dlA__launchOnlineEditorChrome(protocolHandler, url)
+      {
+          var protocolUrl = protocolHandler + ':ofe%7Cu%7C' + url;
+          var protocolHandlerPresent = false;
+
+          var input = document.createElement('input');
+          var inputTop = document.body.scrollTop + 10;
+          input.setAttribute('style', 'z-index: 1000; background-color: rgba(0, 0, 0, 0); border: none; outline: none; position: absolute; left: 10px; top: '+inputTop+'px;');
+          document.getElementsByTagName("body")[0].appendChild(input);
+          input.focus();
+          input.onblur = function() {
+              protocolHandlerPresent = true;
+          };
+          location.href = protocolUrl;
+          setTimeout(function()
+          {
+              input.onblur = null;
+              input.remove();
+              if(!protocolHandlerPresent)
+              {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                      text: this.msg('message.edit-online.supported_office_version_required')
+                  });
+              }
+          }, 500);
+      },
+
+      getProtocolForFileExtension: function(fileExtension)
+      {
+         var msProtocolNames =
+         {
+            'doc'  : 'ms-word',
+            'docx' : 'ms-word',
+            'docm' : 'ms-word',
+            'dot'  : 'ms-word',
+            'dotx' : 'ms-word',
+            'dotm' : 'ms-word',
+            'xls'  : 'ms-excel',
+            'xlsx' : 'ms-excel',
+            'xlsb' : 'ms-excel',
+            'xlsm' : 'ms-excel',
+            'xlt'  : 'ms-excel',
+            'xltx' : 'ms-excel',
+            'xltm' : 'ms-excel',
+            'xlsm' : 'ms-excel',
+            'ppt'  : 'ms-powerpoint',
+            'pptx' : 'ms-powerpoint',
+            'pot'  : 'ms-powerpoint',
+            'potx' : 'ms-powerpoint',
+            'potm' : 'ms-powerpoint',
+            'pptm' : 'ms-powerpoint',
+            'potm' : 'ms-powerpoint',
+            'pps'  : 'ms-powerpoint',
+            'ppsx' : 'ms-powerpoint',
+            'ppam' : 'ms-powerpoint',
+            'ppsm' : 'ms-powerpoint',
+            'sldx' : 'ms-powerpoint',
+            'sldm' : 'ms-powerpoint',
+         };
+         return msProtocolNames[fileExtension];
       },
 
       /**
