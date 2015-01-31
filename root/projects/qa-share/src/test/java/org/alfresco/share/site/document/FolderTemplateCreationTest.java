@@ -505,8 +505,8 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepEnterpriseOnly" })
-    public void dataPrep_AONE_15041() throws Exception
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15040", alwaysRun = true)
+    public void AONE_15041() throws Exception
     {
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
@@ -530,21 +530,10 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
         // Create Site
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-    }
-
-    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15040", alwaysRun = true)
-    public void AONE_15041() throws Exception
-    {
-        String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName);
-        String siteName = getSiteName(testName);
-
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-        openSiteDashboard(drone, siteName);
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
 
         // Select the Create menu > Create folder from templates
-        ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+//        ShareUser.openSitesDocumentLibrary(drone, siteName).render();
         documentLibraryPage.createFolderFromTemplateHover(folderName + 6).render();
         drone.getCurrentPage().render();
         assertTrue(documentLibraryPage.isFileVisible(folderName + 6), "Folder isn't created");
@@ -727,23 +716,15 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepEnterpriseOnly" })
-    public void dataPrep_AONE_15048() throws Exception
-    {
-
-        String testName = getTestName();
-        String siteName = getSiteName(testName);
-
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-    }
-
     @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15049", alwaysRun = true)
     public void AONE_15048() throws Exception
     {
         String testName = getTestName();
         String siteName = getSiteName(testName);
         String[] folderPath = { "Data Dictionary", "Space Templates" };
+
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
 
         deleteTemplates();
 
@@ -774,12 +755,12 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepEnterpriseOnly" })
-    public void dataPrep_AONE_15049() throws Exception
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15047", alwaysRun = true)
+    public void AONE_15049() throws Exception
     {
-
         String testName = getTestName();
         String siteName = getSiteName(testName);
+        String[] folderPath = { "Data Dictionary", "Space Templates" };
 
         ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
@@ -789,16 +770,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         // Upload template folder
         ShareUserRepositoryPage.navigateFoldersInRepositoryPage(drone, folderPath);
         ShareUserRepositoryPage.createFolderInRepository(drone, folderName + 5, folderName + 5);
-    }
-
-    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15047", alwaysRun = true)
-    public void AONE_15049() throws Exception
-    {
-        String testName = getTestName();
-        String siteName = getSiteName(testName);
-        String[] folderPath = { "Data Dictionary", "Space Templates" };
-
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUser.openUserDashboard(drone);
         openSiteDashboard(drone, siteName);
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         String url = shareUrl + "/page" + "/repository";
