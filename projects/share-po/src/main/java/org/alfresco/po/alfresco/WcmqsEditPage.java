@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 public class WcmqsEditPage extends SharePage
 {
@@ -25,6 +26,8 @@ public class WcmqsEditPage extends SharePage
     private static final By TEMPLATENAME_INPUT = By.cssSelector("input[id='wef-panel-wefPanel_prop_ws_templateName']");
     private static final By SUBMIT_BUTTON = By.cssSelector("button[id='wef-panel-wefPanel-form-submit-button']");
     private static final By CANCEL_BUTTON = By.cssSelector("button[id='wef-panel-wefPanel-form-cancel-button']");
+    
+    private static final By NOTIFICATION_BALLOON = By.cssSelector("div.balloon>div>div");
 
     private final TinyMceEditor contentTinyMceEditor;
 
@@ -166,5 +169,24 @@ public class WcmqsEditPage extends SharePage
         {
             throw new ShareException("Time out finding #tinymce content", toe);
         }
+    }
+
+    public boolean isSubmitButtonDisplayed()
+    {
+        return drone.isElementDisplayed(SUBMIT_BUTTON);
+    }
+    
+    public String getNotificationMessage()
+    {
+        try 
+        {
+            WebElement notifBalloon=drone.findAndWait(NOTIFICATION_BALLOON);
+            return notifBalloon.getText();            
+        }
+        catch (TimeoutException toe)
+        {
+            throw new ShareException("Time out finding notification balloon.", toe);
+        }
+        
     }
 }
