@@ -431,29 +431,25 @@ public class CommentsAPITests extends CommentsAPI
         }
 
         param.clear();
-        param.put("maxItems", "2147483647");
-        param.put("skipCount", "1");
+        param.put("maxItems", "10");
+        param.put("skipCount", "4");
         ListResponse<Comment> response = getNodeComments(testUser, DOMAIN, param, docGuid2);
-        assertNotNull(response);
-        assertEquals(response.getPaging().getMaxItems(), new Integer(2147483647));
-        assertEquals(response.getPaging().getSkipCount(), new Integer(1));
+        assertEquals(response.getPaging().getMaxItems(), new Integer(10));
+        assertEquals(response.getPaging().getSkipCount(), new Integer(4));
 
         param.clear();
         param.put("skipCount", "2");
         response = getNodeComments(testUser, DOMAIN, param, docGuid2);
-        assertNotNull(response);
         assertEquals(response.getPaging().getMaxItems(), new Integer(100));
         assertEquals(response.getPaging().getSkipCount(), new Integer(2));
 
         param.clear();
         param.put("maxItems", "4");
         response = getNodeComments(testUser, DOMAIN, param, docGuid2);
-        assertNotNull(response);
         assertEquals(response.getPaging().getMaxItems(), new Integer(4));
         assertEquals(response.getPaging().getSkipCount(), new Integer(0));
 
         response = getNodeComments(testUser, DOMAIN, null, docGuid2);
-        assertNotNull(response);
         assertEquals(response.getPaging().getMaxItems(), new Integer(100));
         assertEquals(response.getPaging().getSkipCount(), new Integer(0));
 
@@ -570,7 +566,6 @@ public class CommentsAPITests extends CommentsAPI
         assertFalse(nodeComments.getList().contains(comment));
     }
 
-
     @Test
     public void AONE_14222() throws Exception
     {
@@ -606,5 +601,4 @@ public class CommentsAPITests extends CommentsAPI
             fail("Http response code must be 200, but actual is " + e.getHttpResponse());
         }
     }
-
 }

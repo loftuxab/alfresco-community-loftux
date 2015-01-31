@@ -27,9 +27,11 @@ import java.util.Map;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.rest.api.tests.client.PublicApiClient;
 import org.alfresco.rest.api.tests.client.PublicApiClient.ListResponse;
 import org.alfresco.rest.api.tests.client.PublicApiException;
 import org.alfresco.rest.api.tests.client.RequestContext;
+import org.alfresco.rest.api.tests.client.data.PersonNetwork;
 import org.alfresco.rest.api.tests.client.data.Preference;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserMembers;
@@ -58,6 +60,7 @@ public class PeopleAPITests extends PeopleAPI
     private String testUserInvalid;
     private String siteName;
     private Preference testpref;
+    private String testPrefInvalid;
     private String fileName;
     private String fileName2;
     private String fileName3;
@@ -70,7 +73,7 @@ public class PeopleAPITests extends PeopleAPI
         super.beforeClass();
 
         testName = this.getClass().getSimpleName();
-
+        logger.info("Starting Tests: " + testName);
         testUser = getUserNameFreeDomain(testName);
         testUser2 = getUserNameFreeDomain(testName + "_2");
         testUserInvalid = "invalid" + testUser;
@@ -103,20 +106,10 @@ public class PeopleAPITests extends PeopleAPI
         fileDirInfo = doclibPage.getFileDirectoryInfo(fileName3);
         fileDirInfo.selectFavourite();
 
-        // TODO: Uncomment the block below when fixed:
-        // https://issues.alfresco.com/jira/browse/ALF-20594
-        /*
-         * preferences = getPersonPreferences(testUser, DOMAIN, testUser, null);
-         * totalCount = preferences.getPaging().getCount(); if
-         * (preferences.getList().size() > 0) { testpref =
-         * preferences.getList().get(0); // new Preference(
-         * "org.alfresco.ext.sites.favourites.sitemsitesapitests.createdAt",
-         * "2013-11-18T10:11:18.480Z"); }
-         */
+        ListResponse <Preference> preferences = getPersonPreferences(testUser, DOMAIN, testUser, null);
+        testpref = preferences.getList().get(0);
     }
 
-    // TODO: Enable test when fixed:
-    // https://issues.alfresco.com/jira/browse/ALF-20594
     @Test(enabled = true)
     public void AONE_14253() throws Exception
     {
@@ -151,7 +144,7 @@ public class PeopleAPITests extends PeopleAPI
         {
             // Incorrect Pref id
             // TODO: Define invalid Pref Id at class level, its easier to maintain e.g. testUserInvalid
-            getPersonPreference(testUser, DOMAIN, testUser, testpref.getId() + "323");
+            getPersonPreference(testUser, DOMAIN, testUser, testpref.getId() + "321");
             Assert.fail(String.format("AONE_14253: , %s, Expected Result: %s", "getFavourites request with incorrect preference id", "Error 404"));
         }
         catch (PublicApiException e)
@@ -167,7 +160,6 @@ public class PeopleAPITests extends PeopleAPI
         param.put("maxItems", "50");
         param.put("skipCount", "2");
 
-        // TODO: Awaiting fix: https://issues.alfresco.com/jira/browse/ALF-20594
         ListResponse<Preference> response = getPersonPreferences(testUser, DOMAIN, testUser, param);
         assertNotNull(response);
         assertEquals(response.getPaging().getMaxItems(), new Integer(50));
@@ -235,7 +227,6 @@ public class PeopleAPITests extends PeopleAPI
 
         param.clear();
         param.put("skipCount", "2");
-        // TODO: Awaiting fix: https://issues.alfresco.com/jira/browse/ALF-20594
         ListResponse<Preference> response = getPersonPreferences(testUser, DOMAIN, testUser, param);
 
         assertNotNull(response);
@@ -291,8 +282,6 @@ public class PeopleAPITests extends PeopleAPI
         }
     }
 
-    // TODO: Enable test when fixed:
-    // https://issues.alfresco.com/jira/browse/ALF-20594
     @Test(enabled = true)
     public void AONE_14256() throws Exception
     {
@@ -363,7 +352,6 @@ public class PeopleAPITests extends PeopleAPI
         {
             assertEquals(e.getHttpResponse().getStatusCode(), 405);
         }
-
     }
 
     @Test
@@ -413,5 +401,14 @@ public class PeopleAPITests extends PeopleAPI
         {
             assertEquals(e.getHttpResponse().getStatusCode(), 401);
         }
+    }
+
+    @Test
+    public void AONE_14223() throws Exception
+    {
+        publicApiClient.setRequestContext(new RequestContext(DOMAIN, getAuthDetails(testUser)[0], getAuthDetails(testUser)[1]));
+        PublicApiClient.ListResponse<PersonNetwork> networks = getNetworkMemberships(testUser, DOMAIN, testUser, null);
+        Assert.assertTrue(networks.getList().get(0).getNetwork().getId().equals(DOMAIN) && networks.getList().get(0).getIsEnabled() &&
+            networks.getList().get(0).getNetwork().getQuotas().isEmpty(), "Incorrect response is returned");
     }
 }

@@ -49,7 +49,7 @@ import org.testng.annotations.Test;
 
 /**
  * Class to include: Tests for favourite rest apis implemented in alfresco-remote-api.
- * 
+ *
  * @author Abhijeet Bharade
  */
 @Listeners(FailedTestListener.class)
@@ -144,7 +144,7 @@ public class NodesAPITests extends NodesAPI
         {
             getNodeTags(testUser, DOMAIN, docGuidInvalid, null);
             Assert.fail(String.format("AONE_14237: , %s, Expected Result: %s", "get nodes tags request with incorrect nodeId - " + docGuidInvalid,
-                    "Expected error 404"));
+                "Expected error 404"));
         }
         catch (PublicApiException e)
         {
@@ -170,6 +170,8 @@ public class NodesAPITests extends NodesAPI
     {
         // Get: tags/tagId
         Tag nodeTag = new Tag("tagNew");
+        ListResponse<Tag> tags = getNodeTags(testUser, DOMAIN, docGuid, null);
+        tagId = tags.getList().get(0).getNodeId();
 
         try
         {
@@ -182,23 +184,22 @@ public class NodesAPITests extends NodesAPI
             assertEquals(e.getHttpResponse().getStatusCode(), 405);
         }
 
+        // Post: tags
         try
         {
             publicApiClient.setRequestContext(new RequestContext(DOMAIN, getAuthDetails(testUser)[0], getAuthDetails(testUser)[1]));
-            nodesClient.getAll("nodes", docGuid, "tags", "tag1", null, "Could not retrieve the tag");
-            Assert.fail(String.format("AONE_14244: , %s, Expected Result: %s", "GET nodes tag not allowed for tag and tag id", "Expected error 405"));
+            nodesClient.create("nodes", docGuid, "tags", null, null, "Could not create the tag");
+            Assert.fail(String.format("AONE_14244: , %s, Expected Result: %s", "POST nodes tag not allowed for tag and tag id", "Expected error 400"));
         }
         catch (PublicApiException e)
         {
-            assertEquals(e.getHttpResponse().getStatusCode(), 405);
+            assertEquals(e.getHttpResponse().getStatusCode(), 400);
         }
 
-        // Post: tags
-        // TODO: Add step to TestLink
         try
         {
             publicApiClient.setRequestContext(new RequestContext(DOMAIN, getAuthDetails(testUser)[0], getAuthDetails(testUser)[1]));
-            nodesClient.create("nodes", docGuid, "tags", "tag1", nodeTag.toJSON().toJSONString(), "Could not create the tag");
+            nodesClient.create("nodes", docGuid, "tags", tagId, nodeTag.toJSON().toJSONString(), "Could not create the tag");
             Assert.fail(String.format("AONE_14244: , %s, Expected Result: %s", "POST nodes tag not allowed for tag and tag id", "Expected error 405"));
         }
         catch (PublicApiException e)
@@ -222,7 +223,7 @@ public class NodesAPITests extends NodesAPI
         try
         {
             publicApiClient.setRequestContext(new RequestContext(DOMAIN, getAuthDetails(testUser)[0], getAuthDetails(testUser)[1]));
-            nodesClient.update("nodes", docGuid, "tags", nodeTag.getNodeId(), null, "Could not update the tag");
+            nodesClient.update("nodes", docGuid, "tags", tagId, null, "Could not update the tag");
             Assert.fail(String.format("AONE_14244: , %s, Expected Result: %s", "PUT nodes tag not allowed for tag and tag id", "Expected error 405"));
         }
         catch (PublicApiException e)
@@ -277,7 +278,7 @@ public class NodesAPITests extends NodesAPI
         {
             createTag(testUser, DOMAIN, docGuidInvalid, nodeTag);
             Assert.fail(String.format("AONE_14243: , %s, Expected Result: %s", "get nodes tags request with incorrect nodeId - " + docGuid + "yy",
-                    "Expected error 404"));
+                "Expected error 404"));
         }
         catch (PublicApiException e)
         {
@@ -370,7 +371,7 @@ public class NodesAPITests extends NodesAPI
             param.put("maxItems", "b");
             getNodeTags(testUser, DOMAIN, docGuid, param);
             Assert.fail(String.format("AONE_14245: , %s, Expected Result: %s", "getNodeTags request with incorrect skipCount and maxItems - " + param,
-                    "Expected error 400"));
+                "Expected error 400"));
         }
         catch (PublicApiException e)
         {
@@ -384,7 +385,7 @@ public class NodesAPITests extends NodesAPI
             param.put("maxItems", "-2");
             getNodeTags(testUser, DOMAIN, docGuid, param);
             Assert.fail(String.format("AONE_14245: , %s, Expected Result: %s", "getNodeTags request with incorrect skipCount and maxItems - " + param,
-                    "Expected error 400"));
+                "Expected error 400"));
         }
         catch (PublicApiException e)
         {
@@ -444,7 +445,7 @@ public class NodesAPITests extends NodesAPI
         {
             getNodeRatings(testUser, DOMAIN, docGuidInvalid, null);
             Assert.fail(String.format("AONE_14237: , %s, Expected Result: %s", "get nodes ratings request with incorrect nodeId - " + docGuid + "a",
-                    "Expected error 404"));
+                "Expected error 404"));
         }
         catch (PublicApiException e)
         {
@@ -521,7 +522,7 @@ public class NodesAPITests extends NodesAPI
             publicApiClient.setRequestContext(new RequestContext(DOMAIN, getAuthDetails(testUser)[0], getAuthDetails(testUser)[1]));
             nodesClient.remove("nodes", docGuid, "ratings", null, "Could not update the rating");
             Assert.fail(String
-                    .format("AONE_14239: , %s, Expected Result: %s", "DELETE nodes rating not allowed for rating and rating id", "Expected error 405"));
+                .format("AONE_14239: , %s, Expected Result: %s", "DELETE nodes rating not allowed for rating and rating id", "Expected error 405"));
         }
         catch (PublicApiException e)
         {
@@ -575,7 +576,7 @@ public class NodesAPITests extends NodesAPI
         {
             createNodeRating(testUser, DOMAIN, docGuidInvalid, nodeRating);
             Assert.fail(String.format("AONE_14238: , %s, Expected Result: %s", "POST nodes ratings request with incorrect nodeId - " + docGuidInvalid,
-                    "Expected error 404"));
+                "Expected error 404"));
         }
         catch (PublicApiException e)
         {
@@ -592,7 +593,7 @@ public class NodesAPITests extends NodesAPI
             param.put("maxItems", "a");
             getNodeRatings(testUser, DOMAIN, docGuid, param);
             Assert.fail(String.format("AONE_14240: , %s, Expected Result: %s", "getNodeRatings request with incorrect maxItems - " + param,
-                    "Expected error 400"));
+                "Expected error 400"));
         }
         catch (PublicApiException e)
         {
@@ -605,7 +606,7 @@ public class NodesAPITests extends NodesAPI
             param.put("skipCount", "s");
             getNodeRatings(testUser, DOMAIN, docGuid, param);
             Assert.fail(String.format("AONE_14240: , %s, Expected Result: %s", "getNodeRatings request with incorrect skipCount - " + param,
-                    "Expected error 400"));
+                "Expected error 400"));
         }
         catch (PublicApiException e)
         {
@@ -618,7 +619,7 @@ public class NodesAPITests extends NodesAPI
             param.put("maxItems", "-1");
             getNodeRatings(testUser, DOMAIN, docGuid, param);
             Assert.fail(String.format("AONE_14240: , %s, Expected Result: %s", "getNodeRatings request with incorrect maxItems - " + param,
-                    "Expected error 400"));
+                "Expected error 400"));
         }
         catch (PublicApiException e)
         {
@@ -631,7 +632,7 @@ public class NodesAPITests extends NodesAPI
             param.put("skipCount", "-2");
             getNodeRatings(testUser, DOMAIN, docGuid, param);
             Assert.fail(String.format("AONE_14240: , %s, Expected Result: %s", "getNodeRatings request with incorrect skipCount - " + param,
-                    "Expected error 400"));
+                "Expected error 400"));
         }
         catch (PublicApiException e)
         {
@@ -672,7 +673,7 @@ public class NodesAPITests extends NodesAPI
             param.put("maxItems", "b");
             getNodeRatings(testUser, DOMAIN, docGuid, param);
             Assert.fail(String.format("AONE_14240: , %s, Expected Result: %s", "getNodeRatings request with incorrect skipCount and maxItems - " + param,
-                    "Expected error 400"));
+                "Expected error 400"));
         }
         catch (PublicApiException e)
         {
@@ -686,7 +687,7 @@ public class NodesAPITests extends NodesAPI
             param.put("maxItems", "-2");
             getNodeRatings(testUser, DOMAIN, docGuid, param);
             Assert.fail(String.format("AONE_14240: , %s, Expected Result: %s", "getNodeRatings request with incorrect skipCount and maxItems - " + param,
-                    "Expected error 400"));
+                "Expected error 400"));
         }
         catch (PublicApiException e)
         {
