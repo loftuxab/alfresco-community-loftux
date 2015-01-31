@@ -1,15 +1,16 @@
+<#assign id=args.htmlid?html>
 <#if formUI == "true">
    <@formLib.renderFormsRuntime formId=formId />
 </#if>
 
-<div id="${args.htmlid}-dialog">
-   <div id="${args.htmlid}-dialogTitle" class="hd"></div>
+<div id="${id}-dialog">
+   <div id="${id}-dialogTitle" class="hd"></div>
    <div class="bd">
 
       <div id="${formId}-container" class="form-container">
 
          <div class="yui-u first edit-metadata flat-button">
-            <button id="${args.htmlid}-editMetadata" tabindex="0"></button>
+            <button id="${id}-editMetadata" tabindex="0"></button>
          </div>
    
          <#if form.showCaption?exists && form.showCaption>

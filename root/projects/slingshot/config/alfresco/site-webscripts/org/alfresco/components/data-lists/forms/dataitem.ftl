@@ -1,4 +1,4 @@
-<#assign id=args.htmlid>
+<#assign id=args.htmlid?html>
 <#if formUI == "true">
    <@formLib.renderFormsRuntime formId=formId />
 </#if>
@@ -23,7 +23,7 @@
          <form id="${formId}" method="${form.method}" accept-charset="utf-8" enctype="${form.enctype}" action="${form.submissionUrl}">
    
          <#if form.destination??>
-            <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination}" />
+            <input id="${formId}-destination" name="alf_destination" type="hidden" value="${form.destination?html}" />
          </#if>
    
             <div id="${formId}-fields" class="form-fields">

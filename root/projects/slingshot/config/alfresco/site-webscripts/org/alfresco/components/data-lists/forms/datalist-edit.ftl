@@ -1,4 +1,4 @@
-<#assign id=args.htmlid>
+<#assign id=args.htmlid?html>
 <#if formUI == "true">
    <@formLib.renderFormsRuntime formId=formId />
 </#if>
@@ -10,7 +10,7 @@
       <div id="${formId}-container" class="form-container">
 
          <div class="yui-g">
-            <h2 id="${args.htmlid}-dialogHeader">${msg("header")}</h2>
+            <h2 id="${id}-dialogHeader">${msg("header")}</h2>
          </div>
 
          <#if form.showCaption?exists && form.showCaption>
