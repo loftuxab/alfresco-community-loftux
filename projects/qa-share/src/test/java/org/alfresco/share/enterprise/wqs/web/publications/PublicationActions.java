@@ -29,9 +29,6 @@ import java.net.UnknownHostException;
 public class PublicationActions extends AbstractUtils
 {
         private static final Logger logger = Logger.getLogger(PublicationActions.class);
-        private final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
-        private final String QUICK_START_EDITORIAL = "Quick Start Editorial";
-        private final String ROOT_FOLDER = "root";
         private String testName;
         private String wqsURL;
         private String siteName;
@@ -56,8 +53,6 @@ public class PublicationActions extends AbstractUtils
                 {
                         logger.error("Ip address from Alfresco server could not be obtained");
                 }
-
-                ;
                 wqsURL = siteName + ":8080/wcmqs";
                 logger.info(" wcmqs url : " + wqsURL);
                 logger.info("Start Tests from: " + testName);
@@ -104,7 +99,6 @@ public class PublicationActions extends AbstractUtils
                 documentLibPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
                 documentPropertiesPage.setSiteHostname(ipAddress);
                 documentPropertiesPage.clickSave();
-
                 //setup new entry in hosts to be able to access the new wcmqs site
                 String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
                         + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
@@ -122,7 +116,6 @@ public class PublicationActions extends AbstractUtils
                 // Navigate to http://host:8080/wcmqs
                 // ---- Expected results ----
                 // Sample site is opened
-
                 drone.navigateTo(wqsURL);
 
                 //verify that the publications dropdown list exists and has research reports and white papers within it
