@@ -13,6 +13,13 @@
 		<listener
 			class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
 	</listeners>	
+	
+	<test name="MyDashboardWebViewDashletTests" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.mydashboard.MyDashboardWebViewDashletTests" />
+		</classes>
+	</test>
 	 
 	<test name="AddOnsRssFeedDashletTests" verbose="1">
 		<classes>
@@ -28,12 +35,7 @@
 		</classes>
 	</test>
 	
-	<test name="MyDashboardWebViewDashletTests" verbose="1">
-		<classes>
-			<class
-				name="org.alfresco.share.mydashboard.MyDashboardWebViewDashletTests" />
-		</classes>
-	</test>
+	
 	
 	<!--  
 	<test name="TinyMCE editor" verbose="1">
