@@ -47,6 +47,7 @@ import static org.testng.Assert.assertTrue;
  * @since 1.6.2
  */
 @Listeners(FailedTestListener.class)
+@Test(groups = { "TestBug" })
 public class EditTaskPageTest extends AbstractTaskTest
 {
     private EditTaskPage pageUnderTest;
