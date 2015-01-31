@@ -1,8 +1,19 @@
-package org.alfresco.share.enterprise.wqs.web.blog;
-
-/**
- * Created by P3700473 on 12/2/2014.
+/*
+ * Copyright (C) 2005-2015 Alfresco Software Limited
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
+
+package org.alfresco.share.enterprise.wqs.web.blog;
 
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
 import org.alfresco.po.share.dashlet.WebQuickStartOptions;
@@ -11,6 +22,7 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.datalist.DataListPage;
 import org.alfresco.po.share.site.datalist.items.VisitorFeedbackRow;
+import org.alfresco.po.share.site.datalist.items.VisitorFeedbackRowProperties;
 import org.alfresco.po.share.site.datalist.lists.VisitorFeedbackList;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
@@ -33,30 +45,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created by Lucian Tuca on 12/02/2014.
+ * Modified by Sergiu Vidrascu on 01/09/2015
  */
 public class BlogComponent extends AbstractUtils
 {
         private static final Logger logger = Logger.getLogger(BlogComponent.class);
-        private final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
-        private final String QUICK_START_EDITORIAL = "Quick Start Editorial";
-        private final String ROOT = "root";
-
-        private final String ACCOUNTING = "accounting";
-        private final String ACCOUNTING_DATA = "Accounting";
-
-        private String testName;
         private String wqsURL;
         private String siteName;
         private String ipAddress;
-        private String hostName;
 
         @Override @BeforeClass(alwaysRun = true) public void setup() throws Exception
         {
                 super.setup();
-
-                testName = this.getClass().getSimpleName();
+                String testName = this.getClass().getSimpleName();
                 siteName = testName;
-                hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
+                String hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
                 try
                 {
                         ipAddress = InetAddress.getByName(hostName).toString().replaceAll(".*/", "");
@@ -71,6 +74,7 @@ public class BlogComponent extends AbstractUtils
                 wqsURL = siteName + ":8080/wcmqs";
                 logger.info(" wcmqs url : " + wqsURL);
                 logger.info("Start Tests from: " + testName);
+
         }
 
         @AfterClass(alwaysRun = true) public void tearDown()
@@ -119,10 +123,11 @@ public class BlogComponent extends AbstractUtils
                 // Site Dashboard is rendered with Data List link
                 ShareUser.openSiteDashboard(drone, siteName).render();
 
-                //setup new entry in hosts to be able to access the new wcmqs site
+                //                setup new entry in hosts to be able to access the new wcmqs site
                 String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
                         + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
                 Runtime.getRuntime().exec(setHostAddress);
+
         }
 
         /*
@@ -380,17 +385,31 @@ public class BlogComponent extends AbstractUtils
         /*
         * AONE-5677 Verify correct work of comments number value
         */
-        @Test(dependsOnMethods = { "AONE_5676" }, groups = { "WQS" }) public void AONE_5677() throws Exception
+        @Test(groups = { "WQS" }) public void AONE_5677() throws Exception
         {
+                String visitorName = "name " + getTestName();
+                String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
+                String visitorWebsite = "website " + getTestName();
+                String visitorComment = "Comment by " + visitorName;
 
+                navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS);
+                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+                wcmqsBlogPostPage.setVisitorName(visitorName);
+                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
+                wcmqsBlogPostPage.setVisitorWebsite(visitorWebsite);
+                wcmqsBlogPostPage.setVisitorComment(visitorComment);
+                wcmqsBlogPostPage.clickPostButton();
                 // ---- Step 1 ----
                 // ---- Step action ----
                 // Open My Web Site via Alfresco Share;
                 // ---- Expected results ----
                 // Site is opened successfully;
-
-                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-                DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+                navigateTo(getShareUrl());
+                SiteDashboardPage shareSite = ShareUser.openSiteDashboard(drone, siteName);
 
                 // ---- Step 2 ----
                 // ---- Step action ----
@@ -398,7 +417,7 @@ public class BlogComponent extends AbstractUtils
                 // ---- Expected results ----
                 // Data lists component is opened, Visitor Feedback  (Alfresco WCM Quick Start) data list is displayed by default;
 
-                DataListPage dataListPage = docLibPage.getSiteNav().selectDataListPage().render();
+                DataListPage dataListPage = shareSite.getSiteNav().selectDataListPage().render();
 
                 // ---- Step 3 ----
                 // ---- Step action ----
@@ -416,7 +435,7 @@ public class BlogComponent extends AbstractUtils
                 // ---- Expected results ----
                 // Item duplicated message is shown;
 
-                VisitorFeedbackRow testrow = feedbackList.getRowForVisitorEmail("Share-5676" + "@" + DOMAIN_FREE);
+                VisitorFeedbackRow testrow = feedbackList.getRowForVisitorEmail(visitorEmail);
                 testrow.clickDuplicateOnRow();
                 assertThat("Check if the duplicate message appears!", testrow.isDuplicateMessageDisplayed());
 
@@ -427,12 +446,10 @@ public class BlogComponent extends AbstractUtils
                 // Blog1 is opened;
 
                 navigateTo(wqsURL);
-                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage = new WcmqsHomePage(drone);
                 homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
-                WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+                blogPage = new WcmqsBlogPage(drone);
                 blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
                 assertThat("Verify if the correct page opened ", blogPage.getTitle(), containsString(WcmqsBlogPage.ETHICAL_FUNDS));
 
                 // ---- Step 6 ----
@@ -442,7 +459,7 @@ public class BlogComponent extends AbstractUtils
                 // Number of comments increased;
 
                 WcmqsComment wcmqsComment = new WcmqsComment(drone).render();
-                assertThat(wcmqsComment.getNumberOfCommentsOnPage(), is(equalTo(2)));
+                assertThat(wcmqsComment.getNumberOfCommentsOnPage(), is(equalTo(3)));
 
         }
 
@@ -467,8 +484,6 @@ public class BlogComponent extends AbstractUtils
                 homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
                 WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
                 blogPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
                 WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
                 wcmqsBlogPostPage.setVisitorName(visitorName + "!@#$%^&*");
 
@@ -581,6 +596,519 @@ public class BlogComponent extends AbstractUtils
         }
 
         /*
+        * AONE-5680 Verifying correct work of name field on comment form
+        */
+        @Test(groups = { "WQS" }) public void AONE_5680() throws Exception
+        {
+                String visitorName = "name" + getTestName();
+                String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
+                String visitorWebsite = "website " + getTestName();
+                String visitorComment = "Comment by " + visitorName;
+
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened;
+
+                navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Open any blog post;
+                // ---- Expected results ----
+                // Blog post is opened;
+
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Enter data in Name field ended with space;
+                // ---- Expected results ----
+                // Data entered successfully;
+
+                wcmqsBlogPostPage.setVisitorName(visitorName + "     ");
+
+                // ---- Step 4 ----
+                // ---- Step action ----
+                // Fill other fields with correct data and click Post button;
+                // ---- Expected results ----
+                // Data processed correctly, Your comment has been sent message is displayed;
+
+                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
+                wcmqsBlogPostPage.setVisitorWebsite(visitorWebsite);
+                wcmqsBlogPostPage.setVisitorComment(visitorComment);
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Check if posting was succesfull", wcmqsBlogPostPage.isAddCommentMessageDisplay());
+
+        }
+
+        /*
+        * AONE-5681 Commenting blog post with empty mandatory fields
+        */
+        @Test(groups = { "WQS" }) public void AONE_5681() throws Exception
+        {
+                String visitorName = "name" + getTestName();
+                String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
+                String visitorWebsite = "website " + getTestName();
+                String visitorComment = "Comment by " + visitorName;
+
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Do not enter any data and click Post button;
+                // ---- Expected results ----
+                // Friendly notification is displayed;
+
+                navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Main form error message is displayed! ", wcmqsBlogPostPage.isFormProblemsMessageDisplay());
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Leave Name(mandatory) field empty, fill other fields with correct data;
+                // ---- Expected results ----
+                // Data is entered successfully;
+
+                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
+                wcmqsBlogPostPage.setVisitorWebsite(visitorWebsite);
+                wcmqsBlogPostPage.setVisitorComment(visitorComment);
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Click Post button;
+                // ---- Expected results ----
+                // Friendly notification is displayed;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Verify name field error is displayed", wcmqsBlogPostPage.getFormErrorMessages(), hasItem(equalTo("please enter a name")));
+
+                // ---- Step 4 ----
+                // ---- Step action ----
+                // Leave Email(mandatory) field empty, fill other fields with correct data;
+                // ---- Expected results ----
+                // Data is entered successfully;
+
+                wcmqsBlogPostPage.setVisitorName(visitorName);
+                wcmqsBlogPostPage.setVisitorEmail("");
+
+                // ---- Step 5 ----
+                // ---- Step action ----
+                // Click Post button;
+                // ---- Expected results ----
+                // Friendly notification is displayed;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Verify email field error is displayed", wcmqsBlogPostPage.getFormErrorMessages(),
+                        hasItem(equalTo("please enter an email address")));
+
+                // ---- Step 6 ----
+                // ---- Step action ----
+                // Leave Website field empty, fill other fields with correct data;
+                // ---- Expected results ----
+                // Data is entered successfully;
+
+                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
+                wcmqsBlogPostPage.setVisitorWebsite("");
+
+                // ---- Step 7 ----
+                // ---- Step action ----
+                // Click Post button;
+                // ---- Expected results ----
+                // Post is saved successfully;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Posting was succesfull", wcmqsBlogPostPage.isAddCommentMessageDisplay());
+
+                // ---- Step 8 ----
+                // ---- Step action ----
+                // Open Blog post again;
+                // ---- Expected results ----
+                // Blog post is opened;
+
+                homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+
+                assertThat("Verify if the correct page opened ", blogPage.getTitle(), containsString(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP));
+
+                // ---- Step 9 ----
+                // ---- Step action ----
+                // Leave Comment field empty, fill other fields with correct data;
+                // ---- Expected results ----
+                // Data is entered successfully;
+
+                wcmqsBlogPostPage.setVisitorName(visitorName);
+                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
+                wcmqsBlogPostPage.setVisitorWebsite(visitorWebsite);
+
+                // ---- Step 10 ----
+                // ---- Step action ----
+                // Click Post button;
+                // ---- Expected results ----
+                // Friendly notification is displayed;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Verify comment textfield error is displayed", wcmqsBlogPostPage.getFormErrorMessages(), hasItem(equalTo("please enter a comment")));
+        }
+
+        /*
+        * AONE-5682 Checking correct work of Email field
+        */
+        @Test(groups = { "WQS" }) public void AONE_5682() throws Exception
+        {
+                String visitorName = "name" + getTestName();
+                String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
+                String visitorWebsite = "website " + getTestName();
+                String visitorComment = "Comment by " + visitorName;
+
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Enter some email address without @ in Email field(e.g. mail_this.com);
+                // ---- Expected results ----
+                // Data is entered sucessfully;
+
+                navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+
+                wcmqsBlogPostPage.setVisitorEmail("mail_this.com");
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Fill other fields with correct data;
+                // ---- Expected results ----
+                // Data is entered sucessfully;
+
+                wcmqsBlogPostPage.setVisitorName(visitorName);
+                wcmqsBlogPostPage.setVisitorWebsite(visitorWebsite);
+                wcmqsBlogPostPage.setVisitorComment(visitorComment);
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Click Post button;
+                // ---- Expected results ----
+                // Friendly notification is displayed;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Verify invalid email error is displayed", wcmqsBlogPostPage.getFormErrorMessages(),
+                        hasItem(equalTo("the email address is not valid")));
+
+                // ---- Step 4 ----
+                // ---- Step action ----
+                // Enter some incorrect data in Email field(e.g. !#$@^*%.$)#);
+                // ---- Expected results ----
+                // Data is entered sucessfully;
+
+                wcmqsBlogPostPage.setVisitorEmail("!#$@^*%.$");
+
+                // ---- Step 5 ----
+                // ---- Step action ----
+                // Click post button;
+                // ---- Expected results ----
+                // Friendly notification is displayed;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Verify invalid email error is displayed", wcmqsBlogPostPage.getFormErrorMessages(),
+                        hasItem(equalTo("the email address is not valid")));
+
+                // ---- Step 6 ----
+                // ---- Step action ----
+                // Enter some incorrect data woithout . in Email field(e.g. mail1@comcom);
+                // ---- Expected results ----
+                // Data is entered sucessfully;
+
+                wcmqsBlogPostPage.setVisitorEmail("mail@comcom");
+
+                // ---- Step 7 ----
+                // ---- Step action ----
+                // Click Post button;
+                // ---- Expected results ----
+                // Friendly notificetion is displayed;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Verify invalid email error is displayed", wcmqsBlogPostPage.getFormErrorMessages(),
+                        hasItem(equalTo("the email address is not valid")));
+
+                // ---- Step 8 ----
+                // ---- Step action ----
+                // Enter some valid email address in Email field(e.g. mail1@tt.com);
+                // ---- Expected results ----
+                // Data is entered sucessfully;
+
+                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
+
+                // ---- Step 9 ----
+                // ---- Step action ----
+                // Click Post button;
+                // ---- Expected results ----
+                // Comment is saved and displayed correctly;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Posting was succesfull", wcmqsBlogPostPage.isAddCommentMessageDisplay());
+
+        }
+
+        /*
+        * AONE-5683 Reporting post
+        */
+        @Test(groups = { "WQS" }) public void AONE_5683() throws Exception
+        {
+
+                String visitorName = "name" + getTestName();
+                String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
+                String visitorWebsite = "website " + getTestName();
+                String visitorComment = "Comment by " + visitorName;
+                String feedBack = getTestName() + " Test feedback Subject";
+
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Click Report this function;
+                // ---- Expected results ----
+                // This comment has been removed message is shown;
+
+                navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS);
+                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+
+                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
+                wcmqsBlogPostPage.setVisitorName(visitorName);
+                wcmqsBlogPostPage.setVisitorWebsite(visitorWebsite);
+                wcmqsBlogPostPage.setVisitorComment(visitorComment);
+                wcmqsBlogPostPage.clickPostButton();
+
+                homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS);
+                wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+                wcmqsBlogPostPage.reportLastCreatedPost();
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Navigate to Visitor Feedback (Alfresco Share - Site' Name - Data Lists);
+                // ---- Expected results ----
+                // Visitor Feedback data list is opened;
+
+                //                ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+                navigateTo(getShareUrl());
+                DataListPage dataListPage = ShareUser.openSiteDashboard(drone, siteName).render().getSiteNav().selectDataListPage().render();
+                dataListPage.selectDataList("Visitor Feedback (Quick Start Editorial)");
+                VisitorFeedbackList feedbackList = new VisitorFeedbackList(drone);
+                feedbackList.render();
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Verify the presense of recently added comment;
+                // ---- Expected results ----
+                // Recently added comment is present in Visitor Feedback data list;
+
+                VisitorFeedbackRow newFeedback = feedbackList.getRowForSpecificValues(visitorEmail, visitorComment, visitorName, visitorWebsite);
+                assertThat(newFeedback.getVisitorName(), is(equalTo(visitorName)));
+                assertThat(newFeedback.getVisitorEmail(), is(equalTo(visitorEmail)));
+                assertThat(newFeedback.getVisitorComment(), is(equalTo(visitorComment)));
+                assertThat(newFeedback.getVisitorWebsite(), is(equalTo(visitorWebsite)));
+
+                // ---- Step 4 ----
+                // ---- Step action ----
+                // Verify Comment has been flagged field;
+                // ---- Expected results ----
+                // Comment has been flagged is checked;
+
+                assertThat(newFeedback.getCommnetFlag(), is(equalTo("true")));
+
+                // ---- Step 5 ----
+                // ---- Step action ----
+                // Click Edit button;
+                // ---- Expected results ----
+                // Edit data item form is shown;
+                feedbackList.getDrone().maximize();
+                newFeedback.clickEditOnRow();
+
+                // ---- Step 6 ----
+                // ---- Step action ----
+                // Uncheck Comment has been flagged checkbox;
+                // ---- Expected results ----
+                // Comment has been flagged checkbox is unchecked;
+
+                VisitorFeedbackRowProperties visitorFeedbackRowProperties = new VisitorFeedbackRowProperties(drone).render();
+                visitorFeedbackRowProperties.clickCommentFlag();
+
+                // ---- Step 7 ----
+                // ---- Step action ----
+                // Fill Feedback Subject field with any valid data;
+                // ---- Expected results ----
+                // Data is entered in Feedback Subject field;
+
+                visitorFeedbackRowProperties.setFeedbackSubject(feedBack);
+                visitorFeedbackRowProperties.clickSave();
+
+                // ---- Step 8 ----
+                // ---- Step action ----
+                // Go back to Blog post page;
+                // ---- Expected results ----
+                // Blog post page is opened;
+
+                navigateTo(wqsURL);
+                homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS);
+                assertThat("Verify if the correct page opened ", blogPage.getTitle(), containsString(WcmqsBlogPage.ETHICAL_FUNDS));
+
+                // ---- Step 9 ----
+                // ---- Step action ----
+                // Verify the presence of edited comment;
+                // ---- Expected results ----
+                // Recently edited comment is present on Blog post page;
+
+                wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+                assertThat("Verify if the new feedback comment has re-appeared", wcmqsBlogPostPage.getFeedBackComments(), hasItem(visitorComment));
+
+        }
+
+        /*
+        * AONE-5684 Verify correct work of Leave Comment form
+        */
+        @Test(groups = { "WQS" }) public void AONE_5684() throws Exception
+        {
+
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Fill in Leave Comment fields with correct data;
+                // ---- Expected results ----
+                // Data is entered successfully;
+
+                String visitorName = "name" + getTestName();
+                String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
+                String visitorWebsite = "website " + getTestName();
+                String visitorComment = "Comment by " + visitorName;
+
+                navigateTo(wqsURL);
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS);
+                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+
+                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
+                wcmqsBlogPostPage.setVisitorName(visitorName);
+                wcmqsBlogPostPage.setVisitorWebsite(visitorWebsite);
+                wcmqsBlogPostPage.setVisitorComment(visitorComment);
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Click Post button;
+                // ---- Expected results ----
+                // Your comment has been sent! message is shown;
+
+                wcmqsBlogPostPage.clickPostButton();
+                assertThat("Posting was succesfull", wcmqsBlogPostPage.isAddCommentMessageDisplay());
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Refresh browser page and verify the presence of Leave Comment form;
+                // ---- Expected results ----
+                // Page is refreshed, Leave Comment form is shown again;
+
+                homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                blogPage = new WcmqsBlogPage(drone);
+                blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS);
+                wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+                assertThat("Leave comment form is displayed ", wcmqsBlogPostPage.isLeaveCommentFormDisplayed());
+        }
+
+        @Test(groups = "DataPrepWQS") public void dataPrep_AONE_5685() throws Exception
+        {
+                // ---- Data prep ----
+                ShareUser.openSiteDashboard(drone, siteName);
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder("Alfresco Quick Start");
+                documentLibPage.selectFolder("Quick Start Editorial");
+                documentLibPage.selectFolder("root");
+                documentLibPage.selectFolder("blog");
+                documentLibPage.getFileDirectoryInfo("blog1.html").addTag("testtag 1");
+                documentLibPage.getFileDirectoryInfo("blog2.html").addTag("testtag 1");
+                documentLibPage.getFileDirectoryInfo("blog3.html").addTag("testtag 2");
+
+                documentLibPage.getFileDirectoryInfo("index.html");
+        }
+
+        /*
+        * AONE-5685 Section tags
+        */
+        @Test(groups = { "WQS" }) public void AONE_5685() throws Exception
+        {
+
+                // ---- Step 1 ----
+                // ---- Step action ----
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened;
+
+                navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ----
+                // Open Blogs page;
+                // ---- Expected results ----
+                // Blogs page is opened;
+
+                WcmqsHomePage homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+
+                // ---- Step 3 ----
+                // ---- Step action ----
+                // Verify Section Tags;
+                // ---- Expected results ----
+                // Tags links with number of tags is displayed:
+                // testtag 1 (2)
+                // testtag 2 (1)
+
+                WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
+                assertThat("Verify if tag list contains testtag 1 (2) and testtag 2 (1)", wcmqsBlogPage.getTagList(),
+                        hasItems("testtag 1 (2)", "testtag 2 (1)"));
+
+                // ---- Step 4 ----
+                // ---- Step action ----
+                // Click testtag 1 link;
+                // ---- Expected results ----
+                // Two blog posts are dislayed;
+
+                wcmqsBlogPage.clickTag("testtag 1 (2)");
+                WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
+                assertThat("Check if the number of results is correct", wcmqsSearchPage.getTagSearchResults().size(), is(equalTo(2)));
+
+                // ---- Step 5 ----
+                // ---- Step action ----
+                // Click testtag 2 link;
+                // ---- Expected results ----
+                // One blog post is displayed;
+
+                homePage = new WcmqsHomePage(drone);
+                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
+                wcmqsBlogPage.clickTag("testtag 2 (1)");
+                wcmqsSearchPage = new WcmqsSearchPage(drone);
+                assertThat("Check if the number of results is correct", wcmqsSearchPage.getTagSearchResults().size(), is(equalTo(1)));
+        }
+
+        /*
         * AONE-5679 Adding blog post comment with too long data
         */
         @Test(groups = { "WQS" }) public void AONE_5679() throws Exception
@@ -609,8 +1137,6 @@ public class BlogComponent extends AbstractUtils
                 homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
                 WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
                 blogPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
                 WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
 
                 // ---- Step 3 ----
@@ -701,60 +1227,6 @@ public class BlogComponent extends AbstractUtils
 
                 wcmqsBlogPostPage.setVisitorName(visitorName);
                 wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
-                wcmqsBlogPostPage.setVisitorComment(visitorComment);
-                wcmqsBlogPostPage.clickPostButton();
-                assertThat("Posting was succesfull", wcmqsBlogPostPage.isAddCommentMessageDisplay());
-
-        }
-
-        /*
-        * AONE-5680 Verifying correct work of name field on comment form
-        */
-        @Test(groups = { "WQS" }) public void AONE_5680() throws Exception
-        {
-                String visitorName = "name" + getTestName();
-                String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
-                String visitorWebsite = "website " + getTestName();
-                String visitorComment = "Comment by " + visitorName;
-
-                // ---- Step 1 ----
-                // ---- Step action ----
-                // Navigate to http://host:8080/wcmqs
-                // ---- Expected results ----
-                // Sample site is opened;
-
-                navigateTo(wqsURL);
-
-                // ---- Step 2 ----
-                // ---- Step action ----
-                // Open any blog post;
-                // ---- Expected results ----
-                // Blog post is opened;
-
-                WcmqsHomePage homePage = new WcmqsHomePage(drone);
-                homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR);
-                WcmqsBlogPage blogPage = new WcmqsBlogPage(drone);
-                blogPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
-                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
-                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
-
-                // ---- Step 3 ----
-                // ---- Step action ----
-                // Enter data in Name field ended with space;
-                // ---- Expected results ----
-                // Data entered successfully;
-
-                wcmqsBlogPostPage.setVisitorName(visitorName);
-
-                // ---- Step 4 ----
-                // ---- Step action ----
-                // Fill other fields with correct data and click Post button;
-                // ---- Expected results ----
-                // Data processed correctly, Your comment has been sent message is displayed;
-
-                wcmqsBlogPostPage.setVisitorEmail(visitorEmail);
-                wcmqsBlogPostPage.setVisitorWebsite(visitorWebsite);
                 wcmqsBlogPostPage.setVisitorComment(visitorComment);
                 wcmqsBlogPostPage.clickPostButton();
                 assertThat("Posting was succesfull", wcmqsBlogPostPage.isAddCommentMessageDisplay());
