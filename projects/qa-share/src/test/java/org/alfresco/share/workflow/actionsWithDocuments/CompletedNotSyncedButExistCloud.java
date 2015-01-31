@@ -461,5 +461,260 @@ public class CompletedNotSyncedButExistCloud extends AbstractWorkflow
 
     }
 
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15705() throws Exception
+    {
+
+        createCompletedWorkflow("15705Z2");
+    }
+
+    /**
+     * AONE-15705:Move (Cloud)
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15705() throws Exception
+    {
+
+        String prefix = "15705Z2";
+        String opSiteName = getSiteName(prefix + testName) + "-OP";
+        String cloudSiteName = getSiteName(prefix + testName) + "-CL";
+
+        String fileName = getFileName(prefix + testName) + ".txt";
+        String folderName = getFolderName(prefix + testName);
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Cloud Move the synced document to another location.
+        // --- Expected results ---
+        // The content is moved successfully.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
+
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        CopyOrMoveContentPage moveToPage = documentLibraryPage.getFileDirectoryInfo(fileName).selectMoveTo().render();
+        moveToPage.selectPath(folderName).render().selectOkButton().render();
+        ShareUser.logout(hybridDrone);
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Check the logs in OP and in Cloud.
+        // --- Expected results ---
+        // The logs contain no error messages. The changes are not synchronized.
+
+        // TODO : Please update 2nd step in TestLink as verifying in logs is not present.
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // OP Verify the document.
+        // --- Expected results ---
+        // The document is not synced.
+
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        ShareUser.logout(drone);
+
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15706() throws Exception
+    {
+
+        createCompletedWorkflow("15706");
+    }
+
+    /**
+     * AONE-15706:Remove (OP)
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15706() throws Exception
+    {
+
+        String prefix = "15706";
+        String opSiteName = getSiteName(prefix + testName) + "-OP";
+        String cloudSiteName = getSiteName(prefix + testName) + "-CL";
+        String fileName = getFileName(prefix + testName) + ".txt";
   
+        // --- Step 1 ---
+        // --- Step action ---
+        // OP Remove the synced document.
+        // --- Expected results ---
+        // The content is removed successfully.
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        documentLibraryPage.getFileDirectoryInfo(fileName).selectCheckbox();
+        documentLibraryPage = ShareUser.deleteSelectedContent(drone).render();
+        Assert.assertFalse(documentLibraryPage.isFileVisible(fileName));
+        ShareUser.logout(drone);
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Check the logs in OP and in Cloud.
+        // --- Expected results ---
+        // The logs contain no error messages.
+
+        // TODO : Please update 2nd step in TestLink as verifying in logs is not present.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // Cloud Verify the document.
+        // --- Expected results ---
+        // The document is not synced.
+
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        ShareUser.logout(hybridDrone);
+    }
+    
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15707() throws Exception
+    {
+
+        createCompletedWorkflow("15707");
+    }
+
+    /**
+     * AONE-15707:Remove (Cloud)
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15707() throws Exception
+    {
+
+        String prefix = "15707";
+        String opSiteName = getSiteName(prefix + testName) + "-OP";
+        String cloudSiteName = getSiteName(prefix + testName) + "-CL";
+        String fileName = getFileName(prefix + testName) + ".txt";
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Cloud Remove the synced document.
+        // --- Expected results ---
+        // The content is removed.
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        documentLibraryPage.getFileDirectoryInfo(fileName).selectCheckbox();
+        documentLibraryPage = ShareUser.deleteSelectedContent(drone).render();
+        Assert.assertFalse(documentLibraryPage.isFileVisible(fileName));
+        ShareUser.logout(drone);
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Check the logs in OP and in Cloud.
+        // --- Expected results ---
+        // The logs contain no error messages.
+
+        // TODO : Please update 2nd step in TestLink as verifying in logs is not present.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+
+        // --- Step 3 ---
+        // --- Step action ---
+        // OP Verify the document.
+        // --- Expected results ---
+        // The document is not synced.
+
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        ShareUser.logout(hybridDrone);
+    }
+    
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15708() throws Exception
+    {
+
+        createCompletedWorkflow("15708");
+    }
+
+    /**
+     * AONE-15708:Unsync (OP)
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15708() throws Exception
+    {
+
+        String prefix = "15708";
+        String opSiteName = getSiteName(prefix + testName) + "-OP";
+        String cloudSiteName = getSiteName(prefix + testName) + "-CL";
+        String fileName = getFileName(prefix + testName) + ".txt";
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // OP Unsync the synced document.
+        // --- Expected results ---
+        // Unsync action is not available.
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isUnSyncFromCloudLinkPresent());
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        ShareUser.logout(drone);
+
+        // --- Step 2 ---
+        // --- Step action ---
+        // Cloud Verify the document.
+        // --- Expected results ---
+        // The document is not synced.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        ShareUser.logout(hybridDrone);
+        
+    }
+    
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_15709() throws Exception
+    {
+
+        createCompletedWorkflow("15709");
+    }
+
+    /**
+     * AONE-15709:Unsync (Cloud)
+     */
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15709() throws Exception
+    {
+
+        String prefix = "15709";
+        String opSiteName = getSiteName(prefix + testName) + "-OP";
+        String cloudSiteName = getSiteName(prefix + testName) + "-CL";
+        String fileName = getFileName(prefix + testName) + ".txt";
+
+        // --- Step 1 ---
+        // --- Step action ---
+        // Cloud Unsync the synced document.
+        // --- Expected results ---
+        // Unsync action is not available.
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isUnSyncFromCloudLinkPresent());
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        ShareUser.logout(hybridDrone);
+        
+        // --- Step 2 ---
+        // --- Step action ---
+        // OP Verify the document.
+        // --- Expected results ---
+        // The document is not synced.
+
+        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        ShareUser.logout(drone);
+        
+    }
+    
 }
