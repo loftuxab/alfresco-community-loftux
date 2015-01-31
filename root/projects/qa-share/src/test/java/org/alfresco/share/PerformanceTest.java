@@ -40,6 +40,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -78,7 +79,7 @@ public class PerformanceTest extends CmisUtils
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
-        super.setup();
+        beforeClass();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
     }
@@ -201,8 +202,6 @@ public class PerformanceTest extends CmisUtils
         finally
         {
             ShareUser.logout(customDrone);
-            customDrone.quit();
-            customDrone = null;
             if (downloadedBigDataFile.exists())
             {
                 downloadedBigDataFile.delete();
@@ -426,4 +425,9 @@ public class PerformanceTest extends CmisUtils
         return new JSONObject(response.getResponse()).getString("persistedObject");
     }
 
+    @Override
+    @AfterClass(alwaysRun = true)
+    public void tearDown(){
+       super.tearDown();
+    }
 }
