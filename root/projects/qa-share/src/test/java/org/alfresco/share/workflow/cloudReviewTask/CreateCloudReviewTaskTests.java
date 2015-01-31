@@ -67,8 +67,8 @@ public class CreateCloudReviewTaskTests extends AbstractWorkflow
         cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
 
         folderName = getFolderName(testName);
-        cloudSite = getSiteName(testName + "CL" + "D1");
-        opSite = getSiteName(testName + "OP" + "D1");
+        cloudSite = getSiteName(testName + "CL");
+        opSite = getSiteName(testName + "OP");
 
     }
 
