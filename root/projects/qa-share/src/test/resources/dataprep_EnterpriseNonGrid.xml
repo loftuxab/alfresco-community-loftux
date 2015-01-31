@@ -62,7 +62,7 @@
                 </methods>
             </class-->
 
-            <class name="org.alfresco.share.AvatarCaching"/>
+            <!--class name="org.alfresco.share.AvatarCaching"/-->
             <class name="org.alfresco.share.PerformanceTest"/>
 
         </classes>

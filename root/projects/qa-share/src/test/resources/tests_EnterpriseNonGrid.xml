@@ -146,11 +146,11 @@
         </classes>
     </test-->
 
-    <test name="AvatarCaching">
+    <!--test name="AvatarCaching">
         <classes>
             <class name="org.alfresco.share.AvatarCaching"/>
         </classes>
-    </test>
+    </test-->
 
     <test name="PerformanceTest">
         <classes>
@@ -158,10 +158,10 @@
         </classes>
     </test>
 
-    <test name="RepositoryFtpTest">
+    <!--test name="RepositoryFtpTest">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryFtpTest2"/>
         </classes>
-    </test>
+    </test-->
 
 </suite>
