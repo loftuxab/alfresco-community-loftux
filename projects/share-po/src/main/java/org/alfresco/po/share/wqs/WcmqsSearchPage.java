@@ -1,6 +1,8 @@
 package org.alfresco.po.share.wqs;
 
-import org.alfresco.po.share.site.document.PaginationForm;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
@@ -11,21 +13,20 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Lucian Tuca on 11/18/2014.
  */
 public class WcmqsSearchPage extends WcmqsAbstractPage
 {
     @RenderWebElement
-    private final By TAG_SEARCH_RESULT_TITLES = By.cssSelector(".newslist-wrapper>li>h4>a");
+    private final By SEARCH_RESULT_HEADER = By.xpath("//div[@class='interior-header']/*[text()='Search Results']");
 
+    private final By TAG_SEARCH_RESULT_TITLES = By.cssSelector(".newslist-wrapper>li>h4>a");
     private final By NO_OF_SEARCH_RESULTS = By.cssSelector("p.intheader-paragraph");
     private final By LATEST_BLOG_ARTICLES = By.cssSelector("div[id='right']>div[class='latest-news']");
     private final By PAGINATION = By.xpath("//div[@class='pagination']");
-    
+    private static final String PAGINATION_BUTTON_NEXT = "//div[@class='body-rm']/a";
+    private static final String PAGINATION_BUTTON_PREVIOUS = "//div[@class='reverse-arrow']/a";
 
     /**
      * Constructor.
@@ -75,9 +76,9 @@ public class WcmqsSearchPage extends WcmqsAbstractPage
                 results.add(div.getText());
             }
         }
-        catch (NoSuchElementException nse)
+        catch (TimeoutException te)
         {
-            throw new PageException("Unable to access search results site data", nse);
+            // no exception is thrown because the list of results can be empty
         }
 
         return results;
@@ -110,6 +111,7 @@ public class WcmqsSearchPage extends WcmqsAbstractPage
 
     /**
      * Method returns the pagination text
+     * 
      * @return
      */
     public String getWcmqsSearchPagePagination()
@@ -123,7 +125,7 @@ public class WcmqsSearchPage extends WcmqsAbstractPage
             throw new PageOperationException("Exceeded time to find Pagination. " + e.toString());
         }
     }
-    
+
     /**
      * Method to get latest blog articles titles
      */
@@ -146,9 +148,10 @@ public class WcmqsSearchPage extends WcmqsAbstractPage
 
         return blogArticles;
     }
-    
+
     /**
      * Method to click a news title
+     * 
      * @param blogArticleTitle - the title of the blog article in wcmqs site
      */
     public void clickLatestBlogArticle(String blogArticleTitle)
@@ -161,5 +164,56 @@ public class WcmqsSearchPage extends WcmqsAbstractPage
         {
             throw new PageOperationException("Exceeded time to find news link. " + e.toString());
         }
+    }
+
+    /**
+     * Selects the next or previous button on the pagination
+     * bar based on the action required.
+     * 
+     * @param drone {@link WebDrone}
+     * @param xpath that identifies which button to select
+     * @return WcmqsSearchPage Search results page
+     */
+    private WcmqsSearchPage selectPaginationButton(WebDrone drone, final String xpath)
+    {
+        try
+        {
+            WebElement pagination = drone.find(PAGINATION);
+            WebElement button = pagination.findElement(By.xpath(xpath));
+            button.click();
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageOperationException("Pagination link element was not found. " + nse.toString());
+        }
+        catch (TimeoutException te)
+        {
+            throw new PageOperationException("Exceeded time to find pagination links. " + te.toString());
+        }
+
+        return this.render();
+    }
+
+    /**
+     * Click next page button on the
+     * pagination bar.
+     * 
+     * @return WcmqsSearchPage Search results page
+     */
+    public WcmqsSearchPage clickNextPage()
+    {
+        return selectPaginationButton(drone, PAGINATION_BUTTON_NEXT);
+
+    }
+
+    /**
+     * Click prev page button on the
+     * pagination bar.
+     * 
+     * @return WcmqsSearchPage Search results page
+     */
+    public WcmqsSearchPage clickPrevPage()
+    {
+        return selectPaginationButton(drone, PAGINATION_BUTTON_PREVIOUS);
     }
 }
