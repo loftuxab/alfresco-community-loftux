@@ -153,7 +153,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsBlogPostPage.cancelArticleDelete();
-                Assert.assertTrue(wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.ETHICAL_FUNDS));
+                Assert.assertTrue(wcmqsBlogPage.isBlogDisplayed(WcmqsBlogPage.ETHICAL_FUNDS));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -169,7 +169,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsBlogPostPage.confirmArticleDelete();
-                Assert.assertTrue(wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.ETHICAL_FUNDS));
+                Assert.assertTrue(wcmqsBlogPage.isBlogDeleted(WcmqsBlogPage.ETHICAL_FUNDS));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
@@ -232,7 +232,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsBlogPostPage.cancelArticleDelete();
-                Assert.assertTrue(wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP));
+                Assert.assertTrue(wcmqsBlogPage.isBlogDisplayed(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -248,7 +248,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsBlogPostPage.confirmArticleDelete();
-                Assert.assertTrue(wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP), "Article was not deleted!");
+                Assert.assertTrue(wcmqsBlogPage.isBlogDeleted(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP), "Article was not deleted!");
 
                 // ---- Step 7 ----
                 // ---- Step action ---
@@ -311,7 +311,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsBlogPostPage.cancelArticleDelete();
-                Assert.assertTrue(wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS));
+                Assert.assertTrue(wcmqsBlogPage.isBlogDisplayed(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS));
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -327,7 +327,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsBlogPostPage.confirmArticleDelete();
-                Assert.assertTrue(wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS));
+                Assert.assertTrue(wcmqsBlogPage.isBlogDeleted(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS));
 
                 // ---- Step 7 ----
                 // ---- Step action ---
