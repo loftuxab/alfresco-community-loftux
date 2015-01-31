@@ -15,10 +15,7 @@
 
 package org.alfresco.po.share;
 
-import java.util.List;
-
 import org.alfresco.po.share.enums.Dashlets;
-import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SiteLayout;
 import org.alfresco.webdrone.RenderTime;
@@ -30,6 +27,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 public class CustomiseUserDashboardPage extends SharePage
 {
@@ -45,6 +44,10 @@ public class CustomiseUserDashboardPage extends SharePage
     private static final String COLUMN_FORMAT = "ul[id$='column-ul-%d']";
     private static final int NUMBER_OF_COLUMNS = 4;
     private static final int MAX_DASHLETS_IN_COLUMN = 5;
+    private static final By SELECT_ONE_COLUMN_LAYOUT_BTN = By.cssSelector("button[id*='dashboard-1-column-button']");
+    private static final By SELECT_TWO_COLUMN_LAYOUT_BTN = By.cssSelector("button[id*='dashboard-2-columns-wide-left-button']");
+    private static final By SELECT_THREE_COLUMN_LAYOUT_BTN = By.cssSelector("button[id*='dashboard-3-columns-button']");
+    private static final By SELECT_FOUR_COLUMN_LAYOUT_BTN = By.cssSelector("button[id*='dashboard-4-columns-button']");
 
     /**
      * Constructor.
@@ -96,8 +99,8 @@ public class CustomiseUserDashboardPage extends SharePage
 
     /**
      * Mimics the action of selection change layout button.
-     * 
-     * @return {@link CustomiseSiteDashboardPage}
+     *
+     * @return {@link CustomiseUserDashboardPage}
      */
     public CustomiseUserDashboardPage selectChangeLayou()
     {
@@ -124,7 +127,7 @@ public class CustomiseUserDashboardPage extends SharePage
 
     /**
      * Mimics the action of removing the all dashlets from Columns.
-     * 
+     *
      * @return {@link SiteDashboardPage}
      */
     public DashBoardPage removeAllDashlets()
@@ -146,7 +149,7 @@ public class CustomiseUserDashboardPage extends SharePage
 
     /**
      * Select Layout from given {@link SiteLayout}.
-     * 
+     *
      * @return {@link SiteDashboardPage}
      */
     public DashBoardPage selectDashboard(SiteLayout layout)
@@ -158,7 +161,7 @@ public class CustomiseUserDashboardPage extends SharePage
 
     /**
      * Add all the dashlets into different columns available.
-     * 
+     *
      * @return {@link SiteDashboardPage}
      */
     public DashBoardPage addAllDashlets()
@@ -189,7 +192,7 @@ public class CustomiseUserDashboardPage extends SharePage
 
     /**
      * Add given dashlet into given column.
-     * 
+     *
      * @param dashletName
      * @param columnNumber
      * @return {@link SiteDashboardPage}
@@ -213,13 +216,13 @@ public class CustomiseUserDashboardPage extends SharePage
 
         try
         {
-            String dashletXpath = String.format("//*[@class='availableDashlet dnd-draggable']/span[text()='%s']", dashletName.getDashletName());
+            String dashletXpath = String.format("//*[@class='availableDashlet dnd-draggable']/span[text()=\"%s\"]", dashletName.getDashletName());
             WebElement element = drone.findAndWait(By.xpath(dashletXpath));
             element.click();
             List<WebElement> dashlets = drone.findAndWaitForElements(AVAILABLE_DASHLETS_NAMES);
             for (WebElement source : dashlets)
             {
-                if (source.getText().contains(dashletName.getDashletName()))
+                if (source.getText().equals(dashletName.getDashletName()))
                 {
                     newDashlet = source;
                     break;
@@ -292,7 +295,7 @@ public class CustomiseUserDashboardPage extends SharePage
     /**
      * This method used to select the ok button present on Customize site
      * dashboard page.
-     * 
+     *
      * @return SiteDashboardPage
      */
     public DashBoardPage selectOk()
@@ -311,7 +314,7 @@ public class CustomiseUserDashboardPage extends SharePage
 
         return new DashBoardPage(drone);
     }
-    
+
     /**
      * Remove dashlet by name.
      *
@@ -326,4 +329,42 @@ public class CustomiseUserDashboardPage extends SharePage
         return selectOk();
     }
 
+    /**
+     * Method to change layout on Customize Site Dashboard page
+     *
+     * @param numOfColumns
+     */
+
+    public void selectNewLayout(int numOfColumns)
+    {
+        if (numOfColumns > NUMBER_OF_COLUMNS || numOfColumns < 1)
+        {
+            throw new IllegalArgumentException("Select correct number of columns");
+        }
+        else
+        {
+            try
+            {
+                switch (numOfColumns)
+                {
+                    case 1:
+                        drone.findAndWait(SELECT_ONE_COLUMN_LAYOUT_BTN).click();
+                        break;
+                    case 2:
+                        drone.findAndWait(SELECT_TWO_COLUMN_LAYOUT_BTN).click();
+                        break;
+                    case 3:
+                        drone.findAndWait(SELECT_THREE_COLUMN_LAYOUT_BTN).click();
+                        break;
+                    case 4:
+                        drone.findAndWait(SELECT_FOUR_COLUMN_LAYOUT_BTN).click();
+                        break;
+                }
+            }
+            catch (NoSuchElementException nse)
+            {
+                logger.info("Unable to find the Select button css " + nse);
+            }
+        }
+    }
 }

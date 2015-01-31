@@ -19,6 +19,7 @@ import org.alfresco.webdrone.RenderElement;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import org.openqa.selenium.NoSuchElementException;
@@ -37,6 +38,7 @@ public class MyProfilePage extends SharePage
     private final By userName = By.cssSelector(".namelabel");
     private final By emailName = By.cssSelector(".fieldvalue");
     private static final By TRASHCAN_LINK = By.cssSelector("div>a[href='user-trashcan']");
+    private static final By FOLLOWING_LINK = By.cssSelector("div>a[href='following']");
 
     /**
      * Constructor.
@@ -111,17 +113,44 @@ public class MyProfilePage extends SharePage
     /**
      * Check that Trashcan link is displayed on page.
      *
-     * @return true - if field displayed.
+     * @return true - if link displayed.
      */
 
     public boolean isTrashcanLinkDisplayed()
     {
         try
         {
-            WebElement searchInputField = drone.findAndWait(TRASHCAN_LINK);
-            return searchInputField.isDisplayed();
+            WebElement trashcanLink = drone.findAndWait(TRASHCAN_LINK);
+            return trashcanLink.isDisplayed();
         }
         catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+        catch (TimeoutException e)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Check that Following link is displayed on page.
+     *
+     * @return true - if link displayed.
+     */
+
+    public boolean isFollowingLinkDisplayed()
+    {
+        try
+        {
+            WebElement followingLink = drone.findAndWait(FOLLOWING_LINK);
+            return followingLink.isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+        catch (TimeoutException e)
         {
             return false;
         }

@@ -15,6 +15,7 @@
 package org.alfresco.po.share.user;
 
 import org.alfresco.po.share.AlfrescoVersion;
+import org.alfresco.po.share.ChangePasswordPage;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
@@ -39,7 +40,9 @@ public class ProfileNavigation
     private static final By NOTIFICATIONS_LINK = By.cssSelector("div>a[href='user-notifications']");
     private static final By SITES_LINK = By.cssSelector("div>a[href='user-sites']");
     private static final By CONTENT_LINK = By.cssSelector("div>a[href='user-content']");
-    
+    private static final By FOLLOWING_LINK = By.cssSelector("div>a[href='following']");
+    private static final By FOLLOWERS_LINK = By.cssSelector("div>a[href='followers']");
+    private static final By CHANGE_PASSWORD_LINK = By.cssSelector("div>a[href='change-password']");
     private final Log logger = LogFactory.getLog(ProfileNavigation.class);
 
     private final WebDrone drone;
@@ -149,4 +152,44 @@ public class ProfileNavigation
         drone.find(CONTENT_LINK).click();
         return new UserContentPage(drone);
     }
+
+    /**
+     * Click on the I'm Following link
+     *
+     * @return - {@link FollowingPage}
+     *
+     */
+
+    public FollowingPage selectFollowing()
+    {
+        drone.find(FOLLOWING_LINK).click();
+        return new FollowingPage(drone);
+    }
+
+    /**
+     * Click on the Following Me link
+     *
+     * @return - {@link FollowersPage}
+     *
+     */
+
+    public FollowersPage selectFollowers()
+    {
+        drone.find(FOLLOWERS_LINK).click();
+        return new FollowersPage(drone);
+    }
+
+    /**
+     * Click on the Following Me link
+     *
+     * @return - {@link FollowersPage}
+     *
+     */
+
+    public ChangePasswordPage selectChangePassword()
+    {
+        drone.find(CHANGE_PASSWORD_LINK).click();
+        return new ChangePasswordPage(drone);
+    }
+
 }

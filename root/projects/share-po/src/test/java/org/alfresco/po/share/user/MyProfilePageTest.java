@@ -28,6 +28,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import static org.testng.Assert.assertTrue;
+
 /**
  * @author Aliaksei Boole
  */
@@ -35,10 +37,12 @@ public class MyProfilePageTest extends AbstractTest
 {
     private MyProfilePage myProfilePage;
     private EditProfilePage editProfilePage;
+    private String userName;
 
     @BeforeClass(groups = { "alfresco-one" }, alwaysRun = true)
     public void prepare() throws Exception
     {
+        userName = "User_" + System.currentTimeMillis();
         AlfrescoVersion version = drone.getProperties().getVersion();
         if (version.isCloud())
         {
@@ -46,7 +50,8 @@ public class MyProfilePageTest extends AbstractTest
         }
         else
         {
-            ShareUtil.loginAs(drone, shareUrl, username, password).render();
+            createEnterpriseUser(userName);
+            ShareUtil.loginAs(drone, shareUrl, userName, UNAME_PASSWORD).render();
         }
 
         DashBoardPage dashboardPage = FactorySharePage.resolvePage(drone).render();
@@ -89,8 +94,17 @@ public class MyProfilePageTest extends AbstractTest
     @Test(groups = { "alfresco-one" }, dependsOnMethods = "uploadNewAvatar")
     public void closeEditProfilePage()
     {
+        editProfilePage = myProfilePage.openEditProfilePage();
         myProfilePage = editProfilePage.clickCancel();
         myProfilePage.render();
+    }
+
+    @Test(groups = { "alfresco-one" }, dependsOnMethods = "closeEditProfilePage")
+    public void editLastName()
+    {
+        editProfilePage = myProfilePage.openEditProfilePage();
+        myProfilePage = editProfilePage.editLastName("edited");
+        assertTrue(myProfilePage.getUserName().endsWith("edited"), "New last name isn't displayed");
     }
 
 
