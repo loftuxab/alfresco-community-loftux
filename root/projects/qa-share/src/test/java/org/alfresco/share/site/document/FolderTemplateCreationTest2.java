@@ -57,17 +57,11 @@ public class FolderTemplateCreationTest2 extends CmisUtils
 
     @Override
     @BeforeClass(alwaysRun = true)
-    public void setup() throws Exception
+    public void beforeClass() throws Exception
     {
         super.beforeClass();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
-    }
-
-    @Override
-    public void beforeClass()
-    {
-        // To change the behavior of initialization.
     }
 
     @Test(groups = {"EnterpriseOnly", "NonGrid" })
