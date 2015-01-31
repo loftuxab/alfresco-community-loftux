@@ -8,11 +8,9 @@ import org.alfresco.po.share.dashlet.AddOnsRssFeedDashlet;
 import org.alfresco.po.share.dashlet.RssFeedUrlBoxPage;
 import org.alfresco.po.share.dashlet.RssFeedUrlBoxPage.NrItems;
 import org.alfresco.po.share.enums.Dashlets;
-import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
-import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
@@ -151,9 +149,6 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
 
         // Login
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
-        // Alfresco Add-ons News Feed dashlet added to My Dashboard
-        ShareUserDashboard.addDashlet(drone, Dashlets.ALFRESCO_ADDONS_RSS_FEED).render();
     }
 
     @Test(groups = { "EnterpriseOnly" })
@@ -164,6 +159,9 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // Alfresco Add-ons News Feed dashlet added to My Dashboard
+        ShareUserDashboard.addDashlet(drone, Dashlets.ALFRESCO_ADDONS_RSS_FEED).render();
 
         AddOnsRssFeedDashlet rssDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.ALFRESCO_ADDONS_RSS_FEED).render();
 
@@ -205,36 +203,20 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
 
         // wait a few seconds to load the RSS Feed
         rssDashlet.waitUntilLoadingDisappears();
-        rssDashlet.render();
 
         // ---- Step 6 ----
         // ---- Step action ---
         // Click on any RSS news;
         // ---- Expected results ----
         // RSS news is opened in new window;
+        Thread.sleep(4000);
         List<ShareLink> links = rssDashlet.getHeadlineLinksFromDashlet();
         links.get(0).openLink();
 
         drone.waitForPageLoad(7);
-        
-        int counter = 1;
-        int retryRefreshCount = 20;
-        while (counter <= retryRefreshCount)
-        {      
-           
-            if (!drone.getTitle().contains("User Dashboard"))
-            {
-                break;
-            }
-            else
-            {
-                logger.info("Wait for the page to open");
-                counter++;
-            }
-        }
-        
-        Set<String> windowHandles = drone.getWindowHandles();
-        Assert.assertEquals(windowHandles.size(), 2);
+
+        Set<String> setWindowHandles = drone.getWindowHandles();
+        Assert.assertEquals(setWindowHandles.size(), 2);
 
     }
 
