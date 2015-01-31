@@ -45,7 +45,6 @@ public enum DataGroup
     HYBRID,
     SANITY,
     TRASHCAN,
-    HYBRID_WORKFLOW2,
-    FTPS
+    HYBRID_WORKFLOW2
     ;   
 }
