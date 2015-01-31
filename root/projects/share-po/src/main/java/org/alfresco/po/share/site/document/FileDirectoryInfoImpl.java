@@ -115,7 +115,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     protected String LOCATE_FILE = "div.document-locate>a";
 
     protected By DETAIL_WINDOW = By.xpath("//div[@class='alf-detail-thumbnail']/../../..");
-
+    protected String DOCUMENT_WEB_ASSET = "div.document-preview-webasset>a";
     protected String DECLARE_AS_RECORD = "div.rm-create-record>a";
     protected String IN_COMPLETE_RECORD = "div.info-banner";
 
@@ -2983,4 +2983,14 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         return tagsList;
     }
     
+    
+    /*
+     * Clicks on Preview Web Asset from the action menu
+     */
+    @Override
+    public void selectPreviewWebAsset()
+    {
+        WebElement menuOption = findElement(By.cssSelector(DOCUMENT_WEB_ASSET));
+        menuOption.click();
+    }
 }
