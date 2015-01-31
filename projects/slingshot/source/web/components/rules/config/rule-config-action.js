@@ -883,6 +883,12 @@
                      hiddenFields.push(Selector.query("input[param=" + p_oObj.prefix + "-folder]", p_oObj.configDef._id)[0]);
                      hiddenFields.push(Selector.query("input[param=" + p_oObj.prefix + "-move]", p_oObj.configDef._id)[0]);
                      this._toggleDisableOnElements(hiddenFields, disabled);
+                     if (disabled)
+                     {
+                        Selector.query("input[param=" + p_oObj.prefix + "-step]", p_oObj.configDef._id)[0].value = "";
+                        Selector.query("input[param=" + p_oObj.prefix + "-folder]", p_oObj.configDef._id)[0].value = "";
+                        Selector.query("input[param=" + p_oObj.prefix + "-move]", p_oObj.configDef._id)[0].value = "";
+                     }
                      p_oObj.button.set("disabled", disabled);
                      this._updateSubmitElements(p_oObj.configDef);
                   },
