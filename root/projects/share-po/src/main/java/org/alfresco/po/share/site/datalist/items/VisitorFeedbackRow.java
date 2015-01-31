@@ -149,7 +149,7 @@ public class VisitorFeedbackRow extends AbstractItem
     {
         try
         {
-            return webElement.findElement(COMMENT_FIELD).getText();
+            return webElement.findElement(FLAGGED_FIELD).getText();
         }
         catch (TimeoutException ex)
         {
@@ -201,6 +201,23 @@ public class VisitorFeedbackRow extends AbstractItem
         try
         {
             return webElement.findElement(VISITOR_WEBSITE_FIELD).getText();
+        }
+        catch (TimeoutException ex)
+        {
+            throw new ShareException("Exceeded time to find the visitor's website", ex);
+        }
+    }
+    
+    /**
+     * Method to get relevant asset file
+     *
+     * @return String
+     */
+    public String getRelevantAsset()
+    {
+        try
+        {
+            return webElement.findElement(RELEVANT_ASSET_FIELD).getText();
         }
         catch (TimeoutException ex)
         {
