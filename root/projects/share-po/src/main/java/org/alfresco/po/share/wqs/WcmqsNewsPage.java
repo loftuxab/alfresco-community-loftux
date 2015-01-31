@@ -15,6 +15,9 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 /**
  * The news page that is opened for a folder (Global Economy, Companies, Markets .... )
  * 
@@ -24,28 +27,29 @@ import java.util.List;
 public class WcmqsNewsPage extends SharePage
 {
 
+    private final By DELETE_LINK = By.cssSelector("a[class=alfresco-content-delete]");
+    private final By DELETE_CONFIRM_OK = By.xpath("//button[contains(text(),'Ok')]");
+    private final By DELETE_CONFIRM_CANCEL = By.xpath("//button[contains(text(),'Cancel')]");
+    private final By DELETE_CONFIRM_WINDOW = By.id("prompt_c");
+
     public static final String FTSE_1000 = "FTSE 100 rallies from seven-week low";
     public static final String GLOBAL_CAR_INDUSTRY = "Global car industry";
     public static final String FRESH_FLIGHT_TO_SWISS = "Fresh flight to Swiss franc as Europe's bond strains return";
     public static final String HOUSE_PRICES = "House prices face rollercoaster ride";
-    public static final String EUROPE_DEPT_CONCERNS = "Europe dept concerns ease but bank fears remain";
-    public static final String MEDIA_CONSULT = "Media Consult new site coming out in September";
-    public static final String CHINA_EYES = "China eyes shake-up of bank holding";
-    public static final String MINICARDS_AVAILABLE = "Minicards are now available";
+    public static final String EUROPE_DEPT_CONCERNS = "Europe debt concerns ease but bank fears remain";
     public static final String INVESTORS_FEAR = "Investors fear rising risk of US regional defaults";
-    public static final String OUR_NEW_BROCHURE = "Our new brochure is now available";
 
     public static final String NEWS = "news";
     public static final String GLOBAL = "global";
     public static final String COMPANIES = "companies";
     public static final String MARKETS = "markets";
 
-    private final String ARTICLE_4 = "article4.html";
-    private final String ARTICLE_3 = "article3.html";
-    private final String ARTICLE_2 = "article2.html";
-    private final String ARTICLE_1 = "article1.html";
-    private final String ARTICLE_6 = "article6.html";
-    private final String ARTICLE_5 = "article5.html";
+    public static final String ARTICLE_4 = "article4.html";
+    public static final String ARTICLE_3 = "article3.html";
+    public static final String ARTICLE_2 = "article2.html";
+    public static final String ARTICLE_1 = "article1.html";
+    public static final String ARTICLE_6 = "article6.html";
+    public static final String ARTICLE_5 = "article5.html";
 
     protected static String TITLES_NEWS = "//div[@id='left']//div[@class='interior-content']//a//.././/./.././a";
 
@@ -253,6 +257,100 @@ public class WcmqsNewsPage extends SharePage
         return new WcmqsNewsPage(drone);
     }
 
+    public boolean checkIfBlogIsDeleted(String title)
+    {
+        boolean check = false;
+        try
+        {
+            drone.waitUntilElementDisappears(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
+                    SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+            check = true;
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
 
+        return check;
+    }
+
+    public boolean checkIfBlogExists(String title)
+    {
+        boolean check = false;
+        try
+        {
+            drone.waitForElement(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
+                    SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+            check = true;
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+
+        return check;
+    }
+
+    /**
+     * Presses the delete button while you are in blog editing
+     */
+    public void deleteArticle()
+    {
+
+        try
+        {
+            drone.findAndWait(DELETE_LINK).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find delete button. " + e.toString());
+        }
+    }
+
+    /**
+     * Verifies if delete confirmation window is displayed
+     *
+     * @return boolean
+     */
+    public boolean isDeleteConfirmationWindowDisplayed()
+    {
+        boolean check = false;
+        try
+        {
+
+            drone.waitForElement(DELETE_CONFIRM_WINDOW, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+            WebElement importMessage = drone.find(By.id("prompt_c"));
+            check = true;
+        }
+        catch (NoSuchElementException nse)
+        {
+        }
+
+        return check;
+    }
+
+    public void confirmArticleDelete()
+    {
+        try
+        {
+            drone.findAndWait(DELETE_CONFIRM_OK).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find delete button. " + e.toString());
+        }
+    }
+
+    public void cancelArticleDelete()
+    {
+        try
+        {
+            drone.findAndWait(DELETE_CONFIRM_CANCEL).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find delete button. " + e.toString());
+        }
+    }
 
 }
