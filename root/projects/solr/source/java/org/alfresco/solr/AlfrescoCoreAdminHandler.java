@@ -321,6 +321,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             properties.setProperty("org.quartz.threadPool.makeThreadsDaemons", "true");
             properties.setProperty("org.quartz.scheduler.makeSchedulerThreadDaemon", "true");
             properties.setProperty("org.quartz.jobStore.class", "org.quartz.simpl.RAMJobStore");
+            properties.setProperty("org.quartz.scheduler.skipUpdateCheck","true");
             factory.initialize(properties);
             scheduler = factory.getScheduler();
             scheduler.start();
