@@ -55,6 +55,30 @@
    background: transparent url(../images/delete-16.png) no-repeat scroll center center;
 }
 
+a.help-link
+{
+   background: transparent url(../images/header/help.png) no-repeat scroll center center;
+   text-align: right;
+   margin-left: 0.4em;
+   border-radius: 5px;
+}
+
+.comments-list .comment-form form
+{
+   float: right;
+   width: 83%;
+}
+
+.comments-list .comment-form .help-text
+{
+   margin-top: 0.4em;
+   padding: 0.6em;
+   background-color: #ffffcc;
+   border: 1px solid #cacaca;
+   font-size: 77%;
+   border-radius: 5px;
+}
+
 .comments-list .details .comment-actions a.edit-comment
 {
    background: transparent url(../images/edit-16.png) no-repeat scroll center center;
@@ -114,7 +138,7 @@ div.comment-content
 {
    padding: 1em;
    margin-bottom: 1em;
-   height: 18em;
+   height: 19em;
 }
 
 .comments-list .comment-form h2
