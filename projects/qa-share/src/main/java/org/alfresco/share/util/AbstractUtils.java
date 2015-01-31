@@ -1729,4 +1729,27 @@ public abstract class AbstractUtils
         createCustomDroneWithLanguage(language.locale);
         logger.info("Browser language is set to: " + language.text);
     }
+    
+    /**
+     * Checks if a browser window is open with an URL matching the given string.
+     * 
+     * @param windowName
+     * @param driver driverObj
+     * @return boolean
+     */
+    public boolean isWindowWithURLOpened(WebDrone driver, String URL)
+    {
+        Set<String> windowHandles = driver.getWindowHandles();
+
+        for (String windowHandle : windowHandles)
+        {
+            driver.switchToWindow(windowHandle);
+            if (drone.getCurrentUrl().contains(URL))
+            {
+                return true;
+            }
+            
+        }
+        return false;
+    }
 }
