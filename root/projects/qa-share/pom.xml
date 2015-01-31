@@ -18,6 +18,7 @@
         <enable.hybrid>false</enable.hybrid>
         <hybrid.url>https://myalf676a.alfresco.me/alfresco/a/{network}/</hybrid.url>
         <uniqueTestRunName>TestReports</uniqueTestRunName>
+        <argLine>-Xms512m -Xmx1024m</argLine>
         <!-- Default suite allows a single test to be run via -Dtest=... in this case the suite will be ignored then anyway -->
         <testng.xml>src/test/resources/tests_debug.xml</testng.xml>
     </properties>
@@ -333,7 +334,6 @@
                         <!-- suiteXmlFile>src/test/resources/qa-download-testng.xml</suiteXmlFile -->
                     </suiteXmlFiles>
                     <runOrder>alphabetical</runOrder>
-                    <argLine>-Xms512m -Xmx1024m</argLine>
                     <workingDirectory>${basedir}</workingDirectory>
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
                     <parallel>classes</parallel>
@@ -439,7 +439,6 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.6.3.201306030806</version>
                         <executions>
                             <execution>
                                 <id>prepare-jacoco</id>
