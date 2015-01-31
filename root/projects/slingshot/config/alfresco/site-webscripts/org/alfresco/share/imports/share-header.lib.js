@@ -55,6 +55,11 @@ function getUserGroupData() {
    {
       userData.isNetworkAdmin = false;
    }
+   userData.isAdmin = user.capabilities["isAdmin"];
+   if (userData.isAdmin == null)
+   {
+      userData.isAdmin = false;
+   }
 
    return userData;
 }
