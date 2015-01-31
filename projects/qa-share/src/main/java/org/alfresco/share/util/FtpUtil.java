@@ -111,9 +111,10 @@ public class FtpUtil extends AbstractUtils
         try
         {
             FTPClient ftpClient = connectServer(shareUrl, user, password);
+            logger.info("Connected to ftp? " + ftpClient.isConnected());
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             ftpClient.changeWorkingDirectory(remoteFolderPath);
-            ftpClient.setControlKeepAliveTimeout(600);
+            ftpClient.setControlKeepAliveTimeout(1200);
             if (ftpClient.isConnected())
                 try
                 {
@@ -125,11 +126,12 @@ public class FtpUtil extends AbstractUtils
 
                         byte[] buffer = new byte[4096];
                         int l;
+                        logger.info("Starting upload file["+contentName.getName()+"]");
                         while ((l = inputStream.read(buffer)) != -1)
                         {
                             outputStream.write(buffer, 0, l);
                         }
-
+                        logger.info("Content uploaded!");
                         inputStream.close();
                         outputStream.flush();
                         outputStream.close();
@@ -401,7 +403,7 @@ public class FtpUtil extends AbstractUtils
         FileServersPage fileServersPage = sysSummaryPage.openConsolePage(AdminConsoleLink.FileServers).render();
         if (!fileServersPage.isFtpEnabledSelected())
         {
-           fileServersPage.selectFtpEnabledCheckbox();
+            fileServersPage.selectFtpEnabledCheckbox();
         }
         fileServersPage.configFtpPort(port);
     }
@@ -947,24 +949,29 @@ public class FtpUtil extends AbstractUtils
     }
 
 
-    public static void concurrentUpload(final String shareUrl, final String user, final String password, final ArrayBlockingQueue<File> fileQueue, final String remoteFolderPath)  {
+    public static void concurrentUpload(final String shareUrl, final String user, final String password, final ArrayBlockingQueue<File> fileQueue, final String remoteFolderPath)
+    {
         int NUM_THREADS = 3;
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_THREADS);
         List<Future> futures = new ArrayList<Future>();
-        for (int i = 0; i < NUM_THREADS; i++) {
+        for (int i = 0; i < NUM_THREADS; i++)
+        {
             futures.add(executorService.submit(new Runnable()
             {
-                @Override public void run()
+                @Override
+                public void run()
                 {
                     while (fileQueue.peek() != null)
                     {
                         File file = fileQueue.poll();
                         if (file != null)
                         {
-                            try {
+                            try
+                            {
                                 uploadContent(shareUrl, user, password, file, remoteFolderPath);
                             }
-                            catch (ExecutionError e) {
+                            catch (ExecutionError e)
+                            {
                                 logger.error(e);
                             }
                         }
@@ -972,10 +979,12 @@ public class FtpUtil extends AbstractUtils
                 }
             }));
         }
-        for (Future future : futures) {
+        for (Future future : futures)
+        {
             try
             {
-                if (!future.isDone()) future.get();
+                if (!future.isDone())
+                    future.get();
             }
             catch (InterruptedException e)
             {
@@ -989,8 +998,6 @@ public class FtpUtil extends AbstractUtils
 
         executorService.shutdown();
     }
-
-
 
 
 }
