@@ -87,6 +87,22 @@ public class FacetedSearchConfigPageTest extends AbstractUtils
         // Page should have a title
         Assert.assertTrue(StringUtils.isNotEmpty(facetedSearchConfigPage.getPageTitle()), "The faceted search config page should have a title");
 
+        if(facetedSearchConfigPage.getFilters().size() > 0)
+        {
+            drone.deleteCookies();
+            drone.refresh();
+            drone.getCurrentPage().render();
+
+            // Login as admin
+            ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+
+            // Navigate to the faceted search page
+            dashBoardPage = ShareUser.selectMyDashBoard(drone);
+            facetedSearchConfigPage = dashBoardPage.getNav().getFacetedSearchConfigPage().render();
+
+            Assert.assertTrue(StringUtils.isNotEmpty(facetedSearchConfigPage.getPageTitle()), "The faceted search config page should have a title");
+        }
+
         // Page should have some filters on it
         Assert.assertTrue(facetedSearchConfigPage.getFilters().size() > 0, "The faceted search config page should have some facets");
 
