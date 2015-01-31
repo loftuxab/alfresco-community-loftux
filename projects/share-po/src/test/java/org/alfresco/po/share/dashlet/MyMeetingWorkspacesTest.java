@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
  * @author Bogdan.Bocancea
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = { "alfresco-one" })
+@Test(groups = { "alfresco-one", "TestBug" })
 public class MyMeetingWorkspacesTest extends AbstractTest
 {
     private DashBoardPage dashBoard;
