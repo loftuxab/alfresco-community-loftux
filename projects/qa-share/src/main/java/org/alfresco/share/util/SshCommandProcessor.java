@@ -3,6 +3,7 @@ package org.alfresco.share.util;
 import com.jcraft.jsch.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.testng.SkipException;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -20,36 +21,44 @@ public class SshCommandProcessor extends AbstractUtils{
     public void connect()
     {
         int i = 0;
-        try
+        boolean result = false;
+        while (!result)
         {
-            if (isSecureSession)
+            try
             {
-                jsch.addIdentity(pathToKeys, "passphrase");
-                session = jsch.getSession(serverUser, sshHost, serverShhPort);
+                if (isSecureSession)
+                {
+                    jsch.addIdentity(pathToKeys, "passphrase");
+                    session = jsch.getSession(serverUser, sshHost, serverShhPort);
+                }
+                else
+                {
+                    session = jsch.getSession(serverUser, sshHost, serverShhPort);
+                    session.setPassword(serverPass);
+                }
+                Properties config = new Properties();
+                config.put("StrictHostKeyChecking", "no");
+                session.setConfig(config);
+                session.setServerAliveInterval(50000);
+                logger.info("try ssh connect");
+                session.connect(5000);
+                result = true;
             }
-            else
+            catch (JSchException e)
             {
-                session = jsch.getSession(serverUser, sshHost, serverShhPort);
-                session.setPassword(serverPass);
-            }
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            session.setServerAliveInterval(50000);
-            logger.info("try ssh connect");
-            session.connect(5000);
-        }
-        catch (JSchException e)
-        {
-            e.printStackTrace();
-            logger.info(e);
-
-            if (i < 5)
-            {
-                connect();
                 i++;
+                e.printStackTrace();
+                logger.info(e);
+
+                if (i > 5)
+                {
+                    result = true;
+                }
+                if (sshHost==null){
+                    throw new SkipException("host mustn't be null");
+                }
+                // System.exit(1);
             }
-            // System.exit(1);
         }
     }
 
