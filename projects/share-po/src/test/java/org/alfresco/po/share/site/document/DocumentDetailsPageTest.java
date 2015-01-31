@@ -7,16 +7,6 @@
  */
 package org.alfresco.po.share.site.document;
 
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertEquals;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UpdateFilePage;
 import org.alfresco.po.share.site.UploadFilePage;
@@ -25,11 +15,15 @@ import org.alfresco.po.share.util.SiteUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import static org.testng.Assert.*;
 
 /**
  * Integration test to verify document CRUD is operating correctly.

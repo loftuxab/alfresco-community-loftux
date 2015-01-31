@@ -110,7 +110,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
      * @param name identifier tag name
      * @return true if name matches tag
      */
-    private boolean isTagVisible(String name)
+    public boolean isTagVisible(String name)
     {
         if (name == null || name.isEmpty())
         {
