@@ -1,18 +1,14 @@
 /*
  * Copyright (C) 2005-2013 Alfresco Software Limited.
- *
  * This file is part of Alfresco
- *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,6 +20,10 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
+import java.util.List;
+
+import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.dashlet.RssFeedUrlBoxPage.NrItems;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
@@ -48,6 +48,9 @@ public class SiteAddOnsRssFeedDashletTest extends AbstractSiteDashletTest
     private static final String EXP_TITLE_BY_DEFAULT = "Alfresco Add-ons RSS Feed";
     private static final String CUSTOM_RSS_URL = "http://projects.apache.org/feeds/atom.xml";
     private static final String EXP_CUSTOM_RSS_TITLE = "Apache Software Foundation Project Releases";
+    private static final String headerInfo = "Find, rate, and contribute Alfresco add-ons and extensions. Visit the Alfresco Add-ons Home Page";
+    String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
+    String rssTitle = "Reuters: Business News";
 
     @BeforeClass
     public void setUp() throws Exception
@@ -88,6 +91,12 @@ public class SiteAddOnsRssFeedDashletTest extends AbstractSiteDashletTest
     }
 
     @Test(dependsOnMethods = "verifyHelpIcon")
+    public void verifyHeaderInfo()
+    {
+        assertTrue(rssFeedDashlet.getHeaderInfo().equals(headerInfo));
+    }
+
+    @Test(dependsOnMethods = "verifyHeaderInfo")
     public void clickConfigureButton()
     {
         rssFeedUrlBoxPage = rssFeedDashlet.clickConfigure().render();
@@ -95,18 +104,39 @@ public class SiteAddOnsRssFeedDashletTest extends AbstractSiteDashletTest
     }
 
     @Test(dependsOnMethods = "clickConfigureButton")
-    public void configExternalRss()
+    public void configExternalRss() throws InterruptedException
     {
         rssFeedUrlBoxPage.fillURL(CUSTOM_RSS_URL);
         rssFeedUrlBoxPage.clickOk();
         for (int i = 0; i < 1000; i++)
         {
-            if (!defaultTitle.equals(rssFeedDashlet.getTitle()))
+            if (rssFeedDashlet.getTitle().equals(EXP_CUSTOM_RSS_TITLE))
             {
                 break;
             }
         }
+
         assertEquals(rssFeedDashlet.getTitle(), EXP_CUSTOM_RSS_TITLE);
+    }
+
+    @Test(dependsOnMethods = "configExternalRss")
+    public void getNrOfHeadlines() throws InterruptedException
+    {
+        rssFeedUrlBoxPage = rssFeedDashlet.clickConfigure().render();
+        rssFeedUrlBoxPage.fillURL(rssUrl);
+        rssFeedUrlBoxPage.selectNrOfItemsToDisplay(NrItems.Five);
+        rssFeedUrlBoxPage.clickOk();
+
+        for (int i = 0; i < 1000; i++)
+        {
+            if (rssFeedDashlet.getTitle().equals(rssTitle))
+            {
+                break;
+            }
+        }
+
+        List<ShareLink> links = rssFeedDashlet.getHeadlineLinksFromDashlet();
+        assertTrue(links.size() > 4);
     }
 
 }
