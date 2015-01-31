@@ -558,7 +558,8 @@ span.mce_alfresco-linklibrary
    border-color: transparent;
 }
 
-.yui-skin-greenTheme div.flat-button span.yui-button-hover
+.yui-skin-greenTheme div.flat-button span.yui-button-hover,
+.yui-skin-greenTheme div.flat-button span.yui-button-focus
 {
    background: transparent url(images/sprite.png) repeat-x scroll 0 0;
    border-color: #808080;
@@ -748,6 +749,8 @@ body.yui-skin-greenTheme .yuimenu .bd
 body.yui-skin-greenTheme .yuimenu .bd a:focus
 {
    outline: none;
+   background-color: #008f22;
+   color: #FFF;
 }
 
 /* YUI Menu roll over state */
@@ -762,8 +765,6 @@ body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected
    background-color: #008f22;
 }
 
-body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel,
-body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a,
 body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected div .yuimenuitemlabel,
 body.yui-skin-greenTheme .yuimenu .bd ul li.yuimenuitem-selected div .yuimenuitemlabel a
 {
@@ -872,6 +873,13 @@ body.yui-skin-greenTheme .categoryview .category .ygtvlph, body.yui-skin-greenTh
 body.yui-skin-greenTheme .categoryview .category .ygtvdepthcell
 {
    background-image: url(images/categoryview-sprite.gif);
+   padding: 1px;
+}
+
+body.yui-skin-greenTheme .treeview a:focus,
+body.yui-skin-greenTheme .category a:focus
+{
+   outline: 1px solid #ccc;
 }
 
 body.yui-skin-greenTheme .treeview .ygtvtn,
