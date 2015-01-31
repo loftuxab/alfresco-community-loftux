@@ -68,7 +68,7 @@ public class SiteSearchSanityTest extends AbstractUtils
      * </ul>
      */
     @Override
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
         super.setup();
