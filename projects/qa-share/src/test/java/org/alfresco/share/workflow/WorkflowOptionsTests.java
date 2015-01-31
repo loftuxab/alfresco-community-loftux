@@ -68,7 +68,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         super.setup();
         testName = this.getClass().getSimpleName();
         testDomain = DOMAIN_HYBRID;
-        testSelectDestFolders = "testDifferenFolders3";
+        testSelectDestFolders = "testDifferenFolders" + "T";
     }
 
     public void dataPrep(String testName) throws Exception
@@ -1370,7 +1370,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15643() throws Exception
     {
-        dataPrep(getTestName()+ "101");
+        dataPrep(getTestName()+ "T");
     }
 
     /**
@@ -1379,7 +1379,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15643() throws Exception
     {
-        String testName = getTestName()+ "101";
+        String testName = getTestName()+ "T";
         String opUser1 = getUserNameForDomain(testName+ "OP", testDomain);
         String cloudUser1 = getUserNameForDomain(testName + "CL", testDomain);
         String cloudSiteName = getSiteName(testName + "cloud" + System.currentTimeMillis());
@@ -1463,7 +1463,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15644() throws Exception
     {
-        dataPrep(getTestName()+ "101");
+        dataPrep(getTestName()+ "T");
     }
 
     /**
@@ -1472,7 +1472,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15644() throws Exception
     {
-        String testName = getTestName()+ "101";
+        String testName = getTestName()+ "T";
   
         String opUser1 = getUserNameForDomain(testName+ "OP", testDomain);
         String cloudUser1 = getUserNameForDomain(testName + "CL", testDomain);
@@ -1558,7 +1558,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15645() throws Exception
     {
-        dataPrep(getTestName()+ "101");
+        dataPrep(getTestName()+ "T");
     }
 
     /**
@@ -1567,7 +1567,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15645() throws Exception
     {
-        String testName = getTestName()+ "101";
+        String testName = getTestName()+ "T";
         String opUser1 = getUserNameForDomain(testName+ "OP", testDomain);
         String cloudUser1 = getUserNameForDomain(testName + "CL", testDomain);
         String cloudSiteName = getSiteName(testName + "cloud" + System.currentTimeMillis());
@@ -1650,7 +1650,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15652() throws Exception
     {
-        String testName = getTestName()+ "101";
+        String testName = getTestName()+ "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
         String[] userInfo1 = new String[] { opUser1 };
 
@@ -1704,7 +1704,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15652() throws Exception
     {
-        String testName = getTestName()+ "101";
+        String testName = getTestName()+ "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
         String opSiteName = getSiteName(testName + "OP");
         String fileName = getFileName(testName) + ".doc";
@@ -1735,7 +1735,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15653() throws Exception
     {
-        String testName = getTestName()+ "101";
+        String testName = getTestName()+ "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
         String cloudUser2 = getUserNameForDomain(testName + "user2", invitedDomain1);
@@ -1798,7 +1798,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15653() throws Exception
     {
-        String testName = getTestName()+ "101";
+        String testName = getTestName()+ "T";
         String opUser1 = getUserNameForDomain(testName + "OP", DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
         String cloudSiteName1 = getSiteName(testName + "4");
@@ -1961,7 +1961,8 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             ShareUserMembers.inviteUserToSiteWithRole(hybridDrone, cloudUser2, cloudUser1, cloudCollaboratorSite, UserRole.COLLABORATOR);
 
             // Creating 3 folders with Collobarator,Contributor and Consumer roles for each folder.
-            ShareUser.openSiteDocumentLibraryFromSearch(hybridDrone, cloudCollaboratorSite);
+            ShareUser.openSitesDocumentLibrary(hybridDrone, cloudCollaboratorSite);
+            //ShareUser.openSiteDocumentLibraryFromSearch(hybridDrone, cloudCollaboratorSite);
             createThreeFoldersWithContentRoles(hybridDrone, cloudUser1, folder1, folder2, folder3);
 
             ShareUser.logout(hybridDrone);
