@@ -233,6 +233,9 @@ public class CalendarPageTest extends AbstractSiteDashletTest
 
         String recurrence = eventInfo.getRecurrenceDetail();
         Assert.assertTrue(recurrence.isEmpty());
+
+        Assert.assertTrue(eventInfo.isDeleteButtonEnabled());
+        Assert.assertTrue(eventInfo.isOkButtonEnabled());
     }
 
     /**
