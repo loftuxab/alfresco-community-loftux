@@ -135,7 +135,8 @@ public class DestinationAndAssigneePage extends SharePage
                         {
                             logger.trace("Site " + siteName + " selected");
                         }
-                        //drone.waitUntilElementDeletedFromDom(By.cssSelector("div[id$='default-cloud-folder-treeview'] td[class='ygtvcell ygtvloading']"), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+                        // drone.waitUntilElementDeletedFromDom(By.cssSelector("div[id$='default-cloud-folder-treeview'] td[class='ygtvcell ygtvloading']"),
+                        // SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
                         // drone.waitForElement(FOLDER_LABELS, SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
                         try
                         {
@@ -471,8 +472,10 @@ public class DestinationAndAssigneePage extends SharePage
 
                     if (folderPath.length > 1)
                     {
-//                        drone.waitUntilElementDeletedFromDom(By.cssSelector("div[id$='default-cloud-folder-treeview'] td[class='ygtvcell ygtvloading']"), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
-//                        drone.waitForElement(By.cssSelector("div[id$='default-cloud-folder-treeview'] td[class^='ygtvcell']>a.ygtvspacer"), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+                        // drone.waitUntilElementDeletedFromDom(By.cssSelector("div[id$='default-cloud-folder-treeview'] td[class='ygtvcell ygtvloading']"),
+                        // SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+                        // drone.waitForElement(By.cssSelector("div[id$='default-cloud-folder-treeview'] td[class^='ygtvcell']>a.ygtvspacer"),
+                        // SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
                         try
                         {
                             drone.waitForElement(By.id("AlfrescoWebdronez1"), SECONDS.convert(WAIT_TIME_3000, MILLISECONDS));
@@ -520,6 +523,27 @@ public class DestinationAndAssigneePage extends SharePage
             logger.error("Submit button not found!!", toe);
         }
         throw new PageException();
+    }
+
+    /**
+     * Click on submit button to submit sync properties.
+     * The method does not verify if the page was rendered
+     * 
+     * @return
+     */
+    public void clickSyncButton()
+    {
+        try
+        {
+
+            drone.findAndWait(SUBMIT_SYNC_BUTTON).click();
+
+        }
+        catch (TimeoutException toe)
+        {
+            logger.error("Submit button not found!!", toe);
+        }
+
     }
 
     /**
