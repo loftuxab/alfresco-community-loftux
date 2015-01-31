@@ -35,7 +35,7 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2898() throws Exception
     {
-        String testName = getTestName() + "2";
+        String testName = getTestName() + "16";
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -52,9 +52,9 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2898() throws Exception
     {
-        String testName = getTestName()+ "2";
+        String testName = getTestName()+ "16";
         String testUser = getUserNameFreeDomain(testName);
-        String url = "https://www.google.com";
+        String url = "https://www.google.com/";
         String linkTitle = "Google";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -93,8 +93,10 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
         // Verify dashlet title is displayed as title link;
         // ---- Expected results ----
         // Dashlet title is displayed as title link;
-        webDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.WEB_VIEW).render();
-        Assert.assertTrue(webDashlet.getTitle().equals(linkTitle));
+        //WebViewDashlet newWebDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.WEB_VIEW).render(maxWaitTime);
+        webDashlet.render();
+        String newTitle = webDashlet.getWebViewDashletTitle();
+        Assert.assertTrue(newTitle.equals(linkTitle));
 
         // ---- Step 6 ----
         // ---- Step action ---
