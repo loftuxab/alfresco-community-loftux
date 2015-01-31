@@ -2,6 +2,14 @@
 <suite name="Sprint BY Data Prep Suite" preserve-order="true" parallel="classes" thread-count="2">
 <test name="Common tests" parallel="classes" thread-count="5">
 <classes>
+    <class name="org.alfresco.share.site.document.FilmStripDocLibTest2">
+        <methods>
+            <include name="dataPrep_AONE_14060"/>
+            <include name="dataPrep_AONE_14052"/>
+            <include name="dataPrep_AONE_14054"/>
+            <exclude name=".*"/>
+        </methods>
+    </class>
 <class name="org.alfresco.share.dashlet.SavedSearchMyDashboardAdvancedTest">
 <methods>
 <include name="dataPrep_AONE_14664"/>
