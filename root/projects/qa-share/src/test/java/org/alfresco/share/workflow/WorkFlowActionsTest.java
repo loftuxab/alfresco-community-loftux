@@ -21,6 +21,7 @@ import org.alfresco.po.share.workflow.TaskHistoryPage;
 import org.alfresco.po.share.workflow.TaskType;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
 import org.alfresco.po.share.workflow.WorkFlowFormDetails;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -29,6 +30,7 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.alfresco.po.share.task.EditTaskPage.Button.REASSIGN;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -1392,5 +1394,246 @@ public class WorkFlowActionsTest extends AbstractWorkflow
 
    ShareUser.logout(drone);
    }
+     
+     @Test(groups = "DataPrepHybrid")
+     public void dataPrep_15675() throws Exception 
+     {
+       String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+       String workFlowName = "Simple Cloud Task " + testName + "-15675CL";
+       TaskDetailsPage taskDetailsPage;
+       EditTaskPage editTaskPage;
+
+       folderName = getFolderName(testName);
+       fileName = getFileName(testName) + "-15675" + ".txt";
+
+       String[] fileInfo = { fileName, DOCLIB };
+
+       ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+       ShareUser.openSiteDashboard(drone, opSite);
+       ShareUser.uploadFileInFolder(drone, fileInfo).render();
+       ShareUser.openSitesDocumentLibrary(drone, opSite).render();
+       CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
+
+       WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+       formDetails.setMessage(workFlowName);
+       formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
+       formDetails.setTaskPriority(Priority.MEDIUM);
+       formDetails.setSiteName(cloudSite);
+       formDetails.setAssignee(cloudUser);
+       formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENTREMOVESYNC);
+       formDetails.setLockOnPremise(false);
+
+       // Create Workflow using File1
+       cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+  
+       ShareUser.logout(drone);
+
+       ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+       
+       MyTasksPage myTasksPage11 = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+
+       taskDetailsPage = myTasksPage11.selectViewTasks(workFlowName).render();
+       editTaskPage = taskDetailsPage.selectEditButton().render();
+       
+       editTaskPage.selectStatusDropDown(TaskStatus.COMPLETED);
+       taskDetailsPage = editTaskPage.selectTaskDoneButton().render();
+       ShareUser.logout(hybridDrone);
+      }
+     
+     @Test(groups = "Hybrid", enabled = true)
+     public void AONE_15675() throws Exception
+    {
+      String workFlowName = "Simple Cloud Task " + testName + "-15675CL";
+      fileName = getFileName(testName) + "-15675" + ".txt";
+
+      try 
+      {
+              ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+              
+               // --- Step 1 ---
+               // --- Step action ---
+               // OP Reassign the received task to any other user
+               // --- Expected results ---
+               // Impossible to reassign task. No Reassign action is available
+               
+               MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).render();
+               myTasksPage.selectActiveTasks().render();
+               myTasksPage.selectViewWorkflow(workFlowName).render();
+//               assertTrue(drone.isElementDisplayed(By.xpath("//*[contains(@class,'task-edit')]")));
+               EditTaskPage editTaskPage = new EditTaskPage(hybridDrone);
+               Assert.assertFalse(editTaskPage.isButtonsDisplayed(REASSIGN), "Button REASSIGN don't display on editTaskPage.");
+      } 
+      
+      catch (Throwable t) 
+      {
+          reportError(drone, testName + "-ENT", t);
+      }
+
+      ShareUser.logout(drone);
+  }
+     
+     @Test(groups = "DataPrepHybrid")
+     public void dataPrep_15676() throws Exception 
+     {
+       String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+       String workFlowName = "Simple Cloud Task " + testName + "-15676CL";
+       TaskDetailsPage taskDetailsPage;
+       EditTaskPage editTaskPage;
+
+       folderName = getFolderName(testName);
+       fileName = getFileName(testName) + "-15676" + ".txt";
+
+       String[] fileInfo = { fileName, DOCLIB };
+
+       ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+       ShareUser.openSiteDashboard(drone, opSite);
+       ShareUser.uploadFileInFolder(drone, fileInfo).render();
+       ShareUser.openSitesDocumentLibrary(drone, opSite).render();
+       CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
+
+       WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+       formDetails.setMessage(workFlowName);
+       formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
+       formDetails.setTaskPriority(Priority.MEDIUM);
+       formDetails.setSiteName(cloudSite);
+       formDetails.setAssignee(cloudUser);
+       formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENTREMOVESYNC);
+       formDetails.setLockOnPremise(false);
+
+       // Create Workflow using File1
+       cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+  
+       ShareUser.logout(drone);
+
+       ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+       
+       MyTasksPage myTasksPage11 = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+
+       taskDetailsPage = myTasksPage11.selectViewTasks(workFlowName).render();
+       editTaskPage = taskDetailsPage.selectEditButton().render();
+       
+       editTaskPage.selectStatusDropDown(TaskStatus.INPROGRESS);
+       taskDetailsPage = editTaskPage.selectSaveButton().render();
+       ShareUser.logout(hybridDrone);
+      }
+     
+     @Test(groups = "Hybrid", enabled = true)
+     public void AONE_15676() throws Exception
+    {
+
+      String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+      String workFlowName = "Simple Cloud Task " + testName + "-15676CL";
+      fileName = getFileName(testName) + "-15676" + ".txt";
+
+      try 
+      {
+              ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+              
+               // --- Step 1 ---
+               // --- Step action ---
+               // Cloud Reassign the received task to any other user
+               // --- Expected results ---
+               // Impossible to reassign task. No Reassign action is available
+               
+               MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+               myTasksPage.selectActiveTasks().render();
+               myTasksPage.selectViewWorkflow(workFlowName).render();
+               Assert.assertFalse(drone.isElementDisplayed(By.xpath("//*[contains(@class,'task-edit')]")));
+               //EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(newWorkFlow.getMessage());
+               EditTaskPage editTaskPage1 = new EditTaskPage(hybridDrone);
+               Assert.assertFalse(editTaskPage1.isButtonsDisplayed(REASSIGN), "Button REASSIGN don't display on editTaskPage.");
+      } 
+      
+      catch (Throwable t) 
+      {
+          reportError(drone, testName + "-ENT", t);
+      }
+
+      ShareUser.logout(drone);
+  }
+     
+     @Test(groups = "DataPrepHybrid")
+     public void dataPrep_15677() throws Exception 
+     {
+       String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+       String workFlowName = "Simple Cloud Task " + testName + "-15677CL";
+       TaskDetailsPage taskDetailsPage;
+       EditTaskPage editTaskPage;
+
+       folderName = getFolderName(testName);
+       fileName = getFileName(testName) + "-15677" + ".txt";
+
+       String[] fileInfo = { fileName, DOCLIB };
+
+       ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+       ShareUser.openSiteDashboard(drone, opSite);
+       ShareUser.uploadFileInFolder(drone, fileInfo).render();
+       ShareUser.openSitesDocumentLibrary(drone, opSite).render();
+       CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
+
+       List<String> userNames = new ArrayList<String>();
+       userNames.add(cloudUser);
+       
+       WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+       formDetails.setMessage(workFlowName);
+       formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
+       formDetails.setApprovalPercentage(20);
+       formDetails.setTaskPriority(Priority.MEDIUM);
+       formDetails.setSiteName(cloudSite);
+       formDetails.setReviewers(userNames);
+       formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
+       formDetails.setLockOnPremise(false);
+
+       // Create Workflow using File1
+       cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+  
+       ShareUser.logout(drone);
+
+       ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+       
+       MyTasksPage myTasksPage11 = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+
+       taskDetailsPage = myTasksPage11.selectViewTasks(workFlowName).render();
+       editTaskPage = taskDetailsPage.selectEditButton().render();
+       
+       editTaskPage.selectStatusDropDown(TaskStatus.INPROGRESS);
+       taskDetailsPage = editTaskPage.selectSaveButton().render();
+       ShareUser.logout(hybridDrone);
+      }
+     
+     @Test(groups = "Hybrid", enabled = true)
+     public void AONE_15677() throws Exception
+    {
+
+      String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+      String workFlowName = "Simple Cloud Task " + testName + "-15677CL";
+      fileName = getFileName(testName) + "-15677" + ".txt";
+
+      try 
+      {
+              ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+              
+               // --- Step 1 ---
+               // --- Step action ---
+               // Cloud Reassign the received task to any other user
+               // --- Expected results ---
+               // Impossible to reassign task. No Reassign action is available
+               
+               MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
+               myTasksPage.selectActiveTasks().render();
+               myTasksPage.selectViewWorkflow(workFlowName).render();
+               Assert.assertFalse(drone.isElementDisplayed(By.xpath("//*[contains(@class,'task-edit')]")));
+               //EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(newWorkFlow.getMessage());
+               EditTaskPage editTaskPage1 = new EditTaskPage(hybridDrone);
+               Assert.assertFalse(editTaskPage1.isButtonsDisplayed(REASSIGN), "Button REASSIGN don't display on editTaskPage.");
+      } 
+      
+      catch (Throwable t) 
+      {
+          reportError(drone, testName + "-ENT", t);
+      }
+
+      ShareUser.logout(drone);
+  }
      
 }
