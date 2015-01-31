@@ -63,9 +63,9 @@ public abstract class AbstractAdminConsole extends SharePage
         drone.findAndWait(SUBMIT_BUTTON).click();
     }
 
-    public String findText()
+    public String getResult()
     {
-        return drone.findAndWait(By.xpath("//*[@id='result']")).getText();
+        return drone.findAndWait(By.tagName("pre")).getText();
     }
 
 }
