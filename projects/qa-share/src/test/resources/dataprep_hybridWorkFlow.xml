@@ -29,11 +29,6 @@
                 <class name="org.alfresco.share.workflow.HybridWorkflowTest1" />
         </classes>
     </test>
-    <test name="dataprep-HybridWorkflowTest2" verbose="1">
-        <classes>
-            <class name="org.alfresco.share.workflow.HybridWorkflowTest2" />
-        </classes>
-    </test>
     <test name="dataprep-HybridWorkflowTest3" verbose="1">
         <classes>
             <class name="org.alfresco.share.workflow.HybridWorkflowTest3" />
