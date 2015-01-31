@@ -6,8 +6,11 @@ import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 /**
  * Created by Lucian Tuca on 11/18/2014.
  */
@@ -65,4 +68,37 @@ public class WcmqsBlogPage extends SharePage
                 }
         }
 
+        public boolean checkIfBlogIsDeleted(String title)
+        {
+                boolean check = false;
+                try
+                {
+                        drone.waitUntilElementDisappears(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
+                                SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+                        check = true;
+                }
+                catch (NoSuchElementException nse)
+                {
+                        return false;
+                }
+
+                return check;
+        }
+
+        public boolean checkIfBlogExists(String title)
+        {
+                boolean check = false;
+                try
+                {
+                        drone.waitForElement(By.xpath(String.format("//a[contains(text(),'%s')]", title)),
+                                SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+                        check = true;
+                }
+                catch (NoSuchElementException nse)
+                {
+                        return false;
+                }
+
+                return check;
+        }
 }
