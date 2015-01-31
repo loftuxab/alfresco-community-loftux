@@ -149,7 +149,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15049", alwaysRun = true)
     public void AONE_15033() throws Exception
     {
         String testName = getTestName();
@@ -695,7 +695,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15033", alwaysRun = true)
     public void AONE_15048() throws Exception
     {
         String testName = getTestName();
