@@ -2,15 +2,22 @@ package org.alfresco.share.enterprise.wqs.web.search;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Random;
 
+import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
+import org.alfresco.po.share.dashlet.WebQuickStartOptions;
+import org.alfresco.po.share.enums.Dashlets;
+import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.wqs.WcmqsBlogPostPage;
 import org.alfresco.po.share.wqs.WcmqsHomePage;
 import org.alfresco.po.share.wqs.WcmqsSearchPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
@@ -105,7 +112,6 @@ public class SearchTests extends AbstractUtils
             logger.error("Ip address from Alfresco server could not be obtained");
         }
 
-        ;
         wqsURL = siteName + ":8080/wcmqs";
         logger.info(" wcmqs url : " + wqsURL);
         logger.info("Start Tests from: " + testName);
@@ -123,107 +129,42 @@ public class SearchTests extends AbstractUtils
         // ---- Step 2 ----
         // ---- Step Action -----
         // Site "My Web Site" is created in Alfresco Share;
-        DocumentLibraryPage documentLibPage = ShareUser.openSiteDocumentLibraryFromSearch(drone, siteName);
-        // ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-        //
-        // // ---- Step 3 ----
-        // // ---- Step Action -----
-        // // WCM Quick Start Site Data is imported;
-        // SiteDashboardPage siteDashBoard = ShareUserDashboard.addDashlet(drone, siteName, Dashlets.WEB_QUICK_START);
-        // SiteWebQuickStartDashlet wqsDashlet = siteDashBoard.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
-        // wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
-        // wqsDashlet.clickImportButtton();
-        //
-        // // Change property for quick start to sitename
-        // DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        // documentLibPage.selectFolder(ALFRESCO_QUICK_START);
-        // EditDocumentPropertiesPage documentPropertiesPage = documentLibPage.getFileDirectoryInfo(QUICK_START_EDITORIAL).selectEditProperties().render();
-        // documentPropertiesPage.setSiteHostname(siteName);
-        // documentPropertiesPage.clickSave();
-        //
-        // // Change property for quick start live to ip address
-        // documentLibPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
-        // documentPropertiesPage.setSiteHostname(ipAddress);
-        // documentPropertiesPage.clickSave();
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
 
-        // Several articles are created in News, Publications, Blogs components:
-        // * blogs: house, techno, trance with any content
+        // ---- Step 3 ----
+        // ---- Step Action -----
+        // WCM Quick Start Site Data is imported;
+        SiteDashboardPage siteDashBoard = ShareUserDashboard.addDashlet(drone, siteName, Dashlets.WEB_QUICK_START);
+        SiteWebQuickStartDashlet wqsDashlet = siteDashBoard.getDashlet(SITE_WEB_QUICK_START_DASHLET).render();
+        wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
+        wqsDashlet.clickImportButtton();
+
+        // Change property for quick start to sitename
+        DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
         documentLibPage.selectFolder(ALFRESCO_QUICK_START);
-        documentLibPage.selectFolder(QUICK_START_EDITORIAL);
-        documentLibPage.selectFolder(ROOT);
-        documentLibPage.selectFolder("blog");
+        EditDocumentPropertiesPage documentPropertiesPage = documentLibPage.getFileDirectoryInfo(QUICK_START_EDITORIAL).selectEditProperties().render();
+        documentPropertiesPage.setSiteHostname(siteName);
+        documentPropertiesPage.clickSave();
 
-        ContentDetails contentDetails1 = new ContentDetails();
-        contentDetails1.setName("BlogH5710.html");
-        contentDetails1.setContent("content blog h1");
-        contentDetails1.setTitle(blogHouse5710);
+        // Change property for quick start live to ip address
+        documentLibPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
+        documentPropertiesPage.setSiteHostname(ipAddress);
+        documentPropertiesPage.clickSave();
 
-        documentLibPage = ShareUser.createContentInCurrentFolder(drone, contentDetails1, ContentType.PLAINTEXT, documentLibPage);
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTe5710.html", "content blog te1", blogTechno5710);
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTr5710.html", "content blog tr1", blogTrance5710);
-
-        // * news: house, techno, trance
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsH5710.html", "content news h1", newsHouse5710);
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTr5710.html", "content news te1", newsTechno5710);
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTe5710.html", "content news tr1", newsTrance5710);
-        // * publications (e.g. rename custom files via Share): house, techno, house techno
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublicationH5710.html", "content publication h1",
-                publicationHouse5710);
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublicationTe5710.html", "content publication te1",
-                publicationTechno5710);
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublicationTr5710.html", "content publication tr1",
-                publicationTrance5710);
-
-        // Several articles are created in News, Publications, Blogs components:
-        // * blogs with content: blog1 with content "house", blog2 with content "techno", blog3 with content "trance"
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogH5711.html", blogHouse5711, "Blog H5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTe5711.html", blogTechno5711, "Blog Te5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTr5711.html", blogTrance5711, "Blog Tr5711");
-
-        // * news articles with content: article1 with content "house", article2 with content "techno", article3 with content "trance"
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsH5711.html", newsHouse5711, "News H5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTe5711.html", newsTechno5711, "News Te5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTr5711.html", newsTrance5711, "News Tr5711");
-
-        // * publication articles with content: publication1 with content "house", publication2 with content "techno", publication3 with content "trance"
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublH5711.html", publicationHouse5711, "Publ H5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTe5711.html", publicationTechno5711, "Publ Te5711");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTr5711.html", publicationTrance5711, "Publ Tr5711");
-
-        // Several articles are created in News, Publications, Blogs components:
-        // * blogs with tags: post1 with tag "house", post2 with tag "techno",post3 with tag "trance"
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogH5712.html", "blog content H5712", "Blog H5712");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTe5712.html", "blog content Te5712", "Blog Te5712");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "blog", "BlogTr5712.html", "blog content Tr5712", "Blog Tr5712");
-        navigateToFolder(documentLibPage, "blog").render();
-        documentLibPage.getFileDirectoryInfo("BlogH5712.html").addTag(tagHouse);
-        documentLibPage.getFileDirectoryInfo("BlogTe5712.html").addTag(tagTechno);
-        documentLibPage.getFileDirectoryInfo("BlogTr5712.html").addTag(tagTrance);
-
-        // * news articles with tags: news1 with tag "house", news2 with tag "techno", news3 with tag "trance"
+        documentLibPage.render();
         ShareUser.openDocumentLibrary(drone);
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsH5712.html", "news content H5712", "News H5712");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTe5712.html", "news content Te5712", "News Te5712");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "news", "NewsTr5712.html", "news content Tr5712", "News Tr5712");
-        navigateToFolder(documentLibPage, "news").render();
-        documentLibPage.getFileDirectoryInfo("NewsH5712.html").addTag(tagHouse);
-        documentLibPage.getFileDirectoryInfo("NewsTe5712.html").addTag(tagTechno);
-        documentLibPage.getFileDirectoryInfo("NewsTr5712.html").addTag(tagTrance);
+        dataPrep_AONE_5710(documentLibPage);
 
-        // * publication articles with tag: paper1 with tag "house", paper2 with tag "techno", paper3 with tag "trance"
-        ShareUser.openDocumentLibrary(drone);
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublH5712.html", "publ content H5712", "Publ H5712");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTe5712.html", "publ content Te5712", "Publ Te5712");
-        documentLibPage = navigateToFolderFromRootAndCreateContent(documentLibPage, "publications", "PublTr5712.html", "publ content Tr5712", "Publ Tr5712");
-        documentLibPage = navigateToFolder(documentLibPage, "publications").render();
-        documentLibPage.getFileDirectoryInfo("PublH5712.html").addTag(tagHouse);
-        documentLibPage.getFileDirectoryInfo("PublTe5712.html").addTag(tagTechno);
-        documentLibPage.getFileDirectoryInfo("PublTr5712.html").addTag(tagTrance);
+        dataPrep_AONE_5711(documentLibPage);
 
-        // // setup new entry in hosts to be able to access the new wcmqs site
-        // String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
-        // + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
-        // Runtime.getRuntime().exec(setHostAddress);
+        dataPrep_AONE_5712(documentLibPage);
+
+        dataPrep_AONE_5713(documentLibPage);
+
+        // setup new entry in hosts to be able to access the new wcmqs site
+        String setHostAddress = "cmd.exe /c echo. >> %WINDIR%\\System32\\Drivers\\Etc\\hosts && echo " + ipAddress + " " + siteName
+                + " >> %WINDIR%\\System32\\Drivers\\Etc\\hosts";
+        Runtime.getRuntime().exec(setHostAddress);
     }
 
     /*
@@ -290,7 +231,7 @@ public class SearchTests extends AbstractUtils
 
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
-        Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results block is empty.");
+        Assert.assertNotEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results block is empty");
 
         // ---- Step 3 ----
         // ---- Step action ----
@@ -337,7 +278,6 @@ public class SearchTests extends AbstractUtils
         String searchedText2 = "techno";
         String searchedText3 = "trance";
         String newsTitle = "House prices face rollercoaster ride";
-        String publicationTitle = "Alfresco Datasheet - Social Computing";
 
         // ---- Step 1 ----
         // ---- Step action ----
@@ -376,8 +316,6 @@ public class SearchTests extends AbstractUtils
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(newsHouse5710), "Search Results block does not contain title: "
                 + newsHouse5710);
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains(newsTechno5710), "Search Results block contains title: " + newsTechno5710);
-        // Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(publicationTitle), "Search Results block does not contain title: "
-        // + publicationTitle);
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(publicationHouse5710), "Search Results block does not contain title: "
                 + publicationHouse5710);
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains(publicationTechno5710), "Search Results block contains title: "
@@ -565,6 +503,66 @@ public class SearchTests extends AbstractUtils
     }
 
     /*
+     * AONE-5713 Pagination on Search page
+     */
+    @Test(groups = { "WQS", "EnterpriseOnly" })
+    public void AONE_5713() throws Exception
+    {
+        String searchedText = "test";
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Navigate to http://host:8080/wcmqs
+        // ---- Expected results ----
+        // Sample site is opened;
+
+        drone.navigateTo(wqsURL);
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Fill in Search field with "test" data and click Search button near Search field;
+        // ---- Expected results ----
+        // Items are displayed;
+
+        WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+        wcmqsHomePage.render();
+        wcmqsHomePage.searchText(searchedText);
+        WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
+        wcmqsSearchPage.render();
+        Assert.assertNotEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results block is empty");
+        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles block is not displayed.");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News9test 5713"), "Search Results block does not contain title: "
+                + "News9test 5713");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog0test 5713"), "Search Results block contains title: "
+                + "Blog0test 5713");
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Click Next page button;
+        // ---- Expected results ----
+        // Next page is opened;
+
+        wcmqsSearchPage.clickNextPage();
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog0test 5713"), "Search Results block does not contain title: "
+                + "Blog0test 5713");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("News9test 5713"), "Search Results block contains title: "
+                + "News9test 5713");
+
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Click Previous page button;
+        // ---- Expected results ----
+        // Previous page is opened;
+
+        wcmqsSearchPage.clickPrevPage();
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News9test 5713"), "Search Results block does not contain title: "
+                + "News9test 5713");
+        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog0test 5713"), "Search Results block contains title: "
+                + "Blog0test 5713");
+
+    }
+
+    /*
      * AONE-5712 Searching items by tags
      */
     @Test(groups = { "WQS", "EnterpriseOnly" })
@@ -686,7 +684,7 @@ public class SearchTests extends AbstractUtils
     public void AONE_5714() throws Exception
     {
         String searchedText = "";
-        
+
         // ---- Step 1 ----
         // ---- Step action ----
         // Navigate to http://host:8080/wcmqs
@@ -713,12 +711,94 @@ public class SearchTests extends AbstractUtils
 
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
-        Assert.assertNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results block is not empty");
+        Assert.assertEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results block is not empty");
         Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles block is not displayed.");
-
     }
 
-    private DocumentLibraryPage navigateToFolderFromRootAndCreateContent(DocumentLibraryPage documentLibPage, String folderName, String fileName, String fileContent, String fileTitle)
+    /*
+     * AONE-5715 Wildcard search
+     */
+    @Test(groups = { "WQS", "EnterpriseOnly" })
+    public void AONE_5715() throws Exception
+    {
+        String searchedText = "*glo?al*";
+        // String searchedText = "*global*";
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Navigate to http://host:8080/wcmqs
+        // ---- Expected results ----
+        // Sample site is opened;
+
+        drone.navigateTo(wqsURL);
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Fill in Search field with wildcards;
+        // ---- Expected results ----
+        // Data is entered successfully;
+
+        WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+        wcmqsHomePage.render();
+        wcmqsHomePage.searchText(searchedText);
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Click Search button near Search field;
+        // ---- Expected results ----
+        // Data is proceeded correctly without errors;
+
+        WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
+        wcmqsSearchPage.render();
+        Assert.assertNotEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results block is empty");
+        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles block is not displayed.");
+        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Global car industry"), "Search Results block does not contain title: "
+                + "Global car industry");
+    }
+
+    /*
+     * AONE-5716 Too long data search
+     */
+    @Test(groups = { "WQS", "EnterpriseOnly" })
+    public void AONE_5716() throws Exception
+    {
+        String searchedText;
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Navigate to http://host:8080/wcmqs
+        // ---- Expected results ----
+        // Sample site is opened;
+
+        drone.navigateTo(wqsURL);
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Fill in Search field with more than 1024 symbols;
+        // ---- Expected results ----
+        // Data is entered successfully;
+
+        searchedText = generateRandomStringOfLength(1024);
+        WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+        wcmqsHomePage.render();
+        wcmqsHomePage.searchText(searchedText);
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Click Search button near Search field;
+        // ---- Expected results ----
+        // Data was cut, only 100 symbols can be entered;
+
+        WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
+        wcmqsSearchPage.render();
+        String actualSearchedText = wcmqsSearchPage.getTextFromSearchField();
+        String expectedSearchedText = searchedText.substring(0, 100);
+        Assert.assertEquals(actualSearchedText, expectedSearchedText, "Actual searched text is " + actualSearchedText + ", but expected is "
+                + expectedSearchedText);
+        Assert.assertEquals(actualSearchedText.length(), 100, "Length of searched text is not 100 characters");
+    }
+
+    private DocumentLibraryPage navigateToFolderAndCreateContent(DocumentLibraryPage documentLibPage, String folderName, String fileName, String fileContent, String fileTitle)
             throws Exception
     {
         navigateToFolder(documentLibPage, folderName);
@@ -726,7 +806,7 @@ public class SearchTests extends AbstractUtils
         contentDetails1.setName(fileName);
         contentDetails1.setTitle(fileTitle);
         contentDetails1.setContent(fileContent);
-        documentLibPage = ShareUser.createContentInCurrentFolder(drone, contentDetails1, ContentType.PLAINTEXT, documentLibPage);
+        documentLibPage = ShareUser.createContentInCurrentFolder(drone, contentDetails1, ContentType.PLAINTEXT, documentLibPage).render();
         return documentLibPage;
     }
 
@@ -737,6 +817,125 @@ public class SearchTests extends AbstractUtils
         documentLibPage.selectFolder(ROOT);
         documentLibPage.selectFolder(folderName);
         return documentLibPage;
+    }
+
+    private String generateRandomStringOfLength(int length)
+    {
+        char[] chars = "abc defghijkl mnopqrs tu vwxyz".toCharArray();
+        StringBuilder stringBuilder = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++)
+        {
+            char c = chars[random.nextInt(chars.length)];
+            stringBuilder.append(c);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private void dataPrep_AONE_5710(DocumentLibraryPage documentLibPage) throws Exception
+    {
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Several articles are created in News, Publications, Blogs components:
+        // * blogs: house, techno, trance with any content
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogH5710.html", "content blog h1", blogHouse5710);
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTe5710.html", "content blog te1", blogTechno5710);
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTr5710.html", "content blog tr1", blogTrance5710);
+
+        // * news: house, techno, trance
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsH5710.html", "content news h1", newsHouse5710);
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTr5710.html", "content news te1", newsTechno5710);
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTe5710.html", "content news tr1", newsTrance5710);
+        
+        // * publications (e.g. rename custom files via Share): house, techno, house techno
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublicationH5710.html", "content publication h1",
+                publicationHouse5710);
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublicationTe5710.html", "content publication te1",
+                publicationTechno5710);
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublicationTr5710.html", "content publication tr1",
+                publicationTrance5710);
+    }
+
+    private void dataPrep_AONE_5711(DocumentLibraryPage documentLibPage) throws Exception
+    {
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Several articles are created in News, Publications, Blogs components:
+        // * blogs with content: blog1 with content "house", blog2 with content "techno", blog3 with content "trance"
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogH5711.html", blogHouse5711, "Blog H5711");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTe5711.html", blogTechno5711, "Blog Te5711");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTr5711.html", blogTrance5711, "Blog Tr5711");
+
+        // * news articles with content: article1 with content "house", article2 with content "techno", article3 with content "trance"
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsH5711.html", newsHouse5711, "News H5711");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTe5711.html", newsTechno5711, "News Te5711");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTr5711.html", newsTrance5711, "News Tr5711");
+
+        // * publication articles with content: publication1 with content "house", publication2 with content "techno", publication3 with content "trance"
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublH5711.html", publicationHouse5711, "Publ H5711");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublTe5711.html", publicationTechno5711, "Publ Te5711");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublTr5711.html", publicationTrance5711, "Publ Tr5711");
+
+    }
+
+    private void dataPrep_AONE_5712(DocumentLibraryPage documentLibPage) throws Exception
+    {
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Several articles are created in News, Publications, Blogs components:
+        // * blogs with tags: post1 with tag "house", post2 with tag "techno",post3 with tag "trance"
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogH5712.html", "blog content H5712", "Blog H5712");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTe5712.html", "blog content Te5712", "Blog Te5712");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTr5712.html", "blog content Tr5712", "Blog Tr5712");
+        navigateToFolder(documentLibPage, "blog").render();
+        documentLibPage.getFileDirectoryInfo("BlogH5712.html").addTag(tagHouse);
+        documentLibPage.getFileDirectoryInfo("BlogTe5712.html").addTag(tagTechno);
+        documentLibPage.getFileDirectoryInfo("BlogTr5712.html").addTag(tagTrance);
+
+        // * news articles with tags: news1 with tag "house", news2 with tag "techno", news3 with tag "trance"
+        ShareUser.openDocumentLibrary(drone);
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsH5712.html", "news content H5712", "News H5712");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTe5712.html", "news content Te5712", "News Te5712");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTr5712.html", "news content Tr5712", "News Tr5712");
+        navigateToFolder(documentLibPage, "news").render();
+        documentLibPage.getFileDirectoryInfo("NewsH5712.html").addTag(tagHouse);
+        documentLibPage.getFileDirectoryInfo("NewsTe5712.html").addTag(tagTechno);
+        documentLibPage.getFileDirectoryInfo("NewsTr5712.html").addTag(tagTrance);
+
+        // * publication articles with tag: paper1 with tag "house", paper2 with tag "techno", paper3 with tag "trance"
+        ShareUser.openDocumentLibrary(drone);
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublH5712.html", "publ content H5712", "Publ H5712");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublTe5712.html", "publ content Te5712", "Publ Te5712");
+        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublTr5712.html", "publ content Tr5712", "Publ Tr5712");
+        documentLibPage = navigateToFolder(documentLibPage, "publications").render();
+        documentLibPage.getFileDirectoryInfo("PublH5712.html").addTag(tagHouse);
+        documentLibPage.getFileDirectoryInfo("PublTe5712.html").addTag(tagTechno);
+        documentLibPage.getFileDirectoryInfo("PublTr5712.html").addTag(tagTrance);
+    }
+
+    private void dataPrep_AONE_5713(DocumentLibraryPage documentLibPage) throws Exception
+    {
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // More than 20 article items with content "test" are created in 'news' and 'blogs' folders;
+
+        ShareUser.openDocumentLibrary(drone);
+        String name;
+        // create 10 blogs in "news" folder
+        for (int i = 0; i < 10; i++)
+        {
+            name = "News" + i;
+            documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", name + "T5713.html", name + " content", name + "test 5713");
+        }
+
+        // create 10 blogs in "blog" folder
+        for (int i = 0; i < 10; i++)
+        {
+            name = "Blog" + i;
+            documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", name + "T5713.html", name + " content", name + "test 5713");
+        }
+
     }
 
 }
