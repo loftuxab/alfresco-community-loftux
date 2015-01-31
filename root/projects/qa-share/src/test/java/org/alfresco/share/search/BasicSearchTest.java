@@ -56,7 +56,7 @@ public class BasicSearchTest extends AbstractUtils
     }
 
     // AdvancedSearchTest
-    @Test(groups = { "DataPrepSearch" })
+    @Test(groups = { "DataPrepSearch" }, timeOut = 900000)
     public void dataPrep_AdvSearch_AONE_13015() throws Exception
     {
         String testName = getTestName().replace("-", "");
@@ -91,20 +91,31 @@ public class BasicSearchTest extends AbstractUtils
 
         Integer fileTypes = fileName.length - 1;
 
-        // User
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
-
-        // Login
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
-        // Site
-        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-
-        // UpLoad Files
-        for (int index = 0; index <= fileTypes; index++)
+        try
         {
-            String[] fileInfo = { fileName[index] };
-            ShareUser.uploadFileInFolder(drone, fileInfo);
+            // User
+            CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+            // Login
+            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+            // Site
+            ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
+
+            // UpLoad Files
+            for (int index = 0; index <= fileTypes; index++)
+            {
+                String[] fileInfo = { fileName[index] };
+                ShareUser.uploadFileInFolder(drone, fileInfo);
+            }
+        }
+        catch (Exception e)
+        {
+            reportError(drone, testName, e);
+        }
+        finally
+        {
+            ShareUser.logout(drone);
         }
     }
 
@@ -115,7 +126,7 @@ public class BasicSearchTest extends AbstractUtils
      * <li>Check Search Results for diff types of files: Search based on Content</li>
      * </ul>
      */
-    @Test (groups = { "CloudOnly" }, timeOut = 900000, enabled = false) //duplicate test (the test is executed via WebDriver project))
+    @Test (groups = { "AlfrescoOne" }, timeOut = 900000)
     public void AONE_13015()
     {
 
@@ -151,41 +162,52 @@ public class BasicSearchTest extends AbstractUtils
 
         Integer fileTypes = fileName.length - 1;
 
-        /** Test Steps */
-        // Login
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        try
+        {
+            /** Test Steps */
+            // Login
+            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        // Search Specific Site
-        // Open Site DashBoard
-        ShareUser.openSiteDashboard(drone, siteName);
+            // Search Specific Site
+            // Open Site DashBoard
+            ShareUser.openSiteDashboard(drone, siteName);
 
-        // Search
-        basicSearch(drone, false, BASIC_SEARCH, testName, fileName[fileTypes], true);
+            // Search
+            basicSearch(drone, false, BASIC_SEARCH, testName, fileName[fileTypes], true);
 
-        // Check the Search Results
-        Boolean searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, testName, fileName[fileTypes], true);
-        Assert.assertTrue(searchOk, "Search Results don't include the last file: " + fileName[fileTypes]);
+            // Check the Search Results
+            Boolean searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, testName, fileName[fileTypes], true);
+            Assert.assertTrue(searchOk, "Search Results don't include the last file: " + fileName[fileTypes]);
 
-        // Check each result contains the search term: apart from xlsx
-        for (int index = 1; index <= fileTypes; index++)
-            if (!(fileName[index].endsWith("ods") || fileName[index].endsWith("odt")))
-                Assert.assertTrue(ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, fileName[index]), "Not Found " + fileName[index]);
+            // Check each result contains the search term: apart from xlsx
+            for (int index = 1; index <= fileTypes; index++)
+                if (!(fileName[index].endsWith("ods") || fileName[index].endsWith("odt")))
+                    Assert.assertTrue(ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, fileName[index]), "Not Found " + fileName[index]);
 
-        // Search all sites
-        basicSearch(drone, true, BASIC_SEARCH, testName, fileName[fileTypes], true);
+            // Search all sites
+            basicSearch(drone, true, BASIC_SEARCH, testName, fileName[fileTypes], true);
 
-        // Check the Search Results
-        searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, testName, fileName[fileTypes], true);
-        Assert.assertTrue((searchOk), "Search Results don't include the last file: " + fileName[fileTypes]);
+            // Check the Search Results
+            searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, testName, fileName[fileTypes], true);
+            Assert.assertTrue((searchOk), "Search Results don't include the last file: " + fileName[fileTypes]);
 
-        // Check each result contains the search term: apart from xlsx
-        for (int index = 1; index <= fileTypes; index++)
-            if (!(fileName[index].endsWith("ods") || fileName[index].endsWith("odt")))
-                Assert.assertTrue(ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, fileName[index]), "Not Found " + fileName[index]);
+            // Check each result contains the search term: apart from xlsx
+            for (int index = 1; index <= fileTypes; index++)
+                if (!(fileName[index].endsWith("ods") || fileName[index].endsWith("odt")))
+                    Assert.assertTrue(ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, fileName[index]), "Not Found " + fileName[index]);
 
+        }
+        catch (Exception e)
+        {
+            reportError(drone, testName, e);
+        }
+        finally
+        {
+            ShareUser.logout(drone);
+        }
     }
 
-    @Test(groups = { "DataPrepSearch" })
+    @Test(groups = { "DataPrepSearch" }, timeOut = 900000)
     public void dataPrep_AdvSearch_AONE_13033() throws Exception
     {
         String testName = getTestName();
@@ -217,6 +239,10 @@ public class BasicSearchTest extends AbstractUtils
         {
             reportError(drone, testName, e);
         }
+        finally
+        {
+            ShareUser.logout(drone);
+        }
 
     }
 
@@ -229,7 +255,7 @@ public class BasicSearchTest extends AbstractUtils
      * <li>Check that the User Dash-board > My Sites Dashlet shows the new Site</li>
      * </ul>
      */
-    @Test(groups = { "CloudOnly" }, timeOut = 900000, enabled = false) //duplicate test (the test is executed via WebDriver project))
+    @Test(groups = { "AlfrescoOne" }, timeOut = 900000)
     public void AONE_13033()
     {
         /** Start Test */
@@ -249,29 +275,39 @@ public class BasicSearchTest extends AbstractUtils
         Integer searchCount = searchTerm.length - 1;
         Boolean searchOk;
 
-        /** Test Steps */
-        // Login
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        try {
+            /** Test Steps */
+            // Login
+            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        // Open SiteDashBoard
-        ShareUser.openSiteDashboard(drone, siteName);
+            // Open SiteDashBoard
+            ShareUser.openSiteDashboard(drone, siteName);
 
-        // Perform Basic Search
-        ShareUserSearchPage.basicSearch(drone, searchTerm[0], false);
+            // Perform Basic Search
+            ShareUserSearchPage.basicSearch(drone, searchTerm[0], false);
 
-        // Check the Results
-        basicSearch(drone, false, BASIC_SEARCH, searchTerm[0], fileName, false);
-        searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, searchTerm[0], fileName, false);
+            // Check the Results
+            basicSearch(drone, false, BASIC_SEARCH, searchTerm[0], fileName, false);
+            searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, searchTerm[0], fileName, false);
 
-        Assert.assertTrue(searchOk, "Incorrect Result for search term: " + searchTerm[0]);
+            Assert.assertTrue(searchOk, "Incorrect Result for search term: " + searchTerm[0]);
 
-        for (int index = 1; index <= searchCount; index++)
+            for (int index = 1; index <= searchCount; index++)
+            {
+                // Search
+                basicSearch(drone, false, BASIC_SEARCH, searchTerm[index], fileName, true);
+
+                searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, searchTerm[index], fileName, true);
+                Assert.assertTrue(searchOk, "Incorrect Result for search term: " + searchTerm[index] + " . Issue: ACE-3115");
+            }
+        }
+        catch (Exception e)
         {
-            // Search
-            basicSearch(drone, false, BASIC_SEARCH, searchTerm[index], fileName, true);
-
-            searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, searchTerm[index], fileName, true);
-            Assert.assertTrue(searchOk, "Incorrect Result for search term: " + searchTerm[index] + " . Issue: ACE-3115");
+            reportError(drone, testName, e);
+        }
+        finally
+        {
+            ShareUser.logout(drone);
         }
     }
 }
