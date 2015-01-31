@@ -1,29 +1,14 @@
 package org.alfresco.share.workflow.actionsWithDocuments;
 
-import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.po.share.site.SiteDashboardPage;
-import org.alfresco.po.share.site.document.ContentDetails;
-import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
-import org.alfresco.po.share.site.document.DocumentDetailsPage;
-import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
-import org.alfresco.po.share.site.document.EditTextDocumentPage;
-import org.alfresco.po.share.task.TaskStatus;
+import org.alfresco.po.share.site.document.*;
 import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.workflow.CloudTaskOrReviewPage;
-import org.alfresco.po.share.workflow.KeepContentStrategy;
-import org.alfresco.po.share.workflow.MyWorkFlowsPage;
-import org.alfresco.po.share.workflow.Priority;
-import org.alfresco.po.share.workflow.TaskType;
-import org.alfresco.po.share.workflow.WorkFlowFormDetails;
+import org.alfresco.po.share.workflow.*;
 import org.alfresco.share.util.AbstractWorkflow;
-import org.alfresco.share.util.EditTaskAction;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.alfresco.webdrone.WebDrone;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -32,10 +17,13 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
 {
-    private String testDomain;
-    private String completeWorkflowTests = "complete_workflow_tests_";
-    private static Log logger = LogFactory.getLog(CompletedWorkflowDocRemoveTests.class);
+    protected String testUser;
+    protected String siteName = "";
     DocumentLibraryPage documentLibraryPage;
+    protected String testName = "";
+    protected String prefixCompleteWithRemoveSync = "WFCompleteRemoveSync";
+    protected String prefixCompleteWithRemoveFile = "WFCompleteRemoveFile";
+    private String testDomain = "hybrid.test";
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -43,454 +31,279 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
     {
         super.setup();
         testName = this.getClass().getSimpleName();
-        testDomain = DOMAIN_HYBRID;
+        testDomain = "hybrid.test";
     }
 
-    private void dataPrep(String testName) throws Exception
+    protected void dataPrepIncomplete(WebDrone drone, WebDrone hybridDrone, String prefix, String sitePrefix) throws Exception
     {
-        String user1 = getUserNameForDomain(completeWorkflowTests + "OP", testDomain);
+        testName = this.getClass().getSimpleName();
+        String user1 = getUserNameForDomain(prefix + testName, testDomain);
+
+        String cloudUser = getUserNameForDomain(prefix + testName, testDomain);
+
+        String opSiteName = getSiteName(prefix + testName) + sitePrefix + "-OP";
+        String cloudSiteName = getSiteName(prefix + testName) + sitePrefix + "-CL";
+
+        String fileName = getFileName(testName) + ".txt";
+        String folderName = getFolderName(testName);
+
+        String workFlowName = prefix + testName + "-WF1";
+        String dueDate = "12/05/2015";
+
         String[] userInfo1 = new String[] { user1 };
-
-        String cloudUser = getUserNameForDomain(completeWorkflowTests + "CL", testDomain);
         String[] cloudUserInfo1 = new String[] { cloudUser };
-
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
 
         // Create User1 (Cloud)
         CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, testDomain, "1000");
 
-        // Login to User1, set up the cloud sync
+        // Cloud user logins and create site.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUserSitePage.createFolder(hybridDrone, folderName, folderName);
+        // ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName);
+        ShareUser.logout(hybridDrone);
+
+        // User1 starts Workflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+
+        ShareUserSitePage.createFolder(drone, folderName, folderName);
+        ShareUser.uploadFileInFolder(drone, new String[] { fileName, DOCLIB });
+
+        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+        formDetails.setMessage(workFlowName);
+        formDetails.setDueDate(dueDate);
+        formDetails.setTaskPriority(Priority.MEDIUM);
+        formDetails.setSiteName(cloudSiteName);
+        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
+        formDetails.setAssignee(cloudUser);
+        if (prefixCompleteWithRemoveSync.equals(prefix))
+        {
+            formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENTREMOVESYNC);
+        }
+        else if (prefixCompleteWithRemoveFile.equals(prefix))
+        {
+            formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
+        }
+        else
+        {
+            formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
+        }
+
+        // Start Simple Cloud Task workflow
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startSimpleCloudTaskWorkFlow(drone);
+        // Select uploaded file
+        cloudTaskOrReviewPage.selectItem(fileName, opSiteName);
+        // Fill the form details and start workflow
+        cloudTaskOrReviewPage.startWorkflow(formDetails);
+
+        ShareUser.logout(drone);
+
     }
 
-    /**
-     * Data preparation for Complete Workflow Tests
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_createUsers() throws Exception
+    protected void dataPrepComplete(WebDrone drone, WebDrone hybridDrone, String prefix, String sitePrefix) throws Exception
     {
-        dataPrep(completeWorkflowTests);
+        dataPrepIncomplete(drone, hybridDrone, prefix, sitePrefix);
+        String cloudUser = getUserNameForDomain(prefix + testName, testDomain);
+        String user1 = getUserNameForDomain(prefix + testName, testDomain);
+        String workFlowName = prefix + testName + "-WF1";
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
+        ShareUser.checkIfTaskIsPresent(hybridDrone, workFlowName);
+        ShareUserWorkFlow.completeWorkFlow(hybridDrone, user1, workFlowName);
+        ShareUser.logout(hybridDrone);
+
+        // Login as OP user
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        ShareUserWorkFlow.navigateToMyTasksPage(drone);
+        ShareUser.checkIfTaskIsPresent(drone, workFlowName);
+        ShareUserWorkFlow.completeWorkFlow(drone, user1, workFlowName).render();
+        ShareUser.logout(hybridDrone);
+
     }
 
-    /**
-     * AONE-15710: Modify properties (OP)
-     */
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15710() throws Exception
+    {
+        String testName = getTestName();
+        dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
+    }
+
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15710() throws Exception
     {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(completeWorkflowTests + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(completeWorkflowTests + "CL", testDomain);
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "2-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "2-CL";
+        String testNameSitePrefix = getTestName();
+        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
 
-        String simpleTaskFile = getFileName(testName) + ".txt";
-        String[] fileInfo = { simpleTaskFile, DOCLIB };
+        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
+        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
+        String fileName = getFileName(testName) + ".txt";
 
-        String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
-        String dueDate = getDueDateString();
+        String modifiedFileTitle = testName + "modifiedBy " + System.currentTimeMillis();
+        String descOfFile = fileName + " modified by " + System.currentTimeMillis();
 
-        String modifiedTitle = testName + "modified";
-        String modifiedDescription = simpleTaskFile + " modified";
-
-        // Login as User1 (Cloud)
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-
-        // Create Site
-        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
-        ShareUser.logout(hybridDrone);
-
-        // Login as User1 (OP)
+        // OP Modify the document's properties, e.g. change title and description. The properties are changed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-
-        // Create Site
-        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
-
-        // Open Document library, Upload a file
-        siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
-        ShareUser.uploadFileInFolder(drone, fileInfo).render();
-
-        // Select "Cloud Task or Review" from select a workflow drop down
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
-
-        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-        formDetails.setDueDate(dueDate);
-        formDetails.setTaskPriority(Priority.MEDIUM);
-        formDetails.setSiteName(cloudSite);
-        formDetails.setAssignee(cloudUser);
-        formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
-        formDetails.setMessage(simpleTaskWF);
-        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
-        cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-
-        // Login as User1 (Cloud)
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        ShareUser.checkIfTaskIsPresent(hybridDrone, simpleTaskWF);
-        ShareUserWorkFlow.completeWorkFlow(hybridDrone, cloudUser, simpleTaskWF);
-        ShareUser.logout(hybridDrone);
-
-        // ---- Step 1 ----
-        // ---- Step action ---
-        // OP Modify the document's properties, e.g. change title and description.
-        // ---- Expected results ----
-        // The properties are changed successfully
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-
-        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
-        ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF);
-        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-        myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
-
-        EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, simpleTaskFile);
-        editDocumentProperties.setDocumentTitle(modifiedTitle);
-        editDocumentProperties.setDescription(modifiedDescription);
+        EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, fileName);
+        editDocumentProperties.setDocumentTitle(modifiedFileTitle + user1);
+        editDocumentProperties.setDescription(descOfFile + user1);
         editDocumentProperties.selectSave().render();
 
+        // Cloud Verify the document. The document is absent.
         ShareUser.logout(drone);
-
-        // ---- Step 2 ----
-        // ---- Step action ---
-        // Check the logs in OP and in Cloud
-        // ---- Expected results ----
-        // The logs contain no error messages. The changes are not synchronized
-
-        // TODO : Please update 2nd step in TestLink as verifying in logs is not present.
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone).selectCompletedWorkFlows();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
-        ShareUser.logout(drone);
-
-        // ---- Step 3 ----
-        // ---- Step action ---
-        // Cloud Verify the document
-        // ---- Expected results ----
-        // The document is absent
-
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.isFileVisible(fileName));
         ShareUser.logout(hybridDrone);
     }
 
-    /**
-     * AONE-15711: Modify properties (OP)
-     */
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15711() throws Exception
+    {
+        String testName = getTestName();
+        dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
+    }
+
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15711() throws Exception
     {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(completeWorkflowTests + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(completeWorkflowTests + "CL", testDomain);
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "2-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "2-CL";
+        String testNameSitePrefix = getTestName();
+        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
 
-        String simpleTaskFile = getFileName(testName) + ".txt";
-        String[] fileInfo = { simpleTaskFile, DOCLIB };
-
-        String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
-        String dueDate = getDueDateString();
+        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
+        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
+        String fileName = getFileName(testName) + ".txt";
 
         String modifiedContentByOnPrem = testName + " modifiedBy " + user1;
 
-        // Login as User1 (Cloud)
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-
-        // Create Site
-        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
-        ShareUser.logout(hybridDrone);
-
-        // Login as User1 (OP)
+        // OP Modify the document's content. The content is changed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-
-        // Create Site
-        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
-
-        // Open Document library, Upload a file
-        siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
-        ShareUser.uploadFileInFolder(drone, fileInfo).render();
-
-        // Select "Cloud Task or Review" from select a workflow drop down
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
-
-        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-        formDetails.setDueDate(dueDate);
-        formDetails.setTaskPriority(Priority.MEDIUM);
-        formDetails.setSiteName(cloudSite);
-        formDetails.setAssignee(cloudUser);
-        formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
-        formDetails.setMessage(simpleTaskWF);
-        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
-        cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-
-        // Login as User1 (Cloud)
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        ShareUser.checkIfTaskIsPresent(hybridDrone, simpleTaskWF);
-        ShareUserWorkFlow.completeWorkFlow(hybridDrone, cloudUser, simpleTaskWF);
-        ShareUser.logout(hybridDrone);
-
-        // ---- Step 1 ----
-        // ---- Step action ---
-        // OP Modify the document's content
-        // ---- Expected results ----
-        // The content is changed successfully
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-
-        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone);
-        ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF);
-        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-        myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
-
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
 
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContentByOnPrem);
-        contentDetails.setName(simpleTaskFile);
+        contentDetails.setName(fileName);
         // Select Inline Edit and change the content and save
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
-        documentDetailsPage = inlineEditPage.save(contentDetails).render();
-
+        inlineEditPage.save(contentDetails).render();
         ShareUser.logout(drone);
 
-        // ---- Step 2 ----
-        // ---- Step action ---
-        // Check the logs in OP and in Cloud
-        // ---- Expected results ----
-        // The logs contain no error messages. The changes are not synchronized
-
-        // TODO : Please update 2nd step in TestLink as verifying in logs is not present.
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        MyWorkFlowsPage myWorkFlowsPage = ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone).selectCompletedWorkFlows().render();
-        Assert.assertTrue(myWorkFlowsPage.isWorkFlowPresent(simpleTaskWF));
-        ShareUser.logout(drone);
-
-        // ---- Step 3 ----
-        // ---- Step action ---
-        // Cloud Verify the document
-        // ---- Expected results ----
-        // The document is absent
-
+        // Cloud Verify the document. The document is absent.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.isFileVisible(fileName));
         ShareUser.logout(hybridDrone);
     }
 
-    /**
-     * AONE-15712: OP Move the document to another location
-     */
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15714() throws Exception
+    {
+        String testName = getTestName();
+        dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
+    }
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15714() throws Exception
+    {
+        String testNameSitePrefix = getTestName();
+        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+
+        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
+        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
+
+        String fileName = getFileName(testName) + ".txt";
+
+        // OP UnSync the document. UnSync action is not available.
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isUnSyncFromCloudLinkPresent());
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        ShareUser.logout(drone);
+
+        // Cloud Verify the document. The document is absent.
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.isFileVisible(fileName));
+        ShareUser.logout(hybridDrone);
+
+    }
+
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15712() throws Exception
+    {
+        String testName = getTestName();
+        dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
+    }
+
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15712() throws Exception
     {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(completeWorkflowTests + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(completeWorkflowTests + "CL", testDomain);
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "2-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "2-CL";
-
-        String simpleTaskFile = getFileName(testName) + ".txt";
-        String[] fileInfo = { simpleTaskFile, DOCLIB };
-
-        String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
-        String dueDate = getDueDateString();
+        String testNameSitePrefix = getTestName();
+        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
         String folderName = getFolderName(testName);
+        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
 
-        // Login as User1 (Cloud)
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
+        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
 
-        // Create Site
-        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
-        ShareUser.logout(hybridDrone);
+        String fileName = getFileName(testName) + ".txt";
 
-        // Login as User1 (OP)
+        // OP Move the document to another location. The content is moved successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-
-        // Create Site
-        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
-
-        // Open Document library, Upload a file
-        siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
-        ShareUser.uploadFileInFolder(drone, fileInfo).render();
-
-        // Select "Cloud Task or Review" from select a workflow drop down
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
-
-        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-        formDetails.setDueDate(dueDate);
-        formDetails.setTaskPriority(Priority.MEDIUM);
-        formDetails.setSiteName(cloudSite);
-        formDetails.setAssignee(cloudUser);
-        formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
-        formDetails.setMessage(simpleTaskWF);
-        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
-        cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-
-        // Login as User1 (Cloud)
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        ShareUser.checkIfTaskIsPresent(hybridDrone, simpleTaskWF);
-        ShareUserWorkFlow.completeWorkFlow(hybridDrone, cloudUser, simpleTaskWF);
-        ShareUser.logout(hybridDrone);
-
-        // ---- Step 1 ----
-        // ---- Step action ---
-        // OP Move the document to another location
-        // ---- Expected results ----
-        // The content is moved successfully.
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-
-        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).render();
-        ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF);
-        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-        myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
-
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        ShareUserSitePage.createFolder(drone, folderName, folderName);
-        CopyOrMoveContentPage moveToPage = documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).selectMoveTo().render();
+        CopyOrMoveContentPage moveToPage = documentLibraryPage.getFileDirectoryInfo(fileName).selectMoveTo().render();
         moveToPage.selectPath(folderName).render().selectOkButton().render();
-
         ShareUser.logout(drone);
 
-        // ---- Step 2 ----
-        // ---- Step action ---
-        // Check the logs in OP and in Cloud
-        // ---- Expected results ----
-        // The logs contain no error messages. The changes are not synchronized
-
-        // TODO : Please update 2nd step in TestLink as verifying in logs is not present.
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone).selectCompletedWorkFlows();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
-        ShareUser.logout(drone);
-
-        // ---- Step 3 ----
-        // ---- Step action ---
-        // Cloud Verify the document
-        // ---- Expected results ----
-        // The document is absent
-
+        // Cloud Verify the document. The document is absent.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.isFileVisible(fileName));
         ShareUser.logout(hybridDrone);
     }
 
-    /**
-     * AONE-15713: OP Remove the document
-     */
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15713() throws Exception
+    {
+        String testName = getTestName();
+        dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
+    }
+
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15713() throws Exception
     {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(completeWorkflowTests + "OP", testDomain);
-        String cloudUser = getUserNameForDomain(completeWorkflowTests + "CL", testDomain);
-        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "2-OP";
-        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "2-CL";
+        String testNameSitePrefix = getTestName();
+        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
 
-        String simpleTaskFile = getFileName(testName) + ".txt";
-        String[] fileInfo = { simpleTaskFile, DOCLIB };
+        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
+        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
 
-        String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
-        String dueDate = getDueDateString();
+        String fileName = getFileName(testName) + ".txt";
 
-        // Login as User1 (Cloud)
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-
-        // Create Site
-        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
-        ShareUser.logout(hybridDrone);
-
-        // Login as User1 (OP)
+        // OP Remove the document. The document is removed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-
-        // Create Site
-        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
-
-        // Open Document library, Upload a file
-        siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
-        ShareUser.uploadFileInFolder(drone, fileInfo).render();
-
-        // Select "Cloud Task or Review" from select a workflow drop down
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
-
-        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-        formDetails.setDueDate(dueDate);
-        formDetails.setTaskPriority(Priority.MEDIUM);
-        formDetails.setSiteName(cloudSite);
-        formDetails.setAssignee(cloudUser);
-        formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
-        formDetails.setMessage(simpleTaskWF);
-        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
-        cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-
-        // Login as User1 (Cloud)
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-        ShareUser.checkIfTaskIsPresent(hybridDrone, simpleTaskWF);
-        ShareUserWorkFlow.completeWorkFlow(hybridDrone, cloudUser, simpleTaskWF);
-        ShareUser.logout(hybridDrone);
-
-        // ---- Step 1 ----
-        // ---- Step action ---
-        // OP Remove the document
-        // ---- Expected results ----
-        // The document is removed successfully
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-
-        MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).render();
-        ShareUser.checkIfTaskIsPresent(drone, simpleTaskWF);
-        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(drone, simpleTaskWF, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE);
-        myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
-
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).selectCheckbox();
+        documentLibraryPage.getFileDirectoryInfo(fileName).selectCheckbox();
         documentLibraryPage = ShareUser.deleteSelectedContent(drone).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
-
+        Assert.assertFalse(documentLibraryPage.isFileVisible(fileName));
         ShareUser.logout(drone);
 
-        // ---- Step 2 ----
-        // ---- Step action ---
-        // Check the logs in OP and in Cloud
-        // ---- Expected results ----
-        // The logs contain no error messages. The changes are not synchronized
-
-        // TODO : Please update 2nd step in TestLink as verifying in logs is not present.
-
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        ShareUserWorkFlow.navigateToMyWorkFlowsPage(drone).selectCompletedWorkFlows();
-        Assert.assertTrue(myTasksPage.isTaskPresent(simpleTaskWF));
-        ShareUser.logout(drone);
-
-        // ---- Step 3 ----
-        // ---- Step action ---
-        // Cloud Verify the document
-        // ---- Expected results ----
-        // The document is absent
-
+        // Cloud Verify the document. The document is absent.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        Assert.assertFalse(documentLibraryPage.isFileVisible(fileName));
         ShareUser.logout(hybridDrone);
     }
 }
