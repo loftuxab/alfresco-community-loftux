@@ -31,11 +31,20 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
 {
 
     /** Constants */
-    private static final By SEARCH_MENU_BAR = By.id("FCTSRCH_TOP_MENU_BAR");
+    private static final By SEARCH_INFO_DIV = By.cssSelector("div.info");
+    private static final By FACET_GROUP = By.cssSelector("div.alfresco-documentlibrary-AlfDocumentFilters:not(.hidden)");
     private static final By RESULT = By.cssSelector("tr.alfresco-search-AlfSearchResult");
     private static final By CONFIGURE_SEARCH = By.cssSelector("div[id=FCTSRCH_CONFIG_PAGE_LINK]");    
     private static final Log logger = LogFactory.getLog(FacetedSearchPage.class);
     private static final String goToAdvancedSearch = "span#HEADER_ADVANCED_SEARCH_text";
+    
+    private FacetedSearchHeaderSearchForm headerSearchForm;
+    private FacetedSearchScopeMenu scopeMenu;
+    private FacetedSearchForm searchForm;
+    private List<FacetedSearchFacetGroup> facetGroups;
+    private FacetedSearchSort sort;
+    private FacetedSearchView view;
+    private List<SearchResult> results;
 
     /**
      * Instantiates a new faceted search page.
@@ -90,7 +99,7 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
             try
             {
                 
-                if (drone.find(SEARCH_MENU_BAR).isDisplayed())
+                if (!drone.find(SEARCH_INFO_DIV).isDisplayed())
                 {
                     break;
                 }
@@ -103,9 +112,29 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
                 timer.end();
             }
         }
+        loadElements();
         return this;
     } 
        
+    /**
+     * Gets the header search form.
+     * 
+     * @return {@link FacetedSearchHeaderSearchForm}
+     */
+    public FacetedSearchHeaderSearchForm getHeaderSearchForm()
+    {
+        return headerSearchForm;
+    }
+
+    /**
+     * Gets the scope menu.
+     * 
+     * @return {@link FacetedSearchScopeMenu}
+     */
+    public FacetedSearchScopeMenu getScopeMenu()
+    {
+        return scopeMenu;
+    }
 
     /**
      * Gets the search form.
@@ -114,7 +143,17 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
      */
     public FacetedSearchForm getSearchForm()
     {
-        return new FacetedSearchForm(drone);
+        return searchForm;
+    }
+
+    /**
+     * Gets the facet groups.
+     * 
+     * @return List<{@link FacetedSearchFacetGroup}>
+     */
+    public List<FacetedSearchFacetGroup> getFacetGroups()
+    {
+        return this.facetGroups;
     }
 
     /**
@@ -124,9 +163,18 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
      */
     public FacetedSearchSort getSort()
     {
-        return new FacetedSearchSort(drone);
+        return sort;
     }
 
+    /**
+     * Gets the view.
+     * 
+     * @return {@link FacetedSearchView}
+     */
+    public FacetedSearchView getView()
+    {
+        return view;
+    }
 
     /**
      * Gets the results.
@@ -135,13 +183,7 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
      */
     public List<SearchResult> getResults()
     {
-    	List<SearchResult> results = new ArrayList<SearchResult>();
-        List<WebElement> response = drone.findAll(RESULT);
-        for (WebElement result : response)
-        {
-        	results.add(new FacetedSearchResult(drone, result));
-        }
-        return results;
+        return this.results;
     }
 
     /**
@@ -170,15 +212,7 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
 		throw new PageOperationException("Unable to get the title  : ");
 
 	}
-	/**
-	 * Gets the view.
-	 * ^M
-	 * @return {@link FacetedSearchView}
-	 */
-	public FacetedSearchView getView()
-	{
-		return new FacetedSearchView(drone);
-	}
+
     /**
      * Gets a result by its name if it exists.
      *
@@ -239,7 +273,42 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
         return StringUtils.substringAfter(url, "#");
     }
 
-    
+    /**
+     * Initialises the elements that make up a FacetedSearchPage.
+     */
+    public void loadElements()
+    {
+        // Initialise the faceted search form
+        this.headerSearchForm = new FacetedSearchHeaderSearchForm(drone);
+
+        // Initialise the faceted search scope menu
+        this.scopeMenu = new FacetedSearchScopeMenu(drone);
+
+        // Initialise the faceted search form
+        this.searchForm = new FacetedSearchForm(drone);
+
+        // Initialise the faceted search facet groups
+        List<WebElement> facetGroups = drone.findAll(FACET_GROUP);
+        this.facetGroups = new ArrayList<FacetedSearchFacetGroup>();
+        for (WebElement facetGroup : facetGroups)
+        {
+            this.facetGroups.add(new FacetedSearchFacetGroup(drone, facetGroup));
+        }
+
+        // Initialise the faceted search sort
+        this.sort = new FacetedSearchSort(drone);
+        
+        // Initialise the faceted search view
+        this.view = new FacetedSearchView(drone);
+
+        // Initialise the faceted search results
+        List<WebElement> results = drone.findAll(RESULT);
+        this.results = new ArrayList<SearchResult>();
+        for (WebElement result : results)
+        {
+            this.results.add(new FacetedSearchResult(drone, result));
+        }
+    }
     /**
      * Get the numeric value display on top of search results.
      * The number indicates the total count found for given search.
@@ -363,7 +432,7 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
     {
         String thumbnailImg;
         boolean isPresent = false;
-        List<SearchResult> searchResults = getResults();
+        List<SearchResult> searchResults = this.results;
 
         for (SearchResult result : searchResults)
         {
@@ -405,8 +474,8 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
     public boolean isPageCorrect()
     {
         boolean isCorrect;
-        isCorrect = drone.isElementDisplayed(getSearchForm().SEARCH_FIELD) && drone.isElementDisplayed(getSearchForm().SEARCH_BUTTON) && drone.isElementDisplayed(RESULT)
-                && getSort().isSortCorrect();
+        isCorrect = drone.isElementDisplayed(searchForm.SEARCH_FIELD) && drone.isElementDisplayed(searchForm.SEARCH_BUTTON) && drone.isElementDisplayed(RESULT)
+                && sort.isSortCorrect();
         return isCorrect;
     }
 
