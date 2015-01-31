@@ -2130,7 +2130,8 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj, p_oE
    var obj =
    {
       type: "button",
-      disabled: false
+      disabled: false,
+      usearia: true
    };
 
    // Any extra parameters?
