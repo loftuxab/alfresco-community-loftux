@@ -1628,6 +1628,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         ShareUserMembers.inviteUserToSiteWithRole(drone, mainUser, testUser, siteName, UserRole.COLLABORATOR);
 
+        ShareUser.logout(drone);
+
     }
 
     /**

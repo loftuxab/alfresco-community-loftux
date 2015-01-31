@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class PreviewPopUpPageTest extends AbstractUtils
 {
-    private static Log logger = LogFactory.getLog(BasicSearchTest.class);    
+    private static Log logger = LogFactory.getLog(PreviewPopUpPageTest.class);
 
     protected String testUser;
     
@@ -90,6 +90,8 @@ public class PreviewPopUpPageTest extends AbstractUtils
             String[] fileInfo = { fileName[index] };
             ShareUser.uploadFileInFolder(drone, fileInfo);
         }
+
+        ShareUser.logout(drone);
     }
     
     // Data prep to create image files in a site
@@ -124,6 +126,8 @@ public class PreviewPopUpPageTest extends AbstractUtils
             String[] fileInfo = { fileName[index] };
             ShareUser.uploadFileInFolder(drone, fileInfo);
         }
+
+        ShareUser.logout(drone);
     }
 
     
@@ -174,13 +178,14 @@ public class PreviewPopUpPageTest extends AbstractUtils
 
         for (int index=0; index <= fileTypes; index++)
         {
-            PreViewPopUpImagePage preViewPopUpImagePage = facetedSearchPage.getResultByName(fileName[index]).clickImageLinkToPicture().render();;
+            PreViewPopUpImagePage preViewPopUpImagePage = facetedSearchPage.getResultByName(fileName[index]).clickImageLinkToPicture().render();
             Assert.assertTrue(preViewPopUpImagePage.isPreViewPopupPageVisible(),"Preview image is displayed successfully");
             facetedSearchPage = preViewPopUpImagePage.selectClose().render();
             Assert.assertTrue(facetedSearchPage.isTitlePresent("Search"));
 
         }
 
+        ShareUser.logout(drone);
     }
     
     /**
@@ -250,6 +255,8 @@ public class PreviewPopUpPageTest extends AbstractUtils
             Assert.assertTrue(facetedSearchPage.isTitlePresent("Search"));
 
         }
+
+        ShareUser.logout(drone);
     		
     }   
     

@@ -199,8 +199,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         trace("Starting searchAndClickViewInBrowserActionTest");      
                 
         String actionName2 = "View In Browser";        
-        
-        String name ="b-fs-test1.txt";
+
         String name1 ="c-fs-test1.txt";
         
         // Login as user2
@@ -224,19 +223,20 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         
         // Get the current url
         String url = drone.getCurrentUrl();
-        
+        String handle1 = drone.getWindowHandle();
         //Check Actions are displayed on Facet results page for file
-        Assert.assertTrue(facetedSearchPage.getResultByName(name1).getActions().hasActionByName(actionName2));        
+       // Assert.assertTrue(facetedSearchPage.getResultByName(name1).getActions().hasActionByName(actionName2));
         
         // Click the second action        
-        facetedSearchPage.getResultByName(name).getActions().clickActionByName(actionName2);
+        facetedSearchPage.getResultByName(name1).getActions().clickActionByName(actionName2);
 
         // Get the url again
         String newUrl = drone.getCurrentUrl();
         
         // We should be on view in browser page
-        Assert.assertNotSame(url, newUrl, "After clicking on action the url should have changed");           
+        Assert.assertNotSame(url, newUrl, "After clicking on action the url should have changed");
 
+        drone.switchToWindow(handle1);
         drone.navigateTo(url);
 
         // Logout
