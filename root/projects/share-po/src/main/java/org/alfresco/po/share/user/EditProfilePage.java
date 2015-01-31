@@ -5,6 +5,8 @@ import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.webdrone.RenderElement;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -17,9 +19,12 @@ import java.io.File;
  */
 public class EditProfilePage extends SharePage
 {
+    private static Log logger = LogFactory.getLog(EditProfilePage.class);
+
     private static final By SAVE_CHANGES = By.cssSelector("button[id$=default-button-save-button]");
     private static final By UPLOAD_AVATAR_BUTTON = By.xpath("//button[contains(@id,'-button-upload-button')]");
     private static final By CANCEL_BUTTON = By.xpath("//button[contains(@id,'-button-cancel-button')]");
+
 
     /**
      * Constructor
@@ -65,6 +70,7 @@ public class EditProfilePage extends SharePage
         UploadFilePage uploadFilePage = new UploadFilePage(drone);
         uploadFilePage.upload(file.getAbsolutePath());
         drone.findAndWait(SAVE_CHANGES).click();
+        logger.info("Avatar["+file.getName()+"] uploaded.");
     }
 
     public MyProfilePage clickCancel()
