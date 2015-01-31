@@ -39,8 +39,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
+import org.testng.annotations.Optional;
 
 import javax.imageio.ImageIO;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -168,6 +170,7 @@ public abstract class AbstractUtils
     protected static final String SITE_CALENDAR = "site-calendar";
     protected static final String SITE_PROFILE = "site-profile";
     protected static final String SITE_SEARCH = "site-search";
+    protected static final String SITE_WEB_QUICK_START_DASHLET = "site-wqs";
 
     // Activity Feeds
     protected static final String FEED_CONTENT_ADDED = " added";
