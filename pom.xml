@@ -140,12 +140,7 @@
     <!-- Maven specific build properties -->
     <maven.build.sourceVersion>1.7</maven.build.sourceVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <!-- Sonar specific properties -->
-    <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
-    <sonar.exclusions />
-    <sonar.skippedModules />
-    <sonar.branch>HEAD-BUG-FIX</sonar.branch>
+    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
 
     <!-- Community build specific properties -->
     <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD</maven.scm.connection>
@@ -559,14 +554,13 @@
                     <workingDirectory>${project.build.directory}</workingDirectory>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <runOrder>alphabetical</runOrder>
-                    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
                     <systemPropertyVariables>
                         <!-- Modified BaseTest and AVMServiceTestBase to accept these properties
                          Otherwise test were looking in hardcoded relative locations -->
                         <alfresco.test.resources.dir>${basedir}/source/test-resources</alfresco.test.resources.dir>
                         <alfresco.web.resources.dir>${basedir}/source/web</alfresco.web.resources.dir>
                         <alfresco.java.sources.dir>${basedir}/source/java</alfresco.java.sources.dir>
-						<alfresco.target.dir>${project.build.directory}</alfresco.target.dir>
+                        <alfresco.target.dir>${project.build.directory}</alfresco.target.dir>
                         <!-- Allow FTP server unit test to run unprivileged -->
                         <ftp.port>50521</ftp.port>
                         <!-- ACE-2704 turned off the ftp and transfer service receiver which must be enabled for integration test -->
@@ -759,11 +753,16 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>1.9.1</version>
             </plugin>
-			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>replacer</artifactId>
-				<version>1.5.3</version>
-			</plugin>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.2.201409121644</version>
+            </plugin>
 			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 			<plugin>
 				<groupId>org.eclipse.m2e</groupId>
