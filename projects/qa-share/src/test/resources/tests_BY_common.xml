@@ -17,6 +17,14 @@
             <exclude name=".*"/>
         </methods>
     </class>
+    <class name="org.alfresco.share.site.document.FilmStripDocLibTest2">
+        <methods>
+            <include name="AONE_14052"/>
+            <include name="AONE_14054"/>
+            <include name="AONE_14060"/>
+            <exclude name=".*"/>
+        </methods>
+    </class>
 <class name="org.alfresco.share.dashlet.SavedSearchMyDashboardAdvancedTest">
 <methods>
 <include name="AONE_14664"/>
