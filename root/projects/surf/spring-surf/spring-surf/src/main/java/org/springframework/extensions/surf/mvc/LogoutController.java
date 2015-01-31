@@ -64,12 +64,12 @@ public class LogoutController extends AbstractController
                     redirectURL = redirectURL + delim + keys[i] + "=" + values[i];
                 }
             }
-            response.setHeader("Location", redirectURL);
+            response.sendRedirect(redirectURL);
         }
         else
         {
             // redirect to the root of the website
-            response.setHeader("Location", request.getContextPath());
+            response.sendRedirect(request.getContextPath());
         }
         
         return null;
