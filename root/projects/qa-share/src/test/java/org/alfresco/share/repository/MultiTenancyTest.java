@@ -19,8 +19,23 @@
 
 package org.alfresco.share.repository;
 
-import org.alfresco.po.alfresco.*;
-import org.alfresco.po.share.*;
+import org.alfresco.po.alfresco.LoginAlfrescoPage;
+import org.alfresco.po.alfresco.MyAlfrescoPage;
+import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
+import org.alfresco.po.alfresco.TenantAdminConsolePage;
+import org.alfresco.po.alfresco.WebScriptsMaintenancePage;
+import org.alfresco.po.alfresco.WebScriptsPage;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.GroupsPage;
+import org.alfresco.po.share.LoginPage;
+import org.alfresco.po.share.MyTasksPage;
+import org.alfresco.po.share.NewGroupPage;
+import org.alfresco.po.share.NewUserPage;
+import org.alfresco.po.share.RepositoryPage;
+import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.ShareUtil;
+import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.admin.AdminConsolePage;
 import org.alfresco.po.share.admin.ManageSitesPage;
 import org.alfresco.po.share.admin.ManagedSiteRow;
@@ -209,17 +224,17 @@ public class MultiTenancyTest extends AbstractUtils
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
             assertTrue(
-                    tenantConsolePage.findText().contains("created tenant: " + tenantDomain1));
+                    tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
             assertTrue(
-                    tenantConsolePage.findText().contains("created tenant: " + tenantDomain2));
+                    tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
 
             //Show a list of all tenants
             tenantConsolePage.sendCommands("show tenants");
             tenantConsolePage.render();
             assertTrue(
-                    tenantConsolePage.findText().contains("Enabled  - Tenant: " + tenantDomain1) && tenantConsolePage.findText().contains(downloadDirectory));
+                    tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain1) && tenantConsolePage.getResult().contains(downloadDirectory));
             assertTrue(
-                    tenantConsolePage.findText().contains("Enabled  - Tenant: " + tenantDomain2) && tenantConsolePage.findText()
+                    tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain2) && tenantConsolePage.getResult()
                             .contains("alf_data/contentstore"));
         }
 
@@ -277,13 +292,13 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage.sendCommands("show tenants");
             tenantConsolePage.render();
             assertTrue(
-                    tenantConsolePage.findText().contains("Enabled  - Tenant: " + tenantDomain1) && tenantConsolePage.findText()
+                    tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain1) && tenantConsolePage.getResult()
                             .contains("alf_data/contentstore"));
 
             //Show Help
             tenantConsolePage.sendCommands("help");
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("List this help"), true);
+            assertEquals(tenantConsolePage.getResult().contains("List this help"), true);
 
         }
 
@@ -326,7 +341,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage.render(maxWaitTime);
             tenantConsolePage.sendCommands("disable " + tenantDomain1);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("Disabled tenant: " + tenantDomain1), true);
+            assertEquals(tenantConsolePage.getResult().contains("Disabled tenant: " + tenantDomain1), true);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -361,7 +376,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             tenantConsolePage.sendCommands("enable " + tenantDomain1);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("Enabled tenant: " + tenantDomain1), true);
+            assertEquals(tenantConsolePage.getResult().contains("Enabled tenant: " + tenantDomain1), true);
         }
 
         //Login Succeeds: When tenant is enable
@@ -414,7 +429,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -467,7 +482,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -525,11 +540,11 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -598,12 +613,12 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             //Create fails : When tenant has the same name, but with capital letters.
             AlfrescoUtil.createTenant(drone, tenantDomain1.toUpperCase(), DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("Tenant already exists: " + tenantDomain1.toLowerCase()), true);
+            assertEquals(tenantConsolePage.getResult().contains("Tenant already exists: " + tenantDomain1.toLowerCase()), true);
         }
 
         //Login to Share as created tenant.
@@ -656,11 +671,11 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -747,7 +762,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             //Export tenant
             tenantConsolePage.sendCommands("export " + tenantDomain1 + " " + downloadDirectory);
@@ -813,11 +828,11 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -924,7 +939,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -977,7 +992,7 @@ public class MultiTenancyTest extends AbstractUtils
             repositoryAdminConsolePage = AlfrescoUtil.repoAdminConsoleLogin(drone, shareUrl, adminTenantDomain1, DEFAULT_PASSWORD);
             repositoryAdminConsolePage.sendCommands("reload messages lifecycle-messages");
             repositoryAdminConsolePage.render();
-            assertTrue(repositoryAdminConsolePage.findText().contains("Message resource bundle reloaded: lifecycle-messages"));
+            assertTrue(repositoryAdminConsolePage.getResult().contains("Message resource bundle reloaded: lifecycle-messages"));
         }
 
         // Login to Share as Admin tenant and create a content.
@@ -1027,7 +1042,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render(maxWaitTime);
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -1105,11 +1120,11 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -1243,11 +1258,11 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -1361,7 +1376,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render(maxWaitTime);
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -1408,7 +1423,7 @@ public class MultiTenancyTest extends AbstractUtils
         tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
         AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
         tenantConsolePage.render();
-        assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+        assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
         //Login to Alfresco as guest
         LoginAlfrescoPage loginPage = new LoginAlfrescoPage(drone);
@@ -1458,7 +1473,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -1546,11 +1561,11 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -1620,11 +1635,11 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
@@ -1697,7 +1712,7 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
         }
 
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");

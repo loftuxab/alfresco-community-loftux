@@ -29,8 +29,6 @@ import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.systemsummary.TenantConsole;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.webdrone.WebDrone;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Created by ivan.kornilov on 23.04.2014.
@@ -38,8 +36,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class AlfrescoUtil extends AbstractUtils
 {
-
-    private static final Log logger = LogFactory.getLog(ApplicationPageUtil.class);
     private static final String ALFRESCO_LOGIN_PAGE = "/alfresco/faces/jsp/login.jsp";
     private static final String TENANT_ADMIN_CONSOLE_PAGE = "/alfresco/faces/jsp/admin/tenantadmin-console.jsp";
     private static final String REPO_ADMIN_CONSOLE_PAGE = "/alfresco/faces/jsp/admin/repoadmin-console.jsp";
