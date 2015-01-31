@@ -713,6 +713,21 @@
                Dom.setAttribute(this.fileSelectionInput, "name", "files[]");
                Dom.addClass(this.fileSelectionInput, "ie10-dnd-file-selection-button");
                Event.addListener(this.fileSelectionInput, "change", this.onFileSelection, this, true);
+
+               // MNT-12948
+               new KeyListener(this.fileSelectionInput,
+               {
+                  keys: KeyListener.KEY.ENTER
+               },
+               {
+                  fn: function enter_key_pressed(obj)
+                  {
+                     this.fileSelectionInput.click();
+                  },
+                  scope: this,
+                  correctScope: true
+               }).enable();
+
                this.fileSelectionInputParent.appendChild(this.fileSelectionInput);
             }
             else
