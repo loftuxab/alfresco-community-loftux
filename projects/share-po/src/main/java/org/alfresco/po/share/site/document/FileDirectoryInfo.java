@@ -62,6 +62,14 @@ public interface FileDirectoryInfo
     List<String> getTags();
 
     /**
+     * Cets the list of inline tags after clicking on tag info icon
+     * string is returned.
+     *
+     * @return List<String> List of inline tags
+     */
+    List<String> getInlineTagsList();
+
+    /**
      * Get the {@link List} of added {@link Categories}.
      *
      * @return {@link List} of {@link Categories}
