@@ -21,6 +21,7 @@ import org.alfresco.po.share.site.SiteLayout;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
@@ -28,6 +29,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CustomiseUserDashboardPage extends SharePage
@@ -242,7 +244,7 @@ public class CustomiseUserDashboardPage extends SharePage
             try
             {
                 String columns = drone.find(By.cssSelector("div[id$='default-wrapper-div']")).getAttribute("class");
-                if (columns != null)
+                if (!StringUtils.isEmpty(columns))
                 {
                     String columnSize = columns.substring(columns.length() - 1);
                     noOfColumns = Integer.valueOf(columnSize);
@@ -250,22 +252,29 @@ public class CustomiseUserDashboardPage extends SharePage
             }
             catch (NoSuchElementException te)
             {
-                if (logger.isTraceEnabled())
-                {
-                    logger.trace("Unable to find the Columns css " + te);
-                }
+                logger.info("Unable to find the Columns css " + te);
             }
 
             if (columnNumber <= noOfColumns)
             {
                 try
                 {
-                    List<WebElement> existingDashletsInColumn = drone.findAndWaitForElements(By.cssSelector(String.format("ul[id$='column-ul-%d'] li",
+                    List<WebElement> existingDashletsInColumn = Collections.emptyList();
+                    try
+                    {
+                        existingDashletsInColumn = drone.findAndWaitForElements(By.cssSelector(String.format("ul[id$='column-ul-%d'] li",
                             columnNumber)));
-
+                    }
+                    catch (TimeoutException e)
+                    {
+                        if (logger.isTraceEnabled())
+                        {
+                            logger.info("Selected column is empty", e);
+                        }
+                    }
                     if (existingDashletsInColumn.size() < MAX_DASHLETS_IN_COLUMN)
                     {
-                        WebElement target = drone.findAndWait(By.cssSelector(String.format("ul[id$='column-ul-%d'] li", columnNumber)));
+                        WebElement target = drone.findAndWait(By.xpath(String.format("//ul[@class='usedList' and contains(@id,'-column-ul-%d')]", columnNumber)));
                         drone.executeJavaScript("window.scrollBy(0,250)", "");
                         drone.dragAndDrop(newDashlet, target);
                         return selectOk();
@@ -279,7 +288,7 @@ public class CustomiseUserDashboardPage extends SharePage
                 {
                     if (logger.isTraceEnabled())
                     {
-                        logger.trace("Exceeded time to find the Available dashlet names ", te);
+                        logger.info("Exceeded time to find the Available dashlet names ", te);
                     }
                 }
             }
