@@ -24,7 +24,30 @@
     <test name="Advance search tests">
         <classes>
             <class name="org.alfresco.share.search.AdvanceSearchTest"/>
-            <class name="org.alfresco.share.search.AdvanceSearchTest2"/>
+            <class name="org.alfresco.share.search.AdvanceSearchTest2">
+                <methods>
+                    <include name="AONE_13900"/>
+                    <include name="AONE_13904"/>
+                    <include name="AONE_13901"/>
+                    <include name="AONE_13902"/>
+                    <include name="AONE_13903"/>
+                    <include name="AONE_13905"/>
+                    <include name="AONE_13906"/>
+                    <include name="AONE_13907"/>
+                    <include name="AONE_13908"/>
+                    <include name="AONE_13909"/>
+                    <include name="AONE_13910"/>
+                    <include name="AONE_13911"/>
+                    <include name="AONE_13912"/>
+                    <include name="AONE_13913"/>
+                    <include name="AONE_13914"/>
+                    <include name="AONE_13915"/>
+                    <include name="AONE_13916"/>
+                    <include name="AONE_13917"/>
+                    <include name="AONE_13918"/>
+                    <include name="AONE_13933"/>
+                </methods>
+            </class>
         </classes>
     </test>
 

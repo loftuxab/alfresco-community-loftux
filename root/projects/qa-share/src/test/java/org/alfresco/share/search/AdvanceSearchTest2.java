@@ -116,6 +116,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         String[] fileInfo = { fileName };
         ShareUser.uploadFileInFolder(drone, fileInfo);
+
+        ShareUser.logout(drone);
     }
 
     /**
@@ -167,6 +169,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
         searchOk = ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, SERACH_ZERO_CONTENT);
         Assert.assertTrue(searchOk);
 
+        ShareUser.logout(drone);
+
     }
 
     /**
@@ -185,6 +189,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
         String[] testUserInfo = new String[] { testUser };
 
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+        ShareUser.logout(drone);
 
     }
 
@@ -220,6 +226,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         Assert.assertTrue(searchOk);
 
+        ShareUser.logout(drone);
+
     }
 
     /**
@@ -238,6 +246,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
         String[] testUserInfo = new String[] { testUser };
 
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+        ShareUser.logout(drone);
 
     }
 
@@ -270,6 +280,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
         searchOk = ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, SERACH_ZERO_CONTENT);
         Assert.assertTrue(searchOk);
 
+        ShareUser.logout(drone);
+
     }
 
     /**
@@ -300,6 +312,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         ShareUserSitePage.createFolder(drone, folderName, folderName);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -348,6 +361,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         searchOk = ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, SERACH_ZERO_CONTENT);
         Assert.assertTrue(searchOk);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -374,6 +388,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -424,6 +439,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         valueEntered = contentSearchPage.getDescription();
         Assert.assertEquals(valueEntered.length(), 1024, "ALF-4839 - No restriction of length for Description field.");
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -494,6 +510,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         contentDetails.setContent(fileContents[3]);
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -554,6 +571,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchText[2], siteName + "_My 4", true));
         Assert.assertTrue(ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, siteName + "_House Techno Trance my"));
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -625,6 +643,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         fileInfo[2] = fileContents[3];
         ShareUser.uploadFileInFolder(drone, fileInfo).render(maxWaitTime);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -678,6 +697,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_FOLDER_SEARCH, searchText[2], siteName + "_House Techno Trance",
                 true));
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -749,6 +769,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         fileInfo[2] = fileContents[3];
         ShareUser.uploadFileInFolder(drone, fileInfo).render(maxWaitTime);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -798,6 +819,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchText[2], "House Techno Trance my", true));
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -869,6 +891,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         fileInfo[2] = fileContents[3];
         ShareUser.uploadFileInFolder(drone, fileInfo).render(maxWaitTime);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -921,6 +944,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_FOLDER_SEARCH, searchText[2], siteName + "_House Techno Trance",
                 true));
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -970,6 +994,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         contentDetails.setTitle(folderTitles[0]);
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1004,6 +1029,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchText, "House my 1", true));
         Assert.assertTrue(ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, "Techno my"));
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1075,6 +1101,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         ShareUserSitePage.createFolder(drone, folders[1], folderTitles[1], null);
         ShareUserSitePage.createFolder(drone, folders[2], folderTitles[0], null);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1116,6 +1143,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertNotNull(searchResultItem);
         Assert.assertTrue(searchResultItem.isFolder());
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1166,6 +1194,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         contentDetails.setDescription(descriptions[0]);
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1200,6 +1229,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchText, "Techno my", true));
         Assert.assertTrue(ShareUserSearchPage.isSearchItemInFacetSearchPage(drone, "House my 1"));
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1271,6 +1301,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         ShareUserSitePage.createFolder(drone, folders[1], descriptions[1]);
         ShareUserSitePage.createFolder(drone, folders[2], descriptions[0]);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1311,6 +1342,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertNotNull(searchResult);
         Assert.assertTrue(searchResult.isFolder());
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1388,6 +1420,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         contentDetails.setContent(folders[3]);
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1417,7 +1450,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         keyWordSearchText.put(SearchKeys.KEYWORD.getSearchKeys(), siteName + "_house");
         List<SearchResult> list = ShareUserSearchPage.advanceSearch(drone, searchInfo, keyWordSearchText);
 
-        if(list.size() != 0)
+        if (list.size() != 0)
         {
             drone.deleteCookies();
             drone.refresh();
@@ -1428,6 +1461,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         Assert.assertTrue(list.size() == 0);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1504,6 +1538,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         contentDetails.setContent(folders[3]);
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1533,7 +1568,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         keyWordSearchText.put(SearchKeys.KEYWORD.getSearchKeys(), siteName + "_house");
         List<SearchResult> list = ShareUserSearchPage.advanceSearch(drone, searchInfo, keyWordSearchText);
 
-        if(list.size() != 0)
+        if (list.size() != 0)
         {
             drone.deleteCookies();
             drone.refresh();
@@ -1544,6 +1579,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         Assert.assertTrue(list.size() == 0);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1668,6 +1704,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 3", true));
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 4", true));
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1685,6 +1722,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13904() throws Exception
     {
+
         String testName = getTestName();
 
         String siteName = getSiteName(testName).replace("-", "");
@@ -1745,6 +1783,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         contentDetails.setContent(folders[3]);
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1756,7 +1795,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
      * <li>Validate the search results are returned as expected</li>
      * </ul>
      */
-    @Test(groups = "alfrescoBug")
+    @Test(groups = "AlfrescoOne")
     public void AONE_13904() throws Exception
     {
         /** Start Test */
@@ -1764,24 +1803,41 @@ public class AdvanceSearchTest2 extends AbstractUtils
         String testUser = getUserNameFreeDomain(testName + "1");
         String siteName = getSiteName(testName).replace("-", "");
 
-        /** Test Data Setup */
-        Map<String, String> keyWordSearchText = new HashMap<>();
-        List<String> searchInfo = Arrays.asList(ADV_CONTENT_SEARCH, "searchAllSitesFromMyDashBoard");
-        String searchTerm = siteName + "_house";
+        try
+        {
+            /** Test Data Setup */
+            Map<String, String> keyWordSearchText = new HashMap<>();
+            List<String> searchInfo = Arrays.asList(ADV_CONTENT_SEARCH, "searchAllSitesFromMyDashBoard");
+            String searchTerm = siteName + "_house";
 
-        ShareUser.login(drone, testUser, testPassword);
+            ShareUser.login(drone, testUser, testPassword);
 
-        // Searching for valid Keyword.
-        keyWordSearchText.put(SearchKeys.KEYWORD.getSearchKeys(), searchTerm);
-        advancedSearchWithRetry(drone, searchInfo, keyWordSearchText, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House my", true);
+            // Searching for valid Keyword.
+            keyWordSearchText.put(SearchKeys.KEYWORD.getSearchKeys(), searchTerm);
+            advancedSearchWithRetry(drone, searchInfo, keyWordSearchText, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House my", true);
 
-        Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House my", true));
-        Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House Techno my", true));
-        Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House Techno Trance my",
-                true));
-        Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 1", true));
-        Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 3", true));
-        Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 4", true));
+            Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House my", true));
+            Assert.assertTrue(ShareUserSearchPage
+                    .checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House Techno my", true));
+            Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName
+                    + "_House Techno Trance my", true));
+            Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 1", true));
+            Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 3", true));
+            Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 4", true));
+
+            ShareUser.logout(drone);
+        }
+        catch (Throwable e)
+        {
+            reportError(drone, testName, e);
+        }
+        finally
+        {
+            ShareUser.login(drone, getUserNameFreeDomain(testName), testPassword);
+            SiteUtil.deleteSite(drone, siteName);
+            ShareUser.logout(drone);
+        }
+
     }
 
     /**
@@ -1819,6 +1875,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         contentDetails.setContent("test");
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1863,6 +1920,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         Assert.assertEquals(actualValueEntered, valueEntered.replaceFirst(valueEntered.split("/")[0], "6"));
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1921,6 +1979,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, "\"string M\"", "string M.txt", true),
                 "MNT-8476 - Search returning inconsistent results.");
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1940,6 +1999,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1964,6 +2024,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
 
         // Verify items are displayed
         Assert.assertTrue(advanceSearchPage.isAdvSearchPageCorrectlyDisplayed(), "Some elements are missing");
+
+        ShareUser.logout(drone);
     }
 
     /**
@@ -1994,6 +2056,8 @@ public class AdvanceSearchTest2 extends AbstractUtils
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setName(testName);
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
+
+        ShareUser.logout(drone);
     }
 
     // todo not relevant for 5.0
@@ -2040,5 +2104,6 @@ public class AdvanceSearchTest2 extends AbstractUtils
         // Click "Back to Test Site" link;
         advanceSearchPage.clickBackToSite();
         Assert.assertTrue(ShareUser.getSharePage(drone) instanceof SiteDashboardPage, "The user isn't redirected to SiteDashboard page");
+        ShareUser.logout(drone);
     }
 }
