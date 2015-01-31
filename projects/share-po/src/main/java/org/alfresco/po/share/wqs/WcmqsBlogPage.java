@@ -7,6 +7,9 @@ import org.alfresco.webdrone.WebDroneUtil;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -18,6 +21,11 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
 {
         @RenderWebElement
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
+        private final By BLOG_ENTRIES = By.cssSelector("div[class='blog-entry']");
+        private final By BLOG_POST_DATE = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(1)");
+        private final By BLOG_POST_CREATOR = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(2)");
+        private final By BlOG_POST_COMMENTS_LINK = By.cssSelector("div[class='blog-entry']>div[class='blog-list-misc']>span:nth-of-type(3)>a");
+
         public static final String ETHICAL_FUNDS = "Ethical funds";
         public static final String COMPANY_ORGANISES_WORKSHOP = "Company organises workshop";
         public static final String ANALYSTS_LATEST_THOUGHTS = "latest thoughts";
@@ -125,5 +133,57 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
                 {
                         throw new PageOperationException("Exceeded time to find news link. " + e.toString());
                 }
+        }
+
+        public int getBlogPosts()
+        {
+                try
+                {
+                        List<WebElement> posts = drone.findAndWaitForElements(BLOG_ENTRIES);
+                        return posts.size();
+                }
+                catch (TimeoutException te)
+                {
+                        throw new PageOperationException("Exceeded time to find the blog posts. " + te.toString());
+                }
+        }
+
+        public boolean isBlogPostDateDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(BLOG_POST_DATE);
+                        return true;
+                }
+                catch (TimeoutException te)
+                {
+                }
+                return false;
+        }
+
+        public boolean isBlogPostCreatorDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(BLOG_POST_CREATOR);
+                        return true;
+                }
+                catch (TimeoutException te)
+                {
+                }
+                return false;
+        }
+
+        public boolean isBlogPostCommentsLinkDisplayed()
+        {
+                try
+                {
+                        drone.findAndWait(BlOG_POST_COMMENTS_LINK);
+                        return true;
+                }
+                catch (TimeoutException te)
+                {
+                }
+                return false;
         }
 }
