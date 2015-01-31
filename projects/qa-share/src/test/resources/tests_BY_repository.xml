@@ -18,7 +18,7 @@
         <classes>
             <class name="org.alfresco.share.repository.MultiTenancyTest"/>
         </classes>
-    </test>-->
+    </test>
 
     <test name="RepositoryFtpTest">
         <classes>
@@ -38,6 +38,6 @@
         <classes>
             <class name="org.alfresco.share.repository.RepositoryFtpsTest"/>
         </classes>
-    </test>
+    </test-->
 
 </suite>
