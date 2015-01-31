@@ -90,6 +90,17 @@
             <identity>user</identity>
          </endpoint>
 
+         <endpoint>
+            <id>alfresco-public</id>
+            <parent-id>alfresco</parent-id>
+            <name>Alfresco Public API - user access</name>
+            <description>Access to Alfresco Repository Public API that require user authentication.
+                         This makes use of the authentication that is provided by parent 'alfresco' endpoint.</description>
+            <connector-id>alfresco</connector-id>
+            <endpoint-url>http://localhost:8080/alfresco/api/-default-/public</endpoint-url>
+            <identity>user</identity>
+         </endpoint>
+
          <!-- The default endpoint -->
          <default-endpoint-id>alfresco</default-endpoint-id>
 

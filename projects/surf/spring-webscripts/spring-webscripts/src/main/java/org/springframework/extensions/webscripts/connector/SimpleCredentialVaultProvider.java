@@ -18,15 +18,18 @@
 
 package org.springframework.extensions.webscripts.connector;
 
+import org.springframework.extensions.config.ConfigService;
+import org.springframework.extensions.config.RemoteConfigElement;
 import org.springframework.extensions.surf.exception.CredentialVaultProviderException;
 
 /**
  * Provides instances of credential vaults
- * 
- * @author muzquiano
  */
 public class SimpleCredentialVaultProvider implements CredentialVaultProvider
 {
+    private ConfigService configService;
+    private RemoteConfigElement config;
+    
     /**
      * Reflection constructor
      */
@@ -35,11 +38,19 @@ public class SimpleCredentialVaultProvider implements CredentialVaultProvider
     }
     
     /**
-     * Provide a Simple Credential Vault
+     * @param configService the configService to set
+     */
+    public void setConfigService(ConfigService configService)
+    {
+        this.configService = configService;
+    }
+
+    /**
+     * Provide a Credential Vault for the given id
      */
     public CredentialVault provide(String id) throws CredentialVaultProviderException
     {
-        return new SimpleCredentialVault(id);
+        return new SimpleCredentialVault(id, getRemoteConfig());
     }
 
     /**
@@ -48,5 +59,21 @@ public class SimpleCredentialVaultProvider implements CredentialVaultProvider
     public String generateKey(String id, String userId)
     {
         return id;
+    }
+    
+    /**
+     * Gets the single instance of the remote config element.
+     * 
+     * @return the remote config
+     */
+    private RemoteConfigElement getRemoteConfig()
+    {
+        if (this.config == null)
+        {
+            // retrieve the remote configuration
+            this.config = (RemoteConfigElement)this.configService.getConfig("Remote").getConfigElement("remote");
+        }
+        
+        return this.config;
     }
 }

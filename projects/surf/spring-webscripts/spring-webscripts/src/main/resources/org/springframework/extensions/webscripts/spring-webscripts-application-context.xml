@@ -384,11 +384,8 @@
    <!--                            -->
    <!-- Credential Vault Providers -->
    <!--                            -->
-   <bean id="credential.vault.provider" class="org.springframework.extensions.webscripts.connector.SimpleCredentialVaultProvider" />
-
-   <bean id="credential.vault.provider.xml" class="org.springframework.extensions.webscripts.connector.XMLCredentialVaultProvider">
+   <bean id="credential.vault.provider" class="org.springframework.extensions.webscripts.connector.SimpleCredentialVaultProvider">
       <property name="configService" ref="web.config" />
-      <property name="location" value="/webscripts/xml" />
    </bean>
    
    
