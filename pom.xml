@@ -159,7 +159,7 @@
 
     <!-- Centralized dependency versions -->
     <dependency.lucene.version>2.4.1</dependency.lucene.version>
-    <dependency.jibx.version>1.2.5</dependency.jibx.version>
+    <dependency.jibx.version>1.2.6</dependency.jibx.version>
     <dependency.tika.version>1.6-20140428-alfresco-patched</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
     <dependency.opencmis.version>0.11.0</dependency.opencmis.version>
@@ -538,10 +538,18 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.5.3</version>
+                <!-- MASSEMBLY-747 - remove when 2.5.4 is released -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-io</artifactId>
+                        <version>2.5</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.10</version>
             </plugin>
             <plugin>
                 <artifactId>maven-help-plugin</artifactId>
@@ -643,7 +651,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.6</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -718,7 +726,7 @@
                     <dependency>
                         <groupId>org.codehaus.plexus</groupId>
                         <artifactId>plexus-archiver</artifactId>
-                        <version>2.8.1</version>
+                        <version>2.9.1</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -777,7 +785,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1.1</version>
+                <version>2.1.2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -905,7 +913,7 @@
         </plugin>
         <plugin>
             <artifactId>maven-project-info-reports-plugin</artifactId>
-            <version>2.7</version>
+            <version>2.8</version>
             <configuration>
                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
             </configuration>
