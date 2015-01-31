@@ -131,4 +131,14 @@
         </classes>
     </test>
 
+    <test name="Admin Console test Suite">
+        <classes>
+            <class name="org.alfresco.share.sanity.SystemAdminConsole">
+                <methods>
+                    <include name="AONE_8097"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
 </suite>
