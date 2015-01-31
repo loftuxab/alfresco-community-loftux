@@ -33,7 +33,6 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.cobra.ldtp.Ldtp;
-import com.cobra.ldtp.LdtpExecutionError;
 
 @Listeners(FailedTestListener.class)
 public class CifsMSExcel2010Tests extends AbstractUtils
@@ -64,9 +63,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     private static final String CIFS_LOCATION = "cifs";
     public String officePath;
     WindowsExplorer explorer = new WindowsExplorer();
-    MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
     MicorsoftOffice2010 excel = new MicorsoftOffice2010(Application.EXCEL, "2010");
-    MicorsoftOffice2010 power = new MicorsoftOffice2010(Application.POWERPOINT, "2010");
     String mapConnect;
     String networkDrive;
     String networkPath;
@@ -77,7 +74,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     {
         super.setup();
 
-        testName = this.getClass().getSimpleName() + 20;
+        testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName);
 
         // word files
@@ -108,9 +105,6 @@ public class CifsMSExcel2010Tests extends AbstractUtils
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        // Runtime.getRuntime().exec("net use * /d /y");;
-        // logger.info("Unmapping succesfull " + testUser);
-
         Runtime.getRuntime().exec(mapConnect);
         logger.info("----------Mapping succesfull " + testUser);
 
@@ -120,8 +114,6 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     public void teardownMethod() throws Exception
     {
         Runtime.getRuntime().exec("taskkill /F /IM EXCEL.EXE");
-        Runtime.getRuntime().exec("taskkill /F /IM POWERPNT.EXE");
-        Runtime.getRuntime().exec("taskkill /F /IM WINWORD.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
     }
 
@@ -129,14 +121,13 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     public void unmapDrive() throws Exception
     {
         Runtime.getRuntime().exec("net use * /d /y");
-        ;
         logger.info("--------Unmapping succesfull " + testUser);
     }
 
-    @Test(groups = { "DataPrepWord" })
+    @Test(groups = { "DataPrepExcel" })
     public void dataPrep_6271() throws Exception
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName);
 
         // Login
@@ -164,7 +155,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6271() throws IOException
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String first_modification = testName + "1";
         String second_modification = testName + "2";
@@ -313,10 +304,10 @@ public class CifsMSExcel2010Tests extends AbstractUtils
 
     }
 
-    @Test(groups = { "DataPrepWord" })
+    @Test(groups = { "DataPrepExcel" })
     public void dataPrep_6272() throws Exception
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName);
 
         // Login
@@ -340,12 +331,11 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         detailsPage.render();
     }
 
-    /** AONE-6272:MS Excel 2010 - uploaded to Share (big) 
-     * @throws AWTException */
+    /** AONE-6272:MS Excel 2010 - uploaded to Share (big) */
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6272() throws IOException, AWTException
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String first_modification = testName + "1";
         String second_modification = testName + "2";
@@ -358,6 +348,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // Open .xlsx document for editing.
         // The document is opened in write mode.
         Ldtp ldtp = excel.openFileFromCMD(fullPath, fileName_6272 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = excel.getAbstractUtil().setOnWindow(fileName_6272);
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -501,7 +492,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     public void dataPrep_6273() throws Exception
     {
 
-        testName = getTestName() + 21;
+        testName = getTestName();
         siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -523,7 +514,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     public void dataPrep_6274() throws Exception
     {
 
-        testName = getTestName() + 21;
+        testName = getTestName();
         siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -544,7 +535,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     @Test(groups = { "DataPrepExcel" })
     public void dataPrep_6275() throws Exception
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -565,7 +556,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     @Test(groups = { "DataPrepExcel" })
     public void dataPrep_6276() throws Exception
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -587,7 +578,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6273() throws Exception
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String addText = "First text";
         String edit1 = "New text1";
@@ -603,7 +594,6 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         // RBC in the window -> New -> New Microsoft Office Word Document
         // --- Expected results --
         // The document .docx is created
-
         l1 = excel.openOfficeApplication();
         excel.editOffice(l1, addText);
         excel.saveAsOffice(l1, fullPath + fileName_6273);
@@ -793,7 +783,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6274() throws Exception
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String addText = "First text";
         String edit1 = "New text1";
@@ -843,7 +833,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        l1.waitTime(5);
         int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
@@ -1003,7 +993,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6275() throws Exception
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String edit2 = "new text2";
         String edit3 = "new text3";
@@ -1188,7 +1178,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6276() throws Exception
     {
-        String testName = getTestName() + 21;
+        String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
         String edit2 = "New text2";
         String edit3 = "New text3";
@@ -1289,7 +1279,7 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        l1.waitTime(5);
         noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
         Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
 
@@ -1397,13 +1387,4 @@ public class CifsMSExcel2010Tests extends AbstractUtils
         r.keyRelease(KeyEvent.VK_V);
     }
     
-    @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
-    public void AONE_62761111() throws Exception
-    {
-        String siteName ="SitemyasShare-627620";
-        String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + SLASH + "documentLibrary" + SLASH;
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
-
-    }
 }
