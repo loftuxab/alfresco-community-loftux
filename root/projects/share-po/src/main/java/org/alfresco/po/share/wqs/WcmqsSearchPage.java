@@ -25,6 +25,7 @@ public class WcmqsSearchPage extends WcmqsAbstractPage
     private final By NO_OF_SEARCH_RESULTS = By.cssSelector("p.intheader-paragraph");
     private final By LATEST_BLOG_ARTICLES = By.cssSelector("div[id='right']>div[class='latest-news']");
     private final By PAGINATION = By.xpath("//div[@class='pagination']");
+    
 
     /**
      * Constructor.
@@ -122,5 +123,43 @@ public class WcmqsSearchPage extends WcmqsAbstractPage
             throw new PageOperationException("Exceeded time to find Pagination. " + e.toString());
         }
     }
+    
+    /**
+     * Method to get latest blog articles titles
+     */
+    public ArrayList<String> getLatestBlogArticles()
 
+    {
+        ArrayList<String> blogArticles = new ArrayList<String>();
+        try
+        {
+            List<WebElement> links = drone.findAndWaitForElements(LATEST_BLOG_ARTICLES);
+            for (WebElement div : links)
+            {
+                blogArticles.add(div.getText());
+            }
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageException("Unable to find Latest Blog Articles", nse);
+        }
+
+        return blogArticles;
+    }
+    
+    /**
+     * Method to click a news title
+     * @param blogArticleTitle - the title of the blog article in wcmqs site
+     */
+    public void clickLatestBlogArticle(String blogArticleTitle)
+    {
+        try
+        {
+            drone.findAndWait(By.xpath(String.format("//a[text()=\"%s\"]", blogArticleTitle))).click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find news link. " + e.toString());
+        }
+    }
 }
