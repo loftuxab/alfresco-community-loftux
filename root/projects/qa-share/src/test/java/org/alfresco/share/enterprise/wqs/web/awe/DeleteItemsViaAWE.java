@@ -6,9 +6,7 @@ import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
-import org.alfresco.po.share.wqs.WcmqsBlogPage;
-import org.alfresco.po.share.wqs.WcmqsBlogPostPage;
-import org.alfresco.po.share.wqs.WcmqsLoginPage;
+import org.alfresco.po.share.wqs.*;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
@@ -28,10 +26,11 @@ public class DeleteItemsViaAWE extends AbstractUtils
         private String testName;
         private String wqsURL;
         private String testUser;
-        private String serverIpAddress = "192.168.56.105";
+        private String siteName;
 
-        private final String ETHICAL_FUNDS = "Ethical funds";
-        private final String siteName = "DeleteItemsViaAwe";
+        private final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
+        private final String QUICK_START_EDITORIAL = "Quick Start Editorial";
+        private final String ROOT_FOLDER = "root";
 
         private static final Logger logger = Logger.getLogger(DeleteItemsViaAWE.class);
 
@@ -40,10 +39,13 @@ public class DeleteItemsViaAWE extends AbstractUtils
         public void setup() throws Exception
         {
                 testName = this.getClass().getSimpleName();
+                siteName = testName
+                //                        +"site"
+                ;
                 testUser = getUserNameFreeDomain(testName);
-                wqsURL = siteName + ":8080/wcmqs";
-                //        serverIpAddress = serverIp;
-                logger.info("wcmqs url : " + wqsURL);
+                //                wqsURL = siteName + ":8080/wcmqs";
+                wqsURL = "http://deleteitemsviaawe:8080/wcmqs/";
+                logger.info(" wcmqs url : " + wqsURL);
                 logger.info("Start Tests from: " + testName);
         }
 
@@ -94,15 +96,14 @@ public class DeleteItemsViaAWE extends AbstractUtils
 
                 //Change property for quick start live to ip address
                 documentLibPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
-                documentPropertiesPage.setSiteHostname(serverIpAddress);
+                documentPropertiesPage.setSiteHostname(wcmqs);
                 documentPropertiesPage.clickSave();
 
                 //setup new entry in hosts to be able to access the new wcmqs site
-                String setHostAddress = "cmd.exe /c echo " + serverIpAddress + " " + siteName + " >> %WINDIR%\\System32\\Drivers\\Etc\\Hosts";
+                String setHostAddress = "cmd.exe /c echo " + wcmqs + " " + siteName + " >> %WINDIR%\\System32\\Drivers\\Etc\\Hosts";
                 Runtime.getRuntime().exec(setHostAddress);
 
         }
-
         /**
          * AONE-5641:Deleting "Ethical funds" blog post
          */
@@ -122,9 +123,11 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // Open "Ethical funds" blog post;
                 // ---- Expected results ----
                 // 2. Blog post is opened;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU);
 
                 WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
-                wcmqsBlogPage.openBlogPost(ETHICAL_FUNDS);
+                wcmqsBlogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
 
                 WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
                 wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
@@ -146,7 +149,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // File is not deleted;
 
                 wcmqsBlogPostPage.cancelArticleDelete();
-                wcmqsBlogPage.checkIfBlogExists(ETHICAL_FUNDS);
+                wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.ETHICAL_FUNDS);
 
                 // ---- Step 5 ----
                 // ---- Step action ---
@@ -162,7 +165,7 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // ---- Expected results ----
                 //  File is deleted and no more dislpayed in the list of articles;
                 wcmqsBlogPostPage.confirmArticleDelete();
-                wcmqsBlogPage.checkIfBlogIsDeleted(ETHICAL_FUNDS);
+                wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.ETHICAL_FUNDS);
 
                 // ---- Step 7 ----
                 // ---- Step action ---
@@ -171,12 +174,645 @@ public class DeleteItemsViaAWE extends AbstractUtils
                 // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
                 ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-                documentLibPage.selectFolder("Alfresco Quick Start");
-                documentLibPage.selectFolder("Quick Start Editorial");
-                documentLibPage.selectFolder("root");
-                documentLibPage.selectFolder("blog");
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsBlogPage.BLOG);
 
-                Assert.assertFalse(documentLibPage.isFileVisible("blog1.html"), "Ethical funds page hasn't been deleted correctly");
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsBlogPage.BLOG_1), "Ethical funds page hasn't been deleted correctly");
 
         }
+
+        /**
+         * AONE-5642:Deleting "Company organises workshop" blog post
+         */
+        @Test(groups = "WQS")
+        public void AONE_5642() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ---
+                // Open "Company organises workshop" blog post;
+                // ---- Expected results ----
+                // 2. Blog post is opened;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU);
+
+                WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
+                wcmqsBlogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 3 ----
+                // ---- Step action ---
+                // Click Delete button near post;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+
+                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+                wcmqsBlogPostPage.deleteArticle();
+                Assert.assertTrue(wcmqsBlogPostPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 4 ----
+                // ---- Step action ---
+                // Click Cancel button;
+                // ---- Expected results ----
+                // File is not deleted;
+
+                wcmqsBlogPostPage.cancelArticleDelete();
+                wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+
+                // ---- Step 5 ----
+                // ---- Step action ---
+                // Click Delete button;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+                wcmqsBlogPostPage.deleteArticle();
+                Assert.assertTrue(wcmqsBlogPostPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 6 ----
+                // ---- Step action ---
+                // Click OK button;
+                // ---- Expected results ----
+                //  File is deleted and no more dislpayed in the list of articles;
+                wcmqsBlogPostPage.confirmArticleDelete();
+                wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+
+                // ---- Step 7 ----
+                // ---- Step action ---
+                // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog2.html file;
+                // ---- Expected results ----
+                // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
+                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsBlogPage.BLOG);
+
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsBlogPage.BLOG_2), "Company organizes workshop page hasn't been deleted correctly");
+
+        }
+
+        /**
+         * AONE-5643:Deleting "Our Analyst's thoughts" blog post
+         */
+        @Test(groups = "WQS")
+        public void AONE_5643() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ---
+                // Open "Our top analyst's latest..." blog post;
+                // ---- Expected results ----
+                // 2. Blog post is opened;
+
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                wcmqsHomePage.selectMenu(WcmqsBlogPage.BLOG_MENU);
+
+                WcmqsBlogPage wcmqsBlogPage = new WcmqsBlogPage(drone);
+                wcmqsBlogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 3 ----
+                // ---- Step action ---
+                // Click Delete button near post;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+
+                WcmqsBlogPostPage wcmqsBlogPostPage = new WcmqsBlogPostPage(drone);
+                wcmqsBlogPostPage.deleteArticle();
+                Assert.assertTrue(wcmqsBlogPostPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 4 ----
+                // ---- Step action ---
+                // Click Cancel button;
+                // ---- Expected results ----
+                // File is not deleted;
+
+                wcmqsBlogPostPage.cancelArticleDelete();
+                wcmqsBlogPage.checkIfBlogExists(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+
+                // ---- Step 5 ----
+                // ---- Step action ---
+                // Click Delete button;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+                wcmqsBlogPostPage.deleteArticle();
+                Assert.assertTrue(wcmqsBlogPostPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 6 ----
+                // ---- Step action ---
+                // Click OK button;
+                // ---- Expected results ----
+                //  File is deleted and no more dislpayed in the list of articles;
+                wcmqsBlogPostPage.confirmArticleDelete();
+                wcmqsBlogPage.checkIfBlogIsDeleted(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+
+                // ---- Step 7 ----
+                // ---- Step action ---
+                // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog3.html file;
+                // ---- Expected results ----
+                // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
+                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsBlogPage.BLOG);
+
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsBlogPage.BLOG_3), "Our top analyst's latest thoughts page hasn't been deleted correctly");
+
+        }
+
+        /**
+         * AONE-5644:Deleting "Europe dept...."article (Global economy)
+         */
+        @Test(groups = "WQS")
+        public void AONE_5644() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ---
+                //  Open "Europe dept concerns ease but bank fears remain" article in Global economy (News);
+                // ---- Expected results ----
+                // 2. Blog post is opened;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.GLOBAL);
+
+                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 3 ----
+                // ---- Step action ---
+                // Click Delete button near post;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 4 ----
+                // ---- Step action ---
+                // Click Cancel button;
+                // ---- Expected results ----
+                // File is not deleted;
+
+                wcmqsNewsPage.cancelArticleDelete();
+                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
+
+                // ---- Step 5 ----
+                // ---- Step action ---
+                // Click Delete button;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 6 ----
+                // ---- Step action ---
+                // Click OK button;
+                // ---- Expected results ----
+                //  File is deleted and no more dislpayed in the list of articles;
+                wcmqsNewsPage.confirmArticleDelete();
+                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
+
+                // ---- Step 7 ----
+                // ---- Step action ---
+                // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
+                // ---- Expected results ----
+                // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
+                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
+                documentLibPage.selectFolder(WcmqsNewsPage.GLOBAL);
+
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_4),
+                        "Europe dept concerns ease but bank fears remain page hasn't been deleted correctly");
+
+        }
+
+        /**
+         * AONE-5645:Deleting "FTSE 100 rallies from seven-week low" (Global economy)
+         */
+        @Test(groups = "WQS")
+        public void AONE_5645() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ---
+                //  Open "Europe dept concerns ease but bank fears remain" article in Global economy (News);
+                // ---- Expected results ----
+                // 2. Blog post is opened;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.GLOBAL);
+
+                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.FTSE_1000);
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 3 ----
+                // ---- Step action ---
+                // Click Delete button near post;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 4 ----
+                // ---- Step action ---
+                // Click Cancel button;
+                // ---- Expected results ----
+                // File is not deleted;
+
+                wcmqsNewsPage.cancelArticleDelete();
+                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.FTSE_1000);
+
+                // ---- Step 5 ----
+                // ---- Step action ---
+                // Click Delete button;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 6 ----
+                // ---- Step action ---
+                // Click OK button;
+                // ---- Expected results ----
+                //  File is deleted and no more dislpayed in the list of articles;
+                wcmqsNewsPage.confirmArticleDelete();
+                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.FTSE_1000);
+
+                // ---- Step 7 ----
+                // ---- Step action ---
+                // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
+                // ---- Expected results ----
+                // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
+                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
+                documentLibPage.selectFolder(WcmqsNewsPage.GLOBAL);
+
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_3),
+                        "FTSE 100 rallies from seven-week low page hasn't been deleted correctly");
+
+        }
+
+        /**
+         * AONE-5645:Deleting "Global car industry" (Global economy)
+         */
+        @Test(groups = "WQS")
+        public void AONE_5646() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ---
+                //  Open "Global car industry" article in Companies (News);
+                // ---- Expected results ----
+                // 2. Blog post is opened;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.COMPANIES);
+
+                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 3 ----
+                // ---- Step action ---
+                // Click Delete button near post;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 4 ----
+                // ---- Step action ---
+                // Click Cancel button;
+                // ---- Expected results ----
+                // File is not deleted;
+
+                wcmqsNewsPage.cancelArticleDelete();
+                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
+
+                // ---- Step 5 ----
+                // ---- Step action ---
+                // Click Delete button;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 6 ----
+                // ---- Step action ---
+                // Click OK button;
+                // ---- Expected results ----
+                //  File is deleted and no more dislpayed in the list of articles;
+                wcmqsNewsPage.confirmArticleDelete();
+                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
+
+                // ---- Step 7 ----
+                // ---- Step action ---
+                // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
+                // ---- Expected results ----
+                // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
+                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
+                documentLibPage.selectFolder(WcmqsNewsPage.COMPANIES);
+
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_2), "Global car industry page hasn't been deleted correctly");
+
+        }
+
+        /**
+         * AONE-5647:Deleting "Fresh flight to Swiss franc as Europe's bond strains return" (Global economy)
+         */
+        @Test(groups = "WQS")
+        public void AONE_5647() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ---
+                //  Open "Fresh flight to Swiss franc as Europe's bond strains return" article in Companies (News);
+                // ---- Expected results ----
+                // 2. Blog post is opened;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.COMPANIES);
+
+                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 3 ----
+                // ---- Step action ---
+                // Click Delete button near post;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 4 ----
+                // ---- Step action ---
+                // Click Cancel button;
+                // ---- Expected results ----
+                // File is not deleted;
+
+                wcmqsNewsPage.cancelArticleDelete();
+                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
+
+                // ---- Step 5 ----
+                // ---- Step action ---
+                // Click Delete button;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 6 ----
+                // ---- Step action ---
+                // Click OK button;
+                // ---- Expected results ----
+                //  File is deleted and no more dislpayed in the list of articles;
+                wcmqsNewsPage.confirmArticleDelete();
+                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
+
+                // ---- Step 7 ----
+                // ---- Step action ---
+                // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
+                // ---- Expected results ----
+                // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
+                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
+                documentLibPage.selectFolder(WcmqsNewsPage.COMPANIES);
+
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_1),
+                        "Fresh flight to Swiss franc as Europe's bond strains return page hasn't been deleted correctly");
+
+        }
+
+        /**
+         * AONE-5648:Deleting Investors fear rising risk of US regional defaults (Global economy)
+         */
+        @Test(groups = "WQS")
+        public void AONE_5648() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ---
+                //  Open Investors fear rising risk of US regional defaults article in markets (News);
+                // ---- Expected results ----
+                // 2. Blog post is opened;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.MARKETS);
+
+                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.INVESTORS_FEAR);
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 3 ----
+                // ---- Step action ---
+                // Click Delete button near post;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 4 ----
+                // ---- Step action ---
+                // Click Cancel button;
+                // ---- Expected results ----
+                // File is not deleted;
+
+                wcmqsNewsPage.cancelArticleDelete();
+                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.INVESTORS_FEAR);
+
+                // ---- Step 5 ----
+                // ---- Step action ---
+                // Click Delete button;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 6 ----
+                // ---- Step action ---
+                // Click OK button;
+                // ---- Expected results ----
+                //  File is deleted and no more dislpayed in the list of articles;
+                wcmqsNewsPage.confirmArticleDelete();
+                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.INVESTORS_FEAR);
+
+                // ---- Step 7 ----
+                // ---- Step action ---
+                // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
+                // ---- Expected results ----
+                // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
+                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
+                documentLibPage.selectFolder(WcmqsNewsPage.MARKETS);
+
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_6),
+                        "Investors fear rising risk of US regional defaults page hasn't been deleted correctly");
+
+        }
+
+        /**
+         * AONE-5649:Deleting House prices face rollercoaster ride (markets)
+         */
+        @Test(groups = "WQS")
+        public void AONE_5649() throws Exception
+        {
+                // ---- Step 1 ----
+                // ---- Step action ---
+                // Navigate to http://host:8080/wcmqs
+                // ---- Expected results ----
+                // Sample site is opened
+
+                drone.navigateTo(wqsURL);
+
+                // ---- Step 2 ----
+                // ---- Step action ---
+                //  Open House prices face rollercoaster ride article in markets (News);
+                // ---- Expected results ----
+                // 2. Blog post is opened;
+                WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
+                WcmqsNewsPage wcmqsNewsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.MARKETS);
+
+                wcmqsNewsPage.clickNewsByTitle(WcmqsNewsPage.HOUSE_PRICES);
+                WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
+                wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+                // ---- Step 3 ----
+                // ---- Step action ---
+                // Click Delete button near post;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 4 ----
+                // ---- Step action ---
+                // Click Cancel button;
+                // ---- Expected results ----
+                // File is not deleted;
+
+                wcmqsNewsPage.cancelArticleDelete();
+                wcmqsNewsPage.checkIfBlogExists(WcmqsNewsPage.HOUSE_PRICES);
+
+                // ---- Step 5 ----
+                // ---- Step action ---
+                // Click Delete button;
+                // ---- Expected results ----
+                // Confirm Delete window is opened;
+                wcmqsNewsPage.deleteArticle();
+                Assert.assertTrue(wcmqsNewsPage.isDeleteConfirmationWindowDisplayed(), "Delete confirmation window not displayed");
+
+                // ---- Step 6 ----
+                // ---- Step action ---
+                // Click OK button;
+                // ---- Expected results ----
+                //  File is deleted and no more dislpayed in the list of articles;
+                wcmqsNewsPage.confirmArticleDelete();
+                wcmqsNewsPage.checkIfBlogIsDeleted(WcmqsNewsPage.HOUSE_PRICES);
+
+                // ---- Step 7 ----
+                // ---- Step action ---
+                // Go to Share "My Web Site" document library (Alfresco Quick Start/Quick Start Editorial/root/blog) and verify blog1.html file;
+                // ---- Expected results ----
+                // Changes made via AWE are dislpayed correctly, file is removed and not displayed in the folder;
+                ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+                DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+                documentLibPage.selectFolder(ALFRESCO_QUICK_START);
+                documentLibPage.selectFolder(QUICK_START_EDITORIAL);
+                documentLibPage.selectFolder(ROOT_FOLDER);
+                documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
+                documentLibPage.selectFolder(WcmqsNewsPage.MARKETS);
+
+                Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_5),
+                        "House prices face rollercoaster ride page hasn't been deleted correctly");
+
+        }
+
 }
