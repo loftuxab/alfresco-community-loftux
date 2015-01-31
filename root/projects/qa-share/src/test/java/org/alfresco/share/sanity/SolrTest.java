@@ -46,6 +46,7 @@ import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
+import org.jsoup.Jsoup;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -1004,7 +1005,7 @@ public class SolrTest extends AbstractUtils
         assertEquals(peopleFinderPage.getTextForFollowButton(user1), "Unfollow");
     }
 
-    @Test(groups = "Sanity", timeOut = 600000)
+    @Test(groups = "ProductBug", timeOut = 600000)
     public void AONE_8281() throws Exception
     {
         String testName = getTestName();
@@ -1149,20 +1150,20 @@ public class SolrTest extends AbstractUtils
             "Activity is disabled for site");
 
         // Verify the mail
-       // Thread.sleep(10000); //solr wait
-       // JmxUtils.invokeAlfrescoServerProperty("Alfresco:Name=Schedule,Group=DEFAULT,Type=MonitoredCronTrigger,Trigger=feedNotifierTrigger", "executeNow");
+        Thread.sleep(10000); //solr wait
+        JmxUtils.invokeAlfrescoServerProperty("Alfresco:Name=Schedule,Group=DEFAULT,Type=MonitoredCronTrigger,Trigger=feedNotifierTrigger", "executeNow");
 
-      //  String emailMsg = MailUtil.getMailAsString(user1, "Alfresco Share: Recent Activities");
-      //  if (emailMsg != null && !emailMsg.isEmpty())
-      //  {
-      //      emailMsg = Jsoup.parse(emailMsg).text();
-      //      assertTrue(emailMsg.contains(activity2), "Could not find activity in mail: " + activity2);
-      //      assertTrue(emailMsg.contains(activity1), "Could not find activity in mail: " + activity1);
-      //  }
-      //  else
-      //  {
-      //      fail("User[" + user1 + "] don't got a mail about Recent Activites.");
-      //  }
+        String emailMsg = MailUtil.getMailAsString(user1, "Alfresco Share: Recent Activities");
+        if (emailMsg != null && !emailMsg.isEmpty())
+        {
+            emailMsg = Jsoup.parse(emailMsg).text();
+            assertTrue(emailMsg.contains(activity2), "Could not find activity in mail: " + activity2);
+            assertTrue(emailMsg.contains(activity1), "Could not find activity in mail: " + activity1);
+        }
+        else
+        {
+            fail("User[" + user1 + "] don't got a mail about Recent Activites.");
+        }
 
         // Verify I'm Following on My Profile
         dashBoard = ShareUser.openUserDashboard(drone).render();
