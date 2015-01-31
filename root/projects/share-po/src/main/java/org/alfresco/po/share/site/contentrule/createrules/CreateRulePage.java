@@ -1,9 +1,5 @@
 package org.alfresco.po.share.site.contentrule.createrules;
 
-import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
-
-import java.util.List;
-
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPageWithRules;
@@ -18,6 +14,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+
+import java.util.List;
+
+import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 /**
  * CreateRulePage page object, holds all element of the HTML page relating to Create Rule Page
@@ -54,10 +54,10 @@ public class CreateRulePage extends SitePage
     public static final String BALLOON_TEXT_VALUE_NOT_EMPTY = "The value cannot be empty.";
 
     // Buttons
-    private static final By CANCEL_BUTTON = By.cssSelector("span[id*='cancel-button'] button[id*='cancel-button']");
-    private static final By CREATE_BUTTON = By.cssSelector("span[id*='create-button'] button[id*='create-button']");
-    private static final By SAVE_BUTTON = By.cssSelector("span[id*='save-button'] button[id*='save-button']");
-    private static final By CREATE_AND_CREATE_ANOTHER_BUTTON = By.cssSelector("span[id*='createAnother-button'] button[id*='createAnother-button']");
+    private static final By CANCEL_BUTTON = By.cssSelector("span[id*='cancel-button'] button[id*='default-cancel-button']");
+    private static final By CREATE_BUTTON = By.cssSelector("span[id*='create-button'] button[id*='default-create-button']");
+    private static final By SAVE_BUTTON = By.cssSelector("span[id*='save-button'] button[id*='default-save-button']");
+    private static final By CREATE_AND_CREATE_ANOTHER_BUTTON = By.cssSelector("span[id*='createAnother-button'] button[id*='default-createAnother-button']");
 
     private static final By CREATED_ALERT = By.xpath(".//*[@id='message']/div/span");
 

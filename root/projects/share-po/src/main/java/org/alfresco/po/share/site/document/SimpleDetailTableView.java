@@ -54,7 +54,7 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
     private WebElement selectMoreAction()
     {
         WebElement actions = selectAction();
-        getDrone().mouseOver(actions);
+        getDrone().mouseOverOnElement(actions);
         WebElement contentActions = selectAction();
         return contentActions.findElement(By.cssSelector(MORE_ACTIONS));
     }
