@@ -28,8 +28,8 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom;
-      Event = YAHOO.util.Event;
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
       substitute = YAHOO.lang.substitute;
 
    /**
