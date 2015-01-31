@@ -21,6 +21,8 @@ import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 /**
@@ -38,7 +40,7 @@ public class MSExcel2011Tests extends AbstractUtils
     private File xls9760TestFile;
     private File xls9761TestFile;
     private File xls9762TestFile;
-    private File xls9761DownloadTestFile = new File(System.getProperty("user.home"),  "Documents/tmpxls9761TestFile.xlsx");
+    private File xls9761DownloadTestFile = new File(System.getProperty("user.home"), "Documents/tmpxls9761TestFile.xlsx");
     private File xls9763TestFile;
     private File xls9764TestFile;
     private File xls9765TestFile;
@@ -53,14 +55,17 @@ public class MSExcel2011Tests extends AbstractUtils
 
     private static final Logger logger = Logger.getLogger(MSExcel2011Tests.class);
 
-    @Override
     @BeforeClass(alwaysRun = true)
-    public void setup() throws Exception
+    @Parameters({ "TESTID" })
+    public void setup(@Optional String TESTID) throws Exception
     {
         super.setup();
         appExcel2011 = new MicrosoftExcel2011();
         appExcel2011.killProcesses();
-        testName = this.getClass().getSimpleName() + "29";
+        if (TESTID == null)
+            TESTID = "0";
+
+        testName = this.getClass().getSimpleName() + TESTID;
         testUser = getUserNameFreeDomain(testName);
         testSiteName = getSiteName(testName);
 
@@ -235,7 +240,7 @@ public class MSExcel2011Tests extends AbstractUtils
         // ---- Expected results ----
         // The document was downloaded correctly. No data was lost.
 
-        xls9761DownloadTestFile = new File(System.getProperty("user.home"),  "Documents/tmpxls9761TestFile.xlsx");
+        xls9761DownloadTestFile = new File(System.getProperty("user.home"), "Documents/tmpxls9761TestFile.xlsx");
         boolean fileSaved = FileBaseUtils.waitForFile(xls9761DownloadTestFile);
 
         Assert.assertTrue(fileSaved, "File " + xls9761DownloadTestFile.getName() + " was saved localy from MDC.");
