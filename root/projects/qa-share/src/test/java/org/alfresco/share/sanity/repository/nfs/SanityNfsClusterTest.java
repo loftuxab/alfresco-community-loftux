@@ -152,7 +152,7 @@ public class SanityNfsClusterTest extends AbstractUtils
             setSshHost(node1Url);
             // Add document 'A' direct to node 1 via NFS
             assertTrue(NfsUtil.uploadContent(sshHost, testUser, DEFAULT_PASSWORD, remotePath, file1),
-                "Document 'A' isn't added to node 1 via CIFS");
+                "Document 'A' isn't added to node 1 via NFS");
 
             setSshHost(node2Url);
             // Add document 'B' direct to node 2 via NFS
@@ -209,7 +209,7 @@ public class SanityNfsClusterTest extends AbstractUtils
             assertTrue(NfsUtil.isObjectExists(sshHost, testUser, DEFAULT_PASSWORD, remotePath, fileNameRename1), "Documents 'A' isn't renamed to 'AA'. Updates isn't seen on node A");
             assertFalse(NfsUtil.isObjectExists(sshHost, testUser, DEFAULT_PASSWORD, remotePath, fileName1), "Documents 'A' isn't renamed to 'AA'. Updates isn't seen on node A");
             setSshHost(node2Url);
-            assertTrue(NfsUtil.isObjectExists(sshHost, testUser, DEFAULT_PASSWORD, remotePath, fileNameRename1), "Documents 'A' isn't renamed to 'AA'. Updates isn't seen on node A");
+            assertTrue(NfsUtil.isObjectExists(sshHost, testUser, DEFAULT_PASSWORD, remotePath, fileNameRename1), "Documents 'A' isn't renamed to 'AA'. Updates isn't seen on node B");
             assertFalse(NfsUtil.isObjectExists(sshHost, testUser, DEFAULT_PASSWORD, remotePath, fileName1), "Documents 'A' isn't renamed to 'AA'. Updates isn't seen on node B.");
 
             // Take node 2 down
@@ -267,10 +267,10 @@ public class SanityNfsClusterTest extends AbstractUtils
 
             // Check that each node can't see deleted document
             assertFalse(NfsUtil.isObjectExists(sshHost, testUser, DEFAULT_PASSWORD, remotePath, fileNameRename2),
-                "Document 'BB' isn't deleted. Node A can see deleted document");
+                "Document 'BB' isn't deleted. Node B can see deleted document");
             setSshHost(node1Url);
             assertFalse(NfsUtil.isObjectExists(sshHost, testUser, DEFAULT_PASSWORD, remotePath, fileNameRename2),
-                "Document 'BB' isn't deleted. Node B can see deleted document");
+                "Document 'BB' isn't deleted. Node A can see deleted document");
 
             // Take node 1 down
             setSshHost(node1Url);
@@ -334,7 +334,7 @@ public class SanityNfsClusterTest extends AbstractUtils
                 }
                 catch (InterruptedException | ExecutionException e)
                 {
-                    logger.error(e);
+                    logger.error("Thread has been interrupted", e);
                 }
             }
             executorService.shutdown();
@@ -359,7 +359,7 @@ public class SanityNfsClusterTest extends AbstractUtils
             RemoteUtil.waitForAlfrescoStartup(node2Url, 2000);
             logger.info("Bring node 2 up");
             checkClusterNumbers();
-            assertTrue(TelnetUtil.connectServer(node2Url, nodePort), "Check port " + nfsMountPort + " for node " + node2Url + "isn't accessible");
+            assertTrue(TelnetUtil.connectServer(node2Url, nodePort), "Check port " + nodePort + " for node " + node2Url + "isn't accessible");
 
             // Check that each node can see the document
             setSshHost(node1Url);
