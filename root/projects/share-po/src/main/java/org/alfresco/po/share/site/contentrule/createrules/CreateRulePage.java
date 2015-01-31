@@ -183,7 +183,14 @@ public class CreateRulePage extends SitePage
         fillField(SET_VALUE_FIELD, text);
     }
 
-
+    /**
+     * Clicks on the checkbox to set value for boolean 'Set Property Value'
+     */
+    public void fillSetValueFieldCheckbox()
+    {
+        WebElement inputField = drone.findAndWait(SET_VALUE_FIELD);
+        inputField.click();
+    }
 
     /**
      * Clicks on the checkbox to apply rule for subfolders
