@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 
@@ -89,7 +90,19 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:admin admin";
 
+        Runtime.getRuntime().exec(mapConnect);
+        if (checkDirOrFileExists(15, 200, networkDrive + cifsPath))
+        {
+            logger.info("----------Mapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("----------Mapping was not done " + testUser);
+        }
+
+        super.tearDown();
         super.tearDown();
     }
 
@@ -106,10 +119,6 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         fileName_6281 = "AONE-6281";
         fileName_6282 = "AONE-6282";
 
-        mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
-
-        Runtime.getRuntime().exec(mapConnect);
-        logger.info("----------Mapping succesfull " + testUser);
     }
 
     @AfterMethod(alwaysRun = true)
@@ -120,8 +129,23 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         Runtime.getRuntime().exec("taskkill /F /IM POWERPNT.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
 
-        Runtime.getRuntime().exec("net use * /d /y");
-        logger.info("--------Unmapping succesfull " + testUser);
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDownClass() throws IOException
+    {
+
+        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
+
+        if (checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
+        {
+            logger.info("--------Unmapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("--------Unmapping was not done correctly " + testUser);
+        }
+
     }
 
     @Test(groups = { "DataPrepPowerPoint" })
@@ -187,10 +211,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(3);
             power.exitOfficeApplication(ldtp, fileName_6277);
-            // ldtp.waitTime(3);
-
-            int nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 4 ----
             // ---- Step Action -----
@@ -236,9 +257,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
             power.exitOfficeApplication(ldtp, fileName_6277);
-            // ldtp.waitTime(3);
-            nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 9 ----
             // ---- Step Action -----
@@ -284,9 +303,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
             power.exitOfficeApplication(ldtp, fileName_6277);
-            // ldtp.waitTime(3);
-            nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 14 ----
             // ---- Step Action -----
@@ -384,10 +401,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(3);
             power.exitOfficeApplication(ldtp, fileName_6278);
-            // ldtp.waitTime(3);
-
-            int nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 4 ----
             // ---- Step Action -----
@@ -441,9 +455,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
             power.exitOfficeApplication(ldtp, fileName_6278);
-            // ldtp.waitTime(3);
-            nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 9 ----
             // ---- Step Action -----
@@ -498,9 +510,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             power.saveOffice(ldtp);
             ldtp.waitTime(2);
             power.exitOfficeApplication(ldtp, fileName_6278);
-            // ldtp.waitTime(3);
-            nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+            Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
             // ---- Step 14 ----
             // ---- Step Action -----
@@ -672,8 +682,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6279);
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -741,9 +750,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6279);
-        // l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -796,9 +803,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6279);
-        // l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -885,8 +890,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6280);
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -957,9 +961,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6280);
-        // l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -1016,9 +1018,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6280);
-        // l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -1068,7 +1068,6 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
 
-        int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = power.openFileFromCMD(localPath, fileName_6281 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6281);
         power.goToFile(l1);
@@ -1080,10 +1079,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1.waitTime(4);
         power.exitOfficeApplication(l1, fileName_6281);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 2 ---
         // --- Step action ---
         // Verify the document's content.
@@ -1150,9 +1146,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6281);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1205,9 +1199,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6281);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1253,7 +1245,6 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
 
-        int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = power.openFileFromCMD(localPath, fileName_6282 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6282);
         power.goToFile(l1);
@@ -1265,10 +1256,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         l1.waitTime(4);
         power.exitOfficeApplication(l1, fileName_6282);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave
-                + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -1339,10 +1327,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6282);
-        // l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1398,10 +1383,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         power.saveOffice(l1);
         l1.waitTime(2);
         power.exitOfficeApplication(l1, fileName_6282);
-        // l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1427,13 +1409,99 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         Assert.assertTrue(body3.contains(edit3));
     }
 
-    private int getNumberOfFilesFromPath(String path)
+    private Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
     {
-        int noOfFiles = 0;
-        File folder = new File(path);
-        noOfFiles = folder.listFiles().length;
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                existence = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+            }
+        }
+        return existence;
+    }
 
-        return noOfFiles;
+    private Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
+    {
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+
+            }
+            else
+            {
+                existence = true;
+                break;
+            }
+        }
+        return existence;
+    }
+
+    private Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
+    {
+        long counter = 0;
+        boolean check = false;
+        boolean existence = true;
+        while (counter < TimeUnit.SECONDS.toMillis(timeout))
+        {
+            File test = new File(path);
+            for (File element : test.listFiles())
+            {
+                if (element.isHidden() && element.getName().contains(extension))
+                {
+                    existence = false;
+                    break;
+                }
+            }
+            if (existence)
+            {
+                check = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + 200;
+                existence = true;
+            }
+        }
+        return check;
     }
 
     private void uploadImageInOffice(String image) throws AWTException
