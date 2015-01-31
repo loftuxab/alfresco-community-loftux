@@ -1,26 +1,10 @@
 package org.alfresco.share.workflow.actionsWithDocuments;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.po.share.site.document.ContentDetails;
-import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
-import org.alfresco.po.share.site.document.DocumentDetailsPage;
-import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
-import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.po.share.site.document.*;
 import org.alfresco.po.share.task.TaskStatus;
-import org.alfresco.po.share.workflow.CloudTaskOrReviewPage;
-import org.alfresco.po.share.workflow.KeepContentStrategy;
-import org.alfresco.po.share.workflow.Priority;
-import org.alfresco.po.share.workflow.TaskType;
-import org.alfresco.po.share.workflow.WorkFlowFormDetails;
-import org.alfresco.share.util.AbstractWorkflow;
-import org.alfresco.share.util.EditTaskAction;
-import org.alfresco.share.util.ShareUser;
-import org.alfresco.share.util.ShareUserSitePage;
-import org.alfresco.share.util.ShareUserWorkFlow;
+import org.alfresco.po.share.workflow.*;
+import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.testng.Assert;
@@ -28,10 +12,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Listeners(FailedTestListener.class)
 public class CompletedWorkflowSyncedTests extends AbstractWorkflow
 {
-    private String testDomain;
     private String user1;
     private String cloudUser;
 
@@ -41,7 +27,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     {
         super.setup();
         testName = this.getClass().getSimpleName();
-        testDomain = DOMAIN_HYBRID;
+        String testDomain = DOMAIN_HYBRID;
 
         user1 = getUserNameForDomain(testName + "opUser", testDomain);
         cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
@@ -65,8 +51,8 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15690() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15690() throws Exception
     {
         createCompletedWorkflow("15690" + "A4");
     }
@@ -74,7 +60,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     /**
      * AONE-15690: Modify properties (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15690() throws Exception
     {
         String prefix = "15690" + "A4";
@@ -109,17 +95,17 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // Changes appeared to Cloud. The changed content is correctly displayed.
         // ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        EditDocumentPropertiesPage editDocumentPropertiescl = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile).render(
+        EditDocumentPropertiesPage editDocumentPropertiesCl = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile).render(
                 maxWaitTime);
-        Assert.assertTrue((modifiedTitle + user1).equals(editDocumentPropertiescl.getDocumentTitle()),
+        Assert.assertTrue((modifiedTitle + user1).equals(editDocumentPropertiesCl.getDocumentTitle()),
                 "Document Title modified by OP User is not present for Cloud.");
-        Assert.assertTrue((modifiedDescription + user1).equals(editDocumentPropertiescl.getDescription()),
+        Assert.assertTrue((modifiedDescription + user1).equals(editDocumentPropertiesCl.getDescription()),
                 "Document Description modified by OP User is not present for Cloud.");
 
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15691() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15691() throws Exception
     {
         createCompletedWorkflow("15691" + "A43");
     }
@@ -127,7 +113,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     /**
      * AONE-15691: Modify properties (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15691() throws Exception
     {
         String prefix = "15691" + "A43";
@@ -149,8 +135,8 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         editDocumentProperties.setDescription(modifiedDescription + cloudUser);
         editDocumentProperties.selectSave().render();
 
-        DocumentLibraryPage cldocumentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
-        cldocumentLibraryPage.selectFile(simpleTaskFile);
+        DocumentLibraryPage clDocumentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
+        clDocumentLibraryPage.selectFile(simpleTaskFile);
         editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile);
         Assert.assertTrue((modifiedTitle + cloudUser).equals(editDocumentProperties.getDocumentTitle()),
                 "Document Title modified by CL User is not present for Cloud.");
@@ -177,8 +163,8 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
 
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15692() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15692() throws Exception
     {
         createCompletedWorkflow("15692" + "A4");
     }
@@ -186,7 +172,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     /**
      * AONE-15692: Modify content (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15692() throws Exception
     {
 
@@ -211,7 +197,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         contentDetails.setName(simpleTaskFile);
 
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
-        documentDetailsPage = inlineEditPage.save(contentDetails).render();
+        inlineEditPage.save(contentDetails).render();
 
         ShareUser.openSiteDashboard(drone, opSiteName).render();
         DocumentLibraryPage docLib = ShareUser.openDocumentLibrary(drone).render();
@@ -234,11 +220,12 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         documentLibraryPageCL = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         documentDetailsPageCL = documentLibraryPageCL.selectFile(simpleTaskFile);
         inlineEditPageCL = documentDetailsPageCL.selectInlineEdit().render();
-        Assert.assertTrue(inlineEditPageCL.getDetails().getContent().contains(modifiedContent));
+        Assert.assertTrue(inlineEditPageCL.getDetails().getContent().contains(modifiedContent),
+                "Changes are not displayed on Cloud");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15693() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15693() throws Exception
     {
 
         createCompletedWorkflow("15693" + "A4");
@@ -247,7 +234,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     /**
      * AONE-15683:Incomplete workflow - modify content (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15693() throws Exception
     {
 
@@ -294,11 +281,12 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
-        Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud));
+        Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud)
+                , "Changes are not displayed on OP");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15694() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15694() throws Exception
     {
         createCompletedWorkflow("15694" + "A4");
     }
@@ -306,7 +294,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     /**
      * AONE-15694: Move (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15694() throws Exception
     {
         String prefix = "15694" + "A4";
@@ -333,12 +321,13 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // The document is still synced.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(),
+                "File has been unsynced on Cloud after moving");
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15695() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15695() throws Exception
     {
         createCompletedWorkflow("15695" + "A4");
     }
@@ -346,7 +335,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     /**
      * AONE-15695:Move (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15695() throws Exception
     {
         String prefix = "15695" + "A4";
@@ -373,14 +362,16 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // The document is still synced. Another location is displayed in the Sync details section.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(),
+                "File has been unsynced on Cloud after moving");
         Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation()
-                .contains(folderName));
+                .contains(folderName),
+                "File has been unsynced on OP after moving");
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15696() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15696() throws Exception
     {
         createCompletedWorkflow("15696" + "A4");
     }
@@ -388,7 +379,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     /**
      * AONE-15696: Remove (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15696() throws Exception
     {
         String prefix = "15696" + "A4";
@@ -401,11 +392,10 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // OP Remove the synced document.
         // ---- Expected results ----
         // The content is removed successfully.
-        // TODO: Modify step 1 in TestLink accordingly to the Assert !
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         documentLibraryPage.deleteItem(simpleTaskFile).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
+        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile), "File was not removed");
         ShareUser.logout(drone);
 
         // ---- Step 3 ----
@@ -415,12 +405,12 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // The document is removed.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
+        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile), "File is still visible on Cloud");
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15697() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15697() throws Exception
     {
         createCompletedWorkflow("15697" + "A4");
     }
@@ -428,7 +418,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     /**
      * AONE-15697:Remove (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15697() throws Exception
     {
         String prefix = "15697" + "A4";
@@ -441,7 +431,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // Cloud Remove the synced document.
         // ---- Expected results ----
         // The content is removed.
-        // TODO: Modify step 1 in TestLink accordingly to the Assert !
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).selectCheckbox();
@@ -449,7 +438,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
 
         // DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         // documentLibraryPage.deleteItem(simpleTaskFile).render(5000);
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
+        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile), "File is still displayed on Cloud");
 
         ShareUser.logout(hybridDrone);
 
@@ -457,25 +446,25 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // ---- Step action ---
         // OP Verify the document.
         // ---- Expected results ----
-        // Document is present. Sync icon is still present for the document. (Won't be actual once ACE-529 is implemented); //ACE-529 was impelmented
+        // Document is present. Sync icon is still present for the document. (Won't be actual once ACE-529 is implemented); //ACE-529 was implemented
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
+        Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile), "File is still displayed on OP");
         // Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
         // Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation()
         // .contains(cloudSite));
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15698() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15698() throws Exception
     {
         createCompletedWorkflow("15698" + "A4");
     }
 
     /**
-     * AONE-15698:Unsync (OP)
+     * AONE-15698:UnSync (OP)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15698() throws Exception
     {
         String prefix = "15698" + "A4";
@@ -485,7 +474,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
 
         // ---- Step 1 ----
         // ---- Step action ---
-        // OP Unsync the synced document.
+        // OP UnSync the synced document.
         // ---- Expected results ----
         // The content is unsynced correctly.
         // TODO Update the test accordingly to assert
@@ -501,22 +490,22 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // ---- Step action ---
         // Cloud Verify the document.
         // ---- Expected results ----
-        // The document is unsynced.
+        // The document is unSynced.
         Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent());
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15699() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut=600000)
+    public void dataPrep_AONE_15699() throws Exception
     {
         createCompletedWorkflow("15699" + "A4");
     }
 
     /**
-     * AONE-15699:Unsync (Cloud)
+     * AONE-15699:UnSync (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut=300000)
     public void AONE_15699() throws Exception
     {
 
@@ -527,9 +516,9 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
 
         // ---- Step 1 ----
         // ---- Step action ---
-        // Cloud Unsync the synced document i.e as network admin click 'Force Unsync' option
+        // Cloud UnSync the synced document i.e as network admin click 'Force UnSync' option
         // ---- Expected results ----
-        // The content is unsynced.
+        // The content is unSynced.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
 
