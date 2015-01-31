@@ -17,6 +17,7 @@ package org.alfresco.po.share;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -176,6 +177,45 @@ public class ShareUtil
         }
         return drone.getCurrentPage().render();
     }
+    
+    /**
+     * Function to create user on Enterprise using UI
+     * 
+     * @param uname - This should always be unique. So the user of this method needs to verify it is unique. 
+     *                eg. - "testUser" + System.currentTimeMillis();
+     * @return
+     * @throws Exception
+     */
+    public static boolean createEnterpriseUser(final WebDrone drone, final String uname, final String url, final String... userInfo) throws Exception
+    {
+        AlfrescoVersion alfrescoVersion = drone.getProperties().getVersion();
+        if (alfrescoVersion.isCloud() || StringUtils.isEmpty(uname))
+        {
+            throw new UnsupportedOperationException("This method is not applicable for cloud");
+        }       
+        try
+        {
+            System.out.println("User Name: " + uname);
+            DashBoardPage dashBoard = loginAs(drone, url, userInfo).render();
+            UserSearchPage page = dashBoard.getNav().getUsersPage().render();
+            NewUserPage newPage = page.selectNewUser().render();
+            String userinfo = uname + "@test.com";
+            newPage.inputFirstName(userinfo);
+            newPage.inputLastName(userinfo);
+            newPage.inputEmail(userinfo);
+            newPage.inputUsername(uname);
+            newPage.inputPassword("password");
+            newPage.inputVerifyPassword("password");
+            UserSearchPage userCreated = newPage.selectCreateUser().render();
+            userCreated.searchFor(userinfo).render();
+            return userCreated.hasResults();
+        }
+        finally
+        {
+            logout(drone);
+        }
+    }
+
 
     public static HtmlPage navigateToWebScriptsHome(final WebDrone drone, final String... userInfo)
     {
@@ -195,6 +235,4 @@ public class ShareUtil
         }
         return drone.getCurrentPage().render();
     }
-
-
 }

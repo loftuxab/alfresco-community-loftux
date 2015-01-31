@@ -34,6 +34,8 @@ public interface FileDirectoryInfo
      * @return true if folder
      */
     boolean isTypeFolder();
+    boolean isFolderType();
+
 
     /**
      * Gets the description of the file or directory, if none then empty string

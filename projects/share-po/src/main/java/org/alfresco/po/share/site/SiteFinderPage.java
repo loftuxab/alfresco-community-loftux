@@ -476,7 +476,7 @@ public class SiteFinderPage extends SharePage
                         logger.info("Site Name: " + site.getText());
                     }
                     site.click();
-                    return drone.getCurrentPage().render();
+                    return new SiteDashboardPage(drone);
                 }
             }
             if (logger.isTraceEnabled())
