@@ -97,7 +97,7 @@ public class NewFolderPageTest extends AbstractTest
 
         NewFolderPage newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
         newFolderPage.typeName("?");
-        newFolderPage.selectSubmitButton();
+//        newFolderPage.selectSubmitButton();
         Assert.assertTrue(newFolderPage.isNotificationMessagePresent());
         Assert.assertNotEquals(newFolderPage.getNotificationMessage(), "");
         newFolderPage.typeName(folderName);
