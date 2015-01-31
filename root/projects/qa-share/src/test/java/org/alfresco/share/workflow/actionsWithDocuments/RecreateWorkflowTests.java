@@ -3,6 +3,7 @@ package org.alfresco.share.workflow.actionsWithDocuments;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.SharePopup;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.SyncInfoPage;
 import org.alfresco.po.share.task.TaskStatus;
 import org.alfresco.po.share.workflow.CloudTaskOrReviewPage;
 import org.alfresco.po.share.workflow.KeepContentStrategy;
@@ -21,6 +22,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+/**
+ * @author bogdan.bocancea
+ */
 
 @Listeners(FailedTestListener.class)
 public class RecreateWorkflowTests extends AbstractWorkflow
@@ -46,14 +51,11 @@ public class RecreateWorkflowTests extends AbstractWorkflow
 
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo1 = new String[] { user1 };
-
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String[] cloudUserInfo1 = new String[] { cloudUser };
-
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
         String fileName = getFileName(testName) + ".txt";
-
         String workFlowName = testName + "-WF";
         String dueDate = getDueDateString();
 
@@ -103,8 +105,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         }
 
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(fileName, opSiteName);
-
+        waitForSync(drone, fileName, opSiteName);
         completeWorkflow(workFlowName, user1, cloudUser);
     }
 
@@ -200,7 +201,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         String dueDate = getDueDateString();
 
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
 
         // Select "Cloud Task or Review" from select a workflow drop down
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
@@ -217,19 +218,25 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
 
         // --- Expected Result ---
-        // Workflow is not created.
+        // Workflow is not created. Friendly behavior occurs - 'Workflow could not be started' dialog: 08110558 The document with the same name already exists
+        // in Cloud.
+        // TODO: Modify step in Test link. Workflow is created, wait a few seconds, the sync fails with error: The document with the same name already exists
+        // in Cloud.
         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
         Assert.assertTrue(checkIfSyncFailed(drone, fileName), "File is synced");
-
+        SyncInfoPage syncInfoPage = docLibPage.getFileDirectoryInfo(fileName).clickOnViewCloudSyncInfo().render();
+        syncInfoPage.clickShowDetails();
+        Assert.assertTrue(syncInfoPage.getSyncFailedErrorDetail().equals("Content with the same name already exists in the target folder."));
+        Assert.assertTrue(syncInfoPage.getTechnicalReport().contains("Content with the same name already exists in the target folder."));
         ShareUser.logout(drone);
 
         // --- Step 3 ---
         // Cloud Verify the workflow and the document.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
+        docLibPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
 
         // --- Expected result ----
-        // The document is still synchronized. The document is not a part of any workflow. No workflow is created
+        // The document is not synchronized. The document is not a part of any workflow. No workflow is created.
         Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isCloudSynced(), "File is synced");
         Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "File is part of workflow");
         ShareUser.logout(hybridDrone);
@@ -276,7 +283,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(workFlowName);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(fileName, opSiteName);
+        waitForSync(drone, fileName, opSiteName);
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName).isCloudSynced(), "File is not synced");
 
         ShareUser.logout(drone);
@@ -291,30 +298,6 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         Assert.assertTrue(docLibPageCloud.getFileDirectoryInfo(fileName).isCloudSynced(), "File is not synced");
         Assert.assertTrue(docLibPageCloud.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "File is not part of workflow");
         ShareUser.logout(hybridDrone);
-    }
-
-    private void waitForSync(String fileName, String siteName)
-    {
-        int counter = 1;
-        int retryRefreshCount = 4;
-        while (counter <= retryRefreshCount)
-        {
-            if (checkIfContentIsSynced(drone, fileName))
-            {
-                break;
-            }
-            else
-            {
-                drone.refresh();
-                counter++;
-
-                if (counter == 2 || counter == 3)
-                {
-                    DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, siteName);
-                    docLib.getFileDirectoryInfo(fileName).selectRequestSync().render();
-                }
-            }
-        }
     }
 
     private void completeWorkflow(String workflowName, String opUser, String clUser)
