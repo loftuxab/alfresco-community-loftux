@@ -42,7 +42,7 @@ import static org.alfresco.po.share.site.document.DocumentAction.CHNAGE_TYPE;
 /**
  * <li>This is a parent class for all the pages using View Details as asection.</li> <li>Functionality here is to support below details: Title, Modified
  * Details, Like(counter), Favourite, Comment(counter) Comment Navigation, Properties, Permissions, Share Panel, Tag Panel.</li>
- * 
+ *
  * @author Naved Shah
  * @version 1.7.0
  */
@@ -138,7 +138,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Gets the page detail title.
-     * 
+     *
      * @return String page detail page title
      */
     public String getContentTitle()
@@ -149,7 +149,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Get all the comments that are displayed on the page.
-     * 
+     *
      * @return List<String> collection of comments
      */
     public List<String> getComments()
@@ -193,7 +193,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Checks for the number of positive votes.
-     * 
+     *
      * @return String number of votes
      */
     public String getLikeCount()
@@ -212,7 +212,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Get the detail permissions from view.
-     * 
+     *
      * @return {@link Map} of key values.
      */
     public Map<String, String> getPermissionsOfDetailsPage()
@@ -250,7 +250,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Get the detail properties from view.
-     * 
+     *
      * @return {@link Map} of Key and Values.
      */
     public Map<String, Object> getProperties()
@@ -305,8 +305,24 @@ public abstract class DetailsPage extends SitePage
     }
 
     /**
+     * Return list with categories names added to file;
+     *
+     * @return
+     */
+    public List<String> getCategoriesNames()
+    {
+        List<WebElement> categoriesElems = drone.findAndWaitForElements(By.cssSelector("div[class='itemtype-cm:category']"));
+        List<String> categoriesNames = new ArrayList<>();
+        for (WebElement categoryElem : categoriesElems)
+        {
+            categoriesNames.add(categoryElem.getText());
+        }
+        return categoriesNames;
+    }
+
+    /**
      * Get the tags displayed on the tags section on the details details page.
-     * 
+     *
      * @return Collection of String tag name
      */
     public List<String> getTagList()
@@ -331,12 +347,12 @@ public abstract class DetailsPage extends SitePage
                 logger.error("Element :span.tag does not exist", te);
             }
         }
-        return Collections.<String> emptyList();
+        return Collections.<String>emptyList();
     }
 
     /**
      * Mimics the action of selecting the Favourite icon on the details page.
-     * 
+     *
      * @return {@link DetailsPage}
      */
     public HtmlPage selectFavourite()
@@ -356,7 +372,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Gets the Favourites status on the document page.
-     * 
+     *
      * @return Boolean
      */
     public boolean isFavourite()
@@ -382,7 +398,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Gets the Like status on the details page.
-     * 
+     *
      * @return
      */
     public boolean isLiked()
@@ -404,7 +420,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Gets the Tool Tip for Favourites action on the details page.
-     * 
+     *
      * @return
      */
     public String getToolTipForFavourite()
@@ -428,7 +444,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Gets the Tool Tip Like action on the details page.
-     * 
+     *
      * @return String
      */
     public String getToolTipForLike()
@@ -452,7 +468,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Mimics the action of selecting edit properties on the details page.
-     * 
+     *
      * @return WebDrone (Drone object which has to be casted at runtime)
      */
     public EditDocumentPropertiesPage selectEditProperties()
@@ -482,7 +498,7 @@ public abstract class DetailsPage extends SitePage
      * Adding a comment to a details by selecting add to prompt the input field,
      * as this is based on a rich editor JavaScript was used to enter the
      * comment.
-     * 
+     *
      * @param comment String user comment
      * @param encoder Encoder as html, javascript, no encoder
      * @return {@link HtmlPage} page response
@@ -514,7 +530,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Method for verify present Comment section on the details page or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isCommentSectionPresent()
@@ -534,7 +550,7 @@ public abstract class DetailsPage extends SitePage
      * Adding a comment to a details by selecting add to prompt the input field,
      * as this is based on a rich editor JavaScript was used to enter the
      * comment.
-     * 
+     *
      * @param comment String user comment
      * @return {@link HtmlPage} page response
      */
@@ -681,7 +697,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Removes the comment on detail page.
-     * 
+     *
      * @param comment to remove
      * @return DetailsPage page object response
      */
@@ -703,7 +719,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Delete the comment on detail page.
-     * 
+     *
      * @param comment to remove
      * @return DetailsPage page object response
      */
@@ -767,7 +783,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Verifies the modified information is present in the page object.
-     * 
+     *
      * @return
      */
     public boolean isModifiedByDetailsPresent()
@@ -794,7 +810,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Verify the share panel is present or not in the page.
-     * 
+     *
      * @return
      */
     public boolean isSharePanePresent()
@@ -813,7 +829,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Get Rich Text or to edit the contents of Comments etc.
-     * 
+     *
      * @return
      */
     public TinyMceEditor getContentPage()
@@ -858,7 +874,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * The number of comments value displayed on the span comment count.
-     * 
+     *
      * @return int total number of comments
      */
     public int getCommentCount()
@@ -881,7 +897,7 @@ public abstract class DetailsPage extends SitePage
     /**
      * Mimics the action of selecting the Manage Permission icon on the document
      * page.
-     * 
+     *
      * @return {@link ManagePermissionsPage}
      */
     public ManagePermissionsPage selectManagePermissions()
@@ -894,7 +910,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Get Sync info page details.
-     * 
+     *
      * @return
      */
     public SyncInfoPage getSyncInfoPage()
@@ -918,7 +934,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Mimics the action of select the manage aspects.
-     * 
+     *
      * @return {@link SelectAspectsPage}
      */
     public SelectAspectsPage selectManageAspects()
@@ -937,7 +953,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Mimics the action of return to the repository Page
-     * 
+     *
      * @return RepositoryPage
      */
     public RepositoryPage navigateToFolderInRepositoryPage() throws PageOperationException
@@ -962,7 +978,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Mimics the action of return to the parent folder from details Page
-     * 
+     *
      * @return RepositoryPage
      */
     public RepositoryPage navigateToParentFolder() throws PageOperationException
@@ -1000,7 +1016,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Checks if link is displayed.
-     * 
+     *
      * @return true if visible
      */
     public boolean isDocumentActionPresent(DocumentAction action)
@@ -1037,8 +1053,8 @@ public abstract class DetailsPage extends SitePage
      * Editing a comment to a details by selecting the edit link,
      * as this is based on a rich editor JavaScript was used to enter the
      * comment.
-     * 
-     * @param comment String user comment
+     *
+     * @param comment    String user comment
      * @param newComment String user new comment
      * @return {@link HtmlPage} page response
      */
@@ -1075,7 +1091,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Mimics the action of saving the edited comments on details page.
-     * 
+     *
      * @return {@link DetailsPage}
      */
     public HtmlPage saveEditComments()
@@ -1103,7 +1119,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Mimics the action of cancelling the edited comments on details page.
-     * 
+     *
      * @return {@link DetailsPage}
      */
     public void cancelEditComments()
@@ -1138,7 +1154,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Check is comment has edit button on details page
-     * 
+     *
      * @param comment
      * @return
      */
@@ -1186,7 +1202,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Check is comment has delete button on details page
-     * 
+     *
      * @param comment
      * @return
      */
@@ -1234,7 +1250,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Check is comment has Avatar, Edit and Remove buttons, Commentator name.
-     * 
+     *
      * @param comment
      * @return
      */
@@ -1253,7 +1269,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Check is Remove and Edit Buttons display and Enable.
-     * 
+     *
      * @param comment
      * @return
      */
@@ -1333,7 +1349,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Open DeleteConfirmForm for comment. Verify that all buttons and text correct.
-     * 
+     *
      * @param comment
      * @return
      */
@@ -1387,7 +1403,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the tags panel is displayed or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isTagsPanelPresent()
@@ -1404,7 +1420,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the properties panel is displayed or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isPropertiesPanelPresent()
@@ -1421,7 +1437,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the like link is displayed or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isLikeLinkPresent()
@@ -1438,7 +1454,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the favourite link is displayed or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isFavouriteLinkPresent()
@@ -1456,7 +1472,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the add comment button is displayed or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isAddCommentButtonPresent()
@@ -1473,7 +1489,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the comments panel is displayed or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isCommentsPanelPresent()
@@ -1492,7 +1508,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the add comments button is enabled or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isAddCommentsButtonEnbaled()
@@ -1511,7 +1527,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the CopyToShareLink is present or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isCopyShareLinkPresent()
@@ -1535,7 +1551,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the Sync panel is present or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isSynPanelPresent()
@@ -1554,7 +1570,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * This method finds whether the Permission panel is present or not.
-     * 
+     *
      * @return boolean
      */
     public boolean isPermissionsPanelPresent()
@@ -1571,7 +1587,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Add comment by clicking 'Comment' link
-     * 
+     *
      * @return
      */
 
@@ -1584,7 +1600,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Click Add comment button from the comment form after clicking 'Comment' link
-     * 
+     *
      * @return
      */
     public AddCommentForm clickAddButton()
@@ -1596,7 +1612,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Click on Edit Tags icon from Tags panel at Details page
-     * 
+     *
      * @param folder when true is for folder details page; false - document details page
      * @return
      */
@@ -1616,7 +1632,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Click on Edit Properties icon from Properties panel at Details page
-     * 
+     *
      * @param folder when true is for folder details page; false - document details page
      * @return EditDocumentPropertiesPage
      */
@@ -1659,7 +1675,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Verify if Link View on Google Maps is visible.
-     * 
+     *
      * @return true if displayed
      * @author rmanyam
      */
@@ -1677,7 +1693,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Method to verify whether Add Comment button is present
-     * 
+     *
      * @return true if displayed
      */
     public boolean isAddCommentButtonDisplayed()
@@ -1733,7 +1749,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Select link Copy to... from Actions
-     * 
+     *
      * @return
      */
     public CopyOrMoveContentPage selectCopyTo()
@@ -1743,7 +1759,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Select link Move to... from Actions
-     * 
+     *
      * @return
      */
     public CopyOrMoveContentPage selectMoveTo()
@@ -1805,7 +1821,7 @@ public abstract class DetailsPage extends SitePage
 
     /**
      * Get HTML for comment
-     * 
+     *
      * @return String HTML
      */
     public String getCommentHTML(String comment)

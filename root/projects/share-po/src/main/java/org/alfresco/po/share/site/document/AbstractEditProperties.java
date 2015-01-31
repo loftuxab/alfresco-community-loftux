@@ -13,9 +13,6 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 /**
  * Abstract of edit properties
  *
@@ -229,7 +226,7 @@ public abstract class AbstractEditProperties extends ShareDialogue
         {
             String id = saveButton.getAttribute("id");
             saveButton.click();
-            drone.waitUntilElementDeletedFromDom(By.id(id), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+            waitUntilAlert();
         }
     }
 

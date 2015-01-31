@@ -40,14 +40,16 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 /**
  * Integration test to verify document CRUD is operating correctly.
- * 
+ *
  * @author Michael Suzuki
  * @since 1.0
  */
 @Listeners(FailedTestListener.class)
-@Test(groups={"alfresco-one"})
+@Test(groups = { "alfresco-one" })
 public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
 {
     private String siteName;
@@ -62,7 +64,7 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
     DocumentLibraryPage docLibPage;
     EditDocumentPropertiesPage editPropertiesPage;
 
-    @AfterClass(groups={"alfresco-one"})	
+    @AfterClass(groups = { "alfresco-one" })
     public void quit()
     {
         if (site != null)
@@ -71,14 +73,14 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
         }
         closeWebDrone();
     }
-    
+
     /**
      * Pre test setup of a dummy file to upload.
-     * 
+     *
      * @throws Exception
      */
-    @BeforeClass(groups={"alfresco-one"})
-    public void prepare()throws Exception
+    @BeforeClass(groups = { "alfresco-one" })
+    public void prepare() throws Exception
     {
         siteName = "editDocumentSiteTest" + System.currentTimeMillis();
         file = SiteUtil.prepareFile();
@@ -106,7 +108,7 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
 
         docPage.selectFile(fileName);
     }
-    
+
     @Test
     public void editPropertiesAndCancel() throws Exception
     {
@@ -122,7 +124,7 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
         Assert.assertTrue(detailsPage.isDocumentDetailsPage());
     }
 
-    @Test(dependsOnMethods="editPropertiesAndCancel")
+    @Test(dependsOnMethods = "editPropertiesAndCancel")
     public void editPropertiesAndSave() throws Exception
     {
         detailsPage = drone.getCurrentPage().render();
@@ -142,7 +144,7 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
         TagPage tagPage = editPage.getTag().render();
         tagPage = tagPage.enterTagValue(tagName).render();
         EditDocumentPropertiesPage editpage = tagPage.clickOkButton().render();
-        detailsPage = editpage.selectSave().render();      
+        detailsPage = editpage.selectSave().render();
         Map<String, Object> properties = detailsPage.getProperties();
         Assert.assertEquals(properties.get("Author"), "me");
         Assert.assertEquals(properties.get("Description"), "my description");
@@ -151,54 +153,54 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
         Assert.assertEquals(properties.get("Mimetype"), "XHTML");
         //Check if input fields show correct value
         List<String> tagName = detailsPage.getTagList();
-        Assert.assertFalse((tagName.isEmpty()) , "tag were not added correctly");
+        Assert.assertFalse((tagName.isEmpty()), "tag were not added correctly");
     }
-    
-    @Test(dependsOnMethods="editPropertiesAndSave")
+
+    @Test(dependsOnMethods = "editPropertiesAndSave")
     public void checkInputFieldsHaveUpdatedValues() throws Exception
     {
-    	detailsPage = drone.getCurrentPage().render();
-    	EditDocumentPropertiesPage editPage = detailsPage.selectEditProperties().render();
-    	Assert.assertTrue(editPage.isEditPropertiesVisible());
-    	Assert.assertEquals(editPage.getName(), "my.txt");
-		Assert.assertEquals(editPage.getDocumentTitle(), "my title");
-		Assert.assertEquals(editPage.getDescription(), "my description");
-		Assert.assertEquals(editPage.getMimeType(), "XHTML");
-		Assert.assertEquals(editPage.getAuthor(), "me");
-		Assert.assertTrue(editPage.hasTags());
-		
-		editPage.clickOnCancel();
+        detailsPage = drone.getCurrentPage().render();
+        EditDocumentPropertiesPage editPage = detailsPage.selectEditProperties().render();
+        Assert.assertTrue(editPage.isEditPropertiesVisible());
+        Assert.assertEquals(editPage.getName(), "my.txt");
+        Assert.assertEquals(editPage.getDocumentTitle(), "my title");
+        Assert.assertEquals(editPage.getDescription(), "my description");
+        Assert.assertEquals(editPage.getMimeType(), "XHTML");
+        Assert.assertEquals(editPage.getAuthor(), "me");
+        Assert.assertTrue(editPage.hasTags());
+
+        editPage.clickOnCancel();
     }
-    
-    @Test(dependsOnMethods="checkInputFieldsHaveUpdatedValues")
+
+    @Test(dependsOnMethods = "checkInputFieldsHaveUpdatedValues")
     public void editPropertiesWithValidationAndSave() throws Exception
     {
         detailsPage = drone.getCurrentPage().render();
         EditDocumentPropertiesPage editPage = detailsPage.selectEditProperties().render();
         editPage.setName("");
         editPage = editPage.selectSaveWithValidation().render();
-        
+
         Map<Fields, String> messages = editPage.getMessages();
-        
+
         Assert.assertEquals(messages.size(), 1);
         Assert.assertFalse(messages.get(EditDocumentPropertiesPage.Fields.NAME).isEmpty());
-        
+
         editPage.setName("new.txt");
         TagPage tagPage = editPage.getTag().render();
         SharePopup shareErrorPopup = tagPage.enterTagValue("////").render();
-        
+
         assertEquals(shareErrorPopup.getShareMessage(), "Could not create new item.");
 
         shareErrorPopup.clickOK().render();
-        
+
         editPage = tagPage.clickOkButton().render();
         detailsPage = editPage.selectSaveWithValidation().render();
-        
+
         Map<String, Object> properties = detailsPage.getProperties();
         Assert.assertEquals(properties.get("Name"), "new.txt");
     }
 
-    @Test(dependsOnMethods="editPropertiesWithValidationAndSave")
+    @Test(dependsOnMethods = "editPropertiesWithValidationAndSave")
     public void editPropertiesOfDublinCoreAspect() throws Exception
     {
         detailsPage = drone.getCurrentPage().render();
@@ -223,7 +225,7 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
         Assert.assertTrue(editPropertiesPage.getType().isEmpty());
     }
 
-    @Test(dependsOnMethods="editPropertiesOfDublinCoreAspect")
+    @Test(dependsOnMethods = "editPropertiesOfDublinCoreAspect")
     public void addDublinCoreAspect() throws Exception
     {
         detailsPage = editPropertiesPage.clickCancel().render();
@@ -249,7 +251,7 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
         detailsPage = editPropertiesPage.selectSave().render();
     }
 
-    @Test(dependsOnMethods="addDublinCoreAspect")
+    @Test(dependsOnMethods = "addDublinCoreAspect")
     public void verifyProperties() throws Exception
     {
         editPropertiesPage = detailsPage.selectEditProperties().render();
@@ -263,4 +265,42 @@ public class EditDocumentPropertiesPageTest extends AbstractDocumentTest
         Assert.assertEquals(editPropertiesPage.getSubject(), "test-subject");
         Assert.assertEquals(editPropertiesPage.getType(), "test-type");
     }
+
+    @Test(dependsOnMethods = "verifyProperties")
+    public void checkIsTagInputVisible()
+    {
+        editPropertiesPage = editPropertiesPage.render();
+        TagPage tagPage = editPropertiesPage.getTag().waitUntilAlert().render();
+        assertTrue(tagPage.isTagInputVisible());
+    }
+
+    @Test(dependsOnMethods = "checkIsTagInputVisible")
+    public void checkAllTagsCount()
+    {
+        TagPage tagPage = drone.getCurrentPage().render();
+        assertTrue(tagPage.getAllTagsCount() > 0);
+    }
+
+    @Test(dependsOnMethods = "checkAllTagsCount")
+    public void checkAddedTagsCount()
+    {
+        TagPage tagPage = drone.getCurrentPage().render();
+        assertTrue(tagPage.getAddedTagsCount() == 0);
+    }
+
+    @Test(dependsOnMethods = "checkAllTagsCount")
+    public void checkAllTagsName()
+    {
+        TagPage tagPage = drone.getCurrentPage().render();
+        assertTrue(tagPage.getAllTagsName().size() > 0);
+    }
+
+    @Test(dependsOnMethods = "checkAllTagsName")
+    public void checkRefreshTagList()
+    {
+        TagPage tagPage = drone.getCurrentPage().render();
+        tagPage.refreshTags();
+        tagPage.clickCancelButton();
+    }
+
 }

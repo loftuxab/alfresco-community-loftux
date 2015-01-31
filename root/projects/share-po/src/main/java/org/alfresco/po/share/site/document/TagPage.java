@@ -28,11 +28,12 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Tag Page allows the user to manage tags relating to document in view.
- * 
+ *
  * @author Subashni Prasanna
  * @since 1.6
  */
@@ -46,10 +47,18 @@ public class TagPage extends AbstractEditProperties
     protected static final By REMOVE_TAG = By.cssSelector("span.removeIcon");
     protected static final By OK_BUTTON = By.cssSelector("span[id$='taggable-cntrl-ok'] button[id$='cntrl-ok-button']");
     protected static final By CANCEL_BUTTON = By.cssSelector("button[id$='cntrl-cancel-button']");
+    private static final By ALL_TAG_LINES = By.xpath("//div[contains(@id,'-cntrl-picker-left')]//tr[contains(@class,'yui-dt-rec')]");
+    private static final By ADDED_TAG_LINES = By.xpath("//div[contains(@id,'-cntrl-picker-right')]//tr[contains(@class,'yui-dt-rec')]");
+
+    private static final By TAG_NAME_RELATIVE = By.xpath(".//h3[@class='item-name']");
+    private static final By TAG_ADD_ICON_RELATIVE = By.xpath(".//a[contains(@class,'add-item')]");
+
+    private static final By NAVIGATION_BUTTON = By.xpath("//button[contains(@id,'picker-navigator-button')]");
+    private static final By REFRESH_TAGS_BUTTON = By.xpath("//a[contains(@class,'yuimenuitemlabel')]");
 
     /**
      * Constructor.
-     * 
+     *
      * @param drone {@link WebDrone}
      */
     public TagPage(WebDrone drone)
@@ -98,7 +107,7 @@ public class TagPage extends AbstractEditProperties
 
     /**
      * Verify if tagPage is displayed.
-     * 
+     *
      * @return true if displayed
      */
     public boolean isTagPageVisible()
@@ -124,7 +133,7 @@ public class TagPage extends AbstractEditProperties
 
     /**
      * Checks if tag input field is visible.
-     * 
+     *
      * @return true if visible
      */
     public boolean isTagInputVisible()
@@ -141,7 +150,7 @@ public class TagPage extends AbstractEditProperties
 
     /**
      * Enter the tag name and click to Add tag.
-     * 
+     *
      * @param tagName
      * @return
      */
@@ -156,7 +165,6 @@ public class TagPage extends AbstractEditProperties
             WebElement createButton = drone.findAndWait(CREATE_TAG);
             createButton.click();
             canResume();
-
             HtmlPage page = FactorySharePage.resolvePage(drone);
             if (page instanceof ShareDialogue)
             {
@@ -174,7 +182,7 @@ public class TagPage extends AbstractEditProperties
 
     /**
      * Click on OK button in tag page
-     * 
+     *
      * @return EditDocumentPropertiesPage
      */
     public EditDocumentPropertiesPage clickOkButton()
@@ -194,7 +202,7 @@ public class TagPage extends AbstractEditProperties
 
     /**
      * Click on cancel button in tag page
-     * 
+     *
      * @return EditDocumentPropertiesPage
      */
     public EditDocumentPropertiesPage clickCancelButton()
@@ -214,7 +222,7 @@ public class TagPage extends AbstractEditProperties
 
     /**
      * Enter the tag name and click to Remove tag.
-     * 
+     *
      * @param tagName
      * @return EditDocumentPropertiesPage
      */
@@ -240,13 +248,67 @@ public class TagPage extends AbstractEditProperties
         {
             logger.error(pe);
         }
-
         throw new PageOperationException("Error in removing tag on TagPage.");
     }
 
     /**
+     * Return  count tags in left panel
+     *
+     * @return
+     */
+    public int getAllTagsCount()
+    {
+        List<WebElement> allTags = getAllTagElements();
+        return allTags.size();
+    }
+
+    /**
+     * Return count added to document tags
+     *
+     * @return
+     */
+    public int getAddedTagsCount()
+    {
+        List<WebElement> addedTags = drone.findAndWaitForElements(ADDED_TAG_LINES);
+        return addedTags.size();
+    }
+
+    /**
+     * Return List of tag names in left panel
+     *
+     * @return
+     */
+    public List<String> getAllTagsName()
+    {
+        List<String> allTagsNames = new ArrayList<>();
+        List<WebElement> allTags = getAllTagElements();
+        for (WebElement tagsElem : allTags)
+        {
+            allTagsNames.add(tagsElem.findElement(TAG_NAME_RELATIVE).getText());
+        }
+        return allTagsNames;
+    }
+
+    /**
+     * Refresh tags list in left panel.
+     */
+    public void refreshTags()
+    {
+        drone.findAndWait(NAVIGATION_BUTTON).click();
+        drone.findAndWait(REFRESH_TAGS_BUTTON).click();
+        waitUntilAlert();
+    }
+
+    private List<WebElement> getAllTagElements()
+    {
+        List<WebElement> addedTags = drone.findAndWaitForElements(ALL_TAG_LINES);
+        addedTags.remove(0);
+        return addedTags;
+    }
+
+    /**
      * This private method is used to get the selected tag element from the list of tags on tag page.
-     * 
+     *
      * @param tagName
      * @return WebElement
      */
@@ -270,7 +332,7 @@ public class TagPage extends AbstractEditProperties
             {
                 name = tag.findElement(By.cssSelector("td[class$='yui-dt-col-name'] h3.name")).getText();
 
-                if (name != null && name.equalsIgnoreCase(tagName))
+                if (name != null && name.equals(tagName))
                 {
                     return tag;
                 }
