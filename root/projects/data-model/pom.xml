@@ -11,11 +11,9 @@
 
     <build>
         <plugins>
-            <!--  See http://jibx.sourceforge.net/maven-jibx-plugin  -->
             <plugin>
                 <groupId>org.jibx</groupId>
                 <artifactId>maven-jibx-plugin</artifactId>
-                <version>${dependency.jibx.version}</version>
                 <configuration>
                     <load>true</load>
                     <schemaBindingDirectory>${project.build.sourceDirectory}/org/alfresco/repo/dictionary</schemaBindingDirectory>
