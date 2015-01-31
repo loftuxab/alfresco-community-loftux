@@ -956,7 +956,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // Click the event's name -> Event Info window pops up;
         String infoWeekDay;
-        ;
         SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
 
         Calendar infoCalendar = Calendar.getInstance();
@@ -1295,8 +1294,8 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
 
         String recDetail = eventInfo.getRecurrenceDetail();
-        String compareDetail = "Occurs every 3 weeks on Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, effective " + infoWeekDay + " from " + startTime
-                + " to " + endTime;
+        String compareDetail = "Occurs every 3 weeks on Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, effective " + infoWeekDay + " from "
+                + startTime + " to " + endTime;
         Assert.assertTrue(recDetail.contains(compareDetail));
 
         eventInfo.closeInformationForm();
@@ -1312,7 +1311,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
 
         Calendar calendar = Calendar.getInstance();
-        //calendar.add(Calendar.DATE, 1);
+        // calendar.add(Calendar.DATE, 1);
         weekDay = dayFormat.format(calendar.getTime());
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
@@ -1347,7 +1346,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         String eventDetails = myCalendar.getEventDetails(siteName);
         Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
-
     }
 
     /**
@@ -1450,10 +1448,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // Calendar tab of the meeting place are correctly displayed (Occurs every <entered number> weeks on <selected day(s)> effective start date from start
         // time to end time);
+        String infoWeekDay;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
         String recDetail = eventInfo.getRecurrenceDetail();
-        String compareRecDetail = "Occurs day " + day + " of every " + month + " month(s)";
+        String compareRecDetail = "Occurs day " + day + " of every " + month + " month(s) effective " + infoWeekDay + " from " + startTime + " to " + endTime;
         Assert.assertTrue(recDetail.contains(compareRecDetail));
-
         eventInfo.closeInformationForm();
 
         // ---- Step 13 -----
@@ -1568,6 +1569,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         recurrence.selectItem("cboTheEditableTextEditableTextofeveryEditableTextmonth(s)1", "Friday");
         recurrence.deleteText("txtTheEditableTextEditableTextofeveryEditableTextmonth(s)", 0);
         recurrence.enterString("txtTheEditableTextEditableTextofeveryEditableTextmonth(s)", "3");
+        String months = recurrence.getTextValue("txtTheEditableTextEditableTextofeveryEditableTextmonth(s)");
 
         String startTime = convertHour(recurrence.getTextValue("txtStart"));
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
@@ -1602,8 +1604,14 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // Calendar tab of the meeting place are correctly displayed (Occurs every <entered number> weeks on <selected day(s)> effective start date from start
         // time to end time);
+        String infoWeekDay;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoCalendar.set(GregorianCalendar.DAY_OF_WEEK, Calendar.FRIDAY);
+        infoCalendar.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, -1);
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
         String recDetail = eventInfo.getRecurrenceDetail();
-        String compareRecDetail = "Occurs the last";
+        String compareRecDetail = "Occurs the last Friday of every " + months + " month(s) effective " + infoWeekDay + " from " + startTime + " to " + endTime;
         Assert.assertTrue(recDetail.contains(compareRecDetail) && recDetail.contains("of every 3 month(s)"));
 
         eventInfo.closeInformationForm();
@@ -1629,6 +1637,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+
         // check start and end date, duration of the event at Site calendar dashlet
         Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
@@ -1737,7 +1746,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Alfresco Share is opened;
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
         SiteDashboardPage siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
 
         // ---- Step 12 -----
@@ -1755,8 +1763,12 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // Calendar tab of the meeting place are correctly displayed (Occurs every <entered number> weeks on <selected day(s)> effective start date from start
         // time to end time);
+        String infoWeekDay;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
         String recDetail = eventInfo.getRecurrenceDetail();
-        String compareRecDetail = "Occurs day " + day + " of every 36 month(s)";
+        String compareRecDetail = "Occurs day " + day + " of every 36 month(s) effective " + infoWeekDay + " from " + startTime + " to " + endTime;
         Assert.assertTrue(recDetail.contains(compareRecDetail));
 
         eventInfo.closeInformationForm();
@@ -1875,7 +1887,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         recurrence.click("rbtnOnthe");
 
         String period = recurrence.getTextValue("cboTheEditableTextEditableTextofEditableText");
-        // String week_day = recurrence.getTextValue("cboTheEditableTextEditableTextofEditableText1");
+        String week_day = recurrence.getTextValue("cboTheEditableTextEditableTextofEditableText1");
 
         String startTime = convertHour(recurrence.getTextValue("txtStart"));
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
@@ -1909,8 +1921,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
 
         String recDetail = eventInfo.getRecurrenceDetail();
-        String compareRecDetail = "Occurs the " + period;
-        Assert.assertTrue(recDetail.contains(compareRecDetail) && recDetail.contains("of every 36 month(s)"));
+        String infoWeekDay;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
+        String compareRecDetail = "Occurs the " + period + " " + week_day + " of every 36 month(s) effective " + infoWeekDay + " from " + startTime + " to "
+                + endTime;
+        Assert.assertTrue(recDetail.contains(compareRecDetail));
 
         eventInfo.closeInformationForm();
 
@@ -2057,7 +2074,11 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
 
         String recDetail = eventInfo.getRecurrenceDetail();
-        String compareRecDetail = "Occurs each week on";
+        String infoWeekDay;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
+        String compareRecDetail = "Occurs each week on Monday, Tuesday, Wednesday, Thursday, Friday, effective " + infoWeekDay + " from " + startTime + " to " + endTime;
         Assert.assertTrue(recDetail.contains(compareRecDetail));
         eventInfo.closeInformationForm();
         calendarPage.chooseAgendaTab().render();
@@ -2082,6 +2103,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        
         // check start and end date, duration of the event at Site calendar dashlet
         Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
@@ -2208,6 +2230,18 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         Assert.assertTrue(eventInfo.getStartDateTime().contains(startTime));
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
         Assert.assertTrue(eventInfo.isRecurrencePresent());
+        
+        String recDetail = eventInfo.getRecurrenceDetail();
+        String infoWeekDay;
+        String untilDate;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
+        
+        infoCalendar.add(Calendar.DATE, 10);
+        untilDate = infoDayFormat.format(infoCalendar.getTime());
+        String compareRecDetail = "Occurs each week on Monday, Tuesday, Wednesday, Thursday, Friday, effective " + infoWeekDay + " until "+ untilDate  + " from " + startTime + " to " + endTime;
+        Assert.assertTrue(recDetail.contains(compareRecDetail));
 
         eventInfo.closeInformationForm();
         calendarPage.chooseAgendaTab().render();
@@ -2358,11 +2392,24 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // New recurrence appointment is created and displayed in the calendar of selected Meeting Workspace;
         CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage().render();
         Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName));
+        
         // Click the event's name -> Event Info window pops up;
         InformationEventForm eventInfo = calendarPage.clickOnEvent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName).render();
         Assert.assertTrue(eventInfo.getStartDateTime().contains(startTime));
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
         Assert.assertTrue(eventInfo.isRecurrencePresent());
+        
+        String recDetail = eventInfo.getRecurrenceDetail();
+        String infoWeekDay;
+        String untilDate;
+        SimpleDateFormat infoDayFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+        Calendar infoCalendar = Calendar.getInstance();
+        infoWeekDay = infoDayFormat.format(infoCalendar.getTime());
+        
+        infoCalendar.add(Calendar.DATE, 2);
+        untilDate = infoDayFormat.format(infoCalendar.getTime());
+        String compareRecDetail = "Occurs every day effective " + infoWeekDay + " until " + untilDate + " from " + startTime + " to " + endTime;
+        Assert.assertTrue(recDetail.contains(compareRecDetail));
 
         eventInfo.closeInformationForm();
         calendarPage.chooseAgendaTab().render();
@@ -2387,15 +2434,14 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        
         // check start and end date, duration of the event at Site calendar dashlet
         Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
-
         customizeUserDash = dashBoard.getNav().selectCustomizeUserDashboard();
         customizeUserDash.render();
-
         dashBoard = customizeUserDash.addDashlet(Dashlets.MY_CALENDAR, 1).render();
 
         MyCalendarDashlet myCalendar = dashBoard.getDashlet("my-calendar").render();
