@@ -1,18 +1,14 @@
 /*
  * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
  * This file is part of Alfresco
- *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -78,13 +74,13 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
         hybridDomainFree = DOMAIN_FREE;
         hybridDomainPremium = DOMAIN_PREMIUM;
-        
+
         adminUserFree = getUserNameForDomain("admin", hybridDomainFree);
         adminUserPrem = getUserNameForDomain("admin", hybridDomainPremium);
 
         CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, adminUserFree);
         CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, adminUserPrem);
-        
+
         if (hybridEnabled)
         {
             setupHybridDrone();
@@ -428,6 +424,48 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
         return false;
     }
+    
+    public static boolean checkIfSyncFailed(WebDrone driver, String fileName)
+    {
+        DocumentLibraryPage docLibPage = (DocumentLibraryPage) getSharePage(driver);
+        docLibPage = docLibPage.renderItem(maxWaitTime, fileName);
+
+        try
+        {
+            RenderTime t = new RenderTime(maxWaitTimeCloudSync);
+            while (true)
+            {
+                t.start();
+                try
+                {
+                    if (!docLibPage.getFileDirectoryInfo(fileName).isViewCloudSyncInfoDisplayed())
+                    {
+                        String fileInfo = docLibPage.getFileDirectoryInfo(fileName).getContentInfo();
+                        return fileInfo.contains("failed");
+                    }
+                    else
+                    {
+                        webDriverWait(driver, 1000);
+                        // Expected to work for RepoPage too
+                        docLibPage = refreshSharePage(driver).render();
+                        docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();
+                    }
+                }
+                finally
+                {
+                    t.end();
+                }
+            }
+
+        }
+        catch (PageException e)
+        {
+        }
+        catch (PageRenderTimeException exception)
+        {
+        }
+        return false;
+    }
 
     /**
      * Navigate to Sync Info Page.
@@ -453,8 +491,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
      * @retrun - DocumentLibraryPage
      * @throw - IllegalArgumentException
      */
-    public static DocumentLibraryPage createNewFolderAndSyncContent(WebDrone drone, String contentName, DestinationAndAssigneeBean desAndAssBean,
-        String folderName)
+    public static DocumentLibraryPage createNewFolderAndSyncContent(WebDrone drone, String contentName, DestinationAndAssigneeBean desAndAssBean, String folderName)
     {
         try
         {
@@ -582,7 +619,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
      * This method is used to check if the description has been updated.
      * If the description hasn't been updated, it refreshes the page and verifies
      * the condition until given period of time
-     *
+     * 
      * @param driver
      * @param fileName
      * @param expectedDescription
