@@ -334,7 +334,10 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       {
          for (var i = 0; i < this.submitElements.length; i++)
          {
-            this.submitElements[i]._setDisabled(disabled);
+            if (this.submitElements[i] !== undefined)
+            {
+                this.submitElements[i]._setDisabled(disabled);
+            }
          }
       },
 
