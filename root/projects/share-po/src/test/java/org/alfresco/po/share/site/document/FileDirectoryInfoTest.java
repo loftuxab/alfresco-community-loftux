@@ -241,7 +241,7 @@ public class FileDirectoryInfoTest extends AbstractDocumentTest
         Assert.assertFalse(thisRow.getTags().contains("No Tags"));
     }
 
-    @Test(expectedExceptions = UnsupportedOperationException.class, groups = { "alfresco-one" }, priority = 8)
+    @Test(groups = { "alfresco-one" }, priority = 8)
     public void test108SelectDownloadForFolderWithExpection() throws Exception
     {
         // Get folder
