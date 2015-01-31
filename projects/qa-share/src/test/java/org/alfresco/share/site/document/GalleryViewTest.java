@@ -60,6 +60,8 @@ public class GalleryViewTest extends AbstractUtils
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
+        //todo most part of the tests should use drone instead of customDrone.
+        //todo BeforeClass method should use drone. other tests where customDrone is necessary - it should be started in Test
         super.setupCustomDrone(WebDroneType.DownLoadDrone);
         // create a single user
         testName = this.getClass().getSimpleName();
@@ -110,7 +112,7 @@ public class GalleryViewTest extends AbstractUtils
         String fileName1 = getFileName(testName) + getRandomStringWithNumders(4) + ".doc";
         String comment = "comment" + getRandomStringWithNumders(4);
 
-        // User login.
+        // Any user logged into Share;
         ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD);
 
         // Open Site Library
@@ -128,11 +130,11 @@ public class GalleryViewTest extends AbstractUtils
 
         FileDirectoryInfo thisRow = ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName1);
 
-        Assert.assertTrue(thisRow.isInfoIconVisible());
+        Assert.assertTrue(thisRow.isInfoIconVisible(), "Info icon is not displayed for the content");
 
         // Click on Gallery Info Icon
         thisRow.clickInfoIcon();
-        Assert.assertTrue(thisRow.isInfoPopUpDisplayed());
+        Assert.assertTrue(thisRow.isInfoPopUpDisplayed(), "Info pop up is not displayed for the content");
 
         String version = thisRow.getVersionInfo();
 
@@ -142,7 +144,7 @@ public class GalleryViewTest extends AbstractUtils
         EditInGoogleDocsPage googleDocsPage = ShareUserGoogleDocs.signInGoogleDocs(googleAuthorisationPage);
 
         // Verify the Document is opened in google docs or not.
-        Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible());
+        Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible(), "Document was not previewed for google view");
 
         GoogleDocsUpdateFilePage googleUpdateFile = ShareUserGoogleDocs.saveGoogleDocWithVersionAndComment(customDrone, comment, true);
         googleUpdateFile.render();
@@ -150,7 +152,8 @@ public class GalleryViewTest extends AbstractUtils
 
         Assert.assertNotNull(docLibPage);
         thisRow = docLibPage.getFileDirectoryInfo(fileName1 + ".txt");
-        Assert.assertNotEquals(thisRow.getVersionInfo(), version);
+        Assert.assertNotEquals(thisRow.getVersionInfo(), version,
+                "Version of file was not updated after editing via Google");
     }
 
     @Test(groups = { "DataPrepAlfrescoOne" })
@@ -255,8 +258,8 @@ public class GalleryViewTest extends AbstractUtils
         ShareUser.createSite(customDrone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
 
         // Open Site Library
-        ShareUser.openDocumentLibrary(customDrone);
-        ShareUserSitePage.createFolder(customDrone, moveFolderName, "");
+        //ShareUser.openDocumentLibrary(customDrone);
+        //ShareUserSitePage.createFolder(customDrone, moveFolderName, "");
     }
 
     /**
@@ -280,11 +283,14 @@ public class GalleryViewTest extends AbstractUtils
         String testName = getTestName();
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName + "file1") + System.currentTimeMillis();
-        String folderName = getFolderName(testName) + System.currentTimeMillis();
-        String moveFolderName = getFolderName("move" + testName);
-        String fileInfo[] = { fileName1 };
-        String[] moveFolderPath = { moveFolderName };
+
+        String folderNameParent1 = getFolderName("parent" + testName) + System.currentTimeMillis();
+        String folderNameParent2 = getFolderName("for_move" + testName) + System.currentTimeMillis();
+        String subFolderName = getFolderName("sub" + testName) + System.currentTimeMillis();
+        String fileName1 = getFileName("file1" + testName) + System.currentTimeMillis();
+        String fileName2 = getFileName("file2" + testName) + System.currentTimeMillis();
+
+        String[] moveFolderPath = { folderNameParent2 };
 
         // User login.
         ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD);
@@ -292,32 +298,49 @@ public class GalleryViewTest extends AbstractUtils
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
 
         // Creating file and folder.
-        ShareUser.createFolderInFolder(customDrone, folderName, "", DOCLIB);
-        ShareUser.uploadFileInFolder(customDrone, fileInfo);
+        ShareUser.createFolderInFolder(customDrone, folderNameParent1, "", DOCLIB);
+        ShareUser.createFolderInFolder(customDrone, subFolderName, "", folderNameParent1);
+        ShareUser.createFolderInFolder(customDrone, folderNameParent2, "", DOCLIB);
 
-        // Open document library in GalleryView.
-        DocumentLibraryPage docLibPage = ShareUser.openDocumentLibraryInGalleryView(customDrone, siteName);
+        ShareUser.uploadFileInFolder1(customDrone, fileName1, folderNameParent1 + File.separator + subFolderName);
+        ShareUser.uploadFileInFolder1(customDrone, fileName2, folderNameParent1);
 
-        // move the testFolder to moveFolder
+        // Choose Gallery option in the Options menu;
+        ShareUser.openDocumentLibraryInGalleryView(customDrone, siteName);
+
+        // Open "Folder1" folder,  navigate to a document;
+        DocumentLibraryPage docLibPage = ShareUserSitePage.navigateToFolder(customDrone, folderNameParent1 + File.separator + subFolderName);
+
+        //Select  your Site and  select "Folder2" folder  in Path and click "Move" button;
         ShareUserSitePage.copyOrMoveToFolder(customDrone, siteName, fileName1, moveFolderPath, false);
 
-        // Navigating to movefolder
-        docLibPage = ShareUserSitePage.navigateToFolder(customDrone, moveFolderName);
+        //Verifying that document is absent;
+        Assert.assertFalse(docLibPage.isFileVisible(fileName1), "Moved content is still displayed.");
+
+        // Navigating to destination folder
+        docLibPage = ShareUserSitePage.navigateToFolder(customDrone, folderNameParent2);
 
         // Verifying that file is moved successfully.
-        Assert.assertTrue(docLibPage.isFileVisible(fileName1));
+        Assert.assertTrue(docLibPage.isFileVisible(fileName1), "Content was not moved");
 
-        // Open document library Documents view.
+        //  Navigate to Document Library page;
         ShareUser.openDocumentLibrary(customDrone);
 
-        // move the testFolder to moveFolder
-        ShareUserSitePage.copyOrMoveToFolder(customDrone, siteName, folderName, moveFolderPath, false);
+        //  Select  your Site and  select "Folder2" folder  in Path and click "Move"button;
+        ShareUserSitePage.copyOrMoveToFolder(customDrone, siteName, folderNameParent1, moveFolderPath, false);
 
-        // Navigating to movefolder
-        docLibPage = ShareUserSitePage.navigateToFolder(customDrone, moveFolderName);
+        //Verifying that folder with sub content is moved;
+        Assert.assertFalse(docLibPage.isFileVisible(folderNameParent1), "Moved folder is still displayed.");
+
+        // Navigating to moveFolder
+        docLibPage = ShareUserSitePage.navigateToFolder(customDrone, folderNameParent2);
 
         // Verifying that file is moved successfully.
-        Assert.assertTrue(docLibPage.isFileVisible(folderName));
+        Assert.assertTrue(docLibPage.isFileVisible(folderNameParent1), "Moved folder is not displayed.");
+        // Navigating to folderNameParent1
+        docLibPage = ShareUserSitePage.navigateToFolder(customDrone, folderNameParent2 + File.separator + folderNameParent1);
+        // Verifying that content was moved moved during moving parent folder
+        Assert.assertTrue(docLibPage.isFileVisible(fileName2), "File into moved folder was not moved.");
     }
 
     @Test(groups = "DataPrepAlfrescoOne")
@@ -1881,9 +1904,20 @@ public class GalleryViewTest extends AbstractUtils
             Assert.assertTrue(detailsPage.isDownloadAsZipAtTopRight(), "Download as zip is not present.");
             Assert.assertTrue(detailsPage.isDocumentActionPresent(DocumentAction.MANAGE_ASPECTS), "Manager Aspect not present");
             Assert.assertTrue(detailsPage.isDocumentActionPresent(DocumentAction.CHNAGE_TYPE), "Change Type is not present");
-            Assert.assertTrue(detailsPage.isDocumentActionPresent(DocumentAction.VIEW_IN_EXPLORER), "View in exlporer is not present");
             Assert.assertTrue(detailsPage.isPermissionsPanelPresent(), "Permission Settings are not present.");
+            if (alfrescoVersion.getVersion() >= 5.0)
+            {
+                Assert.assertFalse(detailsPage.isDocumentActionPresent(DocumentAction.VIEW_IN_EXPLORER), "View in exlporer is not present");
+
+            }
+            else
+            {
+                Assert.assertTrue(detailsPage.isDocumentActionPresent(DocumentAction.VIEW_IN_EXPLORER), "View in exlporer is not present");
+            }
         }
+
+
+
     }
 
     @Test(groups = "DataPrepAlfrescoOne")
