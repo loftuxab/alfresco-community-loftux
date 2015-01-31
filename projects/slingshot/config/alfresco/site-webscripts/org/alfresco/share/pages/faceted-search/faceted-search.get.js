@@ -443,7 +443,7 @@ var searchDocLib = {
       selectedScope: "repo",
       useInfiniteScroll: true,
       siteId: null,
-      rootNode: null,
+      rootNode: repoRootNode,
       repo: true,
       additionalControlsTarget: "FCTSRCH_RESULTS_MENU_BAR",
       additionalViewControlVisibilityConfig: hideOnZeroResultsConfig,
