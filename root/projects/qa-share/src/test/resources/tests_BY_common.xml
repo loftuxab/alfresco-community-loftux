@@ -152,17 +152,17 @@
 <include name="AONE_13984"/>
 <exclude name=".*"/>
 </methods>
-</class>
+</class-->
 <class name="org.alfresco.share.dashlet.SiteSearchDashletTest">
 <methods>
-<include name="AONE_14774"/>
+<!--include name="AONE_14774"/>
 <include name="AONE_14775"/>
-<include name="AONE_14776"/>
+<include name="AONE_14776"/-->
     <include name="AONE_14777"/>
     <include name="AONE_14778"/>
     <include name="AONE_14779"/>
     <include name="AONE_14780"/>
-<include name="AONE_14781"/>
+<!--include name="AONE_14781"/>
 <include name="AONE_14782"/>
 <include name="AONE_14783"/>
 <include name="AONE_14784"/>
@@ -194,10 +194,10 @@
 <include name="AONE_14812"/>
 <include name="AONE_14813"/>
 <include name="AONE_14814"/>
-<include name="AONE_14815"/>
+<include name="AONE_14815"/-->
 <exclude name=".*"/>
 </methods>
-</class-->
+</class>
     <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest">
         <methods>
             <include name="AONE_14818"/>

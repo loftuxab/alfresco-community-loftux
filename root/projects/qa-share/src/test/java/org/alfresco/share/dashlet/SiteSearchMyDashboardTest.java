@@ -271,9 +271,9 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
         String fileName = content + testName + test + ".doc";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test, SearchLimit.HUNDRED);
 
         // Search
-        List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test);
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "event" + test));
