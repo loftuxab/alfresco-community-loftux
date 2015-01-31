@@ -233,7 +233,6 @@ public class SolrTest extends AbstractUtils
         ShareUser.login(drone, user, DEFAULT_PASSWORD);
 
         // Verify My Activities Dashlet
-        ShareUserDashboard.addDashlet(drone, Dashlets.MY_ACTIVITIES).render();
         MyActivitiesDashlet myActivitiesDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.MY_ACTIVITIES).render();
         assertEquals(myActivitiesDashlet.getTitle(), Dashlets.MY_ACTIVITIES.getDashletName());
         assertTrue(myActivitiesDashlet.isHelpIconDisplayed(), "Help icon isn't displayed");
