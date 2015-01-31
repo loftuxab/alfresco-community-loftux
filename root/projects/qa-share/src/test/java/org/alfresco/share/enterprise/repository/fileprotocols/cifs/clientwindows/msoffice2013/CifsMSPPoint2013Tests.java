@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 
@@ -26,14 +27,15 @@ import org.alfresco.windows.application.MicrosoftOffice2013;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.cobra.ldtp.Ldtp;
-import com.cobra.ldtp.LdtpExecutionError;
 
 @Listeners(FailedTestListener.class)
 public class CifsMSPPoint2013Tests extends AbstractUtils
@@ -44,14 +46,15 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
     private String testUser;
     private String siteName;
     private String pptxFileType = ".pptx";
-    String fileName_6271;
-    String fileName_6272;
     String fileName_6295;
     String fileName_6296;
     String fileName_6297;
     String fileName_6298;
     String fileName_6299;
     String fileName_6300;
+
+    int nrFilesBeforeOpen = 0;
+    int nrFilesAfterClose = 0;
 
     String image_1 = DATA_FOLDER + CIFS_LOCATION + SLASH + "CifsPic1.jpg";
     String image_2 = DATA_FOLDER + CIFS_LOCATION + SLASH + "CifsPic2.jpg";
@@ -70,10 +73,28 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
+
         super.setup();
 
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName);
+        cifsPath = power.getCIFSPath();
+
+        networkDrive = power.getMapDriver();
+        networkPath = power.getMapPath();
+
+        try
+        {
+            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        }
+        catch (SkipException e)
+        {
+            // create user
+            logger.info("Creating user " + testUser);
+            String[] testUser1 = new String[] { testUser };
+            CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
+        }
 
         // power point files
         fileName_6295 = "AONE-6295";
@@ -83,35 +104,50 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         fileName_6299 = "AONE-6299";
         fileName_6300 = "AONE-6300";
 
-        cifsPath = power.getCIFSPath();
-
-        networkDrive = power.getMapDriver();
-        networkPath = power.getMapPath();
-        mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
-
-        // create user
-        String[] testUser1 = new String[] { testUser };
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
-
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
         Runtime.getRuntime().exec(mapConnect);
-        logger.info("----------Mapping succesfull " + testUser);
+        if (checkDirOrFileExists(7, 200, networkDrive + cifsPath))
+        {
+            logger.info("----------Mapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("----------Mapping was not done " + testUser);
+        }
+
+        super.tearDown();
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod() throws Exception
+    {
+        super.setup();
 
     }
 
     @AfterMethod(alwaysRun = true)
     public void teardownMethod() throws Exception
     {
-        Runtime.getRuntime().exec("taskkill /F /IM POWERPNT.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
+        Runtime.getRuntime().exec("taskkill /F /IM POWERPNT.EXE");
+        super.tearDown();
     }
-    
+
     @AfterClass(alwaysRun = true)
-    public void unmapDrive() throws Exception
+    public void tearDownClass() throws IOException
     {
-        Runtime.getRuntime().exec("net use * /d /y");
-        logger.info("--------Unmapping succesfull " + testUser);
+
+        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
+
+        if (checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
+        {
+            logger.info("--------Unmapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("--------Unmapping was not done correctly " + testUser);
+        }
+
     }
 
     @Test(groups = { "DataPrepPowerPoint" })
@@ -153,157 +189,149 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
 
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + SLASH + "documentLibrary" + SLASH;
 
-        try
-        {
-            // ---- Step 1 ----
-            // ---- Step Action -----
-            // Open .pptx document for editing.
-            // The document is opened in write mode.
-            Ldtp ldtp = power.openFileFromCMD(fullPath, fileName_6295 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+        // ---- Step 1 ----
+        // ---- Step Action -----
+        // Open .pptx document for editing.
+        // The document is opened in write mode.
 
-            // ---- Step 2 ----
-            // ---- Step Action -----
-            // Add any data.
-            // Expected Result
-            // The data is entered.
-            ldtp = power.getAbstractUtil().setOnWindow(fileName_6295);
-            ldtp.click("paneSlide");
-            power.editOffice(ldtp, " " + first_modification + " ");
+        Ldtp ldtp = power.openFileFromCMD(fullPath, fileName_6295 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        // ---- Step 2 ----
+        // ---- Step Action -----
+        // Add any data.
+        // Expected Result
+        // The data is entered.
+        ldtp = power.getAbstractUtil().setOnWindow(fileName_6295);
+        ldtp.click("paneSlide");
+        power.editOffice(ldtp, " " + first_modification + " ");
 
-            // ---- Step 3 ----
-            // ---- Step Action -----
-            // Save the document (Ctrl+S, for example) and close it
-            // Expected Result
-            // The document is saved. No errors occur in UI and in the log. No tmp files are left.
-            power.saveOffice(ldtp);
-            ldtp.waitTime(3);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
+        // ---- Step 3 ----
+        // ---- Step Action -----
+        // Save the document (Ctrl+S, for example) and close it
+        // Expected Result
+        // The document is saved. No errors occur in UI and in the log. No tmp files are left.
+        power.saveOffice(ldtp);
 
-            int nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+        power.exitOfficeApplication(ldtp, fileName_6295);
 
-            // ---- Step 4 ----
-            // ---- Step Action -----
-            // Verify the document's metadata and version history in the Share.
-            // Expected Result
-            // The document's metadata and version history are not broken. They are displayed correctly.
-            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-            documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6295 + pptxFileType);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
-            EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
-            Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6295 + pptxFileType));
-            editPropertiesPage.clickCancel();
+        // ---- Step 4 ----
+        // ---- Step Action -----
+        // Verify the document's metadata and version history in the Share.
+        // Expected Result
+        // The document's metadata and version history are not broken. They are displayed correctly.
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6295 + pptxFileType);
 
-            // ---- Step 5 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly.
-            String body = detailsPage.getDocumentBody();
-            Assert.assertTrue(body.contains(first_modification));
+        EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
+        Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6295 + pptxFileType));
+        editPropertiesPage.clickCancel();
 
-            // ---- Step 6 ----
-            // ---- Step Action -----
-            // 6. Open the document for editing again.
-            // Expected Result
-            // 6. The document is opened in write mode.
-            ldtp = power.openFileFromCMD(fullPath, fileName_6295 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+        // ---- Step 5 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly.
+        String body = detailsPage.getDocumentBody();
+        Assert.assertTrue(body.contains(first_modification));
 
-            // ---- Step 7 ----
-            // ---- Step Action -----
-            // Add any data.
-            // Expected Result
-            // The data is entered.
-            ldtp = power.getAbstractUtil().setOnWindow(fileName_6295);
-            power.editOffice(ldtp, " " + second_modification + " ");
+        // ---- Step 6 ----
+        // ---- Step Action -----
+        // 6. Open the document for editing again.
+        // Expected Result
+        // 6. The document is opened in write mode.
 
-            // ---- Step 8 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly
-            power.saveOffice(ldtp);
-            ldtp.waitTime(2);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
-            nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+        ldtp = power.openFileFromCMD(fullPath, fileName_6295 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        power.getAbstractUtil().waitForWindow(fileName_6295);
+        // ---- Step 7 ----
+        // ---- Step Action -----
+        // Add any data.
+        // Expected Result
+        // The data is entered.
+        ldtp = power.getAbstractUtil().setOnWindow(fileName_6295);
+        ldtp.click("paneSlide");
+        power.editOffice(ldtp, " " + second_modification + " ");
 
-            // ---- Step 9 ----
-            // ---- Step Action -----
-            // Verify the document's metadata and version history in the Share.
-            // Expected Result
-            // The document's metadata and version history are not broken. They are displayed correctly.
-            documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            detailsPage = documentLibPage.selectFile(fileName_6295 + pptxFileType);
+        // ---- Step 8 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly
+        power.saveOffice(ldtp);
 
-            editPropertiesPage = detailsPage.selectEditProperties().render();
-            Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6295 + pptxFileType));
-            editPropertiesPage.clickCancel();
+        power.exitOfficeApplication(ldtp, fileName_6295);
 
-            // ---- Step 10 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly.
-            body = detailsPage.getDocumentBody();
-            Assert.assertTrue(body.contains(second_modification));
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
-            // ---- Step 11 ----
-            // ---- Step Action -----
-            // 6. Open the document for editing again.
-            // Expected Result
-            // 6. The document is opened in write mode.
-            ldtp = power.openFileFromCMD(fullPath, fileName_6295 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+        // ---- Step 9 ----
+        // ---- Step Action -----
+        // Verify the document's metadata and version history in the Share.
+        // Expected Result
+        // The document's metadata and version history are not broken. They are displayed correctly.
+        documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        detailsPage = documentLibPage.selectFile(fileName_6295 + pptxFileType);
 
-            // ---- Step 12 ----
-            // ---- Step Action -----
-            // Add any data.
-            // Expected Result
-            // The data is entered.
-            ldtp = power.getAbstractUtil().setOnWindow(fileName_6295);
-            ldtp.click("paneSlide");
-            power.editOffice(ldtp, " " + last_modification + " ");
+        editPropertiesPage = detailsPage.selectEditProperties().render();
+        Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6295 + pptxFileType));
+        editPropertiesPage.clickCancel();
 
-            // ---- Step 13 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly
-            power.saveOffice(ldtp);
-            ldtp.waitTime(2);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
-            nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+        // ---- Step 10 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly.
+        detailsPage.render();
+        String body2 = detailsPage.getDocumentBody();
 
-            // ---- Step 14 ----
-            // ---- Step Action -----
-            // Verify the document's metadata and version history in the Share.
-            // Expected Result
-            // The document's metadata and version history are not broken. They are displayed correctly.
-            documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            detailsPage = documentLibPage.selectFile(fileName_6295 + pptxFileType);
+        Assert.assertTrue(body2.contains(second_modification));
 
-            editPropertiesPage = detailsPage.selectEditProperties().render();
-            Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6295 + pptxFileType));
-            editPropertiesPage.clickCancel();
+        // ---- Step 11 ----
+        // ---- Step Action -----
+        // 6. Open the document for editing again.
+        // Expected Result
+        // 6. The document is opened in write mode.
+        ldtp = power.openFileFromCMD(fullPath, fileName_6295 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        power.getAbstractUtil().waitForWindow(fileName_6295);
+        // ---- Step 12 ----
+        // ---- Step Action -----
+        // Add any data.
+        // Expected Result
+        // The data is entered.
+        ldtp = power.getAbstractUtil().setOnWindow(fileName_6295);
+        ldtp.click("paneSlide");
+        power.editOffice(ldtp, " " + last_modification + " ");
 
-            // ---- Step 15 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly.
-            body = detailsPage.getDocumentBody();
-            Assert.assertTrue(body.contains(last_modification));
+        // ---- Step 13 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly
+        power.saveOffice(ldtp);
 
-        }
-        catch (Exception e)
-        {
-            throw new LdtpExecutionError("Not working");
-        }
+        power.exitOfficeApplication(ldtp, fileName_6295);
+
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
+
+        // ---- Step 14 ----
+        // ---- Step Action -----
+        // Verify the document's metadata and version history in the Share.
+        // Expected Result
+        // The document's metadata and version history are not broken. They are displayed correctly.
+        documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        detailsPage = documentLibPage.selectFile(fileName_6295 + pptxFileType);
+
+        editPropertiesPage = detailsPage.selectEditProperties().render();
+        Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6295 + pptxFileType));
+        editPropertiesPage.clickCancel();
+
+        // ---- Step 15 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly.
+        String body3 = detailsPage.getDocumentBody();
+        Assert.assertTrue(body3.contains(last_modification));
 
     }
 
@@ -334,9 +362,13 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         detailsPage.render();
     }
 
-    /** AONE-6296:MS PowerPoint 2013 - uploaded to Share (big) */
+    /**
+     * AONE-6296:MS PowerPoint 2013 - uploaded to Share (big)
+     * 
+     * @throws AWTException
+     */
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
-    public void AONE_6296() throws IOException
+    public void AONE_6296() throws IOException, AWTException
     {
         String testName = getTestName();
         String siteName = getSiteName(testName).toLowerCase();
@@ -346,179 +378,164 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
 
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + SLASH + "documentLibrary" + SLASH;
 
-        try
-        {
-            // ---- Step 1 ----
-            // ---- Step Action -----
-            // Open .pptx document for editing.
-            // The document is opened in write mode.
-            Ldtp ldtp = power.openFileFromCMD(fullPath, fileName_6296 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+        // ---- Step 1 ----
+        // ---- Step Action -----
+        // Open .pptx document for editing.
+        // The document is opened in write mode.
+        Ldtp ldtp = power.openFileFromCMD(fullPath, fileName_6296 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        // ---- Step 2 ----
+        // ---- Step Action -----
+        // Add any data.doc
+        // Expected Result
+        // The data is entered.
+        ldtp = power.getAbstractUtil().setOnWindow(fileName_6296);
+        ldtp.click("paneSlide");
+        uploadImageInOffice(image_1);
+        ldtp.waitTime(2);
+        ldtp.click("paneSlide");
+        power.editOffice(ldtp, " " + first_modification + " ");
 
-            // ---- Step 2 ----
-            // ---- Step Action -----
-            // Add any data.
-            // Expected Result
-            // The data is entered.
-            ldtp = power.getAbstractUtil().setOnWindow(fileName_6296);
-            ldtp.click("paneSlide");
-            uploadImageInOffice(image_1);
-            ldtp.waitTime(2);
-            ldtp.click("paneSlide");
-            power.editOffice(ldtp, " " + first_modification + " ");
+        // ---- Step 3 ----
+        // ---- Step Action -----
+        // Save the document (Ctrl+S, for example) and close it
+        // Expected Result
+        // The document is saved. No errors occur in UI and in the log. No
+        // tmp files are left.
+        power.saveOffice(ldtp);
+        power.getAbstractUtil().setOnWindow(fileName_6296);
+        power.exitOfficeApplication(ldtp, fileName_6296);
 
-            // ---- Step 3 ----
-            // ---- Step Action -----
-            // Save the document (Ctrl+S, for example) and close it
-            // Expected Result
-            // The document is saved. No errors occur in UI and in the log. No
-            // tmp files are left.
-            power.saveOffice(ldtp);
-            ldtp.waitTime(3);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
-            int nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+        // ---- Step 4 ----
+        // ---- Step Action -----
+        // Verify the document's metadata and version history in the Share.
+        // Expected Result
+        // The document's metadata and version history are not broken. They
+        // are displayed correctly.
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6296 + pptxFileType);
 
-            // ---- Step 4 ----
-            // ---- Step Action -----
-            // Verify the document's metadata and version history in the Share.
-            // Expected Result
-            // The document's metadata and version history are not broken. They
-            // are displayed correctly.
-            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-            documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6296 + pptxFileType);
+        EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
+        editPropertiesPage.getDocumentTitle();
+        Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
+        editPropertiesPage.clickCancel();
 
-            EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
-            editPropertiesPage.getDocumentTitle();
-            Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
-            editPropertiesPage.clickCancel();
+        // ---- Step 5 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly.
+        String body = detailsPage.getDocumentBody();
+        Assert.assertTrue(body.contains(first_modification));
 
-            // ---- Step 5 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly.
-            String body = detailsPage.getDocumentBody();
-            Assert.assertTrue(body.contains(first_modification));
+        // ---- Step 6 ----
+        // ---- Step Action -----
+        // 6. Open the document for editing again.
+        // Expected Result
+        // 6. The document is opened in write mode.
+        ldtp = power.openFileFromCMD(fullPath, fileName_6296 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        // ---- Step 7 ----
+        // ---- Step Action -----
+        // Add any data.
+        // Expected Result
+        // The data is entered.
+        ldtp = power.getAbstractUtil().setOnWindow(fileName_6296);
+        ldtp.click("btnNextSlide");
+        ldtp.waitTime(1);
+        ldtp.click("paneSlide");
+        uploadImageInOffice(image_2);
+        ldtp.waitTime(2);
+        ldtp.click("paneSlide");
+        power.editOffice(ldtp, " " + second_modification + " ");
 
-            // ---- Step 6 ----
-            // ---- Step Action -----
-            // 6. Open the document for editing again.
-            // Expected Result
-            // 6. The document is opened in write mode.
-            ldtp = power.openFileFromCMD(fullPath, fileName_6296 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+        // ---- Step 8 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly
+        power.saveOffice(ldtp);
 
-            // ---- Step 7 ----
-            // ---- Step Action -----
-            // Add any data.
-            // Expected Result
-            // The data is entered.
-            ldtp = power.getAbstractUtil().setOnWindow(fileName_6296);
-            ldtp.click("btnNextSlide");
-            ldtp.waitTime(1);
-            ldtp.click("paneSlide");
-            uploadImageInOffice(image_2);
-            ldtp.waitTime(2);
-            ldtp.click("paneSlide");
-            power.editOffice(ldtp, " " + second_modification + " ");
+        power.exitOfficeApplication(ldtp, fileName_6296);
 
-            // ---- Step 8 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly
-            power.saveOffice(ldtp);
-            ldtp.waitTime(2);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
-            nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
-            // ---- Step 9 ----
-            // ---- Step Action -----
-            // Verify the document's metadata and version history in the Share.
-            // Expected Result
-            // The document's metadata and version history are not broken. They
-            // are displayed correctly.
-            documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            detailsPage = documentLibPage.selectFile(fileName_6296 + pptxFileType);
+        // ---- Step 9 ----
+        // ---- Step Action -----
+        // Verify the document's metadata and version history in the Share.
+        // Expected Result
+        // The document's metadata and version history are not broken. They
+        // are displayed correctly.
+        documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        detailsPage = documentLibPage.selectFile(fileName_6296 + pptxFileType);
 
-            editPropertiesPage = detailsPage.selectEditProperties().render();
-            editPropertiesPage.getDocumentTitle();
-            Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
-            editPropertiesPage.clickCancel();
+        editPropertiesPage = detailsPage.selectEditProperties().render();
+        editPropertiesPage.getDocumentTitle();
+        Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
+        editPropertiesPage.clickCancel();
 
-            // ---- Step 10 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly.
-            body = detailsPage.getDocumentBody();
-            Assert.assertTrue(body.contains(second_modification));
+        // ---- Step 10 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly.
+        body = detailsPage.getDocumentBody();
+        Assert.assertTrue(body.contains(second_modification));
 
-            // ---- Step 11 ----
-            // ---- Step Action -----
-            // 6. Open the document for editing again.
-            // Expected Result
-            // 6. The document is opened in write mode.
-            ldtp = power.openFileFromCMD(fullPath, fileName_6296 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+        // ---- Step 11 ----
+        // ---- Step Action -----
+        // 6. Open the document for editing again.
+        // Expected Result
+        // 6. The document is opened in write mode.
+        ldtp = power.openFileFromCMD(fullPath, fileName_6296 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        // ---- Step 12 ----
+        // ---- Step Action -----
+        // Add any data.
+        // Expected Result
+        // The data is entered.
+        ldtp = power.getAbstractUtil().setOnWindow(fileName_6296);
+        ldtp.click("btnNextSlide");
+        ldtp.waitTime(1);
+        ldtp.click("btnNextSlide");
+        ldtp.waitTime(1);
+        ldtp.click("paneSlide");
+        uploadImageInOffice(image_3);
+        ldtp.waitTime(2);
+        ldtp.click("paneSlide");
+        power.editOffice(ldtp, " " + last_modification + " ");
 
-            // ---- Step 12 ----
-            // ---- Step Action -----
-            // Add any data.
-            // Expected Result
-            // The data is entered.
-            ldtp = power.getAbstractUtil().setOnWindow(fileName_6296);
-            ldtp.click("btnNextSlide");
-            ldtp.waitTime(1);
-            ldtp.click("btnNextSlide");
-            ldtp.waitTime(1);
-            ldtp.click("paneSlide");
-            uploadImageInOffice(image_3);
-            ldtp.waitTime(2);
-            ldtp.click("paneSlide");
-            power.editOffice(ldtp, " " + last_modification + " ");
+        // ---- Step 13 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly
+        power.saveOffice(ldtp);
 
-            // ---- Step 13 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly
-            power.saveOffice(ldtp);
-            ldtp.waitTime(2);
-            power.exitOfficeApplication(ldtp);
-            ldtp.waitTime(3);
-            nrFiles = getNumberOfFilesFromPath(fullPath);
-            Assert.assertEquals(nrFiles, 1);
+        power.exitOfficeApplication(ldtp, fileName_6296);
 
-            // ---- Step 14 ----
-            // ---- Step Action -----
-            // Verify the document's metadata and version history in the Share.
-            // Expected Result
-            // The document's metadata and version history are not broken. They
-            // are displayed correctly.
-            documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            detailsPage = documentLibPage.selectFile(fileName_6296 + pptxFileType);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
-            editPropertiesPage = detailsPage.selectEditProperties().render();
-            Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6296 + pptxFileType));
-            editPropertiesPage.clickCancel();
+        // ---- Step 14 ----
+        // ---- Step Action -----
+        // Verify the document's metadata and version history in the Share.
+        // Expected Result
+        // The document's metadata and version history are not broken. They
+        // are displayed correctly.
+        documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        detailsPage = documentLibPage.selectFile(fileName_6296 + pptxFileType);
 
-            // ---- Step 15 ----
-            // ---- Step Action -----
-            // Verify the document's content.
-            // Expected Result
-            // All changes are present and displayed correctly.
-            body = detailsPage.getDocumentBody();
-            Assert.assertTrue(body.contains(last_modification));
+        editPropertiesPage = detailsPage.selectEditProperties().render();
+        Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6296 + pptxFileType));
+        editPropertiesPage.clickCancel();
 
-        }
-        catch (Exception e)
-        {
-            throw new LdtpExecutionError("Not working");
-        }
+        // ---- Step 15 ----
+        // ---- Step Action -----
+        // Verify the document's content.
+        // Expected Result
+        // All changes are present and displayed correctly.
+        body = detailsPage.getDocumentBody();
+        Assert.assertTrue(body.contains(last_modification));
 
     }
 
@@ -620,7 +637,6 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         String edit3 = "New text3";
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + SLASH + "documentLibrary" + SLASH;
 
-        Ldtp security = new Ldtp("Windows Security");
         Ldtp l1;
 
         // --- Step 1 ---
@@ -632,19 +648,16 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         l1 = power.openOfficeApplication();
         power.editOffice(l1, addText);
         power.saveAsOffice(l1, fullPath + fileName_6297);
-        power.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
-        l1.waitTime(3);
+
         power.getAbstractUtil().waitForWindow(fileName_6297);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        power.exitOfficeApplication(l1, fileName_6297);
 
         // ---- Step 2 ----
         // ---- Step Action -----
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6297 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        l1 = power.openFileFromCMD(fullPath, fileName_6297 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
         // ---- Step 3 ----
         // ---- Step Action -----
         // Add any data.
@@ -661,10 +674,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+
+        power.exitOfficeApplication(l1, fileName_6297);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -713,8 +725,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6297 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        l1 = power.openFileFromCMD(fullPath, fileName_6297 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
         // ---- Step 8 ----
         // ---- Step Action -----
         // Add any data.
@@ -730,12 +741,10 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
 
+        power.exitOfficeApplication(l1, fileName_6297);
+
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 10 ---
         // --- Step action ---
         // Specify the document's metadata, e.g. title, description and so on,
@@ -767,8 +776,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6297 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        l1 = power.openFileFromCMD(fullPath, fileName_6297 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
         // ---- Step 13 ----
         // ---- Step Action -----
         // Add any data.
@@ -785,11 +793,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+
+        power.exitOfficeApplication(l1, fileName_6297);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -831,7 +837,6 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         String edit3 = "New text3";
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + SLASH + "documentLibrary" + SLASH;
 
-        Ldtp security = new Ldtp("Windows Security");
         Ldtp l1;
 
         // --- Step 1 ---
@@ -843,19 +848,16 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         l1 = power.openOfficeApplication();
         power.editOffice(l1, addText);
         power.saveAsOffice(l1, fullPath + fileName_6298);
-        power.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
-        l1.waitTime(3);
+
         power.getAbstractUtil().waitForWindow(fileName_6298);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(3);
+        power.exitOfficeApplication(l1, fileName_6298);
 
         // ---- Step 2 ----
         // ---- Step Action -----
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6298 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        l1 = power.openFileFromCMD(fullPath, fileName_6298 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
         // ---- Step 3 ----
         // ---- Step Action -----
         // Add any data (5-10 mb).
@@ -874,10 +876,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+
+        power.exitOfficeApplication(l1, fileName_6298);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -926,7 +927,7 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6298 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = power.openFileFromCMD(fullPath, fileName_6298 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6298);
 
         // ---- Step 8 ----
@@ -946,11 +947,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+
+        power.exitOfficeApplication(l1, fileName_6298);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -983,7 +982,8 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6298 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = power.openFileFromCMD(fullPath, fileName_6298 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        power.getAbstractUtil().waitForWindow(fileName_6298);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6298);
 
         // ---- Step 13 ----
@@ -1005,11 +1005,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+
+        power.exitOfficeApplication(l1, fileName_6298);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -1059,21 +1057,16 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
 
-        int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = power.openFileFromCMD(localPath, fileName_6299 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
-
         l1 = power.getAbstractUtil().setOnWindow(fileName_6299);
         power.navigateToSaveAsSharePointBrowse(l1);
 
         power.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6299, testUser, DEFAULT_PASSWORD);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6299);
-        l1.waitTime(4);
-        power.exitOfficeApplication(l1);
+        // l1.waitTime(4);
+        power.exitOfficeApplication(l1, fileName_6299);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
         // --- Step 2 ---
         // --- Step action ---
         // Verify the document's content.
@@ -1119,7 +1112,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6299 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+
+        l1 = power.openFileFromCMD(fullPath, fileName_6299 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        power.getAbstractUtil().waitForWindow(fileName_6299);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6299);
         String actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6299), "Microsoft Excel - " + fileName_6299 + " window is active.");
@@ -1138,10 +1133,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+
+        power.exitOfficeApplication(l1, fileName_6299);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 7 ---
         // --- Step action ---
@@ -1172,7 +1166,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6299 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+
+        l1 = power.openFileFromCMD(fullPath, fileName_6299 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        power.getAbstractUtil().waitForWindow(fileName_6299);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6299);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6299), "Microsoft Excel - " + fileName_6299 + " window is active.");
@@ -1193,10 +1189,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // files are left.
         l1 = power.getAbstractUtil().setOnWindow(fileName_6299);
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+
+        power.exitOfficeApplication(l1, fileName_6299);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 12 ---
         // --- Step action ---
@@ -1234,7 +1229,6 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + SLASH + "documentLibrary" + SLASH;
         String localPath = DATA_FOLDER + CIFS_LOCATION + SLASH;
         Ldtp l1;
-
         // --- Step 1 ---
         // --- Step action ---
         // Save a document into the CIFS drive (into the Document Library space)
@@ -1243,21 +1237,22 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
 
-        int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = power.openFileFromCMD(localPath, fileName_6300 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
-
+        power.getAbstractUtil().waitForWindow(fileName_6300);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6300);
-        power.navigateToSaveAsSharePointBrowse(l1);
+        // power.navigateToSaveAsSharePointBrowse(l1);
+        //
+        // power.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6300, testUser, DEFAULT_PASSWORD);
+        // l1 = power.getAbstractUtil().setOnWindow(fileName_6300);
+        // // l1.waitTime(4);
+        // power.exitOfficeApplication(l1, fileName_6300);
 
-        power.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6300, testUser, DEFAULT_PASSWORD);
-        l1 = power.getAbstractUtil().setOnWindow(fileName_6300);
-        l1.waitTime(4);
-        power.exitOfficeApplication(l1);
+        power.saveAsOffice(l1, fullPath + fileName_6300);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave
-                + 1);
+        power.getAbstractUtil().setOnWindow(fileName_6300);
+        power.exitOfficeApplication(l1, fileName_6300);
+
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -1304,7 +1299,9 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6300 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+
+        l1 = power.openFileFromCMD(fullPath, fileName_6300 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
+        power.getAbstractUtil().waitForWindow(fileName_6300);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6300);
         String actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6300), "Microsoft Excel - " + fileName_6300 + " window is active.");
@@ -1326,11 +1323,10 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(2);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+
+        power.exitOfficeApplication(l1, fileName_6300);
+
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 7 ---
         // --- Step action ---
@@ -1361,7 +1357,8 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = power.openFileFromCMD(fullPath, fileName_6300 + pptxFileType, testUser, DEFAULT_PASSWORD, true);
+
+        l1 = power.openFileFromCMD(fullPath, fileName_6300 + pptxFileType, testUser, DEFAULT_PASSWORD, false);
         l1 = power.getAbstractUtil().setOnWindow(fileName_6300);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6300), "Microsoft Excel - " + fileName_6300 + " window is active.");
@@ -1385,11 +1382,10 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         power.saveOffice(l1);
-        l1.waitTime(5);
-        power.exitOfficeApplication(l1);
-        l1.waitTime(2);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+        // l1.waitTime(5);
+        power.exitOfficeApplication(l1, fileName_6300);
+
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, pptxFileType, 6));
 
         // --- Step 12 ---
         // --- Step action ---
@@ -1416,15 +1412,6 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         Assert.assertTrue(body3.contains(edit3));
     }
 
-    private int getNumberOfFilesFromPath(String path)
-    {
-        int noOfFiles = 0;
-        File folder = new File(path);
-        noOfFiles = folder.listFiles().length;
-
-        return noOfFiles;
-    }
-
     private void uploadImageInOffice(String image) throws AWTException
     {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -1439,4 +1426,101 @@ public class CifsMSPPoint2013Tests extends AbstractUtils
         r.keyRelease(KeyEvent.VK_V);
     }
 
+    private Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
+    {
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                existence = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+            }
+        }
+        return existence;
+    }
+
+    private Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
+    {
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+
+            }
+            else
+            {
+                existence = true;
+                break;
+            }
+        }
+        return existence;
+    }
+
+    private Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
+    {
+        long counter = 0;
+        boolean check = false;
+        boolean existence = true;
+        while (counter < TimeUnit.SECONDS.toMillis(timeout))
+        {
+            File test = new File(path);
+            for (File element : test.listFiles())
+            {
+                if (element.isHidden() && element.getName().contains(extension))
+                {
+                    existence = false;
+                    break;
+                }
+            }
+            if (existence)
+            {
+                check = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + 200;
+                existence = true;
+            }
+        }
+        return check;
+    }
 }

@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 
@@ -29,6 +30,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -49,8 +51,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     String fileName_6292;
     String fileName_6293;
     String fileName_6294;
-    String fileName_6277;
-    String fileName_6278;
 
     String image_1 = DATA_FOLDER + CIFS_LOCATION + SLASH + "CifsPic1.jpg";
     String image_2 = DATA_FOLDER + CIFS_LOCATION + SLASH + "CifsPic2.jpg";
@@ -86,37 +86,68 @@ public class CifsMSExcel2013Tests extends AbstractUtils
 
         networkDrive = excel.getMapDriver();
         networkPath = excel.getMapPath();
-        mapConnect = "net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
-
-        // create user
-        String[] testUser1 = new String[] { testUser };
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
-
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
+        try
+        {
+            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        }
+        catch (Exception e)
+        {
+            // create user
+            String[] testUser1 = new String[] { testUser };
+            CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
+        }
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
         Runtime.getRuntime().exec(mapConnect);
-        logger.info("----------Mapping succesfull " + testUser);
+        if (checkDirOrFileExists(7, 200, networkDrive + cifsPath))
+        {
+            logger.info("----------Mapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("----------Mapping was not done " + testUser);
+        }
+
+        super.tearDown();
+
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod() throws Exception
+    {
+        super.setup();
 
     }
 
     @AfterMethod(alwaysRun = true)
     public void teardownMethod() throws Exception
     {
+
         Runtime.getRuntime().exec("taskkill /F /IM EXCEL.EXE");
         Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
+        super.tearDown();
     }
 
     @AfterClass(alwaysRun = true)
-    public void unmapDrive() throws Exception
+    public void tearDownClass() throws IOException
     {
-        Runtime.getRuntime().exec("net use * /d /y");
-        logger.info("--------Unmapping succesfull " + testUser);
+
+        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
+
+        if (checkDirOrFileNotExists(7, 200, networkDrive + cifsPath))
+        {
+            logger.info("--------Unmapping succesfull " + testUser);
+        }
+        else
+        {
+            logger.error("--------Unmapping was not done correctly " + testUser);
+        }
+
     }
 
     @Test(groups = { "DataPrepExcel" })
     public void dataPrep_6289() throws Exception
     {
-        String testName = getTestName()+3;
+        String testName = getTestName() + 3;
         String siteName = getSiteName(testName);
 
         // Login
@@ -144,7 +175,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6289() throws IOException
     {
-        String testName = getTestName()+3;
+        String testName = getTestName() + 3;
         String siteName = getSiteName(testName).toLowerCase();
         String first_modification = testName + "1";
         String second_modification = testName + "2";
@@ -157,7 +188,8 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open .xlsx document for editing.
         // The document is opened in write mode.
         Ldtp ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        excel.getAbstractUtil().waitForWindow(fileName_6289);
+        excel.getAbstractUtil().setOnWindow(fileName_6289);
         // ---- Step 2 ----
         // ---- Step Action -----
         // Add any data.
@@ -171,12 +203,11 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Expected Result
         // The document is saved. No errors occur in UI and in the log. No tmp files are left.
         excel.saveOffice(ldtp);
-        ldtp.waitTime(3);
-        excel.exitOfficeApplication(ldtp);
-        ldtp.waitTime(3);
+        // ldtp.waitTime(3);
+        excel.exitOfficeApplication(ldtp, fileName_6289);
+        // ldtp.waitTime(3);
 
-        int nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -205,7 +236,8 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        excel.getAbstractUtil().waitForWindow(fileName_6289);
+        excel.getAbstractUtil().setOnWindow(fileName_6289);
         // ---- Step 7 ----
         // ---- Step Action -----
         // Add any data.
@@ -219,12 +251,10 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Expected Result
         // All changes are present and displayed correctly
         excel.saveOffice(ldtp);
-        ldtp.waitTime(2);
-        excel.exitOfficeApplication(ldtp);
-        ldtp.waitTime(3);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
-
+        // ldtp.waitTime(2);
+        excel.exitOfficeApplication(ldtp, fileName_6289);
+        // ldtp.waitTime(3);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // ---- Step 9 ----
         // ---- Step Action -----
         // Verify the document's metadata and version history in the Share.
@@ -251,7 +281,8 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Expected Result
         // 6. The document is opened in write mode.
         ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        excel.getAbstractUtil().waitForWindow(fileName_6289);
+        excel.getAbstractUtil().setOnWindow(fileName_6289);
         // ---- Step 12 ----
         // ---- Step Action -----
         // Add any data.
@@ -268,9 +299,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp);
         ldtp.waitTime(3);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // ---- Step 14 ----
         // ---- Step Action -----
         // Verify the document's metadata and version history in the Share.
@@ -296,7 +325,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "DataPrepExcel" })
     public void dataPrep_6290() throws Exception
     {
-        String testName = getTestName()+3;
+        String testName = getTestName() + 3;
         String siteName = getSiteName(testName);
 
         // Login
@@ -324,7 +353,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6290() throws IOException, AWTException
     {
-        String testName = getTestName()+3;
+        String testName = getTestName() + 3;
         String siteName = getSiteName(testName).toLowerCase();
         String first_modification = testName + "1";
         String second_modification = testName + "2";
@@ -338,7 +367,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document is opened in write mode.
         Ldtp ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
         excel.getAbstractUtil().waitForWindow(fileName_6290);
-
+        excel.getAbstractUtil().setOnWindow(fileName_6290);
         // ---- Step 2 ----
         // ---- Step Action -----
         // Add any data.
@@ -355,10 +384,8 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.saveOffice(ldtp);
         ldtp.waitTime(3);
         excel.exitOfficeApplication(ldtp);
-        sleep();
 
-        int nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 4 ----
         // ---- Step Action -----
@@ -388,7 +415,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // 6. The document is opened in write mode.
         ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
         excel.getAbstractUtil().waitForWindow(fileName_6290);
-
+        excel.getAbstractUtil().setOnWindow(fileName_6290);
         // ---- Step 7 ----
         // ---- Step Action -----
         // Add any data.
@@ -406,8 +433,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp);
         ldtp.waitTime(3);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 9 ----
         // ---- Step Action -----
@@ -436,7 +462,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // 6. The document is opened in write mode.
         ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
         excel.getAbstractUtil().waitForWindow(fileName_6290);
-
+        excel.getAbstractUtil().setOnWindow(fileName_6290);
         // ---- Step 12 ----
         // ---- Step Action -----
         // Add any data.
@@ -454,8 +480,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         ldtp.waitTime(2);
         excel.exitOfficeApplication(ldtp);
         ldtp.waitTime(3);
-        nrFiles = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(nrFiles, 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 14 ----
         // ---- Step Action -----
@@ -483,7 +508,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     public void dataPrep_6291() throws Exception
     {
 
-        testName = getTestName()+3;
+        testName = getTestName() + 3;
         siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -505,7 +530,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     public void dataPrep_6292() throws Exception
     {
 
-        testName = getTestName()+3;
+        testName = getTestName() + 3;
         siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -526,7 +551,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "DataPrepExcel" })
     public void dataPrep_6293() throws Exception
     {
-        String testName = getTestName()+30;
+        String testName = getTestName() + 30;
         String siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -547,7 +572,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "DataPrepExcel" })
     public void dataPrep_6294() throws Exception
     {
-        String testName = getTestName()+3;
+        String testName = getTestName() + 3;
         String siteName = getSiteName(testName);
 
         ShareUser.login(drone, testUser);
@@ -569,7 +594,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6291() throws Exception
     {
-        String testName = getTestName()+3;
+        String testName = getTestName() + 3;
         String siteName = getSiteName(testName).toLowerCase();
         String addText = "First text";
         String edit1 = "New text1";
@@ -600,7 +625,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
         excel.getAbstractUtil().waitForWindow(fileName_6291);
-
+        excel.getAbstractUtil().setOnWindow(fileName_6291);
         // ---- Step 3 ----
         // ---- Step Action -----
         // Add any data.
@@ -615,10 +640,9 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
         excel.saveOffice(l1);
-        sleep();
+
         excel.exitOfficeApplication(l1);
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -668,7 +692,8 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        excel.getAbstractUtil().waitForWindow(fileName_6291);
+        excel.getAbstractUtil().setOnWindow(fileName_6291);
         // ---- Step 8 ----
         // ---- Step Action -----
         // Add any data.
@@ -686,8 +711,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -721,7 +745,8 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        excel.getAbstractUtil().waitForWindow(fileName_6291);
+        excel.getAbstractUtil().setOnWindow(fileName_6291);
         // ---- Step 13 ----
         // ---- Step Action -----
         // Add any data.
@@ -739,8 +764,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -774,7 +798,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6292() throws Exception
     {
-        String testName = getTestName()+3;
+        String testName = getTestName() + 3;
         String siteName = getSiteName(testName).toLowerCase();
         String addText = "First text";
         String edit1 = "New text1";
@@ -806,7 +830,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
         excel.getAbstractUtil().waitForWindow(fileName_6292);
-
+        excel.getAbstractUtil().setOnWindow(fileName_6292);
         // ---- Step 3 ----
         // ---- Step Action -----
         // Add any data (5-10 mb).
@@ -824,9 +848,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
-        sleep();
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // ---- Step 5 ----
         // ---- Step Action -----
@@ -877,7 +899,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
         excel.getAbstractUtil().waitForWindow(fileName_6292);
-
+        excel.getAbstractUtil().setOnWindow(fileName_6292);
         // ---- Step 8 ----
         // ---- Step Action -----
         // Add any data (5-10 mb).
@@ -896,8 +918,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 10 ---
         // --- Step action ---
@@ -931,7 +952,8 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // ---- Expected Result -----
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
-
+        excel.getAbstractUtil().waitForWindow(fileName_6292);
+        excel.getAbstractUtil().setOnWindow(fileName_6292);
         // ---- Step 13 ----
         // ---- Step Action -----
         // Add any data (5-10 mb).
@@ -950,8 +972,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, 1, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 15 ---
         // --- Step action ---
@@ -985,7 +1006,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6293() throws Exception
     {
-        String testName = getTestName()+30;
+        String testName = getTestName() + 30;
         String siteName = getSiteName(testName).toLowerCase();
         String edit2 = "new text2";
         String edit3 = "new text3";
@@ -1001,19 +1022,16 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
 
-        int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = excel.openFileFromCMD(localPath, fileName_6293 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
-
+        excel.getAbstractUtil().waitForWindow(fileName_6293);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6293);
         excel.navigateToSaveAsSharePointBrowse(l1);
         excel.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6293, testUser, DEFAULT_PASSWORD);
         excel.getAbstractUtil().waitForWindow(fileName_6293);
-        sleep();
+
         excel.exitOfficeApplication(l1);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -1061,6 +1079,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // --- Expected results --
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6293 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().waitForWindow(fileName_6293);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6293);
         String actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6293), "Microsoft Excel - " + fileName_6293 + " window is not active.");
@@ -1081,8 +1100,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 7 ---
         // --- Step action ---
@@ -1114,6 +1132,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // --- Expected results --
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6293 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().waitForWindow(fileName_6293);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6293);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6293), "Microsoft Excel - " + fileName_6293 + " window is not active.");
@@ -1135,8 +1154,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         excel.saveOffice(l1);
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 12 ---
         // --- Step action ---
@@ -1167,7 +1185,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
     @Test(groups = { "CIFSWindowsClient", "EnterpriseOnly" })
     public void AONE_6294() throws Exception
     {
-        String testName = getTestName()+3;
+        String testName = getTestName() + 3;
         String siteName = getSiteName(testName).toLowerCase();
         String edit2 = "New text2";
         String edit3 = "New text3";
@@ -1183,20 +1201,16 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document is saved. No errors occur in UI and in the log. No tmp
         // files are left.
 
-        int noOfFilesBeforeSave = getNumberOfFilesFromPath(fullPath);
         l1 = excel.openFileFromCMD(localPath, fileName_6294 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
-
+        excel.getAbstractUtil().waitForWindow(fileName_6294);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6294);
         excel.navigateToSaveAsSharePointBrowse(l1);
         excel.operateOnSaveAsWithFullPath(l1, fullPath, fileName_6294, testUser, DEFAULT_PASSWORD);
         excel.getAbstractUtil().waitForWindow(fileName_6294);
-        sleep();
+
         excel.exitOfficeApplication(l1);
 
-        int noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        noOfFilesBeforeSave = noOfFilesBeforeSave + 1;
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave
-                + 1);
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
 
         // --- Step 2 ---
         // --- Step action ---
@@ -1244,6 +1258,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // --- Expected results --
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6294 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().waitForWindow(fileName_6294);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6294);
         String actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6294), "Microsoft Excel - " + fileName_6294 + " window is active.");
@@ -1266,9 +1281,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(5);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 7 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1299,6 +1312,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // --- Expected results --
         // The document is opened in write mode.
         l1 = excel.openFileFromCMD(fullPath, fileName_6294 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        excel.getAbstractUtil().waitForWindow(fileName_6294);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6294);
         actualName = l1.getWindowName();
         Assert.assertTrue(actualName.contains(fileName_6294), "Microsoft Excel - " + fileName_6294 + " window is active.");
@@ -1322,9 +1336,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1.waitTime(2);
         excel.exitOfficeApplication(l1);
         l1.waitTime(3);
-        noOfFilesAfterSave = getNumberOfFilesFromPath(fullPath);
-        Assert.assertEquals(noOfFilesAfterSave, noOfFilesBeforeSave, "Number of file after save: " + noOfFilesAfterSave + ". Expected: " + noOfFilesBeforeSave);
-
+        Assert.assertTrue(checkTemporaryFileDoesntExists(fullPath, xlsxFileType, 6));
         // --- Step 12 ---
         // --- Step action ---
         // Verify the document's metadata and version history in the Share.
@@ -1350,15 +1362,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         Assert.assertTrue(body3.contains(edit3));
     }
 
-    private int getNumberOfFilesFromPath(String path)
-    {
-        int noOfFiles = 0;
-        File folder = new File(path);
-        noOfFiles = folder.listFiles().length;
-
-        return noOfFiles;
-    }
-
     private void uploadImageInOffice(String image) throws AWTException
     {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -1373,15 +1376,102 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         r.keyRelease(KeyEvent.VK_V);
     }
 
-    private static void sleep()
+    private Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
     {
-        try
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
         {
-            Thread.sleep(5000);
+            File test = new File(path);
+            if (test.exists())
+            {
+                existence = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+            }
         }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
+        return existence;
     }
+
+    private Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
+    {
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(pollingTimeMILISECONDS);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + pollingTimeMILISECONDS;
+
+            }
+            else
+            {
+                existence = true;
+                break;
+            }
+        }
+        return existence;
+    }
+
+    private Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
+    {
+        long counter = 0;
+        boolean check = false;
+        boolean existence = true;
+        while (counter < TimeUnit.SECONDS.toMillis(timeout))
+        {
+            File test = new File(path);
+            for (File element : test.listFiles())
+            {
+                if (element.isHidden() && element.getName().contains(extension))
+                {
+                    existence = false;
+                    break;
+                }
+            }
+            if (existence)
+            {
+                check = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                counter = counter + 200;
+                existence = true;
+            }
+        }
+        return check;
+    }
+
 }
