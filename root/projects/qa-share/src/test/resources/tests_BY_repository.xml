@@ -27,10 +27,9 @@
                     <include name="AONE_6446"/>
                     <include name="AONE_6447"/>
                     <include name="AONE_6452"/>
-                    <include name="AONE_6449"/>
                     <include name="AONE_6448"/>
-                    <exclude name=".*"/>
-                </methods>
+                    <include name="AONE_6449"/>
+              </methods>
             </class>
         </classes>
     </test>

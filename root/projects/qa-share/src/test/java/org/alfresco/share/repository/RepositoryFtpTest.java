@@ -65,7 +65,7 @@ public class RepositoryFtpTest extends AbstractUtils
         logger.info("Starting Tests: " + testName);
         testName = this.getClass().getSimpleName();
 
-        FtpUtil.configFtpPort();
+        FtpUtil.setCustomFtpPort(drone, ftpPort);
 
     }
 
@@ -1051,7 +1051,8 @@ public class RepositoryFtpTest extends AbstractUtils
 
         try
         {
-            File file = File.createTempFile("ftp", ".tmp");
+            File tmpDir = new File (DATA_FOLDER);
+            File file = File.createTempFile("ftp", ".tmp", tmpDir );
             file.deleteOnExit();
             Writer writer = new FileWriter(file);
             if (System.getProperty("os.name").contains("Windows"))
@@ -1067,7 +1068,7 @@ public class RepositoryFtpTest extends AbstractUtils
             else
             {
                 writer.write(
-                    "verbose\n" + "open " + host + " " + ftpPort + "\n" + "user " + ADMIN_USERNAME + ADMIN_PASSWORD + arguments[0] + "\n" + arguments[1] + "\n"
+                    "open " + host + " " + ftpPort + "\n" + "user " + ADMIN_USERNAME + ADMIN_PASSWORD + arguments[0] + "\n" + arguments[1] + "\n"
                         + arguments[2] + "\n" + arguments[3] + "\n" + arguments[4] + "\n" + arguments[5] + "\n" + arguments[6] + "\n" + arguments[7] + "\n"
                         + "\nquit"
                 );
