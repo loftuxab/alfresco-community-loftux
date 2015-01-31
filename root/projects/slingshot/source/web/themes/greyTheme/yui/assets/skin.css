@@ -1161,6 +1161,7 @@ padding: 0;
 border: none;
 border-right: 1px solid #CBCBCB;
 text-align: left;
+cursor: default;
 }
 .yui-skin-greyTheme .yui-dt-list td {
 border-right: none;
