@@ -36,6 +36,7 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
     private static final By CONFIGURE_SEARCH = By.cssSelector("div[id=FCTSRCH_CONFIG_PAGE_LINK]");    
     private static final Log logger = LogFactory.getLog(FacetedSearchPage.class);
     private static final String goToAdvancedSearch = "span#HEADER_ADVANCED_SEARCH_text";
+    private static final By SEARCH_RESULTS_LIST = By.cssSelector("div[id='FCTSRCH_SEARCH_RESULTS_LIST']");
 
     /**
      * Instantiates a new faceted search page.
@@ -90,7 +91,7 @@ public class FacetedSearchPage extends SharePage implements SearchResultPage
             try
             {
                 
-                if (drone.find(SEARCH_MENU_BAR).isDisplayed())
+                if (drone.find(SEARCH_MENU_BAR).isDisplayed() && drone.find(SEARCH_RESULTS_LIST).isDisplayed())
                 {
                     break;
                 }
