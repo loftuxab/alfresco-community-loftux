@@ -76,7 +76,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     private static final String ENTERPRISE_REMOVE_TAG = "img[src$='delete-tag-off.png']";
     private static final String SELECT_CHECKBOX = "input[id^='checkbox-yui']";
     private static final By SYNC_INFO_PAGE = By
-            .cssSelector("a[data-action='onCloudSyncIndicatorAction']>img[alt='cloud-synced'], img[alt='cloud-indirect-sync']");
+            .cssSelector("a[data-action='onCloudSyncIndicatorAction']>img[alt='cloud-synced'], img[alt='cloud-indirect-sync'], img[alt='cloud-sync-failed']");
     private static final By INFO_BANNER = By.cssSelector("div.info-banner");
     private static final By LOCK_ICON = By.cssSelector("img[alt='lock-owner']");
     private static final By SYNC_FAILED_ICON = By.cssSelector("img[alt='cloud-sync-failed']");
@@ -118,6 +118,8 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
 
     protected By DETAIL_WINDOW = By.xpath("//div[@class='alf-detail-thumbnail']/../../..");
     protected String DOCUMENT_WEB_ASSET = "div.document-preview-webasset>a";
+    protected static final String INDIRECTLY_SYNCED_ICON = "a[data-action='onCloudIndirectSyncIndicatorAction']";
+    protected static final String FAILED_SYNC_ICON = "a[data-action='onCloudSyncFailedIndicatorAction']";
 
     public FileDirectoryInfoImpl(String nodeRef, WebElement webElement, WebDrone drone)
     {
@@ -1153,6 +1155,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
             {
                 syncToCloud.click();
                 drone.waitUntilElementDisappears(CLOUD_SYNC_LINK, 1);
+                drone.waitUntilElementPresent(By.cssSelector("div.hd, .dijitDialogTitleBar"), TimeUnit.MILLISECONDS.toSeconds(defaultWaitTime));
                 if (isSignUpDialogVisible())
                 {
                     return new CloudSignInPage(getDrone());
@@ -1350,7 +1353,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         try
         {
             findAndWait(SYNC_INFO_PAGE).click();
-            return new SyncInfoPage(getDrone());
+            return new SyncInfoPage(getDrone()).render();
         }
         catch (TimeoutException e)
         {
@@ -3020,4 +3023,11 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         WebElement menuOption = findElement(By.cssSelector(DOCUMENT_WEB_ASSET));
         menuOption.click();
     }
+
+    public boolean isIndirectlySyncedIconPresent()
+    {
+        WebElement indirSyncedIcon = findElement(By.cssSelector(INDIRECTLY_SYNCED_ICON));
+        return indirSyncedIcon.isDisplayed();
+    }
+
 }

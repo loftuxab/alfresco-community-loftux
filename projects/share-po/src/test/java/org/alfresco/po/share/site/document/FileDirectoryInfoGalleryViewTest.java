@@ -29,6 +29,7 @@ import org.alfresco.po.share.site.UpdateFilePage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
 import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
+import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.user.CloudSyncPage;
 import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.po.share.util.FailedTestListener;
@@ -69,6 +70,7 @@ public class FileDirectoryInfoGalleryViewTest extends AbstractDocumentTest
     private File tempFile;
     private File tempFileForProfile;
     private File file2;
+    private String network;
 
     /**
      * Pre test setup of a dummy file to upload.
@@ -86,6 +88,7 @@ public class FileDirectoryInfoGalleryViewTest extends AbstractDocumentTest
         if(isHybridEnabled())
         {
             signInToCloud(drone, cloudUserName, cloudUserPassword);
+            network = "cloud.test";
         }
         SiteUtil.createSite(drone, siteName, "description", "Public");
         file = SiteUtil.prepareFile("alfresco123");
@@ -585,7 +588,7 @@ public class FileDirectoryInfoGalleryViewTest extends AbstractDocumentTest
         documentLibPage = uploadForm.uploadFile(testSyncFailedFile.getCanonicalPath()).render();
         
         DestinationAndAssigneePage destinationAndAssigneePage = documentLibPage.getFileDirectoryInfo(testSyncFailedFile.getName()).selectSyncToCloud().render();
-        destinationAndAssigneePage.selectNetwork("premiernet.test");
+        destinationAndAssigneePage.selectNetwork(network);
         destinationAndAssigneePage.render();
         documentLibPage = (DocumentLibraryPage)destinationAndAssigneePage.selectSubmitButtonToSync();
         documentLibPage.render();
@@ -609,6 +612,26 @@ public class FileDirectoryInfoGalleryViewTest extends AbstractDocumentTest
         documentLibPage = documentLibPage.getFileDirectoryInfo(testSyncFailedFile.getName()).selectRequestSync().render();
         // Verify the Sync Failed icon is displayed
         Assert.assertNotNull(documentLibPage);
+    }
+
+    @Test(dependsOnMethods = "isSyncFailedIconPresent", groups = {"Hybrid"})
+    public void isIndirectlySyncedIconPresent()
+    {
+        String fileName = testName + System.currentTimeMillis();
+        ContentDetails contentDetails = new ContentDetails(fileName);
+        CloudSignInPage cloudSignInPage = documentLibPage.getFileDirectoryInfo(folderName).selectSyncToCloud().render();
+        DestinationAndAssigneePage destinationAndAssigneePage = cloudSignInPage.loginAs(cloudUserName, cloudUserPassword).render();
+        destinationAndAssigneePage.selectNetwork(network);
+        destinationAndAssigneePage.render();
+        documentLibPage = (DocumentLibraryPage)destinationAndAssigneePage.selectSubmitButtonToSync();
+        documentLibPage.render();
+        assertTrue(documentLibPage.getFileDirectoryInfo(folderName).isCloudSynced(), folderName + " wasn't synced");
+        documentLibPage.getFileDirectoryInfo(folderName).clickOnTitle().render();
+        CreatePlainTextContentPage contentPage = documentLibPage.getNavigation().selectCreateContent(ContentType.PLAINTEXT).render();
+        DocumentDetailsPage detailsPage = (DocumentDetailsPage)contentPage.createWithValidation(contentDetails);
+        documentLibPage = detailsPage.getSiteNav().selectSiteDocumentLibrary().getFileDirectoryInfo(folderName).clickOnTitle().render();
+        boolean isIconPresent = documentLibPage.getFileDirectoryInfo(fileName).isIndirectlySyncedIconPresent();
+        assertTrue(isIconPresent, "Indirectly synced icon isn't present");
     }
     
     @Test(groups="Enterprise4.2", priority=39)

@@ -577,6 +577,19 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
 
     /*
      * (non-Javadoc)
+     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#isIndirectlySyncedIconPresent()
+     */
+    @Override
+    public boolean isIndirectlySyncedIconPresent()
+    {
+        clickInfoIcon(false);
+        boolean syncFail = super.isIndirectlySyncedIconPresent();
+        focusOnDocLibFooter();
+        return syncFail;
+    }
+
+    /*
+     * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#selectRequestSync()
      */
     @Override

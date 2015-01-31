@@ -50,6 +50,7 @@ import org.alfresco.po.share.systemsummary.directorymanagement.DirectoryManageme
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.task.TaskDetailsPage;
 import org.alfresco.po.share.user.*;
+import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
@@ -520,6 +521,10 @@ public class FactorySharePage implements PageFactory
                 else if(dialogueID.contains("Create New Filter"))
                 {
                         sharePage = new CreateNewFilterPopUpPage(drone);
+                }
+                else if(dialogueID.contains("cloud-folder-title"))
+                {
+                    sharePage = new DestinationAndAssigneePage(drone);
                 }
             }
         }
