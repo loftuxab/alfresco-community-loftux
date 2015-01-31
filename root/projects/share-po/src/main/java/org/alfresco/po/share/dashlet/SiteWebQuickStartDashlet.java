@@ -1,5 +1,7 @@
 package org.alfresco.po.share.dashlet;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 import org.alfresco.webdrone.RenderTime;
@@ -28,6 +30,7 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
     private static final By LOAD_DATA_SELECTOR = By.cssSelector("select[id$='load-data-options']");
     private static final By IMPORT_BUTTON = By.cssSelector("button[id$='default-load-data-link']");
     private static final By WQS_HELP_LINK = By.cssSelector("div.detail-list-item.last-item>a");
+    private static final By IMPORT_MESSAGE = By.xpath(".//span[contains(text(),'Website data import successful')]");
 
     /**
      * Constructor.
@@ -134,12 +137,12 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
      * 
      * @return
      */
-    public boolean isImportMessage()
+    public boolean isImportMessageDisplayed()
     {
         try
         {
 
-            drone.waitForElement(By.xpath(".//span[contains(text(),'Website data import successful')]"), 6);
+            drone.waitForElement(By.xpath(".//span[contains(text(),'Website data import successful')]"), SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
             WebElement importMessage = drone.find(By.xpath(".//span[contains(text(),'Website data import successful')]"));
             if (importMessage != null)
                 return true;
@@ -151,5 +154,23 @@ public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
 
         return false;
     }
+    
+    
+    /**
+     * Wait for message to be displayed and then wait to disappeared; wait for the import to be completed successfully
+     * 
+     * @return
+     * @throws InterruptedException 
+     */
+    public void waitForImportMessage()
+    {
+
+        drone.waitForElement(IMPORT_MESSAGE, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+        drone.waitUntilElementDisappears(IMPORT_MESSAGE, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+    }
+    
+    
+
+    
 
 }
