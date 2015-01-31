@@ -444,7 +444,7 @@ public class EditingItemsTests extends AbstractUtils
                 wcmqsHomePage.render();
                 WcmqsNewsPage newsPage = wcmqsHomePage.openNewsPageFolder("global").render();
 
-                newsPage.clickNewsByTitle(newsName);
+                newsPage.clickLinkByTitle(newsName);
 
                 // Login
                 WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
@@ -549,7 +549,7 @@ public class EditingItemsTests extends AbstractUtils
                 wcmqsHomePage.render();
                 WcmqsNewsPage newsPage = wcmqsHomePage.openNewsPageFolder("global").render();
 
-                newsPage.clickNewsByTitle(newsName);
+                newsPage.clickLinkByTitle(newsName);
 
                 // Login
                 WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
@@ -645,7 +645,7 @@ public class EditingItemsTests extends AbstractUtils
                 wcmqsHomePage.render();
                 WcmqsNewsPage newsPage = wcmqsHomePage.openNewsPageFolder("companies").render();
 
-                newsPage.clickNewsByTitle(newsName);
+                newsPage.clickLinkByTitle(newsName);
 
                 // Login
                 WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
@@ -741,7 +741,7 @@ public class EditingItemsTests extends AbstractUtils
                 wcmqsHomePage.render();
                 WcmqsNewsPage newsPage = wcmqsHomePage.openNewsPageFolder("companies").render();
 
-                newsPage.clickNewsByTitle(newsName);
+                newsPage.clickLinkByTitle(newsName);
 
                 // Login
                 WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
@@ -837,7 +837,7 @@ public class EditingItemsTests extends AbstractUtils
                 wcmqsHomePage.render();
                 WcmqsNewsPage newsPage = wcmqsHomePage.openNewsPageFolder("markets").render();
 
-                newsPage.clickNewsByTitle(newsName);
+                newsPage.clickLinkByTitle(newsName);
 
                 // Login
                 WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
@@ -933,7 +933,7 @@ public class EditingItemsTests extends AbstractUtils
                 wcmqsHomePage.render();
                 WcmqsNewsPage newsPage = wcmqsHomePage.openNewsPageFolder("markets").render();
 
-                newsPage.clickNewsByTitle(newsName);
+                newsPage.clickLinkByTitle(newsName);
 
                 // Login
                 WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);

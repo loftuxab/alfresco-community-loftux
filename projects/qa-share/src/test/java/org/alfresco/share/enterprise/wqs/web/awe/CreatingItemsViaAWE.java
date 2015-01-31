@@ -325,7 +325,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
 
                 WcmqsHomePage homePage = new WcmqsHomePage(drone).render();
                 WcmqsNewsPage newsPage = homePage.openNewsPageFolder(newsCategory);
-                newsPage.clickNewsByTitle(newsTitle);
+                newsPage.clickLinkByTitle(newsTitle);
 
                 WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone).render();
                 wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
@@ -368,7 +368,7 @@ public class CreatingItemsViaAWE extends AbstractUtils
                 {
                         try
                         {
-                                newsPage.clickNewsByTitle(newsArticleTitle);
+                                newsPage.clickLinkByTitle(newsArticleTitle);
                                 newsArticleFound = true;
                         }
                         catch (Exception e)
