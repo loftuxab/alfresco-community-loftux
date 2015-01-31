@@ -1,12 +1,12 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="API Tests for Sprint BY" thread-count="1">
+<suite name="API Tests for Sprint BY" parallel="tests" thread-count="3">
 
     <groups>
         <run>
             <exclude name="DataPrep.*"/>
             <exclude name="Download"/>
             <exclude name="NonGrid"/>
-            <exclude name="CloudOnly" />
+            <exclude name="CloudOnly"/>
             <exclude name=".*Bug.*"/>
         </run>
     </groups>
@@ -15,55 +15,72 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-  <!--  <test name="Favourite API tests">
+    <test name="Sites API test">
         <classes>
-            <class name="org.alfresco.share.api.FavouriteAPITests"/>
+            <class name="org.alfresco.share.api.SitesAPITests">
+                <methods>
+                    <include name="AONE_14265"/>
+                    <include name="AONE_14267"/>
+                    <include name="AONE_14281"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
         </classes>
     </test>
 
-    <test name="Site Membership API tests">
+    <test name="Comments API Tests">
         <classes>
-            <class name="org.alfresco.share.api.SiteMembershipAPITests"/>
+            <class name="org.alfresco.share.api.CommentsAPITests">
+                <methods>
+                    <include name="AONE_14235"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
         </classes>
     </test>
 
-    <test name="Site Membership API with External Domain test">
+    <test name="CmisBrowserTests">
         <classes>
-            <class name="org.alfresco.share.api.SiteMembershipExternalDomainAPITest"/>
+            <class name="org.alfresco.share.api.cmis.CmisBrowserTests"/>
         </classes>
-    </test>-->
-
-    <test name="Public API test">
-    <classes>
-
-    <class name="org.alfresco.share.api.SitesAPITests">
-        <methods>
-            <include name="AONE_14259"/>
-            <exclude name=".*"/>
-        </methods>
-    </class>
-
-    <class name="org.alfresco.share.api.ProcessesAPITests">
-        <methods>
-            <include name="AONE_14394"/>
-            <exclude name=".*"/>
-    </methods>
-    </class>
-
-    <class name="org.alfresco.share.api.CommentsAPITests">
-            <methods>
-                <include name="AONE_14233"/>
-                <include name="AONE_14222"/>
-                <exclude name=".*"/>
-            </methods>
-    </class>
-    </classes>
     </test>
 
-    <test name="CommentsAPITests2">
+    <test name="NodesAPITests">
         <classes>
-            <class name="org.alfresco.share.api.CommentsAPITests2"/>
+            <class name="org.alfresco.share.api.NodesAPITests">
+                <methods>
+                    <include name="AONE_14244"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
         </classes>
-    </test>-->
+    </test>
 
+    <test name="Favourite API tests">
+        <classes>
+            <class name="org.alfresco.share.api.FavouriteAPITests">
+                <methods>
+                    <include name="AONE_14251"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <test name="UserTrashcan API tests">
+        <classes>
+            <class name="org.alfresco.share.api.UserTrashcanApiTests"/>
+        </classes>
+    </test>
+
+    <test name="People API tests">
+        <classes>
+            <class name="org.alfresco.share.api.PeopleAPITests">
+                <methods>
+                    <include name="AONE_14223"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>

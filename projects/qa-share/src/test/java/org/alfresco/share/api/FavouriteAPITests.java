@@ -47,7 +47,7 @@ import static org.testng.Assert.*;
 /**
  * Class to include: Tests for favourite rest apis implemented in
  * alfresco-remote-api.
- * 
+ *
  * @author Abhijeet Bharade
  */
 @Listeners(FailedTestListener.class)
@@ -92,6 +92,8 @@ public class FavouriteAPITests extends FavouritesAPI
     private String testUserDomain2;
     private static String domain1 = RandomUtil.getRandomString(4) + ".test";
     private static String domain2 = RandomUtil.getRandomString(4) + ".test";
+    String MAX_ITEMS = "maxItems";
+    String SKIP_COUNT = "skipCount";
 
     private static Log logger = LogFactory.getLog(FavouriteAPITests.class);
 
@@ -127,9 +129,7 @@ public class FavouriteAPITests extends FavouritesAPI
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserA);
 
         ShareUser.login(drone, testUser);
-
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC, true);
-
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser, testUser2, siteName, UserRole.COLLABORATOR);
 
         ShareUser.openSiteDashboard(drone, siteName);
@@ -364,7 +364,7 @@ public class FavouriteAPITests extends FavouritesAPI
         favs = getFavouritesList(testUser2, testUser2, DOMAIN, param);
         assertNotNull(favs);
         assertTrue(fileFavCount < favs.getPaging().getCount(), "Initial count - " + fileFavCount + " should be lesser than later count - "
-                + favs.getPaging().getCount());
+            + favs.getPaging().getCount());
 
         // Step - 3
         response = createFavourite(testUser2, testUser2, DOMAIN, folderGuid, FavType.FOLDER);
@@ -376,7 +376,7 @@ public class FavouriteAPITests extends FavouritesAPI
         favs = getFavouritesList(testUser2, testUser2, DOMAIN, param);
         assertNotNull(favs);
         assertTrue(fileFavCount < favs.getPaging().getCount(), "Initial count - " + folderFavCount + " should be lesser than later count - "
-                + favs.getPaging().getCount());
+            + favs.getPaging().getCount());
 
         // Step - 5
         response = createFavourite(testUser2, testUser2, DOMAIN, siteName, FavType.SITE);
@@ -388,13 +388,12 @@ public class FavouriteAPITests extends FavouritesAPI
         favs = getFavouritesList(testUser2, testUser2, DOMAIN, param);
         assertNotNull(favs);
         assertTrue(fileFavCount < favs.getPaging().getCount(), "Initial count - " + siteFavCount + " should be lesser than later count - "
-                + favs.getPaging().getCount());
+            + favs.getPaging().getCount());
     }
 
     @Test
     public void AONE_14300() throws Exception
     {
-
         try
         {
             JSONAble wikiJSON = new JSONAble()
@@ -1100,6 +1099,56 @@ public class FavouriteAPITests extends FavouritesAPI
         Assert.assertTrue(favourites.getPaging().getSkipCount().equals(0), "skipCount isn't '0'");
         Assert.assertTrue(favourites.getPaging().getMaxItems().equals(100), "maxItems isn't '100'");
         Assert.assertEquals(favourites.getList().size(), 0, "List isn't '0'");
+    }
+
+    @Test
+    public void AONE_14251() throws Exception
+    {
+        String someSite1 = "site" + System.currentTimeMillis();
+        String someSite2 = someSite1 + "2";
+
+        //The user has 4 favourite sites, skipCount as a value > 0 (e.g. 2), maxItems is specified as a max value of integer
+        publicApiClient.setRequestContext(new RequestContext(DOMAIN, getAuthDetails(testUser)[0], getAuthDetails(testUser)[1]));
+        Site site = sitesProxy.getSite(siteName);
+        makeSiteFavourite(site);
+        site = sitesProxy.getSite(siteNameA);
+        makeSiteFavourite(site);
+        site = sitesProxy.getSite(siteNameB);
+        makeSiteFavourite(site);
+        site = sitesProxy.getSite(siteNameC);
+        makeSiteFavourite(site);
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put(MAX_ITEMS, "2147483647");
+        params.put(SKIP_COUNT, "2");
+        ListResponse<FavouriteSite> response = sitesProxy.getFavouriteSites(testUser, params);
+        assertEquals(response.getPaging().getSkipCount(), new Integer(2));
+        assertEquals(response.getPaging().getMaxItems(), new Integer(2147483647));
+        assertEquals((int)response.getPaging().getTotalItems(), 4);
+        assertEquals((int)response.getPaging().getCount(), 2);
+        assertFalse(response.getPaging().getHasMoreItems());
+
+        //The user has 6 favourite sites
+        ShareUser.login(drone, testUser);
+        ShareUser.createSite(drone, someSite1, SITE_VISIBILITY_PUBLIC ).render();
+        ShareUser.createSite(drone, someSite2, SITE_VISIBILITY_PUBLIC).render();
+        site = sitesProxy.getSite(siteNameB);
+        makeSiteFavourite(site);
+        site = sitesProxy.getSite(siteNameC);
+        makeSiteFavourite(site);
+        site = sitesProxy.getSite(someSite1);
+        makeSiteFavourite(site);
+        site = sitesProxy.getSite(someSite2);
+        makeSiteFavourite(site);
+        params.clear();
+        params.put(MAX_ITEMS, "5");
+        params.put(SKIP_COUNT, "0");
+        publicApiClient.setRequestContext(new RequestContext(DOMAIN, getAuthDetails(testUser)[0], getAuthDetails(testUser)[1]));
+        response = sitesProxy.getFavouriteSites(testUser, params);
+        assertEquals(response.getPaging().getSkipCount(), new Integer(0));
+        assertEquals(response.getPaging().getMaxItems(), new Integer(5));
+        assertEquals((int)response.getPaging().getTotalItems(), 6);
+        assertEquals((int)response.getPaging().getCount(), 5);
+        assertTrue(response.getPaging().getHasMoreItems());
     }
 
     /**
