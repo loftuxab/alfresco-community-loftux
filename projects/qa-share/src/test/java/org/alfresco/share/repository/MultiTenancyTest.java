@@ -21,6 +21,12 @@ package org.alfresco.share.repository;
 
 import org.alfresco.po.alfresco.*;
 import org.alfresco.po.share.*;
+import org.alfresco.po.share.admin.AdminConsolePage;
+import org.alfresco.po.share.admin.ManageSitesPage;
+import org.alfresco.po.share.admin.ManagedSiteRow;
+import org.alfresco.po.share.adminconsole.CategoryManagerPage;
+import org.alfresco.po.share.adminconsole.NodeBrowserPage;
+import org.alfresco.po.share.adminconsole.TagManagerPage;
 import org.alfresco.po.share.dashlet.MyTasksDashlet;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.InviteMembersPage;
@@ -31,10 +37,7 @@ import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractIfSelector;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.ActionSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.WhenSelectorImpl;
-import org.alfresco.po.share.site.document.DocumentAction;
-import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
-import org.alfresco.po.share.site.document.FolderDetailsPage;
-import org.alfresco.po.share.site.document.ManagePermissionsPage;
+import org.alfresco.po.share.site.document.*;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.ModelAndMessagesConsole;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
@@ -58,6 +61,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.joda.time.DateTime;
 import org.openqa.selenium.By;
+import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -74,6 +78,7 @@ import java.util.List;
 
 import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
 import static org.alfresco.po.share.enums.UserRole.CONTRIBUTOR;
+import static org.alfresco.po.share.site.document.Categories.CATEGORY_ROOT;
 import static org.testng.Assert.*;
 
 /**
@@ -182,9 +187,9 @@ public class MultiTenancyTest extends AbstractUtils
             // Create two tenants
             tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD + " " + downloadDirectory);
             tenantConsole.render();
+            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
             tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
             tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
             assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
 
             //Show a list of all tenants
@@ -1653,6 +1658,136 @@ public class MultiTenancyTest extends AbstractUtils
 
         // Check possible deleting any folder by tenant user using WebDav;
         assertTrue(WebDavUtil.deleteItem(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, folderName, path));
+
+    }
+
+    /**
+     * Test: AONE-6592:Delegated Administration
+     */
+
+    @Test public void AONE_6592() throws Exception
+    {
+        String testName = getTestName();
+        String group = getGroupName(testName);
+        String siteName = getSiteName(testName);
+        String testUserSite = siteName + System.currentTimeMillis();
+        String fileName = getFileName(testName);
+        File file = newFile(fileName, fileName);
+        String tagName = getTagName(testName);
+        String folderName = getFolderName(testName);
+        String subCategory = getRandomString(4);
+        String BECOME_SITE_MANAGER_BUTTON = "Become Site Manager";
+
+        if (alfrescoVersion.getVersion() >= 5.0)
+        {
+            // Open Tenant Administration Console
+            SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+
+            // Create any tenant
+            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsole.render();
+            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+        }
+        else
+        {
+            // Creating new tenant.
+            tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
+            AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertEquals(tenantConsolePage.findText().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+        }
+
+        adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
+        userTenantDomain1 = getUserNameForDomain("", tenantDomain1);
+
+        // Login to Share as Admin tenant.
+        resultPage = ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
+        assertTrue(resultPage.isLoggedIn());
+
+        // Create site
+        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC).render();
+        ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+
+        // create folder
+        DocumentLibraryPage documentLibraryPage = ShareUserSitePage.createFolder(drone, folderName, folderName);
+
+        // add tag to the created folder
+        FileDirectoryInfo fileInfo = documentLibraryPage.getFileDirectoryInfo(folderName);
+        fileInfo.addTag(tagName);
+
+        //Upload file
+        ShareUserSitePage.uploadFile(drone, file);
+        String nodeRef = ShareUserSitePage.getFileDirectoryInfo(drone, fileName).getContentNodeRef();
+        nodeRef = nodeRef.substring(nodeRef.indexOf("workspace"));
+        nodeRef = nodeRef.replaceFirst("/", "://");
+
+        // add tag to the uploaded file
+        fileInfo = documentLibraryPage.getFileDirectoryInfo(fileName);
+        fileInfo.addTag(tagName);
+
+        // Create a group
+        page = resultPage.getNav().getGroupsPage().render();
+        page.clickBrowse().render();
+        newGroupPage = page.navigateToNewGroupPage().render();
+        page = newGroupPage.createGroup(group, group, NewGroupPage.ActionButton.CREATE_GROUP).render();
+        assertTrue(page.getGroupList().contains(group), String.format("Group: %s can not be found", group));
+
+        // Create new user
+        userSearchPage = resultPage.getNav().getUsersPage().render();
+        newUserPage = userSearchPage.selectNewUser().render();
+        newUserPage.createEnterpriseUserWithGroup(userTenantDomain1, userTenantDomain1, userTenantDomain1, userTenantDomain1, DEFAULT_PASSWORD, group);
+        userSearchPage.searchFor(userTenantDomain1).render();
+        assertTrue(userSearchPage.hasResults());
+
+
+        // Tag Management
+        ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
+        TagManagerPage tagManagerPage = resultPage.getNav().getTagManagerPage().render();
+        TagManagerPageUtil.findTag(drone, tagName).render();
+        assertTrue(tagManagerPage.isInResults(tagName));
+        ShareUser.logout(drone);
+
+        // Sites Manager
+        ShareUser.login(drone, userTenantDomain1, DEFAULT_PASSWORD).render();
+        ShareUser.createSite(drone, testUserSite, AbstractUtils.SITE_VISIBILITY_PUBLIC).render();
+        ShareUser.logout(drone);
+        ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
+        ManageSitesPage manageSitesPage = ShareUserAdmin.navigateToManageSites(drone);
+        ManagedSiteRow row = manageSitesPage.findManagedSiteRowByNameFromPaginatedResults(testUserSite);
+        assertTrue(row.getActions().hasActionByName(BECOME_SITE_MANAGER_BUTTON));
+        // Click the become manager button
+        row.getActions().clickActionByName(BECOME_SITE_MANAGER_BUTTON);
+        // Reload page elements
+        manageSitesPage.loadElements();
+        // Re-find site and make sure it no longer has a 'become manager' button
+        row = manageSitesPage.findManagedSiteRowByNameFromPaginatedResults(testUserSite);
+        Assert.assertFalse(row.getActions().hasActionByName(BECOME_SITE_MANAGER_BUTTON));
+
+        // Node Browser
+        NodeBrowserPage nodeBrowserPage = resultPage.getNav().getNodeBrowserPage().render();
+        NodeBrowserPageUtil.executeQuery(drone,
+            "/app:company_home/st:sites/cm:" + siteName.toLowerCase() + "/cm:documentLibrary/cm:" + fileName, NodeBrowserPage.QueryType.XPATH).render();
+        getCurrentPage(drone).render(maxWaitTime);
+        assertTrue(nodeBrowserPage.isInResultsByName(fileName) && nodeBrowserPage.isInResultsByNodeRef(nodeRef),
+            "Nothing was found or there was found incorrect file by xpath");
+
+        // Category Manager
+        CategoryManagerPage categoryManagerPage = CategoryManagerPageUtil.openCategoryManagerPage(drone).render();
+        categoryManagerPage.expandCategoryRootTree();
+        assertTrue(categoryManagerPage.isCategoryRootTreeExpanded());
+        categoryManagerPage.addNewCategory(CATEGORY_ROOT.getValue(), subCategory);
+        ShareUser.logout(drone);
+        ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
+        CategoryManagerPageUtil.openCategoryManagerPage(drone).render();
+        getCurrentPage(drone).render();
+        assertTrue(categoryManagerPage.isCategoryPresent(subCategory));
+
+        // Application Page
+        AdminConsolePage adminConsolePage = resultPage.getNav().getAdminConsolePage().render();
+        adminConsolePage.selectTheme(AdminConsolePage.ThemeType.green).render();
+        assertTrue(adminConsolePage.isThemeSelected(AdminConsolePage.ThemeType.green));
 
     }
 
