@@ -35,6 +35,7 @@
 }
 
 .alfresco-share .alf-menu-group .dijitMenuPassive .dijitMenuItemHover,
+.alfresco-share .alf-menu-group .dijitMenuPassive .dijitMenuItemFocused,
 .alfresco-share .alf-menu-group .dijitMenuItemHover 
 .alfresco-share .alf-menu-group .dijitMenuItemSelected {
     background-image: none;
