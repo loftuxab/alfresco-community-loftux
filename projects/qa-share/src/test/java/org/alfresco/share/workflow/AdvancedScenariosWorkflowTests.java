@@ -156,13 +156,11 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Fill the form details and start workflow
         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
-
         ShareUser.logout(drone);
 
         // TODO: Please update last step in test link accordingly to next assertions
         // TODO: verify ALF-20139
-
-        // Cloud user2 login and verifies the task is present or not
+        // TODO: Add step in test link: Cloud user2 login and verifies the task is present or not
         ShareUser.login(hybridDrone, cloudUser2, DEFAULT_PASSWORD);
         ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
@@ -170,7 +168,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite1Name);
         DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(hybridDrone, opFileName);
 
-        // To verify the cloud user is not having the edit options on sync document as he is the consumer on this content.
+        // TODO: Add step: Verify the cloud user is not having the edit options on sync document as he is the consumer on this content.
         Assert.assertFalse(detailsPage.isEditOfflineLinkDisplayed());
         Assert.assertFalse(detailsPage.isUploadNewVersionDisplayed());
 
@@ -279,9 +277,8 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
 
-        // Create User1 (Cloud)
+        // Any Cloud user with cloud partner network is created and activated, e.g. user1@partnernetwork.com
         CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-
         CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, partnerDomain1, "101");
 
         // Login as User1 (Cloud)
@@ -419,7 +416,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     }
 
     /**
-     * AONE-15722:Downgrade Cloud account - Incomplete Workflow
+     * AONE-15722: Downgrade Cloud account - Incomplete Workflow
      */
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15722() throws Exception
@@ -465,7 +462,6 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
                 "Document Title modified by CL User is not present for Cloud.");
 
         // Step 3: Perform any changes against the workflow, e.g. add a comment to the task and save them.s
-
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
         EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(workFlowName, cloudUser1).render();
         editTaskPage.enterComment(comment);
@@ -507,7 +503,6 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         // Step 7: Cloud Verify the created in the pre-condition workflow on Tasks I've Started page.
         // TODO: remove this step from Test Link because option: Tasks I've Started page isn't available for this user
-
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
 
         // Step 8: Verify the task on My Tasks page
@@ -543,7 +538,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         ShareUserWorkFlow.completeTask(hybridDrone, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE).render();
 
         // Workflow cannot be completed or another friendly behavior occurs.
-        // TODO: BUG
+        // TODO: BUG ALF-20442
         Assert.assertTrue(myTasks.isTaskPresent(workFlowName));
     }
 
@@ -1022,7 +1017,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15730() throws Exception
     {
-        String testName = getTestName() + "7";
+        String testName = getTestName() + "11";
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -1058,7 +1053,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15730() throws Exception
     {
-        String testName = getTestName() + "7";
+        String testName = getTestName() + "11";
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -1120,13 +1115,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskOtherLanguage(customDrone, Language.JAPANESE);
         cloudTaskOrReviewPage.selectTask(TaskType.SIMPLE_CLOUD_TASK);
         labels = cloudTaskOrReviewPage.getAllLabels();
-        Assert.assertTrue(labels.contains("メッセージ:"));
-        Assert.assertTrue(labels.contains("期限:"));
-        Assert.assertTrue(labels.contains("優先度:"));
-        Assert.assertTrue(labels.contains("受託者:*"));
-        Assert.assertTrue(labels.contains("完了後:*"));
-        Assert.assertTrue(labels.contains("社内コンテンツをロック"));
-        Assert.assertTrue(labels.contains("アイテム:*"));
+        verifyLabelsFromCloudReviewPage(Language.JAPANESE, labels, TaskType.SIMPLE_CLOUD_TASK);
         customDrone.closeWindow();
 
         // set language in browser to SPANISH
@@ -1269,48 +1258,21 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         details = myTasksPage.getTaskLabels(workFlowName);
         taskLabels = details.getTaskLabels();
-        Assert.assertTrue(taskLabels.contains("期限:"));
-        Assert.assertTrue(taskLabels.contains("開始日:"));
-        Assert.assertTrue(taskLabels.contains("ステータス:"));
-        Assert.assertTrue(taskLabels.contains("タイプ:"));
-        Assert.assertTrue(taskLabels.contains("説明:"));
-        Assert.assertTrue(taskLabels.contains("開始者:"));
+        verifyLabelsMyTaskPage(Language.JAPANESE, taskLabels);
 
         detailsPage = myTasksPage.selectViewTasks(workFlowName).render();
         viewLabels = detailsPage.getAllLabels();
-        Assert.assertTrue(viewLabels.contains("メッセージ:"));
-        Assert.assertTrue(viewLabels.contains("所有者:"));
-        Assert.assertTrue(viewLabels.contains("優先:"));
-        Assert.assertTrue(viewLabels.contains("期限:"));
-        Assert.assertTrue(viewLabels.contains("ステータス:"));
-        Assert.assertTrue(viewLabels.contains("アイテム:"));
-        Assert.assertTrue(viewLabels.contains("コメント:"));
+        verifyLabelsViewTaskPage(Language.JAPANESE, viewLabels);
 
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
         editPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
         editLabels = editPage.getAllLabels();
-        Assert.assertTrue(editLabels.contains("メッセージ:"));
-        Assert.assertTrue(editLabels.contains("所有者:"));
-        Assert.assertTrue(editLabels.contains("優先:"));
-        Assert.assertTrue(editLabels.contains("期限:"));
+        verifyLabelsEditTaskPage(Language.JAPANESE, editLabels);
 
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
         historyPage = myTasksPage.selectTaskHistory(workFlowName).render();
         historyLabels = historyPage.getAllLabels();
-        Assert.assertTrue(historyLabels.contains("完了日:"));
-        Assert.assertTrue(historyLabels.contains("完了者:"));
-        Assert.assertTrue(historyLabels.contains("結果:"));
-        Assert.assertTrue(historyLabels.contains("タイトル:"));
-        Assert.assertTrue(historyLabels.contains("説明:"));
-        Assert.assertTrue(historyLabels.contains("開始者:"));
-        Assert.assertTrue(historyLabels.contains("期限:"));
-        Assert.assertTrue(historyLabels.contains("完了済み:"));
-        Assert.assertTrue(historyLabels.contains("開始済み:"));
-        Assert.assertTrue(historyLabels.contains("優先:"));
-        Assert.assertTrue(historyLabels.contains("ステータス:"));
-        Assert.assertTrue(historyLabels.contains("メッセージ:"));
-        Assert.assertTrue(historyLabels.contains("Eメール通知の送信:"));
-        Assert.assertTrue(historyLabels.contains("アイテム:"));
+        verifyLabelsHistoryTaskPage(Language.JAPANESE, historyLabels);
 
         hybridDrone.closeWindow();
         setupHybridDrone();
@@ -1435,53 +1397,28 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         opDetails = opMyTasksPage.getTaskLabels(workFlowName);
         opTaskLabels = opDetails.getTaskLabels();
-        Assert.assertTrue(opTaskLabels.contains("期限:"));
-        Assert.assertTrue(opTaskLabels.contains("開始日:"));
-        Assert.assertTrue(opTaskLabels.contains("ステータス:"));
-        Assert.assertTrue(opTaskLabels.contains("タイプ:"));
-        Assert.assertTrue(opTaskLabels.contains("説明:"));
-        Assert.assertTrue(opTaskLabels.contains("開始者:"));
+        verifyLabelsMyTaskPage(Language.JAPANESE, opTaskLabels);
 
         opDetailsPage = opMyTasksPage.selectViewTasks(workFlowName).render();
         viewLabelsOP = opDetailsPage.getAllLabels();
-        Assert.assertTrue(viewLabelsOP.contains("メッセージ:"));
-        Assert.assertTrue(viewLabelsOP.contains("所有者:"));
-        Assert.assertTrue(viewLabelsOP.contains("優先:"));
-        Assert.assertTrue(viewLabelsOP.contains("期限:"));
-        Assert.assertTrue(viewLabelsOP.contains("ステータス:"));
-        Assert.assertTrue(viewLabelsOP.contains("アイテム:"));
+        verifyLabelsViewTaskPage(Language.JAPANESE, viewLabelsOP);
 
         opMyTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(customDrone);
         opEditPage = opMyTasksPage.navigateToEditTaskPage(workFlowName).render();
         opEditLabels = opEditPage.getAllLabels();
-        Assert.assertTrue(opEditLabels.contains("メッセージ:"));
-        Assert.assertTrue(opEditLabels.contains("所有者:"));
-        Assert.assertTrue(opEditLabels.contains("優先:"));
-        Assert.assertTrue(opEditLabels.contains("期限:"));
+        verifyLabelsEditTaskPage(Language.JAPANESE, opEditLabels);
 
         opMyTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(customDrone);
         opViewWorkflow = opMyTasksPage.selectViewWorkflow(workFlowName).render();
         opHistoryWorkflowPage = opViewWorkflow.getAllLabels();
-        Assert.assertTrue(opHistoryWorkflowPage.contains("完了日:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("完了者:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("結果:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("タイトル:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("説明:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("開始者:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("期限:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("完了済み:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("開始済み:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("優先:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("ステータス:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("メッセージ:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("アイテム:"));
+        verifyLabelsHistoryTaskPage(Language.JAPANESE, opHistoryWorkflowPage);
         customDrone.closeWindow();
     }
 
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15731() throws Exception
     {
-        String testName = getTestName() + "2";
+        String testName = getTestName() + "4";
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -1517,7 +1454,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
     @Test(groups = "Hybrid")
     public void AONE_15731() throws Exception
     {
-        String testName = getTestName() + "2";
+        String testName = getTestName() + "4";
         String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser1 = getUserNameForDomain("r1" + testName, invitedDomain1);
         String cloudSite1Name = getSiteName(testName + "cl1");
@@ -1581,13 +1518,14 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskOtherLanguage(customDrone, Language.JAPANESE);
         cloudTaskOrReviewPage.selectTask(TaskType.CLOUD_REVIEW_TASK);
         labels = cloudTaskOrReviewPage.getAllLabels();
-        Assert.assertTrue(labels.contains("メッセージ:"));
-        Assert.assertTrue(labels.contains("期限:"));
-        Assert.assertTrue(labels.contains("優先度:"));
-        Assert.assertTrue(labels.contains("レビュア:*"));
-        Assert.assertTrue(labels.contains("完了後:*"));
-        Assert.assertTrue(labels.contains("社内コンテンツをロック"));
-        Assert.assertTrue(labels.contains("アイテム:*"));
+        verifyLabelsFromCloudReviewPage(Language.JAPANESE, labels, TaskType.CLOUD_REVIEW_TASK);
+        // Assert.assertTrue(labels.contains("メッセージ:"));
+        // Assert.assertTrue(labels.contains("期限:"));
+        // Assert.assertTrue(labels.contains("優先度:"));
+        // Assert.assertTrue(labels.contains("レビュア:*"));
+        // Assert.assertTrue(labels.contains("完了後:*"));
+        // Assert.assertTrue(labels.contains("社内コンテンツをロック"));
+        // Assert.assertTrue(labels.contains("アイテム:*"));
         customDrone.closeWindow();
 
         // set language in browser to SPANISH
@@ -1732,48 +1670,53 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         details = myTasksPage.getTaskLabels(workFlowName);
         taskLabels = details.getTaskLabels();
-        Assert.assertTrue(taskLabels.contains("期限:"));
-        Assert.assertTrue(taskLabels.contains("開始日:"));
-        Assert.assertTrue(taskLabels.contains("ステータス:"));
-        Assert.assertTrue(taskLabels.contains("タイプ:"));
-        Assert.assertTrue(taskLabels.contains("説明:"));
-        Assert.assertTrue(taskLabels.contains("開始者:"));
+        verifyLabelsMyTaskPage(Language.JAPANESE, taskLabels);
+        // Assert.assertTrue(taskLabels.contains("期限:"));
+        // Assert.assertTrue(taskLabels.contains("開始日:"));
+        // Assert.assertTrue(taskLabels.contains("ステータス:"));
+        // Assert.assertTrue(taskLabels.contains("タイプ:"));
+        // Assert.assertTrue(taskLabels.contains("説明:"));
+        // Assert.assertTrue(taskLabels.contains("開始者:"));
 
         detailsPage = myTasksPage.selectViewTasks(workFlowName).render();
         viewLabels = detailsPage.getAllLabels();
-        Assert.assertTrue(viewLabels.contains("メッセージ:"));
-        Assert.assertTrue(viewLabels.contains("所有者:"));
-        Assert.assertTrue(viewLabels.contains("優先:"));
-        Assert.assertTrue(viewLabels.contains("期限:"));
-        Assert.assertTrue(viewLabels.contains("ステータス:"));
-        Assert.assertTrue(viewLabels.contains("アイテム:"));
-        Assert.assertTrue(viewLabels.contains("コメント:"));
+        verifyLabelsViewTaskPage(Language.JAPANESE, viewLabels);
+        // Assert.assertTrue(viewLabels.contains("メッセージ:"));
+        // Assert.assertTrue(viewLabels.contains("所有者:"));
+        // Assert.assertTrue(viewLabels.contains("優先:"));
+        // Assert.assertTrue(viewLabels.contains("期限:"));
+        // Assert.assertTrue(viewLabels.contains("ステータス:"));
+        // Assert.assertTrue(viewLabels.contains("アイテム:"));
+        // Assert.assertTrue(viewLabels.contains("コメント:"));
 
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
         editPage = myTasksPage.navigateToEditTaskPage(workFlowName).render();
         editLabels = editPage.getAllLabels();
-        Assert.assertTrue(editLabels.contains("メッセージ:"));
-        Assert.assertTrue(editLabels.contains("所有者:"));
-        Assert.assertTrue(editLabels.contains("優先:"));
-        Assert.assertTrue(editLabels.contains("期限:"));
+        verifyLabelsEditTaskPage(Language.JAPANESE, editLabels);
+        // Assert.assertTrue(editLabels.contains("メッセージ:"));
+        // Assert.assertTrue(editLabels.contains("所有者:"));
+        // Assert.assertTrue(editLabels.contains("優先:"));
+        // Assert.assertTrue(editLabels.contains("期限:"));
 
         myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
         historyPage = myTasksPage.selectTaskHistory(workFlowName).render();
         historyLabels = historyPage.getAllLabels();
-        Assert.assertTrue(historyLabels.contains("完了日:"));
-        Assert.assertTrue(historyLabels.contains("完了者:"));
-        Assert.assertTrue(historyLabels.contains("結果:"));
-        Assert.assertTrue(historyLabels.contains("タイトル:"));
-        Assert.assertTrue(historyLabels.contains("説明:"));
-        Assert.assertTrue(historyLabels.contains("開始者:"));
-        Assert.assertTrue(historyLabels.contains("期限:"));
-        Assert.assertTrue(historyLabels.contains("完了済み:"));
-        Assert.assertTrue(historyLabels.contains("開始済み:"));
-        Assert.assertTrue(historyLabels.contains("優先:"));
-        Assert.assertTrue(historyLabels.contains("ステータス:"));
-        Assert.assertTrue(historyLabels.contains("メッセージ:"));
-        Assert.assertTrue(historyLabels.contains("Eメール通知の送信:"));
-        Assert.assertTrue(historyLabels.contains("アイテム:"));
+        verifyLabelsHistoryTaskPage(Language.JAPANESE, historyLabels);
+
+        // Assert.assertTrue(historyLabels.contains("完了日:"));
+        // Assert.assertTrue(historyLabels.contains("完了者:"));
+        // Assert.assertTrue(historyLabels.contains("結果:"));
+        // Assert.assertTrue(historyLabels.contains("タイトル:"));
+        // Assert.assertTrue(historyLabels.contains("説明:"));
+        // Assert.assertTrue(historyLabels.contains("開始者:"));
+        // Assert.assertTrue(historyLabels.contains("期限:"));
+        // Assert.assertTrue(historyLabels.contains("完了済み:"));
+        // Assert.assertTrue(historyLabels.contains("開始済み:"));
+        // Assert.assertTrue(historyLabels.contains("優先:"));
+        // Assert.assertTrue(historyLabels.contains("ステータス:"));
+        // Assert.assertTrue(historyLabels.contains("メッセージ:"));
+        // Assert.assertTrue(historyLabels.contains("Eメール通知の送信:"));
+        // Assert.assertTrue(historyLabels.contains("アイテム:"));
 
         hybridDrone.closeWindow();
         setupHybridDrone();
@@ -1898,46 +1841,51 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
 
         opDetails = opMyTasksPage.getTaskLabels(workFlowName);
         opTaskLabels = opDetails.getTaskLabels();
-        Assert.assertTrue(opTaskLabels.contains("期限:"));
-        Assert.assertTrue(opTaskLabels.contains("開始日:"));
-        Assert.assertTrue(opTaskLabels.contains("ステータス:"));
-        Assert.assertTrue(opTaskLabels.contains("タイプ:"));
-        Assert.assertTrue(opTaskLabels.contains("説明:"));
-        Assert.assertTrue(opTaskLabels.contains("開始者:"));
+        verifyLabelsMyTaskPage(Language.JAPANESE, opTaskLabels);
+        // Assert.assertTrue(opTaskLabels.contains("期限:"));
+        // Assert.assertTrue(opTaskLabels.contains("開始日:"));
+        // Assert.assertTrue(opTaskLabels.contains("ステータス:"));
+        // Assert.assertTrue(opTaskLabels.contains("タイプ:"));
+        // Assert.assertTrue(opTaskLabels.contains("説明:"));
+        // Assert.assertTrue(opTaskLabels.contains("開始者:"));
 
         opDetailsPage = opMyTasksPage.selectViewTasks(workFlowName).render();
         viewLabelsOP = opDetailsPage.getAllLabels();
-        Assert.assertTrue(viewLabelsOP.contains("メッセージ:"));
-        Assert.assertTrue(viewLabelsOP.contains("所有者:"));
-        Assert.assertTrue(viewLabelsOP.contains("優先:"));
-        Assert.assertTrue(viewLabelsOP.contains("期限:"));
-        Assert.assertTrue(viewLabelsOP.contains("ステータス:"));
-        Assert.assertTrue(viewLabelsOP.contains("アイテム:"));
+        verifyLabelsViewTaskPage(Language.JAPANESE, viewLabelsOP);
+        // Assert.assertTrue(viewLabelsOP.contains("メッセージ:"));
+        // Assert.assertTrue(viewLabelsOP.contains("所有者:"));
+        // Assert.assertTrue(viewLabelsOP.contains("優先:"));
+        // Assert.assertTrue(viewLabelsOP.contains("期限:"));
+        // Assert.assertTrue(viewLabelsOP.contains("ステータス:"));
+        // Assert.assertTrue(viewLabelsOP.contains("アイテム:"));
 
         opMyTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(customDrone);
         opEditPage = opMyTasksPage.navigateToEditTaskPage(workFlowName).render();
         opEditLabels = opEditPage.getAllLabels();
-        Assert.assertTrue(opEditLabels.contains("メッセージ:"));
-        Assert.assertTrue(opEditLabels.contains("所有者:"));
-        Assert.assertTrue(opEditLabels.contains("優先:"));
-        Assert.assertTrue(opEditLabels.contains("期限:"));
+        verifyLabelsEditTaskPage(Language.JAPANESE, opEditLabels);
+        // Assert.assertTrue(opEditLabels.contains("メッセージ:"));
+        // Assert.assertTrue(opEditLabels.contains("所有者:"));
+        // Assert.assertTrue(opEditLabels.contains("優先:"));
+        // Assert.assertTrue(opEditLabels.contains("期限:"));
 
         opMyTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(customDrone);
         opViewWorkflow = opMyTasksPage.selectViewWorkflow(workFlowName).render();
         opHistoryWorkflowPage = opViewWorkflow.getAllLabels();
-        Assert.assertTrue(opHistoryWorkflowPage.contains("完了日:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("完了者:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("結果:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("タイトル:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("説明:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("開始者:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("期限:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("完了済み:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("開始済み:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("優先:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("ステータス:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("メッセージ:"));
-        Assert.assertTrue(opHistoryWorkflowPage.contains("アイテム:"));
+        verifyLabelsHistoryTaskPage(Language.JAPANESE, opHistoryWorkflowPage);
+
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("完了日:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("完了者:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("結果:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("タイトル:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("説明:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("開始者:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("期限:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("完了済み:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("開始済み:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("優先:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("ステータス:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("メッセージ:"));
+        // Assert.assertTrue(opHistoryWorkflowPage.contains("アイテム:"));
         customDrone.closeWindow();
     }
 
