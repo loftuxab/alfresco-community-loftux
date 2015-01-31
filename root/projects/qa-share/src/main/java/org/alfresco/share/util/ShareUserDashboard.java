@@ -658,4 +658,10 @@ public class ShareUserDashboard extends AbstractUtils
         dashBoard = customiseUserDashBoard.removeDashlet(dashlet).render();
         return dashBoard;
     }
+
+    public static AddOnsRssFeedDashlet getAddOnsRssFeedDashlet(WebDrone driver, String name)
+    {
+        return FactoryShareDashlet.getPage(driver, name).render();
+    }
+
 }
