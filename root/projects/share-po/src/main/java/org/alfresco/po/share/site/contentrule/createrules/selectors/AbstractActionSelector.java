@@ -1,6 +1,6 @@
 package org.alfresco.po.share.site.contentrule.createrules.selectors;
 
-import org.alfresco.po.share.site.contentrule.SetPropertyValuePage;
+import org.alfresco.po.share.site.contentrule.createrules.SetPropertyValuePage;
 import org.alfresco.po.share.site.document.CopyOrMoveContentRulesPage;
 import org.alfresco.webdrone.WebDrone;
 import org.openqa.selenium.By;
