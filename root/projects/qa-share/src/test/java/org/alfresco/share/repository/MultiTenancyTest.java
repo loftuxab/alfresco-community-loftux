@@ -179,8 +179,7 @@ public class MultiTenancyTest extends AbstractUtils
 
             //Open Tenant Administration Console
             TenantAdminConsolePage tenantConsolePage = ShareUtil.navigateToTenantAdminConsole(drone, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-//TODO fixme
-            tenantConsolePage.render();
+            Assert.assertNotNull(tenantConsolePage);
         }
     }
 
