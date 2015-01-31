@@ -475,6 +475,8 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         {
             if (debug)
                 logger.debug("Touching the repo to ensure we still have an authenticated session.");
+            // Set the external auth flag so the UI knows we are using SSO etc.
+            session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
             challengeOrPassThrough(chain, req, res, session);
             return;
         }
@@ -737,6 +739,9 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             else if (logger.isDebugEnabled())
                 logger.debug("Validating repository session for  " + userId);
 
+            if(userId != null && !userId.equalsIgnoreCase(req.getRemoteUser())){
+            	session.removeAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH);
+            }
             Connector conn = connectorService.getConnector(this.endpoint, userId, session);
 
             // ALF-10785: We must pass through the language header to set up the session in the correct locale
