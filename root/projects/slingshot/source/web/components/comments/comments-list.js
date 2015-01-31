@@ -312,6 +312,8 @@
                this.widgets.commentForm.hideErrorContainer();
             }
             this.restoreEditForm();
+            //MNT-12784 : IE9/10: Script error when opening any site's page after adding comment from details page
+            editor.getEditor().remove();
          }, this, true);
          cancelButton.set("label", this.msg('button.cancel'));
 
@@ -385,6 +387,9 @@
                editor.save();
                editor.getEditor().undoManager.clear();
                editor.getEditor().nodeChanged();
+ 
+               //MNT-12784 : IE9/10: Script error when opening any site's page after adding comment from details page
+               editor.getEditor().remove();
             },
             scope: this
          };
