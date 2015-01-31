@@ -1267,7 +1267,7 @@ function getTitleBarModel() {
                name: "alfresco/menus/AlfMenuItem",
                config: {
                   id: "HEADER_JOIN_SITE",
-                  label: "join_site.label",
+                  label: (siteData.profile.visibility == "MODERATED" ? "join_site_moderated.label" : "join_site.label"),
                   iconClass: "alf-leave-icon",
                   publishTopic: (siteData.profile.visibility == "MODERATED" ? "ALF_REQUEST_SITE_MEMBERSHIP" : "ALF_JOIN_SITE"),
                   publishPayload: {
