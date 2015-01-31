@@ -12,6 +12,14 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.Select;
 
+
+/**
+ * Page Object that hold all elements for web quick start dashlet page.
+ * 
+ * @author Cristina Axinte
+ * 
+ */
+
 public class SiteWebQuickStartDashlet extends AbstractDashlet implements Dashlet
 {
     private Log logger = LogFactory.getLog(SiteActivitiesDashlet.class);
