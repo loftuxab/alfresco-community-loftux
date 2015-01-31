@@ -48,27 +48,29 @@ public class CopyOrMoveContentPage extends ShareDialogue
     private static Log logger = LogFactory.getLog(CopyOrMoveContentPage.class);
 
     private final By folderPathElementId = By
-        .cssSelector("div[id$='default-copyMoveTo-treeview']>div.ygtvitem, div[id$='_default-ruleConfigAction-destinationDialog-treeview']>div.ygtvitem");
+            .cssSelector("div[id$='default-copyMoveTo-treeview']>div.ygtvitem, div[id$='_default-ruleConfigAction-destinationDialog-treeview']>div.ygtvitem");
     private final RenderElement footerElement = getVisibleRenderElement(By
-        .cssSelector("div[id$='default-copyMoveTo-wrapper'] div.bdft, div[id$='_default-ruleConfigAction-destinationDialog-wrapper'] div.bdft"));
+            .cssSelector("div[id$='default-copyMoveTo-wrapper'] div.bdft, div[id$='_default-ruleConfigAction-destinationDialog-wrapper'] div.bdft"));
     private final RenderElement headerElement = getVisibleRenderElement(By
-        .cssSelector("div[id$='default-copyMoveTo-title'], div[id$='_default-ruleConfigAction-destinationDialog-title']"));
+            .cssSelector("div[id$='default-copyMoveTo-title'], div[id$='_default-ruleConfigAction-destinationDialog-title']"));
     private final By destinationListCss = By.cssSelector(".mode.flat-button>div>span[style*='block']>span>button");
     private final By siteListCss = By.cssSelector("div.site>div>div>a>h4");
     private final By defaultDocumentsFolderCss = By
-        .cssSelector("div.path>div[id$='default-copyMoveTo-treeview']>div.ygtvitem>div.ygtvchildren>div.ygtvitem>table.ygtvtable>tbody>tr>td>span.ygtvlabel,"
-            + "div.path>div[id$='_default-ruleConfigAction-destinationDialog-treeview']>div.ygtvitem>div.ygtvchildren>div.ygtvitem>table.ygtvtable>tbody>tr>td>span.ygtvlabel");
+            .cssSelector("div.path>div[id$='default-copyMoveTo-treeview']>div.ygtvitem>div.ygtvchildren>div.ygtvitem>table.ygtvtable>tbody>tr>td>span.ygtvlabel,"
+                    + "div.path>div[id$='_default-ruleConfigAction-destinationDialog-treeview']>div.ygtvitem>div.ygtvchildren>div.ygtvitem>table.ygtvtable>tbody>tr>td>span.ygtvlabel");
     private final By folderItemsListCss = By.cssSelector("div.path div.ygtvitem>div.ygtvchildren>div.ygtvitem>table.ygtvtable span.ygtvlabel");
     private final By selectedFolderItemsListCss = By
-        .cssSelector("div.path div.ygtvitem>div.ygtvchildren>div.ygtvitem.selected>div.ygtvchildren>div.ygtvitem span.ygtvlabel");
+            .cssSelector("div.path div.ygtvitem>div.ygtvchildren>div.ygtvitem.selected>div.ygtvchildren>div.ygtvitem span.ygtvlabel");
     private final By copyMoveOkButtonCss = By
-        .cssSelector("button[id$='default-copyMoveTo-ok-button'], button[id$='_default-ruleConfigAction-destinationDialog-ok-button']");
+            .cssSelector("button[id$='default-copyMoveTo-ok-button'], button[id$='_default-ruleConfigAction-destinationDialog-ok-button']");
     private final By copyMoveCancelButtonCss = By
-        .cssSelector("button[id$='default-copyMoveTo-cancel-button'], button[id$='_default-ruleConfigAction-destinationDialog-cancel']");
+            .cssSelector("button[id$='default-copyMoveTo-cancel-button'], button[id$='_default-ruleConfigAction-destinationDialog-cancel']");
     private final By copyMoveDialogCloseButtonCss = By
-        .cssSelector("div[id$='default-copyMoveTo-dialog'] .container-close, div[id$='_default-ruleConfigAction-destinationDialog-dialog'] .container-close");
+            .cssSelector("div[id$='default-copyMoveTo-dialog'] .container-close, div[id$='_default-ruleConfigAction-destinationDialog-dialog'] .container-close");
     private final By copyMoveDialogTitleCss = By
-        .cssSelector("div[id$='default-copyMoveTo-title'], div[id$='_default-ruleConfigAction-destinationDialog-title']");
+            .cssSelector("div[id$='default-copyMoveTo-title'], div[id$='_default-ruleConfigAction-destinationDialog-title']");
+
+    private final By rmfolderItemsListCss = By.cssSelector("div#ygtvc7.ygtvchildren");
 
     /**
      * Constructor.
@@ -325,6 +327,7 @@ public class CopyOrMoveContentPage extends ShareDialogue
             {
                 if (destination.getText() != null)
                 {
+                    System.out.println("Destination test" + destination.getText());
                     if (destination.getText().equalsIgnoreCase(destinationName))
                     {
                         destination.click();
@@ -333,7 +336,7 @@ public class CopyOrMoveContentPage extends ShareDialogue
                             drone.waitForElement(siteListCss, SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
                         }
                         else if ((destinationName.contains("Repository")) || (destinationName.contains("Shared Files"))
-                            || (destinationName.contains("My Files")))
+                                || (destinationName.contains("My Files")))
                         {
                             drone.waitForElement(folderPathElementId, SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
                         }
@@ -448,7 +451,7 @@ public class CopyOrMoveContentPage extends ShareDialogue
                         try
                         {
                             if (!drone.findAndWait(By.xpath(String.format("//span[@class='ygtvlabel' and text()='%s']/../../../../..", folderName.getText())))
-                                .getAttribute("class").contains("selected"))
+                                    .getAttribute("class").contains("selected"))
                             {
                                 folderName.click();
                             }
@@ -490,4 +493,33 @@ public class CopyOrMoveContentPage extends ShareDialogue
     {
         return copyMoveOkButtonCss;
     }
+
+    public void rmSelectFolders(String folderName)
+    {
+        List<WebElement> folders;
+        folders = drone.findAndWaitForElements(rmfolderItemsListCss);
+        for (WebElement folder : folders)
+        {
+
+            try
+            {
+
+                if (folder.getText().equalsIgnoreCase(folderName))
+                    System.out.println("the folder is " + folder.getText());
+
+                    folder.click();
+
+            }
+            catch (Exception e)
+            {
+
+                if (logger.isTraceEnabled())
+                {
+                    logger.trace("Unable to get the list of folders : ", e);
+                }
+
+            }
+        }
+    }
+
 }
