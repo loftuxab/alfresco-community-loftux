@@ -1682,7 +1682,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly", "ProductBug" }, timeOut = 400000)
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14897() throws Exception
     {
         String testName = getTestName();
@@ -1696,7 +1696,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
         Date today = new Date(new java.util.Date().getTime());
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
         String ruleDate = sdf.format(today);
-        SimpleDateFormat sdf1 = new SimpleDateFormat("EEE dd MMM yyyy", Locale.ENGLISH);
+        SimpleDateFormat sdf1 = new SimpleDateFormat("EEE d MMM yyyy", Locale.ENGLISH);
         String propDate = sdf1.format(today);
 
         String fileName1 = "temp_" + getFileName(testName) + ".txt";
@@ -1855,7 +1855,7 @@ public class CreateRuleExecuteTest extends AbstractUtils
      * <li>The property value is set according to the rule</li>
      * </ul>
      */
-    @Test(groups = { "EnterpriseOnly", "ProductBug" }, timeOut = 400000)
+    @Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
     public void AONE_14898() throws Exception
     {
         String testName = getTestName();
