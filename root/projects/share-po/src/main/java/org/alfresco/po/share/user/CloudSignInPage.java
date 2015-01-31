@@ -321,7 +321,7 @@ public class CloudSignInPage extends ShareDialogue
     {
         try
         {
-            return drone.find(By.cssSelector(".error")).getText();
+            return drone.findAndWait(By.cssSelector(".error")).getText();
         }
         catch (NoSuchElementException e)
         {

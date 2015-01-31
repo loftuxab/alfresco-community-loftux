@@ -145,7 +145,7 @@ public class CloudSignInPageTest extends AbstractTest
     @Test(groups = { "Hybrid" }, dependsOnMethods = "loginAndLogout")
     public void loginAs() throws Exception
     {
-        cloudSyncPage = cloudSignInPage.loginAs(cloudUserName, cloudUserPassword).render();
+        cloudSignInPage.loginAs(cloudUserName, cloudUserPassword).render();
         Assert.assertTrue(cloudSyncPage.isDisconnectButtonDisplayed());
         cloudSyncPage.disconnectCloudAccount().render();
 
@@ -178,8 +178,8 @@ public class CloudSignInPageTest extends AbstractTest
         cloudSignInPage = cloudSyncPage.selectCloudSign().render();
 
         cloudSignInPage.loginToCloud(cloudUserName, fakePassword);
-        cloudSignInPage.isAccountNotRecognised();
         Assert.assertEquals(cloudSignInPage.getAccountNotRecognisedError(), "Email or password not recognised");
+        Assert.assertTrue(cloudSignInPage.isAccountNotRecognised());
 
     }
 
