@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.alfresco.share.util.ShareUser.refreshDocumentLibrary;
 import static org.testng.Assert.*;
 
 /**
@@ -32,6 +33,8 @@ import static org.testng.Assert.*;
 public class HybridWorkflowSanityTest extends AbstractWorkflow
 {
     private static final Logger logger = Logger.getLogger(HybridWorkflowSanityTest.class);
+    private long timeToWait;
+    private int retryCount;
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -39,7 +42,8 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
     {
         super.setup();
         testName = this.getClass().getSimpleName();
-
+        timeToWait = 25000;
+        retryCount = 5;
         logger.info("[Suite ] : Start Tests in: " + testName);
     }
 
@@ -224,7 +228,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Open Site document library and verify the file is a part of workflow
         DocumentLibraryPage documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSiteName);
-
+        waitAndCheckIfVisible(hybridDrone, documentLibraryPage, fileName);
         assertTrue(documentLibraryPage.isItemVisble(fileName), "Cloud: File was not synced.");
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Workflow was not created.");
 
@@ -2374,4 +2378,21 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
     }
 
+    private boolean waitAndCheckIfVisible(WebDrone driver, DocumentLibraryPage docLib, String contentName)
+    {
+        int i = 0;
+        boolean isVisible = docLib.isItemVisble(contentName);
+        while (!isVisible)
+        {
+            webDriverWait(driver, timeToWait);
+            docLib = refreshDocumentLibrary(driver).render();
+            isVisible = docLib.isItemVisble(contentName);
+            i++;
+            if (i > retryCount)
+            {
+                break;
+            }
+        }
+        return isVisible;
+    }
 }
