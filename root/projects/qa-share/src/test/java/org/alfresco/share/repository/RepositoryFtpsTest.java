@@ -34,7 +34,7 @@ import static org.testng.Assert.*;
  * @author Marina.Nenadovets
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = { "EnterpriseOnly", "FTPS" }, timeOut = 400000)
+@Test(groups = { "EnterpriseOnly" }, timeOut = 400000)
 public class RepositoryFtpsTest extends FtpsUtil
 {
     private static Log logger = LogFactory.getLog(RepositoryFtpsTest.class);

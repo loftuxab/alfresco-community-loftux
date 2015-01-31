@@ -40,7 +40,7 @@ import static org.testng.Assert.*;
  * Created by olga.lokhach
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = "EnterpriseOnly", timeOut = 400000, dependsOnGroups = "FTPS")
+@Test(groups = "EnterpriseOnly", timeOut = 400000)
 
 public class RepositoryFtpTest extends AbstractUtils
 {

@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="Repository Tests for Sprint BY" preserve-order="true" parallel="tests" thread-count="2">
+<suite name="Repository Tests for Sprint BY" preserve-order="true" parallel="tests" thread-count="1">
 
     <groups>
         <run>
