@@ -64,7 +64,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         timeToWait = 25000;
         syncLocation = DOMAIN_PREMIUM + ">" + siteB + ">" + DEFAULT_FOLDER_NAME;
         desAndAssBean = new DestinationAndAssigneeBean();
-        desAndAssBean.setNetwork(hybridDomainPremium);
+        desAndAssBean.setNetwork(DOMAIN_PREMIUM);
         desAndAssBean.setSiteName(siteA);
         desAndAssBean.setSyncToPath(DEFAULT_FOLDER_NAME);
     }
@@ -154,10 +154,6 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
 
         //Navigate to site's DocLib again and click "Sync to Cloud" option for the content2 and subfolder2
         openSitesDocumentLibrary(drone, siteA).render().getFileDirectoryInfo(folderName).clickOnTitle().render();
-        DestinationAndAssigneeBean dessAndAssBean = new DestinationAndAssigneeBean();
-        dessAndAssBean.setNetwork(DOMAIN_PREMIUM);
-        dessAndAssBean.setSiteName(siteA);
-        dessAndAssBean.setSyncToPath(DEFAULT_FOLDER_NAME);
         syncContentToCloud(drone, subFolders[1], desAndAssBean).render();
         assertTrue(checkIfContentIsSynced(drone, subFolders[1]), "Folder " + subFolders[1] + " wasn't synced to Cloud");
         doclibPrem.getFileDirectoryInfo(subFolders[1]).clickOnTitle().render();
@@ -215,10 +211,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
     @Test(groups = "Hybrid")
     public void AONE_15583() throws Exception
     {
-        desAndAssBean = new DestinationAndAssigneeBean();
-        desAndAssBean.setNetwork(hybridDomainPremium);
         desAndAssBean.setSiteName(siteB);
-        desAndAssBean.setSyncToPath(DEFAULT_FOLDER_NAME);
         //Sync all three sync sets to Cloud
         //https://issues.alfresco.com/jira/browse/ALF-14513
         //https://issues.alfresco.com/jira/browse/ALF-15265 - cannot sync folder from selected items menu
