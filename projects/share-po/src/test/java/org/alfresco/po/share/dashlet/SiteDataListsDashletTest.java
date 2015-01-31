@@ -86,7 +86,7 @@ public class SiteDataListsDashletTest extends AbstractSiteDashletTest
         assertEquals(siteDataListsDashlet.getListsCount(), 1);
     }
 
-    @Test(dependsOnMethods = "verifyListCountInDashlet")
+    @Test(dependsOnMethods = "verifyListCountInDashlet", groups="TestBug")
     public void verifyIsDataListDisplayed()
     {
         assertTrue(siteDataListsDashlet.isDataListDisplayed(LIST_NAME));
