@@ -126,7 +126,7 @@ public class RulePagesTest extends AbstractTest
         assertEquals(folderRulesPage.getInheritRulesText(), "Inherit Rules");
     }
 
-    @Test(dependsOnMethods = "folderRulePageTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "folderRulePageTest", groups = {"alfresco-one", "TestBug"})
     public void createRulePageTest()
     {
         FolderRulesPage folderRulesPage = drone.getCurrentPage().render();
@@ -139,7 +139,7 @@ public class RulePagesTest extends AbstractTest
         assertTrue(createRulePage.isPageCorrect());
     }
 
-    @Test(dependsOnMethods = "createRulePageTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "createRulePageTest", groups = {"alfresco-one", "TestBug"})
     public void createRuleAndThenAnotherTest()
     {
         CreateRulePage createRulePage = drone.getCurrentPage().render();
@@ -171,7 +171,7 @@ public class RulePagesTest extends AbstractTest
         assertTrue(createRulePage.isPageCorrect());
     }
 
-    @Test(dependsOnMethods = "createRuleAndThenAnotherTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "createRuleAndThenAnotherTest", groups = {"alfresco-one", "TestBug"})
     public void createNextRuleTest()
     {
         CreateRulePage createRulePage = drone.getCurrentPage().render();
@@ -203,7 +203,7 @@ public class RulePagesTest extends AbstractTest
         assertTrue(folderRulesPageWithRules.isPageCorrect(folderName));
     }
 
-    @Test(dependsOnMethods = "createNextRuleTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "createNextRuleTest", groups = {"alfresco-one", "TestBug"})
     public void foldersRuleWithRulesPageTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
@@ -211,14 +211,14 @@ public class RulePagesTest extends AbstractTest
         assertTrue(folderRulesPageWithRules.isInheritRuleToggleAvailable());
     }
 
-    @Test(dependsOnMethods = "foldersRuleWithRulesPageTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "foldersRuleWithRulesPageTest", groups = {"alfresco-one", "TestBug"})
     public void deleteRuleTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
         folderRulesPageWithRules.deleteRule("testRuleName2");
     }
 
-    @Test(dependsOnMethods = "deleteRuleTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "deleteRuleTest", groups = {"alfresco-one", "TestBug"})
     public void clickNewRuleThenCancelTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
@@ -227,7 +227,7 @@ public class RulePagesTest extends AbstractTest
         assertTrue(folderRulesPageWithRules.isPageCorrect(folderName));
     }
 
-    @Test(dependsOnMethods = "clickNewRuleThenCancelTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "clickNewRuleThenCancelTest", groups = {"alfresco-one", "TestBug"})
     public void getInheritedRulesFolderNameTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
@@ -267,14 +267,14 @@ public class RulePagesTest extends AbstractTest
         assertEquals(folderRulesPageWithRules.getInheritedRulesFolderName("testRuleName1"), folderName);
     }
 
-    @Test(dependsOnMethods = "getInheritedRulesFolderNameTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "getInheritedRulesFolderNameTest", groups = {"alfresco-one", "TestBug"})
     public void isRuleNameDisplayedTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
         assertTrue(folderRulesPageWithRules.isRuleNameDisplayed("testRuleName3"));
     }
 
-    @Test(dependsOnMethods = "isRuleNameDisplayedTest", groups = "EnterpriseOnly")
+    @Test(dependsOnMethods = "isRuleNameDisplayedTest", groups = {"EnterpriseOnly", "TestBug"})
     public void checkEmailForm()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
