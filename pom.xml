@@ -171,7 +171,7 @@
     <dependency.poi.version>3.10.1</dependency.poi.version>
     <dependency.mysql.version>5.1.34</dependency.mysql.version>
     <dependency.postgresql.version>9.3-1102-jdbc41</dependency.postgresql.version>
-    <dependency.yui.version>2.9.0-alfresco-20141119</dependency.yui.version>
+    <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
