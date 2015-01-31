@@ -28157,7 +28157,14 @@ define("tinymce/Editor", [
 		 * @return {Element} Iframe body element.
 		 */
 		getBody: function() {
-			return this.bodyElement || this.getDoc().body;
+                        //MNT-12784 : IE9/10: Script error when opening any site's page after adding comment from details page
+			try {
+			     return this.bodyElement || this.getDoc().body;
+			} catch (ex) {
+			     this.destroy();
+				
+			     return this.bodyElement;
+			}
 		},
 
 		/**
