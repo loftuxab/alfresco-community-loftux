@@ -566,6 +566,7 @@ public class DocumentLibraryPage extends SitePage
     public DocumentDetailsPage selectFile(final String title)
     {
         selectEntry(title).click();
+        waitUntilAlert();
         return new DocumentDetailsPage(drone);
     }
 
