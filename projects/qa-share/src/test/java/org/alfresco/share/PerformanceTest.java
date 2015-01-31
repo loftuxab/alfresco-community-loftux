@@ -142,7 +142,7 @@ public class PerformanceTest extends CmisUtils
         PaginationForm paginationForm = documentLibraryPage.getBottomPaginationForm();
         assertTrue(paginationForm.isDisplay(), "Pagination for moved folder don't displayed.");
         assertEquals(paginationForm.getPaginationInfo(), "Showing items 1 - 50 of 1000++", "Wrong information on pagination.");
-        assertEquals(documentLibraryPage.getFiles(), 50, "Wrong folders count show on page.");
+        assertEquals(documentLibraryPage.getFiles().size(), 50, "Wrong folders count show on page.");
     }
 
     @Test(groups = { "DataPrepPerformance", "Share", "NonGrid", "EnterpriseOnly" })
@@ -152,6 +152,7 @@ public class PerformanceTest extends CmisUtils
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
 
+        FtpUtil.configFtpPort();
         File bigDataFile = new File(BIG_DATA_FILE);
 
         CreateActivateUser(drone, ADMIN_USERNAME, testUser);
@@ -168,7 +169,6 @@ public class PerformanceTest extends CmisUtils
             {
                 fail("File with BigData don't created.");
             }
-            FtpUtil.configFtpPort();
             FtpUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, bigDataFile, "Alfresco/Sites/" + siteName + "/documentLibrary/");
         }
         finally
