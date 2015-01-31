@@ -77,7 +77,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
         opSite = getSiteName(testName + "OP03");
     }
     
-    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods ="setup")
+//    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods ="setup")
     public void dataPrep_createUsers() throws Exception {
 
             String opUser = getUserNameForDomain(testName + "opUser", testDomain);
@@ -1172,45 +1172,48 @@ public class WorkFlowActionsTest extends AbstractWorkflow
      @Test(groups = "DataPrepHybrid")
      public void dataPrep_15673() throws Exception 
      {
-       String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-       String workFlowName = "Simple Cloud Task " + testName + "-15673CL";
-       TaskDetailsPage taskDetailsPage;
-       EditTaskPage editTaskPage;
+         String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+         String workFlowName = "Simple Cloud Task " + testName + "-15673CLoio";
+         TaskDetailsPage taskDetailsPage;
+         EditTaskPage editTaskPage;
 
-       folderName = getFolderName(testName);
-       fileName = getFileName(testName) + "-15673" + ".txt";
+         folderName = getFolderName(testName);
+         fileName = getFileName(testName) + "-15673oio" + ".txt";
 
-       String[] fileInfo = { fileName, DOCLIB };
+         String[] fileInfo = { fileName, DOCLIB };
 
-       ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
-       ShareUser.openSiteDashboard(drone, opSite);
-       ShareUser.uploadFileInFolder(drone, fileInfo).render();
-       ShareUser.openSitesDocumentLibrary(drone, opSite).render();
-       CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
+         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+         ShareUser.openSiteDashboard(drone, opSite);
+         ShareUser.uploadFileInFolder(drone, fileInfo).render();
+         ShareUser.openSitesDocumentLibrary(drone, opSite).render();
+         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
 
-       WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
-       formDetails.setMessage(workFlowName);
-       formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
-       formDetails.setApprovalPercentage(2);
-       formDetails.setTaskPriority(Priority.MEDIUM);
-       formDetails.setSiteName(cloudSite);
-       formDetails.setAssignee(cloudUser);
-       formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
-       formDetails.setLockOnPremise(false);
+         List<String> userNames = new ArrayList<String>();
+         userNames.add(cloudUser);
+         
+         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+         formDetails.setMessage(workFlowName);
+         formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
+         formDetails.setApprovalPercentage(20);
+         formDetails.setTaskPriority(Priority.MEDIUM);
+         formDetails.setSiteName(cloudSite);
+         formDetails.setReviewers(userNames);
+         formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
+         formDetails.setLockOnPremise(false);
 
-       // Create Workflow using File1
-       cloudTaskOrReviewPage.startWorkflow(formDetails).render();
-       ShareUser.logout(drone);
+         // Create Workflow using File1
+         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+         ShareUser.logout(drone);
+         
+         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
 
-       ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-       MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
-
-       taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
-       editTaskPage = taskDetailsPage.selectEditButton().render();
-       editTaskPage.enterComment("test comment edited");
-       editTaskPage.selectStatusDropDown(TaskStatus.INPROGRESS);
-       taskDetailsPage = editTaskPage.selectTaskDoneButton().render();
-       ShareUser.logout(hybridDrone);
+         taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
+         editTaskPage = taskDetailsPage.selectEditButton().render();
+         editTaskPage.enterComment("test comment edited");
+         editTaskPage.selectStatusDropDown(TaskStatus.INPROGRESS);
+         editTaskPage.selectSaveButton().render();
+         ShareUser.logout(hybridDrone);
       }
      
      @Test(groups = "Hybrid", enabled = true)
