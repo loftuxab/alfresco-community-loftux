@@ -60,7 +60,6 @@ public class RepositoryPage extends DocumentLibraryPage
         super(drone);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public RepositoryPage render(RenderTime timer)
     {
@@ -68,14 +67,12 @@ public class RepositoryPage extends DocumentLibraryPage
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public RepositoryPage render()
     {
         return render(new RenderTime(maxPageLoadingTime));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public RepositoryPage render(final long time)
     {

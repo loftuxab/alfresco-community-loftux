@@ -55,7 +55,6 @@ public class CreateSitePage extends ShareDialogue
         super(drone);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public CreateSitePage render(RenderTime timer)
     {
@@ -63,14 +62,12 @@ public class CreateSitePage extends ShareDialogue
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public CreateSitePage render()
     {
         return render(new RenderTime(maxPageLoadingTime));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public CreateSitePage render(final long time)
     {

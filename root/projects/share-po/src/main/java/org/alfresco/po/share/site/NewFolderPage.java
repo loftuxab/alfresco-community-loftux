@@ -64,7 +64,6 @@ public class NewFolderPage extends ShareDialogue
         super(drone);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public NewFolderPage render(RenderTime timer)
     {
@@ -72,14 +71,12 @@ public class NewFolderPage extends ShareDialogue
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public NewFolderPage render()
     {
         return render(new RenderTime(maxPageLoadingTime));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public NewFolderPage render(final long time)
     {

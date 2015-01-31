@@ -18,15 +18,12 @@ import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.WebDroneImpl;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

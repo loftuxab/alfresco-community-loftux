@@ -49,7 +49,6 @@ public class PeopleFinderResultPage extends PeopleFinderPage
         super(drone);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public PeopleFinderResultPage render(RenderTime timer)
     {
@@ -80,14 +79,12 @@ public class PeopleFinderResultPage extends PeopleFinderPage
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public PeopleFinderResultPage render()
     {
         return render(new RenderTime(maxPageLoadingTime));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public PeopleFinderResultPage render(final long time)
     {
