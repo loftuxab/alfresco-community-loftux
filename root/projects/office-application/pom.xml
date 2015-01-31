@@ -13,7 +13,6 @@
     </parent>
 
     <name>office-application</name>
-    <url>http://maven.apache.org</url>
 
     <repositories>
         <repository>
@@ -37,6 +36,10 @@
             <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <properties>
+        <argLine>-Xms512m -Xmx1024m</argLine>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -167,7 +170,6 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Xms512m -Xmx1024m</argLine>
                     <workingDirectory>target</workingDirectory>
                 </configuration>
             </plugin>

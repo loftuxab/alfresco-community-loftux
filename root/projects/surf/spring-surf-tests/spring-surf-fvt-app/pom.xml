@@ -18,12 +18,6 @@
 	<!-- Define Eclipse Integration Plugin -->
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<wtpversion>1.5</wtpversion>
-				</configuration>
-			</plugin>
 		   <!--  JETTY PLUG-IN CONFIGURATION:
 		      The following has been adapted from the jetty:run goal configuration example found
 		      at the following URL: http://docs.codehaus.org/display/JETTY/Maven+Jetty+Plugin
