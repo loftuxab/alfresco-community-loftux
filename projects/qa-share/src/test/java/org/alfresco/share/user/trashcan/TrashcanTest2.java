@@ -8,7 +8,9 @@ import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.blog.BlogPage;
 import org.alfresco.po.share.site.blog.PostViewPage;
 import org.alfresco.po.share.site.datalist.DataListPage;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.SyncInfoPage;
+import org.alfresco.po.share.site.links.LinksDetailsPage;
 import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.po.share.site.wiki.WikiPageList;
@@ -29,9 +31,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * @author Maryia Zaichanka
@@ -1429,12 +1429,13 @@ public class TrashcanTest2 extends AbstractUtils
         }
 
         //Navigate to Link page
-        LinksPage linksPage = siteDashboardPage.getSiteNav().selectLinksPage();
+        LinksPage linksPage = siteDashboardPage.getSiteNav().selectLinksPage().render();
 
         // Deleting 8 links
         for (int i = 0; i < 8; i++)
         {
-            linksPage = linksPage.deleteLinkWithConfirm(testName + "link" + i);
+            LinksDetailsPage linksDetailsPage = linksPage.clickLink(testName + "link" + i).render();
+            linksPage = linksDetailsPage.deleteLink().render();
         }
         ShareUser.logout(drone);
 
@@ -1443,15 +1444,16 @@ public class TrashcanTest2 extends AbstractUtils
         siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName);
 
         // Creating link
-        linksPage = siteDashboardPage.getSiteNav().selectLinksPage();
+        linksPage = siteDashboardPage.getSiteNav().selectLinksPage().render();
         linksPage.createLink(testName + "link8", linkUrl).render();
         String linkId8 = LinkUtil.getLinkId(drone, siteName, testName + "link8");
 
         // Navigate to Link page
-        linksPage = siteDashboardPage.getSiteNav().selectLinksPage();
+        linksPage = siteDashboardPage.getSiteNav().selectLinksPage().render();
 
         // Delete link
-        linksPage.deleteLinkWithConfirm(testName + "link8");
+        LinksDetailsPage linksDetailsPage = linksPage.clickLink(testName + "link8").render();
+        linksDetailsPage.deleteLink().render();
         ShareUser.logout(drone);
 
         // Log in as User1
