@@ -1663,7 +1663,8 @@
             containerId: this.options.containerId,
             path: this.currentPath,
             files: record,
-            rootNode: this.options.rootNode,
+            /* Fix for MNT-12432. Do not overwrite this.modules.copyMoveTo.options.rootNode option if repoBrowsing is enabled. Could cause Repository tab view inconsistency */
+            rootNode: this.options.repositoryBrowsing ? this.modules.copyMoveTo.options.rootNode : this.options.rootNode,
             parentId: this.getParentNodeRef(record),
             zIndex: zIndex
          }).showDialog();
