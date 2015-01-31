@@ -11,6 +11,7 @@ import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.DocumentLibraryUtil;
+import org.alfresco.share.util.FileBaseUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
@@ -41,6 +42,7 @@ public class MSExcel2011Tests extends AbstractUtils
     private File xls9762TestFile;
     private File xls9761DownloadTestFile;
     private File xls9763TestFile;
+    private File xls9765TestFile;
     private File xlsCommonFile;
 
     private ArrayList<File> testFiles = new ArrayList<File>();
@@ -59,7 +61,7 @@ public class MSExcel2011Tests extends AbstractUtils
         super.setup();
         appExcel2011 = new MicrosoftExcel2011();
         appExcel2011.killProcesses();
-        testName = this.getClass().getSimpleName() + "15";
+        testName = this.getClass().getSimpleName() + "22";
         testUser = getUserNameFreeDomain(testName);
         testSiteName = getSiteName(testName);
 
@@ -71,6 +73,7 @@ public class MSExcel2011Tests extends AbstractUtils
         xlsCommonFile = getTestDataFile(SHAREPOINT, "InputOpen.xlsx"); // common excel file used in multiple tests
 
         xls9761DownloadTestFile = new File(System.getProperty("user.home"), testTmpFolderName + "/tmpxls9761TestFile.xlsx");
+        xls9765TestFile = new File(System.getProperty("user.home"), testTmpFolderName + "/AONE-9765.xlsx");
 
         // this files will be uploaded on dataprep
         testFiles.add(xls9761TestFile);
@@ -84,7 +87,6 @@ public class MSExcel2011Tests extends AbstractUtils
     @AfterClass(alwaysRun = true)
     public void tearDown()
     {
-        super.tearDown();
         try
         {
             appExcel2011.handleCrash();
@@ -95,7 +97,7 @@ public class MSExcel2011Tests extends AbstractUtils
             logger.error("Error on TearDown Office 2011" + e.getMessage());
         }
 
-        xls9761DownloadTestFile.delete();
+        super.tearDown();
     }
 
     @Test(groups = { "DataPrepExcelMac" })
@@ -126,6 +128,9 @@ public class MSExcel2011Tests extends AbstractUtils
             logger.info("Setup Data Prep using: " + file.getName());
             ShareUserSitePage.uploadFile(drone, file).render();
         }
+
+        xls9765TestFile.delete();
+        xls9761DownloadTestFile.delete();
     }
 
     /**
@@ -176,7 +181,7 @@ public class MSExcel2011Tests extends AbstractUtils
         // Choose the created in the pre-condition document and click on Upload button.
         // ---- Expected results ----
         // The document is uploaded
-        appExcel2011.getMDC().addFile(xls9760TestFile.getName());
+        appExcel2011.getMDC().addFile(xls9760TestFile);
 
         // I choose to open DL here so in this time, the document will be uploaded from step2 - no wait required
         openDocumentLibraryForTest();
@@ -222,17 +227,18 @@ public class MSExcel2011Tests extends AbstractUtils
         // Choose any location, e.g. Desktop, specify any name and click on Save button.
         // ---- Expected results ----
         // The document is downloaded.
-        appExcel2011.getMDC().saveAsFirstDocument(xls9761DownloadTestFile.getName());
+        appExcel2011.getMDC().saveAsFirstDocumentAs(xls9761DownloadTestFile);
 
         // ---- Step 3 ----
         // ---- Step action ----
         // Verify the chosen location, e.g. Desktop.
         // ---- Expected results ----
         // The document was downloaded correctly. No data was lost.
-        while (!xls9761DownloadTestFile.exists())
-        {
-        }
+
         xls9761DownloadTestFile = new File(System.getProperty("user.home"), testTmpFolderName + "/tmpxls9761TestFile.xlsx");
+        boolean fileSaved = FileBaseUtils.waitForFile(xls9761DownloadTestFile);
+        
+        Assert.assertTrue(fileSaved, "File " + xls9761DownloadTestFile.getName() + " was saved localy from MDC.");
         Assert.assertEquals(xls9761DownloadTestFile.length(), 8679, "Data was lost from the file downloaded");
         xls9761DownloadTestFile.delete();
         appExcel2011.getMDC().exitApplication();
@@ -441,6 +447,81 @@ public class MSExcel2011Tests extends AbstractUtils
 
         appExcel2011.exitApplication();
         ShareUser.logout(drone);
+    }
+
+    /**
+     * Preconditions
+     * <ul>
+     * <li>Any site is created in Share;</li>
+     * <li>Any MS Excel document is uploaded to the site's document library;</li>
+     * <li>MS Document Connection is opened;</li>
+     * <li>A sharepoint connection to Alfresco is created;</li>
+     * <li>Site Document Library is opened.</li>
+     * <li>The document is opened for editing.</li>
+     * <li>Any data is entered into the opened document.</li>
+     * </ul>
+     */
+    @Test(groups = "Enterprise4.2", description = "Edit document - Upload File")
+    public void AONE_9765() throws Exception
+    {
+
+        appExcel2011.openApplication();
+        appExcel2011.edit("some test data");
+        appExcel2011.saveAs(xls9765TestFile);
+        appExcel2011.exitApplication();
+
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Choose the document and click on Upload button.
+        // ---- Expected results ----
+        // Upload Changes window is displayed.
+        appExcel2011.getMDC().addFile(xls9765TestFile);
+
+        // {Paul: cannot use Open URL, Appliction will crash}
+        // appExcel2011.openURL(getVTIDocumentLibraryFilePath(testSiteName, xlsCommonFile.getName()));
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Click on Upload File button.
+        // ---- Expected results ----
+        // The changes are uploaded. The file is still opened for editing.
+        openDocumentLibraryForTest();
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The changes are applied. A new minor version is created. The document is still locked for editing.
+        Assert.assertEquals(DocumentLibraryUtil.getDocumentProperties(documentLibraryPage, xls9765TestFile.getName()).size(), 10);
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = "Enterprise4.2", description = "Check Out")
+    public void AONE_9766() throws Exception
+    {
+        openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Choose the document and click on Check Out button.
+        // ---- Expected results ----
+        // The document is checked out and is opened for editing in a write mode in the default MS Excel app.
+        
+        appExcel2011.getMDC().checkOutFile(xlsCommonFile.getName());
+        openDocumentLibraryForTest();
+        appExcel2011.waitForWindow(xlsCommonFile.getName());
+        appExcel2011.exitApplication();
+        
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Verify the document library of the site in the Share.
+        // ---- Expected results ----
+        // The document is locked. "The document is locked by you for offline editing" message is displayed.
+        Assert.assertEquals(ShareUserSitePage.getFileDirectoryInfo(drone, xlsCommonFile.getName()).getContentInfo(),
+                "This document is locked by you for offline editing.");
     }
 
 }

@@ -11,6 +11,7 @@ public class FileBaseUtils
 {
     /**
      * Create the full path of the File
+     * 
      * @param paths
      * @return String
      */
@@ -31,5 +32,20 @@ public class FileBaseUtils
         }
 
         return combined.getPath();
+    }
+
+    /**
+     * Wait for file
+     * 
+     * @param file
+     */
+    public static boolean waitForFile(File file)
+    {
+        int cnt = 0;
+        while (!file.exists() && cnt < 100)
+        {
+            cnt++;
+        }
+        return file.exists();
     }
 }
