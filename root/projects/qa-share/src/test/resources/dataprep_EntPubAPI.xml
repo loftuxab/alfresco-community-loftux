@@ -6,6 +6,7 @@
             <include name="DataPrep.*" />
             <exclude name="NonGrid" />
             <exclude name=".*Bug.*" />
+            <exclude name="CloudOnly" />
         </run>
     </groups>
 
