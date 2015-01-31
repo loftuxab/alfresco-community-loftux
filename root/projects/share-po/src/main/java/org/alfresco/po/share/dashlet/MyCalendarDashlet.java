@@ -267,7 +267,7 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
         for (WebElement eventLink : eventLinks)
         {
             String linkText = eventLink.getText();
-            if (linkText.equalsIgnoreCase(event))
+            if (linkText.contains(event))
             {
                 Boolean repeating = eventLink.getText().contains("Repeating");
                 return repeating;
