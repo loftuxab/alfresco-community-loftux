@@ -1,13 +1,9 @@
 package org.alfresco.share.sharepoint.office2010;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
-
-
-
-
-
-import java.util.Properties;
+import java.util.Locale;
 
 import org.alfresco.application.util.Application;
 import org.alfresco.po.share.CustomiseUserDashboardPage;
@@ -45,8 +41,7 @@ import com.ibm.icu.util.Calendar;
 public class MSOutlook2010EventsTests extends AbstractUtils
 {
     MicorsoftOffice2010 outlook = new MicorsoftOffice2010(Application.OUTLOOK, "2010");
-    
-    private String next_site;
+
     private CustomiseUserDashboardPage customizeUserDash;
     private DashBoardPage dashBoard;
     private String sharePointPath;
@@ -55,9 +50,9 @@ public class MSOutlook2010EventsTests extends AbstractUtils
     public void setup() throws Exception
     {
         super.setup();
-        
+
         Runtime.getRuntime().exec("taskkill /F /IM OUTLOOK.EXE");
-        
+
         sharePointPath = outlook.getSharePointPath();
     }
 
@@ -258,7 +253,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // MS Outlook 2010 is opened;
         Ldtp l3 = outlook.openOfficeApplication();
 
-
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l3, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
 
@@ -266,7 +260,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         // navigate to site
-        SiteDashboardPage siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        SiteDashboardPage siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
 
         // navigate to Calendar
         CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage().render();
@@ -595,7 +589,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
-
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
 
@@ -723,7 +716,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
-
         // create new meeting workspace
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
 
@@ -793,9 +785,11 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // select OK
         recurrence.click("btnOK");
 
-        // Select Save Changes
+        // Click Send button;
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 9 -----
         // ---- Step Action ----
@@ -821,16 +815,24 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // ---- Step 11 -----
         // ---- Step Action ----
-        // Verify start and end date, duration of the event ar My calendar dashlet, Site calendar dashlet and Calendar tab of the meeting place;
+        // Verify start and end date, duration of the event at My calendar dashlet, Site calendar dashlet and Calendar tab of the meeting place;
         // ---- Expected result ----
-        // The start and end date, duration of the event ar My calendar dashlet, Site calendar dashlet and Calendar tab of the meeting place are correctly
+        // The start and end date, duration of the event at My calendar dashlet, Site calendar dashlet and Calendar tab of the meeting place are correctly
         // displayed;
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
         // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -871,7 +873,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // ---- Step 1, 2 -----
         // ---- Step Action ----
@@ -921,9 +922,15 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
         recurrence.click("btnOK");
 
-        // Select Save Changes
+        // ---- Step 8 -----
+        // ---- Step Action ----
+        // Click Send button;
+        // ---- Expected result ----
+        // Appointment is sent;
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -958,12 +965,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (it occurs
         // every <entered number> days effective start date from start time to end time);
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -1053,9 +1068,15 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // select OK
         recurrence.click("btnOK");
 
-        // Select Save Changes
+        // ---- Step 8 -----
+        // ---- Step Action ----
+        // Click Send button;
+        // ---- Expected result ----
+        // Appointment is sent;
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -1090,12 +1111,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (it occurs
         // every weekday (from Monday till Friday) effective start date from start time to end time);
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -1183,12 +1212,18 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         recurrence.click("chkTuesday");
         recurrence.click("chkWednesday");
         recurrence.click("chkThursday");
+        recurrence.click("chkFriday");
+        recurrence.click("chkSaturday");
+        recurrence.click("chkSunday");
 
         String startTime = convertHour(recurrence.getTextValue("txtStart"));
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
         recurrence.click("btnOK");
+
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -1223,12 +1258,21 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (Occurs every
         // <entered number> weeks on <selected day(s)> effective start date from start time to end time);
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, 1);
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -1268,7 +1312,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // ---- Step 1, 2 -----
         // ---- Step Action ----
@@ -1321,8 +1364,11 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
 
         recurrence.click("btnOK");
+
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -1360,12 +1406,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (Occurs day
         // <number> of every <number> months effective start date from start time to end time);
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -1406,7 +1460,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // ---- Step 1, 2 -----
         // ---- Step Action ----
@@ -1461,6 +1514,8 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -1487,8 +1542,8 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // Calendar tab of the meeting place are correctly displayed (Occurs every <entered number> weeks on <selected day(s)> effective start date from start
         // time to end time);
         String recDetail = eventInfo.getRecurrenceDetail();
-        String compareRecDetail = "Occurs the last Friday of every 3 month(s)";
-        Assert.assertTrue(recDetail.contains(compareRecDetail));
+        String compareRecDetail = "Occurs the last";
+        Assert.assertTrue(recDetail.contains(compareRecDetail) && recDetail.contains("of every 3 month(s)"));
 
         eventInfo.closeInformationForm();
 
@@ -1498,12 +1553,23 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (e.g. Occurs
         // the fourth Friday of every 2 months effective 11/26/2010 from 4:30 PM to 5:00 PM);
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(GregorianCalendar.DAY_OF_WEEK, Calendar.FRIDAY);
+        calendar.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, -1);
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -1545,7 +1611,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // ---- Step 1, 2 -----
         // ---- Step Action ----
@@ -1597,9 +1662,10 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
         recurrence.click("btnOK");
 
-        // Select Save Changes
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -1637,12 +1703,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (it occurs
         // every <entered year frequency> years on <selected month> <selected date> effective <start date> from <start time> to <end time>);
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -1684,7 +1758,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // ---- Step 1, 2 -----
         // ---- Step Action ----
@@ -1733,15 +1806,16 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         recurrence.click("rbtnOnthe");
 
         String period = recurrence.getTextValue("cboTheEditableTextEditableTextofEditableText");
-        String week_day = recurrence.getTextValue("cboTheEditableTextEditableTextofEditableText1");
+        // String week_day = recurrence.getTextValue("cboTheEditableTextEditableTextofEditableText1");
 
         String startTime = convertHour(recurrence.getTextValue("txtStart"));
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
         recurrence.click("btnOK");
 
-        // Select Save Changes
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -1766,8 +1840,8 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         Assert.assertTrue(eventInfo.getEndDateTime().contains(endTime));
 
         String recDetail = eventInfo.getRecurrenceDetail();
-        String compareRecDetail = "Occurs the " + period + " " + week_day + " of every 36 month(s)";
-        Assert.assertTrue(recDetail.contains(compareRecDetail));
+        String compareRecDetail = "Occurs the " + period;
+        Assert.assertTrue(recDetail.contains(compareRecDetail) && recDetail.contains("of every 36 month(s)"));
 
         eventInfo.closeInformationForm();
 
@@ -1778,12 +1852,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly displayed (it occurs
         // every <entered year frequency> years on the <selected frequency> <selected day> of <selected month> effective <start date> from <start time> to <end
         // time>);
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -1825,7 +1907,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // ---- Step 1, 2 -----
         // ---- Step Action ----
@@ -1874,9 +1955,10 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
         recurrence.click("btnOK");
 
-        // Select Save Changes
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -1894,6 +1976,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // New recurrence appointment is created and displayed in the calendar of selected Meeting Workspace;
         CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage().render();
         Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName));
+
         // Click the event's name -> Event Info window pops up;
         InformationEventForm eventInfo = calendarPage.clickOnEvent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName).render();
         Assert.assertTrue(eventInfo.getStartDateTime().contains(startTime));
@@ -1913,12 +1996,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (start date is
         // correct, event repeats with no end date );
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -1960,8 +2051,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
-
 
         // ---- Step 1, 2 -----
         // ---- Step Action ----
@@ -2013,9 +2102,10 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
         recurrence.click("btnOK");
 
-        // Select Save Changes
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -2033,6 +2123,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // New recurrence appointment is created and displayed in the calendar of selected Meeting Workspace;
         CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage().render();
         Assert.assertTrue(calendarPage.isEventPresent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName));
+
         // Click the event's name -> Event Info window pops up;
         InformationEventForm eventInfo = calendarPage.clickOnEvent(CalendarPage.EventType.MONTH_TAB_MULTIPLY_EVENT, siteName).render();
         Assert.assertTrue(eventInfo.getStartDateTime().contains(startTime));
@@ -2050,12 +2141,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (start date is
         // correct, event repeats <enter number of occurences in the 6 step> times );
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -2097,7 +2196,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
-
 
         // ---- Step 1, 2 -----
         // ---- Step Action ----
@@ -2155,9 +2253,10 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String endTime = convertHour(recurrence.getTextValue("txtEnd"));
         recurrence.click("btnOK");
 
-        // Select Save Changes
         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
         after_rec.click("btnSave");
+        after_rec.enterString("txtTo", testUser);
+        after_rec.click("btnSend");
 
         // ---- Step 11 -----
         // ---- Step Action ----
@@ -2192,12 +2291,20 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (start date is
         // correct, event repeats till the end date selected in the 6 step);
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE, d MMMM, yyyy", Locale.US);
+
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
-        // Site calendar dashlet is marked as recurrence
+        // The created appointment is displayed with correct date on the dashlet;
         Assert.assertTrue(siteCalendarDashlet.isEventsDisplayed(siteName), "The " + siteName + " isn't correctly displayed on calendar");
         Assert.assertTrue(siteCalendarDashlet.isRepeating(siteName));
+        // check start and end date, duration of the event at Site calendar dashlet
+        Assert.assertTrue(siteCalendarDashlet.isEventsWithHeaderDisplayed(weekDay));
 
         SharePage page = drone.getCurrentPage().render();
         dashBoard = page.getNav().selectMyDashBoard();
@@ -2240,7 +2347,6 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // MS Outlook 2010 is opened;
         Ldtp l = outlook.openOfficeApplication();
 
-
         // Precondition: any recurrence event is created via MS Outlook;
         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
 
@@ -2281,7 +2387,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         eventInfo.closeInformationForm();
 
         // Verify the event at My calendar dashlet, Site calendar dashlet;
-        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
         SiteCalendarDashlet siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
         // Site calendar dashlet is marked as recurrence
@@ -2329,7 +2435,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         // ---- Expected result ----
         // Event at My calendar dashlet, Site calendar dashlet is not marked as recurrence; Calendar tab of the meeting place are correctly dispalyed (start
         // date is correct, duration is correct); There is not event's reccurrences in future;
-        SiteUtil.openSiteFromSearch(drone, siteName);
+        siteDashBoard = SiteUtil.openSiteFromSearch(drone, siteName).render();
         siteCalendarDashlet = siteDashBoard.getDashlet("site-calendar").render();
 
         // Site calendar dashlet is marked as recurrence
