@@ -77,6 +77,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     private static final String SELECT_CHECKBOX = "input[id^='checkbox-yui']";
     private static final By SYNC_INFO_PAGE = By
             .cssSelector("a[data-action='onCloudSyncIndicatorAction']>img[alt='cloud-synced'], img[alt='cloud-indirect-sync'], img[alt='cloud-sync-failed']");
+    private static final By SYNC_FAILED = By.cssSelector("img[alt='cloud-sync-failed']");
     private static final By INFO_BANNER = By.cssSelector("div.info-banner");
     private static final By LOCK_ICON = By.cssSelector("img[alt='lock-owner']");
     private static final By SYNC_FAILED_ICON = By.cssSelector("img[alt='cloud-sync-failed']");
@@ -1373,6 +1374,25 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         try
         {
             return findAndWait(SYNC_INFO_PAGE).isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Exceeded the time to find css.", e);
+        }
+        return false;
+
+    }
+    
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#isViewCloudSyncInfoDisplayed()
+     */
+    @Override
+    public boolean isCloudSyncFailed()
+    {
+        try
+        {
+            return findAndWait(SYNC_FAILED).isDisplayed();
         }
         catch (TimeoutException e)
         {
