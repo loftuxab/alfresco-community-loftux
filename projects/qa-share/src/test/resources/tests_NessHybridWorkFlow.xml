@@ -14,6 +14,18 @@
 			class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
 	</listeners>
 
+	<test name="HybridSyncNegativeTests3" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.cloudsync.HybridSyncNegativeTests3" />
+		</classes>
+	</test>
+
+	<test name="HybridSyncNegativeTests2" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.cloudsync.HybridSyncNegativeTests2" />
+		</classes>
+	</test>
+
 	<test name="Advanced Workflow Scenarios" verbose="1">
 		<classes>
 			<class name="org.alfresco.share.workflow.AdvancedScenariosWorkflowTests" />
