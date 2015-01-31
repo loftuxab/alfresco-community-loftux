@@ -71,6 +71,7 @@ public class RuntimePropertyLuceneBuilderMapping implements PropertyLuceneBuilde
         registerPropertyLuceneBuilder(PropertyIds.LAST_MODIFICATION_DATE, new DirectLuceneBuilder(dictionaryService, ContentModel.PROP_MODIFIED));
         registerPropertyLuceneBuilder(PropertyIds.CHANGE_TOKEN, new FixedValueLuceneBuilder(null));
         registerPropertyLuceneBuilder(PropertyIds.NAME, new DirectLuceneBuilder(dictionaryService, ContentModel.PROP_NAME));
+        registerPropertyLuceneBuilder(PropertyIds.DESCRIPTION, new DirectLuceneBuilder(dictionaryService, ContentModel.PROP_DESCRIPTION));
         registerPropertyLuceneBuilder(PropertyIds.IS_IMMUTABLE, new NotSupportedLuceneBuilder());
         registerPropertyLuceneBuilder(PropertyIds.IS_LATEST_VERSION, new NotSupportedLuceneBuilder());
         registerPropertyLuceneBuilder(PropertyIds.IS_MAJOR_VERSION, new NotSupportedLuceneBuilder());
