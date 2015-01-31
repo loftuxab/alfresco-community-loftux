@@ -849,7 +849,7 @@
          var fileName = file.name;
          if (file.size === 0)
          {
-            return this.msg("message.zeroByteFileSelected", fileName);
+            return this.msg("message.zeroByteFileSelected", $html(fileName));
          }
          else if (this._maximumFileSizeLimit > 0 && file.size > this._maximumFileSizeLimit)
          {
