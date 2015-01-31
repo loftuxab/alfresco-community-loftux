@@ -100,7 +100,7 @@ public class PostViewPage extends BlogPage
         PostViewPage postViewPage = new PostViewPage(drone);
         BlogCommentForm blogCommentForm = postViewPage.clickAddCommentBtn(comment);
         blogCommentForm.insertText(comment);
-        blogCommentForm.clickAddComment();
+        blogCommentForm.clickAddComment().render();
         waitUntilAlert();
         if (isCommentPresent(comment))
         {
