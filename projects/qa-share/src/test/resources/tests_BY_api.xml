@@ -18,12 +18,12 @@
     <test name="Public API test">
         <classes>
 
-            <class name="org.alfresco.share.api.SitesAPITests">
+            <!--class name="org.alfresco.share.api.SitesAPITests">
                 <methods>
                     <include name="AONE_14259"/>
                     <exclude name=".*"/>
                 </methods>
-            </class>
+            </class-->
 
             <class name="org.alfresco.share.api.ProcessesAPITests">
                 <methods>

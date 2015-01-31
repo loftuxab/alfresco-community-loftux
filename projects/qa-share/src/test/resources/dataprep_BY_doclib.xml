@@ -35,7 +35,7 @@
 
     <test name="Trashcan tests Suite">
         <classes>
-            <class name="org.alfresco.share.user.trashcan.TrashCanTest">
+            <class name="org.alfresco.share.user.trashcan.TrashcanTest2">
                 <methods>
                     <include name="dataPrep_AONE_15088"/>
                     <include name="dataPrep_AONE_15089"/>
