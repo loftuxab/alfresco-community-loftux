@@ -341,6 +341,13 @@ public interface FileDirectoryInfo
      * @return SyncInfoPage
      */
     boolean isViewCloudSyncInfoDisplayed();
+    
+    /**
+     * This method verifies if cloud info button is displayed with failed
+     *
+     * @return SyncInfoPage
+     */
+    boolean isCloudSyncFailed();
 
     /**
      * Selects the "Inline Edit" link on the select data row on
