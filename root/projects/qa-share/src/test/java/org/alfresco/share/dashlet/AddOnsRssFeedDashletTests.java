@@ -140,7 +140,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "DataPrepDashlets" })
     public void dataPrep_2905() throws Exception
     {
-        String testName = getTestName() + "35";
+        String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -154,9 +154,9 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2905() throws Exception
     {
-        String testName = getTestName() + "35";
+        String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
-        String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
+        //String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
@@ -170,6 +170,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         // Click Configure this dashlet icon
         // ---- Expected results ----
         // Enter Feed URL form displays
+        rssDashlet.waitUntilLoadingDisappears();
         RssFeedUrlBoxPage rssFeedUrlBoxPage = rssDashlet.clickConfigure().render();
         Assert.assertNotNull(rssFeedUrlBoxPage);
 
@@ -178,7 +179,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         // Fill in URL field;
         // ---- Expected results ----
         // Information is entered successfully;
-        rssFeedUrlBoxPage.fillURL(rssUrl);
+        // leave the alfresco rss
 
         // ---- Step 3 ----
         // ---- Step action ---
@@ -200,6 +201,7 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         // ---- Expected results ----
         // My Dashboard page is displayed, feed information is changed;
         rssFeedUrlBoxPage.clickOk();
+        rssFeedUrlBoxPage.waitUntilCheckDisapperers();
 
         // wait a few seconds to load the RSS Feed
         rssDashlet.waitUntilLoadingDisappears();
