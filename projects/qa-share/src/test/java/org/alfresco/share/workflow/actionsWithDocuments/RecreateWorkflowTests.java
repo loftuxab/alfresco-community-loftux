@@ -112,7 +112,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
      * Data preparation for test AONE-15715
      */
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15715() throws Exception
+    public void dataPrep_AONE_15715() throws Exception
     {
         dataPrep_recreate(getTestName(), keepStrategy);
     }
@@ -120,7 +120,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15715: Recreate Workflow - The document is already synced
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15715() throws Exception
     {
         String testName = getTestName();
@@ -154,10 +154,12 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         // syncronized with the Cloud. You can only use content that is not yet syncronized with the Cloud to start a new Hybrid Workflow.
         cloudTaskOrReviewPage.startWorkflow(formDetails);
         SharePopup errorPopup = new SharePopup(drone);
-        Assert.assertTrue(errorPopup
-                .getShareMessage()
-                .contains(
-                        "One of the selected documents is already syncronized with the Cloud. You can only use content that is not yet syncronized with the Cloud to start a new Hybrid Workflow."));
+        Assert.assertTrue(
+                errorPopup
+                        .getShareMessage()
+                        .contains(
+                                "One of the selected documents is already syncronized with the Cloud. You can only use content that is not yet syncronized with the Cloud to start a new Hybrid Workflow."),
+                "Incorrect message");
 
         ShareUser.logout(drone);
 
@@ -168,8 +170,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
 
         // --- Expected result ----
         // The document is still synchronized. The document is not a part of any workflow. No workflow is created
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName).isCloudSynced());
-        Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isPartOfWorkflow());
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName).isCloudSynced(), "File is not synced");
+        Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "File is not part of workflow");
         ShareUser.logout(hybridDrone);
     }
 
@@ -177,7 +179,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
      * Data preparation for test AONE-15716
      */
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15716() throws Exception
+    public void dataPrep_AONE_15716() throws Exception
     {
         dataPrep_recreate(getTestName(), removeSyncStrategy);
     }
@@ -185,7 +187,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15716:Recreate Workflow - The document exists in Cloud
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15716() throws Exception
     {
         String testName = getTestName();
@@ -217,7 +219,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         // --- Expected Result ---
         // Workflow is not created.
         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
-        Assert.assertTrue(checkIfSyncFailed(drone, fileName));
+        Assert.assertTrue(checkIfSyncFailed(drone, fileName), "File is synced");
 
         ShareUser.logout(drone);
 
@@ -228,8 +230,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
 
         // --- Expected result ----
         // The document is still synchronized. The document is not a part of any workflow. No workflow is created
-        Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isCloudSynced());
-        Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isPartOfWorkflow());
+        Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isCloudSynced(), "File is synced");
+        Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "File is part of workflow");
         ShareUser.logout(hybridDrone);
     }
 
@@ -237,7 +239,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
      * Data preparation for test AONE-15717
      */
     @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15717() throws Exception
+    public void dataPrep_AONE_15717() throws Exception
     {
         dataPrep_recreate(getTestName(), deleteContentStrategy);
     }
@@ -245,7 +247,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15717:Recreate Workflow - The document was removed from Cloud
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15717() throws Exception
     {
         String testName = getTestName();
@@ -273,11 +275,9 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
         formDetails.setMessage(workFlowName);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
-
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
         waitForSync(fileName, opSiteName);
-
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName).isCloudSynced());
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName).isCloudSynced(), "File is not synced");
 
         ShareUser.logout(drone);
 
@@ -288,10 +288,9 @@ public class RecreateWorkflowTests extends AbstractWorkflow
 
         // --- Expected result ----
         // The document is created in Cloud. The document is a part of a newly created workflow. The workflow is created successfully.
-        Assert.assertTrue(docLibPageCloud.getFileDirectoryInfo(fileName).isCloudSynced());
-        Assert.assertTrue(docLibPageCloud.getFileDirectoryInfo(fileName).isPartOfWorkflow());
+        Assert.assertTrue(docLibPageCloud.getFileDirectoryInfo(fileName).isCloudSynced(), "File is not synced");
+        Assert.assertTrue(docLibPageCloud.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "File is not part of workflow");
         ShareUser.logout(hybridDrone);
-
     }
 
     private void waitForSync(String fileName, String siteName)
@@ -332,6 +331,5 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         ShareUser.checkIfTaskIsPresent(drone, workflowName);
         ShareUserWorkFlow.completeWorkFlow(drone, opUser, workflowName).render();
         ShareUser.logout(drone);
-
     }
 }
