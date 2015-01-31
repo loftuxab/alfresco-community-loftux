@@ -138,51 +138,66 @@
 <exclude name=".*"/>
 </methods>
 </class>
-<class name="org.alfresco.share.dashlet.SiteSearchDashletTest">
+<class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest">
 <methods>
-<include name="dataPrep_AONE_14774"/>
-<include name="dataPrep_AONE_14775"/>
-<include name="dataPrep_AONE_14776"/>
-    <include name="dataPrep_AONE_14777"/>
-    <include name="dataPrep_AONE_14778"/>
-    <include name="dataPrep_AONE_14779"/>
-    <include name="dataPrep_AONE_14780"/>
-<include name="dataPrep_AONE_14781"/>
-<include name="dataPrep_AONE_14782"/>
-<include name="dataPrep_AONE_14783"/>
-<include name="dataPrep_AONE_14784"/>
-<include name="dataPrep_AONE_14785"/>
-<include name="dataPrep_AONE_14786"/>
-<include name="dataPrep_AONE_14787"/>
-<include name="dataPrep_AONE_14788"/>
-<include name="dataPrep_AONE_14789"/>
-<include name="dataPrep_AONE_14790"/>
-<include name="dataPrep_AONE_14791"/>
-<include name="dataPrep_AONE_14792"/>
-<include name="dataPrep_AONE_14793"/>
-<include name="dataPrep_AONE_14794"/>
-<include name="dataPrep_AONE_14795"/>
-<include name="dataPrep_AONE_14796"/>
-<include name="dataPrep_AONE_14797"/>
-<include name="dataPrep_AONE_14798"/>
-<include name="dataPrep_AONE_14799"/>
-<include name="dataPrep_AONE_14800"/>
-<include name="dataPrep_AONE_14802"/>
-<include name="dataPrep_AONE_14803"/>
-<include name="dataPrep_AONE_14804"/>
-<include name="dataPrep_AONE_14805"/>
-<include name="dataPrep_AONE_14806"/>
-<include name="dataPrep_AONE_14807"/>
-<include name="dataPrep_AONE_14808"/>
-<include name="dataPrep_AONE_14809"/>
-<include name="dataPrep_AONE_14811"/>
-<include name="dataPrep_AONE_14812"/>
-<include name="dataPrep_AONE_14813"/>
-<include name="dataPrep_AONE_14814"/>
-<include name="dataPrep_AONE_14815"/>
+<include name="dataPrep_AONE_14818"/>
+<include name="dataPrep_AONE_14819"/>
+<include name="dataPrep_AONE_14820"/>
+    <include name="dataPrep_AONE_14821"/>
+    <include name="dataPrep_AONE_14822"/>
+    <include name="dataPrep_AONE_14823"/>
+    <include name="dataPrep_AONE_14824"/>
+<include name="dataPrep_AONE_14825"/>
+<include name="dataPrep_AONE_14826"/>
+<include name="dataPrep_AONE_14827"/>
 <exclude name=".*"/>
 </methods>
 </class>
+    <class name="org.alfresco.share.dashlet.SiteSearchDashletTest">
+        <methods>
+            <include name="dataPrep_AONE_14774"/>
+            <include name="dataPrep_AONE_14775"/>
+            <include name="dataPrep_AONE_14776"/>
+            <include name="dataPrep_AONE_14777"/>
+            <include name="dataPrep_AONE_14778"/>
+            <include name="dataPrep_AONE_14779"/>
+            <include name="dataPrep_AONE_14780"/>
+            <include name="dataPrep_AONE_14781"/>
+            <include name="dataPrep_AONE_14782"/>
+            <include name="dataPrep_AONE_14783"/>
+            <include name="dataPrep_AONE_14784"/>
+            <include name="dataPrep_AONE_14785"/>
+            <include name="dataPrep_AONE_14786"/>
+            <include name="dataPrep_AONE_14787"/>
+            <include name="dataPrep_AONE_14788"/>
+            <include name="dataPrep_AONE_14789"/>
+            <include name="dataPrep_AONE_14790"/>
+            <include name="dataPrep_AONE_14791"/>
+            <include name="dataPrep_AONE_14792"/>
+            <include name="dataPrep_AONE_14793"/>
+            <include name="dataPrep_AONE_14794"/>
+            <include name="dataPrep_AONE_14795"/>
+            <include name="dataPrep_AONE_14796"/>
+            <include name="dataPrep_AONE_14797"/>
+            <include name="dataPrep_AONE_14798"/>
+            <include name="dataPrep_AONE_14799"/>
+            <include name="dataPrep_AONE_14800"/>
+            <include name="dataPrep_AONE_14802"/>
+            <include name="dataPrep_AONE_14803"/>
+            <include name="dataPrep_AONE_14804"/>
+            <include name="dataPrep_AONE_14805"/>
+            <include name="dataPrep_AONE_14806"/>
+            <include name="dataPrep_AONE_14807"/>
+            <include name="dataPrep_AONE_14808"/>
+            <include name="dataPrep_AONE_14809"/>
+            <include name="dataPrep_AONE_14811"/>
+            <include name="dataPrep_AONE_14812"/>
+            <include name="dataPrep_AONE_14813"/>
+            <include name="dataPrep_AONE_14814"/>
+            <include name="dataPrep_AONE_14815"/>
+            <exclude name=".*"/>
+        </methods>
+    </class>
 <class name="org.alfresco.share.dashlet.WelcomeDashletCreateDelete">
 <methods>
 <include name="dataPrep_AONE_15837"/>

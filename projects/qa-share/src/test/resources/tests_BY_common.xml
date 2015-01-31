@@ -198,6 +198,21 @@
 <exclude name=".*"/>
 </methods>
 </class>
+    <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest">
+        <methods>
+            <include name="AONE_14818"/>
+            <include name="AONE_14819"/>
+            <include name="AONE_14820"/>
+            <include name="AONE_14821"/>
+            <include name="AONE_14822"/>
+            <include name="AONE_14823"/>
+            <include name="AONE_14824"/>
+            <include name="AONE_14825"/>
+            <include name="AONE_14826"/>
+            <include name="AONE_14827"/>
+            <exclude name=".*"/>
+        </methods>
+    </class>
 <class name="org.alfresco.share.dashlet.SiteDashboardMyDiscussionTests">
 <methods>
 <include name="AONE_14766"/>

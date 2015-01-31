@@ -423,7 +423,6 @@ public class SiteSearchDashletTest extends AbstractUtils
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-//        ShareUser.uploadFileInFolder(drone, fileInfo);
         ShareUserDashboard.addDashlet(drone, siteName, Dashlets.SITE_SEARCH);
 
         // Create File
@@ -435,33 +434,6 @@ public class SiteSearchDashletTest extends AbstractUtils
         SiteDashboardPage siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName).render();
         CustomizeSitePage customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite();
         customizeSitePage.addPages(asList(PAGE_TYPES));
-
-//        // Create Wiki Page
-//        WikiPage wikiPage = siteDashboardPage.getSiteNav().selectWikiPage().render();
-//
-//        List<String> txtLines = new ArrayList<>();
-//        txtLines.add(0, content + "wiki" + test);
-//        wikiPage.createWikiPage(content + "wiki" + test, txtLines).render();
-//
-//        // Create Blog Post
-//        BlogPage blogPage = siteDashboardPage.getSiteNav().selectBlogPage().render();
-//        blogPage.createPostInternally(content + "blog" + test, content + "blog" + test).render();
-//
-//        // Create any event
-//        CalendarPage calendarPage = siteDashboardPage.getSiteNav().selectCalendarPage().render();
-//        calendarPage.createEvent(content + "event" + test, content + "event" + test, content + "event" + test, true).render();
-//
-//        // Create Data List
-//        siteDashboardPage.getSiteNav().selectDataListPage();
-//        DataListPage dataListPage = new DataListPage(drone).render();
-//        dataListPage.createDataList(CONTACT_LIST, content + "dataList" + test, content + "dataList" + test).render();
-//
-//        //Create a topic
-//        DiscussionsPage discussionsPage = siteDashboardPage.getSiteNav().selectDiscussionsPage().render();
-//        discussionsPage.createTopic(content + "discussion" + test, content + "discussion" + test).render();
-
-
-
 
         // Create Wiki Page
         WikiPage wikiPage = siteDashboardPage.getSiteNav().selectWikiPage().render();
@@ -519,35 +491,6 @@ public class SiteSearchDashletTest extends AbstractUtils
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "link"));
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
 
-//        // Search
-//        List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, content + "*", SearchLimit.HUNDRED);
-//
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "event" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "dataList" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "discussion" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
-//
-//        // Configure Saved search with "*test"
-//        items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test, SearchLimit.HUNDRED);
-//
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "event" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "dataList" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "discussion" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
-//
-//        // Configure Saved search with "*test*"
-//        items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test + "*", SearchLimit.HUNDRED);
-//
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "event" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "dataList" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "discussion" + test));
-//        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
     }
 
     @Test(groups = { "DataPrepEnterpriseOnly" })

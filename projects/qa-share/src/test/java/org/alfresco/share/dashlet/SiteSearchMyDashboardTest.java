@@ -27,13 +27,23 @@ import org.alfresco.po.share.dashlet.SearchLimit;
 import org.alfresco.po.share.dashlet.SiteSearchDashlet;
 import org.alfresco.po.share.dashlet.SiteSearchItem;
 import org.alfresco.po.share.enums.Dashlets;
+import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.SitePageType;
+import org.alfresco.po.share.site.blog.BlogPage;
+import org.alfresco.po.share.site.calendar.CalendarPage;
+import org.alfresco.po.share.site.calendar.EditEventForm;
+import org.alfresco.po.share.site.calendar.InformationEventForm;
+import org.alfresco.po.share.site.datalist.DataListPage;
+import org.alfresco.po.share.site.discussions.DiscussionsPage;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentAspect;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.links.LinksPage;
+import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
@@ -46,6 +56,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import static java.util.Arrays.asList;
+import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
+
 /**
  * @author Ranjith Manyam
  */
@@ -58,6 +72,15 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
     private String expectedHelpBallonMsg = "Use this dashlet to perform a site search and view the results.\nClicking the item name takes you to the details page so you can preview or work with the item.";
     private static final String NO_RESULTS_FOUND_MESSAGE = "No results found.";
     private static final String LAST_NAME = "SSLastName";
+
+    private static final SitePageType[] PAGE_TYPES = {
+            SitePageType.BLOG,
+            SitePageType.CALENDER,
+            SitePageType.DATA_LISTS,
+            SitePageType.DISCUSSIONS,
+            SitePageType.LINKS,
+            SitePageType.WIKI
+    };
     
     @Override
     @BeforeClass(alwaysRun=true)
@@ -188,10 +211,336 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
 
     }
 
-    // TODO - AONE-14819:Search term - all items are found
-    // TODO - AONE-14820:Partially defined query
-    // TODO - AONE-14821:Search Term - text (description)
-    // TODO - AONE-14822: Search Term - tag
+    @Test(groups={"DataPrepEnterpriseOnly"})
+    public void dataPrep_AONE_14819() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String siteName = getSiteName(testName);
+        String content = "content";
+        String test = "finish";
+        String fileName = content + testName + test + ".doc";
+        String[] fileInfo = { fileName, DOCLIB };
+
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        ShareUserDashboard.addDashlet(drone, Dashlets.SITE_SEARCH);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.uploadFileInFolder(drone, fileInfo);
+
+        SiteDashboardPage siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName).render();
+        CustomizeSitePage customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite();
+        customizeSitePage.addPages(asList(PAGE_TYPES));
+
+        // Create Wiki Page
+        WikiPage wikiPage = siteDashboardPage.getSiteNav().selectWikiPage().render();
+
+        List<String> txtLines = new ArrayList<>();
+        txtLines.add(0, content + "wiki" + test);
+        wikiPage.createWikiPage(content + "wiki" + test, txtLines).render();
+
+        // Create Blog Post
+        BlogPage blogPage = siteDashboardPage.getSiteNav().selectBlogPage().render();
+        blogPage.createPostInternally(content + "blog" + test, content + "blog" + test).render();
+
+        // Create any event
+        CalendarPage calendarPage = siteDashboardPage.getSiteNav().selectCalendarPage().render();
+        calendarPage.createEvent(content + "event" + test, content + "event" + test, content + "event" + test, true).render();
+
+        // Create Data List
+        siteDashboardPage.getSiteNav().selectDataListPage();
+        DataListPage dataListPage = new DataListPage(drone).render();
+        dataListPage.createDataList(CONTACT_LIST, content + "dataList" + test, content + "dataList" + test).render();
+
+        //Create a topic
+        DiscussionsPage discussionsPage = siteDashboardPage.getSiteNav().selectDiscussionsPage().render();
+        discussionsPage.createTopic(content + "discussion" + test, content + "discussion" + test).render();
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = { "EnterpriseOnly"})
+    public void AONE_14819() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String content = "content";
+        String test = "finish";
+        String fileName = content + testName + test + ".doc";
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // Search
+        List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test);
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "event" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "dataList" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "discussion" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
+
+    }
+
+    @Test(groups={"DataPrepEnterpriseOnly"})
+    public void dataPrep_AONE_14820() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String siteName = getSiteName(testName);
+        String content = "content";
+        String test = "finish";
+        String fileName = content + testName + test + ".doc";
+        String[] fileInfo = { fileName, DOCLIB };
+
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        ShareUserDashboard.addDashlet(drone, Dashlets.SITE_SEARCH);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.uploadFileInFolder(drone, fileInfo);
+
+        SiteDashboardPage siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName).render();
+        CustomizeSitePage customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite();
+        customizeSitePage.addPages(asList(PAGE_TYPES));
+
+        // Create Wiki Page
+        WikiPage wikiPage = siteDashboardPage.getSiteNav().selectWikiPage().render();
+
+        List<String> txtLines = new ArrayList<>();
+        txtLines.add(0, content + "wiki" + test);
+        wikiPage.createWikiPage(content + "wiki" + test, txtLines).render();
+
+        // Create Blog Post
+        BlogPage blogPage = siteDashboardPage.getSiteNav().selectBlogPage().render();
+        blogPage.createPostInternally(content + "blog" + test, content + "blog" + test).render();
+
+        // Create any event
+        CalendarPage calendarPage = siteDashboardPage.getSiteNav().selectCalendarPage().render();
+        calendarPage.createEvent(content + "event" + test, content + "event" + test, content + "event" + test, true).render();
+
+        // Create Data List
+        siteDashboardPage.getSiteNav().selectDataListPage();
+        DataListPage dataListPage = new DataListPage(drone).render();
+        dataListPage.createDataList(CONTACT_LIST, content + "dataList" + test, content + "dataList" + test).render();
+
+        //Create a topic
+        DiscussionsPage discussionsPage = siteDashboardPage.getSiteNav().selectDiscussionsPage().render();
+        discussionsPage.createTopic(content + "discussion" + test, content + "discussion" + test).render();
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = { "EnterpriseOnly"})
+    public void AONE_14820() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String content = "content";
+        String test = "finish";
+        String fileName = content + testName + test + ".doc";
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, content + "*", SearchLimit.HUNDRED);
+
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "event" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "dataList" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "discussion" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
+
+        // Configure Saved search with "*test"
+        items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test, SearchLimit.HUNDRED);
+
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "event" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "dataList" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "discussion" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
+
+        // Configure Saved search with "*test*"
+        items = ShareUserDashboard.searchSiteSearchDashlet(drone, "*" + test + "*", SearchLimit.HUNDRED);
+
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "wiki" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "blog" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "event" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "dataList" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, content + "discussion" + test));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
+
+    }
+
+    @Test(groups={"DataPrepEnterpriseOnly"})
+    public void dataPrep_AONE_14821() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String siteName = getSiteName(testName);
+        String description = testName + 1;
+        String fileName = testName + ".doc";
+
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        ShareUserDashboard.addDashlet(drone, Dashlets.SITE_SEARCH);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+        // Create File
+        ContentDetails contentDetails = new ContentDetails();
+        contentDetails.setName(fileName);
+        contentDetails.setDescription(description);
+        ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
+
+        SiteDashboardPage siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName).render();
+        CustomizeSitePage customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite();
+        customizeSitePage.addPages(asList(PAGE_TYPES));
+
+        // Create Wiki Page
+        WikiPage wikiPage = siteDashboardPage.getSiteNav().selectWikiPage().render();
+
+        List<String> txtLines = new ArrayList<>();
+        txtLines.add(0, description);
+        wikiPage.createWikiPage(testName + "wiki", txtLines).render();
+
+        // Create Blog Post
+        BlogPage blogPage = siteDashboardPage.getSiteNav().selectBlogPage().render();
+        blogPage.createPostInternally(testName + "blog", description).render();
+
+        // Create any event
+        CalendarPage calendarPage = siteDashboardPage.getSiteNav().selectCalendarPage().render();
+        calendarPage.createEvent(testName + "event", description, description, true).render();
+
+        // Create Data List
+        siteDashboardPage.getSiteNav().selectDataListPage();
+        DataListPage dataListPage = new DataListPage(drone).render();
+        dataListPage.createDataList(CONTACT_LIST, testName + "dataList", description).render();
+
+        //Create a topic
+        DiscussionsPage discussionsPage = siteDashboardPage.getSiteNav().selectDiscussionsPage().render();
+        discussionsPage.createTopic(testName + "discussion", description).render();
+
+        //Create a link
+        LinksPage linksPage = siteDashboardPage.getSiteNav().selectLinksPage().render();
+        String url = getRandomString(7);
+        linksPage.createLink(testName + "link", url, description, description).render();
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = { "EnterpriseOnly"})
+    public void AONE_14821() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String description = testName + 1;
+        String fileName = testName + ".doc";
+
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // Configure Site search with Description
+        List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, description);
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "wiki"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "blog"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "event"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "dataList"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "discussion"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "link"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
+
+    }
+
+    @Test(groups={"DataPrepEnterpriseOnly"})
+    public void dataPrep_AONE_14822() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String siteName = getSiteName(testName);
+        String tag = testName + 2;
+        String fileName = testName + ".doc";
+
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        ShareUserDashboard.addDashlet(drone, Dashlets.SITE_SEARCH);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+
+        // Create File
+        ContentDetails contentDetails = new ContentDetails();
+        contentDetails.setName(fileName);
+        ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
+
+        ShareUser.openDocumentLibrary(drone);
+        ShareUserSitePage.addTag(drone, fileName, tag);
+
+        SiteDashboardPage siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName).render();
+        CustomizeSitePage customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite();
+        customizeSitePage.addPages(asList(PAGE_TYPES));
+
+        // Create Wiki Page
+        WikiPage wikiPage = siteDashboardPage.getSiteNav().selectWikiPage().render();
+
+        List<String> txtLines = new ArrayList<>();
+        txtLines.add(0, testName + "wiki");
+        List<String> tagLines = new ArrayList<>();
+        txtLines.add(0, tag);
+        wikiPage.createWikiPage(testName + "wiki", txtLines, tagLines).render();
+
+        // Create Blog Post
+        BlogPage blogPage = siteDashboardPage.getSiteNav().selectBlogPage().render();
+        blogPage.createPostInternally(testName + "blog", testName + "blog", tag).render();
+
+        // Create any event
+        CalendarPage calendarPage = siteDashboardPage.getSiteNav().selectCalendarPage().render();
+        calendarPage = (CalendarPage) calendarPage.chooseMonthTab();
+
+        calendarPage = calendarPage.createEvent(testName + "event", testName + "event", testName + "event", false);
+
+        InformationEventForm informationEventForm = calendarPage.clickOnEvent(CalendarPage.EventType.MONTH_TAB_SINGLE_EVENT, testName + "event");
+        EditEventForm editEventForm = informationEventForm.clickOnEditEvent();
+        editEventForm.setTagsField(tag);
+        editEventForm.clickAddTag();
+        editEventForm.clickSave();
+
+        //Create a topic
+        DiscussionsPage discussionsPage = siteDashboardPage.getSiteNav().selectDiscussionsPage().render();
+        discussionsPage.createTopic(testName + "discussion", testName + "discussion", tag).render();
+
+        //Create a link
+        LinksPage linksPage = siteDashboardPage.getSiteNav().selectLinksPage().render();
+        String url = getRandomString(7);
+        linksPage.createLink(testName + "link", url, testName + "link", tag).render();
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = { "EnterpriseOnly"})
+    public void AONE_14822() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String tag = testName + 2;
+        String fileName = testName + ".doc";
+
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // Configure Site search with Tag
+        List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, tag);
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "wiki"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "blog"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "event"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "discussion"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, testName + "link"));
+        Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
+
+    }
 
     @Test(groups={"DataPrepEnterpriseOnly"})
     public void dataPrep_AONE_14823() throws Exception
@@ -231,7 +580,51 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
         ShareUser.logout(drone);
     }
 
-    // TODO - AONE-14824: Search Term - content
+    @Test(groups={"DataPrepEnterpriseOnly"})
+    public void dataPrep_AONE_14824() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String siteName = getSiteName(testName);
+        String fileName = testName;
+        String[] dots = {".pdf", ".xml", ".html", ".txt", ".eml", ".odp", ".ods", ".odt", ".xls", ".xlsx", ".xsl", ".doc", ".docx", ".ppt",
+                ".pptx", ".pot", ".xsd", ".js", ".java", ".css", ".rtf", ".msg"};
+
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        ShareUserDashboard.addDashlet(drone, Dashlets.SITE_SEARCH);
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+
+        for (String dot : dots)
+        {
+            String[] fileInfo = {fileName + dot, DOCLIB};
+            ShareUser.uploadFileInFolder(drone, fileInfo);
+        }
+
+        ShareUser.logout(drone);
+    }
+
+    @Test(groups = { "EnterpriseOnly"})
+    public void AONE_14824() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameForDomain(testName, siteDomain);
+        String fileName = testName;
+        String[] dots = {".pdf", ".xml", ".html", ".txt", ".eml", ".odp", ".ods", ".odt", ".xls", ".xlsx", ".xsl", ".doc", ".docx", ".ppt",
+                ".pptx", ".pot", ".xsd", ".js", ".java", ".css", ".rtf", ".msg"};
+
+
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, fileName, SearchLimit.HUNDRED);
+
+        for (String dot : dots)
+        {
+            Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName + dot));
+        }
+
+    }
 
     @Test(groups={"DataPrepEnterpriseOnly"})
     public void dataPrep_AONE_14825() throws Exception
@@ -263,7 +656,6 @@ public class SiteSearchMyDashboardTest extends AbstractUtils
         List<SiteSearchItem> items = ShareUserDashboard.searchSiteSearchDashlet(drone, folderName);
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, folderName));
     }
-
 
     @Test(groups={"DataPrepEnterpriseOnly"})
     public void dataPrep_AONE_14826() throws Exception
