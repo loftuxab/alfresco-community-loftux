@@ -126,9 +126,9 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         // ---- Step 1 ----
         // ---- Step action ---
-        // Specify 'Keep content synced on cloud' value in the After Completion drop-down list.
+        // OP Modify the synced document's properties, e.g. change title and description.
         // ---- Expected results ----
-        // Performed correctly.
+        // The properties are changed successfully.
         EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, simpleTaskFile);
         editDocumentProperties.setDocumentTitle(modifiedTitle + user1);
         editDocumentProperties.setDescription(modifiedDescription + user1);
@@ -136,7 +136,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
-        
+
         waitForSync(simpleTaskFile, opSiteName);
 
         ShareUser.logout(drone);
@@ -644,7 +644,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 .contains(folderName));
         ShareUser.logout(hybridDrone);
     }
-    
+
     /**
      * AONE-15688:Incomplete workflow - unsync (OP)
      */
@@ -699,7 +699,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // ---- Step action ---
         // OP Remove the synced document.
         // ---- Expected results ----
-        // he content is not removed. It cannot be removed because it is the part of workflow. Friendly behavior occurs (a message).
+        // The content is not removed. It cannot be removed because it is the part of workflow. Friendly behavior occurs (a message).
+        // TODO: Modify step 1 in TestLink accordingly to the Assert !
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent());
 
@@ -716,7 +717,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent());
         ShareUser.logout(hybridDrone);
     }
-    
+
     /**
      * AONE-15689:Incomplete workflow - unsync (Cloud)
      */
@@ -775,8 +776,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // Cloud Remove the synced document.
         // ---- Expected results ----
         // The content is not removed. It cannot be removed because it is the part of workflow. Friendly behavior occurs (a message).
+        // TODO: Modify step 1 in TestLink accordingly to the Assert !
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-
         Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent());
 
@@ -923,8 +924,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // ---- Step action ---
         // Cloud Unsync the synced document
         // ---- Expected results ----
-        // The content is not unsynced. Unsync option is absent / A friendly behavior should occur. It is impossible to unsync the document which is the part of
-        // the incomplete workflow.
+        // The content is not unsynced. Unsync option is absent. It is impossible to unsync the document which is the part of the incomplete workflow
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
 
         Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
