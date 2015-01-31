@@ -10,9 +10,13 @@ import java.util.List;
 
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.enums.ViewType;
+import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.ShareLinkPage;
+import org.alfresco.po.share.site.document.VersionDetails;
 import org.alfresco.po.share.site.document.ViewPublicLinkPage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
@@ -30,9 +34,10 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class AccessSharedDocumentTest extends AbstractUtils
 {
-    private static Log logger = LogFactory.getLog(DocumentDetailsActionsTest.class);
+    private static Log logger = LogFactory.getLog(AccessSharedDocumentTest.class);
     protected String testUser;
     protected String siteName = "";
+    String domain = "invited.test";
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -187,7 +192,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
         ShareUser.login(drone, testUser2, DEFAULT_PASSWORD);
 
         // User2 is logged in successfully. Document Details page of the shared document is opened.
-        // TODO: BUG ? User dashboard is opened instead
+        // TODO: BUG ACE-3132 - Observed result: My dashboard page is opened.
     }
 
     @Test(groups = { "DataPrepDocumentLibrary" })
@@ -312,13 +317,14 @@ public class AccessSharedDocumentTest extends AbstractUtils
         // navigate to the shared link
         drone.navigateTo(shareUrl);
         ViewPublicLinkPage viewPublicLinkPage = new ViewPublicLinkPage(drone);
-        
+
         String title = viewPublicLinkPage.getContentTitle();
+
         // verify that the page contains the document
         assertEquals(title, fileName);
 
-        // verify button Document Details
-        assertNotEquals(viewPublicLinkPage.getButtonName(), "Document Details");
+        // verify button login
+        assertEquals(viewPublicLinkPage.getButtonName(), "Login");
 
     }
 
@@ -445,14 +451,14 @@ public class AccessSharedDocumentTest extends AbstractUtils
         drone.createNewTab();
         drone.navigateTo(shareUrl);
         ViewPublicLinkPage viewPublicLinkPage = new ViewPublicLinkPage(drone);
-        
+
         String title = viewPublicLinkPage.getContentTitle();
-        
+
         // verify that the page contains the document
         assertEquals(title, fileName);
 
-        // verify button Document Details
-        assertNotEquals(viewPublicLinkPage.getButtonName(), "Document Details");
+        // verify button login
+        assertEquals(viewPublicLinkPage.getButtonName(), "Login");
 
     }
 
@@ -482,7 +488,6 @@ public class AccessSharedDocumentTest extends AbstractUtils
         String fileName = getFileName(testName) + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
         ShareUser.uploadFileInFolder(drone, fileInfo);
-
     }
 
     @Test(groups = "AlfrescoOne")
@@ -513,12 +518,13 @@ public class AccessSharedDocumentTest extends AbstractUtils
         drone.createNewTab();
         drone.navigateTo(shareUrl);
         ViewPublicLinkPage viewPublicLinkPage = new ViewPublicLinkPage(drone);
-        
+
         // verify that the page contains the document
         assertTrue(viewPublicLinkPage.isDocumentViewDisplayed());
 
         // verify button Document Details
         assertNotEquals(viewPublicLinkPage.getButtonName(), "Document Details");
+
         // verify button Login
         assertNotEquals(viewPublicLinkPage.getButtonName(), "Login");
 
@@ -672,8 +678,9 @@ public class AccessSharedDocumentTest extends AbstractUtils
     public void dataPrep_AONE_14082() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName) + "1";
-        String testUser2 = getUserNameFreeDomain(testName) + "2";
+
+        String testUser = getUserNameFreeDomain(testName + "1") + domain;
+        String testUser2 = getUserNameFreeDomain(testName + "2") + domain;
         String siteName = getSiteName(testName);
 
         // User
@@ -693,7 +700,22 @@ public class AccessSharedDocumentTest extends AbstractUtils
         // Upload File
         String fileName = getFileName(testName) + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
-        ShareUser.uploadFileInFolder(drone, fileInfo);
+        DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
+
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        ContentDetails contentDetails = new ContentDetails();
+        contentDetails.setContent(testName + "modifed");
+        contentDetails.setName(fileName);
+
+        EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
+        documentDetailsPage = inlineEditPage.save(contentDetails).render();
+
+        // second edit
+        contentDetails = new ContentDetails();
+        contentDetails.setContent(testName + "modifed-2");
+        contentDetails.setName(fileName);
+        inlineEditPage = documentDetailsPage.selectInlineEdit().render();
+        documentDetailsPage = inlineEditPage.save(contentDetails).render();
 
         // User2 is invited to the site with Site Consumer role;
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser, testUser2, siteName, UserRole.CONSUMER);
@@ -704,8 +726,10 @@ public class AccessSharedDocumentTest extends AbstractUtils
     public void AONE_14082() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName) + "1";
-        String testUser2 = getUserNameFreeDomain(testName) + "2";
+
+        String testUser = getUserNameFreeDomain(testName + "1") + domain;
+        String testUser2 = getUserNameFreeDomain(testName + "2") + domain;
+
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName) + ".txt";
 
@@ -739,16 +763,39 @@ public class AccessSharedDocumentTest extends AbstractUtils
         DocumentDetailsPage detailsPage = viewPublicLinkPage.clickOnDocumentDetailsButton().render();
         List<String> documentActionsList = detailsPage.getDocumentActionList();
         List<String> expectedActions = new ArrayList<String>();
-        expectedActions.add("Download");
-        expectedActions.add("View In Browser");
-        expectedActions.add("Copy to...");
-        expectedActions.add("Start Workflow");
-        expectedActions.add("Publish");
-        assertTrue(expectedActions.containsAll(documentActionsList));
+        if (!ShareUser.isAlfrescoVersionCloud(drone))
+        {
+            expectedActions.add("Download");
+            expectedActions.add("View In Browser");
+            expectedActions.add("Copy to...");
+            expectedActions.add("Start Workflow");
+            expectedActions.add("Publish");
+            assertTrue(expectedActions.containsAll(documentActionsList));
+        }
+        else
+        {
+            expectedActions.add("Download");
+            expectedActions.add("View In Browser");
+            expectedActions.add("Copy to...");
+            expectedActions.add("Create Task");
+            assertTrue(expectedActions.containsAll(documentActionsList));
+        }
+
+        VersionDetails versionDetails = detailsPage.getCurrentVersionDetails();
+
+        assertEquals(versionDetails.getVersionNumber(), "1.2", "Verifying version number");
+        assertEquals(versionDetails.getFileName(), fileName, "Verifying File Name");
+
+        assertTrue(detailsPage.isDownloadPreviousVersion("1.1"));
 
         assertTrue(detailsPage.isLikeLinkPresent());
         assertTrue(detailsPage.isFavouriteLinkPresent());
-        assertTrue(detailsPage.isSharePanePresent());
+
+        // TODO:
+        // - View Working Copy (for editing offline document)
+        // - View original document (for editing offline document)
+        // these options are not available for the invited user with role CONSUMER
+        // Please modify TestLink step
 
     }
 
@@ -756,8 +803,8 @@ public class AccessSharedDocumentTest extends AbstractUtils
     public void dataPrep_AONE_14083() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName) + "1";
-        String testUser2 = getUserNameFreeDomain(testName) + "2";
+        String testUser = getUserNameFreeDomain(testName + "1") + domain;
+        String testUser2 = getUserNameFreeDomain(testName + "2") + domain;
         String siteName = getSiteName(testName);
 
         // User
@@ -777,19 +824,33 @@ public class AccessSharedDocumentTest extends AbstractUtils
         // Upload File
         String fileName = getFileName(testName) + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
-        ShareUser.uploadFileInFolder(drone, fileInfo);
+        DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
+
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        ContentDetails contentDetails = new ContentDetails();
+        contentDetails.setContent(testName + "modifed");
+        contentDetails.setName(fileName);
+
+        EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
+        documentDetailsPage = inlineEditPage.save(contentDetails).render();
+
+        // second edit
+        contentDetails = new ContentDetails();
+        contentDetails.setContent(testName + "modifed-2");
+        contentDetails.setName(fileName);
+        inlineEditPage = documentDetailsPage.selectInlineEdit().render();
+        documentDetailsPage = inlineEditPage.save(contentDetails).render();
 
         // User2 is invited to the site with Site Consumer role;
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser, testUser2, siteName, UserRole.CONTRIBUTOR);
-
     }
 
     @Test(groups = "AlfrescoOne")
     public void AONE_14083() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName) + "1";
-        String testUser2 = getUserNameFreeDomain(testName) + "2";
+        String testUser = getUserNameFreeDomain(testName + "1") + domain;
+        String testUser2 = getUserNameFreeDomain(testName + "2") + domain;
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName) + ".txt";
 
@@ -823,17 +884,39 @@ public class AccessSharedDocumentTest extends AbstractUtils
         DocumentDetailsPage detailsPage = viewPublicLinkPage.clickOnDocumentDetailsButton().render();
         List<String> documentActionsList = detailsPage.getDocumentActionList();
         List<String> expectedActions = new ArrayList<String>();
-        expectedActions.add("Download");
-        expectedActions.add("View In Browser");
-        expectedActions.add("Copy to...");
-        expectedActions.add("Start Workflow");
-        expectedActions.add("Publish");
-        assertTrue(expectedActions.containsAll(documentActionsList));
+        if (!ShareUser.isAlfrescoVersionCloud(drone))
+        {
+            expectedActions.add("Download");
+            expectedActions.add("View In Browser");
+            expectedActions.add("Copy to...");
+            expectedActions.add("Start Workflow");
+            expectedActions.add("Publish");
+            assertTrue(expectedActions.containsAll(documentActionsList));
+        }
+        else
+        {
+            expectedActions.add("Download");
+            expectedActions.add("View In Browser");
+            expectedActions.add("Copy to...");
+            expectedActions.add("Create Task");
+            assertTrue(expectedActions.containsAll(documentActionsList));
+        }
 
         assertTrue(detailsPage.isLikeLinkPresent());
         assertTrue(detailsPage.isFavouriteLinkPresent());
-        assertTrue(detailsPage.isSharePanePresent());
         assertTrue(detailsPage.isAddCommentButtonPresent());
+
+        VersionDetails versionDetails = detailsPage.getCurrentVersionDetails();
+
+        assertEquals(versionDetails.getVersionNumber(), "1.2", "Verifying version number");
+        assertEquals(versionDetails.getFileName(), fileName, "Verifying File Name");
+        assertTrue(detailsPage.isDownloadPreviousVersion("1.1"));
+
+        // TODO:
+        // - View Working Copy (for editing offline document)
+        // - View original document (for editing offline document)
+        // these options are not available for the invited user with role CONTRIBUTOR
+        // Please modify TestLink step
 
     }
 
@@ -841,8 +924,8 @@ public class AccessSharedDocumentTest extends AbstractUtils
     public void dataPrep_AONE_14084() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName) + "1";
-        String testUser2 = getUserNameFreeDomain(testName) + "2";
+        String testUser = getUserNameFreeDomain(testName + "1") + domain;
+        String testUser2 = getUserNameFreeDomain(testName + "2") + domain;
         String siteName = getSiteName(testName);
 
         // User
@@ -862,7 +945,22 @@ public class AccessSharedDocumentTest extends AbstractUtils
         // Upload File
         String fileName = getFileName(testName) + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
-        ShareUser.uploadFileInFolder(drone, fileInfo);
+        DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
+
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        ContentDetails contentDetails = new ContentDetails();
+        contentDetails.setContent(testName + "modifed");
+        contentDetails.setName(fileName);
+
+        EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
+        documentDetailsPage = inlineEditPage.save(contentDetails).render();
+
+        // second edit
+        contentDetails = new ContentDetails();
+        contentDetails.setContent(testName + "modifed-2");
+        contentDetails.setName(fileName);
+        inlineEditPage = documentDetailsPage.selectInlineEdit().render();
+        documentDetailsPage = inlineEditPage.save(contentDetails).render();
 
         // User2 is invited to the site with Site Consumer role;
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser, testUser2, siteName, UserRole.COLLABORATOR);
@@ -873,8 +971,8 @@ public class AccessSharedDocumentTest extends AbstractUtils
     public void AONE_14084() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName) + "1";
-        String testUser2 = getUserNameFreeDomain(testName) + "2";
+        String testUser = getUserNameFreeDomain(testName + "1") + domain;
+        String testUser2 = getUserNameFreeDomain(testName + "2") + domain;
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName) + ".txt";
 
@@ -908,34 +1006,73 @@ public class AccessSharedDocumentTest extends AbstractUtils
         DocumentDetailsPage detailsPage = viewPublicLinkPage.clickOnDocumentDetailsButton().render();
         List<String> documentActionsList = detailsPage.getDocumentActionList();
         List<String> expectedActions = new ArrayList<String>();
-        expectedActions.add("Download");
-        expectedActions.add("View In Browser");
-        expectedActions.add("Copy to...");
-        expectedActions.add("Start Workflow");
-        expectedActions.add("Publish");
-        expectedActions.add("Edit Properties");
-        expectedActions.add("Upload New Version");
-        expectedActions.add("Inline Edit");
-        expectedActions.add("Edit Offline");
-        expectedActions.add("Edit in Google Docs™");
-        expectedActions.add("Manage Aspects");
-        expectedActions.add("Change Type");
 
-        assertTrue(expectedActions.containsAll(documentActionsList));
+        if (!ShareUser.isAlfrescoVersionCloud(drone))
+        {
+            expectedActions.add("Download");
+            expectedActions.add("View In Browser");
+            expectedActions.add("Copy to...");
+            expectedActions.add("Start Workflow");
+            expectedActions.add("Publish");
+            expectedActions.add("Edit Properties");
+            expectedActions.add("Upload New Version");
+            expectedActions.add("Inline Edit");
+            expectedActions.add("Edit Offline");
+            expectedActions.add("Edit in Google Docs™");
+            expectedActions.add("Manage Aspects");
+            expectedActions.add("Change Type");
+
+            if (ShareUser.isHybridEnabled())
+            {
+                expectedActions.add("Sync to Cloud");
+            }
+
+            assertTrue(expectedActions.containsAll(documentActionsList));
+        }
+        else
+        {
+            expectedActions.add("Download");
+            expectedActions.add("View In Browser");
+            expectedActions.add("Copy to...");
+            expectedActions.add("Publish");
+            expectedActions.add("Edit Properties");
+            expectedActions.add("Upload New Version");
+            expectedActions.add("Inline Edit");
+            expectedActions.add("Edit Offline");
+            expectedActions.add("Edit in Google Docs™");
+            expectedActions.add("Create Task");
+            assertTrue(expectedActions.containsAll(documentActionsList));
+        }
 
         assertTrue(detailsPage.isLikeLinkPresent());
         assertTrue(detailsPage.isFavouriteLinkPresent());
-        assertTrue(detailsPage.isSharePanePresent());
         assertTrue(detailsPage.isAddCommentButtonPresent());
 
+        VersionDetails versionDetails = detailsPage.getCurrentVersionDetails();
+
+        assertEquals(versionDetails.getVersionNumber(), "1.2", "Verifying version number");
+        assertEquals(versionDetails.getFileName(), fileName, "Verifying File Name");
+
+        assertTrue(detailsPage.isDownloadPreviousVersion("1.1"));
+
+        DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, siteName);
+        FileDirectoryInfo fileInfoDir = ShareUserSitePage.getFileDirectoryInfo(drone, fileName);
+
+        // edit offline document
+        fileInfoDir.selectEditOfflineAndCloseFileWindow().render();
+        detailsPage = docLib.selectFile(fileName);
+
+        assertTrue(detailsPage.isViewOriginalLinkPresent());
+        detailsPage.selectViewOriginalDocument().render();
+        assertTrue(detailsPage.isViewWorkingCopyDisplayed());
     }
 
     @Test(groups = { "DataPrepDocumentLibrary" })
     public void dataPrep_AONE_14085() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName) + "1";
-        String testUser2 = getUserNameFreeDomain(testName) + "2";
+        String testUser = getUserNameFreeDomain(testName + "1") + domain;
+        String testUser2 = getUserNameFreeDomain(testName + "2") + domain;
         String siteName = getSiteName(testName);
 
         // User
@@ -955,7 +1092,23 @@ public class AccessSharedDocumentTest extends AbstractUtils
         // Upload File
         String fileName = getFileName(testName) + ".txt";
         String[] fileInfo = { fileName, DOCLIB };
-        ShareUser.uploadFileInFolder(drone, fileInfo);
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
+
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        ContentDetails contentDetails = new ContentDetails();
+        contentDetails.setContent(testName + "modifed");
+        contentDetails.setName(fileName);
+
+        EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
+        documentDetailsPage = inlineEditPage.save(contentDetails).render();
+
+        // second edit
+        contentDetails = new ContentDetails();
+        contentDetails.setContent(testName + "modifed-2");
+        contentDetails.setName(fileName);
+        inlineEditPage = documentDetailsPage.selectInlineEdit().render();
+        documentDetailsPage = inlineEditPage.save(contentDetails).render();
 
         // User2 is invited to the site with Site Consumer role;
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser, testUser2, siteName, UserRole.MANAGER);
@@ -966,8 +1119,8 @@ public class AccessSharedDocumentTest extends AbstractUtils
     public void AONE_14085() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName) + "1";
-        String testUser2 = getUserNameFreeDomain(testName) + "2";
+        String testUser = getUserNameFreeDomain(testName + "1") + domain;
+        String testUser2 = getUserNameFreeDomain(testName + "2") + domain;
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName) + ".txt";
 
@@ -1001,29 +1154,73 @@ public class AccessSharedDocumentTest extends AbstractUtils
         DocumentDetailsPage detailsPage = viewPublicLinkPage.clickOnDocumentDetailsButton().render();
         List<String> documentActionsList = detailsPage.getDocumentActionList();
         List<String> expectedActions = new ArrayList<String>();
-        expectedActions.add("Download");
-        expectedActions.add("View In Browser");
-        expectedActions.add("Copy to...");
-        expectedActions.add("Start Workflow");
-        expectedActions.add("Publish");
-        expectedActions.add("Edit Properties");
-        expectedActions.add("Upload New Version");
-        expectedActions.add("Inline Edit");
-        expectedActions.add("Edit Offline");
-        expectedActions.add("Edit in Google Docs™");
-        expectedActions.add("Manage Aspects");
-        expectedActions.add("Change Type");
-        expectedActions.add("Move to...");
-        expectedActions.add("Delete Document");
-        expectedActions.add("Manage Permissions");
+
+        if (!ShareUser.isAlfrescoVersionCloud(drone))
+        {
+            expectedActions.add("Download");
+            expectedActions.add("View In Browser");
+            expectedActions.add("Copy to...");
+            expectedActions.add("Start Workflow");
+            expectedActions.add("Publish");
+            expectedActions.add("Edit Properties");
+            expectedActions.add("Upload New Version");
+            expectedActions.add("Inline Edit");
+            expectedActions.add("Edit Offline");
+            expectedActions.add("Edit in Google Docs™");
+            expectedActions.add("Manage Aspects");
+            expectedActions.add("Change Type");
+            expectedActions.add("Move to...");
+            expectedActions.add("Delete Document");
+            expectedActions.add("Manage Permissions");
+
+            if (ShareUser.isHybridEnabled())
+            {
+                expectedActions.add("Sync to Cloud");
+            }
+
+            assertTrue(expectedActions.containsAll(documentActionsList));
+        }
+        else
+        {
+            expectedActions.add("Download");
+            expectedActions.add("View In Browser");
+            expectedActions.add("Copy to...");
+            expectedActions.add("Edit Properties");
+            expectedActions.add("Upload New Version");
+            expectedActions.add("Inline Edit");
+            expectedActions.add("Edit Offline");
+            expectedActions.add("Edit in Google Docs™");
+            expectedActions.add("Change Type");
+            expectedActions.add("Move to...");
+            expectedActions.add("Delete Document");
+            expectedActions.add("Manage Permissions");
+            expectedActions.add("Create Task");
+            assertTrue(expectedActions.containsAll(documentActionsList));
+        }
 
         assertTrue(expectedActions.containsAll(documentActionsList));
 
         assertTrue(detailsPage.isLikeLinkPresent());
         assertTrue(detailsPage.isFavouriteLinkPresent());
-        assertTrue(detailsPage.isSharePanePresent());
         assertTrue(detailsPage.isAddCommentButtonPresent());
 
+        VersionDetails versionDetails = detailsPage.getCurrentVersionDetails();
+
+        assertEquals(versionDetails.getVersionNumber(), "1.2", "Verifying version number");
+        assertEquals(versionDetails.getFileName(), fileName, "Verifying File Name");
+
+        assertTrue(detailsPage.isDownloadPreviousVersion("1.1"));
+
+        DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, siteName);
+        FileDirectoryInfo fileInfoDir = ShareUserSitePage.getFileDirectoryInfo(drone, fileName);
+
+        // edit offline document
+        fileInfoDir.selectEditOfflineAndCloseFileWindow().render();
+        detailsPage = docLib.selectFile(fileName);
+
+        assertTrue(detailsPage.isViewOriginalLinkPresent());
+        detailsPage.selectViewOriginalDocument().render();
+        assertTrue(detailsPage.isViewWorkingCopyDisplayed());
     }
 
 }
