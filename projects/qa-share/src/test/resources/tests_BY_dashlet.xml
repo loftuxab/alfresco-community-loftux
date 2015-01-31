@@ -14,7 +14,7 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <test name="RecentlyModifiedDashletTest" verbose="1">
+  <!--  <test name="RecentlyModifiedDashletTest" verbose="1">
         <classes>
             <class name="org.alfresco.share.dashlet.RecentlyModifiedDashletTest">
                 <methods>
@@ -33,5 +33,12 @@
         <classes>
             <class name="org.alfresco.share.dashlet.MyDashboardMyDiscussionTests" />
         </classes>
+    </test>-->
+
+    <test name="SiteSearchMyDashboardTest2" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest2" />
+        </classes>
     </test>
+
 </suite>

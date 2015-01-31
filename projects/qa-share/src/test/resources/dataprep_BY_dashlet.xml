@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Sprint BY Data Prep Dashlet Suite" preserve-order="true" parallel="tests" thread-count="2">
+    <groups>
+        <run>
+            <include name="DataPrep.*"/>
+            <exclude name="Enterprise4.2"/>
+            <exclude name="Sanity"/>
+            <exclude name="NonGrid"/>
+        </run>
+    </groups>
+
+    <listeners>
+        <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
+    </listeners>
+
+    <test name="SiteSearchMyDashboardTest2">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest2"/>
+        </classes>
+    </test>
+
+</suite>
