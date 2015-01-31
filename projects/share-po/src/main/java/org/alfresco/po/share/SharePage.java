@@ -141,6 +141,9 @@ public abstract class SharePage extends Page
             case Enterprise41:
                 selector = "h1.theme-color-3";
                 break;
+            case Enterprise42:
+                selector="a.alf-menu-title-text";
+                break;
             case Cloud:
                 selector = "div.alf-menu-title span.alf-menu-title-text";
                 break;
