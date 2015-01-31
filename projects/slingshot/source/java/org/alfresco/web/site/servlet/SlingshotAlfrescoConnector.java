@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -21,11 +21,15 @@ package org.alfresco.web.site.servlet;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.extensions.config.RemoteConfigElement.ConnectorDescriptor;
+import org.springframework.extensions.surf.ServletUtil;
 import org.springframework.extensions.webscripts.connector.AlfrescoConnector;
+import org.springframework.extensions.webscripts.connector.Connector;
 import org.springframework.extensions.webscripts.connector.ConnectorContext;
+import org.springframework.extensions.webscripts.connector.ConnectorService;
 import org.springframework.extensions.webscripts.connector.ConnectorSession;
-import org.springframework.extensions.webscripts.connector.Credentials;
 import org.springframework.extensions.webscripts.connector.RemoteClient;
 
 /**
@@ -49,18 +53,19 @@ import org.springframework.extensions.webscripts.connector.RemoteClient;
  *   &lt;description&gt;Connects to an Alfresco instance using cookie-based authentication&lt;/description&gt;
  *   &lt;class&gt;org.alfresco.web.site.servlet.SlingshotAlfrescoConnector&lt;/class&gt;
  *   &lt;userHeader&gt;SsoUserHeader&lt;/userHeader&gt;
+ *   &lt;userIdPattern&gt;&lt;/userIdPattern&gt;
  * &lt;/connector&gt;
  * </pre>
- * This class does not suppress sending the user name in the default Alfresco Repository header
- * {@code "X-Alfresco-Remote-User"} but will also send the user name in the configurable
- * header when it has been configured.
- * <p>
  * The Alfresco global property {@code external.authentication.proxyHeader} still needs to
  * be configured on the Repository side to define which header will be used. For example:
  * <pre>
  * authentication.chain=MySso:external,alfrescoNtlm1:alfrescoNtlm
  * external.authentication.proxyUserName=
  * external.authentication.proxyHeader=SsoUserHeader
+ * </pre>
+ * The {@code userIdPattern} element should mirror the value set on the Repository if used:
+ * <pre>
+ * external.authentication.userIdPattern=
  * </pre>
  * 
  * When using the default Alfresco Repository header (X-Alfresco-Remote-User") Share and the
@@ -70,6 +75,7 @@ import org.springframework.extensions.webscripts.connector.RemoteClient;
  * simply by setting the header.
  * 
  * @author adavis
+ * @author kroast
  */
 public class SlingshotAlfrescoConnector extends AlfrescoConnector
 {
@@ -82,11 +88,27 @@ public class SlingshotAlfrescoConnector extends AlfrescoConnector
     private static final String CD_USER_HEADER = "userHeader";
     
     /**
+     * The name of the element in the {@link ConnectorDescriptor} 
+     * ({@code <connector>...<userIdPattern>...</userIdPattern></connector>}) that
+     * contains the optional regex used by the external SSO to pattern match authenticated
+     * user names. This value must match that used by Alfresco External Auth settings. 
+     */
+    private static final String CD_USER_ID_PATTERN = "userIdPattern";
+    
+    /**
      * The name of the property in the {@link ConnectorSession} that
      * contains the name of the HTTP header used by an external SSO
      * to provide the authenticated user name. 
      */
     public static final String CS_PARAM_USER_HEADER = "userHeader";
+    
+    /**
+     * The name of the property in the {@link ConnectorSession} that
+     * contains the optional regex used by the external SSO to pattern match authenticated
+     * user names.
+     */
+    public static final String CS_PARAM_USER_ID_PATTERN = "userIdPattern";
+    
     
     public SlingshotAlfrescoConnector(ConnectorDescriptor descriptor, String endpoint)
     {
@@ -103,6 +125,16 @@ public class SlingshotAlfrescoConnector extends AlfrescoConnector
         return userHeader;
     }
     
+    private String getUserIdPattern()
+    {
+        String userIdPattern = descriptor.getStringProperty(CD_USER_ID_PATTERN);
+        if (userIdPattern != null && userIdPattern.trim().length() == 0)
+        {
+            userIdPattern = null;
+        }
+        return userIdPattern;
+    }
+    
     /**
      * Overrides super method to set the CS_PARAM_USER_HEADER. This method is
      * always called at the end of {@link ConnectorService#getConnector} when
@@ -113,18 +145,31 @@ public class SlingshotAlfrescoConnector extends AlfrescoConnector
     {
         super.setConnectorSession(connectorSession);
         connectorSession.setParameter(CS_PARAM_USER_HEADER, getUserHeader());
+        connectorSession.setParameter(CS_PARAM_USER_ID_PATTERN, getUserIdPattern());
     }
 
     /**
      * Overrides the super method to add the HTTP header used by an external SSO
      * to provide the authenticated user name when calling alfresco from share.
      */
+    @Override
     protected void applyRequestHeaders(RemoteClient remoteClient, ConnectorContext context)
     {
         // Need to override the headers set on the remoteClient to include the 'userHeader'
         // The following duplicates much of the code in the super method. Creating a new
-        // context with the userGeader is even more complex.
-        super.applyRequestHeaders(remoteClient, context);
+        // context with the userHeader is even more complex.
+        
+        // copy in cookies that have been stored back as part of the connector session
+        ConnectorSession connectorSession = getConnectorSession();
+        if (connectorSession != null)
+        {
+            Map<String, String> cookies = new HashMap<String, String>(8);
+            for (String cookieName : connectorSession.getCookieNames())
+            {
+                cookies.put(cookieName, connectorSession.getCookie(cookieName));
+            }
+            remoteClient.setCookies(cookies);
+        }
         
         Map<String, String> headers = new HashMap<String, String>(8);
         if (context != null)
@@ -132,20 +177,25 @@ public class SlingshotAlfrescoConnector extends AlfrescoConnector
             headers.putAll(context.getHeaders());
         }
         
-        // Proxy the authenticated user name if we have password-less credentials (indicates SSO auth over a secure
-        // connection)
+        // Proxy the authenticated user name if we have password-less credentials (indicates SSO auth over a secure connection)
         if (getCredentials() != null)
         {
-            String user = (String) getCredentials().getProperty(Credentials.CREDENTIAL_USERNAME);
-            String pass = (String) getCredentials().getProperty(Credentials.CREDENTIAL_PASSWORD);
-            if (pass == null)
-            {
-                headers.put("X-Alfresco-Remote-User", user);
-            }
             String userHeader = getUserHeader();
             if (userHeader != null)
             {
-                headers.put(userHeader, user);
+                // TODO: This is not ideal - for scenarios where the request has come through a Spring Dispatcher servlet
+                //       the request will be available in the ServletUtil helper, else if it has come through another route
+                //       it will be available on the MTAuthenticationFilter - this should be resolved.
+                HttpServletRequest req = ServletUtil.getRequest();
+                if (req == null)
+                {
+                    req = MTAuthenticationFilter.getCurrentServletRequest();
+                }
+                String user = req.getHeader(userHeader);
+                if (user != null)
+                {
+                    headers.put(userHeader, user);
+                }
             }
         }
         

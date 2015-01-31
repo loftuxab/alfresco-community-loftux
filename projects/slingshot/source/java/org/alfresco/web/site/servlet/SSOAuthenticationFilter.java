@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -123,6 +125,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     private String endpoint;
     private ServletContext servletContext;
     private String userHeader;
+    private Pattern userIdPattern;
     private SlingshotLoginController loginController;
     
     // Kerberos settings
@@ -214,8 +217,16 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             
             // Obtain the userHeader (if configured) from the alfresco connector
             this.userHeader = conn.getConnectorSession().getParameter(SlingshotAlfrescoConnector.CS_PARAM_USER_HEADER);
+            String userIdPattern = conn.getConnectorSession().getParameter(SlingshotAlfrescoConnector.CS_PARAM_USER_ID_PATTERN);
+            if (userIdPattern != null)
+            {
+                this.userIdPattern = Pattern.compile(userIdPattern);
+            }
             if (logger.isDebugEnabled())
+            {
                 logger.debug("userHeader is " + userHeader);
+                logger.debug("userIdPattern is " + userIdPattern);
+            }
         }
         catch (ConnectorServiceException e)
         {
@@ -352,11 +363,41 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                 public String getRemoteUser()
                 {
                     String remoteUser = req.getHeader(userHeader);
-                    if (remoteUser == null)
+                    if (remoteUser != null)
+                    {
+                        remoteUser = extractUserFromProxyHeader(remoteUser);
+                    }
+                    else
                     {
                         remoteUser = super.getRemoteUser();
                     }
                     return remoteUser;
+                }
+                
+                /**
+                 * Extracts a user ID from the proxy header. If a user ID pattern has been configured returns the contents of the
+                 * first matching regular expression group or <code>null</code>. Otherwise returns the trimmed header contents or
+                 * <code>null</code>.
+                 */
+                private String extractUserFromProxyHeader(String userId)
+                {
+                    if (userIdPattern == null)
+                    {
+                        userId = userId.trim();
+                    }
+                    else
+                    {
+                        Matcher matcher = userIdPattern.matcher(userId);
+                        if (matcher.matches())
+                        {
+                            userId = matcher.group(1).trim();
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    return userId.length() == 0 ? null : userId;
                 }
             };
         }
