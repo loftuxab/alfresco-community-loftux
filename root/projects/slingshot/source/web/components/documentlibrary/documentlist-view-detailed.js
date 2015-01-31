@@ -124,9 +124,26 @@
          Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
          
          var jsNode = oRecord.getData("jsNode"),
-            nodeRef = jsNode.nodeRef;
+             nodeRef = jsNode.nodeRef,
+             name = oRecord.getData("displayName"),
+             checkbox = document.createElement("input"),
+             label = document.createElement("label");
+         checkbox.id = "checkbox-" + oRecord.getId();
+         checkbox.type = "checkbox";
+         checkbox.name = "fileChecked";
+         checkbox.value = nodeRef;
+         checkbox.checked = scope.selectedFiles[nodeRef] ? true : false;
          
-         elCell.innerHTML = '<input id="checkbox-' + oRecord.getId() + '" type="checkbox" name="fileChecked" value="'+ nodeRef + '"' + (scope.selectedFiles[nodeRef] ? ' checked="checked">' : '>');
+         label.id = "label_for_" + checkbox.id;
+         label.style.fontSize="0em";
+         label.innerHTML = (checkbox.checked ? scope.msg("checkbox.uncheck") : scope.msg("checkbox.check")) + " " + name;
+         label.setAttribute("for", checkbox.id);
+         elCell.appendChild(label);
+         elCell.appendChild(checkbox);
+         Event.addListener(checkbox, "click", function(e)
+         {
+            label.innerHTML = (checkbox.checked ? scope.msg("checkbox.uncheck") : scope.msg("checkbox.check")) + " " + name;
+         }, checkbox, true);
 
          // MNT-12522
          var row = Dom.getAncestorByTagName(elCell, "tr");
