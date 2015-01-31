@@ -289,20 +289,4 @@ public class WcmqsPublicationPage extends SharePage
                 }
         }
 
-        /**
-         * Method to click on a document from any publication root page
-         *
-         * @param documentTitle
-         */
-        public void clickDocumentByTitle(String documentTitle)
-        {
-                try
-                {
-                        drone.findAndWait(By.xpath(String.format("//a[contains(text(),'%s')]", documentTitle))).click();
-                }
-                catch (TimeoutException e)
-                {
-                        throw new PageOperationException("Exceeded time to find Document link. " + e.toString());
-                }
-        }
 }
