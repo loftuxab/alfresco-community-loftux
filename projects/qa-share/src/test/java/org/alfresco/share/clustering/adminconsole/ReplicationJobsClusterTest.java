@@ -115,6 +115,14 @@ public class ReplicationJobsClusterTest extends AbstractUtils
             throw new PageOperationException("Number of cluster members is less than two");
         }
 
+        //Enabling replication in case it is disabled
+        Boolean replicationValue = Boolean.parseBoolean(JmxUtils.getAlfrescoServerProperty("Alfresco:Type=Configuration,Category=Replication,id1=default",
+            "replication.enabled").toString());
+        if(!replicationValue)
+        {
+            JmxUtils.setAlfrescoServerProperty("Alfresco:Type=Configuration,Category=Replication,id1=default", "replication.enabled", true);
+        }
+
         //Creating root folder in both servers
         for (int i = 0; i < 2; i++)
         {
