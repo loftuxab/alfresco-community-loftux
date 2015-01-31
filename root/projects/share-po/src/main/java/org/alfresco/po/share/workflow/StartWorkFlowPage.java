@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.alfresco.po.share.SharePage;
+import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.logging.Log;
@@ -42,7 +43,11 @@ public class StartWorkFlowPage extends SharePage
     private static final String WORKFLOW_TEXT = "Please select a workflow";
     private static final By WORKFLOW_BUTTON = By.cssSelector("button[id$='default-workflow-definition-button-button']");
     private static final By WORKFLOW_TITLE_LIST = By.cssSelector("li.yuimenuitem>span.title");
+    private static final By WORKFLOW_DROP_DOWN = By.cssSelector("div[id$='default-workflow-definition-menu'] li span.title");
     private final Log logger = LogFactory.getLog(this.getClass());
+    
+    private static final By ADD_BUTTON = By.cssSelector("div[id$='packageItems-cntrl-itemGroupActions'] span:nth-child(1) span button");
+    private static final By SELECT_BUTTON = By.cssSelector("div[id$='assoc_bpm_assignee-cntrl-itemGroupActions'] button");
 
     /**
      * Constructor.
@@ -220,5 +225,35 @@ public class StartWorkFlowPage extends SharePage
             throw new IllegalArgumentException("Workflow Type can not be null");
         }
         return getWorkflowTypes().contains(workFlowType);
+    }
+    
+    
+    public static HtmlPage startTaskWorkflow(WebDrone drone, String taskName, String assigneeUser, String fileName, String siteName)
+    {
+        HtmlPage htmlPage = null;
+        drone.findAndWait(WORKFLOW_DROP_DOWN_BUTTON).click();
+        List<WebElement> liElements = drone.findAndWaitForElements(WORKFLOW_DROP_DOWN);
+        liElements.get(0).click();
+        NewWorkflowPage newTaskPage = new NewWorkflowPage(drone);
+        newTaskPage.render();
+
+        newTaskPage.enterMessageText(taskName);
+
+        drone.findAndWait(SELECT_BUTTON).click();
+        AssignmentPage assignmentPage = new AssignmentPage(drone);
+        assignmentPage.render();
+        List<String> reviewersList = new ArrayList<String>();
+        reviewersList.add(assigneeUser);
+        assignmentPage.selectReviewers(reviewersList).render();
+
+        drone.findAndWait(ADD_BUTTON).click();
+        SelectContentPage selectContentPage = new SelectContentPage(drone);
+        selectContentPage.render();
+        selectContentPage.addItemFromSite(fileName, siteName);
+        selectContentPage.selectOKButton().render();
+
+        htmlPage = newTaskPage.submitWorkflow();
+
+        return htmlPage;
     }
 }
