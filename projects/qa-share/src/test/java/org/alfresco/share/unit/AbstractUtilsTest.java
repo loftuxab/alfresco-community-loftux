@@ -30,7 +30,7 @@ public class AbstractUtilsTest extends AbstractUtils
                 googleUserName, googlePassword, serviceAccountEmail, serviceAccountPKCS12FileName,
                 googleDriveUserName, googleDrivePassword, serviceDriveAccountEmail, serviceDriveAccountPKCS12FileName,
                 false, "", "", "", "", "", "", "", "", "", "", "",
-                0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","",0,"","",false, "", "",
+                0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","",0,"","",false, "", "", "",
                 layer7Disabled, apiKey, apiSecretKey, "", "");
 
         // Will create a new instance of the bean since it has the prototype scope
@@ -62,7 +62,7 @@ public class AbstractUtilsTest extends AbstractUtils
                 googleUserName, googlePassword, serviceAccountEmail, serviceAccountPKCS12FileName,
                 googleDriveUserName, googleDrivePassword, serviceDriveAccountEmail, serviceDriveAccountPKCS12FileName,
                 false, "", "", "", "", "", "", "", "", "", "", "",
-                0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","",0,"","",false, "", "",
+                0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","",0,"","",false, "","", "",
                 layer7Disabled, apiKey, apiSecretKey, "", "");
 
         // Will create a new instance of the bean since it has the prototype scope
@@ -85,7 +85,7 @@ public class AbstractUtilsTest extends AbstractUtils
                 googleUserName, googlePassword, serviceAccountEmail, serviceAccountPKCS12FileName,
                 googleDriveUserName, googleDrivePassword, serviceDriveAccountEmail, serviceDriveAccountPKCS12FileName,
                 false, "", "", "", "", "", "", "", "", "", "", "",
-                0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","",0,"","",false, "", "",
+                0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","",0,"","",false, "","", "",
                 layer7Disabled, apiKey, apiSecretKey, "", "");
 
         // Will create a new instance of the bean since it has the prototype scope

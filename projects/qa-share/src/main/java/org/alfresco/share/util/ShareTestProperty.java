@@ -80,6 +80,7 @@ public class ShareTestProperty
     private String serverPass;
     private boolean isSecureSession;
     private String pathSharepoint;
+    private String wcmqs;
     private String layer7Disabled;
     private String apiKey;
     private String apiSecretKey;
@@ -94,7 +95,7 @@ public class ShareTestProperty
             final String uniqueTestRunName, final String domainFree, final String domainPremium, final String domainHybrid, final String domainLiveSearch, final String defaultUser,
             final String uniqueTestDataString, final String adminUsername, final String adminPassword, final String superadminUsername,
             final String superadminPassword, final int httpSecurePort, final String headerKey, final String mimeTypes, final String jmxrmiPort, final String jmxrmiUser, final String jmxrmiPassword, final String nodePort, final String licenseShare, final String maxWaitTimeCloudSync,
-            final String blogUrl, final String blogUsername, final String blogPassword, final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String replicationEndPointHost,
+            final String blogUrl, final String blogUsername, final String blogPassword, final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String wcmqs, final String replicationEndPointHost,
             final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath)
     {
         this.shareUrl = shareUrl;
@@ -144,6 +145,7 @@ public class ShareTestProperty
         this.serverPass = serverPass;
         this.isSecureSession = isSecureSession;
         this.pathSharepoint = pathSharepoint;
+        this.wcmqs = wcmqs;
         this.replicationEndPointHost = replicationEndPointHost;
         this.layer7Disabled = layer7Disabled;
         this.apiKey = apiKey;
@@ -416,6 +418,16 @@ public class ShareTestProperty
     {
         this.pathSharepoint = pathSharepoint;
     }
+    
+    /**
+     * Set the path to setWcmqs
+     *
+     * @param setWcmqs
+     */
+    public void setWcmqs(String wcmqs)
+    {
+        this.wcmqs = wcmqs;
+    }
 
     /**
      * To string method
@@ -591,6 +603,10 @@ public class ShareTestProperty
         return pathSharepoint;
     }
 
+    public String getWcmqs()
+    {
+        return wcmqs;
+    }
     public String getreplicationEndPointHost() { return  replicationEndPointHost; }
     
     /**
