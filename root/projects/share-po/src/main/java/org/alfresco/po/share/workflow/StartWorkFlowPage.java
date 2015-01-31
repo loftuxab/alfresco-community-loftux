@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.user.Language;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -255,5 +256,72 @@ public class StartWorkFlowPage extends SharePage
         htmlPage = newTaskPage.submitWorkflow();
 
         return htmlPage;
+    }
+    
+    /**
+     * Method to get the Cloud Task or Review page for different languages
+     * StartWorkFlow page is returned in common,for any of its subclass.
+     * 
+     * @param Language
+     * @return CloudTaskOrReviewPage page
+     * @author Bogdan
+     * 
+     */
+    public CloudTaskOrReviewPage getCloudTaskOrReviewPageInLanguage(Language language)
+    {
+        if (language == null)
+        {
+            throw new IllegalArgumentException("language can't be null");
+        }
+        
+        drone.findAndWait(WORKFLOW_BUTTON).click();
+        
+        String label = "";
+        
+        switch (language)
+        {
+            case FRENCH:
+            {
+                label = "Tâche ou révision cloud";
+                break;
+            }
+            case DEUTSCHE:
+            {
+                label = "Aufgabe oder Überprüfung in der Cloud";
+                break;
+            }
+            case ITALIAN:
+            {
+                label = "Compito di revisione su cloud";
+                break;
+            }
+            case JAPANESE:
+            {
+                label = "Cloudでのタスクまたはレビュー";
+                break;
+            }
+            case SPANISH:
+            {
+                label = "Tarea o revisión en la nube";
+                break;
+            }
+            default:
+            {
+                label = "Cloud Task or Review";
+            }
+        }
+  
+        By dropDown = By.cssSelector("div[id$='default-workflow-definition-menu'] li span.title");
+        List<WebElement> liElements = drone.findAndWaitForElements(dropDown);
+        for (WebElement liElement : liElements)
+        {
+            String elementText = liElement.getText().trim();
+            if (elementText.equalsIgnoreCase(label))
+            {
+                liElement.click();
+            }
+        }
+        
+        return new CloudTaskOrReviewPage(drone);
     }
 }
