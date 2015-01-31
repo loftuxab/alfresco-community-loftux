@@ -290,7 +290,7 @@ public class AdvanceSearchContentTest extends AbstractTest
      * 
      * @throw Exception
      */
-    @Test(dependsOnMethods = "toDateNullCheckTest", groups="Enterprise-only")
+    @Test(dependsOnMethods = "toDateNullCheckTest",groups = {"Enterprise-only","TestBug"})
     public void testIsFolder() throws Exception
     {
         contentSearchPage = dashBoard.getNav().selectAdvanceSearch().render();
@@ -307,7 +307,7 @@ public class AdvanceSearchContentTest extends AbstractTest
      * Note: This test will be enabled only with chrome browser execution.
      * @throw Exception
      */
-    @Test(dependsOnMethods = "testIsFolder", groups = { "Enterprise-only", "chromeOnly" })
+    @Test(dependsOnMethods = "testIsFolder", groups = { "Enterprise-only", "chromeOnly" ,"TestBug"})
     public void testClickOnDownloadAndViewInBrowserLink() throws Exception
     {
         contentSearchPage = dashBoard.getNav().selectAdvanceSearch().render();
@@ -332,7 +332,7 @@ public class AdvanceSearchContentTest extends AbstractTest
      * Note: This test will be enabled only with chrome browser execution.
      * @throw Exception
      */
-    @Test(dependsOnMethods="testIsFolder", groups={"Enterprise-only"})
+    @Test(dependsOnMethods="testIsFolder", groups={"Enterprise-only","TestBug"})
     public void testGetFolderNamesFromPath() throws Exception
     {
         File newFile = SiteUtil.prepareFile("folderPath");
