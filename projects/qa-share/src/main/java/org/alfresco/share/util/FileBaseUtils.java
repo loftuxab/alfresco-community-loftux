@@ -1,6 +1,7 @@
 package org.alfresco.share.util;
 
 import java.io.File;
+import java.util.Date;
 
 /**
  * This file will handle actions related to Files, directories
@@ -42,10 +43,26 @@ public class FileBaseUtils
     public static boolean waitForFile(File file)
     {
         int cnt = 0;
-        while (!file.exists() && cnt < 100)
+        while (!file.exists() && cnt < 10)
         {
+            pause(1);
             cnt++;
         }
         return file.exists();
+    }
+
+    /**
+     * Just pause, without threads
+     * 
+     * @param seconds
+     */
+    public static void pause(int seconds)
+    {
+        Date start = new Date();
+        Date end = new Date();
+        while (end.getTime() - start.getTime() < seconds * 1000)
+        {
+            end = new Date();
+        }
     }
 }
