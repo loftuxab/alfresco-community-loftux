@@ -62,7 +62,7 @@ public class LiveSearchTest extends AbstractUtils
     @Test(groups = { "DataPrepLiveSearch" })
     public void dataPrep_LiveSearch_AONE_14200() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName().replace("-", "");
         String testUser = testName + "@" + DOMAIN_LIVE_SEARCH;
         String[] testUserInfo = new String[] { testUser };
         String siteName = getSiteName(testName);
@@ -99,7 +99,7 @@ public class LiveSearchTest extends AbstractUtils
     {
 
         // live search term is document title
-        testName = getTestName();
+        testName = getTestName().replace("-", "");
         String testUser = testName + "@" + DOMAIN_LIVE_SEARCH;
         String siteName = getSiteName(testName);
 
@@ -119,7 +119,7 @@ public class LiveSearchTest extends AbstractUtils
         }
 
         // Checks document titles
-        Assert.assertTrue(liveSearchDocumentResults.size() > 0);
+        Assert.assertTrue(liveSearchDocumentResults.size() > 0, "Failed to find document: ISSUE ACE-3319");
         List<String> documentTitles = ShareUserLiveSearch.getLiveSearchDocumentTitles(liveSearchDocumentResults);
 
         if (!documentTitles.contains(testName))
@@ -1189,7 +1189,7 @@ public class LiveSearchTest extends AbstractUtils
         }
 
         // Checks document titles
-        Assert.assertTrue(liveSearchDocumentResults.size() > 0);
+        Assert.assertTrue(liveSearchDocumentResults.size() > 0, "Failed to find document: ISSUE ACE-3319");
         List<String> documentTitles = ShareUserLiveSearch.getLiveSearchDocumentTitles(liveSearchDocumentResults);
         Assert.assertTrue(documentTitles.contains(testName));
 
