@@ -2130,13 +2130,13 @@ public class AdvanceSearchTest extends AbstractUtils
     {
         String testName = getTestName();
 
-        String mainUser = getUserNameFreeDomain(testName);
+        String mainUser = getUserNameFreeDomain(testName).replace("-", "");
         String[] mainUserInfo = new String[] { mainUser };
 
-        String testUser1 = getUserNameFreeDomain(testName + "1");
+        String testUser1 = getUserNameFreeDomain(testName + "1").replace("-", "");
         String[] testUserInfo1 = new String[] { testUser1 };
 
-        String testUser2 = getUserNameFreeDomain(testName + "2");
+        String testUser2 = getUserNameFreeDomain(testName + "2").replace("-", "");
         String[] testUserInfo2 = new String[] { testUser2 };
 
         try
@@ -2213,7 +2213,7 @@ public class AdvanceSearchTest extends AbstractUtils
     {
         /** Start Test */
         testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName);
+        String testUser = getUserNameFreeDomain(testName).replace("-", "");
         String siteName = getSiteName(testName).replace("-", "");
 
         AdvanceSearchPage contentSearchPage;
@@ -2273,13 +2273,13 @@ public class AdvanceSearchTest extends AbstractUtils
     {
         String testName = getTestName();
 
-        String mainUser = getUserNameFreeDomain(testName);
+        String mainUser = getUserNameFreeDomain(testName).replace("-", "");
         String[] mainUserInfo = new String[] { mainUser };
 
-        String testUser1 = getUserNameFreeDomain(testName + "1");
+        String testUser1 = getUserNameFreeDomain(testName + "1").replace("-", "");
         String[] testUserInfo1 = new String[] { testUser1 };
 
-        String testUser2 = getUserNameFreeDomain(testName + "2");
+        String testUser2 = getUserNameFreeDomain(testName + "2").replace("-", "");
         String[] testUserInfo2 = new String[] { testUser2 };
 
         try
@@ -2362,7 +2362,7 @@ public class AdvanceSearchTest extends AbstractUtils
     {
         /** Start Test */
         testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName);
+        String testUser = getUserNameFreeDomain(testName).replace("-", "");
         String siteName = getSiteName(testName).replace("-", "");
 
         AdvanceSearchPage contentSearchPage;
