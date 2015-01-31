@@ -1,15 +1,14 @@
 package org.alfresco.po.share.wqs;
 
-import java.util.List;
-
 import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.site.datalist.items.VisitorFeedbackRow;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 /**
  * Representation of comment from wcmqs site that can be used while leaving a comment to an article.
@@ -109,7 +108,7 @@ public class WcmqsComment extends SharePage
     {
             try
             {
-                commentPlaceholder.findElement(REPORT_COMMENT).click();
+                    commentPlaceholder.findElement(REPORT_COMMENT).click();
                     return new WcmqsBlogPostPage(drone);
             }
             catch (TimeoutException e)
@@ -117,6 +116,24 @@ public class WcmqsComment extends SharePage
                     throw new PageOperationException("Exceeded time to find report this post link. " + e.toString());
             }
     }
+
+        /**
+         * Method that returns the the number of comments
+         *
+         * @return String
+         */
+        public Integer getNumberOfCommentsOnPage()
+        {
+                try
+                {
+                        return drone.findAndWaitForElements(COMMENT_PLACEHOLDER).size();
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find report this post link. " + e.toString());
+                }
+        }
+
     
     
 }

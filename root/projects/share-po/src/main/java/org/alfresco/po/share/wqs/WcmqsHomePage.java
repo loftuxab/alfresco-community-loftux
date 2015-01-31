@@ -35,6 +35,10 @@ public class WcmqsHomePage extends WcmqsAbstractPage
         private final By FEATURED_SECTION = By.cssSelector("div[class='h-box-1']>div[class='services-box']>h3");
         private final By EXAMPLE_FEATURE_SECTION = By.cssSelector("div[class='h-box-2']>div[class='address-box']>div");
         private final By LATEST_BLOG_ARTICLES = By.cssSelector("div[id='right']>div[class='latest-news']");
+        public static final String SECTION_NEWSLIST = "newslist-wrapper";
+        public static final String SECTION_SERVICES = "services-box";
+        public static final String SECTION_ADDRESSBOX = "address-box";
+        public static final String SECTION_LATESTNEWS = "latest-news";
 
         // private final By BLOG_ARTICLE=By.cssSelector("div[id='left'] div.interior-content div.blog-entry:nth-child(2)>h2>a");
         // private final By RIGHT_PANEL = By.cssSelector("div[id='right']");
@@ -44,25 +48,19 @@ public class WcmqsHomePage extends WcmqsAbstractPage
                 super(drone);
         }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public WcmqsHomePage render(RenderTime renderTime)
+        @SuppressWarnings("unchecked") @Override public WcmqsHomePage render(RenderTime renderTime)
         {
                 elementRender(renderTime, getVisibleRenderElement(PAGE_MENU), getVisibleRenderElement(CONTACT_MENU),
                         getVisibleRenderElement(PUBLICATIONS_MENU));
                 return this;
         }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public WcmqsHomePage render()
+        @SuppressWarnings("unchecked") @Override public WcmqsHomePage render()
         {
                 return render(new RenderTime(maxPageLoadingTime));
         }
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public WcmqsHomePage render(final long time)
+        @SuppressWarnings("unchecked") @Override public WcmqsHomePage render(final long time)
         {
                 return render(new RenderTime(time));
         }
@@ -328,6 +326,32 @@ public class WcmqsHomePage extends WcmqsAbstractPage
                 {
                         throw new PageOperationException("Exceeded time to find Latest Blog Articles. " + e.toString());
                 }
+        }
+
+        /*
+        * Clicks on a slideshow readme button
+        * @param slideNr 1 2 or 3
+        */
+        public void clickOnSlideShowReadme(Integer slideNr)
+        {
+                long timer = System.currentTimeMillis() + 2000;
+                while (System.currentTimeMillis() < timer)
+                {
+
+                        try
+                        {
+                                drone.executeJavaScript("slideSwitch()");
+                                drone.find(By.xpath("//ul[@id='slideshow']//a[contains(@href,\"slide" + slideNr + "\")]")).click();
+                                return;
+                        }
+                        catch (TimeoutException e)
+                        {
+
+                        }
+                }
+
+                throw new PageOperationException("Exceeded time to find slide " + slideNr + " readme button");
+
         }
 
 
