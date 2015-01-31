@@ -51,6 +51,11 @@
       KeyListener = YAHOO.util.KeyListener;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+   
+   /**
     * FlashUpload constructor.
     *
     * FlashUpload is considered a singleton so constructor should be treated as private,
@@ -1442,7 +1447,7 @@
                // Display the file name and size.
                progressInfo = progressInfo[0];
                this.fileStore[flashId].progressInfo = progressInfo;
-               this.fileStore[flashId].progressInfo.innerHTML = fileInfoStr;
+               this.fileStore[flashId].progressInfo.innerHTML = $html(fileInfoStr);
 
                // Save the cell element
                this.fileStore[flashId].progressInfoCell = el;
