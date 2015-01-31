@@ -14,7 +14,6 @@
  */
 package org.alfresco.po.alfresco;
 
-import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.openqa.selenium.By;
@@ -31,7 +30,7 @@ public class RepositoryAdminConsolePage extends AbstractAdminConsole
 
     private final static By INPUT_FIELD = By.name("tenant-cmd"); 
     private final static By SUBMIT_BUTTON = By.cssSelector("input.inline"); 
-    protected RepositoryAdminConsolePage(WebDrone drone)
+    public RepositoryAdminConsolePage(WebDrone drone)
     {
         super(drone);
     }
