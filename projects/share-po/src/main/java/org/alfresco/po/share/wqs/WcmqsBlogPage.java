@@ -18,6 +18,7 @@ public class WcmqsBlogPage extends SharePage
 {
         @RenderWebElement
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
+//        private final By BLOGS_TITLE = By.cssSelector("div.interior-header");
 
         /**
          * Constructor.
@@ -100,5 +101,23 @@ public class WcmqsBlogPage extends SharePage
                 }
 
                 return check;
+        }
+        
+        /**
+         * Method to click a blog post name from share
+         * 
+         * @param blogNameFromShare of the blog post declared in share!
+         * @return
+         */
+        public void clickBlogNameFromShare(String blogNameFromShare)
+        {
+            try
+            {
+                drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", blogNameFromShare))).click();
+            }
+            catch (TimeoutException e)
+            {
+                throw new PageOperationException("Exceeded time to find news link. " + e.toString());
+            }
         }
 }

@@ -27,6 +27,13 @@ public class WcmqsBlogPostPage extends SharePage
         private final By DELETE_CONFIRM_WINDOW = By.id("prompt_c");
         @RenderWebElement
         private final By PAGE_LOGO = By.cssSelector("#logo>a");
+        
+        private final By VISITOR_NAME=By.cssSelector("input[name='visitorName']");
+        private final By VISITOR_EMAIL=By.cssSelector("input[name='visitorEmail']");
+        private final By VISITOR_WEBSITE=By.cssSelector("input[name='visitorWebsite']");
+        private final By FEEDBACK_COMMENT=By.cssSelector("textarea.bc-textarea");
+        private final By POST_BUTTON=By.cssSelector("input.bc-submit");
+        private final By ADD_SUCCESS_MESSAGE=By.cssSelector("div.contact-success");
 
         /**
          * Constructor.
@@ -171,6 +178,105 @@ public class WcmqsBlogPostPage extends SharePage
                 {
                         throw new PageOperationException("Exceeded time to find delete button. " + e.toString());
                 }
+        }
+        
+        /**
+         * Method that types the visitor name
+         * @return String
+         */
+        public void setVisitorName(String visitorName)
+        {
+                try
+                {
+                        drone.findAndWait(VISITOR_NAME).sendKeys(visitorName);
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to find name field. " + e.toString());
+                }
+        }
+        
+        /**
+         * Method that types the visitor email
+         * @return String
+         */
+        public void setVisitorEmail(String visitorEmail)
+        {
+                try
+                {
+                    drone.findAndWait(VISITOR_EMAIL).sendKeys(visitorEmail);
+                }
+                catch (TimeoutException e)
+                {
+                    throw new PageOperationException("Exceeded time to find email field. " + e.toString());
+                }
+        }
+        
+        /**
+         * Method that types the visitor website
+         * @return String
+         */
+        public void setVisitorWebsite(String visitorWebsite)
+        {
+                try
+                {
+                    drone.findAndWait(VISITOR_WEBSITE).sendKeys(visitorWebsite);
+                }
+                catch (TimeoutException e)
+                {
+                    throw new PageOperationException("Exceeded time to find email field. " + e.toString());
+                }
+        }
+        
+        /**
+         * Method that types the visitor comment
+         * @return String
+         */
+        public void setVisitorComment(String comment)
+        {
+                try
+                {
+                    drone.findAndWait(FEEDBACK_COMMENT).sendKeys(comment);
+                }
+                catch (TimeoutException e)
+                {
+                    throw new PageOperationException("Exceeded time to find email field. " + e.toString());
+                }
+        }
+        
+        /**
+         * Method to click on Create article
+         *
+         * @return WcmqsEditPage
+         */
+        public WcmqsBlogPostPage clickPostButton()
+        {
+                try
+                {
+                        drone.findAndWait(POST_BUTTON).click();
+                        return this;
+                }
+                catch (TimeoutException e)
+                {
+                        throw new PageOperationException("Exceeded time to create article. " + e.toString());
+                }
+        }
+        
+        /**
+         * Method to verify the add comment successful message
+         *
+         * @return WcmqsEditPage
+         */
+        public boolean isAddCommentMessageDisplay()
+        {
+            try{
+                WebElement message=drone.findAndWait(ADD_SUCCESS_MESSAGE);               
+                return message.isDisplayed();
+            }
+            catch (TimeoutException e)
+            {
+                return false;
+            }
         }
 
 }
