@@ -75,7 +75,7 @@ public class SiteDashBoardTest extends AbstractUtils
      * <li>Check that the User Dash-board > My Documents Dashlet shows the new file</li>
      * </ul>
      */
-    @Test
+    @Test (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_12119()
     {
         try
@@ -147,7 +147,7 @@ public class SiteDashBoardTest extends AbstractUtils
      * <li>Check that the User Dash-board > My Documents Dashlet shows the new file</li>
      * </ul>
      */
-    @Test
+    @Test (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_12122()
     {
         try
@@ -238,7 +238,7 @@ public class SiteDashBoardTest extends AbstractUtils
      * <li>Check that the User Dash-board > My Documents Dashlet shows the activity feed</li>
      * </ul>
      */
-    @Test(groups = { "nonEnterprise" })
+    @Test(groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_12124()
     {
         try
