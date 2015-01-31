@@ -151,7 +151,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
         while (!isVisible)
         {
             webDriverWait(hybridDrone, timeToWait);
-            ShareUser.openSiteDashboard(hybridDrone, siteName).render();
+            ShareUser.login(hybridDrone, adminUserPrem);
             docLibCl = openSitesDocumentLibrary(hybridDrone, siteName).render();
             isVisible = docLibCl.isFileVisible(editedFileNamePlain);
             i++;

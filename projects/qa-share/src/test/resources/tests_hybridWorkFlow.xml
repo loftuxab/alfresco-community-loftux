@@ -50,4 +50,10 @@
             <class name="org.alfresco.share.sanity.CloudSyncSanityTest"/>
         </classes>
     </test>
+
+    <test name="Cloud sync smoke tests Suite">
+        <classes>
+            <class name="org.alfresco.share.cloudsync.CloudSyncSmokeTest"/>
+        </classes>
+    </test>
 </suite>
