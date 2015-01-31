@@ -4,6 +4,7 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryNavigation;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.EditTextDocumentPage;
@@ -122,12 +123,11 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         editDocumentProperties.setDescription(modifiedDescription + user1);
         editDocumentProperties.selectSave().render();
 
-        DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
+        DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
         ShareUser.refreshSharePage(drone);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
         ShareUser.logout(drone);
-
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         // ---- Step 3 ----
@@ -230,7 +230,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
@@ -244,12 +244,11 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         editDocumentProperties.setDescription(modifiedDescription + cloudUser);
         editDocumentProperties.selectSave().render();
 
-        DocumentLibraryPage cldocumentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
+        DocumentLibraryPage cldocumentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         cldocumentLibraryPage.selectFile(simpleTaskFile);
         editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile);
         Assert.assertTrue((modifiedTitle + cloudUser).equals(editDocumentProperties.getDocumentTitle()),
                 "Document Title modified by CL User is not present for Cloud.");
-
         ShareUser.logout(hybridDrone);
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
@@ -318,13 +317,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
-
         String modifiedContent = testName + " modified content in OP";
 
         // Login as User1 (Cloud)
@@ -372,10 +368,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         documentDetailsPage = inlineEditPage.save(contentDetails).render();
 
-        DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
+        DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
         ShareUser.refreshSharePage(drone);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
@@ -416,7 +412,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String testName = getTestName();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String[] userInfo1 = new String[] { user1 };
-
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
@@ -479,7 +474,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -487,7 +482,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // ---- Expected results ----
         // The content is changed successfully.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContentOnCloud);
@@ -499,9 +494,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         documentLibraryPage.selectFile(simpleTaskFile);
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Content is not updated");
-
         ShareUser.logout(hybridDrone);
-
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
         // ---- Step 3 ----
@@ -601,7 +594,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
 
         // ---- Step 1, 2 ----
         // ---- Step action ---
@@ -694,7 +687,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
 
         // ---- Step 1, 2 ----
         // ---- Step action ---
@@ -776,7 +769,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         // Open Document library, Upload a file
         siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
         ShareUser.uploadFileInFolder(drone, fileInfo).render();
 
         // Select "Cloud Task or Review" from select a workflow drop down
@@ -791,7 +783,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -799,7 +791,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // ---- Expected results ----
         // The content cannot be removed. Delete Document link is absent in Document Details page and Delete link is absent in Selected Items.
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent());
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent(), "Delete button is displayed");
+        documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).selectCheckbox();
+        DocumentLibraryNavigation documentLibraryNavigation = new DocumentLibraryNavigation(drone);
+        Assert.assertFalse(documentLibraryNavigation.isDeleteActionForIncompleteWorkflowDocumentPresent(), "Delete button is displayed");
+        documentLibraryPage.render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
+        Assert.assertFalse(detailsPage.isDeleteDocumentLinkDisplayed(), "Delete button is displayed");
         ShareUser.logout(drone);
 
         // ---- Step 3 ----
@@ -846,10 +844,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
 
@@ -868,12 +864,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         // Open Document library, Upload a file
         siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
-
         ShareUser.uploadFileInFolder(drone, fileInfo).render();
 
         // Select "Cloud Task or Review" from select a workflow drop down
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
-
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
         formDetails.setDueDate(dueDate);
         formDetails.setTaskPriority(Priority.MEDIUM);
@@ -883,7 +877,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
@@ -891,11 +885,16 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // ---- Step action ---
         // Cloud Remove the synced document.
         // ---- Expected results ----
-        // The content is not removed. It cannot be removed because it is the part of workflow. Friendly behavior occurs (a message).
-        // TODO: Modify step 1 in TestLink accordingly to the Assert !
+        // The content cannot be removed. Delete Document link is absent in Document Details page and Delete link is absent in Selected Items.
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent(), "Delete button is displayed");
+        documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).selectCheckbox();
+        DocumentLibraryNavigation documentLibraryNavigation = new DocumentLibraryNavigation(hybridDrone);
+        Assert.assertFalse(documentLibraryNavigation.isDeleteActionForIncompleteWorkflowDocumentPresent(), "Delete button is displayed");
+        documentLibraryPage.render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
+        Assert.assertFalse(detailsPage.isDeleteDocumentLinkDisplayed(), "Delete button is displayed");
         ShareUser.logout(hybridDrone);
 
         // ---- Step 2 ----
@@ -917,7 +916,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String testName = getTestName();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String[] userInfo1 = new String[] { user1 };
-
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
@@ -977,7 +975,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -1006,7 +1004,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String testName = getTestName();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String[] userInfo1 = new String[] { user1 };
-
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
@@ -1033,10 +1030,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
         String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
-
         String simpleTaskFile = getFileName(testName) + ".txt";
         String[] fileInfo = { simpleTaskFile, DOCLIB };
-
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
 
@@ -1068,7 +1063,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        waitForSync(simpleTaskFile, opSiteName);
+        waitForSync(drone, simpleTaskFile, opSiteName);
         ShareUser.logout(drone);
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
@@ -1095,35 +1090,12 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 "Wrong location");
     }
 
-    private void waitForSync(String fileName, String siteName)
-    {
-        int counter = 1;
-        int retryRefreshCount = 4;
-        while (counter <= retryRefreshCount)
-        {
-            if (checkIfContentIsSynced(drone, fileName))
-            {
-                break;
-            }
-            else
-            {
-                drone.refresh();
-                counter++;
-
-                if (counter == 2 || counter == 3)
-                {
-                    DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, siteName);
-                    docLib.getFileDirectoryInfo(fileName).selectRequestSync().render();
-                }
-            }
-        }
-    }
-
     private static void wait(int seconds)
     {
         long time0;
         long time1;
         time0 = System.currentTimeMillis();
+
         do
         {
             time1 = System.currentTimeMillis();

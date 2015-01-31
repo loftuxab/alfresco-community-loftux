@@ -59,7 +59,6 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     String cloudCollaboratorSite = null;
     String cloudContributorSite = null;
     String cloudConsumerSite = null;
-    String testSelectDestFolders;
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -68,7 +67,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         super.setup();
         testName = this.getClass().getSimpleName();
         testDomain = DOMAIN_HYBRID;
-        testSelectDestFolders = "testDifferenFolders" + "T4";
+
     }
 
     public void dataPrep(String testName) throws Exception
@@ -1916,23 +1915,21 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         }
     }
 
-    /**
-     * Data preparation for tests: AONE-15654, AONE-15655, AONE-15656
-     */
-    @Test(groups = "DataPrepHybrid", timeOut = 400000)
-    public void dataPrep_AONE_selectDifferentFolders() throws Exception
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15654() throws Exception
     {
-        String opUser1 = getUserNameForDomain(testSelectDestFolders, DOMAIN_HYBRID);
-        String cloudUser1 = getUserNameForDomain(testSelectDestFolders + "user1", invitedDomain1);
-        String cloudUser2 = getUserNameForDomain(testSelectDestFolders + "user2", invitedDomain1);
-        String cloudUser3 = getUserNameForDomain(testSelectDestFolders + "user3", invitedDomain1);
-        String cloudUser4 = getUserNameForDomain(testSelectDestFolders + "user4", invitedDomain1);
-        cloudCollaboratorSite = getSiteName(testSelectDestFolders + "Collaborator");
-        cloudContributorSite = getSiteName(testSelectDestFolders + "Contributor");
-        cloudConsumerSite = getSiteName(testSelectDestFolders + "Consumer");
-        String folder1 = getFolderName(testSelectDestFolders + "Collaborator");
-        String folder2 = getFolderName(testSelectDestFolders + "Contributor");
-        String folder3 = getFolderName(testSelectDestFolders + "Consumer");
+        String testName = getTestName();
+        String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
+        String cloudUser2 = getUserNameForDomain(testName + "user2", invitedDomain1);
+        String cloudUser3 = getUserNameForDomain(testName + "user3", invitedDomain1);
+        String cloudUser4 = getUserNameForDomain(testName + "user4", invitedDomain1);
+        cloudCollaboratorSite = getSiteName(testName + "Collaborator");
+        cloudContributorSite = getSiteName(testName + "Contributor");
+        cloudConsumerSite = getSiteName(testName + "Consumer");
+        String folder1 = getFolderName(testName + "Collaborator");
+        String folder2 = getFolderName(testName + "Contributor");
+        String folder3 = getFolderName(testName + "Consumer");
         String[] userInfo1 = new String[] { opUser1 };
         String[] cloudUserInfo1 = new String[] { cloudUser1 };
         String[] cloudUserInfo2 = new String[] { cloudUser2 };
@@ -2025,18 +2022,19 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15654() throws Exception
     {
-        String opUser1 = getUserNameForDomain(testSelectDestFolders, DOMAIN_HYBRID);
-        String cloudUser1 = getUserNameForDomain(testSelectDestFolders + "user1", invitedDomain1);
-        cloudCollaboratorSite = getSiteName(testSelectDestFolders + "Collaborator");
-        cloudContributorSite = getSiteName(testSelectDestFolders + "Contributor");
-        cloudConsumerSite = getSiteName(testSelectDestFolders + "Consumer");
-        String opSiteName1 = getSiteName(testSelectDestFolders + System.currentTimeMillis() + "op1");
+        String testName = getTestName();
+        String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
+        cloudCollaboratorSite = getSiteName(testName + "Collaborator");
+        cloudContributorSite = getSiteName(testName + "Contributor");
+        cloudConsumerSite = getSiteName(testName + "Consumer");
+        String opSiteName1 = getSiteName(testName + System.currentTimeMillis() + "op1");
 
-        String folder1 = getFolderName(testSelectDestFolders + "Collaborator");
+        String folder1 = getFolderName(testName + "Collaborator");
 
-        String fileName1 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "1.doc";
-        String fileName2 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "2.doc";
-        String fileName3 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "3.doc";
+        String fileName1 = getFileName(testName) + System.currentTimeMillis() + "1.doc";
+        String fileName2 = getFileName(testName) + System.currentTimeMillis() + "2.doc";
+        String fileName3 = getFileName(testName) + System.currentTimeMillis() + "3.doc";
         String[] fileInfo1 = { fileName1, DOCLIB };
         String[] fileInfo2 = { fileName2, DOCLIB };
         String[] fileInfo3 = { fileName3, DOCLIB };
@@ -2087,23 +2085,124 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName3).isPartOfWorkflow(), fileName3 + " is not part of workflow");
     }
 
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15655() throws Exception
+    {
+        String testName = getTestName();
+        String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
+        String cloudUser2 = getUserNameForDomain(testName + "user2", invitedDomain1);
+        String cloudUser3 = getUserNameForDomain(testName + "user3", invitedDomain1);
+        String cloudUser4 = getUserNameForDomain(testName + "user4", invitedDomain1);
+        cloudCollaboratorSite = getSiteName(testName + "Collaborator");
+        cloudContributorSite = getSiteName(testName + "Contributor");
+        cloudConsumerSite = getSiteName(testName + "Consumer");
+        String folder1 = getFolderName(testName + "Collaborator");
+        String folder2 = getFolderName(testName + "Contributor");
+        String folder3 = getFolderName(testName + "Consumer");
+        String[] userInfo1 = new String[] { opUser1 };
+        String[] cloudUserInfo1 = new String[] { cloudUser1 };
+        String[] cloudUserInfo2 = new String[] { cloudUser2 };
+        String[] cloudUserInfo3 = new String[] { cloudUser3 };
+        String[] cloudUserInfo4 = new String[] { cloudUser4 };
+
+        try
+        {
+            // Create User1 (On-premise)
+            CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+            // Create User1 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+            // Create User2 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo2);
+
+            // Create User3 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo3);
+
+            // Create User4 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo4);
+
+            CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, invitedDomain1, "1000");
+
+            // Login as User2 (Cloud)
+            ShareUser.login(hybridDrone, cloudUser2, DEFAULT_PASSWORD);
+
+            // Create Site
+            ShareUser.createSite(hybridDrone, cloudCollaboratorSite, SITE_VISIBILITY_PUBLIC);
+
+            // Inviting user1 as colloborator to the site.
+            ShareUserMembers.inviteUserToSiteWithRole(hybridDrone, cloudUser2, cloudUser1, cloudCollaboratorSite, UserRole.COLLABORATOR);
+
+            // Creating 3 folders with Collobarator,Contributor and Consumer roles for each folder.
+            ShareUser.openSitesDocumentLibrary(hybridDrone, cloudCollaboratorSite);
+            createThreeFoldersWithContentRoles(hybridDrone, cloudUser1, folder1, folder2, folder3);
+
+            ShareUser.logout(hybridDrone);
+
+            // Login as User3 (Cloud)
+            ShareUser.login(hybridDrone, cloudUser3, DEFAULT_PASSWORD);
+
+            // Create Site
+            ShareUser.createSite(hybridDrone, cloudContributorSite, SITE_VISIBILITY_PUBLIC);
+
+            // Inviting user1 as contributor to the site.
+            ShareUserMembers.inviteUserToSiteWithRole(hybridDrone, cloudUser3, cloudUser1, cloudContributorSite, UserRole.CONTRIBUTOR);
+
+            // Creating 3 folders with Collobarator,Contrinbutor and Consumer
+            // roles for each folder.
+            createThreeFoldersWithContentRoles(hybridDrone, cloudUser1, folder1, folder2, folder3);
+
+            ShareUser.logout(hybridDrone);
+
+            // Login as User4 (Cloud)
+            ShareUser.login(hybridDrone, cloudUser4, DEFAULT_PASSWORD);
+
+            // Create Site
+            ShareUser.createSite(hybridDrone, cloudConsumerSite, SITE_VISIBILITY_PUBLIC);
+
+            // Inviting user1 as consumer to the site.
+            ShareUserMembers.inviteUserToSiteWithRole(hybridDrone, cloudUser4, cloudUser1, cloudConsumerSite, UserRole.CONSUMER);
+
+            // Creating 3 folders with Collobarator,Contrinbutor and Consumer
+            // roles for each folder.
+            createThreeFoldersWithContentRoles(hybridDrone, cloudUser1, folder1, folder2, folder3);
+
+            ShareUser.logout(hybridDrone);
+
+            // Login as User1 (OP)
+            ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
+
+            // Set up the cloud sync
+            signInToAlfrescoInTheCloud(drone, cloudUser1, DEFAULT_PASSWORD);
+        }
+        catch (Throwable e)
+        {
+            reportError(drone, testName, e);
+        }
+        finally
+        {
+            testCleanup(drone, testName);
+        }
+    }
+
     /**
      * AONE-15655:Select Destination - different folders - Contributor
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15655() throws Exception
     {
-        String opUser1 = getUserNameForDomain(testSelectDestFolders, DOMAIN_HYBRID);
-        String cloudUser1 = getUserNameForDomain(testSelectDestFolders + "user1", invitedDomain1);
-        cloudCollaboratorSite = getSiteName(testSelectDestFolders + "Collaborator");
-        cloudContributorSite = getSiteName(testSelectDestFolders + "Contributor");
-        cloudConsumerSite = getSiteName(testSelectDestFolders + "Consumer");
-        String opSiteName2 = getSiteName(testSelectDestFolders + System.currentTimeMillis() + "15655");
-        String folder2 = getFolderName(testSelectDestFolders + "Contributor");
-        String fileName4 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "1.doc";
-        String fileName5 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "2.doc";
-        String fileName6 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "3.doc";
-
+        String testName = getTestName();
+        String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
+        cloudCollaboratorSite = getSiteName(testName + "Collaborator");
+        cloudContributorSite = getSiteName(testName + "Contributor");
+        cloudConsumerSite = getSiteName(testName + "Consumer");
+        String opSiteName2 = getSiteName(testName + System.currentTimeMillis() + "15655");
+        String folder2 = getFolderName(testName + "Contributor");
+        String fileName4 = getFileName(testName) + System.currentTimeMillis() + "1.doc";
+        String fileName5 = getFileName(testName) + System.currentTimeMillis() + "2.doc";
+        String fileName6 = getFileName(testName) + System.currentTimeMillis() + "3.doc";
         String[] fileInfo4 = { fileName4, DOCLIB };
         String[] fileInfo5 = { fileName5, DOCLIB };
         String[] fileInfo6 = { fileName6, DOCLIB };
@@ -2118,8 +2217,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         ShareUser.createSite(drone, opSiteName2, SITE_VISIBILITY_PUBLIC);
 
         // Open Document library, Upload a file
-        DocumentLibraryPage docLibPage = ShareUser.openDocumentLibrary(drone);
-
+        DocumentLibraryPage docLibPage = ShareUser.openDocumentLibrary(drone).render();
         docLibPage = ShareUser.uploadFileInFolder(drone, fileInfo4).render();
         docLibPage = ShareUser.uploadFileInFolder(drone, fileInfo5).render();
         docLibPage = ShareUser.uploadFileInFolder(drone, fileInfo6).render();
@@ -2158,22 +2256,124 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName6).isPartOfWorkflow(), fileName6 + " is not part of workflow");
     }
 
+    @Test(groups = "DataPrepHybrid")
+    public void dataPrep_AONE_15656() throws Exception
+    {
+        String testName = getTestName();
+        String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
+        String cloudUser2 = getUserNameForDomain(testName + "user2", invitedDomain1);
+        String cloudUser3 = getUserNameForDomain(testName + "user3", invitedDomain1);
+        String cloudUser4 = getUserNameForDomain(testName + "user4", invitedDomain1);
+        cloudCollaboratorSite = getSiteName(testName + "Collaborator");
+        cloudContributorSite = getSiteName(testName + "Contributor");
+        cloudConsumerSite = getSiteName(testName + "Consumer");
+        String folder1 = getFolderName(testName + "Collaborator");
+        String folder2 = getFolderName(testName + "Contributor");
+        String folder3 = getFolderName(testName + "Consumer");
+        String[] userInfo1 = new String[] { opUser1 };
+        String[] cloudUserInfo1 = new String[] { cloudUser1 };
+        String[] cloudUserInfo2 = new String[] { cloudUser2 };
+        String[] cloudUserInfo3 = new String[] { cloudUser3 };
+        String[] cloudUserInfo4 = new String[] { cloudUser4 };
+
+        try
+        {
+            // Create User1 (On-premise)
+            CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
+
+            // Create User1 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+
+            // Create User2 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo2);
+
+            // Create User3 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo3);
+
+            // Create User4 (Cloud)
+            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo4);
+
+            CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, invitedDomain1, "1000");
+
+            // Login as User2 (Cloud)
+            ShareUser.login(hybridDrone, cloudUser2, DEFAULT_PASSWORD);
+
+            // Create Site
+            ShareUser.createSite(hybridDrone, cloudCollaboratorSite, SITE_VISIBILITY_PUBLIC);
+
+            // Inviting user1 as colloborator to the site.
+            ShareUserMembers.inviteUserToSiteWithRole(hybridDrone, cloudUser2, cloudUser1, cloudCollaboratorSite, UserRole.COLLABORATOR);
+
+            // Creating 3 folders with Collobarator,Contributor and Consumer roles for each folder.
+            ShareUser.openSitesDocumentLibrary(hybridDrone, cloudCollaboratorSite);
+            createThreeFoldersWithContentRoles(hybridDrone, cloudUser1, folder1, folder2, folder3);
+
+            ShareUser.logout(hybridDrone);
+
+            // Login as User3 (Cloud)
+            ShareUser.login(hybridDrone, cloudUser3, DEFAULT_PASSWORD);
+
+            // Create Site
+            ShareUser.createSite(hybridDrone, cloudContributorSite, SITE_VISIBILITY_PUBLIC);
+
+            // Inviting user1 as contributor to the site.
+            ShareUserMembers.inviteUserToSiteWithRole(hybridDrone, cloudUser3, cloudUser1, cloudContributorSite, UserRole.CONTRIBUTOR);
+
+            // Creating 3 folders with Collobarator,Contrinbutor and Consumer
+            // roles for each folder.
+            createThreeFoldersWithContentRoles(hybridDrone, cloudUser1, folder1, folder2, folder3);
+
+            ShareUser.logout(hybridDrone);
+
+            // Login as User4 (Cloud)
+            ShareUser.login(hybridDrone, cloudUser4, DEFAULT_PASSWORD);
+
+            // Create Site
+            ShareUser.createSite(hybridDrone, cloudConsumerSite, SITE_VISIBILITY_PUBLIC);
+
+            // Inviting user1 as consumer to the site.
+            ShareUserMembers.inviteUserToSiteWithRole(hybridDrone, cloudUser4, cloudUser1, cloudConsumerSite, UserRole.CONSUMER);
+
+            // Creating 3 folders with Collobarator,Contrinbutor and Consumer
+            // roles for each folder.
+            createThreeFoldersWithContentRoles(hybridDrone, cloudUser1, folder1, folder2, folder3);
+
+            ShareUser.logout(hybridDrone);
+
+            // Login as User1 (OP)
+            ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
+
+            // Set up the cloud sync
+            signInToAlfrescoInTheCloud(drone, cloudUser1, DEFAULT_PASSWORD);
+        }
+        catch (Throwable e)
+        {
+            reportError(drone, testName, e);
+        }
+        finally
+        {
+            testCleanup(drone, testName);
+        }
+    }
+
     /**
      * AONE-15656:Select Destination - different folders - Consumer
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 400000)
     public void AONE_15656() throws Exception
     {
-        String opUser1 = getUserNameForDomain(testSelectDestFolders, DOMAIN_HYBRID);
-        String cloudUser1 = getUserNameForDomain(testSelectDestFolders + "user1", invitedDomain1);
-        cloudCollaboratorSite = getSiteName(testSelectDestFolders + "Collaborator");
-        cloudContributorSite = getSiteName(testSelectDestFolders + "Contributor");
-        cloudConsumerSite = getSiteName(testSelectDestFolders + "Consumer");
-        String opSiteName3 = getSiteName(testSelectDestFolders + System.currentTimeMillis() + "consumer");
-        String folder3 = getFolderName(testSelectDestFolders + "Consumer");
-        String fileName7 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "1.doc";
-        String fileName8 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "2.doc";
-        String fileName9 = getFileName(testSelectDestFolders) + System.currentTimeMillis() + "3.doc";
+        String testName = getTestName();
+        String opUser1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
+        String cloudUser1 = getUserNameForDomain(testName + "user1", invitedDomain1);
+        cloudCollaboratorSite = getSiteName(testName + "Collaborator");
+        cloudContributorSite = getSiteName(testName + "Contributor");
+        cloudConsumerSite = getSiteName(testName + "Consumer");
+        String opSiteName3 = getSiteName(testName + System.currentTimeMillis() + "consumer");
+        String folder3 = getFolderName(testName + "Consumer");
+        String fileName7 = getFileName(testName) + System.currentTimeMillis() + "1.doc";
+        String fileName8 = getFileName(testName) + System.currentTimeMillis() + "2.doc";
+        String fileName9 = getFileName(testName) + System.currentTimeMillis() + "3.doc";
         String[] fileInfo7 = { fileName7, DOCLIB };
         String[] fileInfo8 = { fileName8, DOCLIB };
         String[] fileInfo9 = { fileName9, DOCLIB };
@@ -2188,19 +2388,17 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         ShareUser.createSite(drone, opSiteName3, SITE_VISIBILITY_PUBLIC);
 
         // Open Document library, Upload a file
-        ShareUser.openDocumentLibrary(drone);
-
+        ShareUser.openDocumentLibrary(drone).render();
         ShareUser.uploadFileInFolder(drone, fileInfo7).render();
         ShareUser.uploadFileInFolder(drone, fileInfo8).render();
         ShareUser.uploadFileInFolder(drone, fileInfo9).render();
 
         // Select StartWorkflow for cloud user1 on contributor site for folder3
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName7);
-
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName7).render();
         DestinationAndAssigneePage destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite));
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite), "Site " + cloudCollaboratorSite + " is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite), "Site " + cloudContributorSite + " is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite), "Site " + cloudConsumerSite + " is not displayed");
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -2230,9 +2428,9 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName8);
         destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
 
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite));
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite), "Site " + cloudCollaboratorSite + " is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite), "Site " + cloudContributorSite + " is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite), "Site " + cloudConsumerSite + " is not displayed");
 
         // ---- Step 3 ----
         // ---- Step action ---
@@ -2253,7 +2451,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName3));
 
         // Select StartWorkflow for cloud user1 on contributor site for folder3
-        cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName9);
+        cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName9).render();
         destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite), cloudCollaboratorSite + " is not displayed");
         Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite), cloudContributorSite + " is not displayed");
@@ -2311,13 +2509,13 @@ public class WorkflowOptionsTests extends AbstractWorkflow
      */
     private DocumentLibraryPage startWorFlowOnContentWithRole(String cloudUser, String folder, String fileName, String syncSite, DocumentLibraryPage docLibPage)
     {
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName);
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
 
         DestinationAndAssigneePage destinationPage = cloudTaskOrReviewPage.selectDestinationAndAssigneePage().render();
 
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite));
-        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite));
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudCollaboratorSite), cloudCollaboratorSite + " is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudContributorSite), cloudContributorSite + " is not displayed");
+        Assert.assertTrue(destinationPage.isSiteDisplayed(cloudConsumerSite), cloudConsumerSite + " is not displayed");
 
         // Selection clouduser1 site and sync successfull.
         selectDestinationAndSync(destinationPage, invitedDomain1, syncSite, folder);
