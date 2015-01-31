@@ -36,7 +36,7 @@
             <label for="lockSourceCopy" id="lockSourceCopy-label"><input type="checkbox" value="lockSourceCopy" name="lockSourceCopy" id="lockSourceCopy" class="cloudSyncOption"><span>${msg("label.lock-source-copy")}</span></label>
             
             <label for="isDeleteOnCloud" id="isDeleteOnCloud-label"><input type="checkbox" value="isDeleteOnCloud" name="isDeleteOnCloud" id="isDeleteOnCloud" class="cloudSyncOption" checked="checked"><span>${msg("label.is-delete-on-cloud")}</span></label>
-            <label for="isDeleteOnPrem" id="isDeleteOnPrem-label"><input type="checkbox" value="isDeleteOnPrem" name="isDeleteOnPrem" id="isDeleteOnPrem" class="cloudSyncOption"><span>${msg("label.is-delete-on-prem")}</span></label>
+            <label for="isDeleteOnPrem" id="isDeleteOnPrem-label" class="noWrapElements"><input type="checkbox" value="isDeleteOnPrem" name="isDeleteOnPrem" id="isDeleteOnPrem" class="cloudSyncOption"><span>${msg("label.is-delete-on-prem")}</span></label>
             
             
             <#--

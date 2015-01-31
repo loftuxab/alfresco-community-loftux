@@ -15,6 +15,11 @@ div.cloud-folder div.cloud-options input
    margin: 0 5px 0 15px;
 }
 
+label.noWrapElements
+{
+   white-space: nowrap;
+}
+
 .cloud-path-add-folder
 {
    background: url("../../components/documentlibrary/images/folder-new-16.png") no-repeat scroll 0 0 transparent;
