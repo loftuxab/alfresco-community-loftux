@@ -89,8 +89,8 @@ public class PerformanceTest extends CmisUtils
     {
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
-        String siteName1 = getSiteName(testName);
-        String folderName1 = getFolderName(testName);
+        String siteName1 = getSiteName(testName + "1");
+        String folderName1 = getFolderName(testName + "1");
         String siteName2 = getSiteName(testName + "2");
         String folderName2 = getFolderName(testName + "2");
 
@@ -125,8 +125,8 @@ public class PerformanceTest extends CmisUtils
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
 
-        String siteName1 = getSiteName(testName);
-        String folderName1 = getFolderName(testName);
+        String siteName1 = getSiteName(testName + "1");
+        String folderName1 = getFolderName(testName + "1");
         String siteName2 = getSiteName(testName + "2");
         String folderName2 = getFolderName(testName + "2");
 
@@ -135,7 +135,7 @@ public class PerformanceTest extends CmisUtils
         FileDirectoryInfo fileDirectoryInfo = documentLibraryPage.getFileDirectoryInfo(folderName1);
         CopyOrMoveContentPage copyOrMoveContentPage = fileDirectoryInfo.selectMoveTo();
         copyOrMoveContentPage.selectSite(siteName2).selectPath(folderName2).selectOkButton();
-
+        webDriverWait(drone, 30000);
         documentLibraryPage = openSitesDocumentLibrary(drone, siteName2);
         documentLibraryPage = documentLibraryPage.selectFolder(folderName2).render();
         documentLibraryPage = documentLibraryPage.selectFolder(folderName1).render();
@@ -168,7 +168,7 @@ public class PerformanceTest extends CmisUtils
             {
                 fail("File with BigData don't created.");
             }
-
+            FtpUtil.configFtpPort();
             FtpUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, bigDataFile, "Alfresco/Sites/" + siteName + "/documentLibrary/");
         }
         finally
@@ -427,7 +427,8 @@ public class PerformanceTest extends CmisUtils
 
     @Override
     @AfterClass(alwaysRun = true)
-    public void tearDown(){
-       super.tearDown();
+    public void tearDown()
+    {
+        super.tearDown();
     }
 }
