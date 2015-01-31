@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
@@ -18,7 +16,6 @@ import org.alfresco.po.share.workflow.KeepContentStrategy;
 import org.alfresco.po.share.workflow.Priority;
 import org.alfresco.po.share.workflow.TaskType;
 import org.alfresco.po.share.workflow.WorkFlowFormDetails;
-import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.AbstractWorkflow;
 import org.alfresco.share.util.EditTaskAction;
 import org.alfresco.share.util.ShareUser;
@@ -26,8 +23,6 @@ import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -37,8 +32,6 @@ import org.testng.annotations.Test;
 public class CompletedWorkflowSyncedTests extends AbstractWorkflow
 {
     private String testDomain;
-    private String completeWorkflow = "complete_workflow";
-    private static Log logger = LogFactory.getLog(CompletedWorkflowSyncedTests.class);
     private String user1;
     private String cloudUser;
 
@@ -49,17 +42,15 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         super.setup();
         testName = this.getClass().getSimpleName();
         testDomain = DOMAIN_HYBRID;
-        
+
         user1 = getUserNameForDomain(testName + "opUser", testDomain);
         cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
     }
 
-//    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods = "setup")
+    @BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods = "setup")
     public void dataPrep() throws Exception
     {
-        String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo1 = new String[] { user1 };
-        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
         // Create User1 (On-premise)
@@ -74,19 +65,9 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
-    // /**
-    // * Data preparation for Complete Workflow Synced tests
-    // */
-    // @Test(groups = "DataPrepHybrid")
-    // public void dataPrep_createUsers() throws Exception
-    // {
-    // dataPrep(completeWorkflow);
-    // }
-
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15690() throws Exception
     {
-
         createCompletedWorkflow("15690" + "A4");
     }
 
@@ -96,7 +77,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15690() throws Exception
     {
-
         String prefix = "15690" + "A4";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSite = getSiteName(prefix + testName) + "-CL";
@@ -109,7 +89,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // OP Modify the synced document's properties, e.g. change title and description.
         // ---- Expected results ----
         // The properties are changed successfully.
-
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
         EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, simpleTaskFile);
@@ -129,12 +108,9 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // ---- Expected results ----
         // Changes appeared to Cloud. The changed content is correctly displayed.
         // ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-
         EditDocumentPropertiesPage editDocumentPropertiescl = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile).render(
                 maxWaitTime);
-
         Assert.assertTrue((modifiedTitle + user1).equals(editDocumentPropertiescl.getDocumentTitle()),
                 "Document Title modified by OP User is not present for Cloud.");
         Assert.assertTrue((modifiedDescription + user1).equals(editDocumentPropertiescl.getDescription()),
@@ -145,8 +121,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15691() throws Exception
     {
-
-        createCompletedWorkflow("15691" + "A41");
+        createCompletedWorkflow("15691" + "A43");
     }
 
     /**
@@ -155,8 +130,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15691() throws Exception
     {
-
-        String prefix = "15691" + "A41";
+        String prefix = "15691" + "A43";
         String opSiteName = getSiteName(prefix + testName) + "-OP";
         String cloudSite = getSiteName(prefix + testName) + "-CL";
         String simpleTaskFile = getFileName(prefix + testName) + ".txt";
@@ -168,7 +142,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // Cloud Modify the synced document's properties, e.g. change title and description.
         // ---- Expected results ----
         // The properties are changed successfully.
-
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile);
@@ -190,12 +163,11 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // OP Verify the document.
         // ---- Expected results ----
         // Changes appeared to OP. The changed content is correctly displayed.
-        
         ShareUser.openSiteDashboard(drone, opSiteName).render();
         DocumentLibraryPage docLib = ShareUser.openDocumentLibrary(drone).render();
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
         waitForSync(simpleTaskFile, opSiteName);
-        
+
         editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, simpleTaskFile).render();
 
         Assert.assertTrue((modifiedTitle + cloudUser).equals(editDocumentProperties.getDocumentTitle()),
@@ -208,7 +180,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15692() throws Exception
     {
-
         createCompletedWorkflow("15692" + "A4");
     }
 
@@ -305,7 +276,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         documentLibraryPage.selectFile(simpleTaskFile);
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud));
-
         ShareUser.logout(hybridDrone);
 
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -315,7 +285,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // OP Verify the document.
         // ---- Expected results ----
         // Changes appeared to OP. The changed content is correctly displayed.
-
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, opSiteName).render();
         DocumentLibraryPage docLib = ShareUser.openDocumentLibrary(drone).render();
@@ -331,7 +300,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15694() throws Exception
     {
-
         createCompletedWorkflow("15694" + "A4");
     }
 
@@ -352,7 +320,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // OP Move the synced document to another location.
         // ---- Expected results ----
         // The content is moved successfully.
-
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         CopyOrMoveContentPage moveToPage = documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).selectMoveTo().render();
@@ -373,7 +340,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15695() throws Exception
     {
-
         createCompletedWorkflow("15695" + "A4");
     }
 
@@ -416,7 +382,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15696() throws Exception
     {
-
         createCompletedWorkflow("15696" + "A4");
     }
 
@@ -437,7 +402,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // ---- Expected results ----
         // The content is removed successfully.
         // TODO: Modify step 1 in TestLink accordingly to the Assert !
-
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         documentLibraryPage.deleteItem(simpleTaskFile).render();
@@ -449,7 +413,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // Cloud Verify the document.
         // ---- Expected results ----
         // The document is removed.
-
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
@@ -459,7 +422,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15697() throws Exception
     {
-
         createCompletedWorkflow("15697" + "A4");
     }
 
@@ -484,7 +446,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).selectCheckbox();
         documentLibraryPage = ShareUser.deleteSelectedContent(hybridDrone).render();
-        //
+
         // DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
         // documentLibraryPage.deleteItem(simpleTaskFile).render(5000);
         Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
@@ -499,7 +461,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile));
-
         // Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
         // Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation()
         // .contains(cloudSite));
@@ -508,7 +469,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15698() throws Exception
     {
-
         createCompletedWorkflow("15698" + "A4");
     }
 
@@ -528,7 +488,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // OP Unsync the synced document.
         // ---- Expected results ----
         // The content is unsynced correctly.
-        //TODO Update the test accordingly to assert
+        // TODO Update the test accordingly to assert
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent());
@@ -550,7 +510,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_15699() throws Exception
     {
-
         createCompletedWorkflow("15699" + "A4");
     }
 
@@ -615,26 +574,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         }
     }
 
-    private void completeWorkflow(String workflowName, String opUser, String clUser)
-    {
-        // login as cloud user and complete workflow
-        SharePage sharePage = ShareUser.login(hybridDrone, clUser, DEFAULT_PASSWORD);
-        MyTasksPage myTasksPage = sharePage.getNav().selectMyTasks().render();
-        myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workflowName, TaskStatus.COMPLETED, EditTaskAction.TASK_DONE).render();
-        Assert.assertFalse(myTasksPage.isTaskPresent(workflowName));
-        myTasksPage = myTasksPage.selectCompletedTasks().render();
-        Assert.assertTrue(myTasksPage.isTaskPresent(workflowName));
-        ShareUser.logout(hybridDrone);
-
-        // Login as OP user and complete workflow
-        ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
-        ShareUserWorkFlow.navigateToMyTasksPage(drone).render();
-        ShareUser.checkIfTaskIsPresent(drone, workflowName);
-        ShareUserWorkFlow.completeWorkFlow(drone, opUser, workflowName).render();
-        ShareUser.logout(drone);
-
-    }
-
     private void createCompletedWorkflow(String prefix) throws Exception
     {
         testName = this.getClass().getSimpleName();
@@ -664,7 +603,6 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
 
         WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
         formDetails.setMessage(workFlowName);
-
         formDetails.setTaskPriority(Priority.MEDIUM);
         formDetails.setSiteName(cloudSiteName);
         formDetails.setTaskType(TaskType.CLOUD_REVIEW_TASK);
@@ -673,11 +611,13 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
 
         // Start Cloud Task or Review workflow
-        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone);
-
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone).render();
         cloudTaskOrReviewPage.selectItem(fileName, opSiteName);
+
         // Fill the form details and start workflow
-        cloudTaskOrReviewPage.startWorkflow(formDetails);
+        cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        waitForSync(fileName, opSiteName);
 
         ShareUser.logout(drone);
 

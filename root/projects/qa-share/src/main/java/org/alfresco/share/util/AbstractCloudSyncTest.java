@@ -438,7 +438,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
                 t.start();
                 try
                 {
-                    if (!docLibPage.getFileDirectoryInfo(fileName).isViewCloudSyncInfoDisplayed())
+                    if (docLibPage.getFileDirectoryInfo(fileName).isCloudSyncFailed())
                     {
                         String fileInfo = docLibPage.getFileDirectoryInfo(fileName).getContentInfo();
                         return fileInfo.contains("failed");

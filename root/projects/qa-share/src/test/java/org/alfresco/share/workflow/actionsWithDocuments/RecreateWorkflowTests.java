@@ -44,10 +44,10 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     {
         logger.info("Start data prep for test: " + testName);
 
-        String user1 = getUserNameForDomain(testName, testDomain);
+        String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo1 = new String[] { user1 };
 
-        String cloudUser = getUserNameForDomain(testName, testDomain);
+        String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String[] cloudUserInfo1 = new String[] { cloudUser };
 
         String opSiteName = getSiteName(testName) + "-OP";
@@ -69,14 +69,14 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
 
-        ShareUser.login(hybridDrone, user1, DEFAULT_PASSWORD);
-        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC).render();
         ShareUser.logout(hybridDrone);
 
         // Login as Enterprise user, create site and upload a file.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
-        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC).render();
+        ShareUser.openSitesDocumentLibrary(drone, opSiteName).render().render();
         ShareUser.uploadFileInFolder(drone, new String[] { fileName, DOCLIB });
 
         // Select "Cloud Task or Review" from select a workflow drop down
@@ -124,8 +124,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     public void AONE_15715() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, testDomain);
-        String cloudUser = getUserNameForDomain(testName, testDomain);
+        String user1 = getUserNameForDomain(testName + "opUser", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
         String fileName = getFileName(testName) + ".txt";
@@ -152,7 +152,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         // --- Expected Result ---
         // Workflow is not created. Friendly behavior occurs - 'Workflow could not be started' dialog: 08110558 One of the selected documents is already
         // syncronized with the Cloud. You can only use content that is not yet syncronized with the Cloud to start a new Hybrid Workflow.
-        SharePopup errorPopup = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        cloudTaskOrReviewPage.startWorkflow(formDetails);
+        SharePopup errorPopup = new SharePopup(drone);
         Assert.assertTrue(errorPopup
                 .getShareMessage()
                 .contains(
@@ -188,8 +189,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     public void AONE_15716() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, testDomain);
-        String cloudUser = getUserNameForDomain(testName, testDomain);
+        String user1 = getUserNameForDomain(testName + "opUser", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
         String fileName = getFileName(testName) + ".txt";
@@ -214,13 +215,9 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
 
         // --- Expected Result ---
-        // Workflow is not created. Friendly behavior occurs - 'Workflow could not be started' dialog: 08110558 One of the selected documents is already
-        // syncronized with the Cloud. You can only use content that is not yet syncronized with the Cloud to start a new Hybrid Workflow.
-        SharePopup errorPopup = cloudTaskOrReviewPage.startWorkflow(formDetails).render();
-        Assert.assertTrue(errorPopup
-                .getShareMessage()
-                .contains(
-                        "One of the selected documents is already syncronized with the Cloud. You can only use content that is not yet syncronized with the Cloud to start a new Hybrid Workflow."));
+        // Workflow is not created.
+        cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        Assert.assertTrue(checkIfSyncFailed(drone, fileName));
 
         ShareUser.logout(drone);
 
@@ -252,8 +249,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     public void AONE_15717() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameForDomain(testName, testDomain);
-        String cloudUser = getUserNameForDomain(testName, testDomain);
+        String user1 = getUserNameForDomain(testName + "opUser", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
         String fileName = getFileName(testName) + ".txt";

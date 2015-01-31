@@ -8,10 +8,30 @@
 			<exclude name="NonGrid" />
 		</run>
 	</groups>
+
 	<listeners>
 		<listener
 			class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
 	</listeners>
+
+	<test name="Advanced Workflow Scenarios" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.workflow.AdvancedScenariosWorkflowTests" />
+		</classes>
+	</test>
+
+	<test name="Recreate Workflow" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.workflow.actionsWithDocuments.RecreateWorkflowTests" />
+		</classes>
+	</test>
+
+	<test name="Hybrid Sync Positive Tests" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.cloudsync.HybridSyncPositiveTests" />
+		</classes>
+	</test>
 
 	<test name="CompleteWorkflowTests" verbose="1">
 		<classes>
