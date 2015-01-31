@@ -42,8 +42,9 @@ import org.springframework.extensions.webscripts.connector.Response;
  * This extends the standard {@link LoginController} to store the authenticated user's group membership information
  * as an {@link HttpSession} attribute so that it can be retrieved by the {@link SlingshotUserFactory} when creating
  * {@link SlingshotUser} instances.
- *  
- * @author dave
+ * 
+ * @author david
+ * @author kevinr
  */
 public class SlingshotLoginController extends LoginController
 {
@@ -63,77 +64,80 @@ public class SlingshotLoginController extends LoginController
     @Override
     protected void onSuccess(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
-        
+        this.beforeSuccess(request, response);
+        super.onSuccess(request, response);
+    }
+    
+    protected void beforeSuccess(HttpServletRequest request, HttpServletResponse response) throws Exception
+    {
         try
         {
-            // Get the authenticated user name and use it to retrieve all of the groups that the user is a 
-            // member of...
-            String username = (String) request.getParameter("username");
+            final HttpSession session = request.getSession();
             
-            // ACE-3257 case, request may not contains username parameter (e.g. for SSO login)
+            // Get the authenticated user name and use it to retrieve all of the groups that the user is a member of...
+            String username = (String)request.getParameter(PARAM_USERNAME);
             if (username == null)
             {
-                username = (String)request.getSession(false).getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
+                username = (String)session.getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
             }
             
-            Connector conn = FrameworkUtil.getConnector(request.getSession(), username, AlfrescoUserFactory.ALFRESCO_ENDPOINT_ID);
-            ConnectorContext c = new ConnectorContext(HttpMethod.GET);
-            c.setContentType("application/json");
-            Response res = conn.call("/api/people/" + URLEncoder.encode(username) + "?groups=true", c);
-            if (Status.STATUS_OK == res.getStatus().getCode())
+            if (username != null && session.getAttribute(SESSION_ATTRIBUTE_KEY_USER_GROUPS) == null)
             {
-                // Assuming we get a successful response then we need to parse the response as JSON and then
-                // retrieve the group data from it...
-                // 
-                // Step 1: Get a String of the response...
-                String resStr = res.getResponse();
-                
-                // Step 2: Parse the JSON...
-                JSONParser jp = new JSONParser();
-                Object userData = jp.parse(resStr.toString());
-
-                // Step 3: Iterate through the JSON object getting all the groups that the user is a member of...
-                StringBuilder groups = new StringBuilder();
-                if (userData instanceof JSONObject)
+                Connector conn = FrameworkUtil.getConnector(session, username, AlfrescoUserFactory.ALFRESCO_ENDPOINT_ID);
+                ConnectorContext c = new ConnectorContext(HttpMethod.GET);
+                c.setContentType("application/json");
+                Response res = conn.call("/api/people/" + URLEncoder.encode(username) + "?groups=true", c);
+                if (Status.STATUS_OK == res.getStatus().getCode())
                 {
-                    Object groupsArray = ((JSONObject) userData).get("groups");
-                    if (groupsArray instanceof org.json.simple.JSONArray)
+                    // Assuming we get a successful response then we need to parse the response as JSON and then
+                    // retrieve the group data from it...
+                    // 
+                    // Step 1: Get a String of the response...
+                    String resStr = res.getResponse();
+                    
+                    // Step 2: Parse the JSON...
+                    JSONParser jp = new JSONParser();
+                    Object userData = jp.parse(resStr.toString());
+    
+                    // Step 3: Iterate through the JSON object getting all the groups that the user is a member of...
+                    StringBuilder groups = new StringBuilder(512);
+                    if (userData instanceof JSONObject)
                     {
-                        for (Object groupData: (org.json.simple.JSONArray)groupsArray)
+                        Object groupsArray = ((JSONObject) userData).get("groups");
+                        if (groupsArray instanceof org.json.simple.JSONArray)
                         {
-                            if (groupData instanceof JSONObject)
+                            for (Object groupData: (org.json.simple.JSONArray)groupsArray)
                             {
-                                Object groupName = ((JSONObject) groupData).get("itemName");
-                                if (groupName != null)
+                                if (groupData instanceof JSONObject)
                                 {
-                                    groups.append(groupName.toString() + ",");
+                                    Object groupName = ((JSONObject) groupData).get("itemName");
+                                    if (groupName != null)
+                                    {
+                                        groups.append(groupName.toString()).append(',');
+                                    }
                                 }
                             }
                         }
                     }
+                    
+                    // Step 4: Trim off any trailing commas...
+                    if (groups.length() != 0)
+                    {
+                        groups.delete(groups.length() - 1, groups.length());
+                    }
+                    
+                    // Step 5: Store the groups on the session...
+                    session.setAttribute(SESSION_ATTRIBUTE_KEY_USER_GROUPS, groups.toString());
                 }
-                
-                // Step 4: Trim off any trailing commas...
-                if (groups.length()>0)
+                else
                 {
-                    groups.delete(groups.length()-1, groups.length());
+                    session.setAttribute(SESSION_ATTRIBUTE_KEY_USER_GROUPS, "");
                 }
-                
-                // Step 5: Store the groups on the session...
-                HttpSession session = request.getSession(false);
-                session.setAttribute(SESSION_ATTRIBUTE_KEY_USER_GROUPS, groups.toString());
-            }
-            else
-            {
-                HttpSession session = request.getSession(false);
-                session.setAttribute(SESSION_ATTRIBUTE_KEY_USER_GROUPS, "");
             }
         }
         catch (ConnectorServiceException e1)
         {
-            throw new Exception("Error creating remote connector to request user group data");
+            throw new Exception("Error creating remote connector to request user group data.");
         }
-
-        super.onSuccess(request, response);
     }
 }

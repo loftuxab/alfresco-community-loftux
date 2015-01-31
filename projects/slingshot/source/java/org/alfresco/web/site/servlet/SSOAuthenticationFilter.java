@@ -343,8 +343,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
      */
     private ServletRequest wrapHeaderAuthenticatedRequest(ServletRequest sreq)
     {
-        if (userHeader != null &&
-            sreq instanceof HttpServletRequest)
+        if (userHeader != null && sreq instanceof HttpServletRequest)
         {
             final HttpServletRequest req = (HttpServletRequest)sreq;
             sreq = new HttpServletRequestWrapper(req)
@@ -470,12 +469,22 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         // If userHeader (X-Alfresco-Remote-User or similar) external auth - does not require a challenge/response
         if (this.userHeader != null)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("userHeader external auth - skipping auth filter...");
-            // Set the external auth flag so the UI knows we are using SSO (no Logout button shown etc.)
-            setExternalAuthSession(session);
-            chain.doFilter(sreq, sresp);
-            return;
+            String userId = AuthenticationUtil.getUserId(req);
+            if (userId != null)
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("userHeader external auth - skipping auth filter...");
+                setExternalAuthSession(session);
+                onSuccess(req, res, session, req.getRemoteUser());
+                chain.doFilter(sreq, sresp);
+                return;
+            }
+            else
+            {
+                // initial external user login requires a ping check to authenticate remote Session
+                challengeOrPassThrough(chain, req, res, session);
+                return;
+            }
         }
         
         // Check if there is an authorization header with a challenge response
@@ -486,7 +495,6 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         {
             if (debug)
                 logger.debug("Touching the repo to ensure we still have an authenticated session.");
-            setExternalAuthSession(session);
             challengeOrPassThrough(chain, req, res, session);
             return;
         }
@@ -666,16 +674,6 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     }
 
     /**
-     * Set the external auth Session flag so the UI knows we are using SSO (no Logout button shown etc.)
-     * 
-     * @param session
-     */
-    private void setExternalAuthSession(HttpSession session)
-    {
-        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
-    }
-    
-    /**
      * Removes all attributes stored in session
      * 
      * @param session Session
@@ -747,26 +745,30 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             // In this mode we can only use vaulted credentials. Do not proxy any request headers.
             String userId = AuthenticationUtil.getUserId(req);
             
-            // If we are as yet unauthenticated but have external authentication, do the ping check as the external user.
-            // This will either establish the session or throw us out to log in as someone else!
             if (userId == null)
             {
+                // If we are as yet unauthenticated but have external authentication, do a ping check as the external user.
+                // This will either establish the session or throw us out to log in as someone else!
                 userId = req.getRemoteUser();
              // Set the external auth flag so the UI knows we are using SSO etc.
                 session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
                 if (userId != null && logger.isDebugEnabled())
                     logger.debug("Initial login from externally authenticated user " + userId);
-                
+                setExternalAuthSession(session);
             }
-            else if (logger.isDebugEnabled())
-                logger.debug("Validating repository session for  " + userId);
-
+            else
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("Validating repository session for " + userId);
+            }
+            
             if (userId != null && !userId.equalsIgnoreCase(req.getRemoteUser()) && session.getAttribute(NTLM_AUTH_DETAILS) == null)
             {
                 session.removeAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH);
             }
+            
             Connector conn = connectorService.getConnector(this.endpoint, userId, session);
-
+            
             // ALF-10785: We must pass through the language header to set up the session in the correct locale
             ConnectorContext ctx;
             if (req.getHeader(HEADER_ACCEPT_LANGUAGE) != null)
@@ -779,7 +781,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             {
                 ctx = new ConnectorContext();
             }
-
+            
             Response remoteRes = conn.call("/touch", ctx);
             if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode())
             {
@@ -817,7 +819,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                 {
                     logger.debug("Authentication not required, chaining ...");
                 }
-
+                
                 chain.doFilter(req, res);
                 return;
             }
@@ -1123,7 +1125,6 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                         logger.debug("User logged on via NTLM, " + ntlmDetails);
                     
                     setExternalAuthSession(session);
-                    
                     onSuccess(req, res, session, userName);
                     
                     // Allow the user to access the requested page
@@ -1314,13 +1315,13 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                             Status.STATUS_TEMPORARY_REDIRECT == remoteRes.getStatus().getCode())
                     {
                         if (logger.isDebugEnabled())
-                           logger.debug("Authentication succeded on the repo side.");
-                        // Create User ID in session so the web-framework dispatcher knows we have logged in
-                        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userName);
+                           logger.debug("Authentication succeeded on the repo side.");
                         
                         setExternalAuthSession(session);
+                        onSuccess(req, res, session, userName);
                     }
-                    else if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode()) {
+                    else if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode())
+                    {
                         if (logger.isDebugEnabled())
                             logger.debug("Authentication failed on repo side - beging login process again.");
                         res.setHeader(HEADER_WWWAUTHENTICATE, authHdr);
@@ -1340,10 +1341,9 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                      Status.STATUS_TEMPORARY_REDIRECT == remoteRes.getStatus().getCode())
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Authentication succeded on the repo side.");
+                    logger.debug("Authentication succeeded on the repo side.");
                 
                 setExternalAuthSession(session);
-
                 onSuccess(req, res, session, userName);
             }
             else
@@ -1379,30 +1379,37 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     }
     
     /**
-     * Success login method handler, uses logic of {@link SlingshotLoginController} to retrieve all of the user's groups
+     * Set the external auth Session flag so the UI knows we are using SSO.
+     * A number of elements in an application may depend on this state e.g. Logout button shown etc.
+     * 
+     * @param session
+     */
+    private void setExternalAuthSession(HttpSession session)
+    {
+        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
+    }
+    
+    /**
+     * Success login method handler.
      * 
      * @param req current http request
      * @param res current http response
      * @param session current session
      * @param username logged in user name
-     * 
      */
     private void onSuccess(HttpServletRequest req, HttpServletResponse res, HttpSession session, String username)
     {
+        // Ensure User ID is in session so the web-framework knows we have logged in
+        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
+        
         try
         {
-            if (session.getAttribute(SlingshotLoginController.SESSION_ATTRIBUTE_KEY_USER_GROUPS) == null)
-            {
-                // Create User ID in session so the web-framework dispatcher knows we have logged in
-                session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
-    
-                // ACE-3257 fix, retrieve all of the groups that the user is a member of...
-                loginController.onSuccess(req, res);
-            }
+            // Inform the Slingshot login controller of a successful login attempt as further processing may be required
+            this.loginController.beforeSuccess(req, res);
         }
         catch (Exception e)
         {
-            throw new AlfrescoRuntimeException("Unable to retrieve groups for currently logged in user!", e);
+            throw new AlfrescoRuntimeException("Error during loginController.onSuccess()", e);
         }
     }
 }

@@ -19,15 +19,19 @@ package org.springframework.extensions.surf.mvc;
  
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.extensions.surf.uri.UriUtils;
  
 /**
-  * Responds to Login POSTs to allow the user to authenticate to the web site.
-  * @author muzquiano
-  * @author kevinr
-  */
+ * Responds to Login POSTs to allow the user to authenticate to the application.
+ * 
+ * @author kevinr
+ */
 public class LoginController extends AbstractLoginController
 {
+    protected static final String PARAM_FAILURE = "failure";
+    protected static final String PARAM_SUCCESS = "success";
+
     /**
      * Sends an HTTP redirect response to the success page provided in the request parameters, if present, falling
      * back to root of the web application.
@@ -37,7 +41,7 @@ public class LoginController extends AbstractLoginController
 	@Override
     protected void onSuccess(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
-        String successPage = (String) request.getParameter("success");
+        String successPage = (String) request.getParameter(LoginController.PARAM_SUCCESS);
         if (successPage != null)
         {
             response.sendRedirect(UriUtils.relativeUri(successPage));
@@ -54,9 +58,10 @@ public class LoginController extends AbstractLoginController
      * 
      * @see org.springframework.extensions.surf.mvc.AbstractLoginController#onSuccess(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
+	@Override
 	protected void onFailure(HttpServletRequest request, HttpServletResponse response) throws Exception 
 	{
-        String failurePage = (String) request.getParameter("failure");
+        String failurePage = (String) request.getParameter(LoginController.PARAM_FAILURE);
         
         // Invalidate the session to ensure any session ID cookies are no longer valid
         // as the auth has failed - mitigates session fixation attacks by ensuring that no
