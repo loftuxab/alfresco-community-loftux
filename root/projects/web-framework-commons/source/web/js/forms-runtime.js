@@ -2014,9 +2014,9 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
     */
    Alfresco.forms.validation.numberRange = function numberRange(field, args, event, form)
    {
-      if (Alfresco.logger.isDebugEnabled())
-         Alfresco.logger.debug("Validating number range of field '" + field.id +
-                               "' using args: " + YAHOO.lang.dump(args));
+      if (Alfresco.logger.isDebugEnabled()) {
+         Alfresco.logger.debug("Validating number range of field '" + field.id + "' using args: " + YAHOO.lang.dump(args));
+      }
 
       var valid = true;
       var value = field.value.toString();
@@ -2029,35 +2029,36 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          }
          else
          {
-            var min = -1;
-            var max = -1;
+            // ACE-3690: NaN instead of -1 to indicate a non-present value
+            var min = NaN;
+            var max = NaN;
 
-            if (args.min)
+            if (args.min !== undefined)
             {
                min = parseInt(args.min);
             }
 
-            if (args.minValue)
+            if (args.minValue !== undefined)
             {
                min = parseInt(args.minValue);
             }
 
-            if (args.max)
+            if (args.max !== undefined)
             {
                max = parseInt(args.max);
             }
 
-            if (args.maxValue)
+            if (args.maxValue !== undefined)
             {
                max = parseInt(args.maxValue);
             }
 
-            if (min != -1 && value < min)
+            if (!isNaN(min) && value < min)
             {
                valid = false;
             }
 
-            if (max != -1 && value > max)
+            if (!isNaN(max) && value > max)
             {
                valid = false;
             }
