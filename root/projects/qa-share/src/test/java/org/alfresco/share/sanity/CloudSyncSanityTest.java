@@ -46,8 +46,9 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
-        super.setup();
         testName = this.getClass().getSimpleName();
+        logger.info("Start Tests in: " + testName);
+        super.setup();
         siteName = getSiteName(testName);
         fileName = getFileName(testName);
         fileNamePlain = fileName + "plainText";
