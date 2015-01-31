@@ -8,6 +8,7 @@ package org.alfresco.share.calendar.timezone;
 
 import java.util.Map;
 
+import org.alfresco.application.util.Application;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.MyCalendarDashlet;
 import org.alfresco.po.share.enums.Dashlets;
@@ -20,12 +21,15 @@ import org.alfresco.share.util.CalendarUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.windows.application.MicorsoftOffice2010;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import com.cobra.ldtp.Ldtp;
 
 @Listeners(FailedTestListener.class)
 public class UserDashboardTests extends AbstractUtils
@@ -39,6 +43,9 @@ public class UserDashboardTests extends AbstractUtils
     private String defaultTZ = "London";
     private String newTZ = "Bucharest";
 
+    MicorsoftOffice2010 outlook = new MicorsoftOffice2010(Application.OUTLOOK, "2010");
+    private String sharePointPath;
+
     @Override
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
@@ -50,22 +57,26 @@ public class UserDashboardTests extends AbstractUtils
         siteName = getSiteName(testName);
 
         logger.info("Start Tests in: " + testName);
-        
+
+        Runtime.getRuntime().exec("taskkill /F /IM OUTLOOK.EXE");
+        sharePointPath = outlook.getSharePointPath();
+
         CalendarUtil.changeTimeZone(defaultTZ);
 
     }
 
-
     @AfterMethod(alwaysRun = true)
     public void teardownMEthod() throws Exception
     {
+        Runtime.getRuntime().exec("taskkill /F /IM OUTLOOK.EXE");
+        Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
         CalendarUtil.changeTimeZone(defaultTZ);
     }
 
     @Test(groups = { "DataPrepCalendar" })
     public void dataPrep_AONE_UserDashboard() throws Exception
     {
-        
+
         // Create normal User
         String[] testUser2 = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser2);
@@ -78,22 +89,22 @@ public class UserDashboardTests extends AbstractUtils
 
         // Create public site
         ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-        
+
         // Calendar component is added to the site
         ShareUserDashboard.addPageToSite(drone, siteName, SitePageType.CALENDER);
 
     }
 
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_673() throws Exception
     {
         boolean allDay = false;
 
         ShareUser.login(drone, testUser);
-        
+
         // Calendar is opened
         SiteDashboardPage siteDashBoard = ShareUser.openSiteDashboard(drone, siteName).render(maxWaitTime);
-        
+
         // navigate to Calendar
         CalendarPage calendarPage = siteDashBoard.getSiteNav().selectCalendarPage();
 
@@ -152,7 +163,7 @@ public class UserDashboardTests extends AbstractUtils
 
     }
 
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_674() throws Exception
     {
         boolean allDay = true;
@@ -214,7 +225,7 @@ public class UserDashboardTests extends AbstractUtils
 
     }
 
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_675() throws Exception
     {
         boolean allDay = false;
@@ -279,7 +290,7 @@ public class UserDashboardTests extends AbstractUtils
 
     }
 
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_676() throws Exception
     {
         boolean allDay = true;
@@ -341,7 +352,7 @@ public class UserDashboardTests extends AbstractUtils
 
     }
 
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_677() throws Exception
     {
         boolean allDay = false;
@@ -406,7 +417,7 @@ public class UserDashboardTests extends AbstractUtils
 
     }
 
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_678() throws Exception
     {
         boolean allDay = true;
@@ -467,7 +478,7 @@ public class UserDashboardTests extends AbstractUtils
         Assert.assertTrue(myCalendar.isEventDetailsDisplayed(eventDetail), "The " + eventDetail + " isn't correctly displayed on my calendar");
     }
 
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_679() throws Exception
     {
         boolean allDay = false;
@@ -532,7 +543,7 @@ public class UserDashboardTests extends AbstractUtils
 
     }
 
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_680() throws Exception
     {
         boolean allDay = true;
@@ -592,9 +603,8 @@ public class UserDashboardTests extends AbstractUtils
         // verify the event with the details was created
         Assert.assertTrue(myCalendar.isEventDetailsDisplayed(eventDetail), "The " + eventDetail + " isn't correctly displayed on my calendar");
     }
-    
-    
-    @Test(groups = { "Calendar" ,"EnterpriseOnly"})
+
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
     public void AONE_681() throws Exception
     {
         boolean allDay = false;
@@ -658,6 +668,88 @@ public class UserDashboardTests extends AbstractUtils
                 + CalendarUtil.getDateInFormat(expectedEndDate, "dd MMMM, yyyy h:mm a", allDay) + "\n" + siteName;
 
         // verify the event with the details was created
+        Assert.assertTrue(myCalendar.isEventDetailsDisplayed(eventDetail), "The " + eventDetail + " isn't correctly displayed on my calendar");
+
+    }
+
+    /** AONE-682:User Dashboard. Calendar dashlet. Recurrent */
+    @Test(groups = { "Calendar", "EnterpriseOnly" })
+    public void AONE_682() throws Exception
+    {
+        boolean allDay = false;
+        String location = testName + " - Room";
+        String startDate = "2:30 PM";
+        String endDate = "5:25 PM";
+
+         // MS Outlook 2010 is opened;
+         Ldtp l = outlook.openOfficeApplication();
+        
+         // create new meeting workspace
+         outlook.operateOnCreateNewMeetingWorkspace(l, sharePointPath, siteName, location, testUser, DEFAULT_PASSWORD, true, false);
+        
+         // Step 1
+         // Create any recurrent event, e.g.:
+         //
+         // Name: test-event;
+         // Start Date: 28/06/2013 14:30;
+         // End Date: 28/06/2013 17:25;
+         // Recurrence: Daily, Every 1 day;
+         // End after: 3 occurences.
+         Ldtp l1 = outlook.getAbstractUtil().setOnWindow(siteName);
+         l1.click("chkAlldayevent");
+         l1 = outlook.getAbstractUtil().setOnWindow(siteName);
+         l1.mouseLeftClick("btnRecurrence");
+         // set the recurrence
+         outlook.operateOnRecurrenceAppointment(l1, startDate, endDate, "3");
+        
+         Ldtp after_rec = outlook.getAbstractUtil().setOnWindow(siteName);
+         after_rec.click("btnSave");
+        
+         // User login.
+        ShareUser.login(drone, testUser);
+
+        // Step 2
+        // Open User Dashboard
+        // User Dashboard is opened
+        DashBoardPage userDashboard = ShareUser.selectMyDashBoard(drone);
+        MyCalendarDashlet myCalendar = userDashboard.getDashlet("my-calendar").render();
+
+        // Step 3
+        // Verify Calendar dashlet.
+        Map<String, String> timeValues = CalendarUtil.addValuesToCurrentDate(0, 0, startDate, endDate, allDay);
+        String expectedStartDate = timeValues.get("startDateValue");
+        String expectedEndDate = timeValues.get("endDateValue");
+
+        String eventHeader = siteName + " (Repeating)";
+        String eventDetail = eventHeader + "\n" + CalendarUtil.getDateInFormat(expectedStartDate, "dd MMMM, yyyy h:mm a", allDay) + " - "
+                + CalendarUtil.getDateInFormat(expectedEndDate, "h:mm a", allDay) + "\n" + siteName;
+        //
+        // // verify the event with the details was created
+        // Assert.assertTrue(myCalendar.isRepeating(siteName), "The " + siteName + " is not a repeating event");
+        // Assert.assertTrue(myCalendar.isEventDetailsDisplayed(eventDetail), "The " + eventDetail + " isn't correctly displayed on my calendar");
+        //
+        // ShareUser.logout(drone);
+        //
+        // // Step 4
+        // // On a server machine, open Site Dashboard - instead of accessing a server machine, the date time of the current machine is changed
+        CalendarUtil.changeTimeZone(newTZ);
+
+        ShareUser.login(drone, testUser);
+
+        // Verify User Dashboard is opened
+        userDashboard = ShareUser.selectMyDashBoard(drone);
+        myCalendar = userDashboard.getDashlet("my-calendar").render();
+
+        expectedStartDate = CalendarUtil.convertDateToNewTimeZone(expectedStartDate, defaultTZ, newTZ, allDay);
+        expectedEndDate = CalendarUtil.convertDateToNewTimeZone(expectedEndDate, defaultTZ, newTZ, allDay);
+
+        eventDetail = eventHeader + "\n" + CalendarUtil.getDateInFormat(expectedStartDate, "dd MMMM, yyyy h:mm a", allDay) + " - "
+                + CalendarUtil.getDateInFormat(expectedEndDate, "h:mm a", allDay) + "\n" + siteName;
+
+        // Step 5
+        // Verify Calendar dashlet.
+        // verify the event with the details was created
+        Assert.assertTrue(myCalendar.isRepeating(siteName), "The " + siteName + " is not a repeating event");
         Assert.assertTrue(myCalendar.isEventDetailsDisplayed(eventDetail), "The " + eventDetail + " isn't correctly displayed on my calendar");
 
     }
