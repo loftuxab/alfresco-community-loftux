@@ -358,7 +358,7 @@ public abstract class AbstractUtils
 
     public void setupCustomDrone(WebDriver webDriver)
     {
-        customDrone = new WebDroneImpl(webDriver, 2000, 5000, new ShareProperties(alfrescoVersion.toString()), new FactorySharePage());
+        customDrone = new WebDroneImpl(webDriver, 10000, 60000, new ShareProperties(alfrescoVersion.toString()), new FactorySharePage());
         droneMap.put("custom_drone", customDrone);
         dronePropertiesMap.put(customDrone, testProperties);
         maxWaitTime = ((WebDroneImpl) customDrone).getMaxPageRenderWaitTime();
