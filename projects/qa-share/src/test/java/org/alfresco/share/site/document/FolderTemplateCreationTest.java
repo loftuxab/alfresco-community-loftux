@@ -14,7 +14,6 @@ import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -720,8 +719,6 @@ public class FolderTemplateCreationTest extends AbstractUtils
         newFolder.typeName(folder);
         newFolder.selectSubmitButton();
         drone.getCurrentPage().render();
-//        WebElement notifMessage = drone.findAndWait(By.cssSelector("div[style*='visible']>div>div>span.message"));
-//        String notification = notifMessage.getText();
         String notification = newFolder.getNotificationMessage();
         assertTrue(notification.contains("Duplicate folder name"), "Friendly notification isn't present");
 
@@ -803,8 +800,6 @@ public class FolderTemplateCreationTest extends AbstractUtils
         drone.closeTab();
 
         newFolder.selectSubmitButton();
-//        WebElement notifMessage = drone.findAndWait(By.cssSelector("div[style*='visible']>div>div>span.message"));
-//        String notification = notifMessage.getText();
         String notification = newFolder.getNotificationMessage();
         assertTrue(notification.contains("Duplicate folder name"), "Friendly notification isn't present");
 
