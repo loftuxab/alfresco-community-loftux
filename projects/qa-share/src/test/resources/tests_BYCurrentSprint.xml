@@ -11,5 +11,7 @@
         <!--suite-file path="tests_BY_api.xml"/-->
         <suite-file path="tests_BY_repository.xml"/>
         <!--suite-file path="tests_BY_sanity.xml"/-->
+        <suite-file path="tests_BY_contentRules.xml"/>
+
     </suite-files>
     </suite>
