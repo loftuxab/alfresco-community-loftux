@@ -30,11 +30,11 @@ blockquote {
 .logo-desc, .header-desc { /* this is the italic text used an additional description for headers and detail pages */
 	color:#aaa473; 
 }
-ol { 
+.article-body ol { 
     margin-left: 40px;
     list-style-type: decimal; 
 }
-ul { 
+.article-body ul { 
     margin-left: 40px;
     list-style-type: disc;
 } 

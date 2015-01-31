@@ -28,11 +28,11 @@ blockquote {
 	color:#a5a5a5;	/* text colour in the blockqoutes */
 }
 
-ol { 
+.article-body ol { 
     margin-left: 40px;
     list-style-type: decimal; 
 }
-ul { 
+.article-body ul { 
     margin-left: 40px;
     list-style-type: disc;
 } 
