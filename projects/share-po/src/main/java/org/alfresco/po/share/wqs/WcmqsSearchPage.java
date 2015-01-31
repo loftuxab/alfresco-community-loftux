@@ -135,7 +135,8 @@ public class WcmqsSearchPage extends WcmqsAbstractPage
         ArrayList<String> blogArticles = new ArrayList<String>();
         try
         {
-            List<WebElement> links = drone.findAndWaitForElements(LATEST_BLOG_ARTICLES);
+            WebElement latestNewsBlock = drone.find(LATEST_BLOG_ARTICLES);
+            List<WebElement> links = latestNewsBlock.findElements(By.cssSelector("a"));
             for (WebElement div : links)
             {
                 blogArticles.add(div.getText());
