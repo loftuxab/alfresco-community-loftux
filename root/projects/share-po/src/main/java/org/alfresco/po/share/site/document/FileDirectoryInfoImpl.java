@@ -65,7 +65,7 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
     private static final String FILE_EDIT_INFO = "div.yui-dt-liner div:nth-of-type(1)";
     private static final String TAG_INFO = "span[title='Tag'] + form + span.item";
     private static final String TAG_COLLECTION = TAG_INFO + " > span.tag > a";
-    private static final String IMG_FOLDER = "/documentlibrary/images/unfiled-record-folder-48.png";
+    private static final String IMG_FOLDER = ".*/documentlibrary/images/.*folder.*.png";
     private static final String FAVOURITE_CONTENT = "a[class*='favourite-action']";
     private static final String LIKE_CONTENT = "a[class*='like-action']";
     private static final String LIKE_COUNT = "span.likes-count";
@@ -187,7 +187,8 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         {
             WebElement img = findElement(By.tagName("img"));
             String path = img.getAttribute("src");
-            if (path != null && path.contains(IMG_FOLDER))
+
+            if (path != null && path.matches(IMG_FOLDER))
             {
                 isFolder = true;
             }
