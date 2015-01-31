@@ -151,30 +151,22 @@ public class PerformanceTest extends CmisUtils
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
+        File bigDataFile = null;
 
+        try
+        {
         FtpUtil.configFtpPort();
-        File bigDataFile = new File(BIG_DATA_FILE);
+        bigDataFile = getFileWithSize(BIG_DATA_FILE, 2048);
+        logger.info("2 GB file created! File[" + bigDataFile.getAbsolutePath() + "]=" + (bigDataFile.length() / 1024 / 1024 / 1024) + " gb.");
 
         CreateActivateUser(drone, ADMIN_USERNAME, testUser);
         login(drone, testUser, DEFAULT_PASSWORD);
         createSite(drone, siteName, siteName);
-        try
-        {
-            try
-            {
-                RandomAccessFile f = new RandomAccessFile(bigDataFile, "rw");
-                f.setLength(1024 * 1024 * 1024 * 2l);
-                logger.info("2 GB file created! File[" + bigDataFile.getAbsolutePath() + "]=" + (bigDataFile.length() / 1024 / 1024 / 1024) + " gb.");
-            }
-            catch (Exception e)
-            {
-                fail("File with BigData don't created.");
-            }
-            assertTrue(FtpUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, bigDataFile, "Alfresco/Sites/" + siteName + "/documentLibrary/"), " File[" + bigDataFile.getAbsolutePath() + "] don't upload via FTP.");
+        assertTrue(FtpUtil.uploadContent(shareUrl, testUser, DEFAULT_PASSWORD, bigDataFile, "Alfresco/Sites/" + siteName + "/documentLibrary/"), " File[" + bigDataFile.getAbsolutePath() + "] don't upload via FTP.");
         }
         finally
         {
-            if (bigDataFile.exists())
+            if (bigDataFile != null && bigDataFile.exists())
             {
                 bigDataFile.delete();
             }
@@ -311,6 +303,7 @@ public class PerformanceTest extends CmisUtils
         DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
         EditDocumentPropertiesPage editDocumentPropertiesPage = documentDetailsPage.selectEditProperties().render();
         TagPage tagPage = editDocumentPropertiesPage.getTag();
+        webDriverWait(drone, 3000);
         int allTagsCount = tagPage.getAllTagsCount();
         assertTrue(allTagsCount > 119, "More than 120 tags don't created.");
         tagName = getTagName(testName + 999);
