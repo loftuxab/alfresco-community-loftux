@@ -15,13 +15,15 @@
 
 package org.alfresco.po.share.user;
 
-import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
-
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
+
+import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 /**
  * When the users selects Recover of many items in the trashcan they will be
@@ -78,5 +80,25 @@ public class TrashCanRecoverConfirmDialog extends TrashCanPage
     {
         drone.findAndWait(RECOVER_OK_BUTTON).click();
         return new TrashCanPage(drone);
+    }
+
+    /**
+     * This method helps to get notification message
+     * @return - String
+     * @throws - PageOperationException
+     */
+
+    public String getNotificationMessage()
+    {
+        try
+        {
+            WebElement messageText = drone.findAndWait(By.cssSelector("div.bd"));
+            return messageText.getText();
+        }
+        catch (TimeoutException toe)
+        {
+            throw new PageOperationException("Time out finding notification message", toe);
+        }
+
     }
 }

@@ -15,8 +15,6 @@
 
 package org.alfresco.po.share.user;
 
-import java.util.List;
-
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -24,6 +22,8 @@ import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 /**
  * When the users Deletes an item in the trashcan they will be presented with confirmation Dialog.
@@ -147,5 +147,26 @@ public class TrashCanDeleteConfirmationPage extends TrashCanPage
             throw new PageOperationException("Ok button is not visible", te);
         }
         return new TrashCanPage(drone);
+    }
+
+    /**
+     * This method helps to get notification message
+     * @return - String
+     * @throws - PageOperationException
+     */
+
+
+    public String getNotificationMessage()
+    {
+        try
+        {
+            WebElement messageText = drone.findAndWait(By.cssSelector("div.bd"));
+            return messageText.getText();
+        }
+        catch (TimeoutException toe)
+        {
+            throw new PageOperationException ("Time out finding notification message", toe);
+        }
+
     }
 }
