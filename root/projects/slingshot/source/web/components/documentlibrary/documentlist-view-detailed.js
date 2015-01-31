@@ -147,7 +147,6 @@
 
          // MNT-12522
          var row = Dom.getAncestorByTagName(elCell, "tr");
-         var checkbox = elCell.children[0];
          Event.addListener(checkbox, "focus", function()
          {
             _unhighlightRows(this);
