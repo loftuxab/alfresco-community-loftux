@@ -82,6 +82,7 @@ public abstract class AbstractUtils
     protected static String shareUrl;
 
     protected static String pathSharepoint;
+    protected static String wcmqs;
 
     protected static String cloudUrlForHybrid;
     protected static String pentahoUserConsoleUrl;
@@ -273,6 +274,7 @@ public abstract class AbstractUtils
         testProperties = (ShareTestProperty) ctx.getBean("shareTestProperties");
         shareUrl = testProperties.getShareUrl();
         pathSharepoint = testProperties.getPathSharepoint();
+        wcmqs=testProperties.getWcmqs();
         cloudUrlForHybrid = testProperties.getCloudUrlForHybrid();
         pentahoUserConsoleUrl = testProperties.getPentahoUserConsoleUrl();
         username = testProperties.getUsername();
@@ -1615,12 +1617,22 @@ public abstract class AbstractUtils
     /**
      * Method to get the path for SharePoint
      */
+    public static String getWcmqs(WebDrone drone)
+    {
+        String wcmqs = dronePropertiesMap.get(drone).getWcmqs();
+        return wcmqs;
+    }
+
+
+    /**
+     * Method to get the path for SharePoint
+     */
     public static String getPathSharepoint(WebDrone drone)
     {
         String pathSharepoint = dronePropertiesMap.get(drone).getPathSharepoint();
         return pathSharepoint;
     }
-
+    
     /**
      * Method to get token Key for the user
      */

@@ -53,7 +53,8 @@
 
     <bean id="shareTestProperties" class="org.alfresco.share.util.ShareTestProperty">
         <constructor-arg name="shareUrl" value="${share.target}" />
-        <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" /> 
+        <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" />
+        <constructor-arg name="wcmqs" value="${share.wcmqs.path}" /> 
         <constructor-arg name="apiUrl" value="${api.target}" />
         <constructor-arg name="gridUrl" value="${webdrone.grid.url}" />
         <constructor-arg name="username" value="${test.username}" />
@@ -170,6 +171,7 @@
         <constructor-arg name="serverPass" value="${serverPass}" />
         <constructor-arg name="isSecureSession" value="${isSecureSession}" />
         <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" />
+        <constructor-arg name="wcmqs" value="${share.wcmqs.path}" />
         <constructor-arg name="replicationEndPointHost" value="${replicationEndPointHost}" />
         <constructor-arg name="layer7Disabled" value="${layer7Disabled}" />
         <constructor-arg name="apiKey" value="${apiKey}" />
