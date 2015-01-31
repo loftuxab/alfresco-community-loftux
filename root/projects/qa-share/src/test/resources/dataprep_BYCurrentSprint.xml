@@ -1,8 +1,8 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="Sprint BY Data Prep Suite" preserve-order="true" parallel="classes" thread-count="2">
-<test name="Common tests" parallel="classes" thread-count="5">
+<!--test name="Common tests" parallel="classes" thread-count="5">
 <classes>
-    <!--class name="org.alfresco.share.site.document.FilmStripDocLibTest2">
+    <class name="org.alfresco.share.site.document.FilmStripDocLibTest2">
         <methods>
             <include name="dataPrep_AONE_14060"/>
             <include name="dataPrep_AONE_14052"/>
@@ -137,7 +137,7 @@
 <include name="dataPrep_AONE_13984"/>
 <exclude name=".*"/>
 </methods>
-</class-->
+</class>
 <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest">
 <methods>
 <include name="dataPrep_AONE_14818"/>
@@ -155,14 +155,14 @@
 </class>
     <class name="org.alfresco.share.dashlet.SiteSearchDashletTest">
         <methods>
-            <!--include name="dataPrep_AONE_14774"/>
+            <include name="dataPrep_AONE_14774"/>
             <include name="dataPrep_AONE_14775"/>
-            <include name="dataPrep_AONE_14776"/-->
+            <include name="dataPrep_AONE_14776"/>
             <include name="dataPrep_AONE_14777"/>
             <include name="dataPrep_AONE_14778"/>
             <include name="dataPrep_AONE_14779"/>
             <include name="dataPrep_AONE_14780"/>
-            <!--include name="dataPrep_AONE_14781"/>
+            <include name="dataPrep_AONE_14781"/>
             <include name="dataPrep_AONE_14782"/>
             <include name="dataPrep_AONE_14783"/>
             <include name="dataPrep_AONE_14784"/>
@@ -194,11 +194,11 @@
             <include name="dataPrep_AONE_14812"/>
             <include name="dataPrep_AONE_14813"/>
             <include name="dataPrep_AONE_14814"/>
-            <include name="dataPrep_AONE_14815"/-->
+            <include name="dataPrep_AONE_14815"/>
             <exclude name=".*"/>
         </methods>
     </class>
-<!--class name="org.alfresco.share.dashlet.WelcomeDashletCreateDelete">
+<class name="org.alfresco.share.dashlet.WelcomeDashletCreateDelete">
 <methods>
 <include name="dataPrep_AONE_15837"/>
 <exclude name=".*"/>
@@ -343,14 +343,14 @@
             <include name="dataPrep_AONE_3565"/>
             <exclude name=".*"/>
         </methods>
-    </class-->
+    </class>
 </classes>
-</test>
+</test-->
 <suite-files>
     <!--suite-file path="dataprep_BY_sanity.xml"/>
     <suite-file path="dataprep_BY_doclib.xml"/>
-    <suite-file path="dataprep_BY_repository.xml"/-->
-    <suite-file path="dataprep_BY_dashlet.xml"/>
+    <suite-file path="dataprep_BY_repository.xml"/>
+    <suite-file path="dataprep_BY_dashlet.xml"/-->
     <suite-file path="dataprep_BY_contentRules.xml"/>
 
 </suite-files>
