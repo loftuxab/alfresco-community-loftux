@@ -14,6 +14,7 @@
  */
 package org.alfresco.share.util;
 
+import com.google.common.util.concurrent.ExecutionError;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.FileServersPage;
@@ -31,6 +32,9 @@ import org.testng.Assert;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -395,6 +399,10 @@ public class FtpUtil extends AbstractUtils
     {
         SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
         FileServersPage fileServersPage = sysSummaryPage.openConsolePage(AdminConsoleLink.FileServers).render();
+        if (!fileServersPage.isFtpEnabledSelected())
+        {
+           fileServersPage.selectFtpEnabledCheckbox();
+        }
         fileServersPage.configFtpPort(port);
     }
 
@@ -904,6 +912,85 @@ public class FtpUtil extends AbstractUtils
         }
 
     }
+
+    public static boolean editDocument(String shareUrl, String user, String password, String remoteContentName, String remoteFolderPath, String content)
+    {
+
+        OutputStream outputStream;
+        boolean result = false;
+
+        try
+        {
+            FTPClient ftpClient = connectServer(shareUrl, user, password);
+            ftpClient.changeWorkingDirectory(remoteFolderPath);
+            outputStream = ftpClient.storeFileStream(remoteContentName);
+            if (outputStream != null)
+            {
+                outputStream.write(content.getBytes());
+                outputStream.close();
+                ftpClient.logout();
+                ftpClient.disconnect();
+                result = true;
+            }
+            else
+            {
+                logger.error(ftpClient.getReplyString());
+            }
+
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+
+        return result;
+    }
+
+
+    public static void concurrentUpload(final String shareUrl, final String user, final String password, final ArrayBlockingQueue<File> fileQueue, final String remoteFolderPath)  {
+        int NUM_THREADS = 3;
+        ExecutorService executorService = Executors.newFixedThreadPool(NUM_THREADS);
+        List<Future> futures = new ArrayList<Future>();
+        for (int i = 0; i < NUM_THREADS; i++) {
+            futures.add(executorService.submit(new Runnable()
+            {
+                @Override public void run()
+                {
+                    while (fileQueue.peek() != null)
+                    {
+                        File file = fileQueue.poll();
+                        if (file != null)
+                        {
+                            try {
+                                uploadContent(shareUrl, user, password, file, remoteFolderPath);
+                            }
+                            catch (ExecutionError e) {
+                                logger.error(e);
+                            }
+                        }
+                    }
+                }
+            }));
+        }
+        for (Future future : futures) {
+            try
+            {
+                if (!future.isDone()) future.get();
+            }
+            catch (InterruptedException e)
+            {
+                logger.error(e);
+            }
+            catch (ExecutionException ex)
+            {
+                logger.error(ex);
+            }
+        }
+
+        executorService.shutdown();
+    }
+
+
 
 
 }

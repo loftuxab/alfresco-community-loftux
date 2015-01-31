@@ -22,9 +22,19 @@
 
     <test name="RepositoryFtpTest">
         <classes>
-            <class name="org.alfresco.share.repository.RepositoryFtpTest"/>
+            <class name="org.alfresco.share.repository.RepositoryFtpTest">
+                <methods>
+                    <include name="AONE_6446"/>
+                    <include name="AONE_6447"/>
+                    <include name="AONE_6452"/>
+                    <include name="AONE_6449"/>
+                    <include name="AONE_6448"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
         </classes>
     </test>
+
     <test name="RepositoryFtpsTest">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryFtpsTest"/>
