@@ -40,8 +40,9 @@
             <artifactId>json</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient-patched</groupId>
-            <artifactId>commons-httpclient-patched</artifactId>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1-HTTPCLIENT-1265</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
