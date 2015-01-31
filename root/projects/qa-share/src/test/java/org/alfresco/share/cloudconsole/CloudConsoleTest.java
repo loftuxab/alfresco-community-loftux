@@ -124,7 +124,7 @@ public class CloudConsoleTest extends AbstractUtils
         String user1 = getUserNameFreeDomain(testName + 1);
         String user2 = getUserNameFreeDomain(testName + 2);
         String usersForInvitation = user1 + "\r\n" + user2;
-        File fileForBulkImport = SiteUtil.newFile(DATA_FOLDER + testName + ".txt", usersForInvitation).getAbsoluteFile();
+        File fileForBulkImport = SiteUtil.newFile(DATA_FOLDER + UNIQUE_TESTDATA_STRING+getTestName() + ".txt", usersForInvitation).getAbsoluteFile();
         Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().openInviteUsersTab()
                 .executeCorrectBulkImport(fileForBulkImport);
 
