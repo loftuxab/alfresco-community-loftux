@@ -505,13 +505,13 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15040", alwaysRun = true)
-    public void AONE_15041() throws Exception
+    @Test(groups = { "DataPrepEnterpriseOnly" })
+    public void dataPrep_AONE_15041() throws Exception
     {
+
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
-
         // Create user
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
 
@@ -530,10 +530,20 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
         // Create Site
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+    }
+
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15040", alwaysRun = true)
+    public void AONE_15041() throws Exception
+    {
+        String testName = getTestName();
+        String testUser = getUserNameFreeDomain(testName);
+        String siteName = getSiteName(testName);
+
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        openSiteDashboard(drone, siteName);
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
 
         // Select the Create menu > Create folder from templates
-//        ShareUser.openSitesDocumentLibrary(drone, siteName).render();
         documentLibraryPage.createFolderFromTemplateHover(folderName + 6).render();
         drone.getCurrentPage().render();
         assertTrue(documentLibraryPage.isFileVisible(folderName + 6), "Folder isn't created");
