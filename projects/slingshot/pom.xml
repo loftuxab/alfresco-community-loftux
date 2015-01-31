@@ -16,6 +16,13 @@
         <maven.tomcat.path>/share</maven.tomcat.path>
         <maven.tomcat.port>${tomcat.default.share.port}</maven.tomcat.port>
         <maven.tomcat.httpsPort>${tomcat.default.share.ssl.port}</maven.tomcat.httpsPort>
+        <!-- Files to exclude from SonarQube analysis -->
+        <sonar.exclusions>
+            source/web/jquery/**, 
+            source/web/js/flash/extMouseWheel.js,
+            source/web/js/lightbox.js,
+            source/web/yui/**
+        </sonar.exclusions>
     </properties>
 
     <dependencies>
