@@ -7,8 +7,6 @@
  */
 package org.alfresco.po.share.site.document;
 
-import java.io.File;
-
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.site.SitePage;
@@ -25,9 +23,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.io.File;
+
 /**
  * Unit tests to verify methods of Sync Info functions are working correctly.
- * 
+ *
  * @author nshah
  */
 @Listeners(FailedTestListener.class)
@@ -35,116 +35,116 @@ import org.testng.annotations.Test;
 public class SyncInfoPageTest extends AbstractDocumentTest
 {
 
-    private static String siteName;
-    private static DocumentLibraryPage documentLibPage;
-    private File file;
-    private DestinationAndAssigneePage desAndAsgPage;
-    private String folder;
-    private String folder2;
+        private static String siteName;
+        private static DocumentLibraryPage documentLibPage;
+        private File file;
+        private DestinationAndAssigneePage desAndAsgPage;
+        private String folder;
+        private String folder2;
 
-    /**
-     * Pre test setup of a dummy file to upload.
-     * 
-     * @throws Exception
-     */
-    @BeforeClass
-    public void prepare() throws Exception
-    {
-        siteName = "site" + System.currentTimeMillis();
-        folder = "TempFolder" + System.currentTimeMillis();
-        folder2 = "TempFolder-2" + System.currentTimeMillis();
-        ShareUtil.loginAs(drone, shareUrl, username, password).render();
-        file = SiteUtil.prepareFile();
-    }
+        /**
+         * Pre test setup of a dummy file to upload.
+         *
+         * @throws Exception
+         */
+        @BeforeClass
+        public void prepare() throws Exception
+        {
+                siteName = "site" + System.currentTimeMillis();
+                folder = "TempFolder" + System.currentTimeMillis();
+                folder2 = "TempFolder-2" + System.currentTimeMillis();
+                ShareUtil.loginAs(drone, shareUrl, username, password).render();
+                file = SiteUtil.prepareFile();
+        }
 
-    @Test(groups = "Hybrid")
-    public void prepareCloudSyncData() throws Exception
-    {
-        MyProfilePage myProfilePage = ((SharePage) drone.getCurrentPage()).getNav().selectMyProfile().render();
-        CloudSyncPage cloudSyncPage = myProfilePage.getProfileNav().selectCloudSyncPage().render();
+        @Test(groups = "Hybrid")
+        public void prepareCloudSyncData() throws Exception
+        {
+                MyProfilePage myProfilePage = ((SharePage) drone.getCurrentPage()).getNav().selectMyProfile().render();
+                CloudSyncPage cloudSyncPage = myProfilePage.getProfileNav().selectCloudSyncPage().render();
 
-        CloudSignInPage cloudSignInPage = cloudSyncPage.selectCloudSign().render();
-        cloudSignInPage.loginAs(cloudUserName, cloudUserPassword).render();
+                CloudSignInPage cloudSignInPage = cloudSyncPage.selectCloudSign().render();
+                cloudSignInPage.loginAs(cloudUserName, cloudUserPassword).render();
 
-        SiteUtil.createSite(drone, siteName, "Public");
-        SitePage site = drone.getCurrentPage().render();
-        documentLibPage = site.getSiteNav().selectSiteDocumentLibrary().render();
-        UploadFilePage uploadForm = documentLibPage.getNavigation().selectFileUpload().render();
-        documentLibPage = uploadForm.uploadFile(file.getCanonicalPath()).render();
-        drone.refresh();
-        desAndAsgPage = (DestinationAndAssigneePage) documentLibPage.getFileDirectoryInfo(file.getName()).selectSyncToCloud().render();
-        documentLibPage = ((DocumentLibraryPage) desAndAsgPage.selectSubmitButtonToSync()).render();
-        documentLibPage.render().getNavigation().selectCreateNewFolder().render().createNewFolder(folder);
-        drone.refresh();
-        documentLibPage.render().getNavigation().selectCreateNewFolder().render().createNewFolder(folder2);
-        drone.refresh();
-        desAndAsgPage = (DestinationAndAssigneePage) documentLibPage.getFileDirectoryInfo(folder).selectSyncToCloud().render();
-        documentLibPage = ((DocumentLibraryPage) desAndAsgPage.selectSubmitButtonToSync()).render();
-        documentLibPage = documentLibPage.renderItem(maxWaitTime_CloudSync, folder2);
-        desAndAsgPage = documentLibPage.getFileDirectoryInfo(folder2).selectSyncToCloud().render();
-        documentLibPage = ((DocumentLibraryPage) desAndAsgPage.selectSubmitButtonToSync()).render();
-        documentLibPage = documentLibPage.renderItem(maxWaitTime_CloudSync, folder2);
-    }
+                SiteUtil.createSite(drone, siteName, "Public");
+                SitePage site = drone.getCurrentPage().render();
+                documentLibPage = site.getSiteNav().selectSiteDocumentLibrary().render();
+                UploadFilePage uploadForm = documentLibPage.getNavigation().selectFileUpload().render();
+                documentLibPage = uploadForm.uploadFile(file.getCanonicalPath()).render();
+                drone.refresh();
+                desAndAsgPage = (DestinationAndAssigneePage) documentLibPage.getFileDirectoryInfo(file.getName()).selectSyncToCloud().render();
+                documentLibPage = ((DocumentLibraryPage) desAndAsgPage.selectSubmitButtonToSync()).render();
+                documentLibPage.render().getNavigation().selectCreateNewFolder().render().createNewFolder(folder);
+                drone.refresh();
+                documentLibPage.render().getNavigation().selectCreateNewFolder().render().createNewFolder(folder2);
+                drone.refresh();
+                desAndAsgPage = (DestinationAndAssigneePage) documentLibPage.getFileDirectoryInfo(folder).selectSyncToCloud().render();
+                documentLibPage = ((DocumentLibraryPage) desAndAsgPage.selectSubmitButtonToSync()).render();
+                documentLibPage = documentLibPage.renderItem(maxWaitTime_CloudSync, folder2);
+                desAndAsgPage = documentLibPage.getFileDirectoryInfo(folder2).selectSyncToCloud().render();
+                documentLibPage = ((DocumentLibraryPage) desAndAsgPage.selectSubmitButtonToSync()).render();
+                documentLibPage = documentLibPage.renderItem(maxWaitTime_CloudSync, folder2);
+        }
 
-    @Test(groups = "Hybrid", dependsOnMethods = "prepareCloudSyncData")
-    public void testSyncInfoIcon() throws Exception
-    {
-        Assert.assertTrue(documentLibPage.getFileDirectoryInfo(folder).isCloudSynced());
-        Assert.assertTrue(documentLibPage.getFileDirectoryInfo(file.getName()).isCloudSynced());
-        Assert.assertTrue(documentLibPage.getFileDirectoryInfo(file.getName()).isViewCloudSyncInfoLinkPresent());
-        Assert.assertTrue(documentLibPage.getFileDirectoryInfo(folder).isViewCloudSyncInfoLinkPresent());
-        Assert.assertEquals("Click to view sync info", documentLibPage.getFileDirectoryInfo(folder).getCloudSyncType());
-        Assert.assertFalse(documentLibPage.getFileDirectoryInfo(file.getName()).isCloudSyncFailed());
-    }
+        @Test(groups = "Hybrid", dependsOnMethods = "prepareCloudSyncData")
+        public void testSyncInfoIcon() throws Exception
+        {
+                Assert.assertTrue(documentLibPage.getFileDirectoryInfo(folder).isCloudSynced());
+                Assert.assertTrue(documentLibPage.getFileDirectoryInfo(file.getName()).isCloudSynced());
+                Assert.assertTrue(documentLibPage.getFileDirectoryInfo(file.getName()).isViewCloudSyncInfoLinkPresent());
+                Assert.assertTrue(documentLibPage.getFileDirectoryInfo(folder).isViewCloudSyncInfoLinkPresent());
+                Assert.assertEquals("Click to view sync info", documentLibPage.getFileDirectoryInfo(folder).getCloudSyncType());
+                Assert.assertFalse(documentLibPage.getFileDirectoryInfo(file.getName()).isCloudSyncFailed());
+        }
 
-    @Test(groups = "Hybrid", dependsOnMethods = "prepareCloudSyncData")
-    public void testSyncInfoPopupMethods() throws Exception
-    {
-        drone.refresh();
-        FileDirectoryInfo fileDirInfo = documentLibPage.getFileDirectoryInfo(folder);
-        SyncInfoPage syncInfoPage = fileDirInfo.clickOnViewCloudSyncInfo();
-        syncInfoPage.render(5000);
-        Assert.assertTrue(syncInfoPage.getCloudSyncStatus().contains("Sync") ? true : false);
-        Assert.assertEquals("premiernet.test>Auto Account's Home>Documents>" + folder, syncInfoPage.getCloudSyncLocation());
-        Assert.assertEquals(folder, syncInfoPage.getCloudSyncDocumentName());
+        @Test(groups = "Hybrid", dependsOnMethods = "prepareCloudSyncData")
+        public void testSyncInfoPopupMethods() throws Exception
+        {
+                drone.refresh();
+                FileDirectoryInfo fileDirInfo = documentLibPage.getFileDirectoryInfo(folder);
+                SyncInfoPage syncInfoPage = fileDirInfo.clickOnViewCloudSyncInfo();
+                syncInfoPage.render(5000);
+                Assert.assertTrue(syncInfoPage.getCloudSyncStatus().contains("Sync") ? true : false);
+                Assert.assertEquals("premiernet.test>Auto Account's Home>Documents>" + folder, syncInfoPage.getCloudSyncLocation());
+                Assert.assertEquals(folder, syncInfoPage.getCloudSyncDocumentName());
 
-        Assert.assertTrue(syncInfoPage.isLogoPresent());
-        Assert.assertTrue(syncInfoPage.isRequestSyncButtonPresent());
-        Assert.assertTrue(syncInfoPage.isSyncStatusPresent());
-        Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
-        Assert.assertNotNull(syncInfoPage.getSyncPeriodDetails());
-        Assert.assertFalse(syncInfoPage.isUnableToRetrieveLocation());
-        syncInfoPage.clickOnCloseButton();
-        documentLibPage = (DocumentLibraryPage) drone.getCurrentPage().render();
-        Assert.assertTrue(documentLibPage instanceof DocumentLibraryPage);
-    }
+                Assert.assertTrue(syncInfoPage.isLogoPresent());
+                Assert.assertTrue(syncInfoPage.isRequestSyncButtonPresent());
+                Assert.assertTrue(syncInfoPage.isSyncStatusPresent());
+                Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
+                Assert.assertNotNull(syncInfoPage.getSyncPeriodDetails());
+                Assert.assertFalse(syncInfoPage.isUnableToRetrieveLocation());
+                syncInfoPage.clickOnCloseButton();
+                documentLibPage = (DocumentLibraryPage) drone.getCurrentPage().render();
+                Assert.assertTrue(documentLibPage instanceof DocumentLibraryPage);
+        }
 
-    @Test(groups = "Hybrid", dependsOnMethods = "testSyncInfoPopupMethods")
-    public void testSyncInfoPopup() throws Exception
-    {
-        drone.refresh();
-        FileDirectoryInfo fileDirInfo = documentLibPage.getFileDirectoryInfo(folder);
-        SyncInfoPage syncInfoPage = fileDirInfo.clickOnViewCloudSyncInfo();
-        syncInfoPage.render(5000);
-        Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
-        syncInfoPage.selectUnsyncRemoveContentFromCloud(true);
+        @Test(groups = "Hybrid", dependsOnMethods = "testSyncInfoPopupMethods")
+        public void testSyncInfoPopup() throws Exception
+        {
+                drone.refresh();
+                FileDirectoryInfo fileDirInfo = documentLibPage.getFileDirectoryInfo(folder);
+                SyncInfoPage syncInfoPage = fileDirInfo.clickOnViewCloudSyncInfo();
+                syncInfoPage.render(5000);
+                Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
+                syncInfoPage.selectUnsyncRemoveContentFromCloud(true);
 
-        documentLibPage = (DocumentLibraryPage) drone.getCurrentPage().render();
-        fileDirInfo = documentLibPage.getFileDirectoryInfo(folder);
-        Assert.assertFalse(fileDirInfo.isViewCloudSyncInfoLinkPresent());
+                documentLibPage = (DocumentLibraryPage) drone.getCurrentPage().render();
+                fileDirInfo = documentLibPage.getFileDirectoryInfo(folder);
+                Assert.assertFalse(fileDirInfo.isViewCloudSyncInfoLinkPresent());
 
-        syncInfoPage = documentLibPage.getFileDirectoryInfo(folder2).clickOnViewCloudSyncInfo();
-        syncInfoPage.render(1000);
-        Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
-        syncInfoPage.selectUnsyncRemoveContentFromCloud(false);
-    }
-    
-    @AfterClass
-    public void teardown()
-    {
-        MyProfilePage myProfilePage = ((SharePage) drone.getCurrentPage()).getNav().selectMyProfile().render();
-        CloudSyncPage cloudSyncPage = myProfilePage.getProfileNav().selectCloudSyncPage().render();
-        cloudSyncPage.disconnectCloudAccount();
-        SiteUtil.deleteSite(drone, siteName);
-    }
+                syncInfoPage = documentLibPage.getFileDirectoryInfo(folder2).clickOnViewCloudSyncInfo();
+                syncInfoPage.render(1000);
+                Assert.assertTrue(syncInfoPage.isUnsyncButtonPresent());
+                syncInfoPage.selectUnsyncRemoveContentFromCloud(false);
+        }
+
+        @AfterClass
+        public void teardown()
+        {
+                MyProfilePage myProfilePage = ((SharePage) drone.getCurrentPage()).getNav().selectMyProfile().render();
+                CloudSyncPage cloudSyncPage = myProfilePage.getProfileNav().selectCloudSyncPage().render();
+                cloudSyncPage.disconnectCloudAccount();
+                SiteUtil.deleteSite(drone, siteName);
+        }
 }
