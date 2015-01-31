@@ -2526,7 +2526,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * 
      * @throws Exception
      */
-    @Test(groups = "NonGrid", timeOut = 400000)
+    @Test(groups = "NonGrid", timeOut = 500000)
     public void AONE_14643() throws Exception
     {
         prepare();
@@ -2534,36 +2534,73 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         /** Start Test */
         String testName = getTestName();
         String fileName = getFileName(testName);
+        String fileNameXls = getFileName(testName);
+        String fileNamePptx = getFileName(testName);
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName) + System.currentTimeMillis();
 
         fileName = fileName + ".docx";
+        fileNameXls = fileNameXls + ".xlsx";
+        fileNamePptx = fileNamePptx + ".pptx";
 
-        // User login
+        // 1. Any user is logged into the Share
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
+        //2. Any site is created
         ShareUser.createSite(drone, siteName, ShareUser.SITE_VISIBILITY_PUBLIC);
 
+        //3. Document Library page is opened
         ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-        // Creating and saving google doc through sign in with the google doc authentication details
+        // 1. Create a Google Docs™ Document;
+        // 2. Enter any data and click Save to Alfresco.
         createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEDOCS);
+
+        // 4. Verify the activity feed entry in My Activities dashlet on User Dashboard.
+        ShareUser.openUserDashboard(drone);
+        String activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileName + FEED_LOCATION + siteName;
+        Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry, true));
+
+        //3. Verify the activity feed entry in Site Activities dashlet on Site Dashboard.
+        ShareUser.openSiteDashboard(drone, siteName);
+        activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileName;
+        Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
+
+        //Delete cookies
+        prepare();
+
+        // 5. Create a Google Docs™ Spreadsheet;
+        ShareUser.openDocumentLibrary(drone);
+        createAndSavegoogleDocBySignIn(drone, fileNameXls, ContentType.GOOGLESPREADSHEET);
 
         // User DashBoard Activities
         ShareUser.openUserDashboard(drone);
-
-        // Check activity feed on: User DashBoard: Content Added
-        String activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileName + FEED_LOCATION + siteName;
-
-        Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry, true));
+        String activityEntry2 = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileNameXls + FEED_LOCATION + siteName;
+        Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry2, true));
 
         // Site DashBoard Activities
         ShareUser.openSiteDashboard(drone, siteName);
-
-        // Check activity feed on: Site DashBoard: Content Added
-        activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileName;
-
+        activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileNameXls;
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
+
+        //Delete cookies
+        prepare();
+
+        // 7. Create a Google Docs™ Presentation;
+        ShareUser.openDocumentLibrary(drone);
+        createAndSavegoogleDocBySignIn(drone, fileNamePptx, ContentType.GOOGLEPRESENTATION);
+
+        // User DashBoard Activities
+        ShareUser.openUserDashboard(drone);
+        String activityEntry3 = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileNamePptx + FEED_LOCATION + siteName;
+        Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry3, true));
+
+        // Site DashBoard Activities
+        ShareUser.openSiteDashboard(drone, siteName);
+        // Check activity feed on: Site DashBoard: Content Added
+        activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileNamePptx;
+        Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
+
 
         // Deleting the test data.
         SiteUtil.deleteSite(drone, siteName);
@@ -2601,7 +2638,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * 
      * @throws Exception
      */
-    @Test(groups = "NonGrid", timeOut = 400000)
+    @Test(groups = "NonGrid", timeOut = 500000)
     public void AONE_14644() throws Exception
     {
         prepare();
@@ -2609,52 +2646,110 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         /** Start Test */
         String testName = getTestName();
         String fileName = getFileName(testName);
+        String fileNameXlsx = getFileName(testName);
+        String fileNamePptx = getFileName(testName);
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName) + System.currentTimeMillis();
         String docVersion = "";
         String modifiedDocVersion = "";
 
         fileName = fileName + ".docx";
+        fileNameXlsx = fileNameXlsx + ".xlsx";
+        fileNamePptx = fileNamePptx + ".pptx";
 
-        // User login
+        // 1. Any user is logged into the Share;
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
+        //2. Any site has been created;
         ShareUser.createSite(drone, siteName, ShareUser.SITE_VISIBILITY_PUBLIC);
 
+        //Create Document
         ShareUser.openSitesDocumentLibrary(drone, siteName);
-
-        // Creating and saving google doc through sign in with the google doc authentication details
         createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEDOCS);
 
         DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
-
         docVersion = detailsPage.getDocumentVersion();
 
-        // Opening google doc through sign in with the google doc authentication details
+        // 1. Click Edit in Google Docs™ action for the Google Docs™ Document  created;
         EditInGoogleDocsPage googleDocsPage = openEditGoogleDocFromDetailsPage(drone);
         Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible());
 
-        // Saving the second document changes in second browser
+        // 2. Make any changes and click Save to Alfresco button.
         GoogleDocsUpdateFilePage googleUpdatefile = saveGoogleDocWithVersionAndComment(drone, "Comments", true);
         detailsPage = googleUpdatefile.submit().render();
 
         modifiedDocVersion = detailsPage.getDocumentVersion();
+        Assert.assertNotEquals(docVersion, modifiedDocVersion);
 
+        // 4. Verify the activity feed entry in My Activities dashlet on User Dashboard.
+        ShareUser.openUserDashboard(drone);
+        String activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileName + FEED_LOCATION + siteName;
+        Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry, true));
+
+        //3. Verify the activity feed entry in Site Activities dashlet on Site Dashboard.
+        ShareUser.openSiteDashboard(drone, siteName);
+        activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileName;
+        Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
+
+
+        //Create Spreadsheet
+        prepare();
+        ShareUser.openSitesDocumentLibrary(drone, siteName);
+        createAndSavegoogleDocBySignIn(drone, fileNameXlsx, ContentType.GOOGLESPREADSHEET);
+
+        DocumentDetailsPage detailsPageXls = ShareUser.openDocumentDetailPage(drone, fileNameXlsx);
+        docVersion = detailsPageXls.getDocumentVersion();
+
+        // 5. Click Edit in Google Docs™ action for the Google Docs™ Spreadsheet  created;
+        EditInGoogleDocsPage googleDocsPageXlsx = openEditGoogleDocFromDetailsPage(drone);
+        Assert.assertTrue(googleDocsPageXlsx.isGoogleDocsIframeVisible());
+
+        // Make any changes and click Save to Alfresco button.
+        GoogleDocsUpdateFilePage googleUpdatefileXlsx = saveGoogleDocWithVersionAndComment(drone, "Comments", true);
+        detailsPageXls = googleUpdatefileXlsx.submit().render();
+
+        modifiedDocVersion = detailsPageXls.getDocumentVersion();
         Assert.assertNotEquals(docVersion, modifiedDocVersion);
 
         // User DashBoard Activities
         ShareUser.openUserDashboard(drone);
-
-        String activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileName + FEED_LOCATION + siteName;
-
-        Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry, true));
+        String activityEntry2 = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileNameXlsx + FEED_LOCATION + siteName;
+        Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry2, true));
 
         // Site DashBoard Activities
         ShareUser.openSiteDashboard(drone, siteName);
-
         // Check activity feed on: Site DashBoard: Content Added
-        activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileName;
+        activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileNameXlsx;
+        Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
 
+        //Create Presentation
+        prepare();
+        ShareUser.openSitesDocumentLibrary(drone, siteName);
+        createAndSavegoogleDocBySignIn(drone, fileNamePptx, ContentType.GOOGLEPRESENTATION);
+
+        DocumentDetailsPage detailsPagePptx = ShareUser.openDocumentDetailPage(drone, fileNamePptx);
+        docVersion = detailsPagePptx.getDocumentVersion();
+
+        // 7. Click Edit in Google Docs™ action for the Google Docs™ Presentation created;
+        EditInGoogleDocsPage googleDocsPagePptx = openEditGoogleDocFromDetailsPage(drone);
+        Assert.assertTrue(googleDocsPagePptx.isGoogleDocsIframeVisible());
+
+        // Make any changes and click Save to Alfresco button.
+        GoogleDocsUpdateFilePage googleUpdatefilePptx = saveGoogleDocWithVersionAndComment(drone, "Comments", true);
+        detailsPagePptx = googleUpdatefilePptx.submit().render();
+
+        modifiedDocVersion = detailsPagePptx.getDocumentVersion();
+        Assert.assertNotEquals(docVersion, modifiedDocVersion);
+
+        // User DashBoard Activities
+        ShareUser.openUserDashboard(drone);
+        String activityEntry3 = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileNamePptx + FEED_LOCATION + siteName;
+        Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry3, true));
+
+        // Site DashBoard Activities
+        ShareUser.openSiteDashboard(drone, siteName);
+        // Check activity feed on: Site DashBoard: Content Added
+        activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileNamePptx;
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
 
         // Deleting the test data.
@@ -2709,39 +2804,34 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         String[] fileInfo = { fileName };
 
-        // User login
+        // 1. Any user is logged into the Share
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
+        // 2. Any site is created
         ShareUser.createSite(drone, siteName, ShareUser.SITE_VISIBILITY_PUBLIC);
 
+        // 3. Any MS Office/OpenOffice document, except Google Docs™, is uploaded
         ShareUser.uploadFileInFolder(drone, fileInfo);
 
         DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
-
         docVersion = detailsPage.getDocumentVersion();
 
-        // Opening google doc through sign in with the google doc authentication details
+        // 1. Click Edit in Google Docs™ action for the created in the pre-condition document.
         EditInGoogleDocsPage googleDocsPage = signIntoEditGoogleDocFromDetailsPage(drone);
         Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible());
 
-        // Saving the second document changes in second browser
+        // 2. Make any changes and click Save to Alfresco button.
         GoogleDocsUpdateFilePage googleUpdatefile = saveGoogleDocWithVersionAndComment(drone, "Comments", true);
         detailsPage = googleUpdatefile.submit().render();
 
-        // User DashBoard Activities
+        // 4. Verify the activity feed entry in My Activities dashlet on User Dashboard.
         ShareUser.openUserDashboard(drone);
-
-        // Check activity feed on: User DashBoard: Content Updated
         String activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileName + FEED_LOCATION + siteName;
-
         Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry, true));
 
-        // Site DashBoard Activities
+        // 3. Verify the activity feed entry in Site Activities dashlet on Site Dashboard.
         ShareUser.openSiteDashboard(drone, siteName);
-
-        // Check activity feed on: User DashBoard: Content Updated
         activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileName;
-
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
 
         // Deleting the test data.
