@@ -12,16 +12,6 @@
  */
 package org.alfresco.po.share.site.document;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.awt.Robot;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.exception.AlfrescoVersionException;
@@ -30,23 +20,24 @@ import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
-import org.alfresco.webdrone.HtmlElement;
-import org.alfresco.webdrone.HtmlPage;
-import org.alfresco.webdrone.RenderTime;
-import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.WebDroneImpl;
+import org.alfresco.webdrone.*;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotVisibleException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Entity that models the list of file or directories as it appears on the {@link DocumentLibraryPage}. The list models the HTML element representing
@@ -2963,5 +2954,33 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
             
                 
         }
+
+    /**
+     * This method gets the list of in line tags after clicking on tag info icon.
+     *
+     * @return List<String> collection of tags
+     */
+
+    @Override
+    public List<String> getInlineTagsList()
+    {
+        List<String> tagsList = new ArrayList<String>();
+        try
+        {
+            List<WebElement> tagList = findAllWithWait(By.cssSelector(INLINE_TAGS));
+            for (WebElement tag : tagList)
+            {
+                tagsList.add(tag.getText());
+            }
+        }
+        catch (TimeoutException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Timed out while waiting for Tag Information", e);
+            }
+        }
+        return tagsList;
+    }
     
 }
