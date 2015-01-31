@@ -56,8 +56,8 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, testDomain, "1001");
         timeToWait = 25000;
         retryCount = 10;
-        uniqueRun = "TS6";
-        
+        uniqueRun = "TS20";
+
     }
 
     @Test(groups = "DataPrepHybrid")
@@ -303,10 +303,10 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
 
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC).render();
         ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         ShareUser.uploadFileInFolder(drone, opFileInfo).render();
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.logout(drone);
     }
 
@@ -396,6 +396,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         ShareUser.refreshSharePage(drone);
+        ShareUser.refreshSharePage(drone);
         documentLibraryPage.getFileDirectoryInfo(fileName).selectRequestSync().render();
         waitForSync(drone, fileName, opSiteName);
 
@@ -429,10 +430,11 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
 
         // Login to User1, set up the cloud sync
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD).render();
         ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
         ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         ShareUser.uploadFileInFolder(drone, opFileInfo).render();
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
+
         ShareUser.logout(drone);
     }
 
@@ -612,7 +614,6 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         ContentDetails contentDetails1 = new ContentDetails(testName);
         ContentDetails contentDetails2 = new ContentDetails(testName + "2");
         ContentType contentType = ContentType.PLAINTEXT;
-
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
 
@@ -644,7 +645,6 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         // Login to User2, set up the cloud sync
         ShareUser.login(drone, opUser2, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-
         ShareUser.logout(drone);
     }
 
@@ -861,7 +861,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15512() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "A1";
+        String testName = getTestName() + uniqueRun;
         String opUser = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo1 = new String[] { opUser };
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
@@ -900,7 +900,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15512() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "A1";;
+        String testName = getTestName() + uniqueRun;
         String opUser = getUserNameForDomain(testName + "opUser", testDomain);
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
@@ -1224,7 +1224,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15516() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "A1";;
+        String testName = getTestName() + uniqueRun;
         String opUser = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo = new String[] { opUser };
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
@@ -1279,7 +1279,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 600000)
     public void AONE_15516() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "A1";;
+        String testName = getTestName() + uniqueRun;
         String opUser = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String opFolderName = getFolderName(testName);
@@ -1380,7 +1380,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         ContentType contentType = ContentType.PLAINTEXT;
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
-        
+
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo);
         CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo);
 
@@ -1738,7 +1738,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15520() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "A1";;
+        String testName = getTestName() + uniqueRun;
         String opUser = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo = new String[] { opUser };
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
@@ -1793,7 +1793,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15520() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "A1";;
+        String testName = getTestName() + uniqueRun;
         String opUser = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String opFolderName = getFolderName(testName);

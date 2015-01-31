@@ -43,13 +43,13 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         logger.info("[Suite ] : Start Tests in: " + testName);
         testDomain1 = "negative1.test";
         testDomain = DOMAIN_HYBRID;
-        uniqueRun = "TS9";
+        uniqueRun = "TS21";
     }
 
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15501() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "S2";
+        String testName = getTestName() + uniqueRun;
         String opUser1 = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo1 = new String[] { opUser1 };
 
@@ -88,7 +88,7 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 500000)
     public void AONE_15501() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "S2";
+        String testName = getTestName() + uniqueRun;
         String opUser1 = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain1);
 
@@ -143,13 +143,11 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15502() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "S1";
+        String testName = getTestName() + uniqueRun;
         String opUser1 = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo1 = new String[] { opUser1 };
-
         String cloudUser1 = getUserNameForDomain(testName + "cloudUser", testDomain1);
         String[] cloudUserInfo1 = new String[] { cloudUser1 };
-
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL1";
         String opFileName1 = getFileName(testName);
@@ -180,7 +178,7 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true, timeOut = 500000)
     public void AONE_15502() throws Exception
     {
-        String testName = getTestName() + uniqueRun + "S1";
+        String testName = getTestName() + uniqueRun;
         String opUser1 = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain1);
 
@@ -302,6 +300,7 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
         documentLibraryPage = documentLibraryPage.getFileDirectoryInfo(folderName).delete().render();
+        ShareUser.logout(hybridDrone);
 
         // ---- Step 3 ----
         // ---- Step action ----
@@ -310,6 +309,8 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         // Target folder shouldn’t be displayed.
         ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        ShareUser.refreshSharePage(drone);
+        documentLibraryPage.render();
         SyncInfoPage syncInfoPage = documentLibraryPage.getFileDirectoryInfo(opFileName1).clickOnViewCloudSyncInfo().render();
         Assert.assertTrue(syncInfoPage.isUnableToRetrieveLocation(), "Unable to retrieve location isn't displayed");
     }
@@ -386,10 +387,10 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         EditDocumentPropertiesPage editDocumentPropertiesPageOP = doclib.getFileDirectoryInfo(opFileName).selectEditProperties().render();
         editDocumentPropertiesPageOP.setDocumentTitle(premiseTitle);
         editDocumentPropertiesPageOP.selectSave();
-        drone.refresh();
-        drone.refresh();
+        ShareUser.refreshSharePage(drone);
+        ShareUser.refreshSharePage(drone);
         doclib.getFileDirectoryInfo(opFileName).selectRequestSync().render();
-        waitForSync(opFileName, opSiteName);
+        waitForSync(drone, opFileName, opSiteName);
 
         editDocumentPropertiesPageOP = doclib.getFileDirectoryInfo(opFileName).selectEditProperties().render();
         Assert.assertTrue(editDocumentPropertiesPageOP.getDocumentTitle().equals(cloudTitle), "Title wasn't synced");
@@ -461,7 +462,7 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         destinationAndAssigneePage.selectSite(cloudSiteName);
         destinationAndAssigneePage.selectFolder("Documents");
         destinationAndAssigneePage.clickSyncButton();
-        Assert.assertTrue(doclib.isSyncMessagePresent());
+        Assert.assertTrue(doclib.isSyncMessagePresent(), "Sync message not displayed");
         doclib.render();
         Assert.assertTrue(checkIfContentIsSynced(drone, opFileName), "File isn't synced");
 
@@ -495,7 +496,6 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         }
 
         checkIfFileNameIsUpdated(drone, cloudFileName);
-
         editDocumentPropertiesPageOP = doclib.getFileDirectoryInfo(cloudFileName).selectEditProperties().render();
         Assert.assertTrue(editDocumentPropertiesPageOP.getName().equals(cloudFileName), "The name isn't correct");
         editDocumentPropertiesPageOP.selectCancel();
@@ -560,8 +560,7 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         destinationAndAssigneePage.selectSite(cloudSiteName);
         destinationAndAssigneePage.selectFolder("Documents");
         destinationAndAssigneePage.clickSyncButton();
-        Assert.assertTrue(doclib.isSyncMessagePresent());
-
+        Assert.assertTrue(doclib.isSyncMessagePresent(), "Sync message not displayed");
         Assert.assertTrue(checkIfContentIsSynced(drone, opFileName), "Sync failed");
         doclib.render();
         DocumentDetailsPage detailsOp = doclib.selectFile(opFileName).render();
@@ -580,9 +579,9 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
 
         detailsOp = ShareUser.editTextDocument(drone, opFileName, "", premiseContent);
         doclib = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        drone.refresh();
+        ShareUser.refreshSharePage(drone);
         doclib.getFileDirectoryInfo(opFileName).selectRequestSync().render();
-        waitForSync(opFileName, opSiteName);
+        waitForSync(drone, opFileName, opSiteName);
 
         ContentDetails contentDetailsOp = ShareUserSitePage.getInLineEditContentDetails(drone, opFileName);
         String contentOp = contentDetailsOp.getContent();
@@ -710,7 +709,7 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName).render();
         editDocumentPropertiesPage = documentLibraryPage.getFileDirectoryInfo(cloudFileName).selectEditProperties().render();
         editDocumentPropertiesPage.setName(opFileName);
-        documentLibraryPage = editDocumentPropertiesPage.selectSave().render();
+        editDocumentPropertiesPage.selectSave().render();
 
         doclib = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         ShareUser.refreshSharePage(drone);
@@ -839,7 +838,7 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         signInToAlfrescoInTheCloud(drone, cloudUser1, DEFAULT_PASSWORD);
 
         DocumentLibraryPage doclib = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        ShareUser.uploadFileInFolder(drone, opFileInfo).render();
+        doclib = ShareUser.uploadFileInFolder(drone, opFileInfo).render();
         DestinationAndAssigneePage destinationAndAssigneePage = doclib.getFileDirectoryInfo(opFileName).selectSyncToCloud().render();
         destinationAndAssigneePage.selectNetwork(testDomain1);
         destinationAndAssigneePage.selectSite(cloudSiteName1);
@@ -951,7 +950,7 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         ShareUser.refreshSharePage(drone);
         ShareUser.refreshSharePage(drone);
         doclib.getFileDirectoryInfo(opFileName).selectRequestSync().render();
-        waitForSync(opFileName, opSiteName);
+        waitForSync(drone, opFileName, opSiteName);
 
         DocumentDetailsPage detailsPage = doclib.selectFile(opFileName).render();
         VersionDetails versionDetails = detailsPage.getCurrentVersionDetails();
@@ -1046,38 +1045,10 @@ public class HybridSyncNegativeTests3 extends AbstractWorkflow
         doclib = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
         doclib.getFileDirectoryInfo(opFileName1).selectUnSyncAndRemoveContentFromCloud(false);
         Assert.assertFalse(doclib.getFileDirectoryInfo(opFileName1).isCloudSynced(), "The file " + opFileName1 + " is synced");
-
         doclib.getFileDirectoryInfo(opFileName2).selectUnSyncAndRemoveContentFromCloud(false);
         Assert.assertFalse(doclib.getFileDirectoryInfo(opFileName2).isCloudSynced(), "The file " + opFileName2 + " is synced");
-
         doclib.getFileDirectoryInfo(folderName).selectUnSyncAndRemoveContentFromCloud(false);
         Assert.assertFalse(doclib.getFileDirectoryInfo(folderName).isCloudSynced(), "The folder " + folderName + " is synced");
-    }
-
-    private void waitForSync(String fileName, String siteName)
-    {
-        int counter = 1;
-        int retryRefreshCount = 4;
-        while (counter <= retryRefreshCount)
-        {
-            if (checkIfContentIsSynced(drone, fileName))
-            {
-                break;
-            }
-            else
-            {
-                logger.info("Wait for Sync");
-
-                drone.refresh();
-                counter++;
-
-                if (counter == 2 || counter == 3)
-                {
-                    DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, siteName);
-                    docLib.getFileDirectoryInfo(fileName).selectRequestSync().render();
-                }
-            }
-        }
     }
 
 }
