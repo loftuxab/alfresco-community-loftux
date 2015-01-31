@@ -6,11 +6,18 @@ import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.TreeMenuNavigation;
+import org.alfresco.po.share.workflow.CloudTaskOrReviewPage;
+import org.alfresco.po.share.workflow.KeepContentStrategy;
+import org.alfresco.po.share.workflow.Priority;
+import org.alfresco.po.share.workflow.TaskType;
+import org.alfresco.po.share.workflow.WorkFlowFormDetails;
 import org.alfresco.share.site.document.DocumentDetailsActionsTest;
 import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.AbstractWorkflow;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
@@ -24,12 +31,13 @@ import org.testng.annotations.Test;
  */
 
 @Listeners(FailedTestListener.class)
-public class ManageDocLibItemsTests extends AbstractUtils
+public class ManageDocLibItemsTests extends AbstractWorkflow
 {
     private static Log logger = LogFactory.getLog(DocumentDetailsActionsTest.class);
     protected String testUser;
     protected String siteName = "";
     private static DocumentLibraryPage documentLibPage;
+    String testDomain;
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -39,15 +47,19 @@ public class ManageDocLibItemsTests extends AbstractUtils
         testName = this.getClass().getSimpleName();
         testUser = testName + "@" + DOMAIN_FREE;
         logger.info("Start Tests in: " + testName);
+        testDomain = DOMAIN_HYBRID;
     }
 
     @Test(groups = { "DataPrepDocumentLibrary", "AlfrescoOne" })
     public void dataPrep_12567() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
         String testUser2 = getUserNameFreeDomain(testName) + "2";
         String siteName = getSiteName(testName);
+        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
+        String dueDate = getDueDateString();
+        String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
 
         // User 1
         String[] testUserInfo = new String[] { testUser };
@@ -57,8 +69,24 @@ public class ManageDocLibItemsTests extends AbstractUtils
         String[] testUserInfo2 = new String[] { testUser2 };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo2);
 
+        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
+        String[] cloudUserInfo1 = new String[] { cloudUser };
+
+        // Create User1 (Cloud)
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
+        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
+
+        // Login as User1 (Cloud)
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
         // Login
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
 
         // Create Site
         ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC).render(maxWaitTime);
@@ -66,7 +94,7 @@ public class ManageDocLibItemsTests extends AbstractUtils
         // invite user2 to site
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser, testUser2, siteName, UserRole.COLLABORATOR);
 
-        ShareUser.openSiteDashboard(drone, siteName).render();
+        ShareUser.openSitesDocumentLibrary(drone, siteName);
 
         // Upload File
         String fileName1 = getFileName(testName) + "1.txt";
@@ -88,11 +116,11 @@ public class ManageDocLibItemsTests extends AbstractUtils
 
         // edit offline first document
         fileInfoDir.selectEditOfflineAndCloseFileWindow().render();
-        
+
         // select favorite for File2
         fileInfoDir = ShareUserSitePage.getFileDirectoryInfo(drone, fileName2);
         fileInfoDir.selectFavourite();
-        
+
         ShareUser.logout(drone);
 
         // Login user 2
@@ -105,15 +133,34 @@ public class ManageDocLibItemsTests extends AbstractUtils
         fileInfoDir.selectEditOfflineAndCloseFileWindow().render();
         fileInfoDir = ShareUserSitePage.getFileDirectoryInfo(drone, fileName2);
         fileInfoDir.selectFavourite();
-        
+
+        ShareUser.logout(drone);
+        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+
+        // sync a document to cloud
+        // Select "Cloud Task or Review" from select a workflow drop down
+        ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName2).render();
+
+        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+        formDetails.setDueDate(dueDate);
+        formDetails.setTaskPriority(Priority.MEDIUM);
+        formDetails.setSiteName(cloudSite);
+        formDetails.setAssignee(cloudUser);
+        formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
+        formDetails.setMessage(simpleTaskWF);
+        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
+
+        cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
+        waitForSync(fileName2);
         ShareUser.logout(drone);
 
     }
 
-    @Test(groups = "AlfrescoOne")
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_12567() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "6";
         String fileName1 = getFileName(testName) + "1.txt";
         String fileName2 = getFileName(testName) + "2.txt";
         String fileName3 = getFileName(testName) + "3.txt";
@@ -170,6 +217,7 @@ public class ManageDocLibItemsTests extends AbstractUtils
         // 6. Click Locate File action from More+ menu for one of documents;
         fileInfoDir1 = ShareUserSitePage.getFileDirectoryInfo(drone, fileName3);
         fileInfoDir1.selectLocateFile();
+        documentLibPage.render();
         assertTrue(documentLibPage.isFileVisible(fileName3));
 
         // 7. Click the Recently Modified view;
@@ -211,10 +259,37 @@ public class ManageDocLibItemsTests extends AbstractUtils
         fileInfoDir1 = ShareUserSitePage.getFileDirectoryInfo(drone, fileName2);
         fileInfoDir1.selectLocateFile();
         assertTrue(documentLibPage.isFileVisible(fileName2));
-        
+
         // 13. Click the Synced content view
+        treeMenuNavigation.selectDocumentNode(TreeMenuNavigation.DocumentsMenu.SYNCED_CONTENT).render();
+        
+        assertTrue(ShareUserSitePage.getDocTreeMenuWithRetry(drone, fileName2, TreeMenuNavigation.DocumentsMenu.SYNCED_CONTENT, true), fileName1
+                + " cannot be found.");
+        assertTrue(ShareUserSitePage.getDocTreeMenuWithRetry(drone, fileName1, TreeMenuNavigation.DocumentsMenu.SYNCED_CONTENT, false), fileName1
+                + " cannot be found.");
+        
         // 14. Click Locate File action from More+ menu for one of folders.
-        // TODO: it is necessary to have the hybrid workflow enabled, but this test is executed only for cloud.
+        fileInfoDir1 = ShareUserSitePage.getFileDirectoryInfo(drone, fileName2);
+        fileInfoDir1.selectLocateFile();
+        assertTrue(documentLibPage.isFileVisible(fileName2));
     }
 
+    private void waitForSync(String fileName)
+    {
+        int counter = 1;
+        int retryRefreshCount = 4;
+
+        while (counter <= retryRefreshCount)
+        {
+            if (checkIfContentIsSynced(drone, fileName))
+            {
+                break;
+            }
+            else
+            {
+                drone.refresh();
+                counter++;
+            }
+        }
+    }
 }
