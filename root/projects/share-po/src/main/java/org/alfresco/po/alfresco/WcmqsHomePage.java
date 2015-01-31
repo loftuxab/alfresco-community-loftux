@@ -157,5 +157,28 @@ public class WcmqsHomePage extends SharePage
             throw new TimeoutException("Exceeded time to find edit button. " + e.toString());
         }
     }
+    
+    /**
+     * Method to navigate to news folders
+     * @param folderName - the Name of the folder from SHARE
+     * @return WcmqsNewsPage 
+     */
+    public WcmqsNewsPage openNewsPage(String folderName)
+    {
+        try
+        {
+            WebElement news = drone.findAndWait(NEWS_MENU);
+            drone.mouseOver(news);
+            
+            drone.findAndWait(By.cssSelector(String.format("a[href$='/wcmqs/news/%s/']", folderName))).click();;
+            
+        }
+        catch (TimeoutException e)
+        {
+            throw new TimeoutException("Exceeded time to find news links. " + e.toString());
+        }   
+        
+        return new WcmqsNewsPage(drone);
+    } 
 
 }
