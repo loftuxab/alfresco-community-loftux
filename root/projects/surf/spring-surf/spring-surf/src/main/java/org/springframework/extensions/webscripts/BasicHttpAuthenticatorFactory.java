@@ -176,7 +176,7 @@ public class BasicHttpAuthenticatorFactory implements ServletAuthenticatorFactor
                             // perform the authentication test directly using the connector
                             Connector connector = connectorService.getConnector(endpointId, username, session);
                             Response response = connector.call("/touch");
-                            authorized = (response.getStatus().getCode() != Status.STATUS_UNAUTHORIZED);
+                            authorized = (response.getStatus().getCode() == Status.STATUS_OK);
                             if (RequiredAuthentication.admin == required)
                             {
                                 // additional check for 'admin' user
