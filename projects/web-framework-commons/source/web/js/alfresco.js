@@ -2170,7 +2170,6 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj, p_oE
                      {
                         if (p_aArgs[0].keyCode == YUIKeyListener.KEY.ENTER)
                         {
-                           this.hide();
                            p_oObj.fn.call(p_oObj.scope, p_sType, p_aArgs);
                         }
                      },

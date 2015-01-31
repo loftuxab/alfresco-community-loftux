@@ -3428,7 +3428,6 @@
 
          // Select based upon the className of the clicked item
          this.selectFiles(Alfresco.util.findEventClass(eventTarget));
-         Event.preventDefault(domEvent);
       },
 
       /**
