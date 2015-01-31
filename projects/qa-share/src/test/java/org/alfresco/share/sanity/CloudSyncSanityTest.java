@@ -51,7 +51,7 @@ public class CloudSyncSanityTest extends AbstractCloudSyncTest
     {
         super.setup();
         testName = this.getClass().getSimpleName();
-        siteName = getSiteName(testName) + "26";
+        siteName = getSiteName(testName) + System.currentTimeMillis();
         fileName = getFileName(testName);
         fileNamePlain = fileName + "plainText";
         editedFileNamePlain = fileNamePlain + "edited";
