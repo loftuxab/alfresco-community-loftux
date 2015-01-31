@@ -733,6 +733,8 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             if (userId == null)
             {
                 userId = req.getRemoteUser();
+             // Set the external auth flag so the UI knows we are using SSO etc.
+                session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
                 if (userId != null && logger.isDebugEnabled())
                     logger.debug("Initial login from externally authenticated user " + userId);
                 
@@ -740,7 +742,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             else if (logger.isDebugEnabled())
                 logger.debug("Validating repository session for  " + userId);
 
-            if(userId != null && !userId.equalsIgnoreCase(req.getRemoteUser())){
+            if(userId != null && !userId.equalsIgnoreCase(req.getRemoteUser()) && session.getAttribute(NTLM_AUTH_DETAILS) == null){
             	session.removeAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH);
             }
             Connector conn = connectorService.getConnector(this.endpoint, userId, session);
