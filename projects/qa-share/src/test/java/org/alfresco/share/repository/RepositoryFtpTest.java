@@ -40,7 +40,7 @@ import static org.testng.Assert.*;
  * Created by olga.lokhach
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = "EnterpriseOnly", timeOut = 400000)
+@Test(groups = "EnterpriseOnly", timeOut = 400000, dependsOnGroups = "FTPS")
 
 public class RepositoryFtpTest extends AbstractUtils
 {
@@ -61,8 +61,6 @@ public class RepositoryFtpTest extends AbstractUtils
     /**
      * Test: AONE-6433:Creating folder
      */
-
-
     @Test
     public void AONE_6433() throws Exception
     {

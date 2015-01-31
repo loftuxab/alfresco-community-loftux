@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.Runtime.getRuntime;
 
 /**
  * @author Marina.Nenadovets
@@ -38,19 +39,127 @@ public class FtpsUtil extends AbstractUtils
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
     private static final Pattern DOMAIN_PATTERN = Pattern.compile("\\w+(\\.\\w+)*(\\.\\w{2,})");
 
+    private static String ALIAS = getRandomString(6);
+    private static String ALGORITHM = "RSA";
+    private static int VALIDITY = 7;
+    private static String PASS = "alfresco";
+    private static String KEYSTORENAME;
+    private static String TRUSTSTORENAME;
+    private static final String pathToKeyStoreFile = DATA_FOLDER + SLASH + "ftps";
+
+
     /**
-     * Method to unable ftps through jmx
+     * Method to generate a keystore file
+     *
+     * @param keystoreName Name of the file
+     * @throws Exception
      */
-    public static void enableFtps()
+    public static File generateKeyStore(String keystoreName) throws Exception
     {
-        File keyStoreFile = new File(DATA_FOLDER + SLASH + "ftps", "keystore");
-        String filePathOnSys = keyStoreFile.getAbsolutePath();
+        KEYSTORENAME = keystoreName;
+        String line;
+        String cmdline = "keytool -genkeypair" +
+            " -dname \"cn=" + "Test Name" + ", ou=" + "QA" + ", o=" + "SomeCompany" + ", L=" + "Ghost Town" + ", ST=" + "Uruguay" + ", c=" + "UY" + "\"" +
+            " -keyalg " + ALGORITHM +
+            " -alias " + ALIAS +
+            " -keypass " + PASS +
+            " -keystore " + pathToKeyStoreFile + SLASH + KEYSTORENAME +
+            " -storepass " + PASS +
+            " -validity " + VALIDITY;
+        Process p = getRuntime().exec(cmdline);
+        p.waitFor();
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        while ((line = in.readLine()) != null)
+        {
+            System.out.println(line);
+            if (line.contains("error"))
+            {
+                throw new ShareException("Unable to generate keystore.");
+            }
+        }
+        logger.info("Generated keystore " + KEYSTORENAME);
+        return new File(pathToKeyStoreFile + SLASH + KEYSTORENAME);
+    }
+
+    /**
+     * Method to generate trustore based on existing keystore
+     *
+     * @param keyStore
+     * @param trustStoreName
+     * @throws Exception
+     */
+    public static File generateTrustStore(File keyStore, String trustStoreName) throws Exception
+    {
+        if (trustStoreName == null || trustStoreName.isEmpty())
+        {
+            TRUSTSTORENAME = "truststore";
+        }
+        else
+        {
+            TRUSTSTORENAME = trustStoreName;
+        }
+        String line;
+        //exporting keystore to alfresco.cer file first
+        String cmdline = "keytool -export" +
+            " -alias " + ALIAS +
+            " -keystore " + keyStore.getAbsolutePath() +
+            " -storepass " + PASS +
+            " -rfc -file alfresco.cer";
+        Process p = getRuntime().exec(cmdline);
+        p.waitFor();
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        while ((line = in.readLine()) != null)
+        {
+            System.out.println(line);
+            if (line.contains("error"))
+            {
+                throw new ShareException("Unable to generate keystore.");
+            }
+        }
+
+        //now generating truststore
+        cmdline = "keytool -import" +
+            " -alias " + ALIAS +
+            " -storepass " + PASS +
+            "-file alfresco.cer" +
+            " -keystore " + pathToKeyStoreFile + SLASH + TRUSTSTORENAME;
+        p = getRuntime().exec(cmdline);
+        p.waitFor();
+        in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        while ((line = in.readLine()) != null)
+        {
+            System.out.println(line);
+            if (line.contains("error"))
+            {
+                throw new ShareException("Unable to generate keystore.");
+            }
+        }
+        logger.info("Generated truststore " + TRUSTSTORENAME);
+        return new File(pathToKeyStoreFile + SLASH + TRUSTSTORENAME);
+    }
+
+    /**
+     * Method to generate keystore and unable ftps through jmx
+     */
+    public static void enableFtps(File keyStore, File trustStore) throws Exception
+    {
+        String keyStrFilePathOnSys = keyStore.getAbsolutePath();
         JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
         JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.enabled", true);
         JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", true);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", filePathOnSys);
-        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", "alfresco");
-        JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", keyStrFilePathOnSys);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", PASS);
+        if (trustStore == null)
+        {
+            JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+        }
+        else
+        {
+            String trustStrFilePathOnSys = trustStore.getAbsolutePath();
+            JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", trustStrFilePathOnSys);
+            JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", PASS);
+            JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+        }
         logger.info("FTPS is on.");
     }
 
@@ -64,6 +173,8 @@ public class FtpsUtil extends AbstractUtils
         JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", false);
         JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", "");
         JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", "");
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStore", "");
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.trustStorePassphrase", "");
         JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
         logger.info("FTPS is off.");
     }
@@ -84,7 +195,7 @@ public class FtpsUtil extends AbstractUtils
 
         TrustManager trustManager = TrustManagerUtils.getValidateServerCertificateTrustManager();
         FTPSClient ftpsClient = new FTPSClient(false);
-        if(ftpsClient.isConnected())
+        if (ftpsClient.isConnected())
         {
             ftpsClient.disconnect();
         }
@@ -113,7 +224,6 @@ public class FtpsUtil extends AbstractUtils
      * @param remoteFolderPath
      * @return true if content is uploaded
      */
-
     public static boolean uploadContent(String shareUrl, String user, String password, File contentName, String remoteFolderPath)
     {
 
@@ -854,8 +964,8 @@ public class FtpsUtil extends AbstractUtils
 
                 }
                 FTPSClient.changeWorkingDirectory(remoteFolderPath + "/" + remoteFolderName);
-                FTPFile [] filesToDlts = FTPSClient.listFiles();
-                for(FTPFile theFiles : filesToDlts)
+                FTPFile[] filesToDlts = FTPSClient.listFiles();
+                for (FTPFile theFiles : filesToDlts)
                 {
                     FTPSClient.deleteFile(theFiles.getName());
                 }
@@ -968,5 +1078,14 @@ public class FtpsUtil extends AbstractUtils
         {
             throw new RuntimeException(ex.getMessage());
         }
+    }
+
+    public static void restrictPort(String portFrom, String portTo)
+    {
+        JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.dataPortFrom", portFrom);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, "ftp.dataPortTo", portTo);
+        JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
+        logger.info("FTP port range was restricted from " + portFrom + " to " + portTo);
     }
 }
