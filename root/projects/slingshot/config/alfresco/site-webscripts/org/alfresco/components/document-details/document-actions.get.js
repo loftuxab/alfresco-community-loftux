@@ -28,7 +28,7 @@ function main()
          siteId : (model.site != null) ? model.site : null,
          containerId : model.container,
          rootNode : model.rootNode,
-         replicationUrlMapping : (model.replicationUrlMappingJSON != null) ? model.replicationUrlMappingJSON : "{}",
+         replicationUrlMapping : (model.replicationUrlMapping != null) ? model.replicationUrlMapping : "{}",
          documentDetails : documentDetails,
          repositoryBrowsing : (model.rootNode != null),
          syncMode : model.syncMode != null ? model.syncMode : "",         
