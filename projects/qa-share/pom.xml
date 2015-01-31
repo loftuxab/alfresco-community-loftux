@@ -420,9 +420,9 @@
                                              autocommit="true">drop database if exists alfresco; create database alfresco
                                         </sql>
                                         <echo>Downloading Alfresco installer...</echo>
-                                        <sshexec username="tomcat" host="pbld01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath"
+                                        <sshexec username="tomcat" host="pbam01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath"
                                                  command="ls -rt /data/bamboo/artifacts/${enterprise.installer.version}/ALL/alfresco-enterprise-*-installer-linux-x64.??? | tail -1 | tr ' ' '?' "/>
-                                        <scp remoteFile="tomcat@pbld01.alfresco.com:${installerPath}" localTofile="target/alf-installer.bin"
+                                        <scp remoteFile="tomcat@pbam01.alfresco.com:${installerPath}" localTofile="target/alf-installer.bin"
                                              keyfile="${user.home}/.ssh/id_rsa"/>
 
                                         <chmod file="target/alf-installer.bin" perm="a+x" verbose="true"/>
@@ -597,8 +597,8 @@
                                         <echo>Recreating database...</echo>
                                         <sql driver="org.postgresql.Driver" url="jdbc:postgresql:template1" userid="alfresco" password="alfresco" autocommit="true">drop database if exists alfresco; create database alfresco</sql>
                                         <echo>Downloading Pentaho Installer...</echo>
-                                        <sshexec username="tomcat" host="pbld01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath" command="ls -rt /bamboo/artifacts/INTEGRATIONS-PENTAHO/JOB1/build*/PentahoDistribution/alfresco-reporting-*.zip | tail -1 | tr ' ' '?' " />
-                                        <scp remoteFile="tomcat@pbld01.alfresco.com:${installerPath}" localTofile="target/alfresco-reporting.zip" keyfile="${user.home}/.ssh/id_rsa" />
+                                        <sshexec username="tomcat" host="pbam01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath" command="ls -rt /bamboo/artifacts/INTEGRATIONS-PENTAHO/JOB1/build*/PentahoDistribution/alfresco-reporting-*.zip | tail -1 | tr ' ' '?' " />
+                                        <scp remoteFile="tomcat@pbam01.alfresco.com:${installerPath}" localTofile="target/alfresco-reporting.zip" keyfile="${user.home}/.ssh/id_rsa" />
                                         <chmod file="target/alfresco-reporting.zip" perm="a+x" verbose="true" />
                                         <echo>Unzip the Alfresco Reporting...</echo>
                                         <unpack artifact="${basedir}/target/alfresco-reporting.zip" outputDirectory="${basedir}/target" silent="true" />
@@ -607,8 +607,8 @@
                                         <chmod file="${basedir}/target/alfresco-reporting/ba-server/tomcat/bin/*.sh" perm="a+x" verbose="true" />
 
                                         <echo>Downloading Alfresco installer...</echo>
-                                        <sshexec username="tomcat" host="pbld01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath" command="ls -rt /data/nightlybuilds/Enterprise?${enterprise.installer.version}/build*/ALL/alfresco-enterprise-*-installer-linux-x64.??? | tail -1 | tr ' ' '?' " />
-                                        <scp remoteFile="tomcat@pbld01.alfresco.com:${installerPath}" localTofile="target/alf-installer.bin" keyfile="${user.home}/.ssh/id_rsa" />
+                                        <sshexec username="tomcat" host="pbam01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath" command="ls -rt /data/nightlybuilds/Enterprise?${enterprise.installer.version}/build*/ALL/alfresco-enterprise-*-installer-linux-x64.??? | tail -1 | tr ' ' '?' " />
+                                        <scp remoteFile="tomcat@pbam01.alfresco.com:${installerPath}" localTofile="target/alf-installer.bin" keyfile="${user.home}/.ssh/id_rsa" />
                                         <chmod file="target/alf-installer.bin" perm="a+x" verbose="true" />
                                         <echo>Installing Alfresco...</echo>
                                         <exec executable="${basedir}/target/alf-installer.bin" dir="target" failonerror="true">
