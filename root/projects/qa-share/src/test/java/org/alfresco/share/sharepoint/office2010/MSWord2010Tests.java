@@ -118,40 +118,28 @@ public class MSWord2010Tests extends AbstractUtils
         ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
 
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-
         File file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9644 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9645 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9646 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9648 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9649 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9650 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9651 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9652 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9659 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9660 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9661 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
-
         file = new File(DATA_FOLDER + SLASH + SHAREPOINT + SLASH + docFileName_9662 + fileType);
         ShareUserSitePage.uploadFile(drone, file).render();
 
@@ -1041,7 +1029,7 @@ public class MSWord2010Tests extends AbstractUtils
     @Test(groups = "alfresco-one")
     public void AONE_9663() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "4";
         DocumentLibraryPage customDocumentLibPage;
         WebDrone thisDrone;
         DocumentDetailsPage detailsPage;
@@ -1081,10 +1069,8 @@ public class MSWord2010Tests extends AbstractUtils
 
         // 5. As user2, without refreshing the page, click "Edit Online", then click OK.
         customDetailsPage = ShareUser.openDocumentDetailPage(thisDrone, fileName).render();
-
-        String errorMessage = customDetailsPage.getErrorEditOfflineDocument();
-        Assert.assertEquals(errorMessage, "You cannot edit '" + fileName + "'.");
-
+        customDetailsPage.selectEditOffLine();
+        Assert.assertTrue(customDetailsPage.isErrorEditOfflineDocument(fileName));
     }
 
 }

@@ -59,7 +59,6 @@ public class MSWordTests extends AbstractUtils
     private static DocumentLibraryPage documentLibPage;
     private static final String SHAREPOINT = "sharepoint";
     public String sharepointPath;
-    
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -86,7 +85,7 @@ public class MSWordTests extends AbstractUtils
         docFileName_9827 = "WInputCancel";
 
         Runtime.getRuntime().exec("taskkill /F /IM WINWORD.EXE");
-        
+
         sharepointPath = word.getSharePointPath();
     }
 
@@ -207,7 +206,7 @@ public class MSWordTests extends AbstractUtils
 
         Ldtp l1 = word.getAbstractUtil().setOnWindow(docFileName_9809);
         // edit document
-        
+
         String newContent = testName;
         word.editOffice(l1, newContent);
         word.saveOffice(l1);
@@ -231,7 +230,7 @@ public class MSWordTests extends AbstractUtils
                 docFileName_9809 + fileType + " cannot be found.");
 
     }
-    
+
     @Test(groups = "alfresco-one")
     public void AONE_9810() throws Exception
     {
@@ -255,7 +254,7 @@ public class MSWordTests extends AbstractUtils
         Ldtp l1 = word.getAbstractUtil().setOnWindow(docFileName_9810);
         // 1. Make some changes to the document;
         // 2. Click Save button;
-        
+
         String newContent = testName;
         word.editOffice(l1, newContent);
         word.saveOffice(l1);
@@ -281,17 +280,16 @@ public class MSWordTests extends AbstractUtils
         // 5. Go to site Document Library and verify changes;
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-        // 5.  Document version history is correctly dispalyed; Changes are applied;
+        // 5. Document version history is correctly dispalyed; Changes are applied;
 
         DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9810 + fileType).render();
-        
+
         Assert.assertTrue(detailsPage.isCheckedOut(), "The document is not checkout");
         Assert.assertEquals(detailsPage.getDocumentVersion(), fileVersion);
         String documentContent = detailsPage.getDocumentBody();
         Assert.assertTrue(documentContent.contains(newContent), "Changes are present in the document.");
 
     }
-    
 
     @Test(groups = "alfresco-one")
     public void AONE_9811() throws Exception
@@ -368,7 +366,6 @@ public class MSWordTests extends AbstractUtils
         // 7. Go to site Document library;
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
 
-
         // 7. Locked document and working copy are present;
         DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9812 + fileType);
         Assert.assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.");
@@ -432,8 +429,7 @@ public class MSWordTests extends AbstractUtils
 
         // 7. Go to site Document Library and verify workbook is in locked
         assertEquals(fileInfo.getContentInfo(), "This document is locked by you for offline editing.", "File " + docFileName_9813 + " isn't locked");
-       
-        
+
         // 7. Excel Document is present in I'm Editing section;
         TreeMenuNavigation treeMenuNavigation = documentLibPage.getLeftMenus().render();
         treeMenuNavigation.selectDocumentNode(TreeMenuNavigation.DocumentsMenu.IM_EDITING).render();
@@ -563,10 +559,10 @@ public class MSWordTests extends AbstractUtils
 
         // 8. Navigate the document;
         DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9815 + fileType).render();
-        
+
         String documentContent = detailsPage.getDocumentBody();
         Assert.assertTrue(documentContent.contains(newContent), "Changes are present in the document.");
-        
+
         // 8. Changes are applied to the original file; Version is increased to
         // new major one.
         Assert.assertFalse(detailsPage.isCheckedOut(), "The document is checkout");
@@ -626,7 +622,7 @@ public class MSWordTests extends AbstractUtils
         ShareUser.login(drone, testUser);
 
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        
+
         // 6. Navigate the document;
         DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9816 + fileType);
 
@@ -639,7 +635,7 @@ public class MSWordTests extends AbstractUtils
         {
             assertEquals(version, "1.0");
         }
-        
+
     }
 
     @Test(groups = "alfresco-one")
@@ -687,7 +683,7 @@ public class MSWordTests extends AbstractUtils
         // This step cannot be automated. The LDTP tool cannot perform actions on Read Only window
         // 4. Click Edit Workbook button;
         // 4. The uploaded version is opened;
-        
+
     }
 
     @Test(groups = "alfresco-one")
@@ -850,7 +846,7 @@ public class MSWordTests extends AbstractUtils
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
         // 7. Excel Document is still checked out; Changes are not applied;
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9827 + fileType);        
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9827 + fileType);
         assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.", "File " + docFileName_9827 + " isn't locked");
 
         String documentContent = detailsPage.getDocumentBody();
@@ -860,7 +856,7 @@ public class MSWordTests extends AbstractUtils
     @Test(groups = "alfresco-one")
     public void AONE_9828() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "3";
         DocumentLibraryPage customDocumentLibPage;
         WebDrone thisDrone;
         DocumentDetailsPage detailsPage;
@@ -904,12 +900,8 @@ public class MSWordTests extends AbstractUtils
         // 5. As user2, without refreshing the page, click "Edit Online", then
         // click OK.
         customDetailsPage = ShareUser.openDocumentDetailPage(thisDrone, fileName).render();
-
-        String errorMessage = customDetailsPage.getErrorEditOfflineDocument();
-        Assert.assertEquals(errorMessage, "You cannot edit '" + fileName + "'.");
-
+        customDetailsPage.selectEditOffLine();
+        Assert.assertTrue(customDetailsPage.isErrorEditOfflineDocument(fileName));
     }
-
- 
 
 }
