@@ -198,12 +198,9 @@ public class PerformanceTest extends CmisUtils
             DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(customDrone, siteName);
             DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(BIG_DATA_FILE);
             documentDetailsPage.clickOnDownloadLinkForUnsupportedDocument();
-            File file = customDrone.getScreenShot();
-            logger.info("ScreenShot in :" + file.getAbsolutePath());
-            logger.info("Start downloading file[" + BIG_DATA_FILE + "] to:" + downloadDirectory);
-            documentDetailsPage.waitForFile(300000, downloadDirectory + BIG_DATA_FILE);
+            webDriverWait(customDrone, 600000);
             assertTrue(downloadedBigDataFile.exists(), "Big data file don't download");
-            assertEquals(downloadedBigDataFile.length(), 1024 * 1024 * 2047, "File does not fully downloaded.");
+            assertEquals(downloadedBigDataFile.length(), 1024 * 1024 * 2047L, "File does not fully downloaded.");
         }
         finally
         {
