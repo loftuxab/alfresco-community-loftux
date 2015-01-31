@@ -1866,7 +1866,7 @@ var DASHLET_TITLE_BAR_ACTIONS_OPACITY = 0,
                   var _this = this;
                   if (currAction.eventOnClick)
                   {
-                     Event.addListener(currActionNode, "click", (function(e)
+                     var event = (function(e)
                      {
                         // If the action is an event then the value passed should be a custom event that
                         // we will simply fire when the action node is clicked...
@@ -1874,13 +1874,18 @@ var DASHLET_TITLE_BAR_ACTIONS_OPACITY = 0,
                         
                         return function(e)
                         {
-                           _this._fadeOut(e, _this);
-                           customEvent.fire({
+                           if (e.type == "click" || (e.type == "keydown" && e.keyCode == 13))
+                           {
+                              _this._fadeOut(e, _this);
+                              customEvent.fire({
                               event: e,
                               scope: _this
-                           });
+                              });
+                           }
                         }
-                     })());
+                     });
+                     Event.addListener(currActionNode, "click", event());
+                     Event.addListener(currActionNode, "keydown", event());
                   }
                   else if (currAction.linkOnClick)
                   {
@@ -1917,14 +1922,29 @@ var DASHLET_TITLE_BAR_ACTIONS_OPACITY = 0,
                         html: currAction.bubbleOnClick.message,
                         width: "30em"
                      });
-
-                     Event.addListener(currActionNode, "click", balloon.show, balloon, true);
+                     
+                     var show = (function(e)
+                     {
+                        return function(e)
+                        {
+                           if (e.type == "click" || (e.type == "keydown" && e.keyCode == 13))
+                           {
+                              balloon.show();
+                           }
+                        }
+                     });
+                     Event.addListener(currActionNode, "click", show(), balloon, true);
+                     Event.addListener(currActionNode, "keydown", show(), balloon, true);
                   }
                }
                else
                {
                   Alfresco.logger.warn("DashletTitleBarActions_onReady: Action is not valid.");
                }
+               
+               Dom.setAttribute(currActionNode, "tabindex", 0);
+               Event.addListener(currActionNode, "focus", this._fadeIn, this);
+               Event.addListener(currActionNode, "blur", this._fadeOut, this);
             }
 
             // Add a listener to animate the actions...
@@ -1953,8 +1973,8 @@ var DASHLET_TITLE_BAR_ACTIONS_OPACITY = 0,
          }
          else
          {
-            // Only fade out if the mouse has left the dashlet entirely
-            if (!Dom.isAncestor(me.dashlet, Event.getRelatedTarget(e)))
+            // Only fade out if the mouse has left the dashlet entirely or blur event
+            if (!Dom.isAncestor(me.dashlet, Event.getRelatedTarget(e)) || e.type == "blur")
             {
                var fade = new YAHOO.util.Anim(me.actionsNode,
                {
