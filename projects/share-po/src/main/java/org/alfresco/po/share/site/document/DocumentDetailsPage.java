@@ -102,7 +102,7 @@ public class DocumentDetailsPage extends DetailsPage
     private static final By BUTTON_TAG_NAME = By.tagName("button");
     private static final By HISTORY_VERSIONS = By.cssSelector("div[class*='document-versions'] span[class='document-version']");
 
-    private static final String DOCUMENT_BODY = "div[id$='document-details_x0023_default-viewer']";
+    private static final By DOCUMENT_BODY = By.cssSelector("div[id$='document-details_x0023_default-viewer']");
 
     private static final By VIEW_ORIGINAL_DOCUMENT = By.cssSelector("div.document-view-original>a");
 

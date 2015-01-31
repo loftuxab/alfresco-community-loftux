@@ -150,6 +150,14 @@ public final class FactoryShareDashlet
             {
                 return new MyProfileDashlet(drone);
             }
+            if ("site-contents".equalsIgnoreCase(name) || Dashlets.SITE_CONTENT.getDashletName().equalsIgnoreCase(name))
+            {
+                return new SiteContentDashlet(drone);
+            }
+            if ("site-wqs".equalsIgnoreCase(name) || Dashlets.WEB_QUICK_START.getDashletName().equalsIgnoreCase(name))
+            {
+                return new SiteWebQuickStartDashlet(drone);
+            }
             throw new PageException(String.format("%s does not match any known dashlet name", name));
         }
         catch (NoSuchElementException ex)
