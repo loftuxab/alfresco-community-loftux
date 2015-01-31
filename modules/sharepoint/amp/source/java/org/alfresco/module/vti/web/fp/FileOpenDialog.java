@@ -20,12 +20,15 @@ package org.alfresco.module.vti.web.fp;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.metadata.dialog.DialogMetaInfo;
 import org.alfresco.module.vti.metadata.dialog.DialogMetaInfoComparator;
@@ -36,6 +39,7 @@ import org.alfresco.module.vti.metadata.dic.VtiSortField;
 import org.alfresco.module.vti.web.VtiRequestDispatcher;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mortbay.jetty.HttpSchemes;
 import org.springframework.extensions.surf.util.I18NUtil;
 import org.springframework.extensions.surf.util.URLDecoder;
 import org.springframework.extensions.surf.util.URLEncoder;
@@ -96,13 +100,34 @@ public class FileOpenDialog extends AbstractMethod
         List<DialogMetaInfo> items = dialogInfo.getDialogMetaInfoList();
 
         Collections.sort(items, new DialogMetaInfoComparator(sortField, sort));
+        URI uri = null;
+        
+        try
+        {
+            uri = new URI(urlHelper.getExternalBaseURL());
+        }
+        catch (URISyntaxException e)
+        {
+            throw new AlfrescoRuntimeException("Unable to resolve SPP external URL.", e);
+        }
 
+        // MNT-13003 fix, use vti.server.external.* properties to construct urls in webview
+        String scheme = uri.getScheme();
+        int port = uri.getPort();
+        StringBuilder host = new StringBuilder(uri.getHost());
+
+        if ((HttpSchemes.HTTP.equalsIgnoreCase(scheme) && port != 80) || 
+                (HttpSchemes.HTTPS.equalsIgnoreCase(scheme) && port != 443))
+        {
+            host.append(":");
+            host.append(uri.getPort());
+        }
         Map<String, Object> freeMarkerMap = new HashMap<String, Object>();
         freeMarkerMap.put("sortField", sortField);
         freeMarkerMap.put("sort", sort);
-        freeMarkerMap.put("context", request.getAlfrescoContextName());
-        freeMarkerMap.put("scheme", request.getScheme());
-        freeMarkerMap.put("host", request.getHeader("Host"));
+        freeMarkerMap.put("context", uri.getPath());
+        freeMarkerMap.put("scheme", scheme);
+        freeMarkerMap.put("host", host.toString());
         freeMarkerMap.put("items", items);
         freeMarkerMap.put("alfContext", (String) request.getAttribute(VtiRequestDispatcher.VTI_ALFRESCO_CONTEXT));
         freeMarkerMap.put("location", URLEncoder.encode(location));
