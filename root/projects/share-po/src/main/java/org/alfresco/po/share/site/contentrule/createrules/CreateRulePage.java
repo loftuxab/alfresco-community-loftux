@@ -43,6 +43,8 @@ public class CreateRulePage extends SitePage
     private static final By NAME_FIELD = By.cssSelector("input[name='title']");
     private static final By DESCRIPTION_FIELD = By.cssSelector("textarea[name='description']");
     private static final By SET_VALUE_FIELD = By.cssSelector("span[class*='paramtype_arca_set-property-value'] input");
+    private static final By SET_VALUE_CHECKBOX = By.cssSelector("span[class*='paramtype_arca_set-property-value'] input[type='checkbox']");
+    private static final By SET_VALUE_FIELD_DATE = By.cssSelector("span[class*='paramtype_arca_set-property-value'] input[type='text']");
 
     // CheckBoxes
     private static final By CHECK_BOX_DISABLE = By.cssSelector("div[class='form-field disabled'] input[title='Disable rule']");
@@ -188,8 +190,18 @@ public class CreateRulePage extends SitePage
      */
     public void fillSetValueFieldCheckbox()
     {
-        WebElement inputField = drone.findAndWait(SET_VALUE_FIELD);
+        WebElement inputField = drone.findAndWait(SET_VALUE_CHECKBOX);
         inputField.click();
+        waitUntilAlert(5);
+    }
+
+    /**
+     * Set date to set value field 'Set Property Value'
+     */
+    public void fillSetValueFieldDate(final String text)
+    {
+        fillField(SET_VALUE_FIELD_DATE, text);
+        waitUntilAlert(5);
     }
 
     /**
