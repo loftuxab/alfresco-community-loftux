@@ -719,7 +719,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
     }
 
     /**
-     * AONE-15689:Incomplete workflow - unsync (Cloud)
+     * AONE-15687:Incomplete workflow - remove (Cloud)
      */
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15687() throws Exception

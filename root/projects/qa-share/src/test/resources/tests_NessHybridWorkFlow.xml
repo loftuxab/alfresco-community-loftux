@@ -12,7 +12,13 @@
 		<listener
 			class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
 	</listeners>
-	
+
+	<test name="CompleteWorkflowTests" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.workflow.CompletedWorkflowSyncedTests" />
+		</classes>
+	</test>
+
 	<test name="IncompleteWorkflowTests" verbose="1">
 		<classes>
 			<class name="org.alfresco.share.workflow.IncompleteWorkflowTests" />
@@ -21,11 +27,10 @@
 
 	<test name="AfterCompletionActionsWorkflowTests" verbose="1">
 		<classes>
-			<class
-				name="org.alfresco.share.workflow.WorkflowOptionsTests" />
+			<class name="org.alfresco.share.workflow.WorkflowOptionsTests" />
 		</classes>
 	</test>
-	
+
 	<test name="HybridCreateWorkfloFormTests" verbose="1">
 		<classes>
 			<class name="org.alfresco.share.workflow.HybridCreateWorkfloFormTests" />
