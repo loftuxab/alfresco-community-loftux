@@ -71,7 +71,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
 
     /**
      * Sync. Folder with files to Cloud. Mixed case for user
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepHybrid" })
@@ -212,7 +212,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         doclibPrem = ShareUserSitePage.createFolder(drone, folderName, folderName).render();
     }
 
-    @Test(groups = { "Hybrid" })
+    @Test(groups = "Hybrid")
     public void AONE_15583() throws Exception
     {
         desAndAssBean = new DestinationAndAssigneeBean();
@@ -258,7 +258,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test(groups = { "Hybrid" })
+    @Test(groups = "Hybrid", dependsOnMethods = "AONE_15583")
     public void AONE_15584() throws Exception
     {
         int i;
@@ -373,15 +373,15 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         // For indirectly synced content/folder the 'synced indirectly' icon is displayed.
         assertTrue(docLibPrem.getFileDirectoryInfo(newFiles[0]).isIndirectlySyncedIconPresent() && docLibPrem.getFileDirectoryInfo(newFiles[1])
             .isIndirectlySyncedIconPresent(), "Indirectly synced icon isn't displayed");
-        //boolean isSynced = checkIfContentIsSynced(drone, newFiles[0]);
+        boolean isSynced = checkIfContentIsSynced(drone, newFiles[0]);
         SyncInfoPage syncInf1 = docLibPrem.getFileDirectoryInfo(newFiles[0]).clickOnViewCloudSyncInfo().render();
-        assertTrue(syncInf1.getCloudSyncLocation().equals(syncLocation + ">" + folderName), "File " +
+        assertTrue(syncInf1.getCloudSyncLocation().equals(syncLocation + ">" + folderName) && isSynced, "File " +
             "wasn't synced");
         syncInf1.clickOnCloseButton();
 
-        //isSynced = checkIfContentIsSynced(drone, newFiles[1]);
+        isSynced = checkIfContentIsSynced(drone, newFiles[1]);
         SyncInfoPage syncInf2 = docLibPrem.getFileDirectoryInfo(newFiles[1]).clickOnViewCloudSyncInfo().render();
-        assertTrue(syncInf2.getCloudSyncLocation().equals(syncLocation + ">" + folderName), "File " +
+        assertTrue(syncInf2.getCloudSyncLocation().equals(syncLocation + ">" + folderName) && isSynced, "File " +
             "wasn't synced");
         syncInf2.clickOnCloseButton();
 
@@ -399,7 +399,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
         assertTrue(docLibCl.isFileVisible(newFiles[0]) && docLibCl.isFileVisible(newFiles[1]), "Files were not added to Cloud");
         assertTrue(docLibCl.getFileDirectoryInfo(newFiles[0]).isIndirectlySyncedIconPresent() && docLibCl.getFileDirectoryInfo(newFiles[1])
             .isIndirectlySyncedIconPresent(), "Indirectly synced icons are not displayed on Cloud side");
-        boolean isSynced = checkIfContentIsSynced(hybridDrone, newFiles[0]);
+        isSynced = checkIfContentIsSynced(hybridDrone, newFiles[0]);
         SyncInfoPage syncInf3 = docLibCl.getFileDirectoryInfo(newFiles[0]).clickOnViewCloudSyncInfo().render();
         assertTrue(isSynced && syncInf3.getCloudSyncIndirectLocation().equals(folderName), "Incorrect sync info for " +
             newFiles[0]);
@@ -461,7 +461,7 @@ public class CloudSyncSmokeTest extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test
+    @Test(groups = "Hybrid", dependsOnMethods = "AONE_15584")
     public void AONE_15585() throws Exception
     {
         //1st sync set: unsync and DO NOT remove the files from Cloud
