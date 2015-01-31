@@ -21,9 +21,11 @@ import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderElement;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -44,6 +46,7 @@ public class NewFolderPage extends ShareDialogue
     private final By descriptionLocator = By.cssSelector("textarea[id$='default-createFolder_prop_cm_description']");
     private final By submitButton = By.cssSelector("button[id$='default-createFolder-form-submit-button']");
     private final By cancelButton = By.cssSelector("button[id$='createFolder-form-cancel-button']");
+    private final By NOTIFICATION_BALLOON = By.cssSelector("div[style*='visible']>div>div.balloon>div.text");
 
     private final RenderElement folderTitleElement = getVisibleRenderElement(folderTitleCss);
     private final RenderElement nameElement = getVisibleRenderElement(name);
@@ -343,4 +346,54 @@ public class NewFolderPage extends ShareDialogue
 
         return message;
     }
+
+
+    /**
+     * Mimics the action of clicking the save button.
+     *
+     */
+    public void selectSubmitButton()
+    {
+        WebElement okButton = drone.findAndWait(submitButton);
+        okButton.click();
+
+    }
+
+    /**
+     * Method finds notification baloon
+     *
+     * @return notification message
+     */
+    public String getNotificationMessage()
+    {
+        try
+        {
+            WebElement notifBalloon = drone.findAndWait(NOTIFICATION_BALLOON);
+            return notifBalloon.getText();
+        }
+        catch (TimeoutException toe)
+        {
+            throw new PageException("Time out finding notification balloon.", toe);
+        }
+
+    }
+
+    /**
+     * Method checks if notification baloon is present
+     *
+     * @return false if notification isn't present
+     */
+    public boolean isNotificationMessagePresent()
+    {
+        try
+        {
+            return drone.find(NOTIFICATION_BALLOON).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+        }
+
+        return false;
+    }
+
 }

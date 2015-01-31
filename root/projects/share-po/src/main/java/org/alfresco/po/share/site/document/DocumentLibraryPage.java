@@ -17,6 +17,7 @@ package org.alfresco.po.share.site.document;
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.Pagination;
 import org.alfresco.po.share.enums.ViewType;
+import org.alfresco.po.share.site.NewFolderPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.webdrone.*;
 import org.alfresco.webdrone.exception.PageException;
@@ -1480,7 +1481,7 @@ public class DocumentLibraryPage extends SitePage
      *
      * @return List<WebElement> of all existing templates
      */
-    private List<WebElement> getTemplateList(){
+    public List<WebElement> getTemplateList(){
         drone.getCurrentPage().render();
         drone.waitUntilNotVisibleWithParitalText(By.xpath(TEMPLATE_LIST), "Loading...", SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
         drone.findAndWaitForElements(By.xpath(TEMPLATE_LIST));
@@ -1597,4 +1598,29 @@ public class DocumentLibraryPage extends SitePage
         drone.findAndWait(DOCUMENT_LIBRARY).click();
         return new DocumentLibraryPage(drone);
     }
+
+
+    /**
+     * Create folder from template
+     *
+     * @param templateName
+     * @return {@link DocumentLibraryPage}
+     */
+    public NewFolderPage openFolderFromTemplateHover(String templateName)
+    {
+        try{
+            if(!templateName.isEmpty()){
+                getNavigation().selectCreateFolderFromTemplateHover().render();
+                drone.findAndWait(By.xpath("//div[@class='bd']//span[contains(text(), '" + templateName + "')]")).click();
+                drone.findAndWait(submitButton);
+                return new NewFolderPage(drone);
+            }
+        }
+        catch (StaleElementReferenceException ste)
+        {
+        }
+        throw new PageOperationException(String.format("Template didn't found [%s]", templateName));
+
+    }
+
 }
