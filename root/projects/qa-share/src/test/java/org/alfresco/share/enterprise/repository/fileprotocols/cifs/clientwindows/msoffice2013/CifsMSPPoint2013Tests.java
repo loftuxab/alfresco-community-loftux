@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.alfresco.application.util.Application;
+import org.alfresco.application.windows.MicrosoftOffice2013;
 import org.alfresco.explorer.WindowsExplorer;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
@@ -15,8 +15,8 @@ import org.alfresco.share.util.CifsUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.utilities.Application;
 import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.alfresco.windows.application.MicrosoftOffice2013;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;

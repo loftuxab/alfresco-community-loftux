@@ -3,10 +3,9 @@ package org.alfresco.share.sharepoint.office2010;
 import static org.testng.Assert.assertEquals;
 
 import java.io.File;
-
 import java.util.Properties;
 
-import org.alfresco.application.util.Application;
+import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
@@ -18,8 +17,8 @@ import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.WebDroneType;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.utilities.Application;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.windows.application.MicorsoftOffice2010;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;

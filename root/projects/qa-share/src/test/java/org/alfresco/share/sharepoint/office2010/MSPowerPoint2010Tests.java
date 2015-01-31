@@ -5,7 +5,7 @@ import static org.testng.Assert.assertEquals;
 import java.io.File;
 import java.util.Properties;
 
-import org.alfresco.application.util.Application;
+import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
@@ -14,8 +14,7 @@ import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.windows.application.MicorsoftOffice2010;
-import org.apache.camel.util.toolbox.FlexibleAggregationStrategy;
+import org.alfresco.utilities.Application;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;

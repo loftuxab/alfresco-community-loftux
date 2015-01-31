@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.alfresco.application.util.Application;
+import org.alfresco.application.windows.MicrosoftOffice2013;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.ShareLinkPage;
@@ -17,7 +17,7 @@ import org.alfresco.share.util.MailUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.windows.application.MicrosoftOffice2013;
+import org.alfresco.utilities.Application;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
