@@ -24,7 +24,7 @@ public class AbstractUtilsTest extends AbstractUtils
     @Test
     public void testGetAPIURLCloud()
     {
-        ShareTestProperty testProperties = new ShareTestProperty("https://my.alfresco.me/share",
+        ShareTestProperty testProperties = new ShareTestProperty("https://my.alfresco.me/share", "",
                 "", "", SUPERADMIN_USERNAME, DEFAULT_PASSWORD,
                 AlfrescoVersion.Cloud.toString(), cloudUrlForHybrid, pentahoUserConsoleUrl, downloadDirectory,
                 googleUserName, googlePassword, serviceAccountEmail, serviceAccountPKCS12FileName,
@@ -56,7 +56,7 @@ public class AbstractUtilsTest extends AbstractUtils
     @Test
     public void testGetAPIURLEnterprise()
     {
-        ShareTestProperty testProperties = new ShareTestProperty("http://localhost:8080/share", 
+        ShareTestProperty testProperties = new ShareTestProperty("http://localhost:8080/share", "",
                 "", "", SUPERADMIN_USERNAME, DEFAULT_PASSWORD, 
                 AlfrescoVersion.Enterprise.toString(), cloudUrlForHybrid, pentahoUserConsoleUrl, downloadDirectory, 
                 googleUserName, googlePassword, serviceAccountEmail, serviceAccountPKCS12FileName,
@@ -79,7 +79,7 @@ public class AbstractUtilsTest extends AbstractUtils
     @Test
     public void testGetAPIURLAfterExplicitSet()
     {
-        ShareTestProperty testProperties = new ShareTestProperty("http://localhost:8081/share", 
+        ShareTestProperty testProperties = new ShareTestProperty("http://localhost:8081/share", "",
                 "http://localhost:8080/", "", SUPERADMIN_USERNAME, DEFAULT_PASSWORD, 
                 AlfrescoVersion.Enterprise.toString(), cloudUrlForHybrid, pentahoUserConsoleUrl, downloadDirectory, 
                 googleUserName, googlePassword, serviceAccountEmail, serviceAccountPKCS12FileName,
