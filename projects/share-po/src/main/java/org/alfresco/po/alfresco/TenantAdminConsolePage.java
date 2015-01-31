@@ -14,6 +14,7 @@
  */
 package org.alfresco.po.alfresco;
 
+import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.openqa.selenium.By;
@@ -76,11 +77,12 @@ public class TenantAdminConsolePage extends AbstractAdminConsole
      * @param tenantName String tenant name 
      * @param password String tenant password
      */
-    public void createTenant(String tenantName, String password)
+    public HtmlPage createTenant(String tenantName, String password)
     {
         WebElement input = drone.find(INPUT_FIELD);
         input.clear();
         input.sendKeys(String.format("create %s %s", tenantName, password));
         drone.find(SUBMIT_BUTTON).click();
+        return this;
     }
 }
