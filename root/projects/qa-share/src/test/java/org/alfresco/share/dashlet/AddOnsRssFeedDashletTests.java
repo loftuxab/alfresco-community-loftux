@@ -294,12 +294,10 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         // Dashlet displays correctly
         rssFeedUrlBoxPage.clickOk();
         rssDashlet = ShareUserDashboard.getDashlet(drone, Dashlets.ALFRESCO_ADDONS_RSS_FEED).render();
+        rssDashlet.render();
         Assert.assertTrue(rssDashlet.getHeaderInfo().equals(headerInfo));
         Assert.assertTrue(rssDashlet.isHelpIconDisplayed());
         Assert.assertTrue(rssDashlet.isConfigurePresent());
-        Thread.sleep(5);
-        List<ShareLink> links = rssDashlet.getHeadlineLinksFromDashlet();
-        Assert.assertTrue(links.isEmpty());
         
         // ---- Step 7 ----
         // ---- Step action ---
@@ -315,9 +313,10 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         // Dashlet displays. No changes were made.
         rssFeedUrlBoxPage.fillURL(rssUrl);
         rssFeedUrlBoxPage.clickCancel();
-        Thread.sleep(5);
-        List<ShareLink>links2 = rssDashlet.getHeadlineLinksFromDashlet();
-        Assert.assertTrue(links2.isEmpty());
+        rssDashlet.render();
+        Assert.assertTrue(rssDashlet.getHeaderInfo().equals(headerInfo));
+        Assert.assertTrue(rssDashlet.isHelpIconDisplayed());
+        Assert.assertTrue(rssDashlet.isConfigurePresent());
     }
 
     private static String createString(int size)
