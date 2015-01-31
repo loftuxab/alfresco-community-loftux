@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="Classes" verbose="1" preserve-order="true">
+<suite name="Classes" preserve-order="true">
     <groups>
         <run>
             <include name="DataPrep.*"/>
@@ -11,7 +11,7 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <test name="dataprep" verbose="1" parallel="classes" thread-count="1">
+    <test name="dataprep">
         <groups>
             <run>
                 <include name="DataPrep.*"/>

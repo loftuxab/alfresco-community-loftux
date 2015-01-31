@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="Classes" verbose="1" preserve-order="true" parallel="classes" thread-count="1">
+<suite name="Classes" verbose="1" preserve-order="true">
     <groups>
         <run>
             <exclude name="DataPrep.*"/>
