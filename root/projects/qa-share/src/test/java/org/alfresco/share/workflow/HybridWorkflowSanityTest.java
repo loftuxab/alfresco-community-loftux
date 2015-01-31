@@ -221,13 +221,19 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         SyncInfoPage syncInf2 = documentDetailsPage.getSyncInfoPage();
         assertEquals(syncInf2.getCloudSyncLocation(), DOMAIN_HYBRID + ">" + cloudSiteName + ">" + DEFAULT_FOLDER_NAME, "Failed to displayed sync info");
 
+        // Open Site Document Library, verify the document is part of the workflow, document is synced and verify Sync Status
+        DocumentLibraryPage documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(drone, opSiteName);
+
+        assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isCloudSynced(), "Verifying the document is synced");
+        // Verify the sync status for the Content
+        assertTrue(ShareUser.checkIfContentIsSynced(drone, fileName), "Verifying the Sync Status is \"Synced\"");
         ShareUser.logout(drone);
 
         // Login as Cloud User,
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
 
         // Open Site document library and verify the file is a part of workflow
-        DocumentLibraryPage documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSiteName);
+        documentLibraryPage = SiteUtil.openSiteDocumentLibraryURL(hybridDrone, cloudSiteName);
         waitAndCheckIfVisible(hybridDrone, documentLibraryPage, fileName);
         assertTrue(documentLibraryPage.isItemVisble(fileName), "Cloud: File was not synced.");
         assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isPartOfWorkflow(), "Workflow was not created.");
@@ -235,7 +241,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         // Navigate to MyTasks page
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
         // Verify Task Details are displayed correctly
-        assertTrue(myTasksPage.isTaskPresent(workFlowName), "Cloud: New task is not displayed");
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, true), "Cloud: task is not displayed");
         TaskDetails taskDetails = myTasksPage.getTaskDetails(workFlowName);
 
         assertEquals(taskDetails.getTaskName(), workFlowName, "Verifying workflow name");
@@ -851,7 +857,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Navigate to MyTasks page
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, true), "Cloud: task is not displayed");
         // Verify Task Details are displayed correctly
         TaskDetails taskDetails = myTasksPage.getTaskDetails(workFlowName);
 
@@ -1287,7 +1293,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
         // Verify Task is displayed
-        assertTrue(myTasksPage.isTaskPresent(workFlowName));
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, true), "Cloud: task is not displayed");
 
         // Edit task and Reject
         myTasksPage = ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName, TaskStatus.COMPLETED, cloudComment, EditTaskAction.REJECT);
@@ -1676,7 +1682,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
         // Verify task is not displayed in Active Tasks list
-        assertTrue(myTasksPage.isTaskPresent(workFlowName));
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, true), "Cloud: task is not displayed");
 
         ShareUser.logout(hybridDrone);
 
@@ -1899,9 +1905,9 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
         // Verify tasks are displayed in Active Tasks list
-        assertTrue(myTasksPage.isTaskPresent(workFlowName1));
-        assertTrue(myTasksPage.isTaskPresent(workFlowName2));
-        assertTrue(myTasksPage.isTaskPresent(workFlowName3));
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName1, true), "Cloud: task is not displayed");
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName2, true), "Cloud: task is not displayed");
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName3, true), "Cloud: task is not displayed");
 
         // Edit each task and mark them as completed
         ShareUserWorkFlow.completeTaskFromMyTasksPage(hybridDrone, workFlowName1, TaskStatus.COMPLETED, cloudComment1, EditTaskAction.TASK_DONE);
@@ -2119,9 +2125,8 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         // Navigate to MyTasks page and verify both tasks are present
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
-
-        assertTrue(myTasksPage.isTaskPresent(workFlowName1));
-        assertTrue(myTasksPage.isTaskPresent(workFlowName2));
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName1, true), "Cloud: task is not displayed");
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName2, true), "Cloud: task is not displayed");
 
         ShareUser.logout(hybridDrone);
     }
@@ -2366,7 +2371,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
 
-        assertTrue(myTasksPage.isTaskPresent(workFlowName), "Task is not displayed on Cloud");
+        assertTrue(AbstractWorkflow.checkIfTaskIsPresent(hybridDrone, workFlowName, true), "Cloud: task is not displayed");
 
         ShareUser.logout(hybridDrone);
     }
