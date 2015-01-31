@@ -5,7 +5,6 @@ import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 import java.util.List;
 
 import org.alfresco.po.share.SharePage;
-import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.logging.Log;
@@ -114,7 +113,7 @@ public class WcmqsHomePage extends SharePage
      * @param folderName - the Name of the folder from SHARE
      * @return WcmqsNewsPage
      */
-    public WcmqsNewsPage openNewsPage(String folderName)
+    public WcmqsNewsPage openNewsPageFolder(String folderName)
     {
         try
         {
