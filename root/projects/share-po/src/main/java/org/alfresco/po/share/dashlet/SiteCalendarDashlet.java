@@ -21,6 +21,7 @@ public class SiteCalendarDashlet extends AbstractDashlet implements Dashlet
     private static final By DASHLET_CONTAINER_PLACEHOLDER = By.cssSelector("div.calendar");
     private static final By EVENTS_LINKS = By.cssSelector(".details2>div>span>a");
     private static final By EVENTS_DETAILS = By.cssSelector(".details2>div>span");
+    private static final By EVENTS_HEADER = By.cssSelector("div[class='details2']>h4");
 
     /**
      * Constructor.
@@ -160,6 +161,26 @@ public class SiteCalendarDashlet extends AbstractDashlet implements Dashlet
         {
             String linkText = eventLink.getText();
             if (linkText.contains(eventDetail))
+            {
+                return eventLink.isDisplayed();
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 
+     * @param eventHeader
+     * @return boolean
+     */
+    public boolean isEventsWithHeaderDisplayed(String eventHeader)
+    {
+        checkNotNull(eventHeader);
+        List<WebElement> eventLinks = dashlet.findElements(EVENTS_HEADER);
+        for (WebElement eventLink : eventLinks)
+        {
+            String linkText = eventLink.getText();
+            if (linkText.contains(eventHeader))
             {
                 return eventLink.isDisplayed();
             }
