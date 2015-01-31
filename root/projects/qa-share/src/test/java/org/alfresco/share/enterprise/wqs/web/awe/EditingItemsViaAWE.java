@@ -18,6 +18,7 @@ import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.enums.TinyMceColourCode;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.TinyMceEditor;
+import org.alfresco.po.share.site.document.TinyMceEditor.FormatType;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
@@ -65,7 +66,7 @@ public class EditingItemsViaAWE extends AbstractUtils
     public void dataPrep_AONE() throws Exception
     {
         String testUser = getUserNameForDomain(testName, DOMAIN_FREE);
-        String siteName = getSiteName(testName) + "sasa3";
+        String siteName = getSiteName(testName);
 
         // User
         String[] testUserInfo = new String[] { testUser };
@@ -92,7 +93,7 @@ public class EditingItemsViaAWE extends AbstractUtils
         wqsDashlet.waitForImportMessage();
 
     }
-    
+
     @Test(groups = "WQS")
     public void AONE_5607() throws Exception
     {
@@ -100,51 +101,46 @@ public class EditingItemsViaAWE extends AbstractUtils
         // ---- Step action ---
         // Navigate to http://host:8080/wcmqs
         // ---- Expected results ----
-        //  Sample site is opened
-    
+        // Sample site is opened
+
         drone.navigateTo("http://localhost:8080/wcmqs/");
-        
+
         // ---- Step 2 ----
         // ---- Step action ---
         // Open any blog post/article
         // ---- Expected results ----
         // Blog post/article is opened
-        
+
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.selectFirstArticleFromLeftPanel();
-        
+
         // Login
         WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
         wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
         WcmqsNewsArticleDetails wcmqsNewsArticleDetails = new WcmqsNewsArticleDetails(drone);
-        
+
         // ---- Step 3 ----
         // ---- Step action ---
         // Click Edit button near blog post/article(login as admin, if required)
         // ---- Expected results ----
         // Edit window is opened
-                
-        wcmqsNewsArticleDetails.clickEditButton();
-        
+
+        WcmqsEditPage wcmqsEditPage = wcmqsNewsArticleDetails.clickEditButton();
+
         // ---- Step 4 ----
         // ---- Step action ---
         // Verify the presence of all fields on the form
         // ---- Expected results ----
         // The form contains of fields: Name(mandatory), Title, Description,
         // Content, Template Name. It also contains Submit and Cancel buttons
-        WcmqsArticleDetails wcmqsArticleDetails = new WcmqsArticleDetails();
-        wcmqsArticleDetails.getName();
-        wcmqsArticleDetails.getTitle();
-        wcmqsArticleDetails.getDescription();
-        wcmqsArticleDetails.getContent();
-        wcmqsArticleDetails.getTemplateName();
+        // TODO: wcmqsEditPage.isFieldDisplayed("");
     }
-    
+
     @Test(groups = "WQS")
     public void AONE_5609() throws Exception
     {
         drone.navigateTo("http://localhost:8080/wcmqs/");
-        
+
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.selectFirstArticleFromLeftPanel();
 
@@ -153,280 +149,246 @@ public class EditingItemsViaAWE extends AbstractUtils
         wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
         WcmqsNewsArticleDetails wcmqsNewsArticleDetails = new WcmqsNewsArticleDetails(drone);
         WcmqsEditPage wcmqsEditPage = wcmqsNewsArticleDetails.clickEditButton();
-        
-        
+
         // ---- Step 1 ----
         // ---- Step action ---
         // Fill all mandatory fields with correct information
         // ---- Expected results ----
         // Data is entered successfully
-    
-        WcmqsArticleDetails wcmqsArticleDetails = new WcmqsArticleDetails();
-        
-        String name = wcmqsArticleDetails.getName();
-        wcmqsArticleDetails.setName(name);
-        
-        String title= wcmqsArticleDetails.getTitle();
-        wcmqsArticleDetails.setTitle(title);
-        
-        String description = wcmqsArticleDetails.getDescription();
-        wcmqsArticleDetails.setDescription(description);
-        
-        String content = wcmqsArticleDetails.getContent();
-        wcmqsArticleDetails.setContent(content);
-        
-        String template = wcmqsArticleDetails.getTemplateName();
-        wcmqsArticleDetails.setTemplateName(template);
-        
+        String name = wcmqsEditPage.getArticleDetails().getName();
+        wcmqsEditPage.editName(name);
+
         // ---- Step 2 ----
         // ---- Step action ---
         // Verify Submit button
         // ---- Expected results ----
         // Submit button is active
-        
-        
-         wcmqsEditPage.clickSubmitButton();
-        
+        Assert.assertTrue(wcmqsEditPage.isSubmitButtonDisplayed(), "Submit button is not displayed.");
+
         // ---- Step 3 ----
         // ---- Step action ---
         // Leave Name field empty
         // ---- Expected results ----
         // Name field is empty
-         wcmqsHomePage.selectFirstArticleFromLeftPanel();
-         wcmqsNewsArticleDetails.clickEditButton();
-         String name2 = "";
-         wcmqsEditPage.editName(name2);
-             
-        
+        String name2 = "";
+        wcmqsEditPage.editName(name2);
+
         // ---- Step 4 ----
         // ---- Step action ---
         // Verify Submit button
         // ---- Expected results ----
         // Submit button isn't active/friendly notification is displayed
-        
-         wcmqsEditPage.clickSubmitButton();
-         wcmqsEditPage.clickSubmitButton();
+        wcmqsEditPage.clickSubmitButton();
+        Assert.assertEquals(wcmqsEditPage.getNotificationMessage(), "The value cannot be empty.");
 
     }
-    
+
     @Test(groups = "WQS", enabled = true)
     public void AONE_5610() throws Exception
     {
         drone.navigateTo("http://localhost:8080/wcmqs/");
-        
+
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.selectFirstArticleFromLeftPanel();
-        
+
         // Login
-        
+
         WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
         wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
         WcmqsNewsArticleDetails wcmqsNewsArticleDetails = new WcmqsNewsArticleDetails(drone);
-        WcmqsEditPage wcmqsEditPage = wcmqsNewsArticleDetails.clickEditButton();
-        
+        WcmqsEditPage wcmqsEditPage = wcmqsNewsArticleDetails.clickEditButton().render();
+
         // ---- Step 1 ----
         // ---- Step action ---
         // Fill all mandatory fields with correct information
         // ---- Expected results ----
         // Data is entered successfully
-    
-        WcmqsArticleDetails wcmqsArticleDetails = new WcmqsArticleDetails();
-        
-        String title= wcmqsArticleDetails.getTitle();
-        wcmqsEditPage.editTitle(title);
-        
-        String description = wcmqsArticleDetails.getDescription();
-        wcmqsEditPage.editDescription(description);
-        
-        String template = wcmqsArticleDetails.getTemplateName();
-        wcmqsEditPage.editTemplateName(template);
-        
+        String name = wcmqsEditPage.getArticleDetails().getName();
+        wcmqsEditPage.editName(name);
+
         // ---- Step 2 ----
         // ---- Step action ---
         // Verify Submit button
         // ---- Expected results ----
         // Submit button is active
-        
-        wcmqsEditPage.clickSubmitButton();
-        
+        Assert.assertTrue(wcmqsEditPage.isSubmitButtonDisplayed(), "Submit button is not displayed.");
+
         // ---- Step 3 ----
         // ---- Step action ---
         // Fill Name field with wildcards
         // ---- Expected results ----
         // Data is entered successfully
-        
-        drone.navigateTo("http://localhost:8080/wcmqs/");                  
-        wcmqsHomePage.selectFirstArticleFromLeftPanel();
-        wcmqsNewsArticleDetails.clickEditButton();
-        String name2 = " *";
+        String name2 = "a *";
         wcmqsEditPage.editName(name2);
-        
+
         // ---- Step 4 ----
         // ---- Step action ---
         // Verify Submit button
         // ---- Expected results ----
         // Submit button isn't active/friendly notification is displayed
-        
-        wcmqsEditPage.clickSubmitButton();
-        wcmqsEditPage.clickSubmitButton();
-        
+        Assert.assertEquals(wcmqsEditPage.getNotificationMessage(), "Value contains illegal characters.");
+
     }
-    
+
     @Test(groups = "WQS", enabled = true)
     public void AONE_5611() throws Exception
     {
         drone.navigateTo("http://localhost:8080/wcmqs/");
-        
+
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.selectFirstArticleFromLeftPanel();
-        
+
         // Login
-        
+
         WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
         wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
         WcmqsNewsArticleDetails wcmqsNewsArticleDetails = new WcmqsNewsArticleDetails(drone);
         WcmqsEditPage wcmqsEditPage = wcmqsNewsArticleDetails.clickEditButton();
-        
+
         // ---- Step 1 ----
         // ---- Step action ---
         // Enter some new name in Name field;
         // ---- Expected results ----
         // Data is entered successfully
-    
-//        WcmqsArticleDetails wcmqsArticleDetails = new WcmqsArticleDetails();
-        
-//        String name = wcmqsArticleDetails.getName();
-//        wcmqsEditPage.editName(name);
-        wcmqsEditPage.editName("article2.html");
-        
-        
+        String newName = "article3.html";
+        wcmqsEditPage.editName(newName);
+        Assert.assertTrue(wcmqsEditPage.getArticleDetails().getName().contains(newName));
+
         // ---- Step 2 ----
         // ---- Step action ---
         // Click Submit button
         // ---- Expected results ----
         // Edit blog post/article form is closed, data is changed successfully
-        
         wcmqsEditPage.clickSubmitButton();
+        WcmqsNewsPage newsPage = new WcmqsNewsPage(drone);
+        Assert.assertNotNull(newsPage);
 
     }
-    
+
     @Test(groups = "WQS", enabled = true)
     public void AONE_5612() throws Exception
     {
         String textBold = "Bold Text";
         String textItalic = "Italic Text";
+        String textUnderlined = "Underlined Text";
         String textBullet = "Bullet Text";
         String colorText = "Color Text";
-    	
+
         drone.navigateTo("http://localhost:8080/wcmqs/");
-        
+
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         WcmqsNewsArticleDetails wcmqsNewsArticleDetails = new WcmqsNewsArticleDetails(drone);
         wcmqsHomePage.selectFirstArticleFromLeftPanel();
-        
+
         // Login
-        
+
         WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
         wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
-        
+
         WcmqsEditPage wcmqsEditPage = wcmqsNewsArticleDetails.clickEditButton();
-        
+        wcmqsEditPage.render();
+
         // ---- Step 1 ----
         // ---- Step action ---
         // Leave Content field empty
         // ---- Expected results ----
         // Content field is empty
- 
+
         String content = "";
         wcmqsEditPage.insertTextInContent(content);
-        
+
         // ---- Step 2 ----
         // ---- Step action ---
         // Verify Submit button status
         // ---- Expected results ----
         // Submit button is active
-        
-        wcmqsEditPage.clickSubmitButton();
-        
+        Assert.assertTrue(wcmqsEditPage.isSubmitButtonDisplayed(), "Submit button is not displayed.");
+
         // ---- Step 3 ----
         // ---- Step action ---
         // Enter some valid data and apply Bold, Italic and Underline styles for it
         // ---- Expected results ----
         // Styles are applied successfully
-                  
-        drone.navigateTo("http://localhost:8080/wcmqs/");                  
-        wcmqsHomePage.selectFirstArticleFromLeftPanel();
-        wcmqsNewsArticleDetails.clickEditButton();
-        
         String content2 = "test";
         wcmqsEditPage.insertTextInContent(content2);
-        
+
         TinyMceEditor tinyMceEditor = wcmqsEditPage.getContentTinyMCEEditor();
         tinyMceEditor.setText(textBold);
         tinyMceEditor.clickTextFormatter(BOLD);
         assertEquals(tinyMceEditor.getContent(), String.format("<p><strong>%s</strong></p>", textBold), "The text didn't mark as bold.");
-        
+
         tinyMceEditor.setText(textItalic);
         tinyMceEditor.clickTextFormatter(ITALIC);
         assertEquals(tinyMceEditor.getContent(), String.format("<p><em>%s</em></p>", textItalic), "The text didn't italic.");
-               
+
+        tinyMceEditor.setText(textUnderlined);
+        tinyMceEditor.clickFormat();
+        tinyMceEditor.clickTextFormatter(FormatType.UNDERLINED);
+        assertEquals(tinyMceEditor.getContent(), String.format("<p><span style=\"text-decoration: underline;\">%s</span></p>", textUnderlined),
+                "The text didn't underlined.");
+
         // ---- Step 4 ----
         // ---- Step action ---
         // Try to paste any Unodered and Odered list
         // ---- Expected results ----
         // Lists are pasted successfully
-        
+
         tinyMceEditor.setText(textBullet);
         tinyMceEditor.clickTextFormatter(BULLET);
         assertEquals(tinyMceEditor.getContent(), String.format("<ul style=\"\"><li>%s</li></ul>", textBullet), "List didn't display.");
 
-        
         // ---- Step 5 ----
         // ---- Step action ---
         // Change color for some text
         // ---- Expected results ----
         // Color is changed successfully
-        
+
         tinyMceEditor.setText(colorText);
         tinyMceEditor.clickColorCode(TinyMceColourCode.BLUE);
         assertEquals(tinyMceEditor.getContent(), String.format("<p><span style=\"color: rgb(0, 0, 255);\">%s</span></p>", colorText),
                 "Text didn't get colored.");
-        
+
         // ---- Step 6 ----
         // ---- Step action ---
-        //  Click Undo button
+        // Click Undo button (In order to click Undo button, Edit button should be clicked first)
         // ---- Expected results ----
         // Last formatting action is canceled
-        
+        String editedText = "text to undo";
+        tinyMceEditor.setText("aaaa");
         tinyMceEditor.clickEdit();
-        
         tinyMceEditor.clickUndo();
-                        
+        Assert.assertFalse(tinyMceEditor.getContent().contains(editedText));
+
         // ---- Step 7 ----
         // ---- Step action ---
-        // Click Redo button
+        // Click Redo button (In order to click Undo button, Edit button should be clicked first)
         // ---- Expected results ----
         // Last formatting action is redone
         tinyMceEditor.clickEdit();
-        
         tinyMceEditor.clickRedo();
-        
+        Assert.assertTrue(tinyMceEditor.getContent().contains(editedText));
+
         // ---- Step 8 ----
         // ---- Step action ---
-        // Highlight some text and click Remove formatting button
+        // Highlight some text and click Remove formatting button (Edit menu is already expanded, Format menu should be clicked twice)
         // ---- Expected results ----
         // Formatting is removed
-        
+        tinyMceEditor.selectTextFromEditor();
         tinyMceEditor.clickFormat();
         tinyMceEditor.clickFormat();
         tinyMceEditor.removeFormatting();
-        
+        Assert.assertNotEquals(tinyMceEditor.getContent(), String.format("<p><span style=\"color: rgb(0, 0, 255);\">%s</span></p>", colorText),
+                "Text didn't get colored.");
+
         // ---- Step 9 ----
         // ---- Step action ---
         // Click Submit button
         // ---- Expected results ----
         // Edit blog post/article form is closed, changes are saved
         wcmqsEditPage.clickSubmitButton();
+        WcmqsNewsPage newsPage = new WcmqsNewsPage(drone);
+        Assert.assertNotNull(newsPage.render());
+
     }
 
     /** AONE-5613:Editing Content field(negative test) */
