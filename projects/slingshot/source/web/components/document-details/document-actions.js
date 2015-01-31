@@ -241,7 +241,7 @@
             }
             return true;
          };
-         YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
+         YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler, true);
 
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
