@@ -15,6 +15,12 @@
 
 package org.alfresco.share.util;
 
+import static org.alfresco.po.share.enums.CloudSyncStatus.ATTEMPTED;
+import static org.alfresco.po.share.enums.CloudSyncStatus.PENDING;
+import static org.alfresco.po.share.enums.CloudSyncStatus.SYNCED;
+
+import java.util.concurrent.TimeUnit;
+
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.enums.CloudSyncStatus;
@@ -37,14 +43,9 @@ import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.Seconds;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-
-import java.util.concurrent.TimeUnit;
-
-import static org.alfresco.po.share.enums.CloudSyncStatus.*;
 
 /**
  * This class is responsible for holding all common methods related hybrid
@@ -425,6 +426,17 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
         return false;
     }
 
+    /**
+     * This method is used to get sync status (with retry) for a content from
+     * document library page and returns true if the content has the status sync failed otherwise
+     * false. Since cloud sync is not instantaneous, the method keeps retrying
+     * until maxWaitTime_CloudSync is reached This method could be invoked after
+     * syncToCloud is initiated from document library page.
+     * 
+     * @param driver
+     * @param fileName
+     * @return boolean
+     */
     public static boolean checkIfSyncFailed(WebDrone driver, String fileName)
     {
         DocumentLibraryPage docLibPage = (DocumentLibraryPage) getSharePage(driver);
@@ -468,6 +480,45 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
     }
 
     /**
+     * This method is used to get sync status (with retry) for a content from
+     * document library page and returns true if the content synced otherwise
+     * false. Since cloud sync is not instantaneous, the method keeps retrying
+     * until maxWaitTime_CloudSync is reached This method could be invoked after
+     * syncToCloud is initiated from document library page. If document is not synced in time
+     * a request sync is made.
+     * 
+     * @param driver
+     * @param fileName
+     * @param siteName
+     * @return boolean
+     */
+    public static void waitForSync(WebDrone driver, String fileName, String siteName)
+    {
+        int counter = 1;
+        int retryRefreshCount = 4;
+        while (counter <= retryRefreshCount)
+        {
+            if (checkIfContentIsSynced(driver, fileName))
+            {
+                break;
+            }
+            else
+            {
+                logger.info("Wait for Sync");
+
+                driver.refresh();
+                counter++;
+
+                if (counter == 2 || counter == 3)
+                {
+                    DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(driver, siteName);
+                    docLib.getFileDirectoryInfo(fileName).selectRequestSync().render();
+                }
+            }
+        }
+    }
+
+    /**
      * Navigate to Sync Info Page.
      * 
      * @param drone
@@ -478,7 +529,6 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
     {
         DocumentLibraryPage doclibPage = (DocumentLibraryPage) getSharePage(drone);
         return doclibPage.getFileDirectoryInfo(content).clickOnViewCloudSyncInfo().render();
-
     }
 
     /**
