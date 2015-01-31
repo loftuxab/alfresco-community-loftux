@@ -80,14 +80,11 @@ public class SiteUtil extends AbstractUtils
      */
     public static File prepareFile()
     {
-
         File file = null;
         OutputStreamWriter writer = null;
         try
         {
-
             file = File.createTempFile("myfile", ".txt");
-
             writer = new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8").newEncoder());
             writer.write("this is a sample test upload file");
             writer.close();
@@ -95,10 +92,6 @@ public class SiteUtil extends AbstractUtils
         catch (IOException ioe)
         {
             logger.error("Unable to create sample file", ioe);
-        }
-        catch (Exception e)
-        {
-            logger.error("Unable to create site", e);
         }
         finally
         {
@@ -135,9 +128,9 @@ public class SiteUtil extends AbstractUtils
             ImageIO.write(image, "jpg", jpgFile);
             return jpgFile;
         }
-        catch (IOException e)
+        catch (IOException ioe)
         {
-            e.printStackTrace();
+            logger.error("Unable to prepare jpg file", ioe);
         }
         throw new SkipException("Can't create JPG file");
     }
