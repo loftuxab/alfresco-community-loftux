@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 public class IncompleteWorkflowTests extends AbstractWorkflow
 {
     private String testDomain;
-    private String incompleteWorkflow = "incomplete_workflow20";
+    private String incompleteWorkflow = "incomplete_workflow22";
     private static Log logger = LogFactory.getLog(CifsMSOffice2010Tests.class);
 
     @Override
@@ -64,7 +64,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
     }
 
     /**
-     * Data preparation for tests: AONE-15680, AONE-15681, AONE-15682, AONE-15683, AONE-15684
+     * Data preparation for Incomplete Workflow tests
      */
     @Test(groups = "DataPrepHybrid")
     public void dataPrep_createUsers() throws Exception
@@ -137,6 +137,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
+        
         waitForSync(simpleTaskFile, opSiteName);
 
         ShareUser.logout(drone);
@@ -335,7 +336,6 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         formDetails.setMessage(simpleTaskWF);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         documentLibraryPage = cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
-        // waitForSync(simpleTaskFile);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -350,9 +350,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         documentDetailsPage = inlineEditPage.save(contentDetails).render();
-         
+
         DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
+
         waitForSync(simpleTaskFile, opSiteName);
 
         ShareUser.logout(drone);
@@ -644,6 +645,155 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 .contains(folderName));
         ShareUser.logout(hybridDrone);
     }
+    
+    /**
+     * AONE-15688:Incomplete workflow - unsync (OP)
+     */
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15686() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
+        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
+
+        String simpleTaskFile = getFileName(testName) + ".txt";
+        String[] fileInfo = { simpleTaskFile, DOCLIB };
+
+        String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
+        String dueDate = getDueDateString();
+
+        // Login as User1 (Cloud)
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login as User1 (OP)
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+
+        // Create Site
+        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+
+        // Open Document library, Upload a file
+        siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
+
+        ShareUser.uploadFileInFolder(drone, fileInfo).render();
+
+        // Select "Cloud Task or Review" from select a workflow drop down
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
+
+        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+        formDetails.setDueDate(dueDate);
+        formDetails.setTaskPriority(Priority.MEDIUM);
+        formDetails.setSiteName(cloudSite);
+        formDetails.setAssignee(cloudUser);
+        formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
+        formDetails.setMessage(simpleTaskWF);
+        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
+        cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
+        waitForSync(simpleTaskFile, opSiteName);
+
+        // ---- Step 1 ----
+        // ---- Step action ---
+        // OP Remove the synced document.
+        // ---- Expected results ----
+        // he content is not removed. It cannot be removed because it is the part of workflow. Friendly behavior occurs (a message).
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent());
+
+        ShareUser.logout(drone);
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
+
+        // ---- Step 3 ----
+        // ---- Step action ---
+        // Cloud Verify the document.
+        // ---- Expected results ----
+        // The document is still synced.
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isUnSyncFromCloudLinkPresent());
+        ShareUser.logout(hybridDrone);
+    }
+    
+    /**
+     * AONE-15689:Incomplete workflow - unsync (Cloud)
+     */
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15687() throws Exception
+    {
+        String testName = getTestName();
+        String user1 = getUserNameForDomain(incompleteWorkflow + "OP", testDomain);
+        String cloudUser = getUserNameForDomain(incompleteWorkflow + "CL", testDomain);
+        String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
+        String cloudSite = getSiteName(testName) + System.currentTimeMillis() + "1-CL";
+
+        String simpleTaskFile = getFileName(testName) + ".txt";
+        String[] fileInfo = { simpleTaskFile, DOCLIB };
+
+        String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
+        String dueDate = getDueDateString();
+
+        // Login as User1 (Cloud)
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+
+        // Create Site
+        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
+
+        // Login as User1 (OP)
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+
+        // Create Site
+        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+
+        // Open Document library, Upload a file
+        siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
+
+        ShareUser.uploadFileInFolder(drone, fileInfo).render();
+
+        // Select "Cloud Task or Review" from select a workflow drop down
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, simpleTaskFile).render();
+
+        WorkFlowFormDetails formDetails = new WorkFlowFormDetails();
+        formDetails.setDueDate(dueDate);
+        formDetails.setTaskPriority(Priority.MEDIUM);
+        formDetails.setSiteName(cloudSite);
+        formDetails.setAssignee(cloudUser);
+        formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
+        formDetails.setMessage(simpleTaskWF);
+        formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
+        cloudTaskOrReviewPage.startWorkflow(formDetails).render(maxWaitTimeCloudSync);
+        waitForSync(simpleTaskFile, opSiteName);
+
+        ShareUser.logout(drone);
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+
+        // ---- Step 1 ----
+        // ---- Step action ---
+        // Cloud Remove the synced document.
+        // ---- Expected results ----
+        // The content is not removed. It cannot be removed because it is the part of workflow. Friendly behavior occurs (a message).
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
+
+        Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
+        Assert.assertFalse(documentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isDeletePresent());
+
+        ShareUser.logout(hybridDrone);
+
+        // ---- Step 2 ----
+        // ---- Step action ---
+        // OP Verify the document.
+        // ---- Expected results ----
+        // The document is still synced. The correct location is displayed in the Sync details section.
+        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
+        DocumentLibraryPage opDocumentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
+        Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced());
+        Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).clickOnViewCloudSyncInfo().render().getCloudSyncLocation()
+                .contains(cloudSite));
+    }
 
     /**
      * AONE-15688:Incomplete workflow - unsync (OP)
@@ -809,8 +959,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
             {
                 drone.refresh();
                 counter++;
-                
-                if(counter == 2 || counter == 3)
+
+                if (counter == 2 || counter == 3)
                 {
                     DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(drone, siteName);
                     docLib.getFileDirectoryInfo(fileName).selectRequestSync().render();
