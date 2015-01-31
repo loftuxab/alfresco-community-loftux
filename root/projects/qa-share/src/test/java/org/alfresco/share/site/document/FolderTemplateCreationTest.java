@@ -684,7 +684,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
         }
     }
 
-    @Test(groups = { "DataPrepEnterpriseOnly" }, dependsOnMethods = "AONE_15046", alwaysRun = true)
+    @Test(groups = { "DataPrepEnterpriseOnly" })
     public void dataPrep_AONE_15047() throws Exception
     {
 
@@ -702,7 +702,7 @@ public class FolderTemplateCreationTest extends AbstractUtils
 
     }
 
-    @Test(groups = { "EnterpriseOnly" })
+    @Test(groups = { "EnterpriseOnly" }, dependsOnMethods = "AONE_15046", alwaysRun = true)
     public void AONE_15047() throws Exception
     {
         String testName = getTestName();
