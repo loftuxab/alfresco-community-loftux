@@ -26,6 +26,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -696,5 +697,23 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     public String getSiteHostname()
     {
         return drone.find(INPUT_SITE_HOSTNAME_SELECTOR).getText();
+    }
+
+    /**
+     * Gets the web assets visible on the dialog.
+     *
+     * @return
+     */
+    public List<String> getWebAssets()
+    {
+        WebElement assetsList = drone.findAndWait(WEB_ASSETS_LIST);
+        List<WebElement> assets = assetsList.findElements(By.cssSelector("div"));
+        List<String> foundAssets = new ArrayList<>();
+
+        for (WebElement asset : assets)
+        {
+            foundAssets.add(asset.getText());
+        }
+        return foundAssets;
     }
 }
