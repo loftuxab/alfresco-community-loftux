@@ -46,6 +46,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
     public static final String MARKETS = "markets";
     public static final String COLLECTIONS = "collections";
     public static final String SECTION_ARTICLES = "section.articles";
+    public static final String RELATED_ARTICLES_SECTION ="services-box";
 
     public static final String ARTICLE_4 = "article4.html";
     public static final String ARTICLE_3 = "article3.html";
@@ -59,6 +60,8 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     @RenderWebElement
     private final By NEWS_MENU = By.cssSelector("a[href$='news/']");
+    
+    private final By RSS_LINK=By.xpath("//a[text()='Subscribe to RSS']");
 
     /**
      * Constructor.
@@ -193,7 +196,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
         }
         catch (TimeoutException e)
         {
-            throw new PageOperationException("Exceeded time to find the title:" + e.toString());
+            throw new PageOperationException("Exceeded time to find the news title:" + e.toString());
         }
 
     }
@@ -258,6 +261,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
         return check;
     }
 
+    
     public boolean checkIfNewsExists(String title)
     {
         boolean check = false;
@@ -359,5 +363,57 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
         return titles;
     }
+    
+    
+    /**
+     * Method to verify if the Subscribe to RSS link is displayed 
+     * 
+     * @param 
+     * @return is displayed
+     */
+    public boolean isRSSLinkDisplayed()
+    {
+        boolean present = false;
+
+        try
+        {
+            present = drone.findAndWait(RSS_LINK).isDisplayed();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Exceeded time to find RSS link. " + e.toString());
+        }
+
+        return present;
+
+    }
+    
+    
+//    /**
+//     * Method to click a news title
+//     * 
+//     * @param newsTitle - the title of the news in wcmqs site
+//     * @return
+//     */
+//    public void clickLinkByTitle(String newsTitle)
+//    {
+//        try
+//        {
+//            List<ShareLink> relatedArticlesList=getRightHeadlineTitleNews();
+//            for (ShareLink relatedArticle:relatedArticlesList)
+//            {
+//                if(relatedArticle.getDescription().equals(newsTitle))
+//                {
+//                    relatedArticle.click();
+//                }
+//            }
+//        }
+//        catch (TimeoutException e)
+//        {
+//            throw new PageOperationException("Exceeded time to find related articles link. " + e.toString());
+//        }
+//
+//    }
+    
 
 }
