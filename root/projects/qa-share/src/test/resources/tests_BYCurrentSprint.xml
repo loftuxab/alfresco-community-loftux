@@ -3,6 +3,7 @@
     <suite-files>
         <!--suite-file path="tests_BY_managePermission.xml"/>
         <suite-file path="tests_BY_doclib.xml"/>-->
+        <suite-file path="tests_BY_profile.xml"/>
         <suite-file path="tests_BY_dashlet.xml"/>
         <suite-file path="tests_BY_common.xml"/>
         <suite-file path="tests_BY_api.xml"/>
