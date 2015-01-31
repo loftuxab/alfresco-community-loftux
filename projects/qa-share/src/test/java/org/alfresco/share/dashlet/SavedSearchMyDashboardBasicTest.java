@@ -440,7 +440,7 @@ public class SavedSearchMyDashboardBasicTest extends AbstractUtils {
         Assert.assertTrue(ShareUserDashboard.isContentDisplayedInSearchResults(items, fileName));
 
         // Configure Saved search with "*test*"
-        ShareUserDashboard.configureSavedSearch(drone, "*" + test + "*", title, SearchLimit.FIFTY);
+        ShareUserDashboard.configureSavedSearch(drone, "*" + test + "*", title, SearchLimit.HUNDRED);
         searchDashlet = ShareUserDashboard.getSavedSearchDashlet(drone);
         items = searchDashlet.getSearchItems();
 
