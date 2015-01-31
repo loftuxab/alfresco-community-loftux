@@ -39,10 +39,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -57,10 +54,6 @@ public class ClusterJMX extends AbstractUtils
     private static String node1Url;
     private static String node2Url;
     private static final String regexUrl = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
-    private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
-    private static final Pattern DOMAIN_PATTERN = Pattern.compile("\\w+(\\.\\w+)*(\\.\\w{2,})");
-
-    protected String siteName = "";
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -114,28 +107,9 @@ public class ClusterJMX extends AbstractUtils
         }
     }
 
-    private static String getAddress(String url)
-    {
-        checkNotNull(url);
-        Matcher m = IP_PATTERN.matcher(url);
-        if (m.find())
-        {
-            return m.group();
-        }
-        else
-        {
-            m = DOMAIN_PATTERN.matcher(url);
-            if (m.find())
-            {
-                return m.group();
-            }
-        }
-        throw new PageOperationException(String.format("Can't parse address from url[%s]", url));
-    }
-
     private SharePage login(WebDrone drone, String userName, String password)
     {
-        SharePage resultPage = null;
+        SharePage resultPage;
         try
         {
             resultPage = ShareUser.login(drone, userName, password);
