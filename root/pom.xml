@@ -961,20 +961,8 @@
     <!-- Profile to build alfresco-enterprise -->
     <profile>
         <id>enterprise</id>
-        <repositories>
-            <repository>
-                <id>alfresco-internal</id>
-                <url>https://artifacts.alfresco.com/nexus/content/groups/internal</url>
-            </repository>
-        </repositories>
         <modules>
-			<module>enterpriseprojects/repository</module>
-            <module>enterpriseprojects/repository-crypto</module>
-            <module>enterpriseprojects/remote-api</module>
-            <module>enterpriseprojects/overlays</module>
-            <module>enterpriseprojects/spring-encryptor</module>
-            <module>enterpriseprojects/server-root</module>
-            <module>enterpriseprojects/vti-bin</module>
+            <module>enterpriseprojects</module>
         </modules>
         <properties>
             <!-- Enterprise specific properties -->

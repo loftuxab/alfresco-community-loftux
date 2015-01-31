@@ -14,29 +14,6 @@
 
     <name>office-application</name>
 
-    <repositories>
-        <repository>
-            <id>alfresco-public</id>
-            <url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
-        </repository>
-        <repository>
-            <id>alfresco-public-snapshot</id>
-            <url>https://artifacts.alfresco.com/nexus/content/groups/public-snapshots/</url>
-        </repository>
-    </repositories>
-    <distributionManagement>
-        <repository>
-            <id>alfresco-internal</id>
-            <name>Alfresco Releases Repository</name>
-            <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>alfresco-internal-snapshots</id>
-            <name>Alfresco Snapshots Repository</name>
-            <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
         <argLine>-Xms512m -Xmx1024m</argLine>
     </properties>
