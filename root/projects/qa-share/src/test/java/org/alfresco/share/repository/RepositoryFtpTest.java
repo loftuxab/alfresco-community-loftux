@@ -44,7 +44,9 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.io.*;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import static org.testng.Assert.*;
@@ -953,59 +955,72 @@ public class RepositoryFtpTest extends AbstractUtils
 
         // Navigate to ftp://login:pass@server_ip
         drone.navigateTo(ftpUrl);
-        assertTrue(drone.findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
+        String handle1 = drone.getWindowHandle();
+        assertTrue(drone.findAndWait(By.cssSelector(".up")).getAttribute("href").contains(ftpUrl));
+        assertTrue(getDrone().findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
 
         //  Navigate to ftp://server_ip
         ftpUrl = "ftp://%s";
         ftpUrl = String.format(ftpUrl, serverIP);
-        drone.executeJavaScript("window.location.replace(\"" + ftpUrl + "\"" + ")");
-        Thread.sleep(5000);
+        drone.executeJavaScript("myWindow = window.open(\"" + ftpUrl + "\"" + ","+ "\"myWindow\"," + "\""+"[top=500, left=500, width=800, height=600]"+"\""+"); myWindow.focus(); myWindow.moveTo(0, 0);");
+        sleep();
 
         //  Fill Login and Pass fields and click 'Ok' button;
-        for (String winHandle : drone.getWindowHandles())
+        try
         {
-            drone.switchToWindow(winHandle);
-
-            try
-            {
-                Robot robot = new Robot();
-                type(ADMIN_USERNAME);
-                robot.keyPress(KeyEvent.VK_TAB);
-                type(ADMIN_PASSWORD);
-                robot.keyPress(KeyEvent.VK_ENTER);
-                break;
-            }
-            catch (AWTException ex)
-            {
-                logger.error(ex);
-            }
+            Robot robot = new Robot();
+            type(ADMIN_USERNAME);
+            robot.keyPress(KeyEvent.VK_TAB);
+            type(ADMIN_PASSWORD);
+            robot.keyPress(KeyEvent.VK_ENTER);
         }
-        assertTrue(drone.findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
+        catch (AWTException ex)
+        {
+            logger.error(ex);
+        }
+
+        Set<String> windowIds = drone.getWindowHandles();
+        Iterator<String> iter= windowIds.iterator();
+        String windowId1=iter.next();
+        String windowId2=iter.next();
+        if (windowId1.equals(handle1)){
+            drone.switchToWindow(windowId2);
+        }
+        assertTrue(drone.findAndWait(By.cssSelector(".up")).getAttribute("href").contains(ftpUrl), String.format("displayed: %s, Expected: %s",
+            drone.findAndWait(By.cssSelector(".up")).getAttribute("href"), ftpUrl));
+        assertTrue(getDrone().findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
+        String handle2 = drone.getWindowHandle();
 
         // Navigate to ftp://login@server_ip
         ftpUrl = "ftp://%s@%s";
         ftpUrl = String.format(ftpUrl, ADMIN_USERNAME, serverIP);
-        drone.executeJavaScript("window.location.replace(\"" + ftpUrl + "\"" + ")");
-        Thread.sleep(5000);
+        drone.executeJavaScript("myWindow1 = window.open(\"" + ftpUrl + "\"" + ","+ "\"myWindow1\"," + "\""+"[top=500, left=500, width=800, height=600]"+"\""+"); myWindow1.focus(); myWindow1.moveTo(0, 0);");
+        sleep();
 
         // Fill Password field and click 'Ok' button;
-        for (String winHandle : drone.getWindowHandles())
+        try
         {
-            drone.switchToWindow(winHandle);
-
-            try
-            {
-                Robot robot = new Robot();
-                type(ADMIN_PASSWORD);
-                robot.keyPress(KeyEvent.VK_ENTER);
-                break;
-            }
-            catch (AWTException ex)
-            {
-                logger.error(ex);
-            }
+            Robot robot = new Robot();
+            robot.setAutoWaitForIdle(true);
+            type(ADMIN_PASSWORD);
+            robot.keyPress(KeyEvent.VK_ENTER);
         }
-        assertTrue(drone.findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
+        catch (AWTException ex)
+        {
+            logger.error(ex);
+        }
+
+        windowIds = drone.getWindowHandles();
+        iter= windowIds.iterator();
+        windowId1=iter.next();
+        windowId2=iter.next();
+        String windowId3=iter.next();
+        if (windowId1.equals(handle1) && windowId2.equals(handle2)){
+            drone.switchToWindow(windowId3);
+        }
+        assertTrue(drone.findAndWait(By.cssSelector(".up")).getAttribute("href").contains(ftpUrl),String.format("displayed: %s, Expected: %s",
+            drone.findAndWait(By.cssSelector(".up")).getAttribute("href"), ftpUrl));
+        assertTrue(getDrone().findAndWait(By.cssSelector(".dir")).getText().contains("Alfresco"));
     }
 
     private void writeToClipboard(String s)
@@ -1090,5 +1105,16 @@ public class RepositoryFtpTest extends AbstractUtils
             throw new RuntimeException(ex.getMessage());
         }
         return content.toString();
+    }
+    private static void sleep()
+    {
+        try
+        {
+            Thread.sleep(5000);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
     }
 }
