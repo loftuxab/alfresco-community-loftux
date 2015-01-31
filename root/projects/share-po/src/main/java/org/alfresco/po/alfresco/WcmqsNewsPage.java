@@ -157,7 +157,7 @@ public class WcmqsNewsPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", newsName))).getText();
+            return drone.findAndWait(By.xpath(String.format("//h4/a[contains(@href,'%s')]", newsName))).getText();
         }
         catch (TimeoutException e)
         {
