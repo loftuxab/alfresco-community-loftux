@@ -70,8 +70,8 @@ public class EditCloudReviewTaskTests extends AbstractWorkflow
         cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
 
         folderName = getFolderName(testName);
-        cloudSite = getSiteName(testName + "CL" + "D1");
-        opSite = getSiteName(testName + "OP" + "D1");
+        cloudSite = getSiteName(testName + "CL");
+        opSite = getSiteName(testName + "OP");
 
     }
 
@@ -228,7 +228,7 @@ public class EditCloudReviewTaskTests extends AbstractWorkflow
             // Comment: (None)
             myTasksPage = editTaskPage.selectCancelButton().render();
 
-            TaskDetailsPage taskDetailsPage = myTasksPage.selectViewTasks(workFlowName);
+            TaskDetailsPage taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
             assertEquals(taskDetailsPage.getComment(), NONE);
 
             // --- Step 7 ---
