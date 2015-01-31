@@ -850,8 +850,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -996,8 +1001,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
     }
 
     /**
@@ -1142,8 +1152,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
     }
 
     /**
@@ -1289,8 +1304,15 @@ public class MSOutlook2010EventsTests extends AbstractUtils
 
         // The start and end date, duration of the event at My calendar dashlet
         String theTime = startTime + " - " + endTime;
+
+        // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -1437,8 +1459,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -1588,8 +1615,11 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -1735,8 +1765,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -1884,8 +1919,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -2028,8 +2068,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -2173,8 +2218,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -2323,8 +2373,13 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         String theTime = startTime + " - " + endTime;
 
         // The start and end date, duration of the event at My calendar dashlet
+        dayFormat = new SimpleDateFormat("d MMMM, yyyy", Locale.US);
+
+        calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         String eventDetails = myCalendar.getEventDetails(siteName);
-        Assert.assertTrue(eventDetails.contains(theTime));
+        Assert.assertTrue(eventDetails.contains(weekDay + " " + theTime));
 
     }
 
@@ -2460,7 +2515,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
     private String convertHour(String hour)
     {
         SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm");
-        SimpleDateFormat _12HourSDF = new SimpleDateFormat("hh:mm a");
+        SimpleDateFormat _12HourSDF = new SimpleDateFormat("h:mm a");
         String convertedHour = "";
         try
         {
@@ -2472,14 +2527,7 @@ public class MSOutlook2010EventsTests extends AbstractUtils
         {
             e.printStackTrace();
         }
-
-        String hours = convertedHour.substring(0, 2);
-        int hours_int = Integer.parseInt(hours);
-        if (hours_int <= 10)
-        {
-            convertedHour = convertedHour.substring(1);
-        }
-
+        
         return convertedHour;
     }
 }
