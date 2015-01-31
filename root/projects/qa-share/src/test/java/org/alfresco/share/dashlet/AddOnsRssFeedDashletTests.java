@@ -203,17 +203,17 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
 
         // wait a few seconds to load the RSS Feed
         rssDashlet.waitUntilLoadingDisappears();
-        // Thread.sleep(5);
 
         // ---- Step 6 ----
         // ---- Step action ---
         // Click on any RSS news;
         // ---- Expected results ----
         // RSS news is opened in new window;
+        Thread.sleep(5);
         List<ShareLink> links = rssDashlet.getHeadlineLinksFromDashlet();
         links.get(0).openLink();
         Set<String> windowHandles = drone.getWindowHandles();
-        Assert.assertEquals(2, windowHandles.size());
+        Assert.assertEquals(windowHandles.size(), 2);
 
     }
 
@@ -297,9 +297,10 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         Assert.assertTrue(rssDashlet.getHeaderInfo().equals(headerInfo));
         Assert.assertTrue(rssDashlet.isHelpIconDisplayed());
         Assert.assertTrue(rssDashlet.isConfigurePresent());
+        Thread.sleep(5);
         List<ShareLink> links = rssDashlet.getHeadlineLinksFromDashlet();
-        Assert.assertTrue(links.size() == 0);
-
+        Assert.assertTrue(links.isEmpty());
+        
         // ---- Step 7 ----
         // ---- Step action ---
         // Click Configure this dashlet icon again
@@ -314,8 +315,9 @@ public class AddOnsRssFeedDashletTests extends AbstractUtils
         // Dashlet displays. No changes were made.
         rssFeedUrlBoxPage.fillURL(rssUrl);
         rssFeedUrlBoxPage.clickCancel();
-        links = rssDashlet.getHeadlineLinksFromDashlet();
-        Assert.assertTrue(links.size() == 0);
+        Thread.sleep(5);
+        List<ShareLink>links2 = rssDashlet.getHeadlineLinksFromDashlet();
+        Assert.assertTrue(links2.isEmpty());
     }
 
     private static String createString(int size)
