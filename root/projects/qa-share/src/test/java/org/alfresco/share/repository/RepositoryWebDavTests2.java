@@ -52,7 +52,6 @@ import static org.testng.Assert.assertTrue;
  * @author Sergey Kardash
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = "EnterpriseOnly", timeOut = 400000)
 public class RepositoryWebDavTests2 extends AbstractUtils
 {
     private static Log logger = LogFactory.getLog(RepositoryWebDavTests2.class);
@@ -104,15 +103,6 @@ public class RepositoryWebDavTests2 extends AbstractUtils
     {
         super.setup();
 
-        super.tearDown();
-
-        logger.info("Starting Tests: " + testName);
-    }
-
-    @BeforeMethod(alwaysRun = true)
-    public void beforeMethod() throws Exception
-    {
-        super.setup();
 
         testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName);
@@ -129,8 +119,9 @@ public class RepositoryWebDavTests2 extends AbstractUtils
         // Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
 
         mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
-        Process process = Runtime.getRuntime().exec(mapConnect);
 
+        //Runtime.getRuntime().exec(mapConnect);
+        Process process = Runtime.getRuntime().exec(mapConnect);
         waitProcessEnd(process);
 
         if (CifsUtil.checkDirOrFileExists(10, 200, networkDrive + sitesPath))
@@ -143,16 +134,6 @@ public class RepositoryWebDavTests2 extends AbstractUtils
         }
 
         logger.info("[Suite ] : Start Tests in: " + testName);
-
-    }
-
-    @AfterMethod(alwaysRun = true)
-    public void teardownMethod() throws Exception
-    {
-
-        Runtime.getRuntime().exec("taskkill /F /IM CobraWinLDTP.EXE");
-        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
-        super.tearDown();
     }
 
     @AfterClass(alwaysRun = true)
@@ -170,6 +151,8 @@ public class RepositoryWebDavTests2 extends AbstractUtils
             logger.error("--------Unmapping was not done correctly " + testUser);
         }
 
+        super.tearDown();
+
     }
 
     private static String getAddressWithPort(String shareUrl)
@@ -181,6 +164,48 @@ public class RepositoryWebDavTests2 extends AbstractUtils
             return m1.group();
         }
         throw new PageException("Can't extract address from URL");
+    }
+
+
+    /**
+     * Test: AONE-6545:Verify accessing WebDAV in browser
+     * <ul>
+     * <li>In your browser open the following link http://servername/alfresco/webdav</li>
+     * <li>Information is entered successfully and Company home is opened in view mode</li>
+     * <li>Navigate through the folder structure</li>
+     * </ul>
+     *
+     * @throws Exception
+     */
+    @Test(groups = "EnterpriseOnly", timeOut = 300000)
+    public void AONE_6545() throws Exception
+    {
+        String testName = getTestName();
+        String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
+
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        // Any site is created
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC).render();
+
+        // In your browser open the following link http://servername/alfresco/webdav
+        WebDavPage webDavPage = ShareUtil.navigateToWebDav(drone, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+
+        // Information is entered successfully and Company home is opened in view mode
+        Assert.assertTrue(webDavPage.getDirectoryText().equals("Directory listing for /"), "Default directory isn't opened");
+
+        // Navigate through the folder structure
+        webDavPage.clickDirectory("Sites");
+
+        Assert.assertTrue(webDavPage.getDirectoryText().equals("Directory listing for /Sites"), "Link 'Sites' isn't opened");
+
+        Assert.assertTrue(webDavPage.checkDirectoryDisplayed(siteName.toLowerCase()), "Expected site " + siteName + " isn't displayed");
+        Assert.assertTrue(webDavPage.checkUpToLevelDisplayed(), "'Up a level' link isn't displayed");
+
+        // Navigation works correctly
+        webDavPage.clickUpToLevel();
+
+        Assert.assertTrue(webDavPage.getDirectoryText().equals("Directory listing for /"), "Default directory isn't opened");
+
     }
 
     /**
@@ -199,16 +224,16 @@ public class RepositoryWebDavTests2 extends AbstractUtils
      *
      * @throws Exception
      */
-    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" }, timeOut = 600000)
+    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" },dependsOnMethods = "AONE_6545" , timeOut = 600000, alwaysRun = true)
     public void AONE_6544() throws Exception
     {
         String testName = getTestName();
-        String siteName1 = getSiteName(testName + "-1-") + System.currentTimeMillis();
-        String fileName = getFileName(testName + "-1") + getRandomString(5);
+        String siteName1 = getSiteName(testName + "-1-") +  getRandomString(3);
+        String fileName = getFileName(testName + "-1") +getRandomString(3);
         String fileTitle = getFileName(testName + "-1") + "_title";
         String fileDesc = getFileName(testName + "-1") + "_description";
-        String folderName = "folder1" + getRandomString(10);
-        String folderName2 = "folder2" + getRandomString(10);
+        String folderName = "folder1" + getRandomString(3);
+        String folderName2 = "folder2" + getRandomString(3);
         String folderTitle = getFolderName(testName) + "_title";
         String folderDesc = getFolderName(testName) + "_description";
 
@@ -315,81 +340,6 @@ public class RepositoryWebDavTests2 extends AbstractUtils
     }
 
     /**
-     * Test: AONE-6547:Verify accessing WebDAV via Windows machine
-     * <ul>
-     * <li>Any any site is created via Alfresco Share</li>
-     * <li>Windows explorer is opened</li>
-     * <li>Add the url of the webdav server</li>
-     * <li>Fill in the user/password (e.g. admin/admin) and press 'OK' button</li>
-     * <li>Alfresco WebDAV connection is established</li>
-     * <li>The created connection is opened in a new window. The appropriate space are displayed</li>
-     * <li>Open webdav folder and navigate through the folders structure</li>
-     * </ul>
-     *
-     * @throws Exception
-     */
-    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" }, timeOut = 1000000)
-    public void AONE_6547() throws Exception
-    {
-        String testName = getTestName();
-        String siteName1 = getSiteName(testName + "-1-") + System.currentTimeMillis();
-        String webdavPath = "alfresco/webdav";
-
-        // Any site is created
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-        ShareUser.createSite(drone, siteName1, SITE_VISIBILITY_PUBLIC);
-
-        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
-        logger.info("Remove all mapped drives");
-
-        // Windows explorer is opened
-        explorer.openWindowsExplorer();
-        logger.info("Windows explorer is opened");
-
-        String drive = explorer.mapNetworkDrive(shareUrl, webdavPath, ADMIN_USERNAME, ADMIN_PASSWORD);
-
-        // The created connection is opened in a new window. The appropriate space are displayed
-        String windowName = explorer.getAbstractUtil().getAbsoluteWindowName("frmwebdav");
-        Assert.assertTrue(windowName.contains(drive), "The created connection is not opened in a new window");
-
-        // Open webdav folder and navigate through the folders structure
-        explorer.openFolder(drive + "\\" + "Sites");
-        explorer.activateApplicationWindow("frmSites");
-
-        String[] allObjectsWindow = explorer.getAbstractUtil().getLdtp().getObjectList();
-        String ip = getAddressWithPort(shareUrl).replace(".", "");
-        ip = ip.replace(":", "@");
-
-        Assert.assertTrue(Arrays.asList(allObjectsWindow).contains("lst" + siteName1.toLowerCase()), "Navigation works not correctly. Expected site "
-                + siteName1.toLowerCase() + " isn't presented.");
-        Assert.assertTrue(Arrays.asList(allObjectsWindow).contains("tblc" + ip), "The created connection isn't displayed in \"The Internet\" section.");
-
-        String uknwebdav = null;
-        for (String objectWindow : allObjectsWindow)
-        {
-            if (objectWindow.toLowerCase().contains("uknwebdav"))
-            {
-                uknwebdav = objectWindow;
-                break;
-            }
-        }
-
-        // The created connection is displayed in "The Internet" section
-        if (uknwebdav != null)
-        {
-            Assert.assertTrue(uknwebdav.contains(("DavWWWRoot\\alfresco)(") + drive.substring(0, drive.length() - 1)),
-                    "The created connection isn't displayed in \"The Internet\" section.");
-        }
-
-        logger.info("Close window");
-        explorer.closeExplorer();
-        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
-
-        SiteUtil.deleteSite(drone, siteName1);
-        ShareUser.logout(drone);
-    }
-
-    /**
      * Test: AONE-6554:Hidden files
      * <ul>
      * <li>Map Alfresco Webdav as a network drive</li>
@@ -402,14 +352,14 @@ public class RepositoryWebDavTests2 extends AbstractUtils
      *
      * @throws Exception
      */
-    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" }, timeOut = 600000)
+    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" },dependsOnMethods = "AONE_6544" , timeOut = 600000, alwaysRun = true)
     public void AONE_6554() throws Exception
     {
         String testName = getTestName();
-        String siteName = getSiteName(testName + "-1-") + System.currentTimeMillis();
-        String fileName = ".test" + getRandomString(5);
+        String siteName = getSiteName(testName + "-1-") + getRandomString(3);
+        String fileName = ".test" +getRandomString(3);
         String fileNameCheck = "lst" + fileName.replaceAll("\\W", "");
-        String folderName = ".folder1 " + getRandomString(10);
+        String folderName = ".folder1 " + getRandomString(3);
         String folderNameCheck = "lst" + folderName.replaceAll("\\W", "");
 
         // Any site is created
@@ -472,16 +422,16 @@ public class RepositoryWebDavTests2 extends AbstractUtils
      *
      * @throws Exception
      */
-    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" }, timeOut = 600000)
+    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" },dependsOnMethods = "AONE_6554" , timeOut = 600000, alwaysRun = true)
     public void AONE_6556() throws Exception
     {
         String testName = getTestName();
-        String siteName = getSiteName(testName + "-1-") + System.currentTimeMillis();
-        String fileName = "test" + getRandomString(5);
+        String siteName = getSiteName(testName + "-1-") + getRandomString(3);
+        String fileName = "test" +getRandomString(3);
         String fileNameWithExt = fileName + ".txt";
-        String tempFolder = "tempfolder" + getRandomString(10);
-        String folderName1 = "folder1" + getRandomString(10);
-        String folderName2 = "folder2" + getRandomString(10);
+        String tempFolder = "tempfolder" + getRandomString(3);
+        String folderName1 = "folder1" + getRandomString(3);
+        String folderName2 = "folder2" + getRandomString(3);
 
         File folder = new File(DATA_FOLDER + tempFolder);
         folder.mkdirs();
@@ -584,17 +534,17 @@ public class RepositoryWebDavTests2 extends AbstractUtils
      *
      * @throws Exception
      */
-    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" }, timeOut = 900000)
+    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" },dependsOnMethods = "AONE_6556" , timeOut = 900000, alwaysRun = true)
     public void AONE_6557() throws Exception
     {
         String testName = getTestName();
-        String siteName = getSiteName(testName + "-1-") + System.currentTimeMillis();
-        String fileName1 = "test1" + getRandomString(5);
+        String siteName = getSiteName(testName + "-1-") + getRandomString(3);
+        String fileName1 = "test1" +getRandomString(3);
         String fileName1WithExt = fileName1 + ".txt";
-        String fileName2 = "test2" + getRandomString(5);
+        String fileName2 = "test2" +getRandomString(3);
         String fileName2WithExt = fileName2 + ".txt";
-        String tempFolder = "tempfolder" + getRandomString(10);
-        String folderName1 = "folder1" + getRandomString(10);
+        String tempFolder = "tempfolder" + getRandomString(3);
+        String folderName1 = "folder1" + getRandomString(3);
 
         File folder = new File(DATA_FOLDER + tempFolder);
         folder.mkdirs();
@@ -643,8 +593,10 @@ public class RepositoryWebDavTests2 extends AbstractUtils
         notePad.setNotepadWindow("Notepad");
         notePad.saveAsNotpad(fullPath, fileName1);
         // Enter any text and save the *.docx ot *.txt document to the folder created in preconditions (step 2) via webdav
+        notePad.getAbstractUtil().waitForWindow(fileName1);
         notePad.editNotepad("first create in client", fileName1);
         notePad.ctrlSSave();
+        notePad.getAbstractUtil().getLdtp().waitTime(10);
 
         DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         documentLibraryPage.selectFolder(folderName1);
@@ -655,6 +607,7 @@ public class RepositoryWebDavTests2 extends AbstractUtils
         // Edit the *.docx ot *.txt document via WebDav
         notePad.appendTextToNotepad(" adding abc", fileName1);
         notePad.ctrlSSave();
+        notePad.getAbstractUtil().getLdtp().waitTime(10);
 
         // Check the version in Share
         documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
@@ -665,6 +618,7 @@ public class RepositoryWebDavTests2 extends AbstractUtils
         // Repeat several times
         notePad.appendTextToNotepad(" adding abc", fileName1);
         notePad.ctrlSSave();
+        notePad.getAbstractUtil().getLdtp().waitTime(10);
 
         documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         documentLibraryPage.selectFolder(folderName1);
@@ -707,44 +661,80 @@ public class RepositoryWebDavTests2 extends AbstractUtils
     }
 
     /**
-     * Test: AONE-6545:Verify accessing WebDAV in browser
+     * Test: AONE-6547:Verify accessing WebDAV via Windows machine
      * <ul>
-     * <li>In your browser open the following link http://servername/alfresco/webdav</li>
-     * <li>Information is entered successfully and Company home is opened in view mode</li>
-     * <li>Navigate through the folder structure</li>
+     * <li>Any any site is created via Alfresco Share</li>
+     * <li>Windows explorer is opened</li>
+     * <li>Add the url of the webdav server</li>
+     * <li>Fill in the user/password (e.g. admin/admin) and press 'OK' button</li>
+     * <li>Alfresco WebDAV connection is established</li>
+     * <li>The created connection is opened in a new window. The appropriate space are displayed</li>
+     * <li>Open webdav folder and navigate through the folders structure</li>
      * </ul>
      *
      * @throws Exception
      */
-    @Test(groups = "EnterpriseOnly", timeOut = 300000)
-    public void AONE_6545() throws Exception
+    @Test(groups = { "WEBDAVWindowsClient", "EnterpriseOnly" },dependsOnMethods = "AONE_6557" , timeOut = 1000000, alwaysRun = true)
+    public void AONE_6547() throws Exception
     {
         String testName = getTestName();
-        String siteName = getSiteName(testName + "-") + System.currentTimeMillis();
+        String siteName1 = getSiteName(testName + "-1-") + getRandomString(3);
+        String webdavPath = "alfresco/webdav";
 
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
         // Any site is created
-        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC).render();
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUser.createSite(drone, siteName1, SITE_VISIBILITY_PUBLIC);
 
-        // In your browser open the following link http://servername/alfresco/webdav
-        WebDavPage webDavPage = ShareUtil.navigateToWebDav(drone, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
+        logger.info("Remove all mapped drives");
 
-        // Information is entered successfully and Company home is opened in view mode
-        Assert.assertTrue(webDavPage.getDirectoryText().equals("Directory listing for /"), "Default directory isn't opened");
+        // Windows explorer is opened
+        explorer.openWindowsExplorer();
+        logger.info("Windows explorer is opened");
 
-        // Navigate through the folder structure
-        webDavPage.clickDirectory("Sites");
+        String drive = explorer.mapNetworkDrive(shareUrl, webdavPath, ADMIN_USERNAME, ADMIN_PASSWORD);
+        explorer.getAbstractUtil().waitForWindow("frmwebdav");
 
-        Assert.assertTrue(webDavPage.getDirectoryText().equals("Directory listing for /Sites"), "Link 'Sites' isn't opened");
+        // The created connection is opened in a new window. The appropriate space are displayed
+        String windowName = explorer.getAbstractUtil().getAbsoluteWindowName("frmwebdav");
+        Assert.assertTrue(windowName.contains(drive), "The created connection is not opened in a new window");
 
-        Assert.assertTrue(webDavPage.checkDirectoryDisplayed(siteName.toLowerCase()), "Expected site " + siteName + " isn't displayed");
-        Assert.assertTrue(webDavPage.checkUpToLevelDisplayed(), "'Up a level' link isn't displayed");
+        // Open webdav folder and navigate through the folders structure
+        explorer.openFolder(drive + "\\" + "Sites");
+        explorer.activateApplicationWindow("frmSites");
 
-        // Navigation works correctly
-        webDavPage.clickUpToLevel();
+        String[] allObjectsWindow = explorer.getAbstractUtil().getLdtp().getObjectList();
+        String ip = getAddressWithPort(shareUrl).replace(".", "");
+        ip = ip.replace(":", "@");
 
-        Assert.assertTrue(webDavPage.getDirectoryText().equals("Directory listing for /"), "Default directory isn't opened");
+        Assert.assertTrue(Arrays.asList(allObjectsWindow).contains("lst" + siteName1.toLowerCase()), "Navigation works not correctly. Expected site "
+                + siteName1.toLowerCase() + " isn't presented.");
+//        Assert.assertTrue(Arrays.asList(allObjectsWindow).contains("tblc" + ip), "The created connection isn't displayed in \"The Internet\" section.");
 
+        String uknwebdav = null;
+        for (String objectWindow : allObjectsWindow)
+        {
+            if (objectWindow.toLowerCase().contains("uknwebdav"))
+            {
+                uknwebdav = objectWindow;
+                break;
+            }
+        }
+
+        // The created connection is displayed in "The Internet" section
+        if (uknwebdav != null)
+        {
+            Assert.assertTrue(uknwebdav.contains(("DavWWWRoot\\alfresco)(") + drive.substring(0, drive.length() - 1)),
+                    "The created connection isn't displayed in \"The Internet\" section.");
+        }
+
+        logger.info("Close window");
+        explorer.closeExplorer();
+        Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
+
+        SiteUtil.deleteSite(drone, siteName1);
+        ShareUser.logout(drone);
     }
+
 
 }
