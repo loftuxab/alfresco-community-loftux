@@ -25,10 +25,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -67,11 +70,14 @@ import org.alfresco.webdrone.WebDroneImpl;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
@@ -310,7 +316,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     public static String apiContextCloudInternal = "alfresco/service/internal/cloud/";
     public static String apiContextPublicAPI = "/public/alfresco/versions/1/";
     public static String apicontextCloud = "alfresco/service/internal/cloud/";
-    public static String apiContextEnt = "alfresco/api/";
+    public static String apiContextEnt = "alfresco/service/api/";
     public static String apiPath = "";
     public final static String STAGURL = "https://stagmy.alfresco.com/share";
     public final String CONTENT_FAVOURITE_TOOLTIP = "content.favourite.tooltip";
@@ -677,6 +683,31 @@ public abstract class AbstractUtils implements AlfrescoTests
         }
 
         return apiUrl;
+    }
+
+    /**
+     * Method to get the ticket from from alfresco
+     */
+    public static String getAlfTicket(WebDrone drone, String userName, String password) throws IOException, JSONException
+    {
+        String ticket = "";
+        String urlShare = getAPIURL(drone);
+        try
+        {
+            URL url = new URL(urlShare + "login?u=" + userName + "&pw=" + password + "&format=json");
+            URLConnection con = url.openConnection();
+            InputStream in = con.getInputStream();
+            String encoding = con.getContentEncoding();
+            encoding = encoding == null ? "UTF-8" : encoding;
+            String json = IOUtils.toString(in, encoding);
+            JSONObject getData = new JSONObject(json);
+            ticket = getData.getJSONObject("data").get("ticket").toString();
+        }
+        catch (IOException e)
+        {
+            logger.error("Unable to generate ticket ", e);
+        }
+        return ticket;
     }
 
     /**
