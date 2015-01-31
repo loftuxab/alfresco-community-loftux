@@ -22,6 +22,8 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
+import static org.testng.Assert.assertTrue;
+
 /**
  * @author Sergey Kardash on 10/10/2014.
  */
@@ -400,8 +402,8 @@ public class TrashcanTest3 extends AbstractUtils
         String testName = getTestName();
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
-        String trashcanUser1 = getUserNameFreeDomain(testName + "user1");
-        String trashcanUser2 = getUserNameFreeDomain(testName + "user2");
+        String trashcanUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
+        String trashcanUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
 
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
         String folderName1 = "fo3-" + getFolderName(testName) + System.currentTimeMillis();
@@ -438,17 +440,27 @@ public class TrashcanTest3 extends AbstractUtils
         ShareUser.createSite(drone, siteName1, SITE_VISIBILITY_PUBLIC).render();
 
         // Several content items were created and deleted by user1 (for Cloud by user2@cloud.test)
-        ShareUser.openSitesDocumentLibrary(drone, siteName1);
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName1);
 
         ShareUser.uploadFileInFolder(drone, new String[] { fileName1, DOCLIB });
 
-        ShareUserSitePage.addComment(drone, fileName1, commentForFile);
+        Assert.assertTrue(docLibPage.isFileVisible(fileName1), "Folder " + fileName1 + " isn't visible");
 
-        ShareUser.openDocumentLibrary(drone);
+        // Add comments to file and to folder
+        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName1);
+        detailsPage.addComment(commentForFile).render();
+        assertTrue(detailsPage.isCommentCorrect(commentForFile), "Comment didn't added for folder");
+
+        docLibPage = ShareUser.openDocumentLibrary(drone);
 
         ShareUserSitePage.createFolder(drone, folderName1, folderName1);
 
-        ShareUserSitePage.addComment(drone, folderName1, commentForFolder);
+        Assert.assertTrue(docLibPage.isFileVisible(folderName1), "Folder " + folderName1 + " isn't visible");
+
+        // Add comments to file and to folder
+        FolderDetailsPage folderDetailsPage = ShareUser.openFolderDetailPage(drone, folderName1);
+        folderDetailsPage.addComment(commentForFolder);
+        assertTrue(folderDetailsPage.isCommentCorrect(commentForFolder), "Comment didn't added for folder");
 
         ShareUser.openDocumentLibrary(drone);
 
@@ -508,8 +520,8 @@ public class TrashcanTest3 extends AbstractUtils
         String testName = getTestName();
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
-        String trashcanUser1 = getUserNameFreeDomain(testName + "user1");
-        String trashcanUser2 = getUserNameFreeDomain(testName + "user2");
+        String trashcanUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
+        String trashcanUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
 
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
         String folderName1 = "fo3-" + getFolderName(testName) + System.currentTimeMillis();
@@ -548,16 +560,27 @@ public class TrashcanTest3 extends AbstractUtils
 
         ShareUser.openSitesDocumentLibrary(drone, siteName1).render();
 
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName1);
+
         ShareUser.uploadFileInFolder(drone, new String[] { fileName1, DOCLIB });
 
-        DocumentLibraryPage docLibPage;
+        Assert.assertTrue(docLibPage.isFileVisible(fileName1), "Folder " + fileName1 + " isn't visible");
+
+        // Add comments to file and to folder
+        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName1);
+        detailsPage.addComment(commentForFile).render();
+        assertTrue(detailsPage.isCommentCorrect(commentForFile), "Comment didn't added for folder");
+
+        docLibPage = ShareUser.openDocumentLibrary(drone);
+
         ShareUserSitePage.createFolder(drone, folderName1, folderName1);
 
-        ShareUserSitePage.addComment(drone, fileName1, commentForFile);
+        Assert.assertTrue(docLibPage.isFileVisible(folderName1), "Folder " + folderName1 + " isn't visible");
 
-        ShareUser.openSitesDocumentLibrary(drone, siteName1);
-
-        ShareUserSitePage.addComment(drone, folderName1, commentForFolder);
+        // Add comments to file and to folder
+        FolderDetailsPage folderDetailsPage = ShareUser.openFolderDetailPage(drone, folderName1);
+        folderDetailsPage.addComment(commentForFolder);
+        assertTrue(folderDetailsPage.isCommentCorrect(commentForFolder), "Comment didn't added for folder");
 
         ShareUser.openSitesDocumentLibrary(drone, siteName1);
         ShareUser.selectContentCheckBox(drone, fileName1);
@@ -607,7 +630,7 @@ public class TrashcanTest3 extends AbstractUtils
 
         Assert.assertTrue(docLibPage.isFileVisible(folderName1), "Folder " + folderName1 + " isn't presented in Doc Lib");
 
-        FolderDetailsPage folderDetailsPage = docLibPage.getFileDirectoryInfo(folderName1).selectViewFolderDetails().render();
+        folderDetailsPage = docLibPage.getFileDirectoryInfo(folderName1).selectViewFolderDetails().render();
 
         Assert.assertTrue(folderDetailsPage.getComments().contains(commentForFolder), "Comment for folder " + folderName1 + " isn't presented");
 
@@ -665,8 +688,8 @@ public class TrashcanTest3 extends AbstractUtils
         String testName = getTestName();
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
 
-        String trashcanUser1 = getUserNameFreeDomain(testName + "user1");
-        String trashcanUser2 = getUserNameFreeDomain(testName + "user2");
+        String trashcanUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
+        String trashcanUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
 
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
         String folderName1 = "fo3-" + getFolderName(testName) + System.currentTimeMillis();
@@ -702,16 +725,27 @@ public class TrashcanTest3 extends AbstractUtils
         ShareUser.openSitesDocumentLibrary(drone, siteName1).render();
 
         // Several content items were created and deleted by user1 (for Cloud by user2@cloud.test)
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName1);
+
         ShareUser.uploadFileInFolder(drone, new String[] { fileName1, DOCLIB });
 
-        DocumentLibraryPage docLibPage;
+        Assert.assertTrue(docLibPage.isFileVisible(fileName1), "Folder " + fileName1 + " isn't visible");
+
+        // Add comments to file and to folder
+        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName1);
+        detailsPage.addComment(commentForFile).render();
+        assertTrue(detailsPage.isCommentCorrect(commentForFile), "Comment didn't added for folder");
+
+        docLibPage = ShareUser.openDocumentLibrary(drone);
+
         ShareUserSitePage.createFolder(drone, folderName1, folderName1);
 
-        ShareUserSitePage.addComment(drone, fileName1, commentForFile);
+        Assert.assertTrue(docLibPage.isFileVisible(folderName1), "Folder " + folderName1 + " isn't visible");
 
-        ShareUser.openSitesDocumentLibrary(drone, siteName1);
-
-        ShareUserSitePage.addComment(drone, folderName1, commentForFolder);
+        // Add comments to file and to folder
+        FolderDetailsPage folderDetailsPage = ShareUser.openFolderDetailPage(drone, folderName1);
+        folderDetailsPage.addComment(commentForFolder);
+        assertTrue(folderDetailsPage.isCommentCorrect(commentForFolder), "Comment didn't added for folder");
 
         ShareUser.openSitesDocumentLibrary(drone, siteName1);
 
@@ -788,8 +822,8 @@ public class TrashcanTest3 extends AbstractUtils
     public void AONE_14194() throws Exception
     {
         String testName = getTestName();
-        String testUser1 = getUserNameFreeDomain(testName + "user1");
-        String testUser2 = getUserNameFreeDomain(testName + "user2");
+        String testUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
+        String testUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
         String siteName1 = getSiteName(testName) + "-1" + System.currentTimeMillis();
 
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
@@ -803,8 +837,6 @@ public class TrashcanTest3 extends AbstractUtils
 
         // Any site is created
         ShareUser.createSite(drone, siteName1, SITE_VISIBILITY_PUBLIC).render();
-
-        webDriverWait(drone, 3000);
 
         // The user, e.g. user2, is invited to the site with any role, e.g Consumer
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser1, testUser2, siteName1, UserRole.CONTRIBUTOR);
@@ -887,8 +919,8 @@ public class TrashcanTest3 extends AbstractUtils
 
         String testName = getTestName();
 
-        String testUser1 = getUserNameFreeDomain(testName + "user1");
-        String testUser2 = getUserNameFreeDomain(testName + "user2");
+        String testUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
+        String testUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
 
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
         String folderName = getFolderName(testName) + System.currentTimeMillis();
@@ -902,8 +934,6 @@ public class TrashcanTest3 extends AbstractUtils
 
         // Any site is created
         ShareUser.createSite(drone, siteName1, SITE_VISIBILITY_PUBLIC).render();
-
-        webDriverWait(drone, 3000);
 
         // Add the created in the pre-condition user, e.g. user2
         ShareUserMembers.inviteUserToSiteWithRole(drone, testUser1, testUser2, siteName1, UserRole.CONTRIBUTOR);
@@ -996,16 +1026,27 @@ public class TrashcanTest3 extends AbstractUtils
         ShareUser.openSitesDocumentLibrary(drone, siteName1);
 
         // Several content items were created and deleted by user
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName1);
+
         ShareUser.uploadFileInFolder(drone, new String[] { fileName, DOCLIB });
 
-        DocumentLibraryPage docLibPage;
+        Assert.assertTrue(docLibPage.isFileVisible(fileName), "Folder " + fileName + " isn't visible");
+
+        // Add comments to file and to folder
+        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
+        detailsPage.addComment(commentForFile).render();
+        assertTrue(detailsPage.isCommentCorrect(commentForFile), "Comment didn't added for folder");
+
+        docLibPage = ShareUser.openDocumentLibrary(drone);
+
         ShareUserSitePage.createFolder(drone, folder, folder);
 
-        ShareUserSitePage.addComment(drone, fileName, commentForFile);
+        Assert.assertTrue(docLibPage.isFileVisible(folder), "Folder " + folder + " isn't visible");
 
-        ShareUser.openSitesDocumentLibrary(drone, siteName1);
-
-        ShareUserSitePage.addComment(drone, folder, commentForFolder);
+        // Add comments to file and to folder
+        FolderDetailsPage folderDetailsPage = ShareUser.openFolderDetailPage(drone, folder);
+        folderDetailsPage.addComment(commentForFolder);
+        assertTrue(folderDetailsPage.isCommentCorrect(commentForFolder), "Comment didn't added for folder");
 
         // Several content items were created and deleted by user
         SiteUtil.deleteSite(drone, siteName1);
@@ -1037,7 +1078,7 @@ public class TrashcanTest3 extends AbstractUtils
 
         Assert.assertTrue(docLibPage.isFileVisible(folder), "Folder " + folder + " isn't presented in Doc Lib");
 
-        FolderDetailsPage folderDetailsPage = docLibPage.getFileDirectoryInfo(folder).selectViewFolderDetails().render();
+        folderDetailsPage = docLibPage.getFileDirectoryInfo(folder).selectViewFolderDetails().render();
 
         Assert.assertTrue(folderDetailsPage.getComments().contains(commentForFolder), "Comment for folder " + folder + " isn't presented");
 

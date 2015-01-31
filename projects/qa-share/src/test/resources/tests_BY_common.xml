@@ -2,7 +2,7 @@
 <suite name="Common tests for Sprint BY" preserve-order="true">
 <test name="Common tests" parallel="classes" thread-count="5">
 <classes>
-    <!--<class name="org.alfresco.share.user.trashcan.TrashcanTest2">
+    <class name="org.alfresco.share.user.trashcan.TrashcanTest2">
         <methods>
             <include name="AONE_14180"/>
             <include name="AONE_14181"/>
@@ -14,22 +14,6 @@
             <include name="AONE_14178"/>
             <include name="AONE_14171"/>
             <include name="AONE_14172"/>
-            <exclude name=".*"/>
-        </methods>
-    </class>-->
-    <class name="org.alfresco.share.user.trashcan.TrashcanTest3">
-        <methods>
-            <include name="AONE_14183"/>
-            <include name="AONE_14187"/>
-            <include name="AONE_14186"/>
-            <include name="AONE_14188"/>
-            <include name="AONE_14189"/>
-            <include name="AONE_14190"/>
-            <include name="AONE_14191"/>
-            <include name="AONE_14194"/>
-            <include name="AONE_14195"/>
-            <include name="AONE_14196"/>
-            <include name="AONE_14197"/>
             <exclude name=".*"/>
         </methods>
     </class>
@@ -404,6 +388,22 @@
         <methods>
             <include name="AONE_3563"/>
             <include name="AONE_3565"/>
+            <exclude name=".*"/>
+        </methods>
+    </class>
+    <class name="org.alfresco.share.user.trashcan.TrashcanTest3">
+        <methods>
+            <include name="AONE_14183"/>
+            <include name="AONE_14187"/>
+            <include name="AONE_14186"/>
+            <include name="AONE_14188"/>
+            <include name="AONE_14189"/>
+            <include name="AONE_14190"/>
+            <include name="AONE_14191"/>
+            <include name="AONE_14194"/>
+            <include name="AONE_14195"/>
+            <include name="AONE_14196"/>
+            <include name="AONE_14197"/>
             <exclude name=".*"/>
         </methods>
     </class>
