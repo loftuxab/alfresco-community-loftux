@@ -115,6 +115,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     private static final String PAGE_SERVLET_PATH = "/page";
     private static final String LOGIN_PATH_INFORMATION = "/dologin";
     private static final String LOGIN_PARAMETER = "login";
+    private static final String ERROR_PARAMETER = "error";
     private static final String IGNORE_LINK = "/accept-invite";
     private static final String UNAUTHENTICATED_ACCESS_PROXY = "/proxy/alfresco-noauth";
     
@@ -1129,7 +1130,9 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         if (logger.isDebugEnabled())
             logger.debug("Redirecting to the login page.");
         setRedirectUrl(req);
-        res.sendRedirect(req.getContextPath() + "/page?pt=login");
+        
+        String error = req.getParameter(ERROR_PARAMETER);
+        res.sendRedirect(req.getContextPath() + "/page?pt=login" + (error == null ? "" : "&" + ERROR_PARAMETER + "=" + error));
     }
     
     /**
