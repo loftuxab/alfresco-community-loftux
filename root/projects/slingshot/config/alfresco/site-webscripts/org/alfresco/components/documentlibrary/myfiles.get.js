@@ -20,7 +20,7 @@ function widgets()
       assignTo: "docListToolbar",
       options: {
          siteId: "",
-         rootNode: user.properties['userHome'],
+         rootNode: "alfresco://user/home",
          hideNavBar: Boolean(toolbar.preferences.hideNavBar),
          repositoryBrowsing: toolbar.rootNode != null,
          useTitle: (useTitle == "true"),
@@ -37,7 +37,7 @@ function widgets()
          syncMode : model.syncMode != null ? model.syncMode : "",
          siteId : "",
          containerId : "documentLibrary",
-         rootNode : user.properties['userHome'],
+         rootNode : "alfresco://user/home",
          usePagination : (args.pagination == "true"),
          sortAscending : (model.preferences.sortAscending != null ? model.preferences.sortAscending : true),
          sortField : model.preferences.sortField != null ? model.preferences.sortField : "cm:name",
