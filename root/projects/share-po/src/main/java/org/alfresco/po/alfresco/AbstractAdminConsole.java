@@ -20,16 +20,13 @@
 package org.alfresco.po.alfresco;
 
 import org.alfresco.po.share.SharePage;
-import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.openqa.selenium.By;
-
-import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 /**
  * Created by olga.lokhach on 6/17/2014.
  */
-public class AbstractAdminConsole extends SharePage
+public abstract class AbstractAdminConsole extends SharePage
 {
     private final By INPUT_FIELD = By.xpath("//input[@id='searchForm:command']");
     private final By SUBMIT_BUTTON = By.xpath("//input[@id='searchForm:submitCommand']");
@@ -40,30 +37,6 @@ public class AbstractAdminConsole extends SharePage
         super(drone);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public AbstractAdminConsole render(RenderTime renderTime)
-    {
-        elementRender(renderTime,
-            getVisibleRenderElement(INPUT_FIELD),
-            getVisibleRenderElement(SUBMIT_BUTTON),
-            getVisibleRenderElement(CLOSE_BUTTON));
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public AbstractAdminConsole render()
-    {
-        return render(new RenderTime(maxPageLoadingTime));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public AbstractAdminConsole render(final long time)
-    {
-        return render(new RenderTime(time));
-    }
 
     /**
      * Method for click Close Button
@@ -93,7 +66,6 @@ public class AbstractAdminConsole extends SharePage
     public String findText()
     {
         return drone.findAndWait(By.xpath("//*[@id='result']")).getText();
-
     }
 
 }
