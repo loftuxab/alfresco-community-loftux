@@ -123,9 +123,9 @@
         <property name="nodeService" ref="NodeService"/>
         <property name="versionService" ref="VersionService"/>
         <property name="authenticationService" ref="AuthenticationService" />
-    </bean>    
+    </bean>
  
-    <bean id="abstractVtiHandlerTarget" class="org.alfresco.module.vti.handler.alfresco.AlfrescoMethodHandler">
+    <bean id="abstractVtiHandlerTarget" class="org.alfresco.module.vti.handler.alfresco.AlfrescoMethodHandler" init-method="init">
         <property name="nodeService" ref="NodeService" />
         <property name="fileFolderService" ref="FileFolderService" />
         <property name="permissionService" ref="PermissionService" />
@@ -146,6 +146,10 @@
         <property name="activityPoster" ref="vtiActivityPoster"/>
         <property name="davHelper" ref="sppDAVHelper"/>
         <property name="tenantService" ref="tenantService"/>
+        <property name="encryptTempFiles" value="${vti.server.encryptTempFiles}"/>
+        <property name="tempDirectoryName" value="${vti.server.tempDirectoryName}"/>
+        <property name="memoryThreshold" value="${vti.server.memoryThreshold}"/>
+        <property name="maxContentSize" value="${vti.server.setMaxContentSize}"/>
     </bean>
     
     <bean id="vtiHandlerTarget" parent="abstractVtiHandlerTarget"/>
