@@ -60,12 +60,7 @@ import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.po.share.site.wiki.WikiPageList;
 import org.alfresco.po.share.task.EditTaskPage;
-import org.alfresco.po.share.user.CloudSyncPage;
-import org.alfresco.po.share.user.LanguageSettingsPage;
-import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.po.share.user.NotificationPage;
-import org.alfresco.po.share.user.UserContentPage;
-import org.alfresco.po.share.user.UserSitesPage;
+import org.alfresco.po.share.user.*;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
@@ -160,6 +155,8 @@ public class FactorySharePageTest
     private final String pendingInvites = baseUrl + "%s/page/site/swsdp/pending-invites";
     private final String facetedSearchPage = baseUrl+"%s/page/dp/ws/faceted-search";
     private final String userContentPage =  baseUrl+"/page/user/admin/user-content";
+    private final String followingPage = baseUrl+"/page/user/admin/following";
+    private final String followersPage = baseUrl+"/page/user/admin/followers";
 
     @Test(groups={"unit"})
     public void resolveUrls()
@@ -270,6 +267,12 @@ public class FactorySharePageTest
 
             page = resolvePage(pendingInvites, "pending-invites", drone);
             Assert.assertTrue(page instanceof PendingInvitesPage);
+
+            page = resolvePage(followingPage, "following", drone);
+            Assert.assertTrue(page instanceof FollowingPage);
+
+            page = resolvePage(followersPage, "followers", drone);
+            Assert.assertTrue(page instanceof FollowersPage);
 
             //---------------search ----------------
             page = resolvePage(advanceSearch, "advanceSearch", drone);
