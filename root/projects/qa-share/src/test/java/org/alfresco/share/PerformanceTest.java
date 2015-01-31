@@ -44,7 +44,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +64,8 @@ import static org.alfresco.share.util.WebDroneType.DownLoadDrone;
 import static org.alfresco.share.util.api.CreateUserAPI.CreateActivateUser;
 import static org.apache.chemistry.opencmis.commons.enums.VersioningState.MAJOR;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Aliaksei Boole
@@ -87,7 +91,7 @@ public class PerformanceTest extends CmisUtils
     @Override
     public void beforeClass()
     {
-       // To change the behavior of initialization.
+        // To change the behavior of initialization.
     }
 
     @Test(groups = { "DataPrepPerformance", "Share", "NonGrid", "EnterpriseOnly" })
@@ -194,6 +198,9 @@ public class PerformanceTest extends CmisUtils
             DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(customDrone, siteName);
             DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(BIG_DATA_FILE);
             documentDetailsPage.clickOnDownloadLinkForUnsupportedDocument();
+            File file = customDrone.getScreenShot();
+            logger.info("ScreenShot in :" + file.getAbsolutePath());
+            logger.info("Start downloading file[" + BIG_DATA_FILE + "] to:" + downloadDirectory);
             documentDetailsPage.waitForFile(300000, downloadDirectory + BIG_DATA_FILE);
             assertTrue(downloadedBigDataFile.exists(), "Big data file don't download");
             assertEquals(downloadedBigDataFile.length(), 1024 * 1024 * 2047, "File does not fully downloaded.");
