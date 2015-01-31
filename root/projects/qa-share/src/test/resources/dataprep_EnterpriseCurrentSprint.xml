@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="Sprint 25 Data Prep Suite" verbose="1"
+<suite name="Sprint 37 Data Prep Suite" verbose="1"
 	preserve-order="true" parallel="tests" thread-count="5">
 	<groups>
 		<run>
@@ -12,8 +12,8 @@
 	<listeners>
 		<listener
 			class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
-	</listeners>
-	
+	</listeners>	
+	 
 	<test name="AddOnsRssFeedDashletTests" verbose="1">
 		<classes>
 			<class
@@ -28,10 +28,10 @@
 		</classes>
 	</test>
 	
-	<test name="MyDashboardWebViewDashlet" verbose="1">
+	<test name="MyDashboardWebViewDashletTests" verbose="1">
 		<classes>
 			<class
-				name="org.alfresco.share.mydashboard.MyDashboardWebViewDashlet" />
+				name="org.alfresco.share.mydashboard.MyDashboardWebViewDashletTests" />
 		</classes>
 	</test>
 	
