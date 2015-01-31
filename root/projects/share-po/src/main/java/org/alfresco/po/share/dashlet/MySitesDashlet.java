@@ -338,6 +338,7 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
                 {
                     drone.mouseOverOnElement(webElement);
                     webElement.findElement(By.cssSelector(FAVORITE_SYMB_IN_ROW)).click();
+                    break;
                 }
             }
         }
