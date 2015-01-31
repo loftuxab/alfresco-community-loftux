@@ -96,9 +96,9 @@ public class CifsMSExcel2013Tests extends AbstractUtils
             String[] testUser1 = new String[] { testUser };
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1);
         }
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:admin admin";
         Runtime.getRuntime().exec(mapConnect);
-        if (checkDirOrFileExists(7, 200, networkDrive + cifsPath))
+        if (checkDirOrFileExists(10, 200, networkDrive + cifsPath))
         {
             logger.info("----------Mapping succesfull " + testUser);
         }
@@ -187,8 +187,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // ---- Step Action -----
         // Open .xlsx document for editing.
         // The document is opened in write mode.
-        Ldtp ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
-        excel.getAbstractUtil().waitForWindow(fileName_6289);
+        Ldtp ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().setOnWindow(fileName_6289);
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -227,7 +226,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(first_modification));
 
         // ---- Step 6 ----
@@ -235,7 +234,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // 6. Open the document for editing again.
         // Expected Result
         // 6. The document is opened in write mode.
-        ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6289);
         excel.getAbstractUtil().setOnWindow(fileName_6289);
         // ---- Step 7 ----
@@ -272,7 +271,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(second_modification));
 
         // ---- Step 11 ----
@@ -280,7 +279,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // 6. Open the document for editing again.
         // Expected Result
         // 6. The document is opened in write mode.
-        ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = excel.openFileFromCMD(fullPath, fileName_6289 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6289);
         excel.getAbstractUtil().setOnWindow(fileName_6289);
         // ---- Step 12 ----
@@ -317,7 +316,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(last_modification));
 
     }
@@ -365,7 +364,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // ---- Step Action -----
         // Open .xlsx document for editing.
         // The document is opened in write mode.
-        Ldtp ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        Ldtp ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6290);
         excel.getAbstractUtil().setOnWindow(fileName_6290);
         // ---- Step 2 ----
@@ -405,7 +404,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(first_modification));
 
         // ---- Step 6 ----
@@ -413,7 +412,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // 6. Open the document for editing again.
         // Expected Result
         // 6. The document is opened in write mode.
-        ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6290);
         excel.getAbstractUtil().setOnWindow(fileName_6290);
         // ---- Step 7 ----
@@ -452,7 +451,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(second_modification));
 
         // ---- Step 11 ----
@@ -460,7 +459,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // 6. Open the document for editing again.
         // Expected Result
         // 6. The document is opened in write mode.
-        ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        ldtp = excel.openFileFromCMD(fullPath, fileName_6290 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6290);
         excel.getAbstractUtil().setOnWindow(fileName_6290);
         // ---- Step 12 ----
@@ -499,7 +498,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(last_modification));
 
     }
@@ -601,8 +600,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         String edit2 = "New text2";
         String edit3 = "New text3";
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + SLASH + "documentLibrary" + SLASH;
-
-        Ldtp security = new Ldtp("Windows Security");
         Ldtp l1;
 
         // --- Step 1 ---
@@ -613,7 +610,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1 = excel.openOfficeApplication();
         excel.editOffice(l1, addText);
         excel.saveAsOffice(l1, fullPath + fileName_6291);
-        excel.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         l1.waitTime(2);
         excel.getAbstractUtil().waitForWindow(fileName_6291);
         excel.exitOfficeApplication(l1);
@@ -623,7 +619,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6291);
         excel.getAbstractUtil().setOnWindow(fileName_6291);
         // ---- Step 3 ----
@@ -656,7 +652,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6291 + xlsxFileType));
         editPropertiesPage.clickCancel();
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit1));
 
         // --- Step 6 ---
@@ -691,7 +687,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6291);
         excel.getAbstractUtil().setOnWindow(fileName_6291);
         // ---- Step 8 ----
@@ -736,7 +732,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit2));
 
         // ---- Step 12 ----
@@ -744,7 +740,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6291 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6291);
         excel.getAbstractUtil().setOnWindow(fileName_6291);
         // ---- Step 13 ----
@@ -789,7 +785,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit3));
 
     }
@@ -806,7 +802,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         String edit3 = "New text3";
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + SLASH + "documentLibrary" + SLASH;
 
-        Ldtp security = new Ldtp("Windows Security");
         Ldtp l1;
 
         // --- Step 1 ---
@@ -818,7 +813,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         l1 = excel.openOfficeApplication();
         excel.editOffice(l1, addText);
         excel.saveAsOffice(l1, fullPath + fileName_6292);
-        excel.operateOnSecurityAndWait(security, testUser, DEFAULT_PASSWORD);
         l1.waitTime(3);
         excel.getAbstractUtil().waitForWindow(fileName_6292);
         excel.exitOfficeApplication(l1);
@@ -828,7 +822,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6292);
         excel.getAbstractUtil().setOnWindow(fileName_6292);
         // ---- Step 3 ----
@@ -862,7 +856,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6292 + xlsxFileType));
         editPropertiesPage.clickCancel();
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit1));
 
         // --- Step 6 ---
@@ -897,7 +891,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6292);
         excel.getAbstractUtil().setOnWindow(fileName_6292);
         // ---- Step 8 ----
@@ -943,7 +937,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit2));
 
         // ---- Step 12 ----
@@ -951,7 +945,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open .docx document for editing.
         // ---- Expected Result -----
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6292 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6292);
         excel.getAbstractUtil().setOnWindow(fileName_6292);
         // ---- Step 13 ----
@@ -997,7 +991,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // Expected Result
         // All changes are present and displayed correctly.
-        body = detailsPage.getDocumentBody();
+        body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit3));
 
     }
@@ -1078,7 +1072,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6293 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6293 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6293);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6293);
         String actualName = l1.getWindowName();
@@ -1123,7 +1117,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // --- Expected results --
         // All changes are present and displayed correctly.
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit2));
 
         // --- Step 9 ---
@@ -1131,7 +1125,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6293 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6293 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6293);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6293);
         actualName = l1.getWindowName();
@@ -1177,7 +1171,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // --- Expected results --
         // All changes are present and displayed correctly.
-        String body3 = detailsPage.getDocumentBody();
+        String body3 = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body3.contains(edit3));
     }
 
@@ -1257,7 +1251,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6294 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6294 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6294);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6294);
         String actualName = l1.getWindowName();
@@ -1303,7 +1297,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // --- Expected results --
         // All changes are present and displayed correctly.
-        String body = detailsPage.getDocumentBody();
+        String body = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body.contains(edit2));
 
         // --- Step 9 ---
@@ -1311,7 +1305,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Open the document for editing again.
         // --- Expected results --
         // The document is opened in write mode.
-        l1 = excel.openFileFromCMD(fullPath, fileName_6294 + xlsxFileType, testUser, DEFAULT_PASSWORD, true);
+        l1 = excel.openFileFromCMD(fullPath, fileName_6294 + xlsxFileType, testUser, DEFAULT_PASSWORD, false);
         excel.getAbstractUtil().waitForWindow(fileName_6294);
         l1 = excel.getAbstractUtil().setOnWindow(fileName_6294);
         actualName = l1.getWindowName();
@@ -1358,7 +1352,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Verify the document's content.
         // --- Expected results --
         // All changes are present and displayed correctly.
-        String body3 = detailsPage.getDocumentBody();
+        String body3 = detailsPage.getDocumentBody().replaceAll("\\n", "");
         Assert.assertTrue(body3.contains(edit3));
     }
 
@@ -1396,7 +1390,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
                 }
                 catch (InterruptedException e)
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 counter = counter + pollingTimeMILISECONDS;
@@ -1420,7 +1413,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
                 }
                 catch (InterruptedException e)
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 counter = counter + pollingTimeMILISECONDS;
@@ -1464,7 +1456,6 @@ public class CifsMSExcel2013Tests extends AbstractUtils
                 }
                 catch (InterruptedException e)
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 counter = counter + 200;
