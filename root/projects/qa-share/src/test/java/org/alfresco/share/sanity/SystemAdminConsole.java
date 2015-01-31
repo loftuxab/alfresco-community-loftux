@@ -98,7 +98,7 @@ public class SystemAdminConsole extends AbstractUtils
         assertTrue(sysSummaryPage.isRadioButtonPresent(SystemSummaryPage.indexingSubsystem.NoIndex.get()), "Radio button isn't present");
 
 
-        if (alfrescoVersion.equals(AlfrescoVersion.Enterprise42))
+        if (alfrescoVersion.getVersion() < 5.0)
         {
             assertTrue(sysSummaryPage.isRadioButtonPresent(SystemSummaryPage.indexingSubsystem.Lucene.get()), "Radio button isn't present");
         }
