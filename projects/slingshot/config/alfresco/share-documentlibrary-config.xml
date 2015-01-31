@@ -1120,7 +1120,7 @@
          </action>
 
          <!-- Cancel editing (unlock) -->
-         <action id="document-cancel-editing-unlock" type="javascript" label="actions.document.cancel-editing">
+         <action id="document-cancel-editing-unlock" type="javascript" label="actions.document.cancel-editing-unlock">
             <param name="function">onActionCancelEditing</param>
             <permissions>
                <permission allow="true">Unlock</permission>
