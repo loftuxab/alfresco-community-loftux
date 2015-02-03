@@ -1,18 +1,14 @@
 /*
  * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
  * This file is part of Alfresco
- *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,6 +21,7 @@ import org.alfresco.po.share.systemsummary.directorymanagement.DirectoryInfoRow;
 import org.alfresco.po.share.systemsummary.directorymanagement.DirectoryManagementPage;
 import org.alfresco.po.share.systemsummary.directorymanagement.EditLdapFrame;
 import org.alfresco.webdrone.exception.PageOperationException;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -39,17 +36,17 @@ public class DirectoryManagementPageTest extends AbstractTest
 {
     private static final String AUTH_CHAIN_NAME = "testAuth";
     private DirectoryManagementPage directoryManagementPage;
-    //Open LDAP
+    // Open LDAP
     public static final String LDAP_OPEN_URL = "ldap://172.30.40.61:3268";
     public static final String USER_NAME_FORMAT_OPEN = "%s,CN=Users,DC=qalab,DC=alfresco,DC=org";
     public static final String ADMIN_USER_NAME_OPEN = "admin";
     public static final String SECURITY_NAME_PRINCIPAL_OPEN = "CN=admin,CN=Users,DC=qalab,DC=alfresco,DC=org";
     public static final String USER_SEARCH_BASE_OPEN = "CN=Users,DC=qalab,DC=alfresco,DC=org";
     public static final String GROUP_SEARCH_BASE_OPEN = "CN=Users,DC=qalab,DC=alfresco,DC=org";
-    //LDAP Query
+    // LDAP Query
     public static final String GROUP_QUERY = "(objectclass=group)";
     public static final String USER_QUERY = "(objectclass=user)";
-    //Sync options
+    // Sync options
     public static final String GROUP_TYPE = "group";
     public static final String PERSON_TYPE = "user";
     public static final String MODIFY_TS_ATTR = "whenChanged";
@@ -59,9 +56,8 @@ public class DirectoryManagementPageTest extends AbstractTest
     public static final String USER_LAST_NAME = "sn";
     public static final String USER_FIRST_NAME = "givenName";
     public static final String GROUP_DISPLAY = "displayName";
-    //Security Credentials
+    // Security Credentials
     public static final String SECURITY_CREDENTIALS = "alfresco";
-
 
     @Test
     public void checkOpenPage()
@@ -144,6 +140,7 @@ public class DirectoryManagementPageTest extends AbstractTest
     @Test(dependsOnMethods = "runTestSync")
     public void removeAuthChain()
     {
+        drone.refresh();
         directoryManagementPage = drone.getCurrentPage().render();
         directoryManagementPage.removeAuthChain(AUTH_CHAIN_NAME);
         try
@@ -154,9 +151,17 @@ public class DirectoryManagementPageTest extends AbstractTest
         }
         catch (PageOperationException e)
         {
-            //testPassed
+            // testPassed
         }
     }
 
+    @Test(dependsOnMethods = "removeAuthChain")
+    public void testSaveAndVerifyIfStatusIsDisplayed()
+    {
+        drone.refresh();
+        directoryManagementPage = drone.getCurrentPage().render();
+        directoryManagementPage = directoryManagementPage.clickSave();
+        Assert.assertFalse(directoryManagementPage.isSyncStatusDisplayed());
+    }
 
 }
