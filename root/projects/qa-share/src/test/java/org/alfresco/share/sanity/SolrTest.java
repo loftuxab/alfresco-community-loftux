@@ -19,59 +19,8 @@
 
 package org.alfresco.share.sanity;
 
-import static java.util.Arrays.asList;
-import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.FOURTEEN_DAYS_TOPICS;
-import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.LAST_DAY_TOPICS;
-import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.SEVEN_DAYS_TOPICS;
-import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.TWENTY_EIGHT_DAYS_TOPICS;
-import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.ALL_TOPICS;
-import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.MY_TOPICS;
-import static org.alfresco.po.share.dashlet.MyTasksFilter.ACTIVE_TASKS;
-import static org.alfresco.po.share.dashlet.MyTasksFilter.COMPLETED_TASKS;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.FOURTEEN_DAYS;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.SEVEN_DAYS;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.TODAY;
-import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.TWENTY_EIGHT_DAYS;
-import static org.alfresco.po.share.dashlet.SiteContentFilter.I_AM_EDITING;
-import static org.alfresco.po.share.dashlet.SiteContentFilter.I_HAVE_RECENTLY_MODIFIED;
-import static org.alfresco.po.share.dashlet.SiteContentFilter.MY_FAVOURITES;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-
-import org.alfresco.po.share.ChangePasswordPage;
-import org.alfresco.po.share.CustomiseUserDashboardPage;
-import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.LoginPage;
-import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.po.share.PeopleFinderPage;
-import org.alfresco.po.share.ShareLink;
-import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.dashlet.ActivityShareLink;
-import org.alfresco.po.share.dashlet.AddOnsRssFeedDashlet;
-import org.alfresco.po.share.dashlet.ConfigureWebViewDashletBoxPage;
-import org.alfresco.po.share.dashlet.EditingContentDashlet;
-import org.alfresco.po.share.dashlet.MyActivitiesDashlet;
-import org.alfresco.po.share.dashlet.MyCalendarDashlet;
-import org.alfresco.po.share.dashlet.MyDiscussionsDashlet;
-import org.alfresco.po.share.dashlet.MyDocumentsDashlet;
-import org.alfresco.po.share.dashlet.MyProfileDashlet;
-import org.alfresco.po.share.dashlet.MySitesDashlet;
-import org.alfresco.po.share.dashlet.MyTasksDashlet;
-import org.alfresco.po.share.dashlet.RssFeedDashlet;
-import org.alfresco.po.share.dashlet.RssFeedUrlBoxPage;
-import org.alfresco.po.share.dashlet.SavedSearchDashlet;
-import org.alfresco.po.share.dashlet.SearchLimit;
-import org.alfresco.po.share.dashlet.SiteSearchDashlet;
-import org.alfresco.po.share.dashlet.SiteSearchItem;
-import org.alfresco.po.share.dashlet.WebViewDashlet;
+import org.alfresco.po.share.*;
+import org.alfresco.po.share.dashlet.*;
 import org.alfresco.po.share.dashlet.sitecontent.DetailedViewInformation;
 import org.alfresco.po.share.dashlet.sitecontent.SimpleViewInformation;
 import org.alfresco.po.share.enums.Dashlets;
@@ -85,37 +34,15 @@ import org.alfresco.po.share.site.document.DetailsPage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.systemsummary.AdminConsoleLink;
+import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
+import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.task.TaskDetailsPage;
-import org.alfresco.po.share.user.EditProfilePage;
-import org.alfresco.po.share.user.FollowersPage;
-import org.alfresco.po.share.user.FollowingPage;
-import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.po.share.user.NotificationPage;
-import org.alfresco.po.share.user.TrashCanDeleteConfirmationPage;
-import org.alfresco.po.share.user.TrashCanEmptyConfirmationPage;
-import org.alfresco.po.share.user.TrashCanItem;
-import org.alfresco.po.share.user.TrashCanPage;
-import org.alfresco.po.share.user.TrashCanRecoverConfirmDialog;
-import org.alfresco.po.share.user.UserContentItems;
-import org.alfresco.po.share.user.UserContentPage;
-import org.alfresco.po.share.user.UserSiteItem;
-import org.alfresco.po.share.user.UserSitesPage;
-import org.alfresco.po.share.workflow.NewWorkflowPage;
-import org.alfresco.po.share.workflow.Priority;
-import org.alfresco.po.share.workflow.StartWorkFlowPage;
-import org.alfresco.po.share.workflow.WorkFlowFormDetails;
-import org.alfresco.po.share.workflow.WorkFlowType;
+import org.alfresco.po.share.user.*;
+import org.alfresco.po.share.workflow.*;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
-import org.alfresco.share.util.AbstractUtils;
-import org.alfresco.share.util.ActivityType;
-import org.alfresco.share.util.JmxUtils;
-import org.alfresco.share.util.MailUtil;
-import org.alfresco.share.util.ShareUser;
-import org.alfresco.share.util.ShareUserDashboard;
-import org.alfresco.share.util.ShareUserProfile;
-import org.alfresco.share.util.ShareUserSitePage;
-import org.alfresco.share.util.ShareUserWorkFlow;
+import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDrone;
@@ -128,6 +55,21 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.alfresco.po.share.dashlet.MyDiscussionsHistoryFilter.*;
+import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.ALL_TOPICS;
+import static org.alfresco.po.share.dashlet.MyDiscussionsTopicsFilter.MY_TOPICS;
+import static org.alfresco.po.share.dashlet.MyTasksFilter.ACTIVE_TASKS;
+import static org.alfresco.po.share.dashlet.MyTasksFilter.COMPLETED_TASKS;
+import static org.alfresco.po.share.dashlet.SiteActivitiesHistoryFilter.*;
+import static org.alfresco.po.share.dashlet.SiteContentFilter.*;
+import static org.testng.Assert.*;
+
 /**
  * Created by Olga Lokhach
  */
@@ -137,6 +79,8 @@ import org.testng.annotations.Test;
 public class SolrTest extends AbstractUtils
 {
     private static Log logger = LogFactory.getLog(SolrTest.class);
+    private static String node1Url;
+    private static final String regexUrl = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -979,7 +923,17 @@ public class SolrTest extends AbstractUtils
 
 
         //Config email
-        MailUtil.configOutBoundEmail();
+        SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+        RepositoryServerClusteringPage clusteringPage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepositoryServerClustering).render();
+        if (clusteringPage.isClusterEnabled())
+        {
+            node1Url = shareUrl.replaceFirst(regexUrl, clusteringPage.getClusterMembers().get(0) + ":" + nodePort);
+            MailUtil.configOutBoundEmailForCluster(node1Url);
+        }
+        else
+        {
+            MailUtil.configOutBoundEmail();
+        }
 
         // Create two Users
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
@@ -1382,7 +1336,7 @@ public class SolrTest extends AbstractUtils
 
     private SharePage login(WebDrone drone, String userName, String userPassword)
     {
-        SharePage resultPage = null;
+        SharePage resultPage;
 
         try
         {
