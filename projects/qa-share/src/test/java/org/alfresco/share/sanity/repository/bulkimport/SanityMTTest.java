@@ -5,6 +5,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 
+import org.alfresco.po.alfresco.TenantAdminConsolePage;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
@@ -16,7 +17,6 @@ import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
-import org.alfresco.po.share.systemsummary.TenantConsole;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.FtpUtil;
 import org.alfresco.share.util.ShareUser;
@@ -62,22 +62,20 @@ public class SanityMTTest extends AbstractUtils
     @Test(groups = { "Sanity", "EnterpriseOnly" })
     public void AONE_8082() throws Exception
     {
-
         // log into Alfresco Explorer as admin
         SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-        TenantConsole tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+        TenantAdminConsolePage tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
         assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
 
         // run create <tenant domain> <tenant admin password> command
         tenantConsole.createTenant(tenantDomain, ADMIN_PASSWORD);
         tenantConsole.render();
-        assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain));
+        assertTrue(tenantConsole.getResult().contains("created tenant: " + tenantDomain));
 
         // log in Alfresco Share as admin@tenantA
         SharePage page = ShareUser.login(drone, ADMIN_USERNAME + "@" + tenantDomain, ADMIN_PASSWORD);
         assertTrue(page.getTitle().contains("User Dashboard"));
-
-       ShareUser.logout(drone);
+        ShareUser.logout(drone);
 
     }
 
@@ -95,16 +93,16 @@ public class SanityMTTest extends AbstractUtils
         // Preconditions:
         // at least 2 tenant users created: tenantA and tenantB
         SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-        TenantConsole tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+        TenantAdminConsolePage tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
         assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
 
         tenantConsole.createTenant(tenantDomain, DEFAULT_PASSWORD);
         tenantConsole.render();
-        assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain));
+        assertTrue(tenantConsole.getResult().contains("created tenant: " + tenantDomain));
 
         tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
         tenantConsole.render();
-        assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+        assertTrue(tenantConsole.getResult().contains("created tenant: " + tenantDomain2));
 
         // log in Alfresco Share as admin@tenantA
         SharePage page = ShareUser.login(drone, tenantAdmin1, DEFAULT_PASSWORD);
@@ -147,7 +145,7 @@ public class SanityMTTest extends AbstractUtils
         assertFalse(siteFinderPage.hasResults());
 
         // search for TestDoc
-        //FacetedSearchPage facetedSearchPage = ShareUser.openUserDashboard(drone).getNav().performSearch(testContent);
+        // FacetedSearchPage facetedSearchPage = ShareUser.openUserDashboard(drone).getNav().performSearch(testContent);
         ShareUserSearchPage.basicSearch(drone, testContent, false);
         Boolean searchOk = ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, BASIC_SEARCH, testContent, testContent, true);
         assertFalse(searchOk);
@@ -165,12 +163,12 @@ public class SanityMTTest extends AbstractUtils
 
         // at least one tenant user is created
         SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-        TenantConsole tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+        TenantAdminConsolePage tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
         assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
 
         tenantConsole.createTenant(tenantDomain, DEFAULT_PASSWORD);
         tenantConsole.render();
-        assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain));
+        assertTrue(tenantConsole.getResult().contains("created tenant: " + tenantDomain));
 
         ArrayList<String> items = WebDavUtil.getObjects(shareUrl, tenantAdmin, DEFAULT_PASSWORD, path);
 
