@@ -61,14 +61,7 @@ public class UserTrashcanApiTests extends AlfrescoHttpClient
         testUser = getUserNamePremiumDomain(testName);
         siteName = getSiteName(testName) + System.currentTimeMillis();
         fileName = getFileName(testName) + System.currentTimeMillis();
-
-        if (isAlfrescoVersionCloud(drone))
-        {
-            suffix = "alfresco/a" + DOMAIN_PREMIUM;
-        }
-        else
-            suffix = "alfresco/service";
-        reqURL = getAPIURL(drone).replace("alfresco/api/", suffix) + "/api/archive/workspace/SpacesStore";
+        reqURL = getAPIURL(drone) + "archive/workspace/SpacesStore";
         headers = getRequestHeaders("application/json;charset=utf-8");
         authDetails = getAuthDetails(testUser);
         client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
