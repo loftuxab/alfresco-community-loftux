@@ -609,7 +609,7 @@ public class CmisUtils extends PublicAPIAbstract
         {
             if (property.getDisplayName().equals("Tags"))
             {
-                return property.getValueAsString();
+                return "workspace://SpacesStore/" + property.getValueAsString();
             }
         }
         throw new UnsupportedOperationException("Unable to find Tag Node ref");

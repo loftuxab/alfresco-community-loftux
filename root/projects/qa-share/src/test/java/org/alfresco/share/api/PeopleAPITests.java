@@ -249,7 +249,7 @@ public class PeopleAPITests extends PeopleAPI
         assertEquals(response.getPaging().getSkipCount(), new Integer(1));
 
         param.clear();
-        getPersonPreferences(testUser, DOMAIN, testUser, null);
+        response = getPersonPreferences(testUser, DOMAIN, testUser, param);
 
         assertNotNull(response);
         assertEquals(response.getPaging().getMaxItems(), new Integer(100));
@@ -362,7 +362,7 @@ public class PeopleAPITests extends PeopleAPI
         param.put("skipCount", "1");
         param.put("maxItems", "2");
         
-        ListResponse<Preference> response = getPersonPreferences(testUser, DOMAIN, testUser, null);
+        ListResponse<Preference> response = getPersonPreferences(testUser, DOMAIN, testUser, param);
         
         assertNotNull(response);
         assertEquals(response.getPaging().getMaxItems(), new Integer(2));
@@ -373,7 +373,7 @@ public class PeopleAPITests extends PeopleAPI
 
         for (Preference preference : prefs)
         {
-            if (preference.getValue().equals(siteDashAdmin))
+            if (preference.getValue().equals(siteName))
                 prefFound = true;
         }
         assertTrue(prefFound, "Preference value site name - " + siteName + "should be found in - " + prefs);

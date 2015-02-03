@@ -203,7 +203,7 @@ public class FtpsUtil extends AbstractUtils
         JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.requireSecureSession", true);
         JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.keyStore", pathToKeyStoreFile);
         JmxUtils.setAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, "ftp.keyStorePassphrase", PASS);
-        if (pathToTrustStoreFile.isEmpty())
+        if (pathToTrustStoreFile == null)
         {
             JmxUtils.invokeAlfrescoServerProperty(nodeUrl, JMX_FILE_SERVERS_CONFIG, FTP_START);
         }
