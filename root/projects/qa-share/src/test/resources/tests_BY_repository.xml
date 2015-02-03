@@ -20,7 +20,7 @@
         </classes>
     </test-->
 
-    <test name="RepositoryFtpTest">
+    <!--test name="RepositoryFtpTest">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryFtpTest">
                 <methods>
@@ -34,10 +34,17 @@
         </classes>
     </test>
 
-    <!--test name="RepositoryFtpsTest">
+    <test name="RepositoryFtpsTest">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryFtpsTest"/>
         </classes>
     </test-->
+
+    <test name="RepositoryConfiguringCifsTests">
+        <classes>
+            <class name="org.alfresco.share.repository.RepositoryConfiguringCifsTests"/>
+        </classes>
+    </test>
+
 
 </suite>
