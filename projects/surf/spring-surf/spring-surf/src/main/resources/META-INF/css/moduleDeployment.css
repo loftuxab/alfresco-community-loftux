@@ -26,7 +26,8 @@ select
    padding: 1px 2px 1px 2px;
    color: #515D6B;
    background-color: white;
-   border: 1px solid #CCD4DB;
+   border: 1px solid #CCD4DB;  
+   overflow-x: scroll; 
 }
 
 .hidden
