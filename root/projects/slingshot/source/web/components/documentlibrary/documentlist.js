@@ -1523,17 +1523,24 @@
          // Reload the node's metadata
          var jsNode = record.jsNode,
             nodeRef = jsNode.nodeRef,
-            webscriptPath = "components/documentlibrary/data";
+            webscriptPath = "components/documentlibrary/data",
+            libraryRootParam = "";
          if ($isValueSet(this.options.siteId))
          {
+            // Site mode
             webscriptPath += "/site/" + encodeURIComponent(this.options.siteId)
+         }
+         else
+         {
+            // Repository mode
+            libraryRootParam = "&libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
          }
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + webscriptPath + "/node/" + nodeRef.uri +
                   "?filter=" + encodeURIComponent(this.currentFilter.filterId) +
                   "&view=" + this.actionsView + "&noCache=" + new Date().getTime() +
-                  "&libraryRoot=" + encodeURIComponent(this.options.rootNode.toString()),
+                  libraryRootParam,
             successCallback:
             {
                fn: function DL_insituCallback_refreshSuccess(response)
