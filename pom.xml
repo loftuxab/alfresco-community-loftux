@@ -1088,21 +1088,6 @@
                 <artifactId>mysql-connector-java</artifactId>
             </dependency>
         </dependencies>
-        <build>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>sql-maven-plugin</artifactId>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.mariadb.jdbc</groupId>
-                            <artifactId>mariadb-java-client</artifactId>
-                            <version>1.1.7</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-        </build>
     </profile>
 
     <profile>
