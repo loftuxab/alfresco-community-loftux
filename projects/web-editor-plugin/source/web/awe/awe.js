@@ -993,6 +993,7 @@
                      {
                         url: WEF.get("contextPath") + '/page/dologout',
                         method: "POST",
+                        noReloadOnAuthFailure: true,
                         successCallback: 
                         {
                            fn: function logoutSuccess(e)
@@ -1017,6 +1018,17 @@
                         {
                            fn: function logoutFailure(e)
                            {
+                              if (e.serverResponse.status == 401)
+                              {
+                                 // MNT-13085 fix, 401 status code is expected status code for logout operation, call success handler instead
+                                 var callback = e.config.successCallback;
+                                 callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
+                                 {
+                                    config: e.config,
+                                    serverResponse: e.serverResponse
+                                 }, callback.obj);
+                                 return;
+                              }
                               this.hide();
                               this.destroy();
                            },
