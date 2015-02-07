@@ -1,26 +1,38 @@
 package org.alfresco.share.util;
 
-import jcifs.smb.*;
-
+import jcifs.UniAddress;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
+import jcifs.smb.SmbFileOutputStream;
+import jcifs.smb.SmbSession;
 import org.alfresco.po.share.util.PageUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 
+import javax.swing.ImageIcon;
 import java.awt.AWTException;
-import java.awt.Image;
-import java.awt.Robot;
 import java.awt.Toolkit;
+import java.awt.Robot;
+import java.awt.Image;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.ImageIcon;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -32,10 +44,11 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 {
 
     private Image image;
+    private static Log logger = LogFactory.getLog(CifsUtil.class);
 
     /**
      * Method to add document to the Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -132,7 +145,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to upload document to the Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -195,7 +208,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to verify that item presents in Alfresco
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -230,7 +243,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to verify that item presents in Alfresco
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -276,7 +289,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to rename document in Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -318,7 +331,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to rename document in Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -398,7 +411,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to check content of file
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -468,7 +481,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to create folder via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -581,7 +594,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
     /**
      * Verifies if a folder or file exists each polling time untill the timeout is reached
      * If it finds the item it returns true the moment it is found if not it will return false after the timeout
-     * 
+     *
      * @param timeoutSECONDS
      * @param pollingTimeMILISECONDS
      * @param path
@@ -618,7 +631,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
     /**
      * Verifies if a folder or file doesn't exists each polling time untill the timeout is reached
      * If it doesn't find the item it returns true instantly if not it will return false after the timeout
-     * 
+     *
      * @param timeoutSECONDS
      * @param pollingTimeMILISECONDS
      * @param path
@@ -656,7 +669,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
     /**
      * Verifies if a hidden file doesn't exists on the specified path each 200ms untill the timeout is reached
      * If it doesn't find the item it returns true instantly if not it will return false after the timeout
-     * 
+     *
      * @param path
      * @param extension
      * @param timeout
@@ -726,28 +739,28 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
             SmbFile sFile = new SmbFile("smb://" + server + "/" + cifsPath + "/" + fileName, auth);
 
-                FileOutputStream fileOutputStream = null;
-                SmbFileInputStream smbfileInputStream = null;
-                try
-                {
-                    fileOutputStream = new FileOutputStream(downloadDirectory + fileName);
-                    smbfileInputStream = new SmbFileInputStream(sFile);
+            FileOutputStream fileOutputStream = null;
+            SmbFileInputStream smbfileInputStream = null;
+            try
+            {
+                fileOutputStream = new FileOutputStream(downloadDirectory + fileName);
+                smbfileInputStream = new SmbFileInputStream(sFile);
 
-                    byte[] buf = new byte[16 * 1024 * 1024];
-                    int len;
-                    while ((len = smbfileInputStream.read(buf)) != -1)
-                    {
-                        fileOutputStream.write(buf, 0, len);
-                    }
-                    smbfileInputStream.close();
-                    fileOutputStream.close();
-                    successful = true;
-
-                }
-                catch (IOException ex)
+                byte[] buf = new byte[16 * 1024 * 1024];
+                int len;
+                while ((len = smbfileInputStream.read(buf)) != -1)
                 {
-                    throw new RuntimeException(ex.getMessage());
+                    fileOutputStream.write(buf, 0, len);
                 }
+                smbfileInputStream.close();
+                fileOutputStream.close();
+                successful = true;
+
+            }
+            catch (IOException ex)
+            {
+                throw new RuntimeException(ex.getMessage());
+            }
 
         }
         catch (IOException ex)
@@ -758,4 +771,32 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
         return successful;
     }
 
+    /**
+     * Authenticate a user.
+     *
+     * @param login
+     * @param password
+     * @param shareUrl
+     * @return true if the given password matches the password for this user
+     */
+
+    public static boolean doLoginCheck(String shareUrl, String login, String password)
+    {
+
+        String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+        boolean userAuthenticated = false;
+
+        try
+        {
+            UniAddress dc = UniAddress.getByName(server, true);
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(server, login, password);
+            SmbSession.logon(dc, auth);
+            userAuthenticated = true;
+        }
+        catch (SmbException | UnknownHostException e)
+        {
+            logger.error("The network name cannot be found", e);
+        }
+        return userAuthenticated;
+    }
 }
