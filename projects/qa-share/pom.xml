@@ -37,18 +37,6 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-    <distributionManagement>
-        <repository>
-            <id>alfresco-internal</id>
-            <name>Alfresco Releases Repository</name>
-            <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>alfresco-internal-snapshots</id>
-            <name>Alfresco Snapshots Repository</name>
-            <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <dependencies>
         <dependency>
