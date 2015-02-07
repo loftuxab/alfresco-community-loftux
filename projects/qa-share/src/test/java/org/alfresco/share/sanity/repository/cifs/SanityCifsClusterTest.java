@@ -57,13 +57,9 @@ public class SanityCifsClusterTest extends AbstractUtils
     final String fileName1GB = "File_" + getRandomString(10) + "_1.txt";
     final File file1GB = getFileWithSize(fileName1GB, 1024);
 
-    MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
-
     String mapConnect;
     String mapConnect2;
-    String networkDrive;
     String networkDrive2;
-    String networkPath;
     String networkPath2;
     static String folderName = getRandomString(10);
     private static String cifsPath = "\\" + folderName + "\\";
@@ -120,12 +116,10 @@ public class SanityCifsClusterTest extends AbstractUtils
             throw new PageOperationException("Number of cluster members is less than two");
         }
 
-        networkDrive = word.getMapDriver();
         int charValue = networkDrive.charAt(0);
         String previous = String.valueOf((char) (charValue - 1));
         networkDrive2 = previous.toUpperCase() + ":";
 
-        networkPath = word.getMapPath();
         String ip = getAddressNetworkPath(node1Url);
         networkPath = networkPath.replaceFirst(regexUrlWithPort, ip);
         if (networkPath.contains("alfresco\\"))
@@ -133,7 +127,6 @@ public class SanityCifsClusterTest extends AbstractUtils
             networkPath = networkPath.replace("alfresco\\", "alfresco");
         }
 
-        networkPath2 = word.getMapPath();
         String ip2 = getAddressNetworkPath(node2Url);
         networkPath2 = networkPath2.replaceFirst(regexUrlWithPort, ip2);
         if (networkPath2.contains("alfresco\\"))
@@ -347,7 +340,8 @@ public class SanityCifsClusterTest extends AbstractUtils
             MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
 
             // 23 Open document 'C.doc' for editing on node 1 via CIFS
-            Ldtp ldtp = word.openFileFromCMD(fullPath, fileName3, ADMIN_USERNAME, ADMIN_PASSWORD, false);
+            Ldtp ldtp;
+            word.openFileFromCMD(fullPath, fileName3, ADMIN_USERNAME, ADMIN_PASSWORD, false);
             word.getAbstractUtil().waitForWindow("frm" + fileName3Name + " - Microsoft Word");
             if (word.getAbstractUtil().isWindowPresented("frm" + fileName3Name + " - Microsoft Word"))
             {
