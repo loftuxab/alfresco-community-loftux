@@ -1,7 +1,17 @@
 package org.alfresco.share.util;
 
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.search.*;
+import org.alfresco.po.share.search.AdvanceSearchCRMPage;
+import org.alfresco.po.share.search.AdvanceSearchContentPage;
+import org.alfresco.po.share.search.AdvanceSearchFolderPage;
+import org.alfresco.po.share.search.AdvanceSearchPage;
+import org.alfresco.po.share.search.FacetedSearchPage;
+import org.alfresco.po.share.search.FacetedSearchResult;
+import org.alfresco.po.share.search.SearchBox;
+import org.alfresco.po.share.search.SearchResult;
+import org.alfresco.po.share.search.SearchResultsPage;
+import org.alfresco.po.share.search.SortType;
 import org.alfresco.share.search.SearchKeys;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
@@ -45,12 +55,19 @@ public class ShareUserSearchPage extends AbstractUtils
 
         // faceted search replace
         SearchBox searchBox = sharePage.getSearch();
-        FacetedSearchPage facetedSearchPage =  searchBox.search(searchTerm).render();
-        facetedSearchPage.render();
-
-        // Get Results
-        return facetedSearchPage.getResults();
-
+        AlfrescoVersion version = drone.getProperties().getVersion();
+        if (version.isFacetedSearch())
+        {
+            FacetedSearchPage facetedSearchPage =  searchBox.search(searchTerm).render();
+            facetedSearchPage.render();
+            return facetedSearchPage.getResults();
+        }
+        else
+        {
+            SearchResultsPage searchResultsPage = searchBox.search(searchTerm).render();
+            searchResultsPage.render();
+            return searchResultsPage.getResults();
+        }
     }
 
     /**
