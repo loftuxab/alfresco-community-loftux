@@ -34,7 +34,12 @@ import org.alfresco.utilities.Application;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -239,7 +244,9 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         explorer.openWindowsExplorer();
 
         // Drag and Drop any file from your desktop to the space created in preconditions (step 2) via WebDav
-        explorer.copyFileToOtherFolder(filePath, fileName2, fullPath);
+        if (filePath != null) {
+            explorer.copyFileToOtherFolder(filePath, fileName2, fullPath);
+        }
         Assert.assertTrue(explorer.isFilePresent(fullPath + SLASH + fileName2WithExt), "File " + fileName2WithExt + " isn't moved");
 
         documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
@@ -249,7 +256,9 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         assertTrue(detailsPage.getDocumentVersion().equals("1.0"), "Version '1.0' for file " + fileName2WithExt + " isn't presented");
 
         // Drag and Drop any file from your desktop to the space
-        explorer.copyFileToOtherFolder(filePath, fileName2, fullPath, MoveAndCopyActions.COPY_AND_REPLACE);
+        if (filePath != null) {
+            explorer.copyFileToOtherFolder(filePath, fileName2, fullPath, MoveAndCopyActions.COPY_AND_REPLACE);
+        }
 
         // Open document's details page via browser and verify version history for the rewrited document
         documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
@@ -258,7 +267,9 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         assertTrue(detailsPage.getDocumentVersion().equals("1.1"), "Version '1.1' for file " + fileName2WithExt + " isn't presented");
 
         // Drag and Drop any file from your desktop to the space
-        explorer.copyFileToOtherFolder(filePath, fileName2, fullPath, MoveAndCopyActions.COPY_AND_REPLACE);
+        if (filePath != null) {
+            explorer.copyFileToOtherFolder(filePath, fileName2, fullPath, MoveAndCopyActions.COPY_AND_REPLACE);
+        }
 
         // Open document's details page via browser and verify version history for the rewrited document
         documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();

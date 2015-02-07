@@ -27,7 +27,11 @@ import org.alfresco.po.share.site.document.DetailsPage;
 import org.alfresco.po.share.site.document.DocumentAspect;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.SelectAspectsPage;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.CifsUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
@@ -35,7 +39,12 @@ import org.alfresco.utilities.Application;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -190,7 +199,9 @@ public class AONE6556RepositoryWebDavTests extends AbstractUtils {
         String fullPathNew = networkDrive + sitesPath + siteName.toLowerCase() + docLib + "\\" + folderName2 + "\\" + fileNameWithExt;
 
         // Drag and drop any file from your computer to the folder f1 (move ope)
-        explorer.moveFileToOtherFolder(filePath, fileName, fullPath);
+        if (filePath != null) {
+            explorer.moveFileToOtherFolder(filePath, fileName, fullPath);
+        }
         Assert.assertTrue(explorer.isFilePresent(fullPathNew), "File isn't moved");
         explorer.closeExplorer();
 
