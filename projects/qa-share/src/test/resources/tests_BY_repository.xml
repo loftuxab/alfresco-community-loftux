@@ -42,7 +42,17 @@
 
     <test name="RepositoryConfiguringCifsTests">
         <classes>
-            <class name="org.alfresco.share.repository.RepositoryConfiguringCifsTests"/>
+            <class name="org.alfresco.share.repository.RepositoryConfiguringCifsTests">
+                <methods>
+                    <include name="AONE_6380"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <test name="InbordEmailSubsystemTests">
+        <classes>
+            <class name="org.alfresco.share.repository.subsystems.InbordEmailSubsystemTests"/>
         </classes>
     </test>
 

@@ -7,8 +7,8 @@
         <suite-file path="tests_BY_common.xml"/-->
         <!--suite-file path="tests_BY_api.xml"/-->
         <suite-file path="tests_BY_repository.xml"/>
-        <suite-file path="tests_BY_sanity.xml"/>
+        <!--suite-file path="tests_BY_sanity.xml"/>
         <suite-file path="tests_BY_contentRules.xml"/>
-        <suite-file path="tests_BY_doclib.xml"/>
+        <suite-file path="tests_BY_doclib.xml"/-->
     </suite-files>
     </suite>
