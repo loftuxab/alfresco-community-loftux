@@ -91,6 +91,9 @@ public class ShareTestProperty
     private String replicationEndPointHost;
     private String keystorePath;
     private String truststorePath;
+    private String networkPath;
+    private String networkDrive;
+
 
     public ShareTestProperty(final String shareUrl, String jmxShareUrl, final String apiUrl, final String gridUrl, final String username, final String password, String alfrescoVersion,
             String cloudUrlForHybrid, final String pentahoUserConsoleUrl, final String downloadDirectory, final String googleUserName, final String googlePassword,
@@ -100,7 +103,7 @@ public class ShareTestProperty
             final String uniqueTestDataString, final String adminUsername, final String adminPassword, final String superadminUsername,
             final String superadminPassword, final int httpSecurePort, final String headerKey, final String mimeTypes, final String jmxrmiPort, final String jmxrmiUser, final String jmxrmiPassword, final String nodePort, final String licenseShare, final String maxWaitTimeCloudSync,
             final String blogUrl, final String blogUsername, final String blogPassword, final String nfsMountPort,  final String mountPointHost, final String nfsPort,final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String wcmqs, final String replicationEndPointHost,
-            final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath)
+            final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath, final String networkPath, final String networkDrive)
     {
         this.shareUrl = shareUrl;
         this.jmxShareUrl = jmxShareUrl;
@@ -160,6 +163,8 @@ public class ShareTestProperty
         this.apiSecretKey = apiSecretKey;
         this.keystorePath = keystorePath;
         this.truststorePath = truststorePath;
+        this.networkPath = networkPath;
+        this.networkDrive = networkDrive;
     }
 
     public String getMaxWaitTimeCloudSync()
@@ -463,7 +468,7 @@ public class ShareTestProperty
                 + ", serviceDriveAccountPKCS12FileName=" + serviceDriveAccountPKCS12FileName + ", mimeTypes=" + mimeTypes + ", jmxrmiPort=" + jmxrmiPort
                 + ", jmxrmiUser=" + jmxrmiUser + ", jmxrmiPassword=" + jmxrmiPassword + ", nodePort=" + nodePort + ", nfsMountPort=" + nfsMountPort + ", mountPointHost=" + mountPointHost + ", nfsPort=" + nfsPort + ", ftpPort=" + ftpPort + ", blogUrl=" + blogUrl + ", blogUsername="
                 + blogUsername + ", blogPassword=" + blogPassword + ", serverShhPort=" + serverShhPort + ", serverUser="
-                + serverUser + ", serverPass=" + serverPass + ", isSecureSession=" + isSecureSession + "]";
+                + serverUser + ", serverPass=" + serverPass + ", isSecureSession=" + isSecureSession + ", networkPath=" + networkPath + ", networkDrive=" + networkDrive + "]";
     }
 
     /**
@@ -680,5 +685,25 @@ public class ShareTestProperty
     public String getTruststorePath()
     {
         return  truststorePath;
+    }
+
+    public String getNetworkPath()
+    {
+        return networkPath;
+    }
+
+    public void setNetworkPath(String networkPath)
+    {
+        this.networkPath = networkPath;
+    }
+
+    public String getNetworkDrive()
+    {
+        return networkDrive;
+    }
+
+    public void setNetworkDrive(String networkDrive)
+    {
+        this.networkDrive = networkDrive;
     }
 }

@@ -308,6 +308,8 @@ public abstract class AbstractUtils implements AlfrescoTests
     protected static String apiSecretKey;
     protected static String keystorePath;
     protected static String truststorePath;
+    protected static String networkPath;
+    protected static String networkDrive;
 
     protected static AlfrescoVersion alfrescoVersion;
     protected static Map<WebDrone, ShareTestProperty> dronePropertiesMap = new HashMap<WebDrone, ShareTestProperty>();
@@ -394,6 +396,8 @@ public abstract class AbstractUtils implements AlfrescoTests
         apiSecretKey = testProperties.getApiSecretKey();
         keystorePath = testProperties.getKeystorePath();
         truststorePath = testProperties.getTruststorePath();
+        networkPath = testProperties.getNetworkPath();
+        networkDrive = testProperties.getNetworkDrive();
 
         DEFAULT_FREENET_USER = DEFAULT_USER + "@" + DOMAIN_FREE;
         DEFAULT_PREMIUMNET_USER = DEFAULT_USER + "@" + DOMAIN_PREMIUM;

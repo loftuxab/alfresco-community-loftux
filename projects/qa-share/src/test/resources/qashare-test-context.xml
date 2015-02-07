@@ -116,6 +116,8 @@
         <constructor-arg name="apiSecretKey" value="${apiSecretKey}" />
         <constructor-arg name="keystorePath" value="${keystorePath}" />
         <constructor-arg name="truststorePath" value="${truststorePath}" />
+        <constructor-arg name="networkPath" value="${network.map.path}" />
+        <constructor-arg name="networkDrive" value="${network.map.driver}" />
     </bean>
 
     <!-- -->
@@ -186,6 +188,8 @@
         <constructor-arg name="apiSecretKey" value="${apiSecretKey}" />
         <constructor-arg name="keystorePath" value="${keystorePath}" />
         <constructor-arg name="truststorePath" value="${truststorePath}" />
+        <constructor-arg name="networkPath" value="${network.map.path}" />
+        <constructor-arg name="networkDrive" value="${network.map.driver}" />
     </bean>
 
     <util:constant id="englishLocale" static-field="java.util.Locale.ENGLISH" />
