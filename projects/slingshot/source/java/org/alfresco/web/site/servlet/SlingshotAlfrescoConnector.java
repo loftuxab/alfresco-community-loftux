@@ -18,6 +18,7 @@
  */
 package org.alfresco.web.site.servlet;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -195,6 +196,19 @@ public class SlingshotAlfrescoConnector extends RequestCachingConnector
                 String user = req.getHeader(userHeader);
                 if (user != null)
                 {
+                    // MNT-11041 Share SSOAuthenticationFilter and non-ascii username strings
+                    if (!org.apache.commons.codec.binary.Base64.isBase64(user))
+                    {
+                        try
+                        {
+                            user = org.apache.commons.codec.binary.Base64.encodeBase64String(user.getBytes("UTF-8"));
+                        }
+                        catch (UnsupportedEncodingException e)
+                        {
+                            //TODO
+                        }
+                        headers.put("Remote-User-Encode", Boolean.TRUE.toString());
+                    }
                     headers.put(userHeader, user);
                 }
             }
