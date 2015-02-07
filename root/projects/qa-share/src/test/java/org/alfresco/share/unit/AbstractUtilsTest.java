@@ -31,7 +31,7 @@ public class AbstractUtilsTest extends AbstractUtils
                 googleDriveUserName, googleDrivePassword, serviceDriveAccountEmail, serviceDriveAccountPKCS12FileName,
                 false, "", "", "", "", "", "", "", "", "", "", "",
                 0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","","","","",0,"","",false, "", "", "",
-                layer7Disabled, apiKey, apiSecretKey, "", "");
+                layer7Disabled, apiKey, apiSecretKey, "", "", "", "");
 
         // Will create a new instance of the bean since it has the prototype scope
         WebDrone newDrone = (WebDrone) ctx.getBean("webDrone");
@@ -63,7 +63,7 @@ public class AbstractUtilsTest extends AbstractUtils
                 googleDriveUserName, googleDrivePassword, serviceDriveAccountEmail, serviceDriveAccountPKCS12FileName,
                 false, "", "", "", "", "", "", "", "", "", "", "",
                 0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","","","","",0,"","",false, "","", "",
-                layer7Disabled, apiKey, apiSecretKey, "", "");
+                layer7Disabled, apiKey, apiSecretKey, "", "", "", "");
 
         // Will create a new instance of the bean since it has the prototype scope
         WebDrone newDrone = (WebDrone) ctx.getBean("webDrone");
@@ -86,7 +86,7 @@ public class AbstractUtilsTest extends AbstractUtils
                 googleDriveUserName, googleDrivePassword, serviceDriveAccountEmail, serviceDriveAccountPKCS12FileName,
                 false, "", "", "", "", "", "", "", "", "", "", "",
                 0, "", mimeTypes,"","","","", licenseShare, maxWaitTimeCloudSync.toString(),"","","","","","","",0,"","",false, "","", "",
-                layer7Disabled, apiKey, apiSecretKey, "", "");
+                layer7Disabled, apiKey, apiSecretKey, "", "", "", "");
 
         // Will create a new instance of the bean since it has the prototype scope
         WebDrone newDrone = (WebDrone) ctx.getBean("webDrone");
