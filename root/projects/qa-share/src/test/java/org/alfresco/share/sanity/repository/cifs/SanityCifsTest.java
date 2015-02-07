@@ -1,18 +1,12 @@
 package org.alfresco.share.sanity.repository.cifs;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.alfresco.application.windows.MicorsoftOffice2010;
+import com.cobra.ldtp.Ldtp;
 import org.alfresco.explorer.WindowsExplorer;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.CifsUtil;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.test.FailedTestListener;
-import org.alfresco.utilities.Application;
 import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +18,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import com.cobra.ldtp.Ldtp;
+import java.io.File;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Listeners(FailedTestListener.class)
 public class SanityCifsTest extends AbstractUtils
@@ -34,10 +31,7 @@ public class SanityCifsTest extends AbstractUtils
     private String testUser;
 
     WindowsExplorer explorer = new WindowsExplorer();
-    MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
     String mapConnect;
-    String networkDrive;
-    String networkPath;
     private static String cifsPath = "\\Sites\\";
     private static String docLib = "\\documentLibrary";
     private static final String regexUrlWithPort = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
@@ -52,8 +46,6 @@ public class SanityCifsTest extends AbstractUtils
         String testName = this.getClass().getSimpleName();
         testUser = getUserNameFreeDomain(testName);
 
-        networkDrive = word.getMapDriver();
-        networkPath = word.getMapPath();
         String ip = getAddress(networkPath);
         networkPath = networkPath.replaceFirst(regexUrlWithPort, ip);
         if (networkPath.contains("alfresco\\"))
