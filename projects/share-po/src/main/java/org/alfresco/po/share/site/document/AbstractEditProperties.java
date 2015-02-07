@@ -60,6 +60,7 @@ public abstract class AbstractEditProperties extends ShareDialogue
     protected static final By WEB_ASSETS_LIST = By.cssSelector("div[id$='webassets-cntrl-currentValueDisplay']");
     protected static final By REDITION_CONFIG = By.cssSelector("textarea[id$='prop_ws_renditionConfig']");
     protected static final By INPUT_RECORD_LOCATION = By.cssSelector("input[id$='prop_rma_location']");
+    protected static final By INPUT_EMAIL_ALIAS = By.cssSelector("input[id$='prop_emailserver_alias']");
     /**
      * Clear the input field and inserts the new value.
      *
@@ -299,6 +300,16 @@ public abstract class AbstractEditProperties extends ShareDialogue
     public void setLocation(final String location)
     {
         setInput(drone.findAndWait(INPUT_RECORD_LOCATION), location);
+    }
+
+    /**
+     * Enters a value in to the record properties.
+     *
+     * @param alias
+     */
+    public void setEmailAlias(String alias)
+    {
+        setInput(drone.findAndWait(INPUT_EMAIL_ALIAS), alias);
     }
 
 }
