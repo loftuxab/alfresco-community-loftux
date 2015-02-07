@@ -83,7 +83,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
     public void dataPrep_GoogleDocs_AONE_14617() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R2";
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String[] testUserInfo = new String[] { testUser };
@@ -138,7 +138,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         prepare();
 
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R2";
         String fileName = getFileName(testName + System.currentTimeMillis());
         String testUser = getUserNameFreeDomain(testName);
         String newFileName = getFileName(testName + "1");
@@ -160,7 +160,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String docVersion = detailsPage.getDocumentVersion();
 
         // Select editInGoogleDocs and sign into googleDocs.
-        EditInGoogleDocsPage googleDocsPage = openEditGoogleDocFromDetailsPage(drone);
+        EditInGoogleDocsPage googleDocsPage = openEditGoogleDocFromDetailsPage(drone).render();
 
         renameGoogleDocName(newFileName, googleDocsPage);
 
@@ -378,7 +378,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
     public void dataPrep_GoogleDocs_AONE_14621() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R5";
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String[] testUserInfo = new String[] { testUser };
@@ -426,7 +426,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         prepare();
 
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R5";
         String fileName = getFileName(testName);
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
@@ -442,7 +442,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         // Creating and saving google doc through sign in with the google doc authentication details
         createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEDOCS);
 
-        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
+        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName).render();
         detailsPage.render();
 
         // open editInGoogleDocs.
@@ -487,7 +487,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
     public void dataPrep_GoogleDocs_AONE_14623() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName);
@@ -553,7 +553,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         prepare();
 
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName);
@@ -572,8 +572,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         // open editInGoogleDocs.
         EditInGoogleDocsPage googleDocsPage = signIntoEditGoogleDocFromDetailsPage(drone);
         String docTitle = googleDocsPage.getDocumentTitle();
-
-
 
         Assert.assertTrue(docTitle.contains(fileName + "_doc"));
 
@@ -681,7 +679,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
 
-        fileName = fileName + ".docx";
+        fileName = fileName + "3.docx";
 
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -721,11 +719,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         // Open doc lib.
         ShareUser.openDocumentLibrary(drone);
-        detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
+        detailsPage = ShareUser.openDocumentDetailPage(drone, fileName).render();
 
         // Open the editgoogle docs for the same file again
         googleDocsPage = openEditGoogleDocFromDetailsPage(drone);
-
         Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible());
 
         // Renaming the file name
@@ -1025,7 +1022,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String fileName = getFileName(testName) + System.currentTimeMillis();
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
-
         String expectedMessage = "Document cannot be saved to Alfresco. The filename contains illegal characters.";
 
         fileName = fileName + ".docx";
@@ -1051,11 +1047,8 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         // Click Save to Alfresco and modify the minor version and comment , click save
         GoogleDocsUpdateFilePage googleUpdatefile = saveGoogleDocWithVersionAndComment(drone, "First Comments", true);
-
         SharePopup shareErrorPopup = googleUpdatefile.submit().render();
-
         String actualMessage = shareErrorPopup.getShareMessage();
-
         Assert.assertEquals(actualMessage, expectedMessage);
     }
 
@@ -1115,13 +1108,11 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String fileName = getFileName(testName) + System.currentTimeMillis();
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName) + ShareUser.getRandomStringWithNumders(4);
-
         fileName = fileName + ".docx";
 
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         String url = drone.getCurrentUrl();
-
         ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
 
         // Open Site Library
@@ -1137,9 +1128,9 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         // Open Site Library
         drone.navigateTo(url);
-        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-
-        Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isDeletePresent());
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        // TODO: Please change Step 2 in Test Link accordingly to the assert. Please check ACE-3063 (Resolution: Not a bug)
+        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName).isDeletePresent());
     }
 
     /**
@@ -1698,9 +1689,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
             // User login
             ShareUser.login(drone, siteAdmin, DEFAULT_PASSWORD);
-
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-
             ShareUser.openSitesDocumentLibrary(drone, siteName);
 
             // Invite user to Site as Collaborator.
@@ -1759,7 +1748,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String siteName = getSiteName(testName);
         String docVersion = "";
         String modifiedDocVersion = "";
-
         fileName = fileName + ".docx";
 
         // SiteAdmin login
@@ -1769,13 +1757,11 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         // Creating and saving google doc through sign in with the google doc authentication details
         createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEDOCS);
-
-        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
-
+        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName).render();
         docVersion = detailsPage.getDocumentVersion();
 
         // Opening google doc through sign in with the google doc authentication details
-        EditInGoogleDocsPage googleDocsPage = openEditGoogleDocFromDetailsPage(drone);
+        EditInGoogleDocsPage googleDocsPage = openEditGoogleDocFromDetailsPage(drone).render();
         Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible());
 
         // Saving the url.
@@ -1790,15 +1776,12 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         // Open Site Library
-        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
 
         // Document is locked for editing, EditingoogleDocs option isn't available
         Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isEditInGoogleDocsPresent());
-
         detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
-
         Assert.assertFalse(detailsPage.isUploadNewVersionDisplayed());
-
         ShareUser.logout(drone);
 
         // SiteAdmin login.
@@ -1810,13 +1793,9 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         // Saving google doc
         detailsPage = (DocumentDetailsPage) saveGoogleDoc(drone, false);
         detailsPage.render();
-
         modifiedDocVersion = detailsPage.getDocumentVersion();
-
         Assert.assertTrue(detailsPage.isDocumentDetailsPage());
-
         Assert.assertNotEquals(docVersion, modifiedDocVersion);
-
         ShareUser.logout(drone);
 
         // Deleting cookies
@@ -1827,25 +1806,19 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         // Open Site Library
-        docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-
-        detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
-
+        docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        detailsPage = ShareUser.openDocumentDetailPage(drone, fileName).render();
         googleDocsPage = signIntoEditGoogleDocFromDetailsPage(drone);
-
         Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible());
 
         // Discarding google doc changes.
         detailsPage = discardGoogleDocsChanges(drone).render();
-
         Assert.assertTrue(detailsPage.isDocumentDetailsPage());
         Assert.assertTrue(detailsPage.isUploadNewVersionDisplayed());
-
         String latestDocVersion = detailsPage.getDocumentVersion();
 
         // Uploading new version of the document.
-        detailsPage = ShareUser.uploadNewVersionOfDocument(drone, fileName, "New version uploaded.");
-
+        detailsPage = ShareUser.uploadNewVersionOfDocument(drone, fileName, "New version uploaded.").render();
         Assert.assertNotEquals(latestDocVersion, detailsPage.getDocumentVersion());
         Assert.assertEquals("New version uploaded.", detailsPage.getCommentsOfLastCommit());
     }
@@ -2102,7 +2075,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         // Open Site Library
         ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, firstFileName);
+        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, firstFileName).render();
 
         // Retrieving first document version before changing it.
         firstDocVersion = detailsPage.getDocumentVersion();
@@ -2123,7 +2096,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             // Open Site Library
             ShareUser.openSitesDocumentLibrary(secondDrone, siteName);
 
-            DocumentDetailsPage secondDetailsPage = ShareUser.openDocumentDetailPage(secondDrone, secondFileName);
+            DocumentDetailsPage secondDetailsPage = ShareUser.openDocumentDetailPage(secondDrone, secondFileName).render();
 
             // Retrieving second document version before changing it.
             secondDocVersion = secondDetailsPage.getDocumentVersion();
@@ -2154,19 +2127,14 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         // Open Site Library
         ShareUser.openSitesDocumentLibrary(drone, siteName);
-
-        detailsPage = ShareUser.openDocumentDetailPage(drone, firstFileName);
-
+        detailsPage = ShareUser.openDocumentDetailPage(drone, firstFileName).render();
         Assert.assertEquals("First document renamed", detailsPage.getCommentsOfLastCommit());
         Assert.assertNotSame(firstDocVersion, detailsPage.getDocumentVersion());
 
         ShareUser.openDocumentLibrary(drone);
-
-        detailsPage = ShareUser.openDocumentDetailPage(drone, secondFileName);
-
+        detailsPage = ShareUser.openDocumentDetailPage(drone, secondFileName).render();
         Assert.assertNotSame(secondDocVersion, actualDocVersion);
         Assert.assertEquals("Second document renamed", actualComments);
-
         ShareUser.logout(drone);
     }
 
@@ -2358,7 +2326,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
     public void dataPrep_GoogleDocs_AONE_14649() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String[] testUsernInfo = new String[] { testUser };
@@ -2421,7 +2389,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         prepare();
 
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String firstFileName = getFileName(testName + "3");
         String secondFileName = getFileName(testName + "2");
         String testUser = getUserNameFreeDomain(testName);
@@ -2546,10 +2514,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         // 1. Any user is logged into the Share
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        //2. Any site is created
+        // 2. Any site is created
         ShareUser.createSite(drone, siteName, ShareUser.SITE_VISIBILITY_PUBLIC);
 
-        //3. Document Library page is opened
+        // 3. Document Library page is opened
         ShareUser.openSitesDocumentLibrary(drone, siteName);
 
         // 1. Create a Google Docs™ Document;
@@ -2561,12 +2529,12 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileName + FEED_LOCATION + siteName;
         Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry, true));
 
-        //3. Verify the activity feed entry in Site Activities dashlet on Site Dashboard.
+        // 3. Verify the activity feed entry in Site Activities dashlet on Site Dashboard.
         ShareUser.openSiteDashboard(drone, siteName);
         activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileName;
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
 
-        //Delete cookies
+        // Delete cookies
         prepare();
 
         // 5. Create a Google Docs™ Spreadsheet;
@@ -2583,7 +2551,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileNameXls;
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
 
-        //Delete cookies
+        // Delete cookies
         prepare();
 
         // 7. Create a Google Docs™ Presentation;
@@ -2600,7 +2568,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         // Check activity feed on: Site DashBoard: Content Added
         activityEntry = testUser + " LName" + FEED_CONTENT_ADDED + FEED_FOR_FILE + fileNamePptx;
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
-
 
         // Deleting the test data.
         SiteUtil.deleteSite(drone, siteName);
@@ -2660,17 +2627,17 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         // 1. Any user is logged into the Share;
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        //2. Any site has been created;
+        // 2. Any site has been created;
         ShareUser.createSite(drone, siteName, ShareUser.SITE_VISIBILITY_PUBLIC);
 
-        //Create Document
+        // Create Document
         ShareUser.openSitesDocumentLibrary(drone, siteName);
         createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEDOCS);
 
         DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
         docVersion = detailsPage.getDocumentVersion();
 
-        // 1. Click Edit in Google Docs™ action for the Google Docs™ Document  created;
+        // 1. Click Edit in Google Docs™ action for the Google Docs™ Document created;
         EditInGoogleDocsPage googleDocsPage = openEditGoogleDocFromDetailsPage(drone);
         Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible());
 
@@ -2686,13 +2653,12 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileName + FEED_LOCATION + siteName;
         Assert.assertTrue(ShareUser.searchMyDashBoardWithRetry(drone, DASHLET_ACTIVITIES, activityEntry, true));
 
-        //3. Verify the activity feed entry in Site Activities dashlet on Site Dashboard.
+        // 3. Verify the activity feed entry in Site Activities dashlet on Site Dashboard.
         ShareUser.openSiteDashboard(drone, siteName);
         activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileName;
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
 
-
-        //Create Spreadsheet
+        // Create Spreadsheet
         prepare();
         ShareUser.openSitesDocumentLibrary(drone, siteName);
         createAndSavegoogleDocBySignIn(drone, fileNameXlsx, ContentType.GOOGLESPREADSHEET);
@@ -2700,7 +2666,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         DocumentDetailsPage detailsPageXls = ShareUser.openDocumentDetailPage(drone, fileNameXlsx);
         docVersion = detailsPageXls.getDocumentVersion();
 
-        // 5. Click Edit in Google Docs™ action for the Google Docs™ Spreadsheet  created;
+        // 5. Click Edit in Google Docs™ action for the Google Docs™ Spreadsheet created;
         EditInGoogleDocsPage googleDocsPageXlsx = openEditGoogleDocFromDetailsPage(drone);
         Assert.assertTrue(googleDocsPageXlsx.isGoogleDocsIframeVisible());
 
@@ -2722,7 +2688,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         activityEntry = testUser + " LName" + FEED_CONTENT_UPDATED + FEED_FOR_FILE + fileNameXlsx;
         Assert.assertTrue(ShareUser.searchSiteDashBoardWithRetry(drone, SITE_ACTIVITIES, activityEntry, true, siteName, ActivityType.DESCRIPTION));
 
-        //Create Presentation
+        // Create Presentation
         prepare();
         ShareUser.openSitesDocumentLibrary(drone, siteName);
         createAndSavegoogleDocBySignIn(drone, fileNamePptx, ContentType.GOOGLEPRESENTATION);
