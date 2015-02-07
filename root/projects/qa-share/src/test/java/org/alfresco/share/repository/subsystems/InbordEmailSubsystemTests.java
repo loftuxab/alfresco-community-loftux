@@ -107,7 +107,8 @@ public class InbordEmailSubsystemTests extends AlfrescoHttpClient
             configEmailServer();
 
             // Creating enterprise user with group
-            ShareUser.createEnterpriseUserWithGroup(drone, ADMIN_USERNAME, testUser, testUser, DEFAULT_LASTNAME, DEFAULT_PASSWORD, group);
+            assertTrue (ShareUser.createEnterpriseUserWithGroup(drone, ADMIN_USERNAME, testUser, testUser, DEFAULT_LASTNAME, DEFAULT_PASSWORD, group),
+                "Can't create user with group");
 
             // Admin logs in
             ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
@@ -137,6 +138,7 @@ public class InbordEmailSubsystemTests extends AlfrescoHttpClient
             editDocumentPropertiesPage.selectSave();
 
             //Invite user to the site with Collaborator role
+            webDriverWait(drone, 10000); //solr wait
             ShareUserMembers.inviteUserToSiteWithRole(drone, ADMIN_USERNAME, testUser, siteName, UserRole.COLLABORATOR);
         }
         catch (Exception e)
