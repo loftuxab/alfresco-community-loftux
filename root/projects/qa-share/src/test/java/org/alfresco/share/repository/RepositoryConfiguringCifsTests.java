@@ -20,6 +20,7 @@
 package org.alfresco.share.repository;
 
 import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.CifsUtil;
 import org.alfresco.share.util.JmxUtils;
 import org.alfresco.share.util.TelnetUtil;
 import org.alfresco.test.FailedTestListener;
@@ -93,7 +94,7 @@ public class RepositoryConfiguringCifsTests extends AbstractUtils
             assertTrue(cifsEnabledDefault, "cifs.server isn't true by default");
             assertEquals(cifsPortDefault, cifsDefaultValuePort, "CIFS is not running at the default 445 port");
 
-            // Set cifs.tcpipSMB.port=450 via JMX (MBeans->Alfresco->Configuration->fileServers);
+            // Set cifs.tcpipSMB.port=2450 via JMX (MBeans->Alfresco->Configuration->fileServers);
             JmxUtils.setAlfrescoServerProperty(shareUrl, cifsObject, cifsPort, cifsValuePort);
 
             // click operation "Start"
@@ -124,42 +125,37 @@ public class RepositoryConfiguringCifsTests extends AbstractUtils
     {
 
         boolean cifsEnabledDefault = Boolean.parseBoolean(JmxUtils.getAlfrescoServerProperty(shareUrl, cifsObject, cifsEnabled).toString());
-        String cifsValuePort = "2450";
 
-        try
-        {
-            // CIFS is enabled
-            assertTrue(cifsEnabledDefault, "cifs.server isn't enabled by default");
+        // CIFS is enabled
+        assertTrue(cifsEnabledDefault, "cifs.server isn't enabled by default");
 
-            // Set cifs.enabled=false via JMX
-            JmxUtils.setAlfrescoServerProperty(shareUrl, cifsObject, cifsEnabled, false);
-            JmxUtils.setAlfrescoServerProperty(shareUrl, cifsObject, cifsPort, cifsValuePort);
+        // Set cifs.enabled=false via JMX
+        JmxUtils.setAlfrescoServerProperty(shareUrl, cifsObject, cifsEnabled, false);
 
-            // Invoke Start method;
-            JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "stop");
-            JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "start");
+        // Invoke Start method;
+        JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "stop");
+        JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "start");
 
-            // Connect to Alfresco via CIFS  - User is unable to connect via CIFS
-            assertFalse(TelnetUtil.connectServer(shareUrl, cifsValuePort), "CIFS is enabled");
+        // CIFS is disabled
+        cifsEnabledDefault = Boolean.parseBoolean(JmxUtils.getAlfrescoServerProperty(shareUrl, cifsObject, cifsEnabled).toString());
+        assertFalse(cifsEnabledDefault, "cifs.server is enabled");
 
-            // Set cifs.enabled=true via JMX
-            JmxUtils.setAlfrescoServerProperty(shareUrl, cifsObject, cifsEnabled, true);
+        // Connect to Alfresco via CIFS  - User is unable to connect via CIFS
+        assertFalse(CifsUtil.doLoginCheck(shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD), "It is possible to connect to CIFS");
 
-            // Invoke Start method;
-            JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "stop");
-            JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "start");
+        // Set cifs.enabled=true via JMX
+        JmxUtils.setAlfrescoServerProperty(shareUrl, cifsObject, cifsEnabled, true);
 
-            // Connect to Alfresco via CIFS  - User is able to connect via CIFS
-            assertTrue(TelnetUtil.connectServer(shareUrl, cifsValuePort), "CIFS isn't enabled");
-        }
+        // Invoke Start method;
+        JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "stop");
+        JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "start");
 
-        finally
-        {
-            // Set default cifs port
-            JmxUtils.setAlfrescoServerProperty(shareUrl, cifsObject, cifsPort, cifsDefaultValuePort);
-            JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "stop");
-            JmxUtils.invokeAlfrescoServerProperty(shareUrl, cifsObject, "start");
-        }
+        // CIFS is enabled
+        cifsEnabledDefault = Boolean.parseBoolean(JmxUtils.getAlfrescoServerProperty(shareUrl, cifsObject, cifsEnabled).toString());
+        assertTrue(cifsEnabledDefault, "cifs.server isn't enabled");
+
+        // Connect to Alfresco via CIFS  - User is able to connect via CIFS
+        assertTrue(CifsUtil.doLoginCheck(shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD), "It is impossible to connect to CIFS");
     }
 
 }
