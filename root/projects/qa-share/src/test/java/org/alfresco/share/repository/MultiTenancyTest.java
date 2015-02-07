@@ -1,18 +1,14 @@
 /*
  * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
  * This file is part of Alfresco
- *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -73,9 +69,7 @@ import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.FolderDetailsPage;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
-import org.alfresco.po.share.systemsummary.ModelAndMessagesConsole;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
-import org.alfresco.po.share.systemsummary.TenantConsole;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.po.share.workflow.NewWorkflowPage;
 import org.alfresco.po.share.workflow.Priority;
@@ -128,7 +122,6 @@ import org.xml.sax.SAXException;
  * Created by Olga Lokhach
  */
 @Listeners(FailedTestListener.class)
-
 public class MultiTenancyTest extends AbstractUtils
 {
     private static Log logger = LogFactory.getLog(MultiTenancyTest.class);
@@ -160,7 +153,8 @@ public class MultiTenancyTest extends AbstractUtils
     private String invitationUrlInEmail;
     private static String tenantDomain1;
     private static String tenantDomain2;
-    private static TenantConsole tenantConsole;
+
+    // private static TenantConsole tenantConsole;
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -180,22 +174,19 @@ public class MultiTenancyTest extends AbstractUtils
     /**
      * Test: AONE-15244: Enable multi-tenancy
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15244() throws Exception
     {
-
         if (alfrescoVersion.getVersion() >= 5.0)
         {
-
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
         }
         else
         {
-            //Login to Alfresco
+            // Login to Alfresco
             LoginAlfrescoPage loginPage = new LoginAlfrescoPage(drone);
             drone.navigateTo(LoginAlfrescoPage.getAlfrescoURL(shareUrl));
             ShareUser.deleteSiteCookies(drone, shareUrl);
@@ -205,7 +196,7 @@ public class MultiTenancyTest extends AbstractUtils
             alfrescoPage.render();
             assertTrue(alfrescoPage.userIsLoggedIn("admin"));
 
-            //Open Tenant Administration Console
+            // Open Tenant Administration Console
             TenantAdminConsolePage tenantConsolePage = ShareUtil.navigateToTenantAdminConsole(drone, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             Assert.assertNotNull(tenantConsolePage);
         }
@@ -214,153 +205,133 @@ public class MultiTenancyTest extends AbstractUtils
     /**
      * Test: AONE-15245: Create tenant
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15245() throws Exception
     {
-
         if (alfrescoVersion.getVersion() >= 5.0)
         {
-
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create two tenants
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD + " " + downloadDirectory);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
-            tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD + " " + downloadDirectory);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain2, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
 
-            //Show a list of all tenants
-            tenantConsole.sendCommand("show tenants");
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("Enabled  - Tenant: " + tenantDomain1) && tenantConsole.findText().contains(downloadDirectory));
-            assertTrue(tenantConsole.findText().contains("Enabled  - Tenant: " + tenantDomain2) && tenantConsole.findText().contains("alf_data/contentstore"));
+            // Show a list of all tenants
+            tenantConsolePage.sendCommands("show tenants");
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain1)
+                    && tenantConsolePage.getResult().contains(downloadDirectory));
+            assertTrue(tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain2)
+                    && tenantConsolePage.getResult().contains("alf_data/contentstore"));
         }
-
         else
-
         {
-            //Create two tenants
+            // Create two tenants
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
             tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD + " " + downloadDirectory);
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertTrue(
-                    tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
-            assertTrue(
-                    tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
 
-            //Show a list of all tenants
+            // Show a list of all tenants
             tenantConsolePage.sendCommands("show tenants");
             tenantConsolePage.render();
-            assertTrue(
-                    tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain1) && tenantConsolePage.getResult().contains(downloadDirectory));
-            assertTrue(
-                    tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain2) && tenantConsolePage.getResult()
-                            .contains("alf_data/contentstore"));
+            assertTrue(tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain1)
+                    && tenantConsolePage.getResult().contains(downloadDirectory));
+            assertTrue(tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain2)
+                    && tenantConsolePage.getResult().contains("alf_data/contentstore"));
         }
 
-        //Check Login to Share
+        // Check Login to Share
         adminTenantDomain2 = getUserNameForDomain("admin", tenantDomain2).replace("user", "");
         resultPage = ShareUser.login(drone, adminTenantDomain2, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
-
     }
 
     /**
      * Test: AONE-15246: Show Tenant(s) and Help
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15246() throws Exception
     {
-
         if (alfrescoVersion.getVersion() >= 5.0)
         {
-
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
 
-            //Show a list of all tenants
-            tenantConsole.sendCommand("show tenants");
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("Enabled  - Tenant: " + tenantDomain1) && tenantConsole.findText().contains("alf_data/contentstore"));
+            // Show a list of all tenants
+            tenantConsolePage.sendCommands("show tenants");
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain1)
+                    && tenantConsolePage.getResult().contains("alf_data/contentstore"));
 
-            //Show Help
-            tenantConsole.sendCommand("help");
-            tenantConsole.render();
-            assertEquals(tenantConsole.findText().contains("List this help"), true);
+            // Show Help
+            tenantConsolePage.sendCommands("help");
+            tenantConsolePage.render();
+            assertEquals(tenantConsolePage.getResult().contains("List this help"), true);
         }
-
         else
-
         {
 
-            //Creating any Tenant
+            // Creating any Tenant
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
             tenantConsolePage.render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render(maxWaitTime);
 
-            //Show a list of all tenants
+            // Show a list of all tenants
             tenantConsolePage.sendCommands("show tenants");
             tenantConsolePage.render();
-            assertTrue(
-                    tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain1) && tenantConsolePage.getResult()
-                            .contains("alf_data/contentstore"));
-
-            //Show Help
+            assertTrue(tenantConsolePage.getResult().contains("Enabled  - Tenant: " + tenantDomain1)
+                    && tenantConsolePage.getResult().contains("alf_data/contentstore"));
+            // Show Help
             tenantConsolePage.sendCommands("help");
             tenantConsolePage.render();
             assertEquals(tenantConsolePage.getResult().contains("List this help"), true);
-
         }
-
     }
 
     /**
      * Test: AONE-15247: Disable/ Enable tenant
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15247() throws Exception
     {
-
         if (alfrescoVersion.getVersion() >= 5.0)
         {
 
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
 
-            //Disable tenant
-            tenantConsole.sendCommand("disable " + tenantDomain1);
-            tenantConsole.render();
-            assertEquals(tenantConsole.findText().contains("Disabled tenant: " + tenantDomain1), true);
-
+            // Disable tenant
+            tenantConsolePage.sendCommands("disable " + tenantDomain1);
+            tenantConsolePage.render();
+            assertEquals(tenantConsolePage.getResult().contains("Disabled tenant: " + tenantDomain1), true);
         }
-
         else
-
         {
             // Disable tenant
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
@@ -370,14 +341,13 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage.render();
             assertEquals(tenantConsolePage.getResult().contains("Disabled tenant: " + tenantDomain1), true);
         }
-
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
 
         // Login Fails: When tenant is disabled
         resultPage = login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
         assertFalse(resultPage.isLoggedIn());
 
-        //  Check Page titles
+        // Check Page titles
         resultPage = drone.getCurrentPage().render();
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_LOGIN));
         assertFalse(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
@@ -392,10 +362,10 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Enable tenant
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            tenantConsole.sendCommand("enable " + tenantDomain1);
-            tenantConsole.render();
-            assertEquals(tenantConsole.findText().contains("Enabled tenant: " + tenantDomain1), true);
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            tenantConsolePage.sendCommands("enable " + tenantDomain1);
+            tenantConsolePage.render();
+            assertEquals(tenantConsolePage.getResult().contains("Enabled tenant: " + tenantDomain1), true);
         }
         else
         {
@@ -406,33 +376,28 @@ public class MultiTenancyTest extends AbstractUtils
             assertEquals(tenantConsolePage.getResult().contains("Enabled tenant: " + tenantDomain1), true);
         }
 
-        //Login Succeeds: When tenant is enable
+        // Login Succeeds: When tenant is enable
         resultPage = ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
-
     }
 
     /**
      * Test: AONE-15248: Close tenant admin console
      */
-
     @Test(groups = "Enterprise42Only", timeOut = 400000)
     public void AONE_15248() throws Exception
     {
-
-        //Press Close
+        // Press Close
         tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
         tenantConsolePage.render();
         tenantConsolePage.clickClose();
         assertTrue(drone.getTitle().contains("Alfresco Explorer"));
-
     }
 
     /**
      * Test: AONE-15249: Create user by tenant
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15249() throws Exception
     {
@@ -442,13 +407,13 @@ public class MultiTenancyTest extends AbstractUtils
 
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
         }
         else
         {
@@ -485,7 +450,6 @@ public class MultiTenancyTest extends AbstractUtils
     /**
      * Test: AONE-15250: Log in. Incorrect password
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15250() throws Exception
     {
@@ -495,13 +459,13 @@ public class MultiTenancyTest extends AbstractUtils
 
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
         }
         else
         {
@@ -518,7 +482,7 @@ public class MultiTenancyTest extends AbstractUtils
         resultPage = login(drone, adminTenantDomain1, "uuu").render();
         assertFalse(resultPage.isLoggedIn());
 
-        //  Check Page titles
+        // Check Page titles
         resultPage = drone.getCurrentPage().render();
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_LOGIN));
         assertFalse(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
@@ -529,17 +493,15 @@ public class MultiTenancyTest extends AbstractUtils
         logger.info(loginPage.getErrorMessage());
         assertTrue(loginPage.getErrorMessage().contains(errorNotification));
 
-        //Login Succeeds: When password is correct
+        // Login Succeeds: When password is correct
         resultPage = ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
-
     }
 
     /**
      * Test: AONE-15251: Impossibility to see users created by other tenant
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15251() throws Exception
     {
@@ -548,19 +510,18 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Creating two tenants.
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
 
-            tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+            tenantConsolePage.createTenant(tenantDomain2, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
         }
-
         else
         {
             // Creating two tenants.
@@ -568,7 +529,6 @@ public class MultiTenancyTest extends AbstractUtils
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
             assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
-
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
             assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
@@ -578,7 +538,7 @@ public class MultiTenancyTest extends AbstractUtils
         adminTenantDomain2 = getUserNameForDomain("admin", tenantDomain2).replace("user", "");
         userTenantDomain1 = getUserNameForDomain("", tenantDomain1);
 
-        //Login to Share as first admin tenant
+        // Login to Share as first admin tenant
         resultPage = ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
@@ -594,23 +554,21 @@ public class MultiTenancyTest extends AbstractUtils
         }
         ShareUser.logout(drone);
 
-        //Login to Share as second admin tenant
+        // Login to Share as second admin tenant
         resultPage = ShareUser.login(drone, adminTenantDomain2, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
 
-        //Check impossibility to see users created by other tenant
+        // Check impossibility to see users created by other tenant
         userSearchPage = resultPage.getNav().getUsersPage().render();
         userSearchPage.searchFor(userTenantDomain1).render();
         String message = userSearchPage.getResultsStatus();
         assertTrue(message.endsWith("found 0 results.") || message.equals("No Results."));
-
     }
 
     /**
      * Test: AONE-15252: Verify case sensitivity in tenant creation and tenant login.
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15252() throws Exception
     {
@@ -620,35 +578,34 @@ public class MultiTenancyTest extends AbstractUtils
 
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
 
-            //Create fails : When tenant has the same name, but with capital letters.
-            tenantConsole.createTenant(tenantDomain1.toUpperCase(), DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertEquals(tenantConsole.findText().contains("Tenant already exists: " + tenantDomain1.toLowerCase()), true);
+            // Create fails : When tenant has the same name, but with capital letters.
+            tenantConsolePage.createTenant(tenantDomain1.toUpperCase(), DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertEquals(tenantConsolePage.getResult().contains("Tenant already exists: " + tenantDomain1.toLowerCase()), true);
         }
-
         else
         {
-            //Creating new tenant.
+            // Creating new tenant.
             tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
             assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
-            //Create fails : When tenant has the same name, but with capital letters.
+            // Create fails : When tenant has the same name, but with capital letters.
             AlfrescoUtil.createTenant(drone, tenantDomain1.toUpperCase(), DEFAULT_PASSWORD);
             tenantConsolePage.render();
             assertEquals(tenantConsolePage.getResult().contains("Tenant already exists: " + tenantDomain1.toLowerCase()), true);
         }
 
-        //Login to Share as created tenant.
+        // Login to Share as created tenant.
         resultPage = ShareUser.login(drone, userName + tenantDomain1.toLowerCase(), DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
@@ -656,7 +613,7 @@ public class MultiTenancyTest extends AbstractUtils
         assertTrue(drone.getCurrentUrl().contains("admin%40" + tenantDomain1.toLowerCase()));
         ShareUser.logout(drone);
 
-        //Check login to Share as another tenant with the same name but with capital letters
+        // Check login to Share as another tenant with the same name but with capital letters
         resultPage = ShareUser.login(drone, userName + tenantDomain1.toUpperCase(), DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
@@ -668,7 +625,6 @@ public class MultiTenancyTest extends AbstractUtils
     /**
      * Test: AONE-15253: Add tenant to alfresco_administrators group
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_15253() throws Exception
     {
@@ -679,19 +635,17 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Creating two tenants.
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
-
-            tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain2, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
         }
-
         else
         {
             // Creating two tenants.
@@ -699,7 +653,6 @@ public class MultiTenancyTest extends AbstractUtils
             AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
             assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
-
             AlfrescoUtil.createTenant(drone, tenantDomain2, DEFAULT_PASSWORD);
             tenantConsolePage.render();
             assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2), true, "Tenant already exists: " + tenantDomain2);
@@ -710,12 +663,12 @@ public class MultiTenancyTest extends AbstractUtils
         userTenantDomain1 = getUserNameForDomain("", tenantDomain1);
         userTenantDomain2 = getUserNameForDomain("", tenantDomain2);
 
-        //Login to Share as first tenant admin
+        // Login to Share as first tenant admin
         resultPage = ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
 
-        //Creating new user with alfresco_administrators group.
+        // Creating new user with alfresco_administrators group.
         userSearchPage = resultPage.getNav().getUsersPage().render();
         newUserPage = userSearchPage.selectNewUser().render();
         newUserPage.createEnterpriseUserWithGroup(userTenantDomain1, userTenantDomain1, userTenantDomain1, userTenantDomain1, DEFAULT_PASSWORD, groupToAdd);
@@ -723,12 +676,12 @@ public class MultiTenancyTest extends AbstractUtils
         assertTrue(userSearchPage.hasResults());
         ShareUser.logout(drone);
 
-        //Login to Share as second tenant admin
+        // Login to Share as second tenant admin
         resultPage = ShareUser.login(drone, adminTenantDomain2, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
 
-        //Creating new user with alfresco_administrators group.
+        // Creating new user with alfresco_administrators group.
         userSearchPage = resultPage.getNav().getUsersPage().render();
         newUserPage = userSearchPage.selectNewUser().render();
         newUserPage.createEnterpriseUserWithGroup(userTenantDomain2, userTenantDomain2, userTenantDomain2, userTenantDomain2, DEFAULT_PASSWORD, groupToAdd);
@@ -736,19 +689,19 @@ public class MultiTenancyTest extends AbstractUtils
         assertTrue(userSearchPage.hasResults());
         ShareUser.logout(drone);
 
-        //Login to Share as admin (not tenant)
+        // Login to Share as admin (not tenant)
         resultPage = ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
         ShareUser.logout(drone);
 
-        //Login to Share as first tenant user
+        // Login to Share as first tenant user
         resultPage = ShareUser.login(drone, userTenantDomain1, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
         ShareUser.logout(drone);
 
-        //Login to Share as second tenant user
+        // Login to Share as second tenant user
         resultPage = ShareUser.login(drone, userTenantDomain2, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
         assertTrue(resultPage.isBrowserTitle(PAGE_TITLE_MY_DASHBOARD));
@@ -757,7 +710,6 @@ public class MultiTenancyTest extends AbstractUtils
     /**
      * Test: AONE-6590 Export tenant
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6590() throws Exception
     {
@@ -765,33 +717,15 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
-
-            //Export tenant
-            tenantConsole.sendCommand("export " + tenantDomain1 + " " + downloadDirectory);
-            tenantConsole.waitForFile(downloadDirectory + tenantDomain1 + "_models.acp");
-            tenantConsole.waitForFile(downloadDirectory + tenantDomain1 + "_spaces.acp");
-            tenantConsole.waitForFile(downloadDirectory + tenantDomain1 + "_spaces_archive.acp");
-            tenantConsole.waitForFile(downloadDirectory + tenantDomain1 + "_system.acp");
-            tenantConsole.waitForFile(downloadDirectory + tenantDomain1 + "_users.acp");
-            tenantConsole.waitForFile(downloadDirectory + tenantDomain1 + "_versions2.acp");
-        }
-
-        else
-        {
-            //Creating new tenant.
-            tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
             tenantConsolePage.render();
-            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
 
-            //Export tenant
+            // Export tenant
             tenantConsolePage.sendCommands("export " + tenantDomain1 + " " + downloadDirectory);
             tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_models.acp");
             tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_spaces.acp");
@@ -800,30 +734,45 @@ public class MultiTenancyTest extends AbstractUtils
             tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_users.acp");
             tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_versions2.acp");
         }
+        else
+        {
+            // Creating new tenant.
+            tenantConsolePage = AlfrescoUtil.tenantAdminLogin(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
+            AlfrescoUtil.createTenant(drone, tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
-        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_models.acp"),
-                tenantDomain1 + "_models.acp is not found");
+            // Export tenant
+            tenantConsolePage.sendCommands("export " + tenantDomain1 + " " + downloadDirectory);
+            tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_models.acp");
+            tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_spaces.acp");
+            tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_spaces_archive.acp");
+            tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_system.acp");
+            tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_users.acp");
+            tenantConsolePage.waitForFile(downloadDirectory + tenantDomain1 + "_versions2.acp");
+        }
+        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_models.acp"), tenantDomain1
+                + "_models.acp is not found");
 
-        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_spaces.acp"),
-                tenantDomain1 + "_spaces.acp is not found");
+        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_spaces.acp"), tenantDomain1
+                + "_spaces.acp is not found");
 
-        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_spaces_archive.acp"),
-                tenantDomain1 + "_spaces_archive.acp is not found");
+        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_spaces_archive.acp"), tenantDomain1
+                + "_spaces_archive.acp is not found");
 
-        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_system.acp"),
-                tenantDomain1 + "_system.acp is not found");
+        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_system.acp"), tenantDomain1
+                + "_system.acp is not found");
 
-        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_users.acp"),
-                tenantDomain1 + "_users.acp is not found");
+        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_users.acp"), tenantDomain1
+                + "_users.acp is not found");
 
-        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_versions2.acp"),
-                tenantDomain1 + "_versions2.acp is not found");
+        assertTrue(ShareUser.getContentsOfDownloadedArchieve(drone, downloadDirectory).contains(tenantDomain1 + "_versions2.acp"), tenantDomain1
+                + "_versions2.acp is not found");
     }
 
     /**
      * Test: AONE-6599 Impossibility to execute a rule created by other tenant
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6599() throws Exception
     {
@@ -836,19 +785,18 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Creating two tenants.
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
 
-            tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+            tenantConsolePage.createTenant(tenantDomain2, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
         }
-
         else
         {
             // Creating two tenants.
@@ -865,7 +813,7 @@ public class MultiTenancyTest extends AbstractUtils
         adminTenantDomain1 = getUserNameForDomain("admin", tenantDomain1).replace("user", "");
         adminTenantDomain2 = getUserNameForDomain("admin", tenantDomain2).replace("user", "");
 
-        //Login to Share as first admin tenant
+        // Login to Share as first admin tenant
         resultPage = ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
 
@@ -899,7 +847,7 @@ public class MultiTenancyTest extends AbstractUtils
         assertTrue(folderRulesPageWithRules.isRuleNameDisplayed("Move to Guest folder"), "Rule isn't present");
         ShareUser.logout(drone);
 
-        //Login to Share as second admin tenant
+        // Login to Share as second admin tenant
         resultPage = ShareUser.login(drone, adminTenantDomain2, DEFAULT_PASSWORD).render();
         assertTrue(resultPage.isLoggedIn());
 
@@ -923,11 +871,9 @@ public class MultiTenancyTest extends AbstractUtils
     /**
      * Test: AONE-6596 Deploy dynamic workflow
      */
-
     @Test(groups = "DataPrepMultiTenancy")
     public void dataPrep_AONE_6596() throws Exception
     {
-
         JmxUtils.setAlfrescoServerProperty("Alfresco:Name=WorkflowInformation", "JBPMEngineEnabled", true);
         JmxUtils.setAlfrescoServerProperty("Alfresco:Name=WorkflowInformation", "JBPMWorkflowDefinitionsVisible", true);
     }
@@ -935,8 +881,7 @@ public class MultiTenancyTest extends AbstractUtils
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6596() throws Exception
     {
-
-        String testName = getTestName();
+        String testName = getTestName() + "3";
         String file1 = "lifecycleModel.xml";
         String file2 = "lifecycle_processdefinition.xml";
         String file3 = "lifecycle-messages.properties";
@@ -952,13 +897,13 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
         }
         else
         {
@@ -1006,12 +951,12 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Model and Messages Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, adminTenantDomain1, DEFAULT_PASSWORD).render();
-            ModelAndMessagesConsole repoConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.RepoConsole).render();
-            assertTrue(repoConsole.getTitle().contains("Model and Messages Console"));
+            repositoryAdminConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.RepoConsole).render();
+            assertTrue(repositoryAdminConsolePage.getTitle().contains("Model and Messages Console"));
 
-            //Send "reload messages lifecycle-messages" command
-            repoConsole.sendCommand("reload messages lifecycle-messages");
-            assertTrue(repoConsole.findText().contains("Message resource bundle reloaded: lifecycle-messages"));
+            // Send "reload messages lifecycle-messages" command
+            repositoryAdminConsolePage.sendCommands("reload messages lifecycle-messages");
+            assertTrue(repositoryAdminConsolePage.getResult().contains("Message resource bundle reloaded: lifecycle-messages"));
         }
         else
         {
@@ -1032,17 +977,14 @@ public class MultiTenancyTest extends AbstractUtils
         StartWorkFlowPage startWorkFlowPage = ShareUserSitePage.getFileDirectoryInfo(drone, fileName).selectStartWorkFlow().render();
         List<WorkFlowType> userWorkFlow = startWorkFlowPage.getWorkflowTypes();
         assertTrue(userWorkFlow.contains(WorkFlowType.LIFECYCLE_REVIEW_AND_APPROVE));
-
     }
 
     /**
      * Test: AONE-6597 Inherit parent space permissions
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6597() throws Exception
     {
-
         String testName = getTestName();
         String folderName = getFolderName(testName);
         String testFolder1 = folderName + "_1";
@@ -1054,15 +996,14 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
         }
-
         else
         {
             // Creating new tenant.
@@ -1093,7 +1034,7 @@ public class MultiTenancyTest extends AbstractUtils
         ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folderName + SLASH + testFolder1);
         ShareUserRepositoryPage.createFolderInRepository(drone, testFolder2, testFolder2);
 
-        //Add user to locally set permissions, uncheck "Inherit Permissions", save and return to repository page
+        // Add user to locally set permissions, uncheck "Inherit Permissions", save and return to repository page
         ShareUserMembers.managePermissionsOnContent(drone, userTenantDomain1, testFolder2, UserRole.COLLABORATOR, true);
         ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folderName + SLASH + testFolder1);
         PermPage = ShareUser.returnManagePermissionPage(drone, testFolder2);
@@ -1101,21 +1042,18 @@ public class MultiTenancyTest extends AbstractUtils
         PermPage.toggleInheritPermission(false, ManagePermissionsPage.ButtonType.Yes);
         PermPage.selectSave().render();
 
-        //Verify Inherit permissions options in Manage Permissions page
+        // Verify Inherit permissions options in Manage Permissions page
         ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + folderName + SLASH + testFolder1);
         PermPage = ShareUser.returnManagePermissionPage(drone, testFolder2);
         assertFalse(PermPage.isInheritPermissionEnabled(), "Inherit permissions options in Manage Permissions page is Enabled");
-
     }
 
     /**
      * Test: AONE-6604 Creating pooled task by tenant-user
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6604() throws Exception
     {
-
         String testName = getTestName();
         String folderName = getFolderName(testName);
         String fileName = getFileName(testName);
@@ -1128,19 +1066,17 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Creating two tenants.
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
-
-            tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain2, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
         }
-
         else
         {
             // Creating two tenants.
@@ -1246,19 +1182,17 @@ public class MultiTenancyTest extends AbstractUtils
     /**
      * Test: AONE-6609 Sending invitation by tenants
      */
-
     @Test(groups = "DataPrepMultiTenancy")
     public void dataPrep_AONE_6609() throws Exception
     {
-
         MailUtil.configOutBoundEmail();
     }
 
+    @SuppressWarnings("unused")
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6609() throws Exception
     {
-
-        String testName = getTestName();
+        String testName = getTestName() + "R3";
         String testUser1 = MailUtil.BOT_MAIL_1;
         String siteName = getSiteName(testName);
 
@@ -1266,19 +1200,17 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Creating two tenants.
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
-
-            tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain2, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
         }
-
         else
         {
             // Creating two tenants.
@@ -1322,12 +1254,11 @@ public class MultiTenancyTest extends AbstractUtils
         assertTrue(MailUtil.isMailPresent(testUser1, String.format("You have been invited to join the %s site", siteName)), "Email about invite don't send.");
         ShareUser.logout(drone);
 
-        //Login to Share as first tenant user, check that task "Invitation to join a site" is present.
+        // Login to Share as first tenant user, check that task "Invitation to join a site" is present.
         dashBoardPage = ShareUser.login(drone, userTenantDomain1, DEFAULT_PASSWORD).render();
         myTasksDashlet = dashBoardPage.getDashlet("my-tasks").render();
         List<ShareLink> tasks = myTasksDashlet.getTasks();
-        assertEquals(tasks.get(0).getDescription(),
-                String.format("Invitation to join %s site", siteName),
+        assertEquals(tasks.get(0).getDescription(), String.format("Invitation to join %s site", siteName),
                 String.format("Information about invitation task don't display for user[%s]", testUser1));
         ShareUser.logout(drone);
 
@@ -1356,23 +1287,20 @@ public class MultiTenancyTest extends AbstractUtils
         assertTrue(MailUtil.isMailPresent(testUser1, String.format("You have been invited to join the %s site", siteName)), "Email about invite don't send.");
         ShareUser.logout(drone);
 
-        //Login to Share as second tenant user, check that task "Invitation to join a site" is present.
+        // Login to Share as second tenant user, check that task "Invitation to join a site" is present.
         dashBoardPage = ShareUser.login(drone, userTenantDomain2, DEFAULT_PASSWORD).render();
         myTasksDashlet = dashBoardPage.getDashlet("my-tasks").render();
         tasks = myTasksDashlet.getTasks();
-        assertEquals(tasks.get(0).getDescription(),
-                String.format("Invitation to join %s site", siteName),
+        assertEquals(tasks.get(0).getDescription(), String.format("Invitation to join %s site", siteName),
                 String.format("Information about invitation task don't display for user[%s]", testUser1));
     }
 
     /**
      * Test: AONE-6606 Form-data in webscripts
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6606() throws Exception
     {
-
         String file1 = "formdata.get.desc.xml";
         String file2 = "formdata.get.html.ftl";
         String file3 = "formdata.post.js";
@@ -1388,15 +1316,14 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
         }
-
         else
         {
             // Creating new tenant.
@@ -1414,8 +1341,8 @@ public class MultiTenancyTest extends AbstractUtils
 
         // Add files to Company Home > Data Dictionary > Web Scripts > org > alfresco > sample.
         ShareUserRepositoryPage.openRepositoryDetailedView(drone);
-        ShareUserRepositoryPage.navigateToFolderInRepository(drone,
-                REPO + SLASH + DATA_DICTIONARY_FOLDER + SLASH + "Web Scripts" + SLASH + "org" + SLASH + "alfresco" + SLASH + "sample");
+        ShareUserRepositoryPage.navigateToFolderInRepository(drone, REPO + SLASH + DATA_DICTIONARY_FOLDER + SLASH + "Web Scripts" + SLASH + "org" + SLASH
+                + "alfresco" + SLASH + "sample");
         ShareUserRepositoryPage.uploadFileInRepository(drone, fileName1);
         ShareUserRepositoryPage.uploadFileInRepository(drone, fileName2);
         ShareUserRepositoryPage.uploadFileInRepository(drone, fileName3);
@@ -1431,18 +1358,19 @@ public class MultiTenancyTest extends AbstractUtils
         drone.navigateTo(PageUtils.getProtocol(shareUrl) + PageUtils.getAddress(shareUrl) + "/alfresco/s/test/formdata");
         drone.findAndWait(By.xpath("*//input[1]")).sendKeys(DATA_FOLDER + "formdata" + SLASH + file1);
         drone.findAndWait(By.xpath("*//input[2]")).click();
-        assertTrue(drone.findAndWait(By.xpath("//body"), maxWaitTime).getText().contains("Your file '" + file1 + "'") && drone
-                .findAndWait(By.xpath("//body"), maxWaitTime).getText().contains("InputStreamContent@"), "Webscripts are broken in multi tenancy environment");
+        assertTrue(
+                drone.findAndWait(By.xpath("//body"), maxWaitTime).getText().contains("Your file '" + file1 + "'")
+                        && drone.findAndWait(By.xpath("//body"), maxWaitTime).getText().contains("InputStreamContent@"),
+                "Webscripts are broken in multi tenancy environment");
     }
 
     /**
      * Test: AONE-6593 Guest tenant. Log in
      */
-
+    @SuppressWarnings("static-access")
     @Test(groups = "Enterprise42Only", timeOut = 400000)
     public void AONE_6593() throws Exception
     {
-
         String userName = "guest@";
         String password = "guest";
 
@@ -1452,7 +1380,7 @@ public class MultiTenancyTest extends AbstractUtils
         tenantConsolePage.render();
         assertEquals(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1), true, "Tenant already exists: " + tenantDomain1);
 
-        //Login to Alfresco as guest
+        // Login to Alfresco as guest
         LoginAlfrescoPage loginPage = new LoginAlfrescoPage(drone);
         drone.navigateTo(loginPage.getAlfrescoURL(shareUrl));
         loginPage.render();
@@ -1461,22 +1389,18 @@ public class MultiTenancyTest extends AbstractUtils
         assertTrue(drone.getTitle().contains("My Alfresco"));
     }
 
-
     /**
      * Test: AONE-6610: Webscript call api/invite/{inviteId}/{InvitTicket} obtained using tenant user
      */
-
     @Test(groups = "DataPrepMultiTenancy")
     public void dataPrep_AONE_6610() throws Exception
     {
-
         MailUtil.configOutBoundEmail();
     }
 
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6610() throws Exception
     {
-
         String testName = getTestName();
         String siteName = getSiteName(testName);
         String testUser1 = MailUtil.BOT_MAIL_1;
@@ -1486,13 +1410,13 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
         }
         else
         {
@@ -1524,7 +1448,7 @@ public class MultiTenancyTest extends AbstractUtils
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
         siteDashboardPage = SiteUtil.openSiteDashboard(drone, siteName);
         inviteMembersPage = siteDashboardPage.getSiteNav().selectInvite();
-        List<String> foundUsers = inviteMembersPage.searchUser(userTenantDomain1);
+        inviteMembersPage.searchUser(userTenantDomain1);
         inviteMembersPage.clickAddUser(userTenantDomain1).render();
         inviteMembersPage.selectRoleForAll(CONTRIBUTOR);
         assertTrue(inviteMembersPage.isInviteButtonEnabled(), "Invite button is disabled.");
@@ -1532,11 +1456,10 @@ public class MultiTenancyTest extends AbstractUtils
         String email = MailUtil.getMailAsString(testUser1, String.format("Alfresco Share: You have been invited to join the %s site", siteName));
         parseInvitationMail(email);
 
-        //Get {inviteId} and {InviteTicket}from invitation mail and perform the call anonymously on the site
+        // Get {inviteId} and {InviteTicket}from invitation mail and perform the call anonymously on the site
         String[] parts = invitationUrlInEmail.split(regex);
-        String reqURL =
-                PageUtils.getProtocol(shareUrl) + PageUtils.getAddress(shareUrl) + "/alfresco/s/api/invite/" + parts[1] + "/" + parts[7].substring(0, 36)
-                        + "?inviteeUserName=" + parts[3];
+        String reqURL = PageUtils.getProtocol(shareUrl) + PageUtils.getAddress(shareUrl) + "/alfresco/s/api/invite/" + parts[1] + "/"
+                + parts[7].substring(0, 36) + "?inviteeUserName=" + parts[3];
         String[] headers = AlfrescoHttpClient.getRequestHeaders(null);
         HttpGet request = AlfrescoHttpClient.generateGetRequest(reqURL, headers);
         HttpClient client = AlfrescoHttpClient.getHttpClientWithBasicAuth(reqURL, "", "");
@@ -1547,18 +1470,15 @@ public class MultiTenancyTest extends AbstractUtils
     /**
      * Test: AONE-6603:FTP tenant-clients
      */
-
     @Test(groups = "DataPrepMultiTenancy")
     public void dataPrep_AONE_6603() throws Exception
     {
-
         FtpUtil.configFtpPort();
     }
 
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6603() throws Exception
     {
-
         String testName = getTestName();
         String path = "Alfresco" + "/";
         String fileName = getFileName(testName) + "_1";
@@ -1569,19 +1489,18 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Creating two tenants.
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
 
-            tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+            tenantConsolePage.createTenant(tenantDomain2, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
         }
-
         else
         {
             // Creating two tenants.
@@ -1603,16 +1522,15 @@ public class MultiTenancyTest extends AbstractUtils
         assertTrue(FtpUtil.isObjectExists(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, fileName, path), fileName + " content is not exist.");
 
         // Second tenant user isn't able to see created content using FTP;
-        assertFalse(FtpUtil.isObjectExists(shareUrl, adminTenantDomain2, DEFAULT_PASSWORD, fileName, path),
-                fileName + " content is exist, but should be not.");
+        assertFalse(FtpUtil.isObjectExists(shareUrl, adminTenantDomain2, DEFAULT_PASSWORD, fileName, path), fileName + " content is exist, but should be not.");
 
         // Create new folder by tenant user using FTP;
         assertTrue(FtpUtil.createSpace(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, folderName, path), "Cann't create " + folderName + " folder");
         assertTrue(FtpUtil.isObjectExists(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, folderName, path), folderName + " folder is not exist.");
 
         // Second tenant user isn't able to see created folder using FTP;
-        assertFalse(FtpUtil.isObjectExists(shareUrl, adminTenantDomain2, DEFAULT_PASSWORD, folderName, path),
-                folderName + " folder is exist, but should be not.");
+        assertFalse(FtpUtil.isObjectExists(shareUrl, adminTenantDomain2, DEFAULT_PASSWORD, folderName, path), folderName
+                + " folder is exist, but should be not.");
 
         // Check possible editing of any content by tenant user using FTP;
         assertTrue(FtpUtil.editContent(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, fileName, path));
@@ -1623,13 +1541,11 @@ public class MultiTenancyTest extends AbstractUtils
 
         // Check possible deleting any folder by tenant user using FTP;
         assertTrue(FtpUtil.deleteFolder(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, folderName, path));
-
     }
 
     /**
      * Test: AONE-6601:WebDav tenant-clients
      */
-
     @Test(groups = "EnterpriseOnly", timeOut = 400000)
     public void AONE_6601() throws Exception
     {
@@ -1643,19 +1559,18 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Creating two tenants.
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
 
-            tenantConsole.createTenant(tenantDomain2, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain2));
+            tenantConsolePage.createTenant(tenantDomain2, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain2));
         }
-
         else
         {
             // Creating two tenants.
@@ -1673,24 +1588,20 @@ public class MultiTenancyTest extends AbstractUtils
         adminTenantDomain2 = getUserNameForDomain("admin", tenantDomain2).replace("user", "");
 
         // Create new content by first tenant user using WebDav;
-        assertTrue(WebDavUtil.uploadContent(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, file, path),
-                "Cann't create " + fileName + " content");
-        assertTrue(WebDavUtil.isObjectExists(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, fileName, path),
-                fileName + " content is not exist.");
+        assertTrue(WebDavUtil.uploadContent(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, file, path), "Cann't create " + fileName + " content");
+        assertTrue(WebDavUtil.isObjectExists(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, fileName, path), fileName + " content is not exist.");
 
         // Second tenant user isn't able to see created content using WebDav;
-        assertFalse(WebDavUtil.isObjectExists(shareUrl, adminTenantDomain2, DEFAULT_PASSWORD, fileName, path),
-                fileName + " content is exist, but should be not.");
+        assertFalse(WebDavUtil.isObjectExists(shareUrl, adminTenantDomain2, DEFAULT_PASSWORD, fileName, path), fileName
+                + " content is exist, but should be not.");
 
         // Create new folder by tenant user using WebDav;
-        assertTrue(WebDavUtil.createFolder(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, folderName, path),
-                "Cann't create " + folderName + " folder");
-        assertTrue(WebDavUtil.isObjectExists(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, fileName, path),
-                folderName + " folder is not exist.");
+        assertTrue(WebDavUtil.createFolder(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, folderName, path), "Cann't create " + folderName + " folder");
+        assertTrue(WebDavUtil.isObjectExists(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, fileName, path), folderName + " folder is not exist.");
 
         // Second tenant user isn't able to see created folder using WebDav;
-        assertFalse(WebDavUtil.isObjectExists(shareUrl, adminTenantDomain2, DEFAULT_PASSWORD, folderName, path),
-                folderName + " folder is exist, but should be not.");
+        assertFalse(WebDavUtil.isObjectExists(shareUrl, adminTenantDomain2, DEFAULT_PASSWORD, folderName, path), folderName
+                + " folder is exist, but should be not.");
 
         // Check possible editing of any content by tenant user using WebDav;
         assertTrue(WebDavUtil.editContent(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, fileName, path));
@@ -1701,14 +1612,13 @@ public class MultiTenancyTest extends AbstractUtils
 
         // Check possible deleting any folder by tenant user using WebDav;
         assertTrue(WebDavUtil.deleteItem(shareUrl, adminTenantDomain1, DEFAULT_PASSWORD, folderName, path));
-
     }
 
     /**
      * Test: AONE-6592:Delegated Administration
      */
-
-    @Test public void AONE_6592() throws Exception
+    @Test
+    public void AONE_6592() throws Exception
     {
         String testName = getTestName();
         String group = getGroupName(testName);
@@ -1725,13 +1635,13 @@ public class MultiTenancyTest extends AbstractUtils
         {
             // Open Tenant Administration Console
             SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
-            tenantConsole = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
-            assertTrue(tenantConsole.getTitle().contains("Tenant Admin Console"));
+            tenantConsolePage = sysSummaryPage.openConsolePage(AdminConsoleLink.TenantAdminConsole).render();
+            assertTrue(tenantConsolePage.getTitle().contains("Tenant Admin Console"));
 
             // Create any tenant
-            tenantConsole.createTenant(tenantDomain1, DEFAULT_PASSWORD);
-            tenantConsole.render();
-            assertTrue(tenantConsole.findText().contains("created tenant: " + tenantDomain1));
+            tenantConsolePage.createTenant(tenantDomain1, DEFAULT_PASSWORD);
+            tenantConsolePage.render();
+            assertTrue(tenantConsolePage.getResult().contains("created tenant: " + tenantDomain1));
         }
         else
         {
@@ -1760,7 +1670,7 @@ public class MultiTenancyTest extends AbstractUtils
         FileDirectoryInfo fileInfo = documentLibraryPage.getFileDirectoryInfo(folderName);
         fileInfo.addTag(tagName);
 
-        //Upload file
+        // Upload file
         ShareUserSitePage.uploadFile(drone, file);
         String nodeRef = ShareUserSitePage.getFileDirectoryInfo(drone, fileName).getContentNodeRef();
         nodeRef = nodeRef.substring(nodeRef.indexOf("workspace"));
@@ -1783,7 +1693,6 @@ public class MultiTenancyTest extends AbstractUtils
         newUserPage.createEnterpriseUserWithGroup(userTenantDomain1, userTenantDomain1, userTenantDomain1, userTenantDomain1, DEFAULT_PASSWORD, group);
         userSearchPage.searchFor(userTenantDomain1).render();
         assertTrue(userSearchPage.hasResults());
-
 
         // Tag Management
         ShareUser.login(drone, adminTenantDomain1, DEFAULT_PASSWORD).render();
@@ -1810,11 +1719,11 @@ public class MultiTenancyTest extends AbstractUtils
 
         // Node Browser
         NodeBrowserPage nodeBrowserPage = resultPage.getNav().getNodeBrowserPage().render();
-        NodeBrowserPageUtil.executeQuery(drone,
-            "/app:company_home/st:sites/cm:" + siteName.toLowerCase() + "/cm:documentLibrary/cm:" + fileName, NodeBrowserPage.QueryType.XPATH).render();
+        NodeBrowserPageUtil.executeQuery(drone, "/app:company_home/st:sites/cm:" + siteName.toLowerCase() + "/cm:documentLibrary/cm:" + fileName,
+                NodeBrowserPage.QueryType.XPATH).render();
         getCurrentPage(drone).render(maxWaitTime);
         assertTrue(nodeBrowserPage.isInResultsByName(fileName) && nodeBrowserPage.isInResultsByNodeRef(nodeRef),
-            "Nothing was found or there was found incorrect file by xpath");
+                "Nothing was found or there was found incorrect file by xpath");
 
         // Category Manager
         CategoryManagerPage categoryManagerPage = CategoryManagerPageUtil.openCategoryManagerPage(drone).render();
@@ -1831,7 +1740,6 @@ public class MultiTenancyTest extends AbstractUtils
         AdminConsolePage adminConsolePage = resultPage.getNav().getAdminConsolePage().render();
         adminConsolePage.selectTheme(AdminConsolePage.ThemeType.green).render();
         assertTrue(adminConsolePage.isThemeSelected(AdminConsolePage.ThemeType.green));
-
     }
 
     private SharePage login(WebDrone drone, String userName, String userPassword)
