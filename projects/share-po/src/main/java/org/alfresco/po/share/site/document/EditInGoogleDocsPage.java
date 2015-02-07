@@ -15,6 +15,9 @@
 
 package org.alfresco.po.share.site.document;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.webdrone.HtmlPage;
@@ -28,13 +31,10 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 /**
  * Edit in google docs page, holds all element of the HTML page relating to
  * share's edit document properties page.
- *
+ * 
  * @author Subashni Prasanna
  * @since 1.5
  */
@@ -47,6 +47,7 @@ public class EditInGoogleDocsPage extends SitePage
     @SuppressWarnings("unused")
     private static final By EDIT_GOOGLE_DOCS = By.cssSelector("span[class$='goog-inline-block kix-lineview-text-block']");
     private static final By GOOGLE_DOC_TITLE = By.cssSelector("div[id$='docs-title-inner']");
+
     private final String documentVersion;
     private final boolean editOfflineFlag = false;
     private boolean isGoogleCreate;
@@ -67,8 +68,8 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Constructor used by SharePageFactory
-     *
-     * @param drone           {@link WebDrone}
+     * 
+     * @param drone {@link WebDrone}
      */
     public EditInGoogleDocsPage(WebDrone drone)
     {
@@ -79,8 +80,8 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Constructor.
-     *
-     * @param drone           {@link WebDrone}
+     * 
+     * @param drone {@link WebDrone}
      * @param documentVersion String original document version
      */
     protected EditInGoogleDocsPage(WebDrone drone, final String documentVersion, Boolean isGoogleCreate)
@@ -95,8 +96,8 @@ public class EditInGoogleDocsPage extends SitePage
     public EditInGoogleDocsPage render(RenderTime timer) throws PageRenderTimeException
     {
         basicRender(timer);
-//        elementRender(timer, getVisibleRenderElement(BUTTON_SAVE_TO_ALFRESCO), getVisibleRenderElement(BUTTON_DISCARD_CHANGES),
-//                getVisibleRenderElement(BUTTON_BACK_TO_SHARE), getVisibleRenderElement(GOOGLEDOCS_FRAME));
+        // elementRender(timer, getVisibleRenderElement(BUTTON_SAVE_TO_ALFRESCO), getVisibleRenderElement(BUTTON_DISCARD_CHANGES),
+        // getVisibleRenderElement(BUTTON_BACK_TO_SHARE), getVisibleRenderElement(GOOGLEDOCS_FRAME));
         return this;
     }
 
@@ -116,7 +117,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Verify if WebElement Save To Alfresco is visible.
-     *
+     * 
      * @return true if displayed
      */
     public boolean isSaveToAlfrescoVisible()
@@ -133,7 +134,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Verify if WebElement Discard Changes is visible.
-     *
+     * 
      * @return true if displayed
      */
     public boolean isDiscardChangesVisible()
@@ -148,7 +149,7 @@ public class EditInGoogleDocsPage extends SitePage
         }
     }
 
-    /**
+/**
      * Verify if WebElement back to Share "<" visible.
      *
      * @return true if displayed
@@ -165,7 +166,7 @@ public class EditInGoogleDocsPage extends SitePage
         }
     }
 
-    /**
+/**
      * Verify if WebElement back to Share "<" visible.
      *
      * @return true if displayed
@@ -193,7 +194,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Select Discard Changes button.
-     *
+     * 
      * @return- GoogleDocsDiscardChanges
      */
     public GoogleDocsDiscardChanges selectDiscard()
@@ -204,7 +205,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Selects the save to Alfresco button that triggers the form submit.
-     *
+     * 
      * @return - GoogleDocsUpdateFilePage
      */
     public HtmlPage selectSaveToAlfresco()
@@ -226,7 +227,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Selects the save to Alfresco button that triggers the form submit.
-     *
+     * 
      * @return - SharePage
      */
     public HtmlPage selectBackToShare()
@@ -270,7 +271,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Rename the document inside Google Docs.
-     *
+     * 
      * @return- GoogleDocsRenamePage
      */
     public GoogleDocsRenamePage renameDocumentTitle()
@@ -278,6 +279,8 @@ public class EditInGoogleDocsPage extends SitePage
         try
         {
             googledocsframe();
+            drone.waitForPageLoad(15);
+            wait(5);
             drone.findAndWait(GOOGLE_DOC_TITLE).click();
             return new GoogleDocsRenamePage(drone, isGoogleCreate);
         }
@@ -289,7 +292,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Title of the document inside Google Docs.
-     *
+     * 
      * @return- String
      */
     public String getDocumentTitle()
@@ -306,5 +309,17 @@ public class EditInGoogleDocsPage extends SitePage
         {
             throw new PageOperationException("time out in finding the name of doc title", te);
         }
+    }
+
+    private static void wait(int seconds)
+    {
+        long time0;
+        long time1;
+        time0 = System.currentTimeMillis();
+        do
+        {
+            time1 = System.currentTimeMillis();
+        }
+        while (time1 - time0 < seconds * 1000);
     }
 }

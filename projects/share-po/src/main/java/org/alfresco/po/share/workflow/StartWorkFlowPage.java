@@ -46,7 +46,7 @@ public class StartWorkFlowPage extends SharePage
     private static final By WORKFLOW_TITLE_LIST = By.cssSelector("li.yuimenuitem>span.title");
     private static final By WORKFLOW_DROP_DOWN = By.cssSelector("div[id$='default-workflow-definition-menu'] li span.title");
     private final Log logger = LogFactory.getLog(this.getClass());
-    
+
     private static final By ADD_BUTTON = By.cssSelector("div[id$='packageItems-cntrl-itemGroupActions'] span:nth-child(1) span button");
     private static final By SELECT_BUTTON = By.cssSelector("div[id$='assoc_bpm_assignee-cntrl-itemGroupActions'] button");
 
@@ -199,7 +199,10 @@ public class StartWorkFlowPage extends SharePage
 
             for (WebElement workFlow : workflowElements)
             {
-                workFlowTypes.add(WorkFlowType.getWorkflowTypeByTitle(workFlow.getText()));
+                if (!workFlow.getText().isEmpty())
+                {
+                    workFlowTypes.add(WorkFlowType.getWorkflowTypeByTitle(workFlow.getText()));
+                }
             }
         }
         catch (NoSuchElementException nse)
@@ -227,8 +230,7 @@ public class StartWorkFlowPage extends SharePage
         }
         return getWorkflowTypes().contains(workFlowType);
     }
-    
-    
+
     public static HtmlPage startTaskWorkflow(WebDrone drone, String taskName, String assigneeUser, String fileName, String siteName)
     {
         HtmlPage htmlPage = null;
@@ -257,7 +259,7 @@ public class StartWorkFlowPage extends SharePage
 
         return htmlPage;
     }
-    
+
     /**
      * Method to get the Cloud Task or Review page for different languages
      * StartWorkFlow page is returned in common,for any of its subclass.
@@ -265,7 +267,6 @@ public class StartWorkFlowPage extends SharePage
      * @param Language
      * @return CloudTaskOrReviewPage page
      * @author Bogdan
-     * 
      */
     public CloudTaskOrReviewPage getCloudTaskOrReviewPageInLanguage(Language language)
     {
@@ -273,11 +274,11 @@ public class StartWorkFlowPage extends SharePage
         {
             throw new IllegalArgumentException("language can't be null");
         }
-        
+
         drone.findAndWait(WORKFLOW_BUTTON).click();
-        
+
         String label = "";
-        
+
         switch (language)
         {
             case FRENCH:
@@ -310,7 +311,7 @@ public class StartWorkFlowPage extends SharePage
                 label = "Cloud Task or Review";
             }
         }
-  
+
         By dropDown = By.cssSelector("div[id$='default-workflow-definition-menu'] li span.title");
         List<WebElement> liElements = drone.findAndWaitForElements(dropDown);
         for (WebElement liElement : liElements)
@@ -321,7 +322,7 @@ public class StartWorkFlowPage extends SharePage
                 liElement.click();
             }
         }
-        
+
         return new CloudTaskOrReviewPage(drone);
     }
 }
