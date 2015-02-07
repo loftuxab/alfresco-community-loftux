@@ -19,7 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.telnet.TelnetClient;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 
@@ -32,7 +34,7 @@ public class TelnetUtil extends AbstractUtils
 
     /**
      * Method to check connection via telnet
-     * 
+     *
      * @param shareUrl
      * @param port
      * @return true if connection was established, else will be returned false
@@ -66,17 +68,69 @@ public class TelnetUtil extends AbstractUtils
         }
         catch (UnknownHostException e)
         {
-            logger.error("Unknown host: " + server);
+            logger.error("Unknown host: " + server, e);
             status = false;
         }
         catch (IOException e)
         {
-            logger.error("Error connecting to server: " + server + " - " + e.getMessage(), e);
+            logger.error("Error connecting to server: " + server, e);
             status = false;
         }
 
         return status;
 
+    }
+
+    /**
+     * Method to read input stream
+     *
+     * @param shareUrl
+     * @param port
+     * @return String message
+     */
+
+    public static String readStreamString(String shareUrl, String port)
+    {
+        String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+        int portInt = Integer.parseInt(port);
+        TelnetClient telnetClient = new TelnetClient();
+        StringBuilder content = new StringBuilder();
+        BufferedReader reader = null;
+        String inputLine;
+
+        try
+        {
+            if (server == null || portInt < 0 || portInt > 65535)
+            {
+                throw new RuntimeException("Error connecting to server: " + server);
+            }
+
+            telnetClient.connect(server, portInt);
+
+            if (telnetClient.isConnected())
+            {
+                try
+                {
+                    reader = new BufferedReader(new InputStreamReader(telnetClient.getInputStream()));
+                    while ((inputLine = reader.readLine()) != null)
+                    {
+                        content.append(inputLine);
+                    }
+
+                }
+                finally
+                {
+                    reader.close();
+                    telnetClient.disconnect();
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            logger.error("Error connecting to server: " + server, e);
+        }
+
+        return content.toString();
     }
 
 }

@@ -14,17 +14,31 @@
  */
 package org.alfresco.share.util;
 
+import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.mail.*;
-import javax.mail.search.FlagTerm;
-
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.NoSuchProviderException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
+
+//import javax.mail.Flags;
 
 /**
  * @author Aliaksei Boole
@@ -180,16 +194,16 @@ public class MailUtil extends AbstractUtils
             throw new PageException("Can't close connect to email.", e);
         }
     }
-    
+
     /**
      * This method checks the Gmail email by matching only the email subject regardless of the email content type - String or Multipart
-     * 
+     *
      * @param user
      * @param password
      * @param mailSubject
      * @return
      */
- 
+
     public static String checkGmail(String user, String password, String mailSubject)
     {
         sleep();
@@ -307,12 +321,10 @@ public class MailUtil extends AbstractUtils
         JmxUtils.invokeAlfrescoServerProperty(jmxUrl, JMX_OUTBOUND_OBJ_NAME, SMTP_START);
     }
 
-
-
     /**
      * Check that mail get and present in mail box(after 60 sec waiting)
      * If has - deleted that mail(if once return true for mail - next return false)
-     * 
+     *
      * @param mailSubject
      * @return true is mail present in mail box.
      */
@@ -324,7 +336,7 @@ public class MailUtil extends AbstractUtils
     /**
      * Returned mail with title[mailSubject] content as String (after 60 sec waiting)
      * If mail with title not found return empty string.
-     * 
+     *
      * @param email
      * @param mailSubject
      * @return
@@ -372,5 +384,89 @@ public class MailUtil extends AbstractUtils
             e.printStackTrace();
         }
     }
+
+    /**
+     * This method to send email content directly to specific nodes via Alfresco email server
+     *
+     * @param subject
+     * @param body
+     * @param userPass
+     * @param userEmail
+     * @param listRecipients
+     * @param shareUrl
+     * @param port
+     * @return true if email is send
+     */
+
+    public static Boolean sendMailData(String subject, String body, final String userPass, final String userEmail, List listRecipients, String shareUrl, String port)
+    {
+
+        String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+
+        Boolean results = false;
+        Properties props = new Properties();
+        props.put("mail.smtp.host", server);
+        props.put("mail.smtp.port", port);
+
+        Session session = Session.getDefaultInstance(props);
+
+        try
+        {
+            // Instantiate a message
+            Message msg = new MimeMessage(session);
+
+            //Set message attributes
+            msg.setFrom(new InternetAddress(userEmail));
+            msg.setRecipients(Message.RecipientType.TO, getAddresses(listRecipients));
+            msg.setSubject(subject);
+
+            // Set message content
+            msg.setText(body);
+            Transport transport = session.getTransport("smtp");
+
+            try
+            {
+                transport.connect(server, userEmail, userPass);
+                Transport.send(msg);
+                results = true;
+            }
+            finally
+            {
+                transport.close();
+            }
+        }
+        catch (Exception ex)
+        {
+           logger.error("Can't connect to email server", ex);
+        }
+        return results;
+    }
+
+    /**
+     * Creates a list of Internet addresses (email)
+     * @param listRecipients
+     * @return list of Internet addresses (email)
+     * @throws AddressException if an email address is not correct
+     */
+
+    private static InternetAddress[] getAddresses (List listRecipients)
+    {
+        InternetAddress[] addresses = new InternetAddress[listRecipients.size()];
+
+        try
+        {
+            for (int i = 0; i < listRecipients.size(); i++)
+            {
+                addresses[i] = new InternetAddress(listRecipients.get(i).toString());
+            }
+        }
+        catch (AddressException ex)
+        {
+            logger.error("Could not create email address", ex);
+        }
+        return addresses;
+
+    }
+
 
 }
