@@ -23,7 +23,6 @@ import static org.alfresco.web.site.SlingshotPageView.REDIRECT_URI;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -364,14 +363,6 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                 public String getRemoteUser()
                 {
                     String remoteUser = req.getHeader(userHeader);
-                    // MNT-11041 Share SSOAuthenticationFilter and non-ascii username strings
-                    if (remoteUser != null)
-                    {
-                        if (!Charset.forName("US-ASCII").newEncoder().canEncode(remoteUser))
-                        {
-                            remoteUser = new String(Base64.decode(remoteUser.getBytes()));
-                        }
-                    }
                     if (remoteUser != null)
                     {
                         remoteUser = extractUserFromProxyHeader(remoteUser);

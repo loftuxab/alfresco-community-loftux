@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.extensions.config.RemoteConfigElement.ConnectorDescriptor;
 import org.springframework.extensions.surf.ServletUtil;
-import org.springframework.extensions.surf.util.Base64;
 import org.springframework.extensions.webscripts.RequestCachingConnector;
 import org.springframework.extensions.webscripts.connector.AlfrescoConnector;
 import org.springframework.extensions.webscripts.connector.Connector;
@@ -196,7 +195,7 @@ public class SlingshotAlfrescoConnector extends RequestCachingConnector
                 String user = req.getHeader(userHeader);
                 if (user != null)
                 {
-                    headers.put(userHeader, new String(Base64.encodeBytes(user.getBytes())));
+                    headers.put(userHeader, user);
                 }
             }
         }
