@@ -739,33 +739,40 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
             SmbFile sFile = new SmbFile("smb://" + server + "/" + cifsPath + "/" + fileName, auth);
 
-            FileOutputStream fileOutputStream = null;
+                FileOutputStream outputStream = null;
             SmbFileInputStream smbfileInputStream = null;
             try
             {
-                fileOutputStream = new FileOutputStream(downloadDirectory + fileName);
+                    outputStream = new FileOutputStream(downloadDirectory + fileName);
                 smbfileInputStream = new SmbFileInputStream(sFile);
 
                 byte[] buf = new byte[16 * 1024 * 1024];
                 int len;
                 while ((len = smbfileInputStream.read(buf)) != -1)
                 {
-                    fileOutputStream.write(buf, 0, len);
+                        outputStream.write(buf, 0, len);
                 }
-                smbfileInputStream.close();
-                fileOutputStream.close();
                 successful = true;
-
             }
             catch (IOException ex)
             {
-                throw new RuntimeException(ex.getMessage());
+                    throw new RuntimeException("Content isn't downloaded", ex);
+                }
+                finally
+                {
+                    if (smbfileInputStream != null)
+                        smbfileInputStream.close();
+                    if (outputStream != null)
+                    {
+                        outputStream.flush();
+                        outputStream.close();
+                    }
             }
 
         }
         catch (IOException ex)
         {
-            throw new RuntimeException(ex.getMessage());
+            throw new RuntimeException("Content isn't downloaded", ex);
         }
 
         return successful;

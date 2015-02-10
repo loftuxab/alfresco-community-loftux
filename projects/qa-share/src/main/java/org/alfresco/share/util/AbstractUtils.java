@@ -21,6 +21,7 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -36,6 +37,7 @@ import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1913,4 +1915,38 @@ public abstract class AbstractUtils implements AlfrescoTests
             file.delete();
         }
     }
+
+
+    public static String checksum (String fileName) throws IOException
+        {
+        try {
+            String filePath = new File(downloadDirectory + fileName).getAbsolutePath();
+
+
+            InputStream fin = new FileInputStream(filePath);
+            java.security.MessageDigest md5er =
+                    MessageDigest.getInstance("MD5");
+            byte[] buffer = new byte[1024];
+            int read;
+            do {
+                read = fin.read(buffer);
+                if (read > 0)
+                    md5er.update(buffer, 0, read);
+            }
+            while (read != -1);
+            fin.close();
+            byte[] digest = md5er.digest();
+            if (digest == null)
+                return null;
+            String strDigest = "0x";
+            for (int i = 0; i < digest.length; i++)
+            {
+                strDigest += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1).toUpperCase();
+            }
+            return strDigest;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

@@ -121,18 +121,19 @@ public class WebDavUtil extends AbstractUtils
         return false;
     }
 
-    public static boolean downloadContent(String shareUrl, String userName, String password, String remoteContentName, String remoteFolderPath)
-    {
+    public static boolean downloadContent(String shareUrl, String userName, String password, String remoteContentName, String remoteFolderPath) throws IOException {
         boolean result = false;
 
-
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        GetMethod getMethod = null;
         try
         {
             HttpClient client = connectServer(shareUrl, userName, password);
-            GetMethod getMethod = new GetMethod(serverUrl + "/" + remoteFolderPath + remoteContentName);
+            getMethod = new GetMethod(serverUrl + "/" + remoteFolderPath + remoteContentName);
             client.executeMethod(getMethod);
-            InputStream inputStream = getMethod.getResponseBodyAsStream();
-            OutputStream outputStream = new FileOutputStream(downloadDirectory + remoteContentName);
+            inputStream = getMethod.getResponseBodyAsStream();
+            outputStream = new FileOutputStream(downloadDirectory + remoteContentName);
 
 
             if (inputStream != null)
@@ -145,17 +146,27 @@ public class WebDavUtil extends AbstractUtils
                     outputStream.write(buffer, 0, l);
                 }
 
-                logger.info("Content uploaded!");
-                inputStream.close();
-//                outputStream.flush();
-                outputStream.close();
-                getMethod.releaseConnection();
+                logger.info("Content downloaded!");
                 result = true;
             }
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Content isn't downloaded", e);
+        }
+        finally
+        {
+            if (inputStream != null)
+            inputStream.close();
+            if (outputStream !=null)
+            {
+                outputStream.flush();
+                outputStream.close();
+            }
+
+            if (getMethod != null) {
+                getMethod.releaseConnection();
+            }
         }
         return result;
     }

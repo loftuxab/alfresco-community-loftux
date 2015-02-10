@@ -1041,8 +1041,8 @@ public class FtpUtil extends AbstractUtils
     public static boolean downloadContent(String shareUrl, String user, String password, String contentName, String remoteFolderPath)
     {
 
-        InputStream inputStream;
-        OutputStream outputStream;
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         boolean result = false;
 
         try
@@ -1067,28 +1067,35 @@ public class FtpUtil extends AbstractUtils
                             outputStream.write(buffer, 0, l);
                         }
                         logger.info("Content uploaded!");
-                        inputStream.close();
-                        outputStream.flush();
-                        outputStream.close();
-                        ftpClient.logout();
-                        ftpClient.disconnect();
                         result = true;
                     }
                     else
                     {
                         logger.error(ftpClient.getReplyString());
                     }
+
                 }
                 catch (IOException ex)
                 {
-                    throw new RuntimeException(ex.getMessage());
+                    throw new RuntimeException("Connection to FTP isn't established", ex);
+                }
+                finally
+                {
+                    if (inputStream != null)
+                    inputStream.close();
+                    if (outputStream != null)
+                    {
+                        outputStream.flush();
+                        outputStream.close();
+                    }
+                    ftpClient.logout();
+                    ftpClient.disconnect();
                 }
         }
         catch (IOException ex)
         {
-            throw new RuntimeException(ex.getMessage());
+            throw new RuntimeException("Content isn't downloaded", ex);
         }
-
         return result;
     }
 
