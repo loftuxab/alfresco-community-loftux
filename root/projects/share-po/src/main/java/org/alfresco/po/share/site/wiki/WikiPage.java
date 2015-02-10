@@ -28,6 +28,7 @@ import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.document.TinyMceEditor;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
+import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderElement;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
@@ -40,6 +41,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
 
 /**
  * Site wiki main page object, holds all element of the HTML page relating to
@@ -979,12 +981,12 @@ public class WikiPage extends SitePage
      *
      * @param versionNum
      */
-    public void viewVersion(Double versionNum)
+    public HtmlPage viewVersion(Double versionNum)
     {
         logger.info("Viewing Wiki Page version");
         if (versionNum == null)
         {
-            throw new PageException("Version number is required");
+            throw new IllegalArgumentException("Version number is required");
         }
         try
         {
@@ -1019,6 +1021,7 @@ public class WikiPage extends SitePage
         {
             throw new PageException("Unable to find the button");
         }
+        return drone.getCurrentPage();
     }
 
     /**
