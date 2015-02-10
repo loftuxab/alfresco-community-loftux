@@ -88,14 +88,14 @@ public class WikiPageTest extends AbstractSiteDashletTest
     @Test(dependsOnMethods="testWikiPageDisplay")
     public void testBulletListOfWikiPage()
     {
-    	wikiPage.createWikiPageTitle(wikiTitle);
-    	textLines.add("This is a new Wiki text!");
-    	wikiPage.insertText(textLines);
-    	TinyMceEditor tinyMceEditor = wikiPage.getTinyMCEEditor();    	
-    	tinyMceEditor.clickTextFormatter(FormatType.BULLET);
-    	Assert.assertEquals(textLines.get(0), tinyMceEditor.getText());       
+        wikiPage.createWikiPageTitle(wikiTitle);
+        textLines.add("This is a new Wiki text!");
+        wikiPage.insertText(textLines);
+        TinyMceEditor tinyMceEditor = wikiPage.getTinyMCEEditor();
+        tinyMceEditor.clickTextFormatter(FormatType.BULLET);
+        Assert.assertEquals(textLines.get(0), tinyMceEditor.getText());
         Assert.assertTrue(tinyMceEditor.getContent().contains("<li>" + textLines.get(0) + "</li>"));
-        wikiPage.clickSaveButton();
+         wikiPage.clickSaveButton();
     }
     
     @Test(dependsOnMethods = "testBulletListOfWikiPage", enabled = false)
@@ -108,12 +108,13 @@ public class WikiPageTest extends AbstractSiteDashletTest
     }
     
     @Test(dependsOnMethods = "testFontStyle", enabled = false)
-    public void testFontSize() throws Exception{
-    	wikiPage.clickFontSize();
-    	Assert.assertEquals(textLines.get(0), wikiPage.retrieveWikiText("FONT"));
-    	wikiPage.clickOnRemoveFormatting();
-    	Assert.assertEquals(textLines.get(0),wikiPage.retrieveWikiText(""));
-    	wikiPage.clickSaveButton();
+    public void testFontSize() throws Exception
+    {
+        wikiPage.clickFontSize();
+        Assert.assertEquals(textLines.get(0), wikiPage.retrieveWikiText("FONT"));
+        wikiPage.clickOnRemoveFormatting();
+        Assert.assertEquals(textLines.get(0),wikiPage.retrieveWikiText(""));
+        wikiPage.clickSaveButton();
     }
 
     @Test (dependsOnMethods = "testBulletListOfWikiPage")
@@ -131,9 +132,9 @@ public class WikiPageTest extends AbstractSiteDashletTest
     public void testViewVersion()
     {
         Double versionToView = 1.0;
-        wikiPage.viewVersion(versionToView);
-        Assert.assertTrue(wikiPage.getWikiText().contentEquals(textLines.get(0))
-            && wikiPage.getCurrentWikiVersion().equals(versionToView));
+        wikiPage.viewVersion(versionToView).render();
+        Assert.assertTrue(wikiPage.getWikiText().contentEquals(textLines.get(0)));
+        Assert.assertTrue(versionToView.equals(wikiPage.getCurrentWikiVersion()));
     }
 
     @Test (dependsOnMethods = "testViewVersion", groups="ChromeIssue")
