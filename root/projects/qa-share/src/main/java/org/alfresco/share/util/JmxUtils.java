@@ -5,7 +5,11 @@ import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.management.*;
+import javax.management.Attribute;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -133,6 +137,50 @@ public class JmxUtils extends AbstractUtils
             MBeanServerConnection mBSC = connector.getMBeanServerConnection();
             ObjectName objectJmx = new ObjectName(objectName);
             mBSC.invoke(objectJmx, operation, new Object[] {}, new String[] {});
+            connector.close();
+        }
+        catch (InstanceNotFoundException ex)
+        {
+            // assuming that if we've faced an exception due to Alfresco installation onto IBM Webshpere
+            // try to query Mbeans according to WAS implementation
+            invokeAlfrescoServerProperty(getWasObjectName(objectName), operation);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public static Object invokeAlfrescoOperation(String hostURL, String objectName, String operation)
+    {
+        try
+        {
+
+            JMXConnector connector = makeJmxConnector(hostURL);
+            MBeanServerConnection mBSC = connector.getMBeanServerConnection();
+            ObjectName objectJmx = new ObjectName(objectName);
+            Object  result = mBSC.invoke(objectJmx, operation, new Object[]{}, new String[]{});
+            connector.close();
+            return result;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
+
+    }
+
+    public static void invokeAlfrescoServerPropertyProp(String hostURL, String objectName, String operation, String prop)
+    {
+        try
+        {
+            JMXConnector connector = makeJmxConnector(hostURL);
+            MBeanServerConnection mBSC = connector.getMBeanServerConnection();
+            ObjectName objectJmx = new ObjectName(objectName);
+            Object obj = prop;
+            Object [] paramsForInvoke = new Object[] {obj};
+            String signitureForInvoke[] = {String.class.getName()};
+            mBSC.invoke(objectJmx, operation, paramsForInvoke, signitureForInvoke);
             connector.close();
         }
         catch (InstanceNotFoundException ex)

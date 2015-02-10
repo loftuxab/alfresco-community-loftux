@@ -1,6 +1,7 @@
 package org.alfresco.share.util;
 
 import com.jcraft.jsch.*;
+import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.exec.CommandLine;
@@ -596,4 +597,33 @@ public class RemoteUtil extends AbstractUtils
         alfHome = JmxUtils.getAlfrescoServerProperty(nodeUrl, jmxSysProps, jmxAlfHome).toString();
         catalinaHome = JmxUtils.getAlfrescoServerProperty(nodeUrl, jmxSysProps, jmxCatalinaHome).toString();
     }
+
+    public static void uploadFileFromRemoteFolderToLocalFtp(String filePath, String ftpFilePath, String userName, String userPassword, String serverIP) throws Exception
+    {
+        initConnection();
+        commandProcessor.executeCommand("curl -T " + filePath + " --user " + userName + ":" + userPassword + " ftp://" + serverIP + "/Alfresco/" + ftpFilePath);
+        logger.info("File uploaded!");
+        commandProcessor.disconnect();
+    }
+
+    public static void removeItem(String folderPath) 
+    {
+
+        initConnection();
+        commandProcessor.executeCommand("rm -rf " + folderPath);
+        logger.info("Item is deleted");
+        commandProcessor.disconnect();
+
+    }
+
+    public static void executeCommand (String command) 
+    {
+
+        initConnection();
+        commandProcessor.executeCommand(command);
+        logger.info("Command is executed");
+        commandProcessor.disconnect();
+
+    }
+
 }
