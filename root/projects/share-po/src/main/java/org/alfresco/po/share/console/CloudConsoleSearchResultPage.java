@@ -23,6 +23,7 @@ import org.openqa.selenium.WebElement;
 public class CloudConsoleSearchResultPage extends CloudConsolePage
 {
     private static final By AUDIT_LOG_LINK = By.cssSelector("li>a[href*='audit']");
+    private static final By PERSON_DETAILS_LINK = By.cssSelector("li>a[href*='accounts']");
 
     public CloudConsoleSearchResultPage(WebDrone drone)
     {
@@ -82,7 +83,14 @@ public class CloudConsoleSearchResultPage extends CloudConsolePage
     {
         try
         {
-            return drone.find(AUDIT_LOG_LINK).isDisplayed();
+            if (drone.findDisplayedElements(AUDIT_LOG_LINK).size()>0)
+            {
+                return drone.find(AUDIT_LOG_LINK).isDisplayed();
+            }
+            else
+            {
+               return drone.find(PERSON_DETAILS_LINK).isDisplayed();
+            }
         }
         catch (NoSuchElementException nse)
         {
