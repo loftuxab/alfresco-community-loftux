@@ -60,7 +60,7 @@ public class SanityCifsClusterTest extends AbstractUtils
     String mapConnect;
     String mapConnect2;
     String networkDrive2;
-    String networkPath2;
+    String networkPathNew2;
     static String folderName = getRandomString(10);
     private static String cifsPath = "\\" + folderName + "\\";
     private static String cifsPathValidate = "\\Sites\\";
@@ -121,25 +121,26 @@ public class SanityCifsClusterTest extends AbstractUtils
         networkDrive2 = previous.toUpperCase() + ":";
 
         String ip = getAddressNetworkPath(node1Url);
-        networkPath = networkPath.replaceFirst(regexUrlWithPort, ip);
-        if (networkPath.contains("alfresco\\"))
+        String networkPathNew = networkPath.concat("webdav");
+        networkPathNew = networkPathNew.replaceFirst(regexUrlWithPort, ip);
+        if (networkPathNew.contains("alfresco\\"))
         {
-            networkPath = networkPath.replace("alfresco\\", "alfresco");
+            networkPathNew = networkPathNew.replace("alfresco\\", "alfresco");
         }
 
         String ip2 = getAddressNetworkPath(node2Url);
-        networkPath2 = networkPath2.replaceFirst(regexUrlWithPort, ip2);
-        if (networkPath2.contains("alfresco\\"))
+        networkPathNew2 = networkPathNew2.replaceFirst(regexUrlWithPort, ip2);
+        if (networkPathNew2.contains("alfresco\\"))
         {
-            networkPath2 = networkPath2.replace("alfresco\\", "alfresco");
+            networkPathNew2 = networkPathNew2.replace("alfresco\\", "alfresco");
         }
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPathNew + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
         Runtime.getRuntime().exec(mapConnect);
 
         webDriverWait(drone, 5000);
 
-        mapConnect2 = "cmd /c start /WAIT net use" + " " + networkDrive2 + " " + networkPath2 + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
+        mapConnect2 = "cmd /c start /WAIT net use" + " " + networkDrive2 + " " + networkPathNew2 + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
         Runtime.getRuntime().exec(mapConnect2);
 
         CifsUtil.addSpace(node1Url, ADMIN_USERNAME, ADMIN_PASSWORD, "Alfresco/", folderName);
