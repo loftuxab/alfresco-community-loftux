@@ -310,6 +310,12 @@ public abstract class AbstractUtils implements AlfrescoTests
     protected static String truststorePath;
     protected static String networkPath;
     protected static String networkDrive;
+    protected static String transformServInstallationTarget;
+    protected static String transformHostName1;
+    protected static String transformHostName2;
+    protected static String pbldUserName;
+    protected static String pbldUserPassword;
+    protected static String pathToRSAKey;
 
     protected static AlfrescoVersion alfrescoVersion;
     protected static Map<WebDrone, ShareTestProperty> dronePropertiesMap = new HashMap<WebDrone, ShareTestProperty>();
@@ -398,6 +404,12 @@ public abstract class AbstractUtils implements AlfrescoTests
         truststorePath = testProperties.getTruststorePath();
         networkPath = testProperties.getNetworkPath();
         networkDrive = testProperties.getNetworkDrive();
+        transformServInstallationTarget = testProperties.getTransformServInstallationTarget();
+        transformHostName1 = testProperties.getTransformHostName1();
+        transformHostName2 = testProperties.getTransformHostName2();
+        pbldUserName = testProperties.getPbldUserName();
+        pbldUserPassword = testProperties.getPbldUserPassword();
+        pathToRSAKey = testProperties.getPathToRSAKey();
 
         DEFAULT_FREENET_USER = DEFAULT_USER + "@" + DOMAIN_FREE;
         DEFAULT_PREMIUMNET_USER = DEFAULT_USER + "@" + DOMAIN_PREMIUM;
