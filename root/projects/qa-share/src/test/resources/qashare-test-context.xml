@@ -118,6 +118,12 @@
         <constructor-arg name="truststorePath" value="${truststorePath}" />
         <constructor-arg name="networkPath" value="${network.map.path}" />
         <constructor-arg name="networkDrive" value="${network.map.driver}" />
+        <constructor-arg name="transformServInstallationTarget" value="${transformServInstallationTarget}" />
+        <constructor-arg name="transformHostName1" value="${transformHostName1}" />
+        <constructor-arg name="transformHostName2" value="${transformHostName2}" />
+        <constructor-arg name="pbldUserName" value="${pbldUserName}" />
+        <constructor-arg name="pbldUserPassword" value="${pbldUserPassword}" />
+        <constructor-arg name="pathToRSAKey" value="${pathToRSAKey}" />
     </bean>
 
     <!-- -->
@@ -190,6 +196,12 @@
         <constructor-arg name="truststorePath" value="${truststorePath}" />
         <constructor-arg name="networkPath" value="${network.map.path}" />
         <constructor-arg name="networkDrive" value="${network.map.driver}" />
+        <constructor-arg name="transformServInstallationTarget" value="${transformServInstallationTarget}" />
+        <constructor-arg name="transformHostName1" value="${transformHostName1}" />
+        <constructor-arg name="transformHostName2" value="${transformHostName2}" />
+        <constructor-arg name="pbldUserName" value="${pbldUserName}" />
+        <constructor-arg name="pbldUserPassword" value="${pbldUserPassword}" />
+        <constructor-arg name="pathToRSAKey" value="${pathToRSAKey}" />
     </bean>
 
     <util:constant id="englishLocale" static-field="java.util.Locale.ENGLISH" />

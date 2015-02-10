@@ -33,7 +33,7 @@ public class SshCommandProcessor extends AbstractUtils
     private final JSch jsch = new JSch();
     private Session session;
 
-    public void connect()
+    public Session connect()
     {
         int i = 0;
         boolean result = false;
@@ -75,6 +75,7 @@ public class SshCommandProcessor extends AbstractUtils
                 // System.exit(1);
             }
         }
+        return session;
     }
 
     public void disconnect()
@@ -96,7 +97,7 @@ public class SshCommandProcessor extends AbstractUtils
             ((ChannelExec) channel).setCommand(command);
             channel.setInputStream(null);
             ((ChannelExec) channel).setErrStream(System.err);
-            InputStream in = channel.getInputStream();
+            InputStream in = channel.getExtInputStream();
             channel.connect();
             byte[] tmp = new byte[1024];
             while (true)

@@ -93,6 +93,12 @@ public class ShareTestProperty
     private String truststorePath;
     private String networkPath;
     private String networkDrive;
+    private String transformServInstallationTarget;
+    private  String transformHostName1;
+    private  String transformHostName2;
+    private  String pbldUserName;
+    private  String pbldUserPassword;
+    private  String pathToRSAKey;
 
 
     public ShareTestProperty(final String shareUrl, String jmxShareUrl, final String apiUrl, final String gridUrl, final String username, final String password, String alfrescoVersion,
@@ -103,7 +109,7 @@ public class ShareTestProperty
             final String uniqueTestDataString, final String adminUsername, final String adminPassword, final String superadminUsername,
             final String superadminPassword, final int httpSecurePort, final String headerKey, final String mimeTypes, final String jmxrmiPort, final String jmxrmiUser, final String jmxrmiPassword, final String nodePort, final String licenseShare, final String maxWaitTimeCloudSync,
             final String blogUrl, final String blogUsername, final String blogPassword, final String nfsMountPort,  final String mountPointHost, final String nfsPort,final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String wcmqs, final String replicationEndPointHost,
-            final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath, final String networkPath, final String networkDrive)
+            final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath, final String networkPath, final String networkDrive, final String transformServInstallationTarget, final String transformHostName1, final String transformHostName2, final String pbldUserName, final String pbldUserPassword, final String pathToRSAKey)
     {
         this.shareUrl = shareUrl;
         this.jmxShareUrl = jmxShareUrl;
@@ -165,6 +171,13 @@ public class ShareTestProperty
         this.truststorePath = truststorePath;
         this.networkPath = networkPath;
         this.networkDrive = networkDrive;
+        this.transformServInstallationTarget = transformServInstallationTarget;
+        this.transformHostName1 = transformHostName1;
+        this.transformHostName2 = transformHostName2;
+        this.pbldUserName = pbldUserName;
+        this.pbldUserPassword = pbldUserPassword;
+        this.pathToRSAKey = pathToRSAKey;
+
     }
 
     public String getMaxWaitTimeCloudSync()
@@ -445,7 +458,7 @@ public class ShareTestProperty
     /**
      * Set the path to setWcmqs
      *
-     * @param setWcmqs
+     * @param wcmqs
      */
     public void setWcmqs(String wcmqs)
     {
@@ -705,5 +718,35 @@ public class ShareTestProperty
     public void setNetworkDrive(String networkDrive)
     {
         this.networkDrive = networkDrive;
+    }
+
+    public String getTransformServInstallationTarget()
+    {
+        return transformServInstallationTarget;
+    }
+
+    public String getTransformHostName1()
+    {
+        return transformHostName1;
+    }
+
+    public String getTransformHostName2()
+    {
+        return transformHostName2;
+    }
+
+    public String getPbldUserName()
+    {
+        return pbldUserName;
+    }
+
+    public String getPbldUserPassword()
+    {
+        return pbldUserPassword;
+    }
+
+    public String getPathToRSAKey()
+    {
+        return pathToRSAKey;
     }
 }
