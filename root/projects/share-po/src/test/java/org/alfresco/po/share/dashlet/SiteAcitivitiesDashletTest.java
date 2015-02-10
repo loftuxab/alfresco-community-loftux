@@ -194,13 +194,6 @@ public class SiteAcitivitiesDashletTest extends AbstractSiteDashletTest
     }
 
     @Test(dependsOnMethods = "selectFake", priority = 1)
-    public void verifyIsBtnRss()
-    {
-        SiteActivitiesDashlet dashlet = siteDashBoard.getDashlet(SITE_ACTIVITY).render();
-        assertTrue(dashlet.isRssBtnDisplayed());
-    }
-
-    @Test(dependsOnMethods = "verifyIsBtnRss", groups = "ChromeIssue")
     public void verifyRss()
     {
         String currentUrl = drone.getCurrentUrl();
