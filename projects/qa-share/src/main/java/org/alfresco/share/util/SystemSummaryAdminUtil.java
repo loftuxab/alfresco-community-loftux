@@ -36,7 +36,7 @@ public class SystemSummaryAdminUtil extends AbstractUtils
 {
     //Open LDAP
     public static final String LDAP_OPEN_URL = "ldap://172.30.40.61:3268";
-    public static final String USER_NAME_FORMAT_OPEN = "%s,CN=Users,DC=qalab,DC=alfresco,DC=org";
+    public static final String USER_NAME_FORMAT_OPEN = "CN=%s,CN=Users,DC=qalab,DC=alfresco,DC=org";
     public static final String ADMIN_USER_NAME_OPEN = "admin";
     public static final String SECURITY_NAME_PRINCIPAL_OPEN = "CN=admin,CN=Users,DC=qalab,DC=alfresco,DC=org";
     public static final String USER_SEARCH_BASE_OPEN = "CN=Users,DC=qalab,DC=alfresco,DC=org";
