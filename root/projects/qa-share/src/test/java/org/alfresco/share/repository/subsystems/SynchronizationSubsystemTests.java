@@ -23,6 +23,8 @@ import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.PeopleFinderPage;
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.UserProfilePage;
+import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.systemsummary.directorymanagement.DirectoryInfoRow;
 import org.alfresco.po.share.systemsummary.directorymanagement.DirectoryManagementPage;
 import org.alfresco.share.util.AbstractUtils;
@@ -58,6 +60,9 @@ public class SynchronizationSubsystemTests extends AbstractUtils
     private static String syncAutoCreate = "synchronization.autoCreatePeopleOnLogin";
     private static String syncWhenMissing = "synchronization.syncWhenMissingPeopleLogIn";
     private static String syncOnStartup = "synchronization.syncOnStartup";
+    private static String[] users;
+    private String testUser1;
+    private String testUser2;
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -66,6 +71,9 @@ public class SynchronizationSubsystemTests extends AbstractUtils
         super.setup();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
+        testUser1 = MailUtil.BOT_MAIL_2.split("[@]+")[0];
+        testUser2 = MailUtil.BOT_MAIL_3.split("[@]+")[0];
+        users = new String [] {testUser1, testUser2};
 
         try
         {
@@ -82,6 +90,20 @@ public class SynchronizationSubsystemTests extends AbstractUtils
             JmxUtils.invokeAlfrescoServerProperty(shareUrl, syncObject, "stop");
             JmxUtils.invokeAlfrescoServerProperty(shareUrl, syncObject, "start");
 
+            // Delete testUser1 and testUser2 from Alfresco
+            ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+            DashBoardPage dashBoardPage = drone.getCurrentPage().render();
+            UserSearchPage userSearchPage = dashBoardPage.getNav().getUsersPage().render();
+
+            for (String user : users)
+            {
+                UserSearchPage results = userSearchPage.searchFor(user).render();
+                if (results.hasResults())
+                {
+                    UserProfilePage userProfile = results.clickOnUser(user).render();
+                    userProfile.deleteUser().render();
+                }
+            }
         }
         catch (Exception e)
         {
@@ -97,7 +119,6 @@ public class SynchronizationSubsystemTests extends AbstractUtils
     @Test(groups = "EnterpriseOnly")
     public void AONE_7289() throws Exception
     {
-        String testUser = MailUtil.BOT_MAIL_2.split("[@]+")[0];
         String password = MailUtil.PASSWORD_OUTBOUND_ALFRESCO;
         String authChainName = RandomUtil.getRandomString(5);
 
@@ -114,10 +135,10 @@ public class SynchronizationSubsystemTests extends AbstractUtils
             JmxUtils.invokeAlfrescoServerProperty(shareUrl, syncObject, "stop");
             JmxUtils.invokeAlfrescoServerProperty(shareUrl, syncObject, "start");
 
-            // Try to log in to Share as testUser;
+            // Verify can't login testUser1 who does not yet exist in Alfresco;
             ShareUser.deleteSiteCookies(drone,shareUrl);
-            SharePage resultPage = login(drone, testUser, password).render();
-            assertFalse(resultPage.isLoggedIn(), testUser + " can login with old password");
+            SharePage resultPage = login(drone, testUser1, password).render();
+            assertFalse(resultPage.isLoggedIn(), testUser1 + " can login");
 
         }
         finally
@@ -144,8 +165,6 @@ public class SynchronizationSubsystemTests extends AbstractUtils
     @Test(groups = "EnterpriseOnly")
     public void AONE_7290() throws Exception
     {
-        String testUser1 = MailUtil.BOT_MAIL_2.split("[@]+")[0];
-        String testUser2 = MailUtil.BOT_MAIL_3.split("[@]+")[0];
         String password = MailUtil.PASSWORD_OUTBOUND_ALFRESCO;
         String authChainName = RandomUtil.getRandomString(5);
 
@@ -171,15 +190,11 @@ public class SynchronizationSubsystemTests extends AbstractUtils
             PeopleFinderPage peopleFinderPage = dashBoard.getNav().selectPeople().render();
             peopleFinderPage = peopleFinderPage.searchFor(testUser2).render();
             List<ShareLink> names = peopleFinderPage.getResults();
-            assertTrue(names.size() == 0);
+            assertTrue(names.size() == 0, testUser2 + "is found");
 
         }
         finally
         {
-            // Delete testUser
-            ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-            ShareUser.deleteUser(drone, testUser1);
-
             // Set default property "synchronization.autoCreatePeopleOnLogin"
             JmxUtils.setAlfrescoServerProperty(shareUrl, syncObject, syncWhenMissing, true);
 
