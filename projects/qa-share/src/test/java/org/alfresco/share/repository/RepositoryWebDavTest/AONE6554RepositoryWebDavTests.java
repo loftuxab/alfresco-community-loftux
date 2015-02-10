@@ -16,7 +16,6 @@
 package org.alfresco.share.repository.RepositoryWebDavTest;
 
 import com.cobra.ldtp.Ldtp;
-import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.explorer.WindowsExplorer;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.share.util.AbstractUtils;
@@ -31,7 +30,6 @@ import org.alfresco.utilities.LdtpUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -58,10 +56,7 @@ public class AONE6554RepositoryWebDavTests extends AbstractUtils
     String folderNameCheck = "lst" + folderName.replaceAll("\\W", "");
 
     WindowsExplorer explorer = new WindowsExplorer();
-    MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
     String mapConnect;
-    String networkDrive;
-    String networkPath;
     private static String sitesPath = "\\Sites\\";
     LdtpUtil ldtpUtil = new LdtpUtil();
     Process removeMappedDrive;
@@ -71,11 +66,12 @@ public class AONE6554RepositoryWebDavTests extends AbstractUtils
     public void setup() throws Exception
     {
         super.setup();
-
         removeMappedDrive = Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
         removeMappedDrive.waitFor();
-
-        logger.info("[Suite ] : Start Test in: " + "AONE6554RepositoryWebDavTests");
+        Process process = Runtime.getRuntime().exec("net stop webclient");
+        process.waitFor();
+        process = Runtime.getRuntime().exec("net start webclient");
+        process.waitFor();
     }
 
     @BeforeMethod(groups = "setup", timeOut = 150000)
@@ -86,14 +82,11 @@ public class AONE6554RepositoryWebDavTests extends AbstractUtils
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
-        networkDrive = word.getMapDriver();
-        networkPath = word.getMapPath();
-        if (networkPath.contains("alfresco\\"))
-        {
-            networkPath = networkPath.concat("webdav");
-        }
+        ShareUser.logout(drone);
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
+        String networkPathNew = networkPath.concat("webdav");
+
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPathNew + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
 
         // Runtime.getRuntime().exec(mapConnect);
         Process process = Runtime.getRuntime().exec(mapConnect);
@@ -107,11 +100,13 @@ public class AONE6554RepositoryWebDavTests extends AbstractUtils
         else
         {
             logger.error("----------Mapping was not done " + testUser);
+            Assert.fail("Mapping was not done " + testUser);
         }
 
         // Any site is created
         ShareUser.login(drone, testUser);
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
 
     }
 
@@ -133,6 +128,10 @@ public class AONE6554RepositoryWebDavTests extends AbstractUtils
     public void AONE_6554() throws Exception
     {
 
+        if (!CifsUtil.checkDirOrFileExists(10, 200, networkDrive + sitesPath))
+        {
+            Assert.fail("Mapping was not done " + testUser);
+        }
         // Alfresco WebDAV connection is established
         String docLib = "\\documentLibrary";
         // Alfresco WebDAV connection is established
@@ -166,25 +165,15 @@ public class AONE6554RepositoryWebDavTests extends AbstractUtils
 
         int fileCount = docLibPage.getFiles().size();
 
+        ShareUser.logout(drone);
+
         // The file and folder are not displayed
         Assert.assertTrue(fileCount == 0, "Some file isn't hidden in Document Library. MNT-13125 and MNT-8116");
 
-        ShareUser.logout(drone);
     }
 
     @AfterMethod(groups = "teardown", timeOut = 150000)
     public void endTest()
-    {
-        ShareUser.login(drone, testUser);
-        SiteUtil.deleteSite(drone, siteName);
-        ShareUser.logout(drone);
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-        ShareUser.deleteUser(drone, testUser).render();
-        ShareUser.logout(drone);
-    }
-
-    @AfterClass(groups = "teardown", timeOut = 150000)
-    public void tearDownClass()
     {
         try
         {
@@ -196,7 +185,11 @@ public class AONE6554RepositoryWebDavTests extends AbstractUtils
             logger.error("Error occurred during delete mapped drive ", e);
         }
 
-        logger.info("[Suite ] : End Test in: " + "AONE6554RepositoryWebDavTests");
+        ShareUser.login(drone, testUser);
+        SiteUtil.deleteSite(drone, siteName);
+        ShareUser.logout(drone);
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUser.deleteUser(drone, testUser).render();
     }
 
 }

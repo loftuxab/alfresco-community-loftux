@@ -25,12 +25,12 @@ import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -59,8 +59,10 @@ public class AONE6547RepositoryWebDavTests extends AbstractUtils
 
         removeMappedDrive = Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
         removeMappedDrive.waitFor();
-
-        logger.info("[Suite ] : Start Test in: " + "AONE6547RepositoryWebDavTests");
+        Process process = Runtime.getRuntime().exec("cmd /c start /WAIT net stop webclient");
+        process.waitFor();
+        process = Runtime.getRuntime().exec("cmd /c start /WAIT net start webclient");
+        process.waitFor();
     }
 
     @BeforeMethod(groups = "setup", timeOut = 150000)
@@ -70,6 +72,7 @@ public class AONE6547RepositoryWebDavTests extends AbstractUtils
         // Create user
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        ShareUser.logout(drone);
 
         // Any site is created
         ShareUser.login(drone, testUser);
@@ -148,17 +151,7 @@ public class AONE6547RepositoryWebDavTests extends AbstractUtils
     @AfterMethod(groups = "teardown", timeOut = 150000)
     public void endTest()
     {
-        ShareUser.login(drone, testUser);
-        SiteUtil.deleteSite(drone, siteName);
-        ShareUser.logout(drone);
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-        ShareUser.deleteUser(drone, testUser).render();
-        ShareUser.logout(drone);
-    }
 
-    @AfterClass(groups = "teardown", timeOut = 150000)
-    public void tearDownClass()
-    {
         try
         {
             removeMappedDrive = Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
@@ -169,7 +162,10 @@ public class AONE6547RepositoryWebDavTests extends AbstractUtils
             logger.error("Error occurred during delete mapped drive ", e);
         }
 
-        logger.info("[Suite ] : End Test in: " + "AONE6547RepositoryWebDavTests");
+        ShareUser.login(drone, testUser);
+        SiteUtil.deleteSite(drone, siteName);
+        ShareUser.logout(drone);
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUser.deleteUser(drone, testUser).render();
     }
-
 }
