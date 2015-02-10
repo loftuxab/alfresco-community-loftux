@@ -14,6 +14,7 @@
  */
 package org.alfresco.po.share;
 
+import org.alfresco.po.alfresco.AlfrescoTransformationServerHistoryPage;
 import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
 import org.alfresco.po.alfresco.TenantAdminConsolePage;
 import org.alfresco.po.alfresco.WebScriptsPage;
@@ -246,6 +247,7 @@ public class FactorySharePage implements PageFactory
         pages.put("analyze", AdhocAnalyzerPage.class);
         pages.put("analyze-site", AdhocAnalyzerPage.class);
         pages.put("manage-users", AccountSettingsPage.class);
+        pages.put("transformations", AlfrescoTransformationServerHistoryPage.class);
     }
 
     public HtmlPage getPage(WebDrone drone)
