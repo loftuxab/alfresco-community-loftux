@@ -59,6 +59,7 @@ public class AONE6182MapCifs extends AbstractUtils
     String mapConnect;
     private static final String regexUrlIP = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})";
     private static final String regexUrlWithPort = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
+    private static String networkPathNew;
 
     @Override
     @BeforeClass(groups = "setup")
@@ -67,10 +68,10 @@ public class AONE6182MapCifs extends AbstractUtils
         super.setup();
 
         String ip = getAddress(networkPath);
-        networkPath = networkPath.replaceFirst(regexUrlWithPort, ip);
-        if (networkPath.contains("alfresco\\"))
+        networkPathNew = networkPath.replaceFirst(regexUrlWithPort, ip);
+        if (networkPathNew.contains("alfresco\\"))
         {
-            networkPath = networkPath.replace("alfresco\\", "alfresco");
+            networkPathNew = networkPathNew.replace("alfresco\\", "alfresco");
         }
     }
 
@@ -98,7 +99,7 @@ public class AONE6182MapCifs extends AbstractUtils
         logger.info("Create user: " + testUser);
         ShareUser.logout(drone);
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPathNew + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
 
         logger.info("Try execute command: " + mapConnect);
         process = Runtime.getRuntime().exec(mapConnect);
@@ -159,7 +160,7 @@ public class AONE6182MapCifs extends AbstractUtils
         process.waitFor();
         logger.info("Restart webclient service");
 
-        String expectedError = executeCommandGetErrorText("net use " + networkDrive + " " + networkPath + " /user:" + testUser + " " + DEFAULT_PASSWORD);
+        String expectedError = executeCommandGetErrorText("net use " + networkDrive + " " + networkPathNew + " /user:" + testUser + " " + DEFAULT_PASSWORD);
 
         logger.info("Expected error: " + expectedError);
 
@@ -179,7 +180,7 @@ public class AONE6182MapCifs extends AbstractUtils
         explorer.clickButton("Computer", "Mapnetworkdrive");
         explorer.activateApplicationWindow("Map Network Drive");
         Ldtp newLdtp = new Ldtp("Map Network Drive");
-        newLdtp.enterString("txtFolder", networkPath);
+        newLdtp.enterString("txtFolder", networkPathNew);
         newLdtp.check("chkConnectusingdifferentcredentials");
         newLdtp.click("Finish");
         logger.info("map network driver via windows explorer");

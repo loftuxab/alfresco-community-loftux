@@ -63,6 +63,7 @@ public class AONE6180MapCifs extends AbstractUtils
     String filename = "x1234567.001.600";
     String filenameWithExt = filename + ".txt";
     File file1;
+    private static String networkPathNew;
 
     @Override
     @BeforeClass(groups = "setup")
@@ -71,10 +72,10 @@ public class AONE6180MapCifs extends AbstractUtils
         super.setup();
 
         String ip = getAddress(networkPath);
-        networkPath = networkPath.replaceFirst(regexUrlWithPort, ip);
-        if (networkPath.contains("alfresco\\"))
+        networkPathNew = networkPath.replaceFirst(regexUrlWithPort, ip);
+        if (networkPathNew.contains("alfresco\\"))
         {
-            networkPath = networkPath.replace("alfresco\\", "alfresco");
+            networkPathNew = networkPathNew.replace("alfresco\\", "alfresco");
         }
 
         logger.info("Starting Tests: " + testName);
@@ -92,7 +93,7 @@ public class AONE6180MapCifs extends AbstractUtils
         Process process = Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
         process.waitFor();
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPathNew + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
 
         logger.info("Try execute command: " + mapConnect);
         process = Runtime.getRuntime().exec(mapConnect);

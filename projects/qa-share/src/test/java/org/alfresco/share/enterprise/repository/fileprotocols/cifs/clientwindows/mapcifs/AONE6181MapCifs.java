@@ -62,6 +62,7 @@ public class AONE6181MapCifs extends AbstractUtils
     String cifsServerName = "cifs.serverName";
     String cifsDomain = "cifs.domain";
     String domain = "QALAB";
+    private static String networkPathNew;
 
     @Override
     @BeforeClass(groups = "setup")
@@ -70,12 +71,12 @@ public class AONE6181MapCifs extends AbstractUtils
         super.setup();
 
         ip = getAddress(networkPath);
-        networkPath = networkPath.replaceFirst(regexUrlWithPort, ip);
-        if (networkPath.contains("alfresco\\"))
+        networkPathNew = networkPath.replaceFirst(regexUrlWithPort, ip);
+        if (networkPathNew.contains("alfresco\\"))
         {
-            networkPath = networkPath.replace("alfresco\\", "alfresco");
+            networkPathNew = networkPathNew.replace("alfresco\\", "alfresco");
         }
-        logger.info("Network path: " + networkPath);
+        logger.info("Network path: " + networkPathNew);
     }
 
     /**
@@ -122,19 +123,19 @@ public class AONE6181MapCifs extends AbstractUtils
     public void AONE_6181() throws Exception
     {
         List<String> list;
-        list = executeCommandGetConsoleText("cmd /c net use " + networkPath + " /user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD);
+        list = executeCommandGetConsoleText("cmd /c net use " + networkPathNew + " /user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD);
         Assert.assertTrue(checkString(list, "The command completed successfully"), "Expected text isn't found");
         list = executeCommandGetConsoleText("net use");
-        Assert.assertTrue(checkString(list, networkPath), "Expected text isn't found");
+        Assert.assertTrue(checkString(list, networkPathNew), "Expected text isn't found");
 
         // Use commands \\184.168.80.59 OR \\184.168.80.59\alfresco
-        executeCommandGetConsoleText("cmd /c start /WAIT " + networkPath);
+        executeCommandGetConsoleText("cmd /c start /WAIT " + networkPathNew);
 
         // Alfresco window is opened
         explorer.openWindowsExplorer();
         explorer.getAbstractUtil().waitForWindow("alfresco");
         explorer.closeExplorer();
-        Runtime.getRuntime().exec("cmd /c start /WAIT net use " + networkPath + " /DELETE /y");
+        Runtime.getRuntime().exec("cmd /c start /WAIT net use " + networkPathNew + " /DELETE /y");
 
         explorer.activateApplicationWindow("alfresco");
         String[] allObjectsWindow = explorer.getAbstractUtil().getLdtp().getObjectList();
