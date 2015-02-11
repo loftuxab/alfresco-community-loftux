@@ -33,7 +33,6 @@ import org.alfresco.po.share.util.ShareTestProperty;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.test.AlfrescoTests;
-import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.WebDroneImpl;
@@ -285,19 +284,15 @@ public abstract class AbstractTest implements AlfrescoTests
      * User Log out using logout URL Assumes User is logged in.
      *
      * @param drone WebDrone Instance
-     * @return HtmlPage
      */
-    public static HtmlPage logout(WebDrone drone)
+    public static void logout(WebDrone drone)
     {
-        SharePage page = null;
         if(drone != null){
             try
             {
-                
                 if (drone.getCurrentUrl().contains(shareUrl.trim()))
                 {
                     ShareUtil.logout(drone);
-                    page = drone.getCurrentPage().render();
                     if(logger.isTraceEnabled())
                     {
                         logger.trace("Logout");
@@ -309,7 +304,6 @@ public abstract class AbstractTest implements AlfrescoTests
                 // Already logged out.
             }
         }
-        return page;
     }
 
     /**
