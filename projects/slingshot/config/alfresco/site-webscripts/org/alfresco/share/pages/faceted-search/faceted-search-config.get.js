@@ -167,7 +167,8 @@ function getFormDefinition(canEditFilterId) {
                      name: "isEnabled",
                      value: "true",
                      label: "faceted-search-config.isEnabled.label",
-                     description: "faceted-search-config.isEnabled.description"
+                     description: "faceted-search-config.isEnabled.description",
+                     _convertStringValuesToBooleans: true
                   }
                },
                {
@@ -180,6 +181,7 @@ function getFormDefinition(canEditFilterId) {
                      label: "faceted-search-config.isDefault.label",
                      description: "faceted-search-config.isDefault.description",
                      postWhenHiddenOrDisabled: false,
+                     _convertStringValuesToBooleans: true,
                      disablementConfig: {
                         initialValue: true
                      }

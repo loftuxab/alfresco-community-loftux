@@ -1382,7 +1382,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         return dojoMessagesDefaultScope;
     }
     
-    public String getDojoDefafultLessConfig()
+    public String getDojoDefaultLessConfig()
     {
         return dojoDefaultLessConfig;
     }
