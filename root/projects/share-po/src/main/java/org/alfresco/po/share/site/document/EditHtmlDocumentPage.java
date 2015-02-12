@@ -14,9 +14,6 @@
  */
 package org.alfresco.po.share.site.document;
 
-import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
-import java.util.NoSuchElementException;
-
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
@@ -28,8 +25,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.NoSuchElementException;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 /**
  * @author nshah
@@ -124,6 +125,31 @@ public class EditHtmlDocumentPage extends InlineEditPage
         }
     }
 
+    /**
+     * Edit the editor, enter new text line, count the lines and save it.
+     *
+     * @param txtLine
+     * @return
+     */
+    public void addTextToTinyMCE(String txtLine)
+    {
+        try
+        {
+            drone.switchToDefaultContent();
+            TinyMceEditor tinyMceEditor = new TinyMceEditor(drone);
+            tinyMceEditor.setTinyMce(IFRAME_ID);
+            String oldText = tinyMceEditor.getContent();
+            tinyMceEditor.setText(oldText + txtLine);
+            drone.switchToFrame(IFRAME_ID);
+            WebElement element = drone.findAndWait(By.cssSelector("#tinymce"));
+            element.sendKeys(Keys.chord(Keys.ENTER));
+            drone.switchToDefaultContent();
+        }
+        catch (TimeoutException toe)
+        {
+            logger.error("Tinymce Editor is not found", toe);
+        }
+    }
     /**
      * Edit the editor, enter new text line, count the lines and save it.
      * 
