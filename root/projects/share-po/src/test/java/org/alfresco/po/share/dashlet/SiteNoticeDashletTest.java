@@ -41,7 +41,18 @@ import org.testng.annotations.Test;
 public class SiteNoticeDashletTest extends AbstractSiteDashletTest
 {
     private static final String SITE_NOTICE = "site-notice";
-    
+    private static final String expectedHelpBallonMsg = "This dashlet displays a custom message on the dashboard, specified by the site manager";
+    // ACE-1883
+    // private final String linkContent = "<a target=\"_blank\" title=\"Test\" href=\"https://google.co.uk\" data-mce-href=\"https://google.co.uk\">%s</a>";
+    private final String linkContent = "<a href=\"https://google.co.uk\" target=\"_blank\" data-mce-href=\"https://google.co.uk\">%s</a>";
+    private final String anchorContent = "<a class=\"mceItemAnchor\" name=\"%s\"";
+    private final String imageDescription = "Alfresco Business Image";
+    String image_src_content = "src=\"%s\"";
+    String image_data_src_content = "data-mce-src=\"%s\"";
+    String image_align_content = "align=\"bottom\"";
+    String image_height_content = "height=\"%s\"";
+    String image_width_content = "width=\"%s\"";
+    String image_alt_content = "alt=\"%s\"";
     private SiteNoticeDashlet noticeDashlet = null;
     private CustomiseSiteDashboardPage customiseSiteDashBoard = null;
     private ConfigureSiteNoticeDialogBoxPage configureSiteNoticeDialog = null;
@@ -49,26 +60,14 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
     private HtmlSourceEditorPage htmlSourcePage = null;
     private String titleAndText = null;
     private String anchorName = "testAnchor";
-    private static final String expectedHelpBallonMsg = "This dashlet displays a custom message on the dashboard, specified by the site manager";
     private String fontAttForCloud = "<font style=\"color: rgb(0, 0, 255);\">";
     private String fontAtt = "<span style=\"color: rgb(0, 0, 255);\">";
     private String fontBackColorAttr = "<span style=\"background-color: rgb(0, 0, 0);\">";
     private InsertOrEditLinkPage editLinkPage  = null;
     private InsertOrEditImagePage insertOrEditImage = null;
-    // ACE-1883
-    // private final String linkContent = "<a target=\"_blank\" title=\"Test\" href=\"https://google.co.uk\" data-mce-href=\"https://google.co.uk\">%s</a>";
-    private final String linkContent = "<a href=\"https://google.co.uk\" target=\"_blank\" data-mce-href=\"https://google.co.uk\">%s</a>";
-    private final String anchorContent = "<a class=\"mceItemAnchor\" name=\"%s\"";
     private String imageURL = "http://cdn2.business2community.com/wp-content/uploads/2013/04/google-.jpg";
-    private final String imageDescription = "Alfresco Business Image";
     private long imageWidth = 100;
     private long imageHeight = 100;
-    String image_src_content = "src=\"%s\"";
-    String image_data_src_content = "data-mce-src=\"%s\"";
-    String image_align_content = "align=\"bottom\"";
-    String image_height_content = "height=\"%s\"";
-    String image_width_content = "width=\"%s\"";
-    String image_alt_content = "alt=\"%s\"";
     
     @BeforeTest
     public void prepare()
@@ -160,8 +159,9 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         Assert.assertNotEquals(noticeDashlet.getTitle(), titleAndText);
         Assert.assertNotEquals(noticeDashlet.getContent(), titleAndText); 
     }
-    
-    @Test(dependsOnMethods="configureWithDetailsAndClickClose")
+
+    @Test(dependsOnMethods = "configureWithDetailsAndClickClose", groups = {"ProductBug"})
+    //TODO ACE-3776
     public void getTextFromEditor()
     {
         configureSiteNoticeDialog = noticeDashlet.clickOnConfigureIcon().render();
@@ -178,8 +178,8 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         }
         Assert.assertTrue(siteNoticeEditor.getContent().contains(fontAtt +titleAndText+"</span>"));
     }
-    
-    @Test(dependsOnMethods="getTextFromEditor")
+
+    @Test(dependsOnMethods = "getTextFromEditor", groups = {"ProductBug"})
     public void getBackColorFromEditor()
     {
         siteNoticeEditor.clickTextFormatterWithOutSelectingText(FormatType.BOLD);
@@ -188,22 +188,22 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         Assert.assertEquals(titleAndText, siteNoticeEditor.getText());
         Assert.assertTrue(siteNoticeEditor.getContent().contains(fontBackColorAttr));
     }
-    
-    @Test(dependsOnMethods="getBackColorFromEditor")
+
+    @Test(dependsOnMethods = "getBackColorFromEditor", groups = {"ProductBug"})
     public void testInsertOrEditLink()
     {
         siteNoticeEditor.removeFormatting();
         editLinkPage = siteNoticeEditor.clickInsertOrEditLink().render();
         Assert.assertNotNull(editLinkPage);
     }
-    
-    @Test(dependsOnMethods="testInsertOrEditLink",expectedExceptions = IllegalArgumentException.class)
+
+    @Test(dependsOnMethods = "testInsertOrEditLink", expectedExceptions = IllegalArgumentException.class, groups = {"ProductBug"})
     public void testLinkUrlWithNull()
     {
         editLinkPage.setLinkUrl(null);
     }
-    
-    @Test(dependsOnMethods="testLinkUrlWithNull")
+
+    @Test(dependsOnMethods = "testLinkUrlWithNull", groups = {"ProductBug"})
     public void testLinkCancel()
     {
         editLinkPage.setTarget(InsertLinkPageTargetItems.NEW_WINDOW);
@@ -212,8 +212,8 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         configureSiteNoticeDialog = editLinkPage.clickCancelButton().render();
         Assert.assertFalse(configureSiteNoticeDialog.getContentTinyMceEditor().getContent().contains(String.format(linkContent, titleAndText)));
     }
-    
-    @Test(dependsOnMethods="testLinkCancel")
+
+    @Test(dependsOnMethods = "testLinkCancel", groups = {"ProductBug"})
     public void testLinkUrl()
     {
         editLinkPage = siteNoticeEditor.clickInsertOrEditLink().render();
@@ -225,9 +225,9 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         siteNoticeEditor = configureSiteNoticeDialog.getContentTinyMceEditor();
         Assert.assertTrue(siteNoticeEditor.getContent().contains(String.format(linkContent, titleAndText)));
         siteDashBoard = configureSiteNoticeDialog.clickOnOKButton().render();
-    }  
-    
-    @Test(dependsOnMethods="testLinkUrl")
+    }
+
+    @Test(dependsOnMethods = "testLinkUrl", groups = {"ProductBug"})
     public void testLinkOnSiteNoticeDashlet()
     {
         noticeDashlet = siteDashBoard.getDashlet(SITE_NOTICE).render();
@@ -239,7 +239,7 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
        Assert.assertTrue(drone.getTitle().contains(drone.getValue("page.site.dashboard.title")));
     }
 
-    @Test(dependsOnMethods="testLinkOnSiteNoticeDashlet")
+    @Test(dependsOnMethods = "testLinkOnSiteNoticeDashlet", groups = {"ProductBug"})
     public void testUpdateLink()
     {
         configureSiteNoticeDialog = noticeDashlet.clickOnConfigureIcon().render();
@@ -251,7 +251,7 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
        Assert.assertNotNull(configureSiteNoticeDialog);
     }
 
-    @Test(dependsOnMethods="testUpdateLink", enabled = false)
+    @Test(dependsOnMethods = "testUpdateLink", enabled = false, groups = {"ProductBug"})
     public void testUnLink()
     {
         siteNoticeEditor = configureSiteNoticeDialog.getContentTinyMceEditor();
@@ -261,7 +261,7 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
     }
 
     // TODO - ACE-1883 - Unable to set Anchor in TinyMce Editor (Configure Site Notice dialog) and Unlink button doesn't exists.
-    @Test(dependsOnMethods="testUpdateLink", enabled = false)
+    @Test(dependsOnMethods = "testUpdateLink", enabled = false, groups = {"ProductBug"})
     public void testInsertEditAnchor()
     {
         InsertOrEditAnchorPage insertOrEditAnchor = siteNoticeEditor.selectInsertOrEditAnchor().render();
@@ -272,7 +272,7 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
     }
 
     // TODO - ACE-1883 - Unable to set Anchor in TinyMce Editor (Configure Site Notice dialog) and Unlink button doesn't exists.
-    @Test(dependsOnMethods="testInsertEditAnchor", enabled = false)
+    @Test(dependsOnMethods = "testInsertEditAnchor", enabled = false, groups = {"ProductBug"})
     public void testInsertEditAnchorCancelChanges()
     {
         String newAnchorName = anchorName + "updated";
@@ -284,33 +284,33 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         Assert.assertFalse(siteNoticeEditor.getContent().contains(String.format(anchorContent, newAnchorName)));
     }
 
-    @Test(dependsOnMethods="testUpdateLink")
+    @Test(dependsOnMethods = "testUpdateLink", groups = {"ProductBug"})
     public void testClickOnImageLink()
     {
         insertOrEditImage = siteNoticeEditor.selectInsertOrEditImage().render();
         Assert.assertNotNull(insertOrEditImage);
         // Assert.assertTrue(insertOrEditImage.getTitle().equalsIgnoreCase(drone.getValue("page.insert.edit.image.title")));
     }
-    
-    @Test(dependsOnMethods="testClickOnImageLink",expectedExceptions = IllegalArgumentException.class)
+
+    @Test(dependsOnMethods = "testClickOnImageLink", expectedExceptions = IllegalArgumentException.class, groups = {"ProductBug"})
     public void testImageUrlWithNull()
     {
         insertOrEditImage.setImageUrl(null);
     }
-    
-    @Test(dependsOnMethods="testImageUrlWithNull",expectedExceptions = IllegalArgumentException.class)
+
+    @Test(dependsOnMethods = "testImageUrlWithNull", expectedExceptions = IllegalArgumentException.class, groups = {"ProductBug"})
     public void testImageDescWithNull()
     {
         insertOrEditImage.setDescription(null);
     }
-    
-    @Test(dependsOnMethods="testImageDescWithNull",expectedExceptions = IllegalArgumentException.class)
+
+    @Test(dependsOnMethods = "testImageDescWithNull", expectedExceptions = IllegalArgumentException.class, groups = {"ProductBug"})
     public void testDimentionsWidthWithNegitiveValues()
     {
         insertOrEditImage.setDimensions(-1, -200);
     }
-    
-    @Test(dependsOnMethods="testDimentionsWidthWithNegitiveValues")
+
+    @Test(dependsOnMethods = "testDimentionsWidthWithNegitiveValues", groups = {"ProductBug"})
     public void testImage()
     {
         insertOrEditImage.setImageUrl(imageURL);
@@ -327,8 +327,8 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         Assert.assertTrue(siteNoticeEditor.getContent().contains(String.format(image_width_content, imageWidth)));
         // Assert.assertTrue(siteNoticeEditor.getContent().contains(image_align_content));
     }
-    
-    @Test(dependsOnMethods="testImage")
+
+    @Test(dependsOnMethods = "testImage", groups = {"ProductBug"})
     public void testImageCancelChanges()
     {
         insertOrEditImage = siteNoticeEditor.selectInsertOrEditImage().render();
@@ -349,15 +349,15 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         // Assert.assertTrue(siteNoticeEditor.getContent().contains(image_align_content));
     }
 
-    @Test(dependsOnMethods="testImageCancelChanges", expectedExceptions = IllegalArgumentException.class)
+    @Test(dependsOnMethods = "testImageCancelChanges", expectedExceptions = IllegalArgumentException.class, groups = {"ProductBug"})
     public void testHtmlSourceEditorWithNull()
     {
         siteNoticeEditor.clearAll();
         htmlSourcePage = siteNoticeEditor.selectHtmlSourceEditor().render();
         htmlSourcePage.setHTMLSource(null);
     }
-    
-    @Test(dependsOnMethods="testHtmlSourceEditorWithNull")
+
+    @Test(dependsOnMethods = "testHtmlSourceEditorWithNull", groups = {"ProductBug"})
     public void testHtmlSourceEditor()
     {
         String newHtmlSource = "<p>hello</p>";
@@ -366,8 +366,8 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
         siteNoticeEditor = configureSiteNoticeDialog.getContentTinyMceEditor();
         Assert.assertTrue(siteNoticeEditor.getContent().contains(newHtmlSource));
     }
-    
-    @Test(dependsOnMethods="testHtmlSourceEditor")
+
+    @Test(dependsOnMethods = "testHtmlSourceEditor", groups = {"ProductBug"})
     public void testHtmlSourceEditorCancelChanges()
     {
         String newHtmlSource = "<p>hello2</p>";
