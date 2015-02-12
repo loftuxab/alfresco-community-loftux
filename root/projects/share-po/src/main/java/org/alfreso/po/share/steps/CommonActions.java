@@ -31,7 +31,7 @@ public class CommonActions
      * @return SharePage
      * @throws PageException if the current page is not a share page
      */
-    public static SharePage getSharePage(WebDrone drone)
+    public SharePage getSharePage(WebDrone drone)
     {
         checkIfdroneNull(drone);
         try
@@ -51,7 +51,7 @@ public class CommonActions
      * @param drone WebDrone Instance
      * @throws UnsupportedOperationException if drone is null
      */
-    public static void checkIfdroneNull(WebDrone drone)
+    public  void checkIfdroneNull(WebDrone drone)
     {
         if (drone == null)
         {

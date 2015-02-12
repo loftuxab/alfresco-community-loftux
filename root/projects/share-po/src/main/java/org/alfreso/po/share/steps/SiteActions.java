@@ -66,28 +66,7 @@ public class SiteActions extends CommonActions
     protected static final String UNIQUE_TESTDATA_STRING = "sync";
     private static final String SITE_DASH_LOCATION_SUFFIX = "/page/site/";
         
-        /**
-         * User Log out using logout URL Assumes User is logged in.
-         *
-         * @param drone WebDrone Instance
-         */
-        public synchronized HtmlPage logout(WebDrone drone)
-        {
-            HtmlPage currentPage = null;
-            checkIfdroneNull(drone);
-            try
-            {
-                SharePage page = drone.getCurrentPage().render();
-                page.getNav().logout();
-            }
-            catch (Exception e)
-            {
-                // Already logged out.
-                logger.info("already logged out" + e.getMessage());
-            }
-            return currentPage;
-        }
-
+ 
         /**
          * Create site
          */
@@ -182,7 +161,7 @@ public class SiteActions extends CommonActions
          * @param drone WebDrone Instance
          * @return DocumentLibraryPage
          */
-        public static DocumentLibraryPage openDocumentLibrary(WebDrone drone)
+        public DocumentLibraryPage openDocumentLibrary(WebDrone drone)
         {
             // Assumes User is logged in
             /*
@@ -272,7 +251,7 @@ public class SiteActions extends CommonActions
          * @param contentName
          * @return
          */
-        public static FileDirectoryInfo getFileDirectoryInfo(WebDrone drone, String contentName)
+        public  FileDirectoryInfo getFileDirectoryInfo(WebDrone drone, String contentName)
         {
             Boolean moreResultPages = true;
             FileDirectoryInfo contentRow = null;
@@ -464,7 +443,7 @@ public class SiteActions extends CommonActions
          * @return SiteDashboardPage
          * @throws PageException
          */
-        public static SiteDashboardPage openSiteDashboard(WebDrone driver, String siteName) throws PageException
+        public  SiteDashboardPage openSiteDashboard(WebDrone driver, String siteName) throws PageException
         {
             // Assumes User is logged in
             HtmlPage page = getSharePage(driver).render();
@@ -498,7 +477,7 @@ public class SiteActions extends CommonActions
          * @param siteShortURL
          * @return {@link SiteDashBoardPage}
          */
-        public static SiteDashboardPage openSiteURL(WebDrone drone, String siteShortURL)
+        public  SiteDashboardPage openSiteURL(WebDrone drone, String siteShortURL)
         {
             String url = drone.getCurrentUrl();
             String target = url.substring(0, url.indexOf("/page/")) + SITE_DASH_LOCATION_SUFFIX + getSiteShortname(siteShortURL) + "/dashboard";
@@ -515,7 +494,7 @@ public class SiteActions extends CommonActions
          *                 test data with the test
          * @return String site short name
          */
-        public static String getSiteShortname(String siteName)
+        public  String getSiteShortname(String siteName)
         {
             String siteShortname = "";
             String[] unallowedCharacters = { "_", "!" };

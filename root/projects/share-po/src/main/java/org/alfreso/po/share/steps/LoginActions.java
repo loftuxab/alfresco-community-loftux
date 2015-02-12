@@ -45,7 +45,7 @@ public class LoginActions extends CommonActions
      * @param userInfo String username, password
      * @return boolean true: if log in succeeds
      */
-    public synchronized SharePage loginToShare(WebDrone drone, String[] userInfo, String shareUrl)
+    public SharePage loginToShare(WebDrone drone, String[] userInfo, String shareUrl)
     {
         LoginPage loginPage;
         SharePage sharePage;
