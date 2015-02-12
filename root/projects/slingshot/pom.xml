@@ -212,12 +212,6 @@
             <artifactId>aikau</artifactId>
             <version>1.0.4</version>
             <exclusions>
-               <exclusion>
-                  <groupId>org.springframework.extensions.surf</groupId>
-                  <artifactId>spring-surf-api</artifactId>
-               </exclusion>
-            </exclusions>
-            <exclusions>
                 <exclusion>
                     <groupId>org.springframework.extensions.surf</groupId>
                     <artifactId>spring-surf-api</artifactId>
