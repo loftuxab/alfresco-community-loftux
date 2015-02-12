@@ -40,6 +40,8 @@ import org.springframework.extensions.surf.types.ExtensionModule;
 import org.springframework.extensions.surf.types.ModuleDeployment;
 import org.springframework.extensions.webscripts.Registry;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+
 public class ModuleDeploymentService
 {
     private static final Log logger = LogFactory.getLog(ModuleDeploymentService.class);
@@ -317,7 +319,8 @@ public class ModuleDeploymentService
     }
     
     /**
-     * Inner {@link Comparator} class for sorting {@link ExtensionModule} instances based on their auto-deploy-index.
+     * Inner {@link Comparator} class for sorting {@link ExtensionModule} instances based on their auto-deploy-index. This index
+     * can be a Maven version and will be ordered appropriately.
      */
     private class AutoDeployIndexComparator implements Comparator<ExtensionModule>
     {
@@ -326,37 +329,37 @@ public class ModuleDeploymentService
          * @param extMod
          * @return
          */
-        private Integer parseAutoDeployIndex(ExtensionModule extMod)
+        private DefaultArtifactVersion parseAutoDeployIndex(ExtensionModule extMod)
         {
-            Integer i = null;
+            DefaultArtifactVersion version = null;
             try
             {
-                i = Integer.valueOf(extMod.getAutoDeployIndex());
+               version = new DefaultArtifactVersion(extMod.getAutoDeployIndex());
             }
             catch(NumberFormatException e)
             {
                 // No action required - leave as null
             }
-            return i;
+            return version;
         }
         
         public int compare(ExtensionModule o1, ExtensionModule o2)
         {
             int r = 0;
-            Integer i1 = this.parseAutoDeployIndex(o1);
-            Integer i2 = this.parseAutoDeployIndex(o2);
+            DefaultArtifactVersion v1 = this.parseAutoDeployIndex(o1);
+            DefaultArtifactVersion v2 = this.parseAutoDeployIndex(o2);
             
-            if (i1 == null && i2 == null)
+            if (v1 == null && v2 == null)
             {
                 // Neither module has an auto-deploy index so they can stay as they are...
                 r = 0;
             }
-            else if (i1 != null && i2 == null)
+            else if (v1 != null && v2 == null)
             {
                 // If o1 has an auto-deploy index but o2 doesn't then it automatically goes in front
                 r = -1;
             }
-            else if (i1 == null && i2 != null)
+            else if (v1 == null && v2 != null)
             {
                 // If o2 does NOT have an auto-deploy index but o2 DOES then it automatically goes after
                 r = 1;
@@ -364,7 +367,7 @@ public class ModuleDeploymentService
             else
             {
                 // If they both have indices then compare them
-                r = (i1>i2 ? 1 : (i1==i2 ? 0 : -1));
+                r = v1.compareTo(v2);
             }
             return r;
         }

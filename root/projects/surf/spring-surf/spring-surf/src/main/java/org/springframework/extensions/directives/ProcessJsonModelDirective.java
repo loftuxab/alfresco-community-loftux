@@ -34,6 +34,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigElement;
 import org.springframework.extensions.config.ConfigService;
 import org.springframework.extensions.config.ServerConfigElement;
 import org.springframework.extensions.config.ServerProperties;
@@ -50,12 +51,14 @@ import org.springframework.extensions.surf.extensibility.ExtensibilityDirective;
 import org.springframework.extensions.surf.extensibility.ExtensibilityDirectiveData;
 import org.springframework.extensions.surf.extensibility.ExtensibilityModel;
 import org.springframework.extensions.surf.extensibility.impl.DefaultExtensibilityDirectiveData;
+import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.surf.types.AbstractModelObject;
 import org.springframework.extensions.surf.uri.UriUtils;
 import org.springframework.extensions.webscripts.LocalWebScriptContext;
 import org.springframework.extensions.webscripts.LocalWebScriptRuntime;
 import org.springframework.extensions.webscripts.LocalWebScriptRuntimeContainer;
 import org.springframework.extensions.webscripts.Match;
+import org.springframework.extensions.webscripts.ScriptConfigModel;
 import org.springframework.extensions.webscripts.WebScriptProcessor;
 import org.springframework.extensions.webscripts.json.JSONWriter;
 
@@ -285,7 +288,18 @@ public class ProcessJsonModelDirective extends JavaScriptDependencyDirective
         String rootModule = getStringProperty(params, "rootModule", false);
         if (rootModule == null)
         {
-            rootModule = getWebFrameworkConfig().getDojoPageWidget();
+            final RequestContext rc = ThreadLocalRequestContext.getRequestContext();
+            ScriptConfigModel config = rc.getExtendedScriptConfigModel(null);
+            Map<String, ConfigElement> configs = (Map<String, ConfigElement>)config.getScoped().get("WebFramework");
+            if (configs != null)
+            {
+                WebFrameworkConfigElement wfce = (WebFrameworkConfigElement) configs.get("web-framework");
+                rootModule = wfce.getDojoPageWidget();
+            }
+            else
+            {
+                rootModule = this.getWebFrameworkConfig().getDojoPageWidget();
+            }
         }
         
         // We know that we will definitely require the root "Page" object as that's the root object that will be instantiated
