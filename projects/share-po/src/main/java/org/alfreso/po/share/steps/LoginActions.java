@@ -22,7 +22,6 @@ import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.testng.SkipException;
 
 /**
  *  login and Logout of share
@@ -86,7 +85,7 @@ public class LoginActions extends CommonActions
         {
             String errorMessage = "Failed: Login: " + userInfo[0] + " Password: " + userInfo[1] + " Error: " + e;
             logger.info(errorMessage);
-            throw new SkipException(errorMessage);
+            throw new ShareException(errorMessage);
         }
 
         return sharePage;

@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.CreateSitePage;
 import org.alfresco.po.share.site.NewFolderPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
@@ -47,7 +48,6 @@ import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.NoSuchElementException;
-import org.testng.SkipException;
 
 /**
  *  Share actions - All the common steps of site action
@@ -249,7 +249,7 @@ public class SiteActions extends CommonActions
             }
             catch (Exception e)
             {
-                throw new SkipException("Skip test. Error in navigateToFolder: " + e.getMessage());
+                throw new ShareException("Skip test. Error in navigateToFolder: " + e.getMessage());
             }
 
             return docPage;
@@ -339,7 +339,7 @@ public class SiteActions extends CommonActions
             }
             catch (Exception ex)
             {
-                throw new SkipException("Skip test. Error in Create Folder: " + ex.getMessage());
+                throw new ShareException("Skip test. Error in Create Folder: " + ex.getMessage());
             }
         }
 
@@ -365,7 +365,7 @@ public class SiteActions extends CommonActions
             }
             catch (Exception e)
             {
-                throw new SkipException("Skip test. Error in UploadFile: " + e);
+                throw new ShareException("Skip test. Error in UploadFile: " + e);
             }
 
             return docPage.render();
@@ -397,7 +397,7 @@ public class SiteActions extends CommonActions
             catch (Exception e)
             {
                 logger.error(e.getMessage());
-                throw new SkipException("Error in creating content." + e);
+                throw new ShareException("Error in creating content." + e);
             }
 
             return documentLibPage;
