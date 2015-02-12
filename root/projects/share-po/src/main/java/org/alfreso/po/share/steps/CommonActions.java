@@ -24,7 +24,6 @@ import org.alfresco.webdrone.exception.PageException;
 public class CommonActions
 {
     public static long refreshDuration = 25000;
-    
     /**
      * Checks if the current page is share page, throws PageException if not.
      *
