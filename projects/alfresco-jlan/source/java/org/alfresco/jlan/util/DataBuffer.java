@@ -616,6 +616,10 @@ public class DataBuffer {
 			// Check if there is enough space in the buffer
 
 			int bytLen = str.length() * 2;
+			if (nulTerm)
+			{
+				bytLen++;
+			}
 			if ( m_data.length - m_pos < bytLen)
 				extendBuffer(bytLen + 4);
 
@@ -630,9 +634,15 @@ public class DataBuffer {
 		else {
 
 			// Check if there is enough space in the buffer
+			
+			int bytLen = str.length();
+			if (nulTerm)
+			{
+				bytLen++;
+			}
 
-			if ( m_data.length - m_pos < str.length())
-				extendBuffer(str.length() + 2);
+			if ( m_data.length - m_pos < bytLen)
+				extendBuffer(bytLen + 2);
 
 			// Pack the ASCII string
 
