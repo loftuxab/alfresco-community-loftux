@@ -6,12 +6,11 @@ import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DashBoardActions extends AbstractSteps
+public class DashBoardActions extends CommonActions
 {
 
     private static Log logger = LogFactory.getLog(DashBoardActions.class);
-    
-    
+
     /**
      * Navigate to User DashBoard page and waits for the page render to
      * complete. Assumes User is logged in
@@ -28,7 +27,7 @@ public class DashBoardActions extends AbstractSteps
         logger.info("Opened User Dashboard");
         return new DashBoardPage(driver).render();
     }
-    
+
     /**
      * Navigate to User DashBoard and waits for the page render to complete.
      * Assumes User is logged in

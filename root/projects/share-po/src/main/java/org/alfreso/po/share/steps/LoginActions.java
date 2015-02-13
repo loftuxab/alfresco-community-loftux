@@ -1,17 +1,17 @@
- /*
-     * Copyright (C) 2005-2015 Alfresco Software Limited.
-     * This file is part of Alfresco
-     * Alfresco is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Lesser General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or
-     * (at your option) any later version.
-     * Alfresco is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-     * GNU Lesser General Public License for more details.
-     * You should have received a copy of the GNU Lesser General Public License
-     * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
-     */
+/*
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package org.alfreso.po.share.steps;
 
@@ -24,9 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *  login and Logout of share
+ * login and Logout of share
+ * 
  * @author sprasanna
- *
  */
 public class LoginActions extends CommonActions
 {
@@ -35,7 +35,7 @@ public class LoginActions extends CommonActions
     final static String SITE_VISIBILITY_PUBLIC = "public";
     protected static final String SITE_VISIBILITY_PRIVATE = "private";
     protected static final String SITE_VISIBILITY_MODERATED = "moderated";
-    public final static String DOCLIB = "DocumentLibrary";
+
     protected static final String UNIQUE_TESTDATA_STRING = "sync";
 
     /**
@@ -96,7 +96,7 @@ public class LoginActions extends CommonActions
      *
      * @param drone WebDrone Instance
      */
-    public  HtmlPage logout(WebDrone drone)
+    public HtmlPage logout(WebDrone drone)
     {
         HtmlPage currentPage = null;
         checkIfdroneNull(drone);
