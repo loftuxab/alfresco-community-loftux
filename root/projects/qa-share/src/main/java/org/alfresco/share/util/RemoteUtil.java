@@ -1,6 +1,11 @@
 package org.alfresco.share.util;
 
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.webdrone.exception.PageOperationException;
@@ -9,8 +14,18 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 public class RemoteUtil extends AbstractUtils
 {
@@ -571,7 +586,7 @@ public class RemoteUtil extends AbstractUtils
         }
         catch (IOException e)
         {
-            throw new PageOperationException("Failed copying " + sourceFile.getName() + " to " + remotePath, e.getCause());
+            throw new PageOperationException("Failed copying " + sourceFile.getName() + " to " + remotePath, e);
         }
         finally
         {

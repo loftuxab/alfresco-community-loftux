@@ -9,7 +9,8 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -104,7 +105,7 @@ public class TransformServerUtil extends AbstractUtils
         }
         catch (IOException e)
         {
-            throw new PageOperationException("Unable to stop Transformation service", e.getCause());
+            throw new PageOperationException("Unable to stop Transformation service", e);
         }
         logger.info("Transformation service on " + transfServNodeName + " was stopped");
     }
@@ -130,7 +131,7 @@ public class TransformServerUtil extends AbstractUtils
         }
         catch (IOException e)
         {
-            throw new PageOperationException("Unable to start Transformation service", e.getCause());
+            throw new PageOperationException("Unable to start Transformation service", e);
         }
         logger.info("Transformation service on " + transfServNodeName + " was started");
     }
