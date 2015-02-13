@@ -3,7 +3,11 @@ package org.alfresco.po.alfresco;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
@@ -91,7 +95,7 @@ public class AlfrescoTransformationServerHistoryPage extends AlfrescoTransformat
         }
         catch (NoSuchElementException nse)
         {
-            throw new PageOperationException("Unable to find status outcome cell", nse.getCause());
+            throw new PageOperationException("Unable to find status outcome cell", nse);
         }
         return status.getAttribute("src").contains(STATUS_OK_IMG);
     }
@@ -114,6 +118,11 @@ public class AlfrescoTransformationServerHistoryPage extends AlfrescoTransformat
         }
         catch(StaleElementReferenceException ser)
         {
+            retryCount++;
+            if (retryCount == 3)
+            {
+                throw new PageOperationException("Unable to find the file whose transformation failed", ser);
+            }
             return fileTransformFailed();
         }
     }
@@ -123,6 +132,7 @@ public class AlfrescoTransformationServerHistoryPage extends AlfrescoTransformat
         WebElement selectMenu = drone.find(By.id("rowsPerPage-button"));
         selectMenu.click();
         selectMenu.findElement(By.xpath(String.format("//a[text()='%s']", Integer.toString(value)))).click();
+        waitUntilAlert();
         return this;
     }
 }
