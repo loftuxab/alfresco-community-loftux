@@ -263,7 +263,7 @@ public class CustomiseUserDashboardPage extends SharePage
                     try
                     {
                         existingDashletsInColumn = drone.findAndWaitForElements(By.cssSelector(String.format("ul[id$='column-ul-%d'] li",
-                            columnNumber)));
+                                columnNumber)));
                     }
                     catch (TimeoutException e)
                     {
@@ -277,6 +277,7 @@ public class CustomiseUserDashboardPage extends SharePage
                         WebElement target = drone.findAndWait(By.xpath(String.format("//ul[@class='usedList' and contains(@id,'-column-ul-%d')]", columnNumber)));
                         drone.executeJavaScript("window.scrollBy(0,250)", "");
                         drone.dragAndDrop(newDashlet, target);
+                        logger.error("The dashlet " + dashletName + " was added in column " + columnNumber);
                         return selectOk();
                     }
                     else
