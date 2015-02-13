@@ -2,17 +2,14 @@ package org.alfreso.po.share.steps;
 
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.site.SiteMembersPage;
-import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ShareUser extends AbstractSteps
+public class DashBoardActions extends AbstractSteps
 {
 
-    private static Log logger = LogFactory.getLog(ShareUser.class);
+    private static Log logger = LogFactory.getLog(DashBoardActions.class);
     
     
     /**
@@ -22,7 +19,7 @@ public class ShareUser extends AbstractSteps
      * @param driver WebDrone Instance
      * @return DashBoardPage
      */
-    public static DashBoardPage refreshUserDashboard(WebDrone driver)
+    public DashBoardPage refreshUserDashboard(WebDrone driver)
     {
         // Assumes User is logged in
         SharePage page = getSharePage(driver);
@@ -39,7 +36,7 @@ public class ShareUser extends AbstractSteps
      * @param driver WebDrone Instance
      * @return DashBoardPage
      */
-    public static DashBoardPage openUserDashboard(WebDrone driver)
+    public DashBoardPage openUserDashboard(WebDrone driver)
     {
         // Assumes User is logged in
         SharePage page = getSharePage(driver);

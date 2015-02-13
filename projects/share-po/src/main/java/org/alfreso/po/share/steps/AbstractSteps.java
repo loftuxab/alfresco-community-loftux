@@ -31,7 +31,7 @@ public class AbstractSteps
      * @param driver WebDrone Instance
      * @throws UnsupportedOperationException if driver is null
      */
-    protected static void checkIfDriverNull(WebDrone driver)
+    protected void checkIfDriverNull(WebDrone driver)
     {
         if (driver == null)
         {
@@ -46,7 +46,7 @@ public class AbstractSteps
      * @return SharePage
      * @throws PageException if the current page is not a share page
      */
-    public static SharePage getSharePage(WebDrone driver)
+    public SharePage getSharePage(WebDrone driver)
     {
         checkIfDriverNull(driver);
         try

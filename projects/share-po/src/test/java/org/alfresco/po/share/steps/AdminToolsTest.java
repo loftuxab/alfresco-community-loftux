@@ -7,7 +7,7 @@ import org.alfresco.po.share.GroupsPage;
 import org.alfresco.po.share.NewGroupPage;
 import org.alfresco.po.share.NewUserPage;
 import org.alfresco.po.share.UserSearchPage;
-import org.alfreso.po.share.steps.AdminTools;
+import org.alfreso.po.share.steps.AdminActions;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -16,9 +16,11 @@ import org.testng.annotations.Test;
 public class AdminToolsTest extends AbstractTest
 {
     private DashBoardPage dashBoard;
-    private String groupName = "Add_New_Group";
+    private String groupName = "Add_New_Group" + System.currentTimeMillis();
     private String ADD_BUTTON = "td[class*='yui-dt-col-actions'] button";
     private String user = "user" + System.currentTimeMillis() + "@test.com";
+    
+    private AdminActions adminActions = new AdminActions();
     
     @BeforeClass(groups = "Enterprise-only")
     public void setup() throws Exception
@@ -33,7 +35,7 @@ public class AdminToolsTest extends AbstractTest
     @Test(groups = "Enterprise-only")
     public void testsnavigateToGroup() throws Exception
     {
-        GroupsPage groupsPage = AdminTools.navigateToGroup(drone);
+        GroupsPage groupsPage = adminActions.navigateToGroup(drone);
         groupsPage = groupsPage.clickBrowse().render();
         NewGroupPage newGroupPage = groupsPage.navigateToNewGroupPage().render();
         newGroupPage.createGroup(groupName, groupName, NewGroupPage.ActionButton.CREATE_GROUP).render();
