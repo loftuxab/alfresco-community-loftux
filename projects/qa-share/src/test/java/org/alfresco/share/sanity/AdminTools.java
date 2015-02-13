@@ -124,7 +124,7 @@ public class AdminTools extends AbstractUtils
 
                 // go to My Dashboard and verify changes are applied (verify color of link on Welcome dashboard: Create a site)
                 DashBoardPage dashBoardPage = ShareUser.openUserDashboard(drone).render();
-                String color = dashBoardPage.getColor(ShareUserDashboard.CREATE_SITE_BUTTON, false);
+                String color = dashBoardPage.getColor(ShareUserDashboard.CREATE_SITE_BUTTON_ON_DASHLET, false);
                 assertTrue(color.equals(theme.hexTextColor));
 
                 // go to Site Dashboard and verify changes are applied
