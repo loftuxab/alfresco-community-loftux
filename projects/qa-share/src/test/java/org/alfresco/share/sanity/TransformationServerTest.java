@@ -15,7 +15,13 @@ import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
 import org.alfresco.po.share.systemsummary.SystemSummaryPage;
 import org.alfresco.po.share.util.PageUtils;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.JmxUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.TransformServerUtil;
+import org.alfresco.share.util.RemoteUtil;
+import org.alfresco.share.util.ZipArchiveFile;
+import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.logging.Log;
@@ -25,7 +31,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -147,7 +157,7 @@ public class TransformationServerTest extends AbstractUtils
         }
         catch (Exception e)
         {
-            throw new SkipException("Skipping as pre-condition step(s) fail: " + e.getCause());
+            throw new SkipException("Skipping as pre-condition step(s) fail: " + e);
         }
     }
 
@@ -371,7 +381,6 @@ public class TransformationServerTest extends AbstractUtils
         sshHost = node1Url;
         String[] docInfo = { docFileName, DOCLIB };
         String[] xlsInfo = { xlsFileName, DOCLIB };
-        String alfrescoPath = JmxUtils.getAlfrescoServerProperty(node1Url, jmxSysProps, jmxAlfHome).toString();
 
         //Two Transformation Servers should be installed
         if(TransformServerUtil.checkTransformationService(transformHostName2))
