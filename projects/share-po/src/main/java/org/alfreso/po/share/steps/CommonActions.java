@@ -1,18 +1,17 @@
- /*
-     * Copyright (C) 2005-2015 Alfresco Software Limited.
-     * This file is part of Alfresco
-     * Alfresco is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Lesser General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or
-     * (at your option) any later version.
-     * Alfresco is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-     * GNU Lesser General Public License for more details.
-     * You should have received a copy of the GNU Lesser General Public License
-     * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
-  */
-
+/*
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package org.alfreso.po.share.steps;
 
@@ -24,6 +23,9 @@ import org.alfresco.webdrone.exception.PageException;
 public class CommonActions
 {
     public static long refreshDuration = 25000;
+    protected static final String MY_DASHBOARD = " Dashboard";
+    public final static String DOCLIB = "DocumentLibrary";
+
     /**
      * Checks if the current page is share page, throws PageException if not.
      *
@@ -51,7 +53,7 @@ public class CommonActions
      * @param drone WebDrone Instance
      * @throws UnsupportedOperationException if drone is null
      */
-    public  void checkIfdroneNull(WebDrone drone)
+    public void checkIfdroneNull(WebDrone drone)
     {
         if (drone == null)
         {
