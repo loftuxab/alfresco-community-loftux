@@ -13,15 +13,18 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class AdminToolsTest extends AbstractTest
+public class AdminActionsTest extends AbstractTest
 {
     private DashBoardPage dashBoard;
+
     private String groupName = "Add_New_Group" + System.currentTimeMillis();
+
     private String ADD_BUTTON = "td[class*='yui-dt-col-actions'] button";
+
     private String user = "user" + System.currentTimeMillis() + "@test.com";
-    
+
     private AdminActions adminActions = new AdminActions();
-    
+
     @BeforeClass(groups = "Enterprise-only")
     public void setup() throws Exception
     {
@@ -46,5 +49,13 @@ public class AdminToolsTest extends AbstractTest
         Assert.assertTrue(drone.isElementDisplayed(By.cssSelector(ADD_BUTTON)));
         addUser.clickClose();
 
+    }
+
+    @Test(groups = "Enterprise-only")
+    public void testsBrowseGroup() throws Exception
+    {
+        GroupsPage groupsPage = adminActions.browseGroups(drone);
+
+        Assert.assertTrue(groupsPage.isGroupPresent("ALFRESCO_ADMINISTRATORS"));
     }
 }
