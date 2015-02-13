@@ -189,9 +189,9 @@ cursor: default;
 .yui-skin-greyTheme .yui-menu-button-disabled button {
 background-image: url(menu-button-arrow-disabled.png);
 }
-.yui-skin-greyTheme .yui-split-button-disabled button {
+/*.yui-skin-greyTheme .yui-split-button-disabled button {
 background-image: url(split-button-arrow-disabled.png);
-}
+}*/
 .yui-calcontainer {
 position: relative;
 float: left;
