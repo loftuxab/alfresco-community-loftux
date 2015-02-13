@@ -814,8 +814,13 @@
                         Dom.removeClass(document.getElementsByName('end')[0].parentNode, "hidden")
 						
                         //Set default start/end dates to prevent AllDay event(see MNT-9498)
-                        document.getElementsByName('start')[0].value="12:00 PM";
-                        document.getElementsByName('end')[0].value="1:00 PM";
+                        //Format date by pattern (see MNT-12811)
+                        var tmpDate = new Date();
+                        tmpDate.setHours(12);
+                        tmpDate.setMinutes(0);
+                        document.getElementsByName('start')[0].value=Alfresco.util.formatDate(tmpDate, Alfresco.messages.global["date-format.shortTime"]);
+                        tmpDate.setHours(13);
+                        document.getElementsByName('end')[0].value=Alfresco.util.formatDate(tmpDate, Alfresco.messages.global["date-format.shortTime"]);
                      }
                   });
 
