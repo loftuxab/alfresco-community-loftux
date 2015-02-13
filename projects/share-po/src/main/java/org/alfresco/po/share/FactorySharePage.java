@@ -15,6 +15,7 @@
 package org.alfresco.po.share;
 
 import org.alfresco.po.alfresco.AlfrescoTransformationServerHistoryPage;
+import org.alfresco.po.alfresco.AlfrescoTransformationServerStatusPage;
 import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
 import org.alfresco.po.alfresco.TenantAdminConsolePage;
 import org.alfresco.po.alfresco.WebScriptsPage;
@@ -248,6 +249,7 @@ public class FactorySharePage implements PageFactory
         pages.put("analyze-site", AdhocAnalyzerPage.class);
         pages.put("manage-users", AccountSettingsPage.class);
         pages.put("transformations", AlfrescoTransformationServerHistoryPage.class);
+        pages.put("transformation-server", AlfrescoTransformationServerStatusPage.class);
     }
 
     public HtmlPage getPage(WebDrone drone)
@@ -367,7 +369,7 @@ public class FactorySharePage implements PageFactory
      * is extracted it is used to get the class from the map which is
      * then instantiated.
      *
-     * @param driver WebDriver browser client
+     * @param drone WebDriver browser client
      * @return SharePage page object
      */
     public static SharePage getPage(final String url, WebDrone drone)
