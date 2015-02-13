@@ -107,6 +107,7 @@
     <module>modules/wcmquickstart</module>
     <module>projects/web-editor-samples/customer-site</module>
     <module>projects/mmt</module>
+    <module>projects/share-po</module>
     <module>projects/sdk/alfresco-platform-distribution</module>
   </modules>
 
@@ -1007,7 +1008,6 @@
         <modules>
             <module>packaging</module>
             <module>projects/qa-share</module>
-            <module>projects/share-po</module>
             <module>projects/share</module>
             <module>projects/system-build-test</module>
             <module>enterpriseprojects/packaging</module>
