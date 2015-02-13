@@ -13,6 +13,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <webdrone.page.render.wait.time>6000</webdrone.page.render.wait.time>
         <testng.xml>src/test/resources/testng.xml</testng.xml>
+        <groups>none</groups>
         <test.exclude>nonEnterprise</test.exclude>
         <testng.suite.filename>src/test/resources/testng_share_po.xml</testng.suite.filename>
         <argLine>-Xms512m -Xmx1024m</argLine>
