@@ -73,6 +73,7 @@
             <extension display="Windows Batch Script">bat</extension>
             <extension display="Unix Shell Script">sh</extension>
             <extension display="Log">log</extension>
+            <extension display="RTE File">rte</extension>
          </mimetype>
          <mimetype mimetype="text/csv" text="true" display="Comma Separated Values (CSV)">
             <extension default="true">csv</extension>
