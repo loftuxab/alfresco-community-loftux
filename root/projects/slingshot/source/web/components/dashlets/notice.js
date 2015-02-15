@@ -154,16 +154,18 @@
                }
             });
 
-            // ACE-1174: change z-index to hide inserted images
+            //manually hide/show panel. see MNT-13324"
             var hidePanel = function(p_event, p_args)
             {
-               Dom.setStyle(p_args[1].panel.element, "z-index", -1);
-               // Remove listener for TinyMCE dialog focus handling
-               Event.removeListener(document, "focusin");
-               // remove all editable selections
-               this.editor.getEditor().getBody().contentEditable = false;
+               Dom.setStyle(p_args[1].panel.element, "display", "none");
             }
             YAHOO.Bubbling.subscribe("hidePanel", hidePanel, this.configDialog);
+
+            var showPanel = function(p_event, p_args)
+            {
+               Dom.setStyle(p_args[1].panel.element, "display", "block");
+            }
+            YAHOO.Bubbling.subscribe("showPanel", showPanel, this.configDialog);                        
          }
          else
          {
@@ -176,11 +178,7 @@
          Event.on(document, "focusin", function(e) {
             Event.stopEvent(e);
          });
-         if (this.configDialog.editor && YAHOO.env.ua.ie > 0)
-         {
-             // set back contentEditable
-             this.configDialog.editor.getEditor().getBody().contentEditable = true;
-         }
+         
          this.configDialog.show();
       },
       
