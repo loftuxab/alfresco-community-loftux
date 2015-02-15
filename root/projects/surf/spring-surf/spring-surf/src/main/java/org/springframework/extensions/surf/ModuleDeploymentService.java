@@ -334,7 +334,11 @@ public class ModuleDeploymentService
             DefaultArtifactVersion version = null;
             try
             {
-               version = new DefaultArtifactVersion(extMod.getAutoDeployIndex());
+               String versionString = extMod.getAutoDeployIndex();
+               if (versionString != null)
+               {
+                   version = new DefaultArtifactVersion(versionString);
+               }
             }
             catch(NumberFormatException e)
             {
