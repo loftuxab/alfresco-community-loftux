@@ -1,14 +1,10 @@
 package org.alfresco.po.share.steps;
 
 import org.alfresco.po.share.AbstractTest;
-import org.alfresco.po.share.AddUserGroupPage;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.GroupsPage;
-import org.alfresco.po.share.NewGroupPage;
-import org.alfresco.po.share.NewUserPage;
-import org.alfresco.po.share.UserSearchPage;
+import org.alfresco.po.share.exception.UnexpectedSharePageException;
 import org.alfreso.po.share.steps.AdminActions;
-import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -17,45 +13,43 @@ public class AdminActionsTest extends AbstractTest
 {
     private DashBoardPage dashBoard;
 
-    private String groupName = "Add_New_Group" + System.currentTimeMillis();
-
-    private String ADD_BUTTON = "td[class*='yui-dt-col-actions'] button";
-
-    private String user = "user" + System.currentTimeMillis() + "@test.com";
-
     private AdminActions adminActions = new AdminActions();
 
     @BeforeClass(groups = "Enterprise-only")
     public void setup() throws Exception
     {
         dashBoard = loginAs("admin", "admin");
-        UserSearchPage userPage = dashBoard.getNav().getUsersPage().render();
-        NewUserPage newPage = userPage.selectNewUser().render();
-        newPage.createEnterpriseUser(user, user, user, user, user);
-
     }
-
-    @Test(groups = "Enterprise-only")
+    
+    @Test(groups = "Enterprise-only", priority=1)
+    public void testUnExpectedSharePageException() throws Exception
+    {
+        try
+        {
+            // Without navigating to groups page, this action should return UnexpectedSharePageException
+            adminActions.browseGroups(drone);
+        }
+        catch(UnexpectedSharePageException e)
+        {
+            Assert.assertTrue(e.getMessage().contains("GroupsPage"));
+        }
+    }
+    
+    @Test(groups = "Enterprise-only", priority=2)
     public void testsnavigateToGroup() throws Exception
     {
         GroupsPage groupsPage = adminActions.navigateToGroup(drone);
-        groupsPage = groupsPage.clickBrowse().render();
-        NewGroupPage newGroupPage = groupsPage.navigateToNewGroupPage().render();
-        newGroupPage.createGroup(groupName, groupName, NewGroupPage.ActionButton.CREATE_GROUP).render();
-        groupsPage = drone.getCurrentPage().render();
-        groupsPage.selectGroup(groupName);
-        AddUserGroupPage addUser = groupsPage.selectAddUser();
-        addUser.searchUser(user).render(3000);
-        Assert.assertTrue(drone.isElementDisplayed(By.cssSelector(ADD_BUTTON)));
-        addUser.clickClose();
-
+        groupsPage = adminActions.browseGroups(drone);
+        Assert.assertNotNull(groupsPage);
     }
 
-    @Test(groups = "Enterprise-only")
+    @Test(groups = "Enterprise-only", priority=3)
     public void testsBrowseGroup() throws Exception
     {
         GroupsPage groupsPage = adminActions.browseGroups(drone);
 
         Assert.assertTrue(groupsPage.isGroupPresent("ALFRESCO_ADMINISTRATORS"));
+        
+        Assert.assertTrue(adminActions.isUserGroupMember(drone, "Administrator", "admin", "ALFRESCO_ADMINISTRATORS"));
     }
 }
