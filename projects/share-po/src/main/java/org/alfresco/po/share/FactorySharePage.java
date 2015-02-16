@@ -109,7 +109,6 @@ import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
-import org.alfresco.po.thirdparty.pentaho.PentahoUserConsolePage;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.PageFactory;
 import org.alfresco.webdrone.WebDrone;
@@ -203,7 +202,7 @@ public class FactorySharePage implements PageFactory
         pages.put("search", SiteResultsPage.class);
         pages.put("start-workflow", StartWorkFlowPage.class);
         pages.put("user-cloud-auth", CloudSyncPage.class);
-        pages.put("node-browser", NodeBrowserPage.class);        
+        pages.put("node-browser", NodeBrowserPage.class);
         pages.put("category-manager", CategoryManagerPage.class);
         pages.put("admin-console", AdminConsolePage.class);
         pages.put("manage-sites", ManageSitesPage.class);
@@ -244,7 +243,6 @@ public class FactorySharePage implements PageFactory
         pages.put("followers", FollowersPage.class);
         pages.put("replication-jobs", ReplicationJobsPage.class);
         pages.put("replication-job", NewReplicationJobPage.class);
-        pages.put("Home", PentahoUserConsolePage.class);
         pages.put("analyze", AdhocAnalyzerPage.class);
         pages.put("analyze-site", AdhocAnalyzerPage.class);
         pages.put("manage-users", AccountSettingsPage.class);
@@ -522,7 +520,7 @@ public class FactorySharePage implements PageFactory
             }
             catch (NoSuchElementException e)
             {
-            } 
+            }
             if (dialogue != null && dialogue.isDisplayed())
             {
                 String dialogueID = dialogue.getAttribute("id");
