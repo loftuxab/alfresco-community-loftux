@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.enums.UserRole;
@@ -34,6 +35,7 @@ import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
 import org.alfresco.po.share.site.document.CreatePlainTextContentPage;
+import org.alfresco.po.share.site.document.DetailsPage;
 import org.alfresco.po.share.site.document.DocumentAspect;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
@@ -168,7 +170,7 @@ public class MyFilesTest extends AbstractUtils
 
         DocumentDetailsPage detailsPage = myFilesPage.selectFile(file1).render();
         assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page");
-        assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page");
+        verifyPreviewer(detailsPage);
 
         Map<ContentType, String> types = new HashMap<>();
         types.put(ContentType.PLAINTEXT, plainFile);
@@ -193,8 +195,9 @@ public class MyFilesTest extends AbstractUtils
             detailsPage = myFilesPage.selectFile(type.getValue()).render();
             assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page for plain text file");
             if (!type.getKey().equals(ContentType.HTML))
-                assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"),
-                        "Preview isn't correctly displayed on details page for plain text file");
+            {
+                verifyPreviewer(detailsPage);
+            }
         }
 
         // create document from template
@@ -205,8 +208,7 @@ public class MyFilesTest extends AbstractUtils
 
         detailsPage = myFilesPage.selectFile(fileName).render();
         assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page for file created from template");
-        assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"),
-                "Preview isn't correctly displayed on details page for file created from template");
+        verifyPreviewer(detailsPage);
 
         // create folder
         myFilesPage = detailsPage.getNav().selectMyFilesPage().render();
@@ -313,31 +315,31 @@ public class MyFilesTest extends AbstractUtils
         assertTrue(fileInfo.isFileShared());
 
         // edit content offline
-        //fileInfo = ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName);
-//        myFilesPage = (MyFilesPage) ShareUserSitePage.selectView(customDrone, ViewType.DETAILED_VIEW).render(maxWaitTime);
-//        fileInfo.selectEditOffline().render();
-//
-//        myFilesPage.getNav().selectMyFilesPage().render();
-//        fileInfo =ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName);
-//        assertEquals(fileInfo.getContentInfo(), "This document is locked by you for offline editing.");
-//
-//        // click View Original Document action for the document
-//        DocumentDetailsPage documentDetailsPage = fileInfo.selectViewOriginalDocument().render(maxWaitTime);
-//        assertTrue(documentDetailsPage.isLockedByYou());
-//        assertTrue(documentDetailsPage.isViewWorkingCopyDisplayed());
-//
-//        // navigate to My Files and click Cancel Editing
-//        myFilesPage.getNav().selectMyFilesPage().render();
-//        fileInfo = ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName);
-//        webDriverWait(customDrone, 1000);
-//        myFilesPage = (MyFilesPage) ShareUserSitePage.selectView(customDrone, ViewType.DETAILED_VIEW).render(maxWaitTime);
-//        webDriverWait(customDrone, 1000);
-//        fileInfo.selectCancelEditing();
-//
-//        myFilesPage.getNav().selectMyFilesPage().render();
-//        webDriverWait(customDrone, 3000);
-//        fileInfo = ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName);
-//        assertFalse(fileInfo.isEdited());
+        // fileInfo = ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName);
+        // myFilesPage = (MyFilesPage) ShareUserSitePage.selectView(customDrone, ViewType.DETAILED_VIEW).render(maxWaitTime);
+        // fileInfo.selectEditOffline().render();
+        //
+        // myFilesPage.getNav().selectMyFilesPage().render();
+        // fileInfo =ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName);
+        // assertEquals(fileInfo.getContentInfo(), "This document is locked by you for offline editing.");
+        //
+        // // click View Original Document action for the document
+        // DocumentDetailsPage documentDetailsPage = fileInfo.selectViewOriginalDocument().render(maxWaitTime);
+        // assertTrue(documentDetailsPage.isLockedByYou());
+        // assertTrue(documentDetailsPage.isViewWorkingCopyDisplayed());
+        //
+        // // navigate to My Files and click Cancel Editing
+        // myFilesPage.getNav().selectMyFilesPage().render();
+        // fileInfo = ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName);
+        // webDriverWait(customDrone, 1000);
+        // myFilesPage = (MyFilesPage) ShareUserSitePage.selectView(customDrone, ViewType.DETAILED_VIEW).render(maxWaitTime);
+        // webDriverWait(customDrone, 1000);
+        // fileInfo.selectCancelEditing();
+        //
+        // myFilesPage.getNav().selectMyFilesPage().render();
+        // webDriverWait(customDrone, 3000);
+        // fileInfo = ShareUserSitePage.getFileDirectoryInfo(customDrone, fileName);
+        // assertFalse(fileInfo.isEdited());
 
         // click Download from the document actions
         myFilesPage = (MyFilesPage) ShareUserSitePage.selectView(customDrone, ViewType.DETAILED_VIEW).render(maxWaitTime);
@@ -431,10 +433,10 @@ public class MyFilesTest extends AbstractUtils
         documentDetailsPage = myFilesPage.selectFile(fileName).render();
         CopyOrMoveContentPage copyOrMoveContentPage = documentDetailsPage.selectCopyTo().render();
         documentDetailsPage = copyOrMoveContentPage.selectPath(testUser, copyFolder).render().selectOkButton().render();
-//        copyOrMoveContentPage.selectOkButton().render();
+        // copyOrMoveContentPage.selectOkButton().render();
 
-//        CopyOrMoveContentPage copyOrMoveContentPage = fileInfo.selectCopyTo().render();
-//        copyOrMoveContentPage.selectPath(REPO, copyFolder).render().selectOkButton().render();
+        // CopyOrMoveContentPage copyOrMoveContentPage = fileInfo.selectCopyTo().render();
+        // copyOrMoveContentPage.selectPath(REPO, copyFolder).render().selectOkButton().render();
         myFilesPage.getNav().selectMyFilesPage().render();
         myFilesPage = (MyFilesPage) ShareUserSitePage.navigateToFolder(customDrone, REPO + SLASH + copyFolder).render(maxWaitTime);
         webDriverWait(customDrone, 5000);
@@ -447,10 +449,10 @@ public class MyFilesTest extends AbstractUtils
         copyOrMoveContentPage = documentDetailsPage.selectMoveTo().render();
         documentDetailsPage = copyOrMoveContentPage.selectPath(testUser, moveFolder).render().selectOkButton().render();
 
-//        fileInfo = myFilesPage.getFileDirectoryInfo(fileName);
-//        copyOrMoveContentPage = fileInfo.selectMoveTo().render();
-//        myFilesPage = copyOrMoveContentPage.selectPath(REPO, moveFolder).render().selectOkButton().render();
-//        assertFalse(myFilesPage.isFileVisible(fileName));
+        // fileInfo = myFilesPage.getFileDirectoryInfo(fileName);
+        // copyOrMoveContentPage = fileInfo.selectMoveTo().render();
+        // myFilesPage = copyOrMoveContentPage.selectPath(REPO, moveFolder).render().selectOkButton().render();
+        // assertFalse(myFilesPage.isFileVisible(fileName));
 
         // Start Workflow for the document
         myFilesPage.getNav().selectMyFilesPage().render();
@@ -588,12 +590,12 @@ public class MyFilesTest extends AbstractUtils
         CopyOrMoveContentPage copyOrMoveContentPage = folderDetailsPage.selectCopyTo().render();
         folderDetailsPage = copyOrMoveContentPage.selectPath(testUser, copyFolder).render().selectOkButton().render();
 
-//        myFilesPage.getNav().selectMyFilesPage().render();
-//        myFilesPage = (MyFilesPage) ShareUserSitePage.selectView(drone, ViewType.DETAILED_VIEW).render(maxWaitTime);
-//        webDriverWait(drone, 5000);
-//        fileInfo = myFilesPage.getFileDirectoryInfo(folderName);
-//        CopyOrMoveContentPage copyOrMoveContentPage = fileInfo.selectCopyTo().render();
-//        copyOrMoveContentPage.selectPath(REPO, copyFolder).render().selectOkButton().render();
+        // myFilesPage.getNav().selectMyFilesPage().render();
+        // myFilesPage = (MyFilesPage) ShareUserSitePage.selectView(drone, ViewType.DETAILED_VIEW).render(maxWaitTime);
+        // webDriverWait(drone, 5000);
+        // fileInfo = myFilesPage.getFileDirectoryInfo(folderName);
+        // CopyOrMoveContentPage copyOrMoveContentPage = fileInfo.selectCopyTo().render();
+        // copyOrMoveContentPage.selectPath(REPO, copyFolder).render().selectOkButton().render();
         myFilesPage.getNav().selectMyFilesPage().render();
         myFilesPage = (MyFilesPage) ShareUserSitePage.navigateToFolder(customDrone, REPO + SLASH + copyFolder).render(maxWaitTime);
         assertTrue(myFilesPage.isItemVisble(folderName));
@@ -606,10 +608,10 @@ public class MyFilesTest extends AbstractUtils
         copyOrMoveContentPage = folderDetailsPage.selectMoveTo().render();
         folderDetailsPage = copyOrMoveContentPage.selectPath(testUser, moveFolder).render().selectOkButton().render();
 
-//        copyOrMoveContentPage = fileInfo.selectMoveTo().render(maxWaitTime);
-//        myFilesPage = copyOrMoveContentPage.selectPath(REPO, moveFolder).render().selectOkButton().render();
-//
-//        assertFalse(myFilesPage.isItemVisble(folderName));
+        // copyOrMoveContentPage = fileInfo.selectMoveTo().render(maxWaitTime);
+        // myFilesPage = copyOrMoveContentPage.selectPath(REPO, moveFolder).render().selectOkButton().render();
+        //
+        // assertFalse(myFilesPage.isItemVisble(folderName));
 
         myFilesPage.getNav().selectMyFilesPage().render();
         myFilesPage = (MyFilesPage) ShareUserSitePage.navigateToFolder(customDrone, REPO + SLASH + moveFolder).render(maxWaitTime);
@@ -1017,5 +1019,17 @@ public class MyFilesTest extends AbstractUtils
 
         ShareUser.logout(customDrone);
         customDrone.quit();
+    }
+
+    private void verifyPreviewer(DocumentDetailsPage detailsPage)
+    {
+        if (alfrescoVersion == AlfrescoVersion.Enterprise42)
+        {
+            assertTrue(detailsPage.getPreviewerClassName().equals("previewer WebPreviewer"), "Preview isn't correctly displayed on details page");
+        }
+        else
+        {
+            assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page");
+        }
     }
 }
