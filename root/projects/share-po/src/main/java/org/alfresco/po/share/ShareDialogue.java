@@ -244,7 +244,7 @@ public class ShareDialogue extends SharePage
      * 
      * @return WebElement
      */
-    private WebElement getDialogueHeader()
+    public WebElement getDialogueHeader()
     {
         try
         {

@@ -377,6 +377,10 @@ public class FactorySharePage implements PageFactory
         {
             logger.trace(url + " : page name: " + pageName);
         }
+        if (pages.get(pageName) == null)
+        {
+            return instantiatePage(drone, UnknownSharePage.class);
+        }            
         return instantiatePage(drone, pages.get(pageName));
     }
 
