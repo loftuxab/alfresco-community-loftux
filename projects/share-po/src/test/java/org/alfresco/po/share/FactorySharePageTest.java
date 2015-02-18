@@ -383,6 +383,11 @@ public class FactorySharePageTest
             
             page = resolvePage("http://localhost:8080/alfresco/s/enterprise/admin/admin-repoconsole", "admin-repoconsole", drone);
             Assert.assertTrue(page instanceof RepositoryAdminConsolePage);
+            
+            page = resolvePage("http://localhost:8080/share/xxyyzz", "UnknownSharePage", drone);
+            Assert.assertTrue(page instanceof SharePage);
+            Assert.assertTrue(page instanceof UnknownSharePage);
+            
 
             long duration = System.currentTimeMillis() - start;
             logger.info("Total duration of test in milliseconds: " + duration);
