@@ -322,18 +322,10 @@ public class CustomiseSiteDashboardPage extends SharePage
                     if (existingDashletsInColumn.size() < MAX_DASHLETS_IN_COLUMN)
                     {
                         WebElement target = drone.findAndWait(By.xpath(String.format("//ul[@class='usedList' and contains(@id,'-column-ul-%d')]", columnNumber)));
-                        drone.executeJavaScript("window.scrollBy(0,250)", "");
+//                        drone.executeJavaScript("window.scrollBy(0,250)", "");
+                        drone.executeJavaScript(String.format("window.scrollTo(0, '%s')", target.getLocation().getY()));
                         drone.dragAndDrop(newDashlet, target);
                         logger.error("The dashlet " + dashletName + " was added in column " + columnNumber);
-                        try
-                        {
-                            wait(maxPageLoadingTime);
-                        }
-                        catch (InterruptedException ie)
-                        {
-                            logger.info("The page did not loaded in max page loading time", ie);
-
-                        }
                         return selectOk();
                     }
                     else
