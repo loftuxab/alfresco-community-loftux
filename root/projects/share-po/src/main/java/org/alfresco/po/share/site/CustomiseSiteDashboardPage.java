@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -199,11 +200,11 @@ public class CustomiseSiteDashboardPage extends SharePage
         drone.executeJavaScript(scrollJs, "");
         removeAllDashletsWithOutConfirm();
         int i = 0;
-        while(drone.findAll(AVAILABLE_DASHLETS).size() > 0)
+        while (drone.findAll(AVAILABLE_DASHLETS).size() > 0)
         {
             removeAllDashletsWithOutConfirm();
             i++;
-            if(i == 2)
+            if (i == 2)
             {
                 break;
             }
@@ -323,6 +324,16 @@ public class CustomiseSiteDashboardPage extends SharePage
                         WebElement target = drone.findAndWait(By.xpath(String.format("//ul[@class='usedList' and contains(@id,'-column-ul-%d')]", columnNumber)));
                         drone.executeJavaScript("window.scrollBy(0,250)", "");
                         drone.dragAndDrop(newDashlet, target);
+                        logger.error("The dashlet " + dashletName + " was added in column " + columnNumber);
+                        try
+                        {
+                            wait(maxPageLoadingTime);
+                        }
+                        catch (InterruptedException ie)
+                        {
+                            logger.info("The page did not loaded in max page loading time", ie);
+
+                        }
                         return selectOk();
                     }
                     else
