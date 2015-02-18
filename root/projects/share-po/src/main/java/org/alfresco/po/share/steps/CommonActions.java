@@ -13,7 +13,7 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.alfreso.po.share.steps;
+package org.alfresco.po.share.steps;
 
 import org.alfresco.po.share.SharePage;
 import org.alfresco.webdrone.HtmlPage;
@@ -27,37 +27,50 @@ public class CommonActions
     public final static String DOCLIB = "DocumentLibrary";
 
     /**
+     * Checks if driver is null, throws UnsupportedOperationException if so.
+     *
+     * @param driver WebDrone Instance
+     * @throws UnsupportedOperationException if driver is null
+     */
+    public void checkIfDriverIsNull(WebDrone driver)
+    {
+        if (driver == null)
+        {
+            throw new UnsupportedOperationException("WebDrone is required");
+        }
+    }
+    
+    /**
      * Checks if the current page is share page, throws PageException if not.
      *
-     * @param drone WebDrone Instance
+     * @param driver WebDrone Instance
      * @return SharePage
      * @throws PageException if the current page is not a share page
      */
-    public SharePage getSharePage(WebDrone drone)
+    public SharePage getSharePage(WebDrone driver)
     {
-        checkIfdroneNull(drone);
+        checkIfDriverIsNull(driver);
         try
         {
-            HtmlPage generalPage = drone.getCurrentPage().render(refreshDuration);
+            HtmlPage generalPage = driver.getCurrentPage().render(refreshDuration);
             return (SharePage) generalPage;
         }
         catch (PageException pe)
         {
-            throw new PageException("Can not cast to SharePage: Current URL: " + drone.getCurrentUrl());
+            throw new PageException("Can not cast to SharePage: Current URL: " + driver.getCurrentUrl());
         }
     }
-
+    
     /**
-     * Checks if drone is null, throws UnsupportedOperationException if so.
-     *
-     * @param drone WebDrone Instance
-     * @throws UnsupportedOperationException if drone is null
-     */
-    public void checkIfdroneNull(WebDrone drone)
+     * Refreshes and returns the current page: throws PageException if not a share page.
+     * 
+     * @param driver WebDrone Instance
+     * @return HtmlPage
+     * */
+    public HtmlPage refreshSharePage(WebDrone driver)
     {
-        if (drone == null)
-        {
-            throw new UnsupportedOperationException("WebDrone is required");
-        }
+        checkIfDriverIsNull(driver);
+        driver.refresh();
+        return getSharePage(driver);
     }
 }

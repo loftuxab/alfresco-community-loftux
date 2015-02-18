@@ -13,7 +13,7 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.alfreso.po.share.steps;
+package org.alfresco.po.share.steps;
 
 import org.alfresco.po.share.LoginPage;
 import org.alfresco.po.share.SharePage;
@@ -56,7 +56,7 @@ public class LoginActions extends CommonActions
                 throw new Exception("Invalid login details");
             }
 
-            checkIfdroneNull(drone);
+            checkIfDriverIsNull(drone);
 
             drone.navigateTo(shareUrl);
 
@@ -99,7 +99,7 @@ public class LoginActions extends CommonActions
     public HtmlPage logout(WebDrone drone)
     {
         HtmlPage currentPage = null;
-        checkIfdroneNull(drone);
+        checkIfDriverIsNull(drone);
         try
         {
             SharePage page = drone.getCurrentPage().render();
