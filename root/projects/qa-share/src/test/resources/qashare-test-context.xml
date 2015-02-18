@@ -15,6 +15,7 @@
     <import resource="classpath:webdrone-context.xml" />
     <import resource="classpath:share-po-context.xml" />
     <import resource="classpath:share-po-test-context.xml" />
+    <import resource="classpath:util-context.xml" />
 
     <bean id="shareProperties"
         class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
