@@ -166,7 +166,7 @@
     <dependency.opencmis.version>0.11.0</dependency.opencmis.version>
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
     <dependency.spring.version>3.2.10.RELEASE</dependency.spring.version>
-    <dependency.tomcat.version>7.0.53</dependency.tomcat.version>
+    <dependency.tomcat.version>7.0.59</dependency.tomcat.version>
     <dependency.activiti.version>5.16.4</dependency.activiti.version>
     <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
     <dependency.poi.version>3.10.1</dependency.poi.version>
@@ -176,7 +176,7 @@
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
-    <installer.java.version>1.8.0_25</installer.java.version>
+    <installer.java.version>1.8.0_31</installer.java.version>
     <installer.postgresql.version>9.3.5</installer.postgresql.version>
     <installer.libreoffice.version>4.2.5-alfresco</installer.libreoffice.version>
   </properties>
