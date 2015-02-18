@@ -347,6 +347,7 @@
                                 <suiteXmlFile>src/test/resources/LinksPageSuite.xml</suiteXmlFile>
                                 <suiteXmlFile>src/test/resources/CalendarPageSuite.xml</suiteXmlFile>
                                 <suiteXmlFile>src/test/resources/MyProfileSuite.xml</suiteXmlFile>
+                                <suiteXmlFile>src/test/resources/ShareStepsSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
                             <excludedGroups>
                                 ${test.exclude}

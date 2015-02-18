@@ -13,7 +13,7 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.alfreso.po.share.steps;
+package org.alfresco.po.share.steps;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -345,7 +345,7 @@ public class SiteActions extends CommonActions
         DocumentLibraryPage docPage;
         try
         {
-            checkIfdroneNull(drone);
+            checkIfDriverIsNull(drone);
             docPage = drone.getCurrentPage().render(refreshDuration);
             // Upload File
             UploadFilePage upLoadPage = docPage.getNavigation().selectFileUpload().render();

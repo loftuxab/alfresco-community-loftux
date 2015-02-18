@@ -1,4 +1,4 @@
-package org.alfreso.po.share.steps;
+package org.alfresco.po.share.steps;
 
 import java.util.List;
 

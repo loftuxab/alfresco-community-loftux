@@ -1,4 +1,4 @@
-package org.alfreso.po.share.steps;
+package org.alfresco.po.share.steps;
 
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.SharePage;

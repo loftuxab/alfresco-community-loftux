@@ -4,7 +4,7 @@ import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.GroupsPage;
 import org.alfresco.po.share.exception.UnexpectedSharePageException;
-import org.alfreso.po.share.steps.AdminActions;
+import org.alfresco.po.share.steps.AdminActions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
