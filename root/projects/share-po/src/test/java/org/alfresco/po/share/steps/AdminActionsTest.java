@@ -3,6 +3,7 @@ package org.alfresco.po.share.steps;
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.GroupsPage;
+import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.exception.UnexpectedSharePageException;
 import org.alfresco.po.share.steps.AdminActions;
 import org.testng.Assert;
@@ -52,4 +53,13 @@ public class AdminActionsTest extends AbstractTest
         
         Assert.assertTrue(adminActions.isUserGroupMember(drone, "Administrator", "admin", "ALFRESCO_ADMINISTRATORS"));
     }
+    
+    @Test(groups = "Enterprise-only", priority=4)
+    public void testsCreateEntUserWithGroup() throws Exception
+    {
+        String userInfo = "usertest" + System.currentTimeMillis() + "@test.com";
+        UserSearchPage userPage = adminActions.createEnterpriseUserWithGroup(drone, userInfo, userInfo, userInfo, userInfo, userInfo, "ALFRESCO_ADMINISTRATORS").render();
+        Assert.assertNotNull(userPage);
+    }
+        
 }

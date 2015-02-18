@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.GroupsPage;
+import org.alfresco.po.share.NewUserPage;
+import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.exception.UnexpectedSharePageException;
 import org.alfresco.po.share.site.document.UserProfile;
+import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
 
 public class AdminActions extends DashBoardActions
@@ -19,8 +22,20 @@ public class AdminActions extends DashBoardActions
     public GroupsPage navigateToGroup(WebDrone driver)
     {
         DashBoardPage dashBoard = openUserDashboard(driver);
-        GroupsPage page = dashBoard.getNav().getGroupsPage();
+        GroupsPage page = dashBoard.getNav().getGroupsPage().render();
         return page;
+    }
+    
+    /**
+     * Navigate to Groups page
+     * @param driver WebDriver Instance
+     * @return Groups page
+     */
+
+    public UserSearchPage navigateToUserPage(WebDrone driver)
+    {
+        DashBoardPage dashBoard = openUserDashboard(driver);
+        return dashBoard.getNav().getUsersPage().render();
     }
     
     /**
@@ -84,5 +99,14 @@ public class AdminActions extends DashBoardActions
             }
         }
         return false;
+    }
+
+    public HtmlPage createEnterpriseUserWithGroup(WebDrone driver, String userName, String fName, String lName, String userEmail, String password,
+            String groupName)
+    {
+        UserSearchPage userPage = navigateToUserPage(driver);
+        NewUserPage newPage = userPage.selectNewUser().render();
+
+        return newPage.createEnterpriseUserWithGroup(userName, fName, lName, userEmail, password, groupName).render();
     }
 }
