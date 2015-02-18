@@ -6,8 +6,8 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
-import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.util.PageUtils;
+import org.alfresco.share.enums.OSName;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -41,6 +41,7 @@ public class RemoteUtil extends AbstractUtils
     private static String javaHome;
     private static String alfHome;
     private static String catalinaHome;
+    private static OSName osName;
 
     private static Session initConnection()
     {
@@ -62,6 +63,7 @@ public class RemoteUtil extends AbstractUtils
     public static void applyIptablesAllPorts()
     {
         initConnection();
+        getCygwinPath("C:\\Alfresco");
         commandProcessor.executeCommand("service iptables start");
         commandProcessor.executeCommand("iptables -F");
         commandProcessor.executeCommand("iptables -A INPUT -p tcp -m tcp -m multiport ! --dports " + serverShhPort + " -j DROP");
@@ -83,20 +85,66 @@ public class RemoteUtil extends AbstractUtils
 
     public static void stopAlfresco(String alfrescoPath)
     {
-        initConnection();
-        commandProcessor.executeCommand(alfrescoPath + "/./alfresco.sh stop");
-        logger.info("Stop alfresco server " + sshHost);
-        logger.info("Execute command: " + alfrescoPath + "/./alfresco.sh stop");
-        commandProcessor.disconnect();
+        switch (osName)
+        {
+            case Windows:
+            {
+                String installCmd = "stop-service -inputobject $(get-service -ComputerName " + sshHost + " -Name alfrescoTomcat)";
+                CommandLine cmdLine = new CommandLine("powershell");
+                cmdLine.addArgument(installCmd);
+                DefaultExecutor executor = new DefaultExecutor();
+                try
+                {
+                    executor.execute(cmdLine);
+                }
+                catch (IOException e)
+                {
+                    throw new PageOperationException("Unable to stop alfrescoTomcat service", e);
+                }
+                logger.info("alfrescoTomcat service on " + sshHost + " was stopped");
+                break;
+            }
+            default:
+            {
+                initConnection();
+                commandProcessor.executeCommand(alfrescoPath + "/./alfresco.sh stop");
+                logger.info("Stop alfresco server " + sshHost);
+                logger.info("Execute command: " + alfrescoPath + "/./alfresco.sh stop");
+                commandProcessor.disconnect();
+            }
+        }
     }
 
     public static void startAlfresco(String alfrescoPath)
     {
-        initConnection();
-        commandProcessor.executeCommand(alfrescoPath + "/./alfresco.sh start");
-        logger.info("Start alfresco server " + sshHost);
-        logger.info("Execute command: " + alfrescoPath + "/./alfresco.sh start");
-        commandProcessor.disconnect();
+        switch (osName)
+        {
+            case Windows:
+            {
+                String installCmd = "start-service -inputobject $(get-service -ComputerName " + sshHost + " -Name alfrescoTomcat)";
+                CommandLine cmdLine = new CommandLine("powershell");
+                cmdLine.addArgument(installCmd);
+                DefaultExecutor executor = new DefaultExecutor();
+                try
+                {
+                    executor.execute(cmdLine);
+                }
+                catch (IOException e)
+                {
+                    throw new PageOperationException("Unable to start alfrescoTomcat service", e);
+                }
+                logger.info("alfrescoTomcat service on " + sshHost + " was started");
+                break;
+            }
+            default:
+            {
+                initConnection();
+                commandProcessor.executeCommand(alfrescoPath + "/./alfresco.sh start");
+                logger.info("Start alfresco server " + sshHost);
+                logger.info("Execute command: " + alfrescoPath + "/./alfresco.sh start");
+                commandProcessor.disconnect();
+            }
+        }
     }
 
     public static void waitForAlfrescoStartup(String nodeURL, long starttime)
@@ -287,11 +335,20 @@ public class RemoteUtil extends AbstractUtils
         ChannelSftp channelSftp = null;
         try
         {
-            channelSftp = openSftp();
-            channelSftp.cd(sftpTargetDir);
-            File f = new File(workingDir);
-            channelSftp.put(new FileInputStream(f), f.getName());
-            logger.info("Transfer to " + sshHost + " complete");
+            switch (osName)
+            {
+                case Windows:
+                    copyToRemoteWin(new File(workingDir), "\\\\" + sshHost + "\\" + sftpTargetDir.replace(":", "$"));
+                    break;
+                default:
+                {
+                    channelSftp = openSftp();
+                    channelSftp.cd(sftpTargetDir);
+                    File f = new File(workingDir);
+                    channelSftp.put(new FileInputStream(f), f.getName());
+                    logger.info("Transfer to " + sshHost + " complete");
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -476,6 +533,10 @@ public class RemoteUtil extends AbstractUtils
         ChannelSftp channelSftp;
         StringBuilder rv = new StringBuilder();
         RemoteUtil.initJmxProps(nodeUrl);
+        if (osName == OSName.Windows)
+        {
+            catalinaHome = getCygwinPath(catalinaHome);
+        }
         try
         {
             channelSftp = openSftp();
@@ -506,8 +567,16 @@ public class RemoteUtil extends AbstractUtils
      */
     public static String applyRepoAmp(String ampPath)
     {
+        String output;
+        if (osName == OSName.Windows)
+        {
+            javaHome = getCygwinPath(javaHome);
+            alfHome = getCygwinPath(alfHome);
+            ampPath = getCygwinPath(ampPath);
+            catalinaHome = getCygwinPath(catalinaHome);
+        }
         initConnection();
-        String output = commandProcessor.executeCommand(javaHome + "/bin/java -jar " + alfHome + "/bin/alfresco-mmt.jar install " + ampPath + " "
+        output = commandProcessor.executeCommand(javaHome + "/bin/java -jar " + alfHome + "/bin/alfresco-mmt.jar install " + ampPath + " "
             + catalinaHome + "/webapps/alfresco.war");
         logger.info("Applied repo amps on  " + sshHost);
         return output;
@@ -520,8 +589,13 @@ public class RemoteUtil extends AbstractUtils
      */
     public static String cleanAlfrescoDir()
     {
+        String output;
+        if (osName == OSName.Windows)
+        {
+            catalinaHome = getCygwinPath(catalinaHome);
+        }
         initConnection();
-        String output = commandProcessor.executeCommand("rm -rf " + catalinaHome + "/webapps/alfresco");
+        output = commandProcessor.executeCommand("rm -rf " + catalinaHome + "/webapps/alfresco");
         logger.info("Cleaning Alfresco dir...");
         commandProcessor.disconnect();
         return output;
@@ -534,8 +608,13 @@ public class RemoteUtil extends AbstractUtils
      */
     public static String cleanShareDir()
     {
+        String output;
+        if (osName == OSName.Windows)
+        {
+            catalinaHome = getCygwinPath(catalinaHome);
+        }
         initConnection();
-        String output = commandProcessor.executeCommand("rm -rf " + catalinaHome + "/webapps/share");
+        output = commandProcessor.executeCommand("rm -rf " + catalinaHome + "/webapps/share");
         logger.info("Cleaning Share dir...");
         commandProcessor.disconnect();
         return output;
@@ -549,8 +628,17 @@ public class RemoteUtil extends AbstractUtils
      */
     public static String applyShareAmp(String ampPath)
     {
+        String output;
+        if (osName == OSName.Windows)
+        {
+            javaHome = getCygwinPath(javaHome);
+            alfHome = getCygwinPath(alfHome);
+            ampPath = getCygwinPath(ampPath);
+            catalinaHome = getCygwinPath(catalinaHome);
+
+        }
         initConnection();
-        String output = commandProcessor.executeCommand(javaHome + "/bin/java -jar " + alfHome + "/bin/alfresco-mmt.jar install " + ampPath + " "
+        output = commandProcessor.executeCommand(javaHome + "/bin/java -jar " + alfHome + "/bin/alfresco-mmt.jar install " + ampPath + " "
             + catalinaHome + "/webapps/share.war");
         logger.info("Applied share amps on  " + sshHost);
         return output;
@@ -611,6 +699,7 @@ public class RemoteUtil extends AbstractUtils
         javaHome = JmxUtils.getAlfrescoServerProperty(nodeUrl, jmxSysProps, jmxJavaHome).toString();
         alfHome = JmxUtils.getAlfrescoServerProperty(nodeUrl, jmxSysProps, jmxAlfHome).toString();
         catalinaHome = JmxUtils.getAlfrescoServerProperty(nodeUrl, jmxSysProps, jmxCatalinaHome).toString();
+        osName = getServerOS(nodeUrl);
     }
 
     public static void uploadFileFromRemoteFolderToLocalFtp(String filePath, String ftpFilePath, String userName, String userPassword, String serverIP) throws Exception
@@ -621,7 +710,7 @@ public class RemoteUtil extends AbstractUtils
         commandProcessor.disconnect();
     }
 
-    public static void removeItem(String folderPath) 
+    public static void removeItem(String folderPath)
     {
 
         initConnection();
@@ -631,7 +720,7 @@ public class RemoteUtil extends AbstractUtils
 
     }
 
-    public static void executeCommand (String command) 
+    public static void executeCommand(String command)
     {
 
         initConnection();
@@ -640,5 +729,4 @@ public class RemoteUtil extends AbstractUtils
         commandProcessor.disconnect();
 
     }
-
 }

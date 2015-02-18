@@ -62,6 +62,7 @@ import org.alfresco.po.share.SharePopup;
 import org.alfresco.po.share.ShareProperties;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.console.CloudConsolePage;
+import org.alfresco.share.enums.OSName;
 import org.alfresco.share.search.SearchKeys;
 import org.alfresco.share.util.api.tokenKey.Layer7AuthorizationOnCloud;
 import org.alfresco.test.AlfrescoTests;
@@ -103,7 +104,7 @@ import com.google.common.io.Files;
 /**
  * Class includes: Abstract test holds all common methods, These will be used
  * from within the ShareUser utils or tests.
- * 
+ *
  * @author Meenal Bhave
  */
 public abstract class AbstractUtils implements AlfrescoTests
@@ -117,8 +118,8 @@ public abstract class AbstractUtils implements AlfrescoTests
     public enum BrowserLanguages
     {
         FRENCH(Locale.FRENCH, "Français"), GERMANY(Locale.GERMANY, "Deutsch"), ITALIAN(Locale.ITALIAN, "Italiano"), JAPANESE(Locale.JAPANESE, "日本語"), SPANISH(
-                new Locale("es", "SP"),
-                "Español");
+        new Locale("es", "SP"),
+        "Español");
 
         public final Locale locale;
         public final String text;
@@ -493,7 +494,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to log a user into alfresco.
-     * 
+     *
      * @param drone
      * @param userInfo
      * @return DashBoardPage
@@ -511,7 +512,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper to Take a ScreenShot. Saves a screenshot in target folder
      * <RESULTS_FOLDER>
-     * 
+     *
      * @param methodName String This is the Test Name / ID
      * @return void
      * @throws Exception if error
@@ -542,7 +543,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper to Take a ScreenShot. Saves a screenshot in target folder
      * <RESULTS_FOLDER>
-     * 
+     *
      * @param methodName String This is the Test Name / ID
      * @return void
      * @throws Exception if error
@@ -570,7 +571,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Take OS ScreenShot
-     * 
+     *
      * @param methodName - Method Name
      */
     public void saveOsScreenShot(String methodName) throws IOException, AWTException
@@ -591,7 +592,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper returns the test / methodname. This needs to be called as the 1st
      * step of the test. Common Test code can later be introduced here.
-     * 
+     *
      * @return String testcaseName
      */
     public static String getTestName()
@@ -603,7 +604,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper returns the test / methodname. This needs to be called as the 1st
      * step of the test. Common Test code can later be introduced here.
-     * 
+     *
      * @return String testcaseName
      */
     public static String getTestName(String testID)
@@ -622,7 +623,7 @@ public abstract class AbstractUtils implements AlfrescoTests
      * Helper to perform the common cleanup actions after a test. This needs to
      * be called as the last step of the test. Common Test code to perform
      * cleanup can later be introduced here.
-     * 
+     *
      * @param testName String test case ID
      * @return N/A
      */
@@ -640,11 +641,11 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to report error details for a test.
-     * 
-     * @param driver WebDrone Instance
+     *
+     * @param driver   WebDrone Instance
      * @param testName String test case ID
-     * @param t Throwable Error & Exception to include testng assert
-     *            failures being reported as Errors
+     * @param t        Throwable Error & Exception to include testng assert
+     *                 failures being reported as Errors
      */
     protected void reportError(WebDrone driver, String testName, Throwable t)
     {
@@ -666,7 +667,7 @@ public abstract class AbstractUtils implements AlfrescoTests
      * This method returns appropriate API URL for given webDrone associated
      * with the call. URL is picked from the map created initially when the
      * drones are created
-     * 
+     *
      * @param drone
      * @return
      */
@@ -730,7 +731,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to return the stack trace as a string for reporting purposes.
-     * 
+     *
      * @param ex exception / error
      * @return String: stack trace
      */
@@ -753,7 +754,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper to create a new file, empty or with specified contents if one does
      * not exist. Logs if File already exists
-     * 
+     *
      * @param filename String Complete path of the file to be created
      * @param contents String Contents for text file
      * @return File
@@ -793,8 +794,8 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper to search for an Element on the Share Page, with configurable
      * retry search option.
-     * 
-     * @param cssClassName : css Selector such as [class='filename']
+     *
+     * @param cssClassName            : css Selector such as [class='filename']
      * @param linkTextOfElementToFind String
      * @return true if element is found
      */
@@ -824,9 +825,9 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper to consistently get the username in the free domain, in the
      * desired format.
-     * 
+     *
      * @param testID String Name of the test for uniquely identifying / mapping
-     *            test data with the test
+     *               test data with the test
      * @return String username
      */
     public static String getUserNameFreeDomain(String testID)
@@ -841,9 +842,9 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper to consistently get the username in the premium domain, in the
      * desired format.
-     * 
+     *
      * @param testID String Name of the test for uniquely identifying / mapping
-     *            test data with the test
+     *               test data with the test
      * @return String username
      */
     protected static String getUserNamePremiumDomain(String testID)
@@ -858,9 +859,9 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper to consistently get the userName in the specified domain, in the
      * desired format.
-     * 
+     *
      * @param testID String Name of the test for uniquely identifying / mapping
-     *            test data with the test
+     *               test data with the test
      * @return String userName
      */
     protected static String getUserNameForDomain(String testID, String domainName)
@@ -879,9 +880,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper method to generate userName in the specified domain in mixed case
-     * 
-     * @param testID String Name of the test for uniquely identifying / mapping
-     *            test data with the test
+     *
+     * @param testID     String Name of the test for uniquely identifying / mapping
+     *                   test data with the test
      * @param domainName String Name for the desired domain
      * @return String userName
      */
@@ -903,7 +904,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Helper to consistently get the DomainName based on the specified domain,
      * in the desired format.
-     * 
+     *
      * @param domainID String to be prefixed to DOMAIN_FREE
      * @return String Domain
      */
@@ -918,9 +919,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to consistently get the Site Name.
-     * 
+     *
      * @param testID String Name of the test for uniquely identifying / mapping
-     *            test data with the test
+     *               test data with the test
      * @return String sitename
      */
     public static String getSiteName(String testID)
@@ -934,9 +935,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to consistently get the Site Short Name.
-     * 
+     *
      * @param siteName String Name of the test for uniquely identifying / mapping
-     *            test data with the test
+     *                 test data with the test
      * @return String site short name
      */
     public static String getSiteShortname(String siteName)
@@ -954,9 +955,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to consistently get the filename.
-     * 
+     *
      * @param partFileName String Part Name of the file for uniquely identifying /
-     *            mapping test data with the test
+     *                     mapping test data with the test
      * @return String fileName
      */
     protected static String getFileName(String partFileName)
@@ -970,9 +971,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to consistently get the folderName.
-     * 
+     *
      * @param partFolderName String Part Name of the folder for uniquely identifying /
-     *            mapping test data with the test
+     *                       mapping test data with the test
      * @return String folderName
      */
     protected static String getFolderName(String partFolderName)
@@ -986,7 +987,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Checks if driver is null, throws UnsupportedOperationException if so.
-     * 
+     *
      * @param driver WebDrone Instance
      * @throws UnsupportedOperationException if driver is null
      */
@@ -1000,8 +1001,8 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Common method to wait for the next solr indexing cycle.
-     * 
-     * @param driver WebDrone Instance
+     *
+     * @param driver      WebDrone Instance
      * @param waitMiliSec Wait duration in milliseconds
      */
     @SuppressWarnings("deprecation")
@@ -1024,7 +1025,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Common method to get the Authentication details based on the username
      * specified.
-     * 
+     *
      * @param authUsername String Username, User email
      * @return String array of auth details, consisting of username and password
      */
@@ -1052,7 +1053,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * This method is used to get the userDomail from the username value.
-     * 
+     *
      * @param invitedUser
      * @return String
      */
@@ -1064,9 +1065,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to consistently get the comment.
-     * 
+     *
      * @param partFolderName String Part Name of the folder for uniquely identifying /
-     *            mapping test data with the test
+     *                       mapping test data with the test
      * @return String folderName
      */
     protected static String getComment(String partFolderName)
@@ -1093,7 +1094,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper method to extract cookie value of Alfresco-CSRFToken
-     * 
+     *
      * @return String token value
      */
     private static String extractCSRFToken(WebDrone drone)
@@ -1108,8 +1109,8 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to check the actual Result Vs expected
-     * 
-     * @param actualResult HttpResponse
+     *
+     * @param actualResult   HttpResponse
      * @param expectedResult int
      * @return void
      */
@@ -1128,7 +1129,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Retrieves the another drone object.
-     * 
+     *
      * @return WebDrone
      */
     public WebDrone getSecondDrone()
@@ -1142,7 +1143,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Return the {@link WebDrone} Configured starting of test.
-     * 
+     *
      * @return {@link WebDrone}
      */
     public WebDrone getDrone()
@@ -1152,7 +1153,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Return the domain name to be used in public apis
-     * 
+     *
      * @param driver WebDrone instance
      * @param domain String
      * @return {@String domainName}
@@ -1176,7 +1177,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Method to return Full User name
-     * 
+     *
      * @param firstName
      * @return
      */
@@ -1187,7 +1188,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Method to return Full User name with e-mail id
-     * 
+     *
      * @param firstName
      * @return
      */
@@ -1198,7 +1199,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Method to get Local Date of Today's date
-     * 
+     *
      * @return
      */
     public LocalDate getToDaysLocalDate()
@@ -1208,7 +1209,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Method to get LocalDate of given dateTime
-     * 
+     *
      * @param dateTime
      * @return {@link = LocalDate}
      */
@@ -1219,7 +1220,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Checks if the current page is share page, throws PageException if not.
-     * 
+     *
      * @param driver WebDrone Instance
      * @return SharePage
      * @throws PageException if the current page is not a share page
@@ -1240,9 +1241,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to consistently get the Group Name.
-     * 
+     *
      * @param testID String Name of the test for uniquely identifying / mapping
-     *            test data with the test
+     *               test data with the test
      * @return String groupName
      */
     public static String getGroupName(String testID)
@@ -1267,7 +1268,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Method to get the custom Drone
-     * 
+     *
      * @param language
      * @return
      */
@@ -1289,7 +1290,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Checks if the current page is share page, throws PageException if not.
-     * 
+     *
      * @param driver WebDrone Instance
      * @return ShareErrorPopup
      * @throws PageException if the current page is not a share error popup page
@@ -1336,7 +1337,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Getter method to get Drone Map
-     * 
+     *
      * @return droneMap
      */
     public Map<String, WebDrone> getDroneMap()
@@ -1347,7 +1348,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * This util method gets the random number for the given length of return
      * string.
-     * 
+     *
      * @param length int
      * @return String
      */
@@ -1364,7 +1365,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Compact proxy for the logger.trace method.
-     * 
+     *
      * @param string to log
      */
     public static void traceLog(String string)
@@ -1377,7 +1378,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * This util method returns a random string of letters for the given length.
-     * 
+     *
      * @param length int
      * @return String
      */
@@ -1397,7 +1398,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * This util method returns a random string of letters and spaces matching the
      * lengths and proportion of English words for the given string length.
-     * 
+     *
      * @param length int
      * @return String
      */
@@ -1406,8 +1407,8 @@ public abstract class AbstractUtils implements AlfrescoTests
         StringBuilder rv = new StringBuilder();
         Random rnd = new Random();
         int[] wordLengths = { 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4,
-                4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 9, 9,
-                9, 9, 10, 10, 10, 11, 11, 12, 13 };
+            4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 9, 9,
+            9, 9, 10, 10, 10, 11, 11, 12, 13 };
 
         char from[] = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 
@@ -1434,7 +1435,7 @@ public abstract class AbstractUtils implements AlfrescoTests
      * This util method resizes a given string to a given length.
      * If the string is shorter the end of the string will be cropped.
      * If the string is longer the extra length will be populated with random characters.
-     * 
+     *
      * @param string The string to be resized.
      * @param length The length of the new string.
      * @return String The new string.
@@ -1467,9 +1468,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * This util method returns a file.
-     * 
+     *
      * @param fileName String
-     * @param sizeMB int
+     * @param sizeMB   int
      * @return File
      */
     public static File getFileWithSize(String fileName, int sizeMB)
@@ -1498,9 +1499,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Checks if a browser window is open with a title matching the given string.
-     * 
+     *
      * @param windowName
-     * @param driver driverObj
+     * @param driver     driverObj
      * @return boolean
      */
     public boolean isWindowOpened(WebDrone driver, String windowName)
@@ -1550,9 +1551,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to consistently get the tagName.
-     * 
+     *
      * @param partTagName String Part Name of the tag for uniquely identifying /
-     *            mapping test data with the test
+     *                    mapping test data with the test
      * @return String tagName
      */
     protected static String getTagName(String partTagName)
@@ -1567,9 +1568,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Helper to consistently get the categoryName.
-     * 
+     *
      * @param partCategoryName String Part Name of the category for uniquely identifying /
-     *            mapping test data with the test
+     *                         mapping test data with the test
      * @return String categoryName
      */
     protected static String getCategoryName(String partCategoryName)
@@ -1584,7 +1585,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Method to get the DependsOnMethod name
-     * 
+     *
      * @param cls
      * @return
      * @throws Exception
@@ -1598,7 +1599,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Util to switch drone to window with the specified name
-     * 
+     *
      * @param driver
      * @param windowName
      * @return boolean <tt>true</tt> if specified window is found
@@ -1619,7 +1620,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Refreshes and returns the current page: throws PageException if not a share page.
-     * 
+     *
      * @param driver WebDrone Instance
      * @return HtmlPage
      * @throws PageException if the current page is not a share page
@@ -1633,7 +1634,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Returns the current page: throws PageException if not a share page.
-     * 
+     *
      * @param driver WebDrone Instance
      * @return HtmlPage
      * @throws PageException if the current page is not a share page
@@ -1654,7 +1655,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Returns the text for file from Download Directory
-     * 
+     *
      * @param fileName
      * @return
      * @throws IOException
@@ -1705,7 +1706,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Returns the text for file from Download Directory
-     * 
+     *
      * @param fileName
      * @return
      * @throws IOException
@@ -1794,7 +1795,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Returns any file from testdata folder
-     * 
+     *
      * @param filename
      * @return File
      */
@@ -1806,7 +1807,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Returns the url of a filename, from a DocumentLibrary site using the VTI routing
      * Example: http://127.0.0.1:7070/<sitename>/documentLibrary/<filename>
-     * 
+     *
      * @param sitename
      * @param filename
      * @return the full VTI routing path of the filename
@@ -1823,7 +1824,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Create custom FireFox profile with specific locale.
-     * 
+     *
      * @param locale
      * @return
      */
@@ -1842,7 +1843,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Create a custom custom drone with specific language
-     * 
+     *
      * @param language
      */
     public void setCustomDroneWithLanguage(BrowserLanguages language)
@@ -1853,9 +1854,9 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Checks if a browser window is open with an URL matching the given string.
-     * 
+     *
      * @param windowName
-     * @param driver driverObj
+     * @param driver     driverObj
      * @return boolean
      */
     public boolean isWindowWithURLOpened(WebDrone driver, String URL)
@@ -1876,7 +1877,7 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Create a new temporary file -fullname- based on source File
-     * 
+     *
      * @param source
      * @param location
      * @return File
@@ -1903,13 +1904,13 @@ public abstract class AbstractUtils implements AlfrescoTests
 
     /**
      * Cleanup all temporary files generated by -getTemporaryRandomTestDataFile
-     * 
+     *
      * @author Paul Brodner
      */
     protected void deleteDuplicatedFiles()
     {
         logger.debug("Deleting all temporary generated files!");
-        for (Iterator<File> iterator = tempFiles.iterator(); iterator.hasNext();)
+        for (Iterator<File> iterator = tempFiles.iterator(); iterator.hasNext(); )
         {
             File file = (File) iterator.next();
             file.delete();
@@ -1917,18 +1918,19 @@ public abstract class AbstractUtils implements AlfrescoTests
     }
 
 
-    public static String checksum (String fileName) throws IOException
+    public static String checksum(String fileName) throws IOException
+    {
+        try
         {
-        try {
             String filePath = new File(downloadDirectory + fileName).getAbsolutePath();
-
 
             InputStream fin = new FileInputStream(filePath);
             java.security.MessageDigest md5er =
-                    MessageDigest.getInstance("MD5");
+                MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[1024];
             int read;
-            do {
+            do
+            {
                 read = fin.read(buffer);
                 if (read > 0)
                     md5er.update(buffer, 0, read);
@@ -1944,9 +1946,33 @@ public abstract class AbstractUtils implements AlfrescoTests
                 strDigest += Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1).toUpperCase();
             }
             return strDigest;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return null;
         }
     }
 
+    /**
+     * Method to retrieve OS Name
+     *
+     * @param nodeUrl
+     * @return
+     */
+    public static OSName getServerOS(String nodeUrl)
+    {
+        OSName rv = null;
+        String osname = JmxUtils.getAlfrescoServerProperty(nodeUrl, "Alfresco:Name=SystemProperties", "os.name").toString();
+
+        if (osname.contains("Linux"))
+        {
+            rv = OSName.Linux;
+        }
+
+        if (osname.contains("Windows"))
+        {
+            rv = OSName.Windows;
+        }
+        return rv;
+    }
 }

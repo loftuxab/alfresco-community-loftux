@@ -699,6 +699,7 @@ public class TransformationServerTest extends AbstractUtils
     private String copyAndApplyAmps(String nodeUrl, String alfrescoPath)
     {
         sshHost = nodeUrl;
+        RemoteUtil.initJmxProps(nodeUrl);
         String addrWidPort = PageUtils.getProtocol(shareUrl) + nodeUrl + ":" + nodePort;
         File dirWithMsi = new File(TARGET_PATH_LOCALLY + ARTIFACT_NAME.replace(".zip", ""));
         File[] shareAmp = dirWithMsi.listFiles(new FilenameFilter()
@@ -719,7 +720,6 @@ public class TransformationServerTest extends AbstractUtils
         });
         RemoteUtil.copyToRemoteServer(repoAmp[0].getAbsolutePath(), alfrescoPath + "/amps");
         RemoteUtil.copyToRemoteServer(shareAmp[0].getAbsolutePath(), alfrescoPath + "/amps_share");
-        RemoteUtil.initJmxProps(nodeUrl);
         RemoteUtil.stopAlfresco(alfrescoPath);
         RemoteUtil.waitForAlfrescoShutdown(PageUtils.getProtocol(shareUrl) + nodeUrl + ":" + nodePort, 100);
         RemoteUtil.applyRepoAmp(alfrescoPath + "/amps/" + repoAmp[0].getName());
