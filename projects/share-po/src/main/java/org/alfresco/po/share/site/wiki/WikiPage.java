@@ -14,15 +14,7 @@
  */
 package org.alfresco.po.share.site.wiki;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.document.TinyMceEditor;
@@ -41,6 +33,15 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 
 /**
@@ -67,6 +68,18 @@ public class WikiPage extends SitePage
     private static final By IMAGE_RSLT = By.cssSelector("#image_results");
     private static final By BUTTON_SAVE = By.cssSelector("button[id$='default-save-button-button']");
     private static final By REMOVE_FORMAT = By.cssSelector(".mceIcon.mce_removeformat");
+    private static final By FORMAT_BUTTON = By.xpath("//div[contains(@class,'mce-menubar')]//div[5]//button");
+    private static final By FORMATS_BUTTON = By.xpath("//button/span[text()='Formats']");
+    private static final By HEADINGS_BUTTON = By.xpath("//div[contains(@class,'expand')]/span[text()='Headings']");
+    private static final By HEADING_1 = By.xpath("//span[contains(@style,'32px')]");
+    private static final By HEADING_2 = By.xpath("//span[contains(@style,'24px')]");
+    private static final By HEADING_3 = By.xpath("//span[contains(@style,'18.7167px')]");
+    private static final By HEADING_4 = By.xpath("//span[contains(@style,'16px')]");
+    private static final By HEADING_5 = By.xpath("//span[contains(@style,'2833px')]");
+    private static final By HEADING_6 = By.xpath("//span[contains(@style,'10.7167px')]");
+    private static final By CLEAR_FORMAT_BUTTON = By.xpath("//div[contains(@class,'mce-menu-item')]/i[contains(@class,'removeformat')]/following-sibling::span");
+    private static final By EDIT_BUTTON = By.xpath("//div[contains(@class,'mce-menubar')]//div[2]//button");
+    private static final By SELECT_ALL_BUTTON = By.xpath("//div[contains(@class,'mce-menu-item')]/i[contains(@class,'selectall')]/following-sibling::span");
     private static final By DELETE_WIKI = By.cssSelector("button[id$='default-delete-button-button']");
     private static final By EDIT_WIKI = By.cssSelector("a[href*='action=edit']");
     private static final By BACK_LINK = By.xpath(".//*[contains (@id, 'wiki-page')]/div[1]/div/span[1]/a");
@@ -299,6 +312,71 @@ public class WikiPage extends SitePage
     }
 
     /**
+     * Select all test in editor on Wiki Page
+     */
+    public void selectAllText()
+    {
+        if (getDrone().getProperties().getVersion() == AlfrescoVersion.Enterprise5)
+        {
+            drone.findAndWait(EDIT_BUTTON).click();
+            drone.findAndWait(SELECT_ALL_BUTTON).click();
+        }
+        else
+        {
+            logger.error("Unsupported operation. selectAllText should be updated for specific Alfresco Version");
+        }
+
+    }
+
+    /**
+     * Select Heading Size on wiki text formatter.
+     */
+    public void selectHeadingSize(int headingSize)
+    {
+        if (headingSize < 0 && headingSize > 6)
+        {
+            logger.error("Unsupported operation: Heading Size should be between 1..5");
+        }
+        else
+        {
+            drone.findAndWait(FORMATS_BUTTON).click();
+            drone.findAndWait(HEADINGS_BUTTON).click();
+            switch (headingSize)
+            {
+                case (1):
+                {
+                    drone.findAndWait(HEADING_1).click();
+                    break;
+                }
+                case (2):
+                {
+                    drone.findAndWait(HEADING_2).click();
+                    break;
+                }
+                case (3):
+                {
+                    drone.findAndWait(HEADING_3).click();
+                    break;
+                }
+                case (4):
+                {
+                    drone.findAndWait(HEADING_4).click();
+                    break;
+                }
+                case (5):
+                {
+                    drone.findAndWait(HEADING_5).click();
+                    break;
+                }
+                case (6):
+                {
+                    drone.findAndWait(HEADING_6).click();
+                    break;
+                }
+            }
+        }
+    }
+    /**
      * Retrieve formatted wiki text.
      *
      * @param type
@@ -370,13 +448,29 @@ public class WikiPage extends SitePage
      */
     public void clickOnRemoveFormatting()
     {
-        try
+        if (getDrone().getProperties().getVersion() == AlfrescoVersion.Enterprise5)
         {
-            drone.findAndWait(REMOVE_FORMAT).click();
+            try
+            {
+
+                drone.findAndWait(FORMAT_BUTTON).click();
+                drone.findAndWait(CLEAR_FORMAT_BUTTON).click();
+            }
+            catch (TimeoutException toe)
+            {
+                logger.error("Time out finding " + FORMAT_BUTTON + " or " + CLEAR_FORMAT_BUTTON, toe);
+            }
         }
-        catch (TimeoutException toe)
+        else
         {
-            logger.error("Time out finding " + REMOVE_FORMAT, toe);
+            try
+            {
+                drone.findAndWait(REMOVE_FORMAT).click();
+            }
+            catch (TimeoutException toe)
+            {
+                logger.error("Time out finding " + REMOVE_FORMAT, toe);
+            }
         }
     }
 
