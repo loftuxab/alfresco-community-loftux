@@ -34,7 +34,6 @@ import org.alfresco.po.share.dashlet.ConfigureSiteNoticeDialogBoxPage;
 import org.alfresco.po.share.dashlet.InsertOrEditLinkPage;
 import org.alfresco.po.share.dashlet.mydiscussions.CreateNewTopicPage;
 import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
-import org.alfresco.po.share.reports.AdhocAnalyzerPage;
 import org.alfresco.po.share.search.AdvanceSearchCRMPage;
 import org.alfresco.po.share.search.AdvanceSearchContentPage;
 import org.alfresco.po.share.search.AdvanceSearchFolderPage;
@@ -243,8 +242,6 @@ public class FactorySharePage implements PageFactory
         pages.put("followers", FollowersPage.class);
         pages.put("replication-jobs", ReplicationJobsPage.class);
         pages.put("replication-job", NewReplicationJobPage.class);
-        pages.put("analyze", AdhocAnalyzerPage.class);
-        pages.put("analyze-site", AdhocAnalyzerPage.class);
         pages.put("manage-users", AccountSettingsPage.class);
         pages.put("transformations", AlfrescoTransformationServerHistoryPage.class);
         pages.put("transformation-server", AlfrescoTransformationServerStatusPage.class);

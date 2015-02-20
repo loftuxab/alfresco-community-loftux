@@ -108,6 +108,8 @@ public abstract class AbstractTest implements AlfrescoTests
     @Parameters({"contextFileName"})
     public void setupContext(@Optional("share-po-test-context.xml")String contextFileName) throws Exception
     {
+        System.out.println("USING **** " + contextFileName);
+        
         if(logger.isTraceEnabled())
         {
             logger.trace("Starting test context");
