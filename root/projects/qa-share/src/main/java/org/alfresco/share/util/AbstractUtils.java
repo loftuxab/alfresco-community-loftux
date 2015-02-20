@@ -319,6 +319,7 @@ public abstract class AbstractUtils implements AlfrescoTests
     protected static String pbldUserName;
     protected static String pbldUserPassword;
     protected static String pathToRSAKey;
+    protected static boolean isGoogleDocsV3;
 
     protected static AlfrescoVersion alfrescoVersion;
     protected static Map<WebDrone, ShareTestProperty> dronePropertiesMap = new HashMap<WebDrone, ShareTestProperty>();
@@ -413,6 +414,7 @@ public abstract class AbstractUtils implements AlfrescoTests
         pbldUserName = testProperties.getPbldUserName();
         pbldUserPassword = testProperties.getPbldUserPassword();
         pathToRSAKey = testProperties.getPathToRSAKey();
+        isGoogleDocsV3 = testProperties.getIsGoogleDocsV3();
 
         DEFAULT_FREENET_USER = DEFAULT_USER + "@" + DOMAIN_FREE;
         DEFAULT_PREMIUMNET_USER = DEFAULT_USER + "@" + DOMAIN_PREMIUM;

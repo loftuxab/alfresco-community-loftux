@@ -99,6 +99,7 @@ public class ShareTestProperty
     private  String pbldUserName;
     private  String pbldUserPassword;
     private  String pathToRSAKey;
+    private boolean isGoogleDocsV3;
 
 
     public ShareTestProperty(final String shareUrl, String jmxShareUrl, final String apiUrl, final String gridUrl, final String username, final String password, String alfrescoVersion,
@@ -109,7 +110,8 @@ public class ShareTestProperty
             final String uniqueTestDataString, final String adminUsername, final String adminPassword, final String superadminUsername,
             final String superadminPassword, final int httpSecurePort, final String headerKey, final String mimeTypes, final String jmxrmiPort, final String jmxrmiUser, final String jmxrmiPassword, final String nodePort, final String licenseShare, final String maxWaitTimeCloudSync,
             final String blogUrl, final String blogUsername, final String blogPassword, final String nfsMountPort,  final String mountPointHost, final String nfsPort,final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String wcmqs, final String replicationEndPointHost,
-            final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath, final String networkPath, final String networkDrive, final String transformServInstallationTarget, final String transformHostName1, final String transformHostName2, final String pbldUserName, final String pbldUserPassword, final String pathToRSAKey)
+            final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath, final String networkPath, final String networkDrive, final String transformServInstallationTarget, final String transformHostName1, final String transformHostName2, final String pbldUserName, final String pbldUserPassword, final String pathToRSAKey,
+            final boolean isGoogleDocsV3)
     {
         this.shareUrl = shareUrl;
         this.jmxShareUrl = jmxShareUrl;
@@ -177,6 +179,7 @@ public class ShareTestProperty
         this.pbldUserName = pbldUserName;
         this.pbldUserPassword = pbldUserPassword;
         this.pathToRSAKey = pathToRSAKey;
+        this.isGoogleDocsV3 = isGoogleDocsV3;
 
     }
 
@@ -481,7 +484,8 @@ public class ShareTestProperty
                 + ", serviceDriveAccountPKCS12FileName=" + serviceDriveAccountPKCS12FileName + ", mimeTypes=" + mimeTypes + ", jmxrmiPort=" + jmxrmiPort
                 + ", jmxrmiUser=" + jmxrmiUser + ", jmxrmiPassword=" + jmxrmiPassword + ", nodePort=" + nodePort + ", nfsMountPort=" + nfsMountPort + ", mountPointHost=" + mountPointHost + ", nfsPort=" + nfsPort + ", ftpPort=" + ftpPort + ", blogUrl=" + blogUrl + ", blogUsername="
                 + blogUsername + ", blogPassword=" + blogPassword + ", serverShhPort=" + serverShhPort + ", serverUser="
-                + serverUser + ", serverPass=" + serverPass + ", isSecureSession=" + isSecureSession + ", networkPath=" + networkPath + ", networkDrive=" + networkDrive + "]";
+                + serverUser + ", serverPass=" + serverPass + ", isSecureSession=" + isSecureSession + ", networkPath=" + networkPath + ", networkDrive=" + networkDrive + "" +
+            ", isGoogleDocsV3=" + isGoogleDocsV3 + "]";
     }
 
     /**
@@ -748,5 +752,15 @@ public class ShareTestProperty
     public String getPathToRSAKey()
     {
         return pathToRSAKey;
+    }
+
+    public boolean getIsGoogleDocsV3()
+    {
+        return isGoogleDocsV3;
+    }
+
+    public void setIsGoogleDocsV3(boolean isGoogleDocsV3)
+    {
+        this.isGoogleDocsV3 = isGoogleDocsV3;
     }
 }

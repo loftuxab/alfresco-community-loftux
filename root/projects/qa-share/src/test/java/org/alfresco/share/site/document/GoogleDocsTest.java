@@ -9,6 +9,7 @@ import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryNavigation;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditInGoogleDocsPage;
 import org.alfresco.po.share.site.document.GoogleDocsUpdateFilePage;
@@ -24,19 +25,23 @@ import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
+import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author cbairaajoni
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = "AceBug")
+@Test(groups = { "AlfrescoOne" }, timeOut = 60000)
 public class GoogleDocsTest extends ShareUserGoogleDocs
 {
     private static Log logger = LogFactory.getLog(GoogleDocsTest.class);
@@ -46,6 +51,9 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
     private static final String TEST_TXT_FILE = "Test2.txt";
     private static final String TEST_DOC_FILE = "Test3.doc";
+    private static final String TEST_FILE_XLSX = "xlsx.xlsx";
+    private static final String TEST_FILE_PPTX = "pptx.pptx";
+    private static final String TEST_FILE_DOCX = "docx.docx";
     private static final String TEST_JPG_FILE = "Test4.JPG";
     private static final String TEST_PDF_FILE = "TestPDFImap.pdf";
     private static final String TEST_HTML_FILE = "Test5.html";
@@ -58,6 +66,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         super.setup();
         testName = this.getClass().getSimpleName();
         testUser = testName + "@" + DOMAIN_FREE;
+        siteName = getSiteName(getRandomString(6));
         logger.info("Starting Tests: " + testName);
     }
 
@@ -77,7 +86,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create User</li>
      * <li>Create Site</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -90,6 +99,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
@@ -98,10 +111,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
             // Site creation
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -129,12 +138,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Open docx in Alfresco share</li>
      * <li>Verify the discarded changes should not be present</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14617() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -181,7 +194,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Create a content docx type</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -225,12 +238,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Click Save Changes</li>
      * <li>Verify Google Docs name should be renamed</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14618() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -282,7 +299,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Upload encrypted content docx type</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -328,10 +345,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>select encrypted docx document</li>
      * <li>Verify error message is displayed and Document is present in doclib.</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
-    @Test(groups = "NonGrid", timeOut = 400000)
+    @Test(groups = "NonGrid", timeOut = 40000)
     public void AONE_14619() throws Exception
     {
         prepare();
@@ -355,10 +372,9 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         {
             signIntoEditGoogleDocFromDetailsPage(drone);
         }
-        catch (PageException e)
+        catch (Exception e)
         {
-            Assert.assertTrue(e.getMessage().contains(
-                    "There was an error opening the document in Google Docs™. If the errors occurs again please contact your System Administrator."));
+            Assert.assertTrue(e instanceof PageOperationException);
         }
 
         Assert.assertTrue(drone.getCurrentPage().getTitle().contains("Document Details"));
@@ -372,7 +388,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Create content with docx type</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -385,6 +401,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
@@ -392,10 +412,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -417,12 +433,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Navigate to url</li>
      * <li>Verify the login page should be displayed.</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14621() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -481,49 +501,32 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Create contents with docx,xls,ppt type</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
     public void dataPrep_GoogleDocs_AONE_14623() throws Exception
     {
-        String testName = getTestName() + "R1";
+        String testName = getTestName() + "R11";
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
-        String fileName = getFileName(testName);
         String[] testUserInfo = new String[] { testUser };
-        String docFileName = fileName + "_doc";
-        String xlsFileName = fileName + "_xls";
-        String pptFileName = fileName + "_ppt";
-
+        String[] docFileInfo = { TEST_FILE_DOCX };
+        String[] xlsFileInfo = { TEST_FILE_XLSX };
+        String[] pptFileInfo = { TEST_FILE_PPTX };
         try
         {
             prepare();
-
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
-
             // User login
             ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-
             ShareUser.openDocumentLibrary(drone);
-
-            // Creating and saving google doc through sign in with the google doc authentication details
-            createAndSavegoogleDocBySignIn(drone, docFileName, ContentType.GOOGLEDOCS);
-
-            // Navigating to google account and Deleting cookies
-            ShareUser.deleteSiteCookies(drone, googleURL);
-            ShareUser.deleteSiteCookies(drone, googlePlusURL);
-
-            createAndSavegoogleDocBySignIn(drone, xlsFileName, ContentType.GOOGLESPREADSHEET);
-
-            // Deleting cookies
-            ShareUser.deleteSiteCookies(drone, googleURL);
-            ShareUser.deleteSiteCookies(drone, googlePlusURL);
-
-            createAndSavegoogleDocBySignIn(drone, pptFileName, ContentType.GOOGLEPRESENTATION);
+            //Uploading documents
+            ShareUser.uploadFileInFolder(drone, docFileInfo).render();
+            ShareUser.uploadFileInFolder(drone, pptFileInfo).render();
+            ShareUser.uploadFileInFolder(drone, xlsFileInfo).render();
         }
         catch (Throwable e)
         {
@@ -544,7 +547,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>open 3 google doc files</li>
      * <li>verify the name</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
@@ -553,61 +556,91 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         prepare();
 
         /** Start Test */
-        String testName = getTestName() + "R1";
+        String testName = getTestName() + "R11";
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
-        String fileName = getFileName(testName);
-        String docFileName = fileName + "_doc.docx";
-        String xlsFileName = fileName + "_xls.xlsx";
-        String pptFileName = fileName + "_ppt.pptx";
+        boolean isTitle;
+        try
+        {
+            // User login.
+            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
-        // User login.
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+            // Open Site Library
+            ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-        // Open Site Library
-        ShareUser.openSitesDocumentLibrary(drone, siteName);
+            DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, TEST_FILE_DOCX).render();
 
-        DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(drone, docFileName);
+            // open editInGoogleDocs.
+            EditInGoogleDocsPage googleDocsPage = signIntoEditGoogleDocFromDetailsPage(drone).render();
+            isTitle = googleDocsPage.getDocumentTitle().equals(TEST_FILE_DOCX);
+            int retryCount = 0;
+            while (!isTitle)
+            {
+                webDriverWait(drone, 5000);
+                isTitle = googleDocsPage.getDocumentTitle().equals(TEST_FILE_DOCX);
+                retryCount++;
+                if (retryCount == 3)
+                {
+                    break;
+                }
+            }
+            Assert.assertTrue(isTitle && googleDocsPage.isDocumentEditor());
 
-        // open editInGoogleDocs.
-        EditInGoogleDocsPage googleDocsPage = signIntoEditGoogleDocFromDetailsPage(drone);
-        String docTitle = googleDocsPage.getDocumentTitle();
+            // Discard changes and Navigate to alfresco
+            discardGoogleDocsChanges(drone).render();
 
-        Assert.assertTrue(docTitle.contains(fileName + "_doc"));
+            // Opening .xls file in googledocs
+            ShareUser.openDocumentLibrary(drone);
+            detailsPage = ShareUser.openDocumentDetailPage(drone, TEST_FILE_XLSX);
+            detailsPage.render();
 
-        // Discard changes and Navigate to alfresco
-        detailsPage = discardGoogleDocsChanges(drone).render();
+            // open editInGoogleDocs.
+            googleDocsPage = openEditGoogleDocFromDetailsPage(drone).render();
+            isTitle = googleDocsPage.getDocumentTitle().equals(TEST_FILE_XLSX);
+            retryCount = 0;
+            while (!isTitle)
+            {
+                webDriverWait(drone, 5000);
+                isTitle = googleDocsPage.getDocumentTitle().equals(TEST_FILE_XLSX);
+                retryCount++;
+                if (retryCount == 3)
+                {
+                    break;
+                }
+            }
+            Assert.assertTrue(isTitle && googleDocsPage.isSpreadSheetEditor());
 
-        // Opening .xls file in googledocs
-        ShareUser.openDocumentLibrary(drone);
-        detailsPage = ShareUser.openDocumentDetailPage(drone, xlsFileName);
-        detailsPage.render();
+            // Discard changes and Navigate to alfresco
+            discardGoogleDocsChanges(drone).render();
 
-        // open editInGoogleDocs.
-        googleDocsPage = openEditGoogleDocFromDetailsPage(drone);
-        docTitle = googleDocsPage.getDocumentTitle();
+            // Opening .ppt file in googledocs
+            ShareUser.openDocumentLibrary(drone);
 
-        Assert.assertTrue(docTitle.contains(fileName + "_xls"));
+            ShareUser.openDocumentDetailPage(drone, TEST_FILE_PPTX);
 
-        // Discard changes and Navigate to alfresco
-        detailsPage = (DocumentDetailsPage) discardGoogleDocsChanges(drone);
-        detailsPage.render();
+            // open editInGoogleDocs.
+            googleDocsPage = openEditGoogleDocFromDetailsPage(drone).render();
+            isTitle = googleDocsPage.getDocumentTitle().equals(TEST_FILE_PPTX);
+            retryCount = 0;
+            while (!isTitle)
+            {
+                webDriverWait(drone, 5000);
+                isTitle = googleDocsPage.getDocumentTitle().equals(TEST_FILE_PPTX);
+                retryCount++;
+                if (retryCount == 3)
+                {
+                    break;
+                }
+            }
+            Assert.assertTrue(isTitle && googleDocsPage.isPresentationEditor());
 
-        // Opening .ppt file in googledocs
-        ShareUser.openDocumentLibrary(drone);
-
-        detailsPage = ShareUser.openDocumentDetailPage(drone, pptFileName);
-        detailsPage.render();
-
-        // open editInGoogleDocs.
-        googleDocsPage = openEditGoogleDocFromDetailsPage(drone);
-        docTitle = googleDocsPage.getDocumentTitle();
-
-        Assert.assertTrue(docTitle.contains(fileName + "_ppt"));
-
-        // Discard changes and Navigate to alfresco
-        detailsPage = (DocumentDetailsPage) discardGoogleDocsChanges(drone);
-        detailsPage.render();
+            // Discard changes and Navigate to alfresco
+            discardGoogleDocsChanges(drone).render();
+        }
+        finally
+        {
+            testCleanup(drone, testName);
+        }
     }
 
     /**
@@ -618,7 +651,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Create content with docx type</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -631,6 +664,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
@@ -638,10 +675,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -665,12 +698,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Save the changes</li>
      * <li>Verify the doc name, version and comments</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14625() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -741,73 +778,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
     }
 
     /**
-     * DataPreparation method - AONE-14627
-     * <ul>
-     * <li>Login</li>
-     * <li>Create User</li>
-     * <li>Create Site</li>
-     * <li>Create folder and sync with cloud</li>
-     * </ul>
-     * 
-     * @throws Exception
-     */
-    @Test(groups = { "DataPrepGoogleDocs", "Hybrid", "NonGrid" }, timeOut = 400000)
-    public void dataPrep_GoogleDocs_AONE_14627() throws Exception
-    {
-        String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName);
-        String cloudUserDomain = hybridDomainPremium;
-        String testCloudUser = getUserNameForDomain(testName, cloudUserDomain);
-        String siteName = getSiteName(testName);
-        String[] testUserInfo = new String[] { testUser };
-        String[] testCloudUserInfo = new String[] { testCloudUser };
-        String folderName = getFolderName(testName);
-
-        try
-        {
-            // User
-            CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
-            CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, testCloudUserInfo);
-
-            // Cloud User login
-            ShareUser.login(hybridDrone, testCloudUser, DEFAULT_PASSWORD);
-
-            // Creating Site
-            ShareUser.createSite(hybridDrone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-
-            // Cloud logout.
-            ShareUser.logout(hybridDrone);
-
-            // Login as User (On-Premise) and configure Cloud Sync
-            ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
-            signInToAlfrescoInTheCloud(drone, testCloudUser, DEFAULT_PASSWORD);
-
-            // Create Site
-            ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-
-            // Creating folder.
-            DocumentLibraryPage docsPage = ShareUserSitePage.createFolder(drone, folderName, "");
-
-            // Select network and site and click on sync
-            DestinationAndAssigneeBean destinationBean = new DestinationAndAssigneeBean();
-            destinationBean.setNetwork(cloudUserDomain);
-            destinationBean.setSiteName(siteName);
-
-            docsPage = (DocumentLibraryPage) AbstractCloudSyncTest.syncContentToCloud(drone, folderName, destinationBean);
-            docsPage.render();
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
-        }
-        finally
-        {
-            testCleanup(drone, testName);
-        }
-    }
-
-    /**
      * Test - AONE-14627:Creating Google Doc in Synced folder.
      * <ul>
      * <li>Login</li>
@@ -820,51 +790,62 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Click Save Changes</li>
      * <li>Verify Google Docs name should be renamed</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "NonGrid", "Hybrid" }, timeOut = 400000)
     public void AONE_14627() throws Exception
     {
         prepare();
-
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
+        String siteName = getSiteName(testName) + System.currentTimeMillis();
         String fileName = getFileName(testName) + System.currentTimeMillis();
         String testUser = getUserNameFreeDomain(testName);
-        String siteName = getSiteName(testName);
-
+        String folderName = getFolderName(testName);
+        String cloudUserDomain = hybridDomainPremium;
+        String testCloudUser = getUserNameForDomain(testName, cloudUserDomain);
         ShareUser.deleteSiteCookies(drone, googleURL);
         ShareUser.deleteSiteCookies(drone, googlePlusURL);
+        // User
+        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
+        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, testCloudUser);
 
-        // User login.
-        ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
+        // Cloud User login
+        ShareUser.login(hybridDrone, testCloudUser, DEFAULT_PASSWORD);
 
-        // Open Site Library
-        DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+        // Creating Site
+        ShareUser.createSite(hybridDrone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
 
-        // Creating and saving google doc through sign in with the google doc authentication details
-        createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEDOCS);
+        // Login as User (On-Premise) and configure Cloud Sync
+        signInToAlfrescoInTheCloud(drone, testCloudUser, DEFAULT_PASSWORD);
 
-        ShareUser.deleteSiteCookies(drone, googleURL);
-        ShareUser.deleteSiteCookies(drone, googlePlusURL);
+        // Create Site
+        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+        // Creating folder.
+        DocumentLibraryPage docsPage = ShareUserSitePage.createFolder(drone, folderName, "");
 
-        // Creating and saving google doc through sign in with the google doc authentication details
-        createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEPRESENTATION);
+        // Select network and site and click on sync
+        DestinationAndAssigneeBean destinationBean = new DestinationAndAssigneeBean();
+        destinationBean.setNetwork(cloudUserDomain);
+        destinationBean.setSiteName(siteName);
 
-        ShareUser.deleteSiteCookies(drone, googleURL);
-        ShareUser.deleteSiteCookies(drone, googlePlusURL);
-
-        // Creating and saving google doc through sign in with the google doc authentication details
-        createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLESPREADSHEET);
-
-        Assert.assertTrue(docLibPage.isDocumentLibrary());
-
-        Assert.assertTrue(docLibPage.isFileVisible(fileName + ".docx"));
-
-        Assert.assertTrue(docLibPage.isFileVisible(fileName + ".xlsx"));
-
-        Assert.assertTrue(docLibPage.isFileVisible(fileName + ".pptx"));
+        docsPage = AbstractCloudSyncTest.syncContentToCloud(drone, folderName, destinationBean);
+        docsPage.render();
+        //Open the  folder which is synced in the document library
+        ShareUserSitePage.navigateToFolder(drone, folderName).render();
+        DocumentLibraryNavigation docLibNav = docsPage.getNavigation().render();
+        docLibNav.selectCreateContentDropdown().render();
+        //Click the 'Create Content ...' option from the Document Library menu bar;
+        assertTrue(docLibNav.isCreateContentPresent(ContentType.GOOGLEDOCS) && docLibNav.isCreateContentPresent(ContentType.GOOGLEPRESENTATION) &&
+            docLibNav.isCreateContentPresent(ContentType.GOOGLESPREADSHEET));
+        ShareUserSitePage.navigateToFolder(drone, folderName).render();
+        ShareUserGoogleDocs.createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEDOCS).render();
+        Assert.assertTrue(docsPage.isFileVisible(fileName), "The document wasn't created");
+        // Login to cloud and verify the synced files appeared
+        ShareUser.login(hybridDrone, adminUserPrem, DEFAULT_PASSWORD);
+        docsPage = ShareUser.openSitesDocumentLibrary(hybridDrone, siteName);
+        assertTrue(docsPage.isItemVisble(fileName) && docsPage.getFileDirectoryInfo(fileName).isCloudSynced(), "The item wasn't synced to Cloud");
     }
 
     /**
@@ -875,7 +856,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Upload documents</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -885,29 +866,21 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String[] testUserInfo = new String[] { testUser };
-
         try
         {
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
-
             // User login
             ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-
             String[] fileInfo1 = { TEST_DOC_FILE };
             ShareUser.uploadFileInFolder(drone, fileInfo1);
-
             String[] fileInfo2 = { TEST_TXT_FILE };
             ShareUser.uploadFileInFolder(drone, fileInfo2);
-
             String[] fileInfo3 = { TEST_JPG_FILE };
             ShareUser.uploadFileInFolder(drone, fileInfo3);
-
             String[] fileInfo4 = { TEST_PDF_FILE };
             ShareUser.uploadFileInFolder(drone, fileInfo4);
-
             String[] fileInfo5 = { TEST_HTML_FILE };
             ShareUser.uploadFileInFolder(drone, fileInfo5);
         }
@@ -930,7 +903,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>select added documents</li>
      * <li>Verify edit in Google Docs option should not be present</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
@@ -942,17 +915,13 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
-
         // User login.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-
         // Open Site Library
         DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-
         // Verifying the EditInGoogleDocs link is present for the supported formats.
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(TEST_DOC_FILE).isEditInGoogleDocsPresent());
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(TEST_TXT_FILE).isEditInGoogleDocsPresent());
-
         // Verifying the EditInGoogleDocs link is not present for the below documents
         Assert.assertFalse(docLibPage.getFileDirectoryInfo(TEST_JPG_FILE).isEditInGoogleDocsPresent());
         Assert.assertFalse(docLibPage.getFileDirectoryInfo(TEST_PDF_FILE).isEditInGoogleDocsPresent());
@@ -966,7 +935,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create User</li>
      * <li>Create Site</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -979,6 +948,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
@@ -986,10 +959,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -1009,12 +978,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Save the changes</li>
      * <li>Verify the error message is displayed.</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14629() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -1059,7 +1032,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create User</li>
      * <li>Create Site</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -1071,12 +1044,12 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -1095,12 +1068,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Navigate to doclib from another browser</li>
      * <li>Verify the delete button is not displayed.</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14631() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -1140,7 +1117,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create User</li>
      * <li>Create Site with site admin</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -1153,6 +1130,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, siteAdminInfo);
 
@@ -1160,10 +1141,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             ShareUser.login(drone, siteAdmin, DEFAULT_PASSWORD);
 
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -1193,12 +1170,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Click save to alfresco</li>
      * <li>Verify the error message.</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "GoogleDocs", "Enterprise42Bug" }, timeOut = 400000)
     public void AONE_14633() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -1279,7 +1260,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create admin Users</li>
      * <li>Create Site with site admin</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -1292,6 +1273,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, siteAdminInfo);
 
@@ -1299,10 +1284,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             ShareUser.login(drone, siteAdmin, DEFAULT_PASSWORD);
 
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -1331,12 +1312,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Try to save the google doc.</li>
      * <li>Verify the expected error message is displayed</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "Enterprise42Bug", timeOut = 400000)
     public void AONE_14634() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -1413,10 +1398,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create admin Users</li>
      * <li>Create Site with site admin</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
-    // @Test(groups={"DataPrepGoogleDocs"}, timeOut = 400000)
+    @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
     public void dataPrep_GoogleDocs_AONE_14635() throws Exception
     {
         String testName = getTestName();
@@ -1426,6 +1411,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, siteAdminInfo);
             CreateUserAPI.upgradeCloudAccount(drone, ADMIN_USERNAME, getUserDomain(siteAdmin), "1000");
@@ -1435,10 +1424,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             ShareUser.login(drone, siteAdmin, DEFAULT_PASSWORD);
 
             ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -1466,14 +1451,17 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Try to save google docs</li>
      * <li>Verify the expected error message is displayed.</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "Enterprise42Bug", "NonGrid" }, timeOut = 400000)
     public void AONE_14635() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
-
         /** Start Test */
         String testName = getTestName();
         String fileName = getFileName(testName) + System.currentTimeMillis();
@@ -1553,7 +1541,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Upload document</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -1567,6 +1555,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             prepare();
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
@@ -1581,10 +1573,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             // Creating and saving google doc through sign in with the google doc authentication details
             createAndSavegoogleDocBySignIn(drone, docFileName, ContentType.GOOGLEDOCS);
 
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -1608,12 +1596,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Open doc in google docs and click save</li>
      * <li>Verify the detailsPage is opened and version will be changed.</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14632() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -1668,7 +1660,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site with site admin</li>
      * <li>Invite another user onto site</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -1683,6 +1675,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, siteAdminInfo);
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUsernInfo);
@@ -1695,10 +1691,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             // Invite user to Site as Collaborator.
             ShareUserMembers.inviteUserToSiteWithRole(drone, siteAdmin, testUser, siteName, UserRole.COLLABORATOR);
             ShareUser.logout(drone);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -1732,12 +1724,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>verify the upload new version is available</li>
      * <li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14636() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -1832,7 +1828,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Add document to the site</li>
      * <li>Invite another user onto site</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -1851,6 +1847,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, siteAdminInfo);
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, collaboratorInfo);
@@ -1878,10 +1878,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             ShareUserMembers.inviteUserToSiteWithRole(drone, siteAdmin, consumer, siteName, UserRole.CONSUMER);
             ShareUser.logout(drone);
         }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
-        }
         finally
         {
             testCleanup(drone, testName);
@@ -1906,12 +1902,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>verify the EditInGoogleDocs option should not be available</li>
      * <li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14640() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -1988,7 +1988,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Add 2 documents to the site</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -2003,6 +2003,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             prepare();
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUsernInfo);
@@ -2023,10 +2027,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
             // Creating and saving google doc through sign in with the google doc authentication details
             createAndSavegoogleDocBySignIn(drone, secondFileName, ContentType.GOOGLEDOCS);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -2049,12 +2049,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Edit and save the two documents alternatively in two browsers</li>
      * <li>verify save is successful</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "NonGrid", "Enterprise42Bug" }, timeOut = 400000)
     public void AONE_14647() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -2146,7 +2150,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Add 2 documents to the site</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -2161,6 +2165,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             prepare();
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUsernInfo);
@@ -2181,10 +2189,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
             // Creating and saving google doc through sign in with the google doc authentication details
             createAndSavegoogleDocBySignIn(drone, secondFileName, ContentType.GOOGLEDOCS);
-        }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
         }
         finally
         {
@@ -2214,12 +2218,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Select Resume in Google Docs link</li>
      * <li>Save Changes.</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14648() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -2320,7 +2328,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Add 2 documents to the site</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -2335,6 +2343,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         try
         {
+            if (isGoogleDocsV3)
+            {
+                throw new SkipException("No applicable to Google Docs V3.");
+            }
             prepare();
             // User
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUsernInfo);
@@ -2356,10 +2368,6 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             // Creating and saving google doc through sign in with the google doc authentication details
             createAndSavegoogleDocBySignIn(drone, secondFileName, ContentType.GOOGLEDOCS);
         }
-        catch (Throwable e)
-        {
-            reportError(drone, testName, e);
-        }
         finally
         {
             testCleanup(drone, testName);
@@ -2380,12 +2388,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Edit and save the two documents alternatively in two browsers</li>
      * <li>verify save is successful</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14649() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -2468,7 +2480,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <ul>
      * <li>Create 1 User</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -2479,6 +2491,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String[] testUsernInfo = new String[] { testUser };
 
         // User
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUsernInfo);
     }
 
@@ -2491,12 +2507,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create google docs</li>
      * <li>Verify the activities in Site and User dashboard</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 500000)
     public void AONE_14643() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -2578,7 +2598,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <ul>
      * <li>Create 1 User</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -2589,6 +2609,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String[] testUsernInfo = new String[] { testUser };
 
         // User
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUsernInfo);
     }
 
@@ -2602,12 +2626,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Edit the google docs</li>
      * <li>Verify the activities in Site and User dashboard</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 500000)
     public void AONE_14644() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -2727,7 +2755,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <ul>
      * <li>Create 1 User</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -2738,6 +2766,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String[] testUsernInfo = new String[] { testUser };
 
         // User
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUsernInfo);
     }
 
@@ -2751,13 +2783,17 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Edit document in the google docs successfully</li>
      * <li>Verify the activities in Site and User dashboard</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @SuppressWarnings("unused")
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14645() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -2812,7 +2848,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Create Site</li>
      * <li>Upload documents</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = { "DataPrepGoogleDocs" }, timeOut = 400000)
@@ -2824,6 +2860,10 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         String[] testUserInfo = new String[] { testUser };
 
         // User
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
         // User login
@@ -2845,12 +2885,16 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      * <li>Login in first user and Verify the doc with Resume Editing google docs option is present</li>
      * <li>click option and save change to alfresco and verify save is successful and lock is not present</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      */
     @Test(groups = "NonGrid", timeOut = 400000)
     public void AONE_14624() throws Exception
     {
+        if (isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -2917,5 +2961,25 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
         docLibPage = ShareUser.openDocumentLibrary(drone);
         Assert.assertFalse(docLibPage.getFileDirectoryInfo(file).isLocked());
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDown()
+    {
+        try
+        {
+            if (!(hybridDrone == null))
+            {
+                hybridDrone.quit();
+            }
+            if (!(drone == null))
+            {
+                drone.quit();
+            }
+        }
+        catch (Exception e)
+        {
+            logger.info("Unable to close instance of browser");
+        }
     }
 }

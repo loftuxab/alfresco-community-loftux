@@ -169,7 +169,7 @@ public class GalleryViewTest extends AbstractUtils
         // Select EditInGoogleDocs
         GoogleDocsAuthorisation googleAuthorisationPage = thisRow.selectEditInGoogleDocs().render();
 
-        EditInGoogleDocsPage googleDocsPage = ShareUserGoogleDocs.signInGoogleDocs(googleAuthorisationPage);
+        EditInGoogleDocsPage googleDocsPage = ShareUserGoogleDocs.signInGoogleDocs(drone, googleAuthorisationPage);
 
         // Verify the Document is opened in google docs or not.
         Assert.assertTrue(googleDocsPage.isGoogleDocsIframeVisible(), "Document was not previewed for google view");
