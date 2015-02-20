@@ -861,7 +861,6 @@ public interface FileDirectoryInfo
 
     String getDescriptionFromInfo();
 
-    
     /***
      * 
      * This method clicks on Preview Web Asset for the selected document
@@ -872,4 +871,7 @@ public interface FileDirectoryInfo
     
     public String getSyncInfoToolTip();
 
+    public GoogleDocCheckInPage selectCheckInGoogleDoc();
+
+    public DocumentLibraryPage selectCancelEditingInGoogleDocs();
 }

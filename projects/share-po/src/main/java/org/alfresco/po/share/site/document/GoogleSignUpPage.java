@@ -20,6 +20,7 @@ import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -137,13 +138,26 @@ public class GoogleSignUpPage extends SharePage
             WebElement submitButton = drone.find(SIGNUP_BUTTON);
             submitButton.click();
             switchToShare();
-            waitUntilAlert(5);
-            return new EditInGoogleDocsPage(drone, documentVersion, isGoogleCreate);
+            waitUntilAlert(10);
+            try
+            {
+                WebElement message = drone.findAndWait(By.cssSelector("div.bd>span.message"));
+                if(message.isDisplayed() && message.getText().equals("There was an error opening the document in Google Docs™." +
+                    " If the errors occurs again please contact your System Administrator."))
+                {
+                    throw new PageOperationException("Unable to open Google Doc for Editing");
+                }
+            }
+            catch (TimeoutException e)
+            {
+                return new EditInGoogleDocsPage(drone, documentVersion, isGoogleCreate);
+            }
         }
         catch (TimeoutException te)
         {
             throw new TimeoutException("Google Sign up page timeout", te);
         }
+        return new EditInGoogleDocsPage(drone, documentVersion, isGoogleCreate);
     }
 
     /**

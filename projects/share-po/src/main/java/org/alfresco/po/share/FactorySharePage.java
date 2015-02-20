@@ -503,6 +503,10 @@ public class FactorySharePage implements PageFactory
         {
             val = extractName(val);
         }
+        if(val.contains("edit") && url.contains("docs.google.com"))
+        {
+            val = "googledocsEditor";
+        }
         return val;
     }
 

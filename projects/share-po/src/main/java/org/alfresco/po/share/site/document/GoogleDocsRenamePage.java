@@ -83,7 +83,10 @@ public class GoogleDocsRenamePage extends SharePage
             rename.clear();
             rename.sendKeys(newName);
             drone.find(OK_BUTTON).click();
-            drone.switchToDefaultContent();
+            if (drone.isElementDisplayed(By.cssSelector("iframe")))
+            {
+                drone.switchToDefaultContent();
+            }
             return new EditInGoogleDocsPage(drone, isGoogleCreate);
         }
         catch (TimeoutException te)
