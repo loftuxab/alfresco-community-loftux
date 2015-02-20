@@ -31,7 +31,7 @@ public class WikiDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized WikiDashlet render(RenderTime timer)
+    public WikiDashlet render(RenderTime timer)
     {
         try
         {
@@ -50,17 +50,12 @@ public class WikiDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
-                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    this.dashlet = drone.find(DASHLET_CONTAINER_PLACEHOLDER);
                     break;
                 }
                 catch (NoSuchElementException e)
                 {
-
-                }
-                catch (StaleElementReferenceException ste)
-                {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.info("The Dashlate was not found " + e);
                 }
                 finally
                 {

@@ -14,19 +14,16 @@
  */
 package org.alfresco.po.share.site;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.alfresco.webdrone.RenderElement;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.WebDroneImpl;
 import org.alfresco.webdrone.exception.PageException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -170,9 +167,10 @@ public class CustomizeSitePage extends SitePage
             {
                 try
                 {
-                    WebDriver webDriver = ((WebDroneImpl) drone).getDriver();
-                    Actions builder = new Actions(webDriver);
+//                    WebDriver webDriver = ((WebDroneImpl) drone).getDriver();
+//                    Actions builder = new Actions(webDriver);
                     WebElement elem = drone.findAndWait(theTypes.getLocator());
+                    drone.executeJavaScript(String.format("window.scrollTo(0, '%s')", target.getLocation().getY()));
                     drone.dragAndDrop(elem, target);
                 }
                 catch (TimeoutException e)
