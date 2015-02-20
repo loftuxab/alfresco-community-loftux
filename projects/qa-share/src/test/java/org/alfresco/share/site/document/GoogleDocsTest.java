@@ -377,7 +377,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             Assert.assertTrue(e instanceof PageOperationException);
         }
 
-        Assert.assertTrue(drone.getCurrentPage().getTitle().contains("Document Details"));
+        Assert.assertTrue(getSharePage(drone).render() instanceof  DocumentDetailsPage, "Wrong page is open");
     }
 
     /**
