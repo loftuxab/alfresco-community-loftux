@@ -75,6 +75,7 @@ public class DocumentDetailsPage extends DetailsPage
     protected static final String ACTION_SET_ID = "document.detail.action.set.id";
     public static final String DOCUMENT_VERSION_PLACEHOLDER = "div.node-header>div.node-info>h1.thin.dark>span.document-version";
     private static final String LINK_EDIT_IN_GOOGLE_DOCS = "div[id$='default-actionSet'] div.google-docs-edit-action-link a";
+    private static final String LINK_CHECKIN_GOOGLE_DOCS = "div[id$='default-actionSet'] div.google-docs-checkin-action-link a";
     private static final String LINK_VIEW_ON_GOOGLE_MAPS = "div[id$='default-actionSet'] div.document-view-googlemaps a";
     private static final String LINK_RESUME_EDIT_IN_GOOGLE_DOCS = "div[id$='default-actionSet'] div.google-docs-resume-action-link a";
     private static final String REQUEST_SYNC_ICON = "a.document-requestsync-link[title='Request Sync']";
@@ -109,6 +110,7 @@ public class DocumentDetailsPage extends DetailsPage
     private static final By VIEW_ORIGINAL_DOCUMENT = By.cssSelector("div.document-view-original>a");
 
     private static final String ERROR_EDITING_DOCUMENT = ".//*[@id='message']/div/span";
+    private static final String LINK_CANCEL_GOOGLE_DOCS = "#onGoogledocsActionCancel a";
 
     public synchronized void setPreviousVersion(final String previousVersion)
     {
@@ -909,8 +911,10 @@ public class DocumentDetailsPage extends DetailsPage
         {
 
         }
-
-        if (!drone.getCurrentUrl().contains(GOOGLE_DOCS_URL))
+        String currUrl = drone.getCurrentUrl();
+        HtmlPage currPage = drone.getCurrentPage();
+        if (!currUrl.contains(GOOGLE_DOCS_URL) && !currUrl.contains("docs.google.com") && !(currPage instanceof DocumentDetailsPage) && !(currPage instanceof
+            DocumentLibraryPage))
         {
             return new GoogleDocsAuthorisation(drone, documentVersion, isGoogleCreate);
         }
@@ -961,7 +965,10 @@ public class DocumentDetailsPage extends DetailsPage
 
             }
 
-            if (!drone.getCurrentUrl().contains(GOOGLE_DOCS_URL))
+            String currUrl = drone.getCurrentUrl();
+            HtmlPage currPage = drone.getCurrentPage();
+            if (!currUrl.contains(GOOGLE_DOCS_URL) && !currUrl.contains("docs.google.com") && !(currPage instanceof DocumentDetailsPage) && !(currPage instanceof
+                DocumentLibraryPage))
             {
                 return new GoogleDocsAuthorisation(drone, documentVersion, isGoogleCreate);
             }
@@ -1831,13 +1838,11 @@ public class DocumentDetailsPage extends DetailsPage
         return new DocumentDetailsPage(drone);
     }
 
-
     /**
      * Returns true if Sync message is present
      *
      * @return boolean
      */
-
     public boolean isSyncMessagePresent()
     {
         try
@@ -1853,6 +1858,44 @@ public class DocumentDetailsPage extends DetailsPage
             return false;
         }
         return false;
+    }
+
+    /**
+     * Method to click Check In Google Doc
+     *
+     * @return GoogleDocCheckInPage
+     */
+    public GoogleDocCheckInPage clickCheckInGoogleDoc()
+    {
+        try
+        {
+            WebElement link = drone.findAndWait(By.cssSelector(LINK_CHECKIN_GOOGLE_DOCS));
+            link.click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Unable to find " + LINK_CHECKIN_GOOGLE_DOCS, e);
+        }
+        return new GoogleDocCheckInPage(drone, null, false).render();
+    }
+
+    /**
+     * Method to click Cancel Editing in Google Docs
+     *
+     * @return DocumentDetailsPage
+     */
+    public DocumentDetailsPage clickCancelEditingInGoogleDocs()
+    {
+        try
+        {
+            WebElement link = drone.findAndWait(By.cssSelector(LINK_CANCEL_GOOGLE_DOCS));
+            link.click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Unable to find " + LINK_CANCEL_GOOGLE_DOCS, e);
+        }
+        return FactorySharePage.resolvePage(drone).render();
     }
 
 }

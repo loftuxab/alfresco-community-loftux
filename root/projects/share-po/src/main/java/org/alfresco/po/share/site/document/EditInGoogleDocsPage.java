@@ -17,6 +17,7 @@ package org.alfresco.po.share.site.document;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.site.SitePage;
@@ -34,7 +35,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Edit in google docs page, holds all element of the HTML page relating to
  * share's edit document properties page.
- * 
+ *
  * @author Subashni Prasanna
  * @since 1.5
  */
@@ -47,6 +48,8 @@ public class EditInGoogleDocsPage extends SitePage
     @SuppressWarnings("unused")
     private static final By EDIT_GOOGLE_DOCS = By.cssSelector("span[class$='goog-inline-block kix-lineview-text-block']");
     private static final By GOOGLE_DOC_TITLE = By.cssSelector("div[id$='docs-title-inner']");
+    private static final By DOCS_BRANDING_CONTAINER = By.cssSelector("#docs-branding-container");
+    private static final By DOCS_EDITOR_CONTAINER = By.cssSelector("#docs-editor-container");
 
     private final String documentVersion;
     private final boolean editOfflineFlag = false;
@@ -68,7 +71,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Constructor used by SharePageFactory
-     * 
+     *
      * @param drone {@link WebDrone}
      */
     public EditInGoogleDocsPage(WebDrone drone)
@@ -80,8 +83,8 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Constructor.
-     * 
-     * @param drone {@link WebDrone}
+     *
+     * @param drone           {@link WebDrone}
      * @param documentVersion String original document version
      */
     protected EditInGoogleDocsPage(WebDrone drone, final String documentVersion, Boolean isGoogleCreate)
@@ -117,7 +120,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Verify if WebElement Save To Alfresco is visible.
-     * 
+     *
      * @return true if displayed
      */
     public boolean isSaveToAlfrescoVisible()
@@ -134,7 +137,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Verify if WebElement Discard Changes is visible.
-     * 
+     *
      * @return true if displayed
      */
     public boolean isDiscardChangesVisible()
@@ -149,7 +152,7 @@ public class EditInGoogleDocsPage extends SitePage
         }
     }
 
-/**
+    /**
      * Verify if WebElement back to Share "<" visible.
      *
      * @return true if displayed
@@ -166,7 +169,7 @@ public class EditInGoogleDocsPage extends SitePage
         }
     }
 
-/**
+    /**
      * Verify if WebElement back to Share "<" visible.
      *
      * @return true if displayed
@@ -194,8 +197,8 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Select Discard Changes button.
-     * 
-     * @return- GoogleDocsDiscardChanges
+     *
+     * @return GoogleDocsDiscardChanges
      */
     public GoogleDocsDiscardChanges selectDiscard()
     {
@@ -205,7 +208,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Selects the save to Alfresco button that triggers the form submit.
-     * 
+     *
      * @return - GoogleDocsUpdateFilePage
      */
     public HtmlPage selectSaveToAlfresco()
@@ -227,7 +230,7 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Selects the save to Alfresco button that triggers the form submit.
-     * 
+     *
      * @return - SharePage
      */
     public HtmlPage selectBackToShare()
@@ -271,16 +274,19 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Rename the document inside Google Docs.
-     * 
-     * @return- GoogleDocsRenamePage
+     *
+     * @return GoogleDocsRenamePage
      */
     public GoogleDocsRenamePage renameDocumentTitle()
     {
         try
         {
-            googledocsframe();
-            drone.waitForPageLoad(15);
-            wait(5);
+            if (drone.find(GOOGLEDOCS_FRAME).isDisplayed())
+            {
+                googledocsframe();
+                drone.waitForPageLoad(15);
+                wait(5);
+            }
             drone.findAndWait(GOOGLE_DOC_TITLE).click();
             return new GoogleDocsRenamePage(drone, isGoogleCreate);
         }
@@ -292,17 +298,24 @@ public class EditInGoogleDocsPage extends SitePage
 
     /**
      * Title of the document inside Google Docs.
-     * 
-     * @return- String
+     *
+     * @return String
      */
     public String getDocumentTitle()
     {
         try
         {
-            googledocsframe();
-            String title = drone.findAndWait(GOOGLE_DOC_TITLE).getText();
-            drone.switchToDefaultContent();
-
+            String title;
+            if (drone.find(GOOGLEDOCS_FRAME).isDisplayed())
+            {
+                googledocsframe();
+                title = drone.findAndWait(GOOGLE_DOC_TITLE).getText();
+                drone.switchToDefaultContent();
+            }
+            else
+            {
+                title = drone.findAndWait(GOOGLE_DOC_TITLE).getText();
+            }
             return title;
         }
         catch (TimeoutException te)
@@ -321,5 +334,74 @@ public class EditInGoogleDocsPage extends SitePage
             time1 = System.currentTimeMillis();
         }
         while (time1 - time0 < seconds * 1000);
+    }
+
+    /**
+     * Method to determine whether is Spreadsheet editor
+     *
+     * @return boolean
+     */
+    public boolean isSpreadSheetEditor()
+    {
+        boolean isEditor;
+        if (drone.find(GOOGLEDOCS_FRAME).isDisplayed())
+        {
+            googledocsframe();
+            isEditor = drone.findAndWait(DOCS_BRANDING_CONTAINER).getAttribute("class").contains("docs-branding-spreadsheets") &&
+                drone.findAndWait(DOCS_EDITOR_CONTAINER).isDisplayed();
+            drone.switchToDefaultContent();
+        }
+        else
+        {
+            return drone.findAndWait(DOCS_BRANDING_CONTAINER).getAttribute("class").contains("docs-branding-spreadsheets") &&
+                drone.findAndWait(DOCS_EDITOR_CONTAINER).isDisplayed();
+        }
+        return isEditor;
+    }
+
+    /**
+     * Method to determine whether is Document editor
+     *
+     * @return boolean
+     */
+    public boolean isDocumentEditor()
+    {
+        boolean isEditor;
+        if (drone.find(GOOGLEDOCS_FRAME).isDisplayed())
+        {
+            googledocsframe();
+            isEditor = drone.findAndWait(DOCS_BRANDING_CONTAINER).getAttribute("class").contains("docs-branding-documents") &&
+                drone.findAndWait(DOCS_EDITOR_CONTAINER).isDisplayed();
+            drone.switchToDefaultContent();
+        }
+        else
+        {
+            return drone.findAndWait(DOCS_BRANDING_CONTAINER).getAttribute("class").contains("docs-branding-documents") &&
+                drone.findAndWait(DOCS_EDITOR_CONTAINER).isDisplayed();
+        }
+        return isEditor;
+    }
+
+    /**
+     * Method to determine whether is Presentation editor
+     *
+     * @return boolean
+     */
+    public boolean isPresentationEditor()
+    {
+        boolean isEditor;
+        if (drone.find(GOOGLEDOCS_FRAME).isDisplayed())
+        {
+            googledocsframe();
+            isEditor = drone.findAndWait(DOCS_BRANDING_CONTAINER).getAttribute("class").contains("docs-branding-presentations") &&
+                drone.findAndWait(DOCS_EDITOR_CONTAINER).isDisplayed();
+            drone.switchToDefaultContent();
+        }
+        else
+        {
+            return drone.findAndWait(DOCS_BRANDING_CONTAINER).getAttribute("class").contains("docs-branding-presentations") &&
+                drone.findAndWait(DOCS_EDITOR_CONTAINER).isDisplayed();
+        }
+        return isEditor;
     }
 }

@@ -1122,5 +1122,27 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
         return exifIcon;
     }
 
+    /**
+     * Method to select Check In Google Doc
+     *
+     * @return GoogleDocCheckInPage
+     */
+    @Override
+    public GoogleDocCheckInPage selectCheckInGoogleDoc()
+    {
+        clickInfoIcon(true);
+        return super.selectCheckInGoogleDoc();
+    }
 
+    /**
+     * Method to select Cancel Editing in Google Docs
+     *
+     * @return DocumentLibraryPage
+     */
+    @Override
+    public DocumentLibraryPage selectCancelEditingInGoogleDocs()
+    {
+        clickInfoIcon(true);
+        return super.selectCancelEditingInGoogleDocs();
+    }
 }
