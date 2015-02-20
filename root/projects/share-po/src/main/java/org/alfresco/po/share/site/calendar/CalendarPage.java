@@ -382,11 +382,6 @@ public class CalendarPage extends SitePage
                 calendarContainer.setDate(startDate);
             }
 
-            if (startTime != null && !startTime.isEmpty())
-            {
-                addEventForm.setStartTimeField(startTime);
-            }
-
             
             if (endYear != null && !endYear.isEmpty())
             {
@@ -415,6 +410,11 @@ public class CalendarPage extends SitePage
                     addEventForm.clickEndDatePicker();
                     calendarContainer.setDate(endDate);
                 }
+            }
+
+            if (startTime != null && !startTime.isEmpty())
+            {
+                addEventForm.setStartTimeField(startTime);
             }
 
             if (endTime != null && !endTime.isEmpty())
