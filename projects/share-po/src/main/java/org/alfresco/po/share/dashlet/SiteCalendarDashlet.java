@@ -4,6 +4,8 @@ import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.WebDroneUtil;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
 
 import java.util.Collections;
@@ -22,6 +24,7 @@ public class SiteCalendarDashlet extends AbstractDashlet implements Dashlet
     private static final By EVENTS_LINKS = By.cssSelector(".details2>div>span>a");
     private static final By EVENTS_DETAILS = By.cssSelector(".details2>div>span");
     private static final By EVENTS_HEADER = By.cssSelector("div[class='details2']>h4");
+    private Log logger = LogFactory.getLog(this.getClass());
 
     /**
      * Constructor.
@@ -34,7 +37,7 @@ public class SiteCalendarDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized SiteCalendarDashlet render(RenderTime timer)
+    public SiteCalendarDashlet render(RenderTime timer)
     {
         try
         {
@@ -55,17 +58,12 @@ public class SiteCalendarDashlet extends AbstractDashlet implements Dashlet
                 {
                     scrollDownToDashlet();
                     getFocus();
-                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    this.dashlet = drone.find(DASHLET_CONTAINER_PLACEHOLDER);
                     break;
                 }
                 catch (NoSuchElementException e)
                 {
-
-                }
-                catch (StaleElementReferenceException ste)
-                {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.info("The Dashlate was not found " + e);
                 }
                 finally
                 {
@@ -189,7 +187,7 @@ public class SiteCalendarDashlet extends AbstractDashlet implements Dashlet
     }
     
     /**
-     * @param eventDetail
+     * @param eventName
      * @return boolean
      */
     public boolean isEventsWithDetailDisplayed(String eventName, String startTime, String endTime)
@@ -212,7 +210,7 @@ public class SiteCalendarDashlet extends AbstractDashlet implements Dashlet
     /**
      * Return the name of the event.
      * 
-     * @param eventName
+     * @param event
      * @return boolean
      */
     public boolean isRepeating(String event)
