@@ -18,6 +18,8 @@
 */
 package org.alfresco.module.vti.web.fp;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -25,6 +27,7 @@ import org.alfresco.repo.webdav.WebDAV;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 import org.springframework.extensions.surf.util.URLDecoder;
 
 /**
@@ -77,5 +80,13 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
         // Do not flush, related to specific Office behaviour
     	return false;
     }
-    
+
+    /**
+     * @see org.alfresco.repo.webdav.PropPatchMethod#persistDeadProperties()
+     */
+    @Override
+    protected void persistDeadProperties(NodeRef nodeRef, Map<QName, String> deadProperties) 
+    {
+        //Do nothing
+    }
 }
