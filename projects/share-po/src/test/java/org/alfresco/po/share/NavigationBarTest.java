@@ -324,39 +324,5 @@ public class NavigationBarTest extends AbstractTest
         CustomiseUserDashboardPage usereDashBoradPage = page.getNav().selectCustomizeUserDashboard().render();
         usereDashBoradPage.getNav().isSiteFavourtie();
     }
-    
-    /**
-     * Test for opening of Adhoc Analyze page under reporting menu by pentaho business analyst
-     * 
-     * Uncomment when pentaho is ready
-     * 
-     * @throws Exception
-     */
-    /**
-   @Test(groups= "Enterprise-only", priority=999)
-    public void navigateToAnalyze() throws Exception
-    {   
-        //logout as admin and log in as pentaho business analyst
-        ShareUtil.logout(drone);
-        DashBoardPage dashBoard = loginAs(username, password);
-        UserSearchPage userSearchpage = dashBoard.getNav().getUsersPage().render();
-        NewUserPage newPage = userSearchpage.selectNewUser().render();
-        newPage.createEnterpriseUserWithGroup(businessAnalystsUserName, businessAnalystsUserName, businessAnalystsUserName, businessAnalystsUserName + "@test.com", UNAME_PASSWORD, pentahoBusinessAnalystGroup);
-        logout(drone);
-        SharePage page = loginAs(businessAnalystsUserName, UNAME_PASSWORD);
-        AdhocAnalyzerPage adhocAnalyzePage = page.getNav().selectAnalyze().render();
-        Assert.assertEquals(adhocAnalyzePage.getPageTitle(), "My Reports");       
-        ShareUtil.logout(drone);
-    }
-    
-    @Test(groups= "Enterprise-only", dependsOnMethods= "navigateToAnalyze")
-    public void navigateToSiteAnalyze() throws Exception
-    {   
-        //log in as pentaho business analyst
-        SharePage page = loginAs(businessAnalystsUserName, UNAME_PASSWORD);
-        AdhocAnalyzerPage adhocAnalyzePage = page.getNav().selectAnalyzeSite().render();
-        Assert.assertEquals(adhocAnalyzePage.getPageTitle(), "Site Reports");       
-        ShareUtil.logout(drone);
-    }
-    **/
+ 
  }
