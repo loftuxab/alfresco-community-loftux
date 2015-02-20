@@ -350,10 +350,10 @@ public class ProcessJsonModelDirective extends JavaScriptDependencyDirective
         
         // It's also necessary to run the JSON strings through the dependency analysis in order to capture
         // any "strangely" nested widget requirements and also to leverage the "widgets*" RegEx pattern that
-        // the processControllerWidgets method will miss. Arguably this might also be a requirement for 
-        // Services although they are not expected to fall into that pattern...
+        // the processControllerWidgets method will miss. 
         DojoDependencies dd = new DojoDependencies();
         this.dojoDependencyHandler.processString(widgetsJSONStr, dd, dependenciesForCurrentRequest);
+        this.dojoDependencyHandler.processString(servicesJSONStr, dd, dependenciesForCurrentRequest);
         
         // It doesn't actually matter what we declare the initial dependency as being, it will just get output in
         // the built cache object as "null". What's important is that we have a starting point to build from...
