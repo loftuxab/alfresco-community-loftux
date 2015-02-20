@@ -217,7 +217,7 @@ public class ToolbarTest extends AbstractUtils
         GoogleDocsAuthorisation googleAuthorisationPage = documentLibraryPage.getNavigation().selectCreateContent(ContentType.GOOGLEDOCS).render();
         googleAuthorisationPage.render();
 
-        EditInGoogleDocsPage googleDocsPage = ShareUserGoogleDocs.signInGoogleDocs(googleAuthorisationPage);
+        EditInGoogleDocsPage googleDocsPage = ShareUserGoogleDocs.signInGoogleDocs(drone, googleAuthorisationPage);
         GoogleDocsDiscardChanges googleDocsDiscardChanges = googleDocsPage.selectDiscard().render(maxWaitTime);
         googleDocsDiscardChanges.clickOkButton().render();
         documentLibraryPage = drone.getCurrentPage().render();
