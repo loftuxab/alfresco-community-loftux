@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -201,7 +201,7 @@ public class SlingshotAlfrescoConnector extends RequestCachingConnector
                     {
                         try
                         {
-                            user = org.apache.commons.codec.binary.Base64.encodeBase64String(user.getBytes("UTF-8"));
+                            user = org.apache.commons.codec.binary.Base64.encodeBase64String((new String(user.getBytes("ISO-8859-1"), "UTF-8")).getBytes("UTF-8"));
                         }
                         catch (UnsupportedEncodingException e)
                         {
