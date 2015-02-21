@@ -18,9 +18,6 @@
  */
 package org.alfresco.po.share.site.document;
 
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.ShareUtil;
@@ -38,6 +35,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.util.List;
+import java.util.regex.Pattern;
+
 @Listeners(FailedTestListener.class)
 public class ContentFormatPageTest extends AbstractTest
 {
@@ -49,7 +49,7 @@ public class ContentFormatPageTest extends AbstractTest
     private FolderDetailsPage folderDetailsPage;
     private TinyMceEditor textEditor;
     private String commentText;
-    private String fontAttForCloud = "<font style=\"color: rgb(0, 0, 255);\">";
+    private String fontAttForCloud = "<font data-mce-style=\"color: #0000ff;\" style=\"color: rgb(0, 0, 255);\">";
     String fontAtt = "<font color=\"#0000FF\">";
      
     /**
@@ -129,7 +129,7 @@ public class ContentFormatPageTest extends AbstractTest
         if (logger.isTraceEnabled()) logger.trace("====testUnderLinedFontOfRichTextFormatter====");
         textEditor.clickTextFormatter(FormatType.UNDERLINED);
         Assert.assertEquals(commentText, textEditor.getText());       
-        Assert.assertTrue(textEditor.getContent().contains("<span style=\"text-decoration: underline;\">"+commentText+"</span>"));
+        Assert.assertTrue(textEditor.getContent().contains("<span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\">"+commentText+"</span>"));
         textEditor.removeFormatting();
     }
 
@@ -177,7 +177,7 @@ public class ContentFormatPageTest extends AbstractTest
         {
             fontAtt = fontAttForCloud ;
         }
-        Assert.assertTrue(textEditor.getContent().contains("<span style=\"color: rgb(0, 0, 255);\">"+commentText+"</span>"));
+        Assert.assertTrue(textEditor.getContent().contains("<span data-mce-style=\"color: #0000ff;\" style=\"color: rgb(0, 0, 255);\">"+commentText+"</span>"));
         textEditor.removeFormatting();
         
     }
@@ -198,8 +198,10 @@ public class ContentFormatPageTest extends AbstractTest
         {
             fontAtt = fontAttForCloud;
         }
-        Assert.assertTrue(textEditor.getContent().contains("<span style=\"color: rgb(0, 0, 255);\">"+commentText+"</span>"));
-        textEditor.clickUndo();        
+        Assert.assertTrue(textEditor.getContent().contains("<span data-mce-style=\"color: #0000ff;\" style=\"color: rgb(0, 0, 255);\">"+commentText+"</span>"));
+
+        textEditor.clickUndo();
+
         Assert.assertTrue(textEditor.getContent().contains("<p>"+commentText+"</p>"));
     }
     
@@ -220,7 +222,7 @@ public class ContentFormatPageTest extends AbstractTest
         {
             fontAtt = fontAttForCloud;
         }
-        Assert.assertTrue(textEditor.getContent().contains("<span style=\"color: rgb(0, 0, 255);\">"+commentText+"</span>"));
+        Assert.assertTrue(textEditor.getContent().contains("<span data-mce-style=\"color: #0000ff;\" style=\"color: rgb(0, 0, 255);\">"+commentText+"</span>"));
         textEditor.clickUndo();        
         Assert.assertTrue(textEditor.getContent().contains("<p>"+commentText+"</p>"));
         textEditor.clickRedo();       
@@ -228,7 +230,7 @@ public class ContentFormatPageTest extends AbstractTest
         {
             fontAtt = fontAttForCloud;
         }
-        Assert.assertTrue(textEditor.getContent().contains("<span style=\"color: rgb(0, 0, 255);\">"+commentText+"</span>"));
+        Assert.assertTrue(textEditor.getContent().contains("<span data-mce-style=\"color: #0000ff;\" style=\"color: rgb(0, 0, 255);\">"+commentText+"</span>"));
         textEditor.removeFormatting();
     }
 
