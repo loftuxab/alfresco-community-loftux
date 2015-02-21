@@ -137,6 +137,12 @@ public class FileTransferReceiver implements TransferReceiver
 
     public void cancel(String transferId) throws TransferException
     {
+        TransferProgress progress = getProgressMonitor().getProgress(transferId);
+        getProgressMonitor().updateStatus(transferId, TransferProgress.Status.CANCELLED);
+        if (progress.getStatus().equals(TransferProgress.Status.PRE_COMMIT))
+        {
+            end(transferId);
+        }
     }
 
     public void commit(String transferId) throws TransferException
