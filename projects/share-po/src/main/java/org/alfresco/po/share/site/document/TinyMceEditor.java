@@ -57,6 +57,7 @@ public class TinyMceEditor extends HtmlElement
     private static final String CSS_EDIT = "button[id$='mce_43-open']";
     private static final String CSS_FORMAT = "button[id$='mce_46-open']";
     private static final String CSS_UNDO = "i[class$='mce-i-undo']";
+//    private static final String CSS_UNDO  = ".//form[contains(@id, 'default-add-form')]//i[contains(@class, 'mce-i-undo')]";
     private static final String CSS_REDO = "i[class$='mce-i-redo']";
     private static final String CSS_BULLET_TEXT = "#tinymce>ul>li";
     protected String CSS_STR_BACK_GROUND_COLOUR;
@@ -291,8 +292,10 @@ public class TinyMceEditor extends HtmlElement
      */
     public void clickUndo()
     {
+        drone.executeJavaScript("$(\"i[class$='mce-i-undo']\").click();");
         setFormatType(FormatType.UNDO);
         clickElementOnRichTextFormatter(getCSSOfFormatType());
+
     }
 
     /**
@@ -318,6 +321,7 @@ public class TinyMceEditor extends HtmlElement
      */
     public void clickRedo()
     {
+        drone.executeJavaScript("$(\"i[class$='mce-i-redo']\").click();");
         setFormatType(FormatType.REDO);
         clickElementOnRichTextFormatter(getCSSOfFormatType());
     }
@@ -390,6 +394,7 @@ public class TinyMceEditor extends HtmlElement
         {
             drone.switchToDefaultContent();
             drone.findFirstDisplayedElement(By.cssSelector(cssString)).click();
+
         }
         catch (NoSuchElementException noSuchElementExp)
         {

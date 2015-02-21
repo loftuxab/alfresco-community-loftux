@@ -60,9 +60,9 @@ public class SiteNoticeDashletTest extends AbstractSiteDashletTest
     private HtmlSourceEditorPage htmlSourcePage = null;
     private String titleAndText = null;
     private String anchorName = "testAnchor";
-    private String fontAttForCloud = "<font style=\"color: rgb(0, 0, 255);\">";
-    private String fontAtt = "<span style=\"color: rgb(0, 0, 255);\">";
-    private String fontBackColorAttr = "<span style=\"background-color: rgb(0, 0, 0);\">";
+    private String fontAttForCloud = "<font data-mce-style=\"color: #0000ff;\" style=\"color: rgb(0, 0, 255);\">";
+    private String fontAtt = "<span data-mce-style=\"color: #0000ff;\" style=\"color: rgb(0, 0, 255);\">";
+    private String fontBackColorAttr = "<span data-mce-style=\"background-color: #000000;\" style=\"background-color: rgb(0, 0, 0);\">";
     private InsertOrEditLinkPage editLinkPage  = null;
     private InsertOrEditImagePage insertOrEditImage = null;
     private String imageURL = "http://cdn2.business2community.com/wp-content/uploads/2013/04/google-.jpg";
