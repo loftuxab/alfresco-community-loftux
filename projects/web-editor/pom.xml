@@ -65,6 +65,9 @@
                     <jswarn>false</jswarn>
                     <encoding>UTF-8</encoding>
                     <excludeResources>true</excludeResources>
+                    <excludes>
+                        <exclude>**/tinymce/**</exclude>
+                    </excludes>
                     <includes>
                         <include>js/**/*.js</include>
                         <include>modules/**/*.js</include>

@@ -347,7 +347,7 @@
                         <exclude>**/sinon-1.10.3/**</exclude>
                         <exclude>**/*-min.js</exclude>
                         <exclude>**/WEB-INF/**</exclude>
-                        <exclude>**/tiny_mce/**</exclude>
+                        <exclude>**/tinymce/**</exclude>
                         <exclude>**/yui/**</exclude>
                         <exclude>js/lib/dojo*/**</exclude>
                         <exclude>**/log4javascript*.js</exclude>
