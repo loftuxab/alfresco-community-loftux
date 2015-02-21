@@ -125,6 +125,7 @@
         <constructor-arg name="pbldUserName" value="${pbldUserName}" />
         <constructor-arg name="pbldUserPassword" value="${pbldUserPassword}" />
         <constructor-arg name="pathToRSAKey" value="${pathToRSAKey}" />
+        <constructor-arg name="isGoogleDocsV3" value="${isGoogleDocsV3}" />
     </bean>
 
     <!-- -->
@@ -203,6 +204,7 @@
         <constructor-arg name="pbldUserName" value="${pbldUserName}" />
         <constructor-arg name="pbldUserPassword" value="${pbldUserPassword}" />
         <constructor-arg name="pathToRSAKey" value="${pathToRSAKey}" />
+        <constructor-arg name="isGoogleDocsV3" value="${isGoogleDocsV3}" />
     </bean>
 
     <util:constant id="englishLocale" static-field="java.util.Locale.ENGLISH" />
