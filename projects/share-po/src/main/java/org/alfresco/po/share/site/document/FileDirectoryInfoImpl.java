@@ -119,6 +119,8 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         protected String LOCATE_FILE = "div.document-locate>a";
         protected By DETAIL_WINDOW = By.xpath("//div[@class='alf-detail-thumbnail']/../../..");
         protected String DOCUMENT_WEB_ASSET = "div.document-preview-webasset>a";
+        protected static final String LINK_CHECKIN_GOOGLE_DOCS = "#onGoogledocsActionCheckin a";
+        protected static final String LINK_CANCEL_GOOGLE_DOCS = "#onGoogledocsActionCancel a";
 
         public FileDirectoryInfoImpl(String nodeRef, WebElement webElement, WebDrone drone)
         {
@@ -3063,4 +3065,27 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
                 return null;
         }
 
+    /**
+     * Method to select Check In Google Doc
+     *
+     * @return GoogleDocCheckInPage
+     */
+    public GoogleDocCheckInPage selectCheckInGoogleDoc()
+    {
+        WebElement checkInGoogleDoc = findAndWait(By.cssSelector(LINK_CHECKIN_GOOGLE_DOCS));
+        checkInGoogleDoc.click();
+        return new GoogleDocCheckInPage(drone, null, false);
+    }
+
+    /**
+     * Method to select Cancel Editing in Google Docs
+     *
+     * @return DocumentLibraryPage
+     */
+    public DocumentLibraryPage selectCancelEditingInGoogleDocs()
+    {
+        WebElement checkInGoogleDoc = findAndWait(By.cssSelector(LINK_CANCEL_GOOGLE_DOCS));
+        checkInGoogleDoc.click();
+        return FactorySharePage.resolvePage(drone).render();
+    }
 }

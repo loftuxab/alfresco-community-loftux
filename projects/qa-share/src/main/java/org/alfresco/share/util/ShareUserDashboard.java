@@ -27,6 +27,8 @@ public class ShareUserDashboard extends AbstractUtils
     protected static final String DEFAULT_FOLDER = "Documents";
     public static final By CREATE_SITE_BUTTON = By
             .cssSelector("#page_x002e_full-width-dashlet_x002e_user_x007e_admin_x007e_dashboard_x0023_default-createSite-button");
+    public static final By CREATE_SITE_BUTTON_ON_DASHLET = By
+            .cssSelector("a[id^='page_x002e_component'][id$='x002e_user_x007e_admin_x007e_dashboard_x0023_default-createSite-button']");
 
     public ShareUserDashboard()
     {

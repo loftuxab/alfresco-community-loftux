@@ -14,6 +14,8 @@
  */
 package org.alfresco.po.share;
 
+import org.alfresco.po.alfresco.AlfrescoTransformationServerHistoryPage;
+import org.alfresco.po.alfresco.AlfrescoTransformationServerStatusPage;
 import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
 import org.alfresco.po.alfresco.TenantAdminConsolePage;
 import org.alfresco.po.alfresco.WebScriptsPage;
@@ -32,7 +34,6 @@ import org.alfresco.po.share.dashlet.ConfigureSiteNoticeDialogBoxPage;
 import org.alfresco.po.share.dashlet.InsertOrEditLinkPage;
 import org.alfresco.po.share.dashlet.mydiscussions.CreateNewTopicPage;
 import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
-import org.alfresco.po.share.reports.AdhocAnalyzerPage;
 import org.alfresco.po.share.search.AdvanceSearchCRMPage;
 import org.alfresco.po.share.search.AdvanceSearchContentPage;
 import org.alfresco.po.share.search.AdvanceSearchFolderPage;
@@ -107,7 +108,6 @@ import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
-import org.alfresco.po.thirdparty.pentaho.PentahoUserConsolePage;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.PageFactory;
 import org.alfresco.webdrone.WebDrone;
@@ -201,7 +201,7 @@ public class FactorySharePage implements PageFactory
         pages.put("search", SiteResultsPage.class);
         pages.put("start-workflow", StartWorkFlowPage.class);
         pages.put("user-cloud-auth", CloudSyncPage.class);
-        pages.put("node-browser", NodeBrowserPage.class);        
+        pages.put("node-browser", NodeBrowserPage.class);
         pages.put("category-manager", CategoryManagerPage.class);
         pages.put("admin-console", AdminConsolePage.class);
         pages.put("manage-sites", ManageSitesPage.class);
@@ -242,10 +242,9 @@ public class FactorySharePage implements PageFactory
         pages.put("followers", FollowersPage.class);
         pages.put("replication-jobs", ReplicationJobsPage.class);
         pages.put("replication-job", NewReplicationJobPage.class);
-        pages.put("Home", PentahoUserConsolePage.class);
-        pages.put("analyze", AdhocAnalyzerPage.class);
-        pages.put("analyze-site", AdhocAnalyzerPage.class);
         pages.put("manage-users", AccountSettingsPage.class);
+        pages.put("transformations", AlfrescoTransformationServerHistoryPage.class);
+        pages.put("transformation-server", AlfrescoTransformationServerStatusPage.class);
     }
 
     public HtmlPage getPage(WebDrone drone)
@@ -365,7 +364,7 @@ public class FactorySharePage implements PageFactory
      * is extracted it is used to get the class from the map which is
      * then instantiated.
      *
-     * @param driver WebDriver browser client
+     * @param drone WebDriver browser client
      * @return SharePage page object
      */
     public static SharePage getPage(final String url, WebDrone drone)
@@ -375,6 +374,10 @@ public class FactorySharePage implements PageFactory
         {
             logger.trace(url + " : page name: " + pageName);
         }
+        if (pages.get(pageName) == null)
+        {
+            return instantiatePage(drone, UnknownSharePage.class);
+        }            
         return instantiatePage(drone, pages.get(pageName));
     }
 
@@ -497,6 +500,10 @@ public class FactorySharePage implements PageFactory
         {
             val = extractName(val);
         }
+        if(val.contains("edit") && url.contains("docs.google.com"))
+        {
+            val = "googledocsEditor";
+        }
         return val;
     }
 
@@ -518,7 +525,7 @@ public class FactorySharePage implements PageFactory
             }
             catch (NoSuchElementException e)
             {
-            } 
+            }
             if (dialogue != null && dialogue.isDisplayed())
             {
                 String dialogueID = dialogue.getAttribute("id");

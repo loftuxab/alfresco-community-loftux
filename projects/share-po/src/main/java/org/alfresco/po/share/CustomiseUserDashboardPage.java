@@ -61,7 +61,7 @@ public class CustomiseUserDashboardPage extends SharePage
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized CustomiseUserDashboardPage render(RenderTime timer)
+    public CustomiseUserDashboardPage render(RenderTime timer)
     {
         while (true)
         {
@@ -263,7 +263,7 @@ public class CustomiseUserDashboardPage extends SharePage
                     try
                     {
                         existingDashletsInColumn = drone.findAndWaitForElements(By.cssSelector(String.format("ul[id$='column-ul-%d'] li",
-                            columnNumber)));
+                                columnNumber)));
                     }
                     catch (TimeoutException e)
                     {
@@ -275,8 +275,10 @@ public class CustomiseUserDashboardPage extends SharePage
                     if (existingDashletsInColumn.size() < MAX_DASHLETS_IN_COLUMN)
                     {
                         WebElement target = drone.findAndWait(By.xpath(String.format("//ul[@class='usedList' and contains(@id,'-column-ul-%d')]", columnNumber)));
-                        drone.executeJavaScript("window.scrollBy(0,250)", "");
+//                        drone.executeJavaScript("window.scrollBy(0,250)", "");
+                        drone.executeJavaScript(String.format("window.scrollTo(0, '%s')", target.getLocation().getY()));
                         drone.dragAndDrop(newDashlet, target);
+                        logger.error("The dashlet " + dashletName + " was added in column " + columnNumber);
                         return selectOk();
                     }
                     else

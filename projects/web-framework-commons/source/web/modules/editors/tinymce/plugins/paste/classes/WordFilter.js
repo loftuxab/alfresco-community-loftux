@@ -52,7 +52,55 @@ define("tinymce/pasteplugin/WordFilter", [
 			function convertFakeListsToProperLists(node) {
 				var currentListNode, prevListNode, lastLevel = 1;
 
-				function convertParagraphToLi(paragraphNode, listStartTextNode, listName, start) {
+				function getText(node) {
+					var txt = '';
+
+					if (node.type === 3) {
+						return node.value;
+					}
+
+					if ((node = node.firstChild)) {
+						do {
+							txt += getText(node);
+						} while ((node = node.next));
+					}
+
+					return txt;
+				}
+
+				function trimListStart(node, regExp) {
+					if (node.type === 3) {
+						if (regExp.test(node.value)) {
+							node.value = node.value.replace(regExp, '');
+							return false;
+						}
+					}
+
+					if ((node = node.firstChild)) {
+						do {
+							if (!trimListStart(node, regExp)) {
+								return false;
+							}
+						} while ((node = node.next));
+					}
+
+					return true;
+				}
+
+				function removeIgnoredNodes(node) {
+					if (node._listIgnore) {
+						node.remove();
+						return;
+					}
+
+					if ((node = node.firstChild)) {
+						do {
+							removeIgnoredNodes(node);
+						} while ((node = node.next));
+					}
+				}
+
+				function convertParagraphToLi(paragraphNode, listName, start) {
 					var level = paragraphNode._listLevel || lastLevel;
 
 					// Handle list nesting
@@ -83,12 +131,6 @@ define("tinymce/pasteplugin/WordFilter", [
 					}
 
 					paragraphNode.name = 'li';
-					listStartTextNode.value = '';
-
-					var nextNode = listStartTextNode.next;
-					if (nextNode && nextNode.type == 3) {
-						nextNode.value = nextNode.value.replace(/^\u00a0+/, '');
-					}
 
 					// Append list to previous list if it exists
 					if (level > lastLevel && prevListNode) {
@@ -96,6 +138,12 @@ define("tinymce/pasteplugin/WordFilter", [
 					}
 
 					lastLevel = level;
+
+					// Remove start of list item "1. " or "&middot; " etc
+					removeIgnoredNodes(paragraphNode);
+					trimListStart(paragraphNode, /^\u00a0+/);
+					trimListStart(paragraphNode, /^\s*([\u2022\u00b7\u00a7\u00d8\u25CF]|\w+\.)/);
+					trimListStart(paragraphNode, /^\u00a0+/);
 				}
 
 				var paragraphs = node.getAll('p');
@@ -105,26 +153,17 @@ define("tinymce/pasteplugin/WordFilter", [
 
 					if (node.name == 'p' && node.firstChild) {
 						// Find first text node in paragraph
-						var nodeText = '';
+						var nodeText = getText(node);
 						var listStartTextNode = node.firstChild;
 
-						while (listStartTextNode) {
-							nodeText = listStartTextNode.value;
-							if (nodeText) {
-								break;
-							}
-
-							listStartTextNode = listStartTextNode.firstChild;
-						}
-
 						// Detect unordered lists look for bullets
-						if (/^\s*[\u2022\u00b7\u00a7\u00d8\u25CF]\s*$/.test(nodeText)) {
-							convertParagraphToLi(node, listStartTextNode, 'ul');
+						if (/^[\s\u00a0]*[\u2022\u00b7\u00a7\u00d8\u25CF]\s*/.test(nodeText)) {
+							convertParagraphToLi(node, 'ul');
 							continue;
 						}
 
 						// Detect ordered lists 1., a. or ixv.
-						if (/^\s*\w+\.$/.test(nodeText)) {
+						if (/^[\s\u00a0]*\w+\./.test(nodeText) && !/^[\s\u00a0]*\w+\.\s*[^\s]+/.test(listStartTextNode.value)) {
 							// Parse OL start number
 							var matches = /([0-9])\./.exec(nodeText);
 							var start = 1;
@@ -132,7 +171,13 @@ define("tinymce/pasteplugin/WordFilter", [
 								start = parseInt(matches[1], 10);
 							}
 
-							convertParagraphToLi(node, listStartTextNode, 'ol', start);
+							convertParagraphToLi(node, 'ol', start);
+							continue;
+						}
+
+						// Convert paragraphs marked as lists but doesn't look like anything
+						if (node._listLevel) {
+							convertParagraphToLi(node, 'ul', 1);
 							continue;
 						}
 
@@ -142,20 +187,27 @@ define("tinymce/pasteplugin/WordFilter", [
 			}
 
 			function filterStyles(node, styleValue) {
-				var outputStyles = {}, styles = editor.dom.parseStyle(styleValue);
-
-				// Parse out list indent level for lists
-				if (node.name === 'p') {
-					var matches = /mso-list:\w+ \w+([0-9]+)/.exec(styleValue);
-
-					if (matches) {
-						node._listLevel = parseInt(matches[1], 10);
-					}
-				}
+				var outputStyles = {}, matches, styles = editor.dom.parseStyle(styleValue);
 
 				Tools.each(styles, function(value, name) {
 					// Convert various MS styles to W3C styles
 					switch (name) {
+						case 'mso-list':
+							// Parse out list indent level for lists
+							matches = /\w+ \w+([0-9]+)/i.exec(styleValue);
+							if (matches) {
+								node._listLevel = parseInt(matches[1], 10);
+							}
+
+							// Remove these nodes <span style="mso-list:Ignore">o</span>
+							// Since the span gets removed we mark the text node and the span
+							if (/Ignore/i.test(value) && node.firstChild) {
+								node._listIgnore = true;
+								node.firstChild._listIgnore = true;
+							}
+
+							break;
+
 						case "horiz-align":
 							name = "text-align";
 							break;
@@ -180,6 +232,20 @@ define("tinymce/pasteplugin/WordFilter", [
 								outputStyles[name] = value;
 							}
 							return;
+
+						case "mso-element":
+							// Remove track changes code
+							if (/^(comment|comment-list)$/i.test(value)) {
+								node.remove();
+								return;
+							}
+
+							break;
+					}
+
+					if (name.indexOf('mso-comment') === 0) {
+						node.remove();
+						return;
 					}
 
 					// Never allow mso- prefixed names
@@ -249,18 +315,34 @@ define("tinymce/pasteplugin/WordFilter", [
 
 				var validElements = settings.paste_word_valid_elements;
 				if (!validElements) {
-					validElements = '@[style],-strong/b,-em/i,-span,-p,-ol,-ul,-li,-h1,-h2,-h3,-h4,-h5,-h6,' +
-						'-table[width],-tr,-td[colspan|rowspan|width],-th,-thead,-tfoot,-tbody,-a[href|name],sub,sup,strike,br';
+					validElements = '-strong/b,-em/i,-span,-p,-ol,-ul,-li,-h1,-h2,-h3,-h4,-h5,-h6,-p/div,' +
+						'-table[width],-tr,-td[colspan|rowspan|width],-th,-thead,-tfoot,-tbody,-a[href|name],sub,sup,strike,br,del';
 				}
 
 				// Setup strict schema
 				var schema = new Schema({
-					valid_elements: validElements
+					valid_elements: validElements,
+					valid_children: '-li[p]'
+				});
+
+				// Add style/class attribute to all element rules since the user might have removed them from
+				// paste_word_valid_elements config option and we need to check them for properties
+				Tools.each(schema.elements, function(rule) {
+					if (!rule.attributes["class"]) {
+						rule.attributes["class"] = {};
+						rule.attributesOrder.push("class");
+					}
+
+					if (!rule.attributes.style) {
+						rule.attributes.style = {};
+						rule.attributesOrder.push("style");
+					}
 				});
 
 				// Parse HTML into DOM structure
 				var domParser = new DomParser({}, schema);
 
+				// Filter styles to remove "mso" specific styles and convert some of them
 				domParser.addAttributeFilter('style', function(nodes) {
 					var i = nodes.length, node;
 
@@ -269,12 +351,38 @@ define("tinymce/pasteplugin/WordFilter", [
 						node.attr('style', filterStyles(node, node.attr('style')));
 
 						// Remove pointess spans
-						if (node.name == 'span' && !node.attributes.length) {
+						if (node.name == 'span' && node.parent && !node.attributes.length) {
 							node.unwrap();
 						}
 					}
 				});
 
+				// Check the class attribute for comments or del items and remove those
+				domParser.addAttributeFilter('class', function(nodes) {
+					var i = nodes.length, node, className;
+
+					while (i--) {
+						node = nodes[i];
+
+						className = node.attr('class');
+						if (/^(MsoCommentReference|MsoCommentText|msoDel|MsoCaption)$/i.test(className)) {
+							node.remove();
+						}
+
+						node.attr('class', null);
+					}
+				});
+
+				// Remove all del elements since we don't want the track changes code in the editor
+				domParser.addNodeFilter('del', function(nodes) {
+					var i = nodes.length;
+
+					while (i--) {
+						nodes[i].remove();
+					}
+				});
+
+				// Keep some of the links and anchors
 				domParser.addNodeFilter('a', function(nodes) {
 					var i = nodes.length, node, href, name;
 
@@ -282,6 +390,11 @@ define("tinymce/pasteplugin/WordFilter", [
 						node = nodes[i];
 						href = node.attr('href');
 						name = node.attr('name');
+
+						if (href && href.indexOf('#_msocom_') != -1) {
+							node.remove();
+							continue;
+						}
 
 						if (href && href.indexOf('file://') === 0) {
 							href = href.split('#')[1];
@@ -293,6 +406,12 @@ define("tinymce/pasteplugin/WordFilter", [
 						if (!href && !name) {
 							node.unwrap();
 						} else {
+							// Remove all named anchors that aren't specific to TOC, Footnotes or Endnotes
+							if (name && !/^_?(?:toc|edn|ftn)/i.test(name)) {
+								node.unwrap();
+								continue;
+							}
+
 							node.attr({
 								href: href,
 								name: name

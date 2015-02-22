@@ -15,7 +15,6 @@
 
 package org.alfresco.share.repository.RepositoryWebDavTest;
 
-import org.alfresco.application.windows.MicorsoftOffice2010;
 import org.alfresco.application.windows.NotepadApplications;
 import org.alfresco.explorer.MoveAndCopyActions;
 import org.alfresco.explorer.WindowsExplorer;
@@ -25,16 +24,20 @@ import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractIfSelector;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.ActionSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.WhenSelectorImpl;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.share.util.*;
+import org.alfresco.po.share.site.document.DocumentAspect;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.CifsUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
-import org.alfresco.utilities.Application;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -66,12 +69,9 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
     String folderName1 = "folder1" + getRandomString(3);
 
     WindowsExplorer explorer = new WindowsExplorer();
-    MicorsoftOffice2010 word = new MicorsoftOffice2010(Application.WORD, "2010");
     NotepadApplications notePad = new NotepadApplications();
 
     String mapConnect;
-    String networkDrive;
-    String networkPath;
     private static String sitesPath = "\\Sites\\";
     Process removeMappedDrive;
 
@@ -83,8 +83,10 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
 
         removeMappedDrive = Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
         removeMappedDrive.waitFor();
-
-        logger.info("[Suite ] : Start Test in: " + "AONE6557RepositoryWebDavTests");
+        Process process = Runtime.getRuntime().exec("cmd /c start /WAIT net stop webclient");
+        process.waitFor();
+        process = Runtime.getRuntime().exec("cmd /c start /WAIT net start webclient");
+        process.waitFor();
     }
 
     @BeforeMethod(groups = "setup", timeOut = 150000)
@@ -95,18 +97,13 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
-        networkDrive = word.getMapDriver();
-        networkPath = word.getMapPath();
-        if (networkPath.contains("alfresco\\"))
-        {
-            networkPath = networkPath.concat("webdav");
-        }
+        ShareUser.logout(drone);
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
+        String networkPathNew = networkPath.concat("webdav");
 
-        // Runtime.getRuntime().exec(mapConnect);
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPathNew + " " + "/user:" + testUser + " " + DEFAULT_PASSWORD;
+
         Process process = Runtime.getRuntime().exec(mapConnect);
-        // waitProcessEnd(process);
         process.waitFor();
 
         if (CifsUtil.checkDirOrFileExists(10, 200, networkDrive + sitesPath))
@@ -116,6 +113,7 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         else
         {
             logger.error("----------Mapping was not done " + testUser);
+            Assert.fail("Mapping was not done " + testUser);
         }
 
         // Any site is created
@@ -152,6 +150,8 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         // Click "Create" button
         FolderRulesPageWithRules folderRulesPageWithRules = createRulePage.clickCreate().render();
         Assert.assertTrue(folderRulesPageWithRules.isPageCorrect(folderName1), "Rule page with rule isn't correct");
+
+        ShareUser.logout(drone);
 
     }
 
@@ -213,7 +213,9 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         notePad.ctrlSSave();
         notePad.getAbstractUtil().getLdtp().waitTime(10);
 
-        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
+        ShareUser.login(drone, testUser);
+
+        DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
         documentLibraryPage.selectFolder(folderName1);
         DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName1WithExt).render();
         // Check a version of saved documents in Share
@@ -244,7 +246,8 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         explorer.openWindowsExplorer();
 
         // Drag and Drop any file from your desktop to the space created in preconditions (step 2) via WebDav
-        if (filePath != null) {
+        if (filePath != null)
+        {
             explorer.copyFileToOtherFolder(filePath, fileName2, fullPath);
         }
         Assert.assertTrue(explorer.isFilePresent(fullPath + SLASH + fileName2WithExt), "File " + fileName2WithExt + " isn't moved");
@@ -256,7 +259,8 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         assertTrue(detailsPage.getDocumentVersion().equals("1.0"), "Version '1.0' for file " + fileName2WithExt + " isn't presented");
 
         // Drag and Drop any file from your desktop to the space
-        if (filePath != null) {
+        if (filePath != null)
+        {
             explorer.copyFileToOtherFolder(filePath, fileName2, fullPath, MoveAndCopyActions.COPY_AND_REPLACE);
         }
 
@@ -267,7 +271,8 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
         assertTrue(detailsPage.getDocumentVersion().equals("1.1"), "Version '1.1' for file " + fileName2WithExt + " isn't presented");
 
         // Drag and Drop any file from your desktop to the space
-        if (filePath != null) {
+        if (filePath != null)
+        {
             explorer.copyFileToOtherFolder(filePath, fileName2, fullPath, MoveAndCopyActions.COPY_AND_REPLACE);
         }
 
@@ -285,17 +290,6 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
     @AfterMethod(groups = "teardown", timeOut = 150000)
     public void endTest()
     {
-        ShareUser.login(drone, testUser);
-        SiteUtil.deleteSite(drone, siteName);
-        ShareUser.logout(drone);
-        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
-        ShareUser.deleteUser(drone, testUser).render();
-        ShareUser.logout(drone);
-    }
-
-    @AfterClass(groups = "teardown", timeOut = 150000)
-    public void tearDownClass()
-    {
         try
         {
             removeMappedDrive = Runtime.getRuntime().exec("cmd /c start /WAIT net use * /d /y");
@@ -306,7 +300,11 @@ public class AONE6557RepositoryWebDavTests extends AbstractUtils
             logger.error("Error occurred during delete mapped drive ", e);
         }
 
-        logger.info("[Suite ] : End Test in: " + "AONE6557RepositoryWebDavTests");
+        ShareUser.login(drone, testUser);
+        SiteUtil.deleteSite(drone, siteName);
+        ShareUser.logout(drone);
+        ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        ShareUser.deleteUser(drone, testUser).render();
     }
 
 }

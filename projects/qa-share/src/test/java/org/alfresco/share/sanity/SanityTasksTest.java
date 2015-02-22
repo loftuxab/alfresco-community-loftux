@@ -1,18 +1,14 @@
 /*
  * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
  * This file is part of Alfresco
- *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -58,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.GroupsPage;
 import org.alfresco.po.share.MyTasksPage;
@@ -75,6 +72,7 @@ import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.WorkFlowDetails;
 import org.alfresco.po.share.workflow.WorkFlowFilters;
 import org.alfresco.po.share.workflow.WorkFlowFormDetails;
+import org.alfresco.po.share.workflow.WorkFlowType;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserAdmin;
@@ -113,6 +111,15 @@ public class SanityTasksTest extends AbstractUtils
         super.setup();
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
+
+        if (alfrescoVersion.equals(AlfrescoVersion.Enterprise42))
+        {
+            WorkFlowType.GROUP_REVIEW_AND_APPROVE.setTitle("Group Review And Approve");
+            WorkFlowType.SEND_DOCS_FOR_REVIEW.setTitle("Send Document(s) For Review");
+            WorkFlowType.POOLED_REVIEW_AND_APPROVE.setTitle("Pooled Review And Approve");
+            WorkFlowType.REVIEW_AND_APPROVE.setTitle("Review And Approve");
+        }
+
         setupWorkFlowsData();
     }
 
@@ -258,9 +265,12 @@ public class SanityTasksTest extends AbstractUtils
         {
             List<WorkFlowDetails> workFlowDetailsList = myWorkFlowsPage.getWorkFlowDetails(createdWorkFlow.getMessage());
             WorkFlowDetails workFlowDetails = workFlowDetailsList.get(0);
-            assertTrue(workFlowDetails.isCancelWorkFlowDisplayed(), String.format("CancelWorkFlow button for task[%s] don't displayed.", createdWorkFlow.getMessage()));
-            assertTrue(workFlowDetails.isViewHistoryDisplayed(), String.format("HistoryView button for task[%s] don't displayed.", createdWorkFlow.getMessage()));
-            assertEquals(createdWorkFlow.getTaskPriority(), workFlowDetails.getPriority(), String.format("Priority for task[%s] wrong!", createdWorkFlow.getMessage()));
+            assertTrue(workFlowDetails.isCancelWorkFlowDisplayed(),
+                    String.format("CancelWorkFlow button for task[%s] don't displayed.", createdWorkFlow.getMessage()));
+            assertTrue(workFlowDetails.isViewHistoryDisplayed(),
+                    String.format("HistoryView button for task[%s] don't displayed.", createdWorkFlow.getMessage()));
+            assertEquals(createdWorkFlow.getTaskPriority(), workFlowDetails.getPriority(),
+                    String.format("Priority for task[%s] wrong!", createdWorkFlow.getMessage()));
             assertNotNull(workFlowDetails.getDescription(), String.format("Description for task[%s] don't displayed.", createdWorkFlow.getMessage()));
             assertNotNull(workFlowDetails.getStartDate(), String.format("StartDate for task[%s] don't displayed.", createdWorkFlow.getMessage()));
             assertNotNull(workFlowDetails.getDueDateString(), String.format("DueDate for task[%s] don't displayed.", createdWorkFlow.getMessage()));
@@ -296,21 +306,24 @@ public class SanityTasksTest extends AbstractUtils
         assertEquals(myWorkFlowsPage.getDisplayedWorkFlowCount(), 5, "Wrong last 14 days workflow displayed.");
         for (WorkFlowFormDetails createdWorkFlow : createdWorkFlows)
         {
-            assertTrue(myWorkFlowsPage.isWorkFlowPresent(createdWorkFlow.getMessage()), String.format("Expected workflow[%s] don't displayed.", createdWorkFlow.getMessage()));
+            assertTrue(myWorkFlowsPage.isWorkFlowPresent(createdWorkFlow.getMessage()),
+                    String.format("Expected workflow[%s] don't displayed.", createdWorkFlow.getMessage()));
         }
 
         workFlowFilters.select(LAST_7_DAYS);
         assertEquals(myWorkFlowsPage.getDisplayedWorkFlowCount(), 5, "Wrong last 7 days workflow displayed.");
         for (WorkFlowFormDetails createdWorkFlow : createdWorkFlows)
         {
-            assertTrue(myWorkFlowsPage.isWorkFlowPresent(createdWorkFlow.getMessage()), String.format("Expected workflow[%s] don't displayed.", createdWorkFlow.getMessage()));
+            assertTrue(myWorkFlowsPage.isWorkFlowPresent(createdWorkFlow.getMessage()),
+                    String.format("Expected workflow[%s] don't displayed.", createdWorkFlow.getMessage()));
         }
 
         workFlowFilters.select(LAST_28_DAYS);
         assertEquals(myWorkFlowsPage.getDisplayedWorkFlowCount(), 5, "Wrong last 14 days workflow displayed.");
         for (WorkFlowFormDetails createdWorkFlow : createdWorkFlows)
         {
-            assertTrue(myWorkFlowsPage.isWorkFlowPresent(createdWorkFlow.getMessage()), String.format("Expected workflow[%s] don't displayed.", createdWorkFlow.getMessage()));
+            assertTrue(myWorkFlowsPage.isWorkFlowPresent(createdWorkFlow.getMessage()),
+                    String.format("Expected workflow[%s] don't displayed.", createdWorkFlow.getMessage()));
         }
 
         workFlowFilters.select(HIGH);
@@ -422,7 +435,8 @@ public class SanityTasksTest extends AbstractUtils
         assertEquals(myTasksPage.getTasksCount(), 0, "Wrong task count displayed on page.");
 
         myTasksPage = myTasksPage.selectActiveTasks();
-        assertTrue(myTasksPage.isTaskEditButtonEnabled(newWorkFlow.getMessage()), String.format("Missing edit button for %s workflow", newWorkFlow.getMessage()));
+        assertTrue(myTasksPage.isTaskEditButtonEnabled(newWorkFlow.getMessage()),
+                String.format("Missing edit button for %s workflow", newWorkFlow.getMessage()));
         EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(newWorkFlow.getMessage());
         TaskInfo taskInfo = editTaskPage.getTaskDetailsInfo();
         assertEquals(taskInfo.getMessage(), newWorkFlow.getMessage(), "Wrong message on editTaskPage.");
@@ -505,7 +519,8 @@ public class SanityTasksTest extends AbstractUtils
         assertNotNull(taskDetails, String.format("Expected task[%s] don't displayed.", groupReviewAndApproveWorkFlow.getMessage()));
 
         myTasksPage = myTasksPage.selectActiveTasks();
-        assertTrue(myTasksPage.isTaskEditButtonEnabled(reviewAndApproveWorkFlow.getMessage()), String.format("Missing edit button for %s workflow", newWorkFlow.getMessage()));
+        assertTrue(myTasksPage.isTaskEditButtonEnabled(reviewAndApproveWorkFlow.getMessage()),
+                String.format("Missing edit button for %s workflow", newWorkFlow.getMessage()));
         editTaskPage = myTasksPage.navigateToEditTaskPage(reviewAndApproveWorkFlow.getMessage());
         taskInfo = editTaskPage.getTaskDetailsInfo();
         assertEquals(taskInfo.getMessage(), reviewAndApproveWorkFlow.getMessage(), "Wrong message on editTaskPage.");
@@ -633,7 +648,8 @@ public class SanityTasksTest extends AbstractUtils
         taskDetails = myTasksPage.getTaskDetails(pooledReviewAndApproveWorkFlow.getMessage());
         assertNotNull(taskDetails, String.format("Expected task[%s] don't displayed.", pooledReviewAndApproveWorkFlow.getMessage()));
 
-        assertTrue(myTasksPage.isTaskEditButtonEnabled(pooledReviewAndApproveWorkFlow.getMessage()), String.format("Missing edit button for %s workflow", pooledReviewAndApproveWorkFlow.getMessage()));
+        assertTrue(myTasksPage.isTaskEditButtonEnabled(pooledReviewAndApproveWorkFlow.getMessage()),
+                String.format("Missing edit button for %s workflow", pooledReviewAndApproveWorkFlow.getMessage()));
         editTaskPage = myTasksPage.navigateToEditTaskPage(pooledReviewAndApproveWorkFlow.getMessage());
         taskInfo = editTaskPage.getTaskDetailsInfo();
         assertEquals(taskInfo.getMessage(), pooledReviewAndApproveWorkFlow.getMessage(), "Wrong message on editTaskPage.");
@@ -712,7 +728,8 @@ public class SanityTasksTest extends AbstractUtils
         myTasksDashlet = dashBoardPage.getDashlet("my-tasks").render();
         List<ShareLink> shareLinks = myTasksDashlet.getTasks();
         assertEquals(shareLinks.size(), 1, "Wrong task count displayed on dashlet");
-        assertEquals(shareLinks.get(0).getDescription(), groupReviewAndApproveWorkFlow.getMessage(), String.format("Expected task[%s] don't displayed.", groupReviewAndApproveWorkFlow.getMessage()));
+        assertEquals(shareLinks.get(0).getDescription(), groupReviewAndApproveWorkFlow.getMessage(),
+                String.format("Expected task[%s] don't displayed.", groupReviewAndApproveWorkFlow.getMessage()));
 
         shareLink = myTasksDashlet.selectTask(groupReviewAndApproveWorkFlow.getMessage());
         editTaskPage = shareLink.click().render();
@@ -761,6 +778,5 @@ public class SanityTasksTest extends AbstractUtils
         assertEquals(myTasksPage.getTaskCount("The document was reviewed and approved."), 2, "Review and approved task count wrong!");
         assertEquals(myTasksPage.getTaskCount("The document was reviewed and rejected."), 2, "Review and rejected task count wrong!");
     }
-
 
 }

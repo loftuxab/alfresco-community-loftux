@@ -47,8 +47,6 @@ public class AONE6545RepositoryWebDavTests extends AbstractUtils
     public void setup() throws Exception
     {
         super.setup();
-
-        logger.info("[Suite ] : Start Test in: " + "AONE6545RepositoryWebDavTests");
     }
 
     @BeforeMethod(groups = "setup", timeOut = 150000)
@@ -58,10 +56,12 @@ public class AONE6545RepositoryWebDavTests extends AbstractUtils
         // Create user
         String[] testUserInfo = new String[] { testUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        ShareUser.logout(drone);
 
         // Any site is created
         ShareUser.login(drone, testUser);
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(drone);
 
     }
 
@@ -88,6 +88,7 @@ public class AONE6545RepositoryWebDavTests extends AbstractUtils
 
         // Navigate through the folder structure
         webDavPage.clickDirectory("Sites");
+        logger.info("Check webdav 'Navigate through the folder structure'");
 
         Assert.assertTrue(webDavPage.getDirectoryText().equals("Directory listing for /Sites"), "Link 'Sites' isn't opened");
 
@@ -109,7 +110,6 @@ public class AONE6545RepositoryWebDavTests extends AbstractUtils
         ShareUser.logout(drone);
         ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
         ShareUser.deleteUser(drone, testUser).render();
-        ShareUser.logout(drone);
     }
 
 }

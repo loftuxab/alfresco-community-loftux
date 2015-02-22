@@ -628,4 +628,28 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
         getDrone().mouseOverOnElement(contentActions);
         super.selectPreviewWebAsset();
     }
+
+    /**
+     * Method to select Check In Google Doc
+     *
+     * @return GoogleDocCheckInPage
+     */
+    @Override
+    public GoogleDocCheckInPage selectCheckInGoogleDoc()
+    {
+        selectMoreAction().click();
+        return super.selectCheckInGoogleDoc();
+    }
+
+    /**
+     * Method to select Cancel Editing in Google Docs
+     *
+     * @return DocumentLibraryPage
+     */
+    @Override
+    public DocumentLibraryPage selectCancelEditingInGoogleDocs()
+    {
+        selectMoreAction().click();
+        return super.selectCancelEditingInGoogleDocs();
+    }
 }

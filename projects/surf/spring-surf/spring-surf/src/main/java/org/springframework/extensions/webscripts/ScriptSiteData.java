@@ -32,6 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.Scriptable;
 import org.springframework.context.ApplicationContext;
+import org.springframework.extensions.config.ConfigElement;
 import org.springframework.extensions.config.WebFrameworkConfigElement;
 import org.springframework.extensions.config.WebFrameworkConfigElement.TypeDescriptor;
 import org.springframework.extensions.surf.FrameworkUtil;
@@ -41,6 +42,7 @@ import org.springframework.extensions.surf.ServletUtil;
 import org.springframework.extensions.surf.exception.ModelObjectPersisterException;
 import org.springframework.extensions.surf.exception.UserFactoryException;
 import org.springframework.extensions.surf.site.AuthenticationUtil;
+import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.surf.types.Chrome;
 import org.springframework.extensions.surf.types.Component;
 import org.springframework.extensions.surf.types.Configuration;
@@ -1585,6 +1587,7 @@ public final class ScriptSiteData extends ScriptBase
      * @param name The name of the package to find (e.g. "dijit")
      * @return A relative path to the requested Dojo package or a failure string.
      */
+    @SuppressWarnings("unchecked")
     @ScriptMethod
     (
             help="Finds the location of the supplied Dojo package as configured in Surf",
@@ -1593,14 +1596,25 @@ public final class ScriptSiteData extends ScriptBase
     public String getDojoPackageLocation(String name)
     {
         String location = "-UNKNOWN-DOJO-PACKAGE-";
-        WebFrameworkConfigElement webFrameworkConfig = getConfig();
-        Map<String, String> dojoPackages = webFrameworkConfig.getDojoPackages();
+        final RequestContext rc = ThreadLocalRequestContext.getRequestContext();
+        ScriptConfigModel config = rc.getExtendedScriptConfigModel(null);
+        WebFrameworkConfigElement wfce = null;
+        Map<String, ConfigElement> configs = (Map<String, ConfigElement>)config.getScoped().get("WebFramework");
+        if (configs != null)
+        {
+            wfce = (WebFrameworkConfigElement) configs.get("web-framework");
+        }
+        else
+        {
+            wfce = this.getConfig();
+        }
+        Map<String, String> dojoPackages = wfce.getDojoPackages();
         if (dojoPackages != null)
         {
             String dojoPackage = dojoPackages.get(name);
             if (dojoPackage != null)
             {
-                location = webFrameworkConfig.getDojoBaseUrl() + dojoPackage;
+                location = wfce.getDojoBaseUrl() + dojoPackage;
             }
         }
         return location;

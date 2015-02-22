@@ -14,15 +14,15 @@
  */
 package org.alfresco.po.share.workflow;
 
+import java.util.List;
+
 import org.alfresco.webdrone.WebDrone;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.util.List;
-
 /**
  * enum class that holds all elements of start workflow drop down contents.
- *
+ * 
  * @author Abhijeet Bharade
  * @since 1.6.2
  */
@@ -83,7 +83,7 @@ public enum WorkFlowType
 
     /**
      * Based title return {@link WorkFlowType}.
-     *
+     * 
      * @param title
      * @return {@link WorkFlowType}
      */
@@ -97,5 +97,10 @@ public enum WorkFlowType
             }
         }
         throw new IllegalArgumentException("Workflow Type not able find for given Title: " + title);
+    }
+
+    public void setTitle(String newTitle)
+    {
+        this.title = newTitle;
     }
 }

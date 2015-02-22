@@ -47,6 +47,12 @@
         </classes>
     </test>
 
+    <test name="SynchronizationSubsystemTests">
+        <classes>
+            <class name="org.alfresco.share.repository.subsystems.SynchronizationSubsystemTests"/>
+        </classes>
+    </test>
+
     <test name="RepositoryConfiguringCifsTests">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryConfiguringCifsTests">

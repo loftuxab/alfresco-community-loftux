@@ -15,6 +15,7 @@
     <import resource="classpath:webdrone-context.xml" />
     <import resource="classpath:share-po-context.xml" />
     <import resource="classpath:share-po-test-context.xml" />
+    <import resource="classpath:util-context.xml" />
 
     <bean id="shareProperties"
         class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
@@ -118,6 +119,13 @@
         <constructor-arg name="truststorePath" value="${truststorePath}" />
         <constructor-arg name="networkPath" value="${network.map.path}" />
         <constructor-arg name="networkDrive" value="${network.map.driver}" />
+        <constructor-arg name="transformServInstallationTarget" value="${transformServInstallationTarget}" />
+        <constructor-arg name="transformHostName1" value="${transformHostName1}" />
+        <constructor-arg name="transformHostName2" value="${transformHostName2}" />
+        <constructor-arg name="pbldUserName" value="${pbldUserName}" />
+        <constructor-arg name="pbldUserPassword" value="${pbldUserPassword}" />
+        <constructor-arg name="pathToRSAKey" value="${pathToRSAKey}" />
+        <constructor-arg name="isGoogleDocsV3" value="${isGoogleDocsV3}" />
     </bean>
 
     <!-- -->
@@ -190,6 +198,13 @@
         <constructor-arg name="truststorePath" value="${truststorePath}" />
         <constructor-arg name="networkPath" value="${network.map.path}" />
         <constructor-arg name="networkDrive" value="${network.map.driver}" />
+        <constructor-arg name="transformServInstallationTarget" value="${transformServInstallationTarget}" />
+        <constructor-arg name="transformHostName1" value="${transformHostName1}" />
+        <constructor-arg name="transformHostName2" value="${transformHostName2}" />
+        <constructor-arg name="pbldUserName" value="${pbldUserName}" />
+        <constructor-arg name="pbldUserPassword" value="${pbldUserPassword}" />
+        <constructor-arg name="pathToRSAKey" value="${pathToRSAKey}" />
+        <constructor-arg name="isGoogleDocsV3" value="${isGoogleDocsV3}" />
     </bean>
 
     <util:constant id="englishLocale" static-field="java.util.Locale.ENGLISH" />

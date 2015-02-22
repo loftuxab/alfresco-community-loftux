@@ -19,12 +19,15 @@ package org.springframework.extensions.surf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.config.ConfigElement;
 import org.springframework.extensions.config.WebFrameworkConfigElement;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.surf.types.Theme;
+import org.springframework.extensions.webscripts.ScriptConfigModel;
 
 import com.asual.lesscss.LessEngine;
 import com.asual.lesscss.LessException;
@@ -42,6 +45,9 @@ import com.asual.lesscss.LessException;
 public class HybridCssThemeHandler extends CssThemeHandler
 {
     private static final Log logger = LogFactory.getLog(HybridCssThemeHandler.class);
+    
+
+    public static final String REQUEST_LESS_CONFIG = "__dojoRequestLessConfig";
     
     /**
      * The engine to use for LESS processing.
@@ -68,53 +74,50 @@ public class HybridCssThemeHandler extends CssThemeHandler
      * 
      * @return A String containing the default LESS configuration variables.
      */
+    @SuppressWarnings("unchecked")
     public String getDefaultLessConfig()
     {
+        final RequestContext rc = ThreadLocalRequestContext.getRequestContext();
         if (this.defaultLessConfig == null)
         {
-            WebFrameworkConfigElement wfce = this.getWebFrameworkConfigElement();
-            if (wfce != null)
+            String defaultLessConfigPath = null;
+            ScriptConfigModel config = rc.getExtendedScriptConfigModel(null);
+            Map<String, ConfigElement> configs = (Map<String, ConfigElement>)config.getScoped().get("WebFramework");
+            if (configs != null)
             {
-                String defaultLessConfigPath = wfce.getDojoDefafultLessConfig();
-                if (defaultLessConfigPath != null)
+                WebFrameworkConfigElement wfce = (WebFrameworkConfigElement) configs.get("web-framework");
+                defaultLessConfigPath = wfce.getDojoDefaultLessConfig();
+            }
+            else
+            {
+                defaultLessConfigPath = this.getWebFrameworkConfigElement().getDojoDefaultLessConfig();
+            }
+            try
+            {
+                InputStream in = this.getDependencyHandler().getResourceInputStream(defaultLessConfigPath);
+                if (in != null)
                 {
-                    try
-                    {
-                        InputStream in = this.getDependencyHandler().getResourceInputStream(defaultLessConfigPath);
-                        if (in != null)
-                        {
-                            this.defaultLessConfig = this.getDependencyHandler().convertResourceToString(in);
-                        }
-                        else
-                        {
-                            if (logger.isErrorEnabled())
-                            {
-                                logger.error("Could not find the default LESS configuration at: " + defaultLessConfigPath);
-                            }
-                           
-                            // Set the configuration as the empty string as it's not in the configured location
-                            this.defaultLessConfig = "";
-                        }
-                    }
-                    catch (IOException e)
-                    {
-                        if (logger.isErrorEnabled())
-                        {
-                            logger.error("An exception occurred retrieving the default LESS configuration from: " + defaultLessConfigPath, e);
-                        }
-                    }
+                    this.defaultLessConfig = this.getDependencyHandler().convertResourceToString(in);
                 }
                 else
                 {
                     if (logger.isErrorEnabled())
                     {
-                        logger.error("A location for the default LESS configuration file has not been specififed");
+                        logger.error("Could not find the default LESS configuration at: " + defaultLessConfigPath);
                     }
+                    // Set the configuration as the empty string as it's not in the configured location
                     this.defaultLessConfig = "";
                 }
             }
+            catch (IOException e)
+            {
+                if (logger.isErrorEnabled())
+                {
+                    logger.error("An exception occurred retrieving the default LESS configuration from: " + defaultLessConfigPath, e);
+                }
+            }
         }
-        return this.defaultLessConfig;
+        return defaultLessConfig;
     }
 
     /**

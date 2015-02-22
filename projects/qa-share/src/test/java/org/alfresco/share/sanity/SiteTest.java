@@ -170,7 +170,7 @@ public class SiteTest extends AbstractUtils
 
         ShareUser.createSite(drone, siteNameModerated, SITE_VISIBILITY_MODERATED);
         customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite();
-        customizeSitePage.addPages(asList(PAGE_TYPES));
+        customizeSitePage.addPages(asList(PAGE_TYPES)).render();
 
         ShareUser.createSite(drone, siteNamePrivate, SITE_VISIBILITY_PRIVATE);
         customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite();
@@ -221,17 +221,16 @@ public class SiteTest extends AbstractUtils
         assertTrue(drone.getCurrentPage().render() instanceof DiscussionsPage, "Site page links work incorrect.(DiscussionsPage)");
 
         siteFinderPage = SiteUtil.searchSite(drone, siteNameModerated);
-        boolean accessNotDenied = false;
+        boolean accessDenied = true;
         try
         {
-            siteFinderPage.selectSite(siteNameModerated);
+            siteDashboardPage=siteFinderPage.selectSite(siteNameModerated).render();
         }
         catch (PageRenderTimeException e)
-        {
-            assertTrue(drone.getCurrentPage() instanceof SiteDashboardPage, "Something wrong with moderated site.");
-            accessNotDenied = true;
+        {        
+            accessDenied = false;
         }
-        assertTrue(accessNotDenied, "User can see moderated site data");
+        assertFalse(accessDenied, "User can see moderated site data");
 
         String privateSiteUrl = format("/page/site/%s/dashboard", siteNamePrivate);
         String currentUrl = drone.getCurrentUrl();

@@ -545,7 +545,14 @@
             this.hashChecked = true;
             // Ensure comments form is visible and in view
             this.onAddCommentClick(true);
-            Dom.get(this.id + "-add-comment").scrollIntoView();
+            if (YAHOO.env.ua.ie == 11)
+            {
+               window.scrollTo(0, Dom.get(this.id + "-add-comment").offsetTop);
+            }
+            else
+            {
+               Dom.get(this.id + "-add-comment").scrollIntoView();
+            }
          }
       },
 
@@ -560,7 +567,14 @@
          {
             // Ensure comments form is visible and in view
             this.onAddCommentClick();
-            Dom.get(this.id + "-add-comment").scrollIntoView();
+            if (YAHOO.env.ua.ie == 11)
+            {
+               window.scrollTo(0, Dom.get(this.id + "-add-comment").offsetTop);
+            }
+            else
+            {
+               Dom.get(this.id + "-add-comment").scrollIntoView();
+            }
          }
       },
 

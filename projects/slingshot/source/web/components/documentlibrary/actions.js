@@ -1386,6 +1386,38 @@
        */
       onActionFormDialog: function dlA_onActionFormDialog(record, owner)
       {
+         var config = this.generateConfigForFormDialogAction(record, owner);
+
+         // Finally display form as dialog
+         Alfresco.util.PopupManager.displayForm(config);
+      },
+      
+      /**
+       * Form Dialog Action with disabling submit buttons.
+       *
+       * Accepts <param name=""></param> declarations in share config xml for the following names:
+       * success - The name of the callback function
+       * successMessage - The msg key to use when the repo action succeded (i.e. message.extract-metadata.success)
+       * failure - The name of the callback function
+       * failureMessage - The msg key to use when the repo action failed (i.e. message.extract-metadata.failure)
+       * ...and any other parameter mathing the properties for GET /service/components/form webscript
+       * i.e itemid, itemkind, mode etc...
+       *
+       * @method onActionFormDialog
+       * @param record {object} Object literal representing the file or folder to be actioned
+       */
+      onActionFormDialogWithSubmitDisable: function dlA_onActionFormDialogWithSubmitDisable(record, owner)
+      {
+         var config = this.generateConfigForFormDialogAction(record, owner);
+         
+         config.properties.disableSubmitButton = true;
+
+         // Finally display form as dialog
+         Alfresco.util.PopupManager.displayForm(config);
+      },
+
+      generateConfigForFormDialogAction: function dlA_generateConfigForFormDialogAction(record, owner)
+      {
          // Get action & params and start create the config for displayForm
          var action = this.getAction(record, owner),
             params = action.params,
@@ -1446,8 +1478,7 @@
          // Use the remaining properties as form properties
          config.properties = params;
 
-         // Finally display form as dialog
-         Alfresco.util.PopupManager.displayForm(config);
+         return config;
       },
 
       /**

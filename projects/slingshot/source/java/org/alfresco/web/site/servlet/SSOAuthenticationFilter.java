@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -23,6 +23,7 @@ import static org.alfresco.web.site.SlingshotPageView.REDIRECT_URI;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -362,9 +363,21 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                 @Override
                 public String getRemoteUser()
                 {
+                    // MNT-11041 Share SSOAuthenticationFilter and non-ascii username strings
                     String remoteUser = req.getHeader(userHeader);
                     if (remoteUser != null)
                     {
+                        if (!org.apache.commons.codec.binary.Base64.isBase64(remoteUser))
+                        {
+                            try
+                            {
+                                remoteUser = new String(remoteUser.getBytes("ISO-8859-1"), "UTF-8");
+                            }
+                            catch (UnsupportedEncodingException e)
+                            {
+                                // TODO
+                            }
+                        }
                         remoteUser = extractUserFromProxyHeader(remoteUser);
                     }
                     else

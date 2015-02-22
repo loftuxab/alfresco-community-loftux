@@ -20,12 +20,11 @@ public class ManageSitesPage extends SharePage
 {
 
     /** Constants */
-    private static final By SITE_ROWS = By
-            .cssSelector("div.alfresco-documentlibrary-views-layouts-AlfDocumentListView.bordered table tbody tr.alfresco-documentlibrary-views-layouts-Row");
-    private static final By SITE_ROW_NAME = By.cssSelector("td.alfresco-documentlibrary-views-layouts-Cell.siteName");
-    private static final By SITE_ROW_DESCRIPTION = By.cssSelector("td.alfresco-documentlibrary-views-layouts-Cell.siteDescription");
-    private static final By SITE_ROW_VISIBILITY = By.cssSelector("td.alfresco-documentlibrary-views-layouts-Cell.visibility");
-    private static final By SITE_ROW_ACTIONS = By.cssSelector("td.alfresco-documentlibrary-views-layouts-Cell.actions");
+    private static final By SITE_ROWS = By.cssSelector("tr.alfresco-lists-views-layouts-Row");
+    private static final By SITE_ROW_NAME = By.cssSelector("td.alfresco-lists-views-layouts-Cell.siteName");
+    private static final By SITE_ROW_DESCRIPTION = By.cssSelector("td.alfresco-lists-views-layouts-Cell.siteDescription");
+    private static final By SITE_ROW_VISIBILITY = By.cssSelector("td.alfresco-lists-views-layouts-Cell.visibility");
+    private static final By SITE_ROW_ACTIONS = By.cssSelector("td.alfresco-lists-views-layouts-Cell.actions");
 
     private List<ManagedSiteRow> managedSiteRows;
     private DocListPaginator docListPaginator;

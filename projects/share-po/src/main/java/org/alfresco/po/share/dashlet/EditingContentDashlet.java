@@ -26,6 +26,8 @@ import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
 
 import java.util.Collections;
@@ -43,11 +45,12 @@ public class EditingContentDashlet extends AbstractDashlet implements Dashlet
     private static final By ITEMS_DETAILS = By.cssSelector(".detail-list-item>div.details");
     private static final By ITEM_LINKS = By.cssSelector(".detail-list-item>div.details>h4>a");
     private static final By SITE_LINKS = By.cssSelector(".detail-list-item>div.details>div>a[class$='site-link']");
+    private Log logger = LogFactory.getLog(this.getClass());
 
     /**
      * Constructor.
      */
-    protected EditingContentDashlet (WebDrone drone)
+    protected EditingContentDashlet(WebDrone drone)
     {
         super(drone, DASHLET_CONTAINER_PLACEHOLDER);
         setResizeHandle(By.cssSelector(".yui-resize-handle"));
@@ -55,7 +58,7 @@ public class EditingContentDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized EditingContentDashlet render(RenderTime timer)
+    public EditingContentDashlet render(RenderTime timer)
     {
         try
         {
@@ -74,18 +77,14 @@ public class EditingContentDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
-                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    this.dashlet = drone.find((DASHLET_CONTAINER_PLACEHOLDER));
                     break;
                 }
-                catch (NoSuchElementException e)
+                catch (NoSuchElementException nse)
                 {
+                    logger.info("The Dashlate was not found " + nse);
+                }
 
-                }
-                catch (StaleElementReferenceException ste)
-                {
-                    // DOM has changed therefore page should render once change
-                    // is completed
-                }
                 finally
                 {
                     timer.end();
@@ -170,6 +169,7 @@ public class EditingContentDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Click on item
+     *
      * @param itemName
      * @return HTMLPage
      */
@@ -208,6 +208,7 @@ public class EditingContentDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Click on site
+     *
      * @param siteName
      * @return SitePage
      */

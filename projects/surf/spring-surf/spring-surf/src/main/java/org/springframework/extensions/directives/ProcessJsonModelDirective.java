@@ -34,6 +34,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.extensions.config.Config;
+import org.springframework.extensions.config.ConfigElement;
 import org.springframework.extensions.config.ConfigService;
 import org.springframework.extensions.config.ServerConfigElement;
 import org.springframework.extensions.config.ServerProperties;
@@ -50,12 +51,14 @@ import org.springframework.extensions.surf.extensibility.ExtensibilityDirective;
 import org.springframework.extensions.surf.extensibility.ExtensibilityDirectiveData;
 import org.springframework.extensions.surf.extensibility.ExtensibilityModel;
 import org.springframework.extensions.surf.extensibility.impl.DefaultExtensibilityDirectiveData;
+import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.surf.types.AbstractModelObject;
 import org.springframework.extensions.surf.uri.UriUtils;
 import org.springframework.extensions.webscripts.LocalWebScriptContext;
 import org.springframework.extensions.webscripts.LocalWebScriptRuntime;
 import org.springframework.extensions.webscripts.LocalWebScriptRuntimeContainer;
 import org.springframework.extensions.webscripts.Match;
+import org.springframework.extensions.webscripts.ScriptConfigModel;
 import org.springframework.extensions.webscripts.WebScriptProcessor;
 import org.springframework.extensions.webscripts.json.JSONWriter;
 
@@ -285,7 +288,18 @@ public class ProcessJsonModelDirective extends JavaScriptDependencyDirective
         String rootModule = getStringProperty(params, "rootModule", false);
         if (rootModule == null)
         {
-            rootModule = getWebFrameworkConfig().getDojoPageWidget();
+            final RequestContext rc = ThreadLocalRequestContext.getRequestContext();
+            ScriptConfigModel config = rc.getExtendedScriptConfigModel(null);
+            Map<String, ConfigElement> configs = (Map<String, ConfigElement>)config.getScoped().get("WebFramework");
+            if (configs != null)
+            {
+                WebFrameworkConfigElement wfce = (WebFrameworkConfigElement) configs.get("web-framework");
+                rootModule = wfce.getDojoPageWidget();
+            }
+            else
+            {
+                rootModule = this.getWebFrameworkConfig().getDojoPageWidget();
+            }
         }
         
         // We know that we will definitely require the root "Page" object as that's the root object that will be instantiated
@@ -336,10 +350,10 @@ public class ProcessJsonModelDirective extends JavaScriptDependencyDirective
         
         // It's also necessary to run the JSON strings through the dependency analysis in order to capture
         // any "strangely" nested widget requirements and also to leverage the "widgets*" RegEx pattern that
-        // the processControllerWidgets method will miss. Arguably this might also be a requirement for 
-        // Services although they are not expected to fall into that pattern...
+        // the processControllerWidgets method will miss. 
         DojoDependencies dd = new DojoDependencies();
         this.dojoDependencyHandler.processString(widgetsJSONStr, dd, dependenciesForCurrentRequest);
+        this.dojoDependencyHandler.processString(servicesJSONStr, dd, dependenciesForCurrentRequest);
         
         // It doesn't actually matter what we declare the initial dependency as being, it will just get output in
         // the built cache object as "null". What's important is that we have a starting point to build from...

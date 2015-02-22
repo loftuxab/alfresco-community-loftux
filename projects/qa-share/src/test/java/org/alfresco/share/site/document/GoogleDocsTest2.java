@@ -3,10 +3,8 @@
  */
 package org.alfresco.share.site.document;
 
-import static org.alfresco.share.util.ShareUserGoogleDocs.createAndSavegoogleDocBySignIn;
-
-import java.util.Map;
-
+import com.google.api.services.drive.Drive;
+import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
@@ -24,11 +22,15 @@ import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import com.google.api.services.drive.Drive;
+import java.util.Map;
+import java.util.Set;
+
+import static org.alfresco.share.util.ShareUserGoogleDocs.createAndSavegoogleDocBySignIn;
 
 /**
  * @author Sergey Kardash
@@ -63,6 +65,7 @@ public class GoogleDocsTest2 extends AbstractUtils
         testName = this.getClass().getSimpleName();
         testUser = testName + "@" + DOMAIN_FREE;
         logger.info("Starting Tests: " + testName);
+        //isVersion3 = JmxUtils.getAlfrescoServerProperty()
     }
 
     private void prepare()
@@ -136,30 +139,36 @@ public class GoogleDocsTest2 extends AbstractUtils
         // click 'Edit in Google Docs' for doc
         // Specify correct credentials and complete authentication
         ShareUserGoogleDocs.signIntoEditGoogleDocFromDetailsPage(drone);
-        Thread.sleep(15000);
+        webDriverWait(drone, 10000);
 
         // User authenticated successfully. Document is opened for editing.
-        Assert.assertTrue(drone.getCurrentPage().render() instanceof EditInGoogleDocsPage,
+        //For v.3 - in new window
+        if(isGoogleDocsV3)
+        {
+            Set<String> setWindowHandles = drone.getWindowHandles();
+            logger.info("Document is opened in new window. Seems Google Drive v.3 is UP!");
+            drone.switchToWindow(setWindowHandles.toArray(new String[setWindowHandles.size()])[1]);
+        }
+        Assert.assertTrue(FactorySharePage.resolvePage(drone) instanceof EditInGoogleDocsPage,
                 "After agree with the document upgrade user don't redirect to EditInGoogleDocsPage");
-
         ShareUserGoogleDocs.discardGoogleDocsChanges(drone).render();
-
         docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(filename1).isEditInGoogleDocsPresent(), "The EditInGoogleDocs link is present for " + filename1);
-
         DocumentDetailsPage detailsPage;
         detailsPage = ShareUser.openDocumentDetailPage(drone, filename1);
-
         detailsPage = detailsPage.editInGoogleDocsOldFormat(false).render();
         Assert.assertTrue(drone.getCurrentPage().render() instanceof DocumentDetailsPage,
                 "After disagree with the document upgrade user don't redirect to DocumentDetailsPage");
 
         detailsPage.editInGoogleDocsOldFormat(true).render();
 
+        if(isGoogleDocsV3)
+        {
+            Set<String> setWindowHandles = drone.getWindowHandles();
+            drone.switchToWindow(setWindowHandles.toArray(new String[setWindowHandles.size()])[1]);
+        }
         ShareUserGoogleDocs.saveGoogleDoc(drone, false);
         detailsPage.render();
-
         docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
         Assert.assertTrue(docLibPage.isFileVisible(newFilename1), "File " + newFilename1 + " isn't visible (format docx.). File isn't upgraded.");
         Assert.assertFalse(docLibPage.isFileVisible(filename1), "File " + filename1 + " is visible (format doc.). File isn't upgraded.");
@@ -185,9 +194,13 @@ public class GoogleDocsTest2 extends AbstractUtils
 
         detailsPage.editInGoogleDocsOldFormat(true).render();
 
+        if(isGoogleDocsV3)
+        {
+            Set<String> setWindowHandles = drone.getWindowHandles();
+            drone.switchToWindow(setWindowHandles.toArray(new String[setWindowHandles.size()])[1]);
+        }
         ShareUserGoogleDocs.saveGoogleDoc(drone, false);
         detailsPage.render();
-
         ShareUser.openDocumentLibrary(drone);
 
         Assert.assertFalse(docLibPage.isFileVisible(tempFilename2), "File " + tempFilename2 + " is visible (xls without extension). File isn't upgraded.");
@@ -323,7 +336,7 @@ public class GoogleDocsTest2 extends AbstractUtils
      * 
      * @throws Exception
      */
-    @Test(groups = "NonGrid", dependsOnMethods = "AONE_14611", timeOut = 600000, alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14611", timeOut = 600000, alwaysRun = true)
     public void AONE_14616() throws Exception
     {
         prepare();
@@ -337,6 +350,10 @@ public class GoogleDocsTest2 extends AbstractUtils
         String[] fileInfo1 = { filename1 };
         String text = "Edited in Google Docs and saved back to Alfresco";
         String newFileName = getRandomString(15) + ".txt";
+        if(isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         try
         {
             newFile(newFileName, text);
@@ -452,6 +469,10 @@ public class GoogleDocsTest2 extends AbstractUtils
         String[] fileInfo1 = { filename1 };
 
         // User
+        if(isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
         // User login
@@ -526,6 +547,10 @@ public class GoogleDocsTest2 extends AbstractUtils
     @Test(groups = "NonGrid", timeOut = 600000, alwaysRun = true)
     public void AONE_14637() throws Exception
     {
+        if(isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */
@@ -632,6 +657,10 @@ public class GoogleDocsTest2 extends AbstractUtils
     @Test(groups = "NonGrid", timeOut = 600000, alwaysRun = true)
     public void AONE_14639() throws Exception
     {
+        if(isGoogleDocsV3)
+        {
+            throw new SkipException("No applicable to Google Docs V3.");
+        }
         prepare();
 
         /** Start Test */

@@ -179,6 +179,10 @@
 
             this.formsRuntime = new Alfresco.forms.Form(this.id);
             this.formsRuntime.setSubmitElements(this.buttons.submit);
+            if (this.options.disableSubmitButton != null && this.options.disableSubmitButton == true)
+            {
+                this.formsRuntime.setShowSubmitStateDynamically(true);
+            }
             
             // setup JSON/AJAX mode if appropriate
             if (this.options.enctype === "application/json")

@@ -141,8 +141,8 @@ WEF.init(
           {
              //set the path to tinymce so tinymce can pick it up
              window.tinyMCEPreInit = {
-               base: module.fullpath.substring(0,module.fullpath.lastIndexOf('/')+1),
-               suffix: "",
+               base: module.fullpath.substring(0,module.fullpath.lastIndexOf('/')),
+               suffix: ".min",
                query: ""
              };                
              return module;

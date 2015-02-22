@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.enums.ViewType;
@@ -199,7 +200,8 @@ public class SharedFilesTest extends AbstractUtils
 
         DocumentDetailsPage detailsPage = sharedFilesPage.selectFile(file1);
         assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page");
-        assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page");
+        verifyPreviewer(detailsPage);
+        // assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page");
 
         // create Plain Text content
         ContentDetails contentDetails = new ContentDetails();
@@ -212,7 +214,8 @@ public class SharedFilesTest extends AbstractUtils
 
         detailsPage = sharedFilesPage.selectFile(plainFile).render();
         assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page for plain text file");
-        assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page for plain text file");
+        verifyPreviewer(detailsPage);
+        // assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page for plain text file");
 
         // create XML content
         contentDetails = new ContentDetails();
@@ -225,7 +228,8 @@ public class SharedFilesTest extends AbstractUtils
 
         detailsPage = sharedFilesPage.selectFile(xmlFile).render();
         assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page for XML file");
-        assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page for XML file");
+        verifyPreviewer(detailsPage);
+        // assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page for XML file");
 
         // create HTML content
         contentDetails = new ContentDetails();
@@ -239,6 +243,7 @@ public class SharedFilesTest extends AbstractUtils
         detailsPage = sharedFilesPage.selectFile(htmlFile).render();
         assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page for HTML file");
         // assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page for HTML file");
+        verifyPreviewer(detailsPage);
 
         // create document from template
         sharedFilesPage = ShareUserSharedFilesPage.createContentFromTemplate(drone, fileName);
@@ -247,8 +252,9 @@ public class SharedFilesTest extends AbstractUtils
 
         detailsPage = sharedFilesPage.selectFile(fileName).render();
         assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page for file created from template");
-        assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"),
-                "Preview isn't correctly displayed on details page for file created from template");
+        // assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"),
+        // "Preview isn't correctly displayed on details page for file created from template");
+        verifyPreviewer(detailsPage);
 
         // create folder
         ShareUserSharedFilesPage.openSharedFiles(drone);
@@ -682,8 +688,7 @@ public class SharedFilesTest extends AbstractUtils
             assertTrue(folderRulesPageWithRules.isPageCorrect(folderName), "Rule page with rule isn't correct");
 
             ShareUserSharedFilesPage.openSharedFiles(customDrone).render(maxWaitTime);
-            ShareUserSharedFilesPage.navigateToFolderInSharedFiles(customDrone, REPO + SLASH + folderForMove + SLASH + folderName).render(
-                    maxWaitTime);
+            ShareUserSharedFilesPage.navigateToFolderInSharedFiles(customDrone, REPO + SLASH + folderForMove + SLASH + folderName).render(maxWaitTime);
 
             File newFileName = newFile(DATA_FOLDER + (fileName), fileName);
             sharedFilesPage = ShareUserSharedFilesPage.uploadFileInSharedFiles(customDrone, newFileName);
@@ -1728,6 +1733,17 @@ public class SharedFilesTest extends AbstractUtils
             ShareUser.logout(drone);
 
         }
+    }
 
+    private void verifyPreviewer(DocumentDetailsPage detailsPage)
+    {
+        if (alfrescoVersion == AlfrescoVersion.Enterprise42)
+        {
+            assertTrue(detailsPage.getPreviewerClassName().equals("previewer WebPreviewer"), "Preview isn't correctly displayed on details page");
+        }
+        else
+        {
+            assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page");
+        }
     }
 }

@@ -27,7 +27,6 @@ import org.alfresco.po.share.adminconsole.CategoryManagerPage;
 import org.alfresco.po.share.adminconsole.NodeBrowserPage;
 import org.alfresco.po.share.adminconsole.TagManagerPage;
 import org.alfresco.po.share.exception.ShareException;
-import org.alfresco.po.share.reports.AdhocAnalyzerPage;
 import org.alfresco.po.share.search.AdvanceSearchContentPage;
 import org.alfresco.po.share.search.FacetedSearchConfigPage;
 import org.alfresco.po.share.search.FacetedSearchHeaderSearchForm;
@@ -238,13 +237,13 @@ public class Navigation extends SharePage
      * Select Analyze from Reporting dropdown.
      * @return
      */
-    public AdhocAnalyzerPage selectAnalyze()
+    public HtmlPage selectAnalyze()
     {
         try
         {
             selectReportingDropdown(); 
             drone.findAndWait(By.cssSelector("td#HEADER_PENTAHO_ANALYZE_text a")).click();
-            return new AdhocAnalyzerPage(drone);
+            return FactorySharePage.resolvePage(drone);
         }
         catch(TimeoutException toe)
         {
@@ -258,13 +257,13 @@ public class Navigation extends SharePage
      * Select Analyze Site from Reporting dropdown.
      * @return
      */
-    public AdhocAnalyzerPage selectAnalyzeSite()
+    public HtmlPage selectAnalyzeSite()
     {
         try
         {
             selectReportingDropdown(); 
             drone.findAndWait(By.cssSelector("td#HEADER_PENTAHO_ANALYZE_SITE_text a")).click();
-            return new AdhocAnalyzerPage(drone);
+            return FactorySharePage.resolvePage(drone);
         }
         catch(TimeoutException toe)
         {

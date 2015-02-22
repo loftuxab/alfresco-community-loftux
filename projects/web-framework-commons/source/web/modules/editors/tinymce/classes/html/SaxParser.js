@@ -58,6 +58,45 @@ define("tinymce/html/SaxParser", [
 	var each = Tools.each;
 
 	/**
+	 * Returns the index of the end tag for a specific start tag. This can be
+	 * used to skip all children of a parent element from being processed.
+	 *
+	 * @private
+	 * @method findEndTag
+	 * @param {tinymce.html.Schema} schema Schema instance to use to match short ended elements.
+	 * @param {String} html HTML string to find the end tag in.
+	 * @param {Number} startIndex Indext to start searching at should be after the start tag.
+	 * @return {Number} Index of the end tag.
+	 */
+	function findEndTag(schema, html, startIndex) {
+		var count = 1, index, matches, tokenRegExp, shortEndedElements;
+
+		shortEndedElements = schema.getShortEndedElements();
+		tokenRegExp = /<([!?\/])?([A-Za-z0-9\-_\:\.]+)((?:\s+[^"\'>]+(?:(?:"[^"]*")|(?:\'[^\']*\')|[^>]*))*|\/|\s+)>/g;
+		tokenRegExp.lastIndex = index = startIndex;
+
+		while ((matches = tokenRegExp.exec(html))) {
+			index = tokenRegExp.lastIndex;
+
+			if (matches[1] === '/') { // End element
+				count--;
+			} else if (!matches[1]) { // Start element
+				if (matches[2] in shortEndedElements) {
+					continue;
+				}
+
+				count++;
+			}
+
+			if (count === 0) {
+				break;
+			}
+		}
+
+		return index;
+	}
+
+	/**
 	 * Constructs a new SaxParser instance.
 	 *
 	 * @constructor
@@ -65,7 +104,7 @@ define("tinymce/html/SaxParser", [
 	 * @param {Object} settings Name/value collection of settings. comment, cdata, text, start and end are callbacks.
 	 * @param {tinymce.html.Schema} schema HTML Schema class to use when parsing.
 	 */
-	return function(settings, schema) {
+	function SaxParser(settings, schema) {
 		var self = this;
 
 		function noop() {}
@@ -98,8 +137,8 @@ define("tinymce/html/SaxParser", [
 			var validate, elementRule, isValidElement, attr, attribsValue, validAttributesMap, validAttributePatterns;
 			var attributesRequired, attributesDefault, attributesForced;
 			var anyAttributesRequired, selfClosing, tokenRegExp, attrRegExp, specialElements, attrValue, idCount = 0;
-			var decode = Entities.decode, fixSelfClosing, filteredUrlAttrs = Tools.makeMap('src,href');
-			var scriptUriRegExp = /(java|vb)script:/i;
+			var decode = Entities.decode, fixSelfClosing, filteredUrlAttrs = Tools.makeMap('src,href,data,background,formaction,poster');
+			var scriptUriRegExp = /((java|vb)script|mhtml):/i, dataUriRegExp = /^data:/i;
 
 			function processEndTag(name) {
 				var pos, i;
@@ -165,22 +204,24 @@ define("tinymce/html/SaxParser", [
 					}
 				}
 
-				// Block any javascript: urls
+				// Block any javascript: urls or non image data uris
 				if (filteredUrlAttrs[name] && !settings.allow_script_urls) {
 					var uri = value.replace(trimRegExp, '');
 
 					try {
 						// Might throw malformed URI sequence
 						uri = decodeURIComponent(uri);
-						if (scriptUriRegExp.test(uri)) {
-							return;
-						}
 					} catch (ex) {
 						// Fallback to non UTF-8 decoder
 						uri = unescape(uri);
-						if (scriptUriRegExp.test(uri)) {
-							return;
-						}
+					}
+
+					if (scriptUriRegExp.test(uri)) {
+						return;
+					}
+
+					if (!settings.allow_html_data_urls && dataUriRegExp.test(uri) && !/^data:image\//i.test(uri)) {
+						return;
 					}
 				}
 
@@ -199,7 +240,7 @@ define("tinymce/html/SaxParser", [
 				'(?:!DOCTYPE([\\w\\W]*?)>)|' + // DOCTYPE
 				'(?:\\?([^\\s\\/<>]+) ?([\\w\\W]*?)[?/]>)|' + // PI
 				'(?:\\/([^>]+)>)|' + // End element
-				'(?:([A-Za-z0-9\\-\\:\\.]+)((?:\\s+[^"\'>]+(?:(?:"[^"]*")|(?:\'[^\']*\')|[^>]*))*|\\/|\\s+)>)' + // Start element
+				'(?:([A-Za-z0-9\\-_\\:\\.]+)((?:\\s+[^"\'>]+(?:(?:"[^"]*")|(?:\'[^\']*\')|[^>]*))*|\\/|\\s+)>)' + // Start element
 			')', 'g');
 
 			attrRegExp = /([\w:\-]+)(?:\s*=\s*(?:(?:\"((?:[^\"])*)\")|(?:\'((?:[^\'])*)\')|([^>\s]+)))?/g;
@@ -336,7 +377,13 @@ define("tinymce/html/SaxParser", [
 							}
 
 							// Invalidate element if it's marked as bogus
-							if (attrList.map['data-mce-bogus']) {
+							if ((attr = attrList.map['data-mce-bogus'])) {
+								if (attr === 'all') {
+									index = findEndTag(schema, html, tokenRegExp.lastIndex);
+									tokenRegExp.lastIndex = index;
+									continue;
+								}
+
 								isValidElement = false;
 							}
 						}
@@ -419,5 +466,9 @@ define("tinymce/html/SaxParser", [
 				}
 			}
 		};
-	};
+	}
+
+	SaxParser.findEndTag = findEndTag;
+
+	return SaxParser;
 });

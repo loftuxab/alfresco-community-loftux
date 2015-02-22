@@ -119,7 +119,7 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
      * @param waitForLoading boolean to whether check for waiting for Loading text to disappear.
      * @return {@link MySitesDashlet}
      */
-    public synchronized MySitesDashlet render(RenderTime timer, boolean waitForLoading)
+    public MySitesDashlet render(RenderTime timer, boolean waitForLoading)
     {
         try
         {
@@ -148,6 +148,7 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
                 }
                 catch (NoSuchElementException e)
                 {
+                    logger.info("Unable to find the dashlet container " + e);
                 }
                 finally
                 {
@@ -396,7 +397,9 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
         try
         {
             drone.find(CREATE_SITE).click();
-            return drone.getCurrentPage().render();
+//            return drone.getCurrentPage().render();
+            return new CreateSitePage(drone).render();
+
         }
         catch (NoSuchElementException nse)
         {
@@ -409,7 +412,7 @@ public class MySitesDashlet extends AbstractDashlet implements Dashlet
     /**
      * Method to check if a site name is displayed in My Sites Dashlet
      *
-     * @param taskName
+     * @param siteName
      * @return True if Site exists
      */
     public boolean isSitePresent(String siteName)

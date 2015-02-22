@@ -43,11 +43,13 @@
                        </div>
                        <div>
                           <span>Evaluator:</span>
-                          <select id="evaluator" name="evaluator" onChange="showRequiredEvaluatorProps(this.value);">
-                             <#list evaluators as ev>
-                                <option value='${ev}'><script type="text/javascript">getEvaluatorId(${ev});</script></option>
-                             </#list>
-                          </select>
+                            <div class="scrollableContainer">
+                              <select id="evaluator" name="evaluator" onChange="showRequiredEvaluatorProps(this.value);">
+                                 <#list evaluators as ev>
+                                    <option value='${ev}'><script type="text/javascript">getEvaluatorId(${ev});</script></option>
+                                 </#list>
+                              </select>
+                            </div>
                        </div>
                        <div>
                           <span>Evaluator Properties: </span>
@@ -65,22 +67,26 @@
                  </tr>
                  <tr>
                     <td>
-                       <select name="undeployedModules" size="10">
-                          <#list undeployedModules as mod>
-                             <option value='${mod}' onClick="showSelectedEvaluator(this, false);"><script type="text/javascript">getModuleId(${mod});</script></option>
-                          </#list>
-                       </select>
+                      <div class="scrollableContainer">
+                         <select name="undeployedModules" size="10">
+                            <#list undeployedModules as mod>
+                               <option value='${mod}' onClick="showSelectedEvaluator(this, false);"><script type="text/javascript">getModuleId(${mod});</script></option>
+                            </#list>
+                         </select>
+                      </div>
                     </td>
                     <td>
                        <input type="button" value="Add" onClick="deploymentAction(this.form.undeployedModules, this.form.deployedModules);"/><br/>
                        <input type="button" value="Remove" onClick="deploymentAction(this.form.deployedModules, this.form.undeployedModules);"/>
                     </td>
                     <td>
-                       <select name="deployedModules" size="10">
-                          <#list deployedModules as mod>
-                             <option value='${mod}' onClick="showSelectedEvaluator(this, false);"><script type="text/javascript">getModuleId(${mod});</script></option>
-                          </#list>
-                       </select>
+                      <div class="scrollableContainer">
+                         <select name="deployedModules" size="10">
+                            <#list deployedModules as mod>
+                               <option value='${mod}' onClick="showSelectedEvaluator(this, false);"><script type="text/javascript">getModuleId(${mod});</script></option>
+                            </#list>
+                         </select>
+                      </div>
                     </td>
                     <td>
                        <input type="button" value="Up" onClick="moveUp(this.form.deployedModules);"><br/>

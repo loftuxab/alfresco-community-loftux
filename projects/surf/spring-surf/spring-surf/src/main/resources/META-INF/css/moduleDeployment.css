@@ -1,8 +1,3 @@
-select
-{
-    width: 400px;
-}
-
 input[type="button"]
 {
    width: 75px;
@@ -20,14 +15,15 @@ input[type="text"]
 
 select
 {
+   min-width: 400px;   
    font-family: Trebuchet MS, Arial, sans-serif;
    font-size: 12px;
    margin: 2px;
    padding: 1px 2px 1px 2px;
    color: #515D6B;
    background-color: white;
-   border: 1px solid #CCD4DB;  
-   overflow-x: scroll; 
+   border:none;
+   overflow: hidden;
 }
 
 .hidden
@@ -59,4 +55,16 @@ select
 {
 	color: red;
 	font-weight: bolder;
+}
+
+.scrollableContainer
+{
+   width: 400px;
+   -moz-overflow: auto; /* Mozilla */
+   -ms-overflow: auto;  /*Microsoft */
+   -webkit-overflow: auto; /* Webkit */
+   overflow: auto; /* W3C */
+   position: relative;
+   padding-bottom: 0;
+   border: 1px solid #CCD4DB;
 }

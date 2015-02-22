@@ -14,6 +14,7 @@
  */
 package org.alfresco.po.share.site.document;
 
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.enums.Encoder;
 import org.alfresco.po.share.enums.TinyMceColourCode;
 import org.alfresco.webdrone.HtmlElement;
@@ -34,7 +35,7 @@ public class TinyMceEditor extends HtmlElement
     private Log logger = LogFactory.getLog(TinyMceEditor.class);
 
     private static final String TINY_MCE_SELECT_ALL_COMMAND = "tinyMCE.activeEditor.selection.select(tinyMCE.activeEditor.getBody(),true);";
-    //private static final String XPATH_COLOUR_FONT = "//font";
+    // private static final String XPATH_COLOUR_FONT = "//font";
     private static final String XPATH_COLOUR_FONT2 = ".//*[@id='tinymce']/p/span";
     private static final String CSS_REMOVE_FORMAT = "i.mce-i-removeformat";
     private static final String CSS_COLOR_ATT = "rich.txt.editor.color.code";
@@ -56,6 +57,7 @@ public class TinyMceEditor extends HtmlElement
     private static final String CSS_EDIT = "button[id$='mce_43-open']";
     private static final String CSS_FORMAT = "button[id$='mce_46-open']";
     private static final String CSS_UNDO = "i[class$='mce-i-undo']";
+//    private static final String CSS_UNDO  = ".//form[contains(@id, 'default-add-form')]//i[contains(@class, 'mce-i-undo')]";
     private static final String CSS_REDO = "i[class$='mce-i-redo']";
     private static final String CSS_BULLET_TEXT = "#tinymce>ul>li";
     protected String CSS_STR_BACK_GROUND_COLOUR;
@@ -64,25 +66,25 @@ public class TinyMceEditor extends HtmlElement
 
     public enum FormatType
     {
-        BOLD, 
-        ITALIC, 
-        UNDERLINED, 
-        NUMBER, 
-        BULLET, 
-        BOLD_FMT_TXT, 
-        ITALIC_FMT_TXT, 
-        UNDER_LINED_FMT_TXT, 
-        BULLET_FMT_TXT, 
-        NUMBER_FMT_TXT, 
+        BOLD,
+        ITALIC,
+        UNDERLINED,
+        NUMBER,
+        BULLET,
+        BOLD_FMT_TXT,
+        ITALIC_FMT_TXT,
+        UNDER_LINED_FMT_TXT,
+        BULLET_FMT_TXT,
+        NUMBER_FMT_TXT,
         COLOR,
         FORMAT,
         EDIT,
-        UNDO, 
-        REDO, 
-        DEFAULT, 
-        COLOR_FONT, 
-        BULLET_TEXT, 
-        BOLD_EDIT, 
+        UNDO,
+        REDO,
+        DEFAULT,
+        COLOR_FONT,
+        BULLET_TEXT,
+        BOLD_EDIT,
         BACK_GROUND_COLOR;
     }
 
@@ -105,33 +107,33 @@ public class TinyMceEditor extends HtmlElement
     {
         switch (formatType)
         {
-        case BOLD:
-            return CSS_STR_BOLD;
-        case ITALIC:
-            return CSS_STR_ITALIC;
-        case UNDERLINED:
-            return CSS_STR_UNDER_LINED;
-        case BULLET:
-            return CSS_STR_BULLETS;
-        case NUMBER:
-            return CSS_STR_NUMBERS;
-        case COLOR:
-            return CSS_STR_FORE_COLOUR;
-        case FORMAT:
-        	return CSS_FORMAT;
-        case EDIT:
-        	return CSS_EDIT;
-        case UNDO:
-            return CSS_UNDO;
-        case REDO:
-            return CSS_REDO;
-            // temporary solution
-        case BOLD_EDIT:
-            return "DIV[class='comments-list']>DIV[class='comment-form'] " + CSS_STR_BOLD;
-        case BACK_GROUND_COLOR:
-            return CSS_STR_BACK_GROUND_COLOUR;
-        default:
-            throw new PageException();
+            case BOLD:
+                return CSS_STR_BOLD;
+            case ITALIC:
+                return CSS_STR_ITALIC;
+            case UNDERLINED:
+                return CSS_STR_UNDER_LINED;
+            case BULLET:
+                return CSS_STR_BULLETS;
+            case NUMBER:
+                return CSS_STR_NUMBERS;
+            case COLOR:
+                return CSS_STR_FORE_COLOUR;
+            case FORMAT:
+                return CSS_FORMAT;
+            case EDIT:
+                return CSS_EDIT;
+            case UNDO:
+                return CSS_UNDO;
+            case REDO:
+                return CSS_REDO;
+                // temporary solution
+            case BOLD_EDIT:
+                return "DIV[class='comments-list']>DIV[class='comment-form'] " + CSS_STR_BOLD;
+            case BACK_GROUND_COLOR:
+                return CSS_STR_BACK_GROUND_COLOUR;
+            default:
+                throw new PageException();
 
         }
     }
@@ -140,22 +142,22 @@ public class TinyMceEditor extends HtmlElement
     {
         switch (formatType)
         {
-        case BOLD_FMT_TXT:
-            return CSS_STR_BOLD_FMT_TXT;
-        case ITALIC_FMT_TXT:
-            return CSS_STR_ITALIC_FMT_TXT;
-        case UNDER_LINED_FMT_TXT:
-            return CSS_STR_UNDER_LINED_FMT_TXT;
-        case BULLET_FMT_TXT:
-            return CSS_STR_BULLET_FMT_TXT;
-        case NUMBER_FMT_TXT:
-            return CSS_STR_NUMBER_FMT_TXT;
-        case COLOR_FONT:
-            return CSS_COLOR_FONT;
-        case BULLET_TEXT:
-            return CSS_BULLET_TEXT;
-        default:
-            return CSS_STR_TEXT_TAG;
+            case BOLD_FMT_TXT:
+                return CSS_STR_BOLD_FMT_TXT;
+            case ITALIC_FMT_TXT:
+                return CSS_STR_ITALIC_FMT_TXT;
+            case UNDER_LINED_FMT_TXT:
+                return CSS_STR_UNDER_LINED_FMT_TXT;
+            case BULLET_FMT_TXT:
+                return CSS_STR_BULLET_FMT_TXT;
+            case NUMBER_FMT_TXT:
+                return CSS_STR_NUMBER_FMT_TXT;
+            case COLOR_FONT:
+                return CSS_COLOR_FONT;
+            case BULLET_TEXT:
+                return CSS_BULLET_TEXT;
+            default:
+                return CSS_STR_TEXT_TAG;
         }
     }
 
@@ -239,16 +241,16 @@ public class TinyMceEditor extends HtmlElement
 
         switch (encoder)
         {
-        case ENCODER_HTML:
-            encodedComment = ESAPI.encoder().encodeForHTML(text);
-            logger.info("Text encoded as HTML");
-            break;
-        case ENCODER_JAVASCRIPT:
-            encodedComment = ESAPI.encoder().encodeForJavaScript(text);
-            logger.info("Text encoded as JavaScript");
-            break;
-        default:
-            logger.info("Text is not encoded");
+            case ENCODER_HTML:
+                encodedComment = ESAPI.encoder().encodeForHTML(text);
+                logger.info("Text encoded as HTML");
+                break;
+            case ENCODER_JAVASCRIPT:
+                encodedComment = ESAPI.encoder().encodeForJavaScript(text);
+                logger.info("Text encoded as JavaScript");
+                break;
+            default:
+                logger.info("Text is not encoded");
         }
         setText(encodedComment);
     }
@@ -290,8 +292,10 @@ public class TinyMceEditor extends HtmlElement
      */
     public void clickUndo()
     {
+        drone.executeJavaScript("$(\"i[class$='mce-i-undo']\").click();");
         setFormatType(FormatType.UNDO);
         clickElementOnRichTextFormatter(getCSSOfFormatType());
+
     }
 
     /**
@@ -302,7 +306,7 @@ public class TinyMceEditor extends HtmlElement
         setFormatType(FormatType.EDIT);
         clickElementOnRichTextFormatter(getCSSOfFormatType());
     }
-    
+
     /**
      * click to format button
      */
@@ -311,33 +315,48 @@ public class TinyMceEditor extends HtmlElement
         setFormatType(FormatType.FORMAT);
         clickElementOnRichTextFormatter(getCSSOfFormatType());
     }
-    
+
     /**
      * Click to Redo the undo operation.
      */
     public void clickRedo()
     {
+        drone.executeJavaScript("$(\"i[class$='mce-i-redo']\").click();");
         setFormatType(FormatType.REDO);
         clickElementOnRichTextFormatter(getCSSOfFormatType());
     }
 
     public String getColourAttribute()
     {
-        try
+        if (getDrone().getProperties().getVersion() == AlfrescoVersion.Enterprise5)
         {
             drone.switchToFrame(getFrameId());
-            WebElement element = drone.findAndWait(By.xpath(XPATH_COLOUR_FONT2));
-            if (!CSS_COLOR_ATT.equals(element.getAttribute("color")) || CSS_COLOR_ATT.equals(element.getAttribute("style")))
-            {
-                drone.switchToDefaultContent();
-                return "BLUE";
-            }
+            WebElement html5Editor = drone.findAndWait(By.cssSelector("#tinymce>ol>li>span"));
+            String colorAttr = html5Editor.getAttribute("style");
+            drone.switchToDefaultContent();
+            return colorAttr;
+
 
         }
-        catch (NoSuchElementException noSuchElementExp)
+        else
         {
-            logger.error("Element :" + XPATH_COLOUR_FONT2 + " does not exist", noSuchElementExp);
+            try
+            {
+                drone.switchToFrame(getFrameId());
+                WebElement element = drone.findAndWait(By.xpath(XPATH_COLOUR_FONT2));
+                if (!CSS_COLOR_ATT.equals(element.getAttribute("color")) || CSS_COLOR_ATT.equals(element.getAttribute("style")))
+                {
+                    drone.switchToDefaultContent();
+                    return "BLUE";
+                }
+
+            }
+            catch (NoSuchElementException noSuchElementExp)
+            {
+                logger.error("Element :" + XPATH_COLOUR_FONT2 + " does not exist", noSuchElementExp);
+            }
         }
+
         return "";
     }
 
@@ -375,6 +394,7 @@ public class TinyMceEditor extends HtmlElement
         {
             drone.switchToDefaultContent();
             drone.findFirstDisplayedElement(By.cssSelector(cssString)).click();
+
         }
         catch (NoSuchElementException noSuchElementExp)
         {

@@ -37,6 +37,7 @@ public class SanityCifsTest extends AbstractUtils
     private static final String regexUrlWithPort = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(:\\d{1,5})?";
     private static final String regexUrlIP = "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})";
     private static final String dlgAlfDeskAction = "dlgAlfresco Desktop Action";
+    private static String networkPathNew;
 
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
@@ -47,13 +48,13 @@ public class SanityCifsTest extends AbstractUtils
         testUser = getUserNameFreeDomain(testName);
 
         String ip = getAddress(networkPath);
-        networkPath = networkPath.replaceFirst(regexUrlWithPort, ip);
-        if (networkPath.contains("alfresco\\"))
+        networkPathNew = networkPath.replaceFirst(regexUrlWithPort, ip);
+        if (networkPathNew.contains("alfresco\\"))
         {
-            networkPath = networkPath.replace("alfresco\\", "alfresco");
+            networkPathNew = networkPathNew.replace("alfresco\\", "alfresco");
         }
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPathNew + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
         Runtime.getRuntime().exec(mapConnect);
 
         if (CifsUtil.checkDirOrFileExists(10, 200, networkDrive + cifsPath))
@@ -148,7 +149,7 @@ public class SanityCifsTest extends AbstractUtils
         file.deleteOnExit();
         ShareUserSitePage.uploadFile(drone, file).render();
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPathNew + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
         Runtime.getRuntime().exec(mapConnect);
         String removeSecurity = "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3\" /v \"1806\" /t REG_DWORD /d 0 /f";
         Runtime.getRuntime().exec(removeSecurity);
@@ -157,7 +158,7 @@ public class SanityCifsTest extends AbstractUtils
 
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + docLib;
 
-        //explorer.openFolder(ldtp, fullPath);
+        // explorer.openFolder(ldtp, fullPath);
         explorer.openFolder(fullPath);
 
         // Drag content item "Test" to __AlfrescoCheckInOut.exe icon
@@ -248,7 +249,7 @@ public class SanityCifsTest extends AbstractUtils
         file.deleteOnExit();
         ShareUserSitePage.uploadFile(drone, file).render();
 
-        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPath + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
+        mapConnect = "cmd /c start /WAIT net use" + " " + networkDrive + " " + networkPathNew + " " + "/user:" + ADMIN_USERNAME + " " + ADMIN_PASSWORD;
         Runtime.getRuntime().exec(mapConnect);
         String removeSecurity = "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\3\" /v \"1806\" /t REG_DWORD /d 0 /f";
         Runtime.getRuntime().exec(removeSecurity);
@@ -257,7 +258,7 @@ public class SanityCifsTest extends AbstractUtils
 
         String fullPath = networkDrive + cifsPath + siteName.toLowerCase() + docLib;
 
-        //explorer.openFolder(ldtp, fullPath);
+        // explorer.openFolder(ldtp, fullPath);
         explorer.openFolder(fullPath);
 
         // Drag content item "Test" to __AlfrescoCheckInOut.exe icon
