@@ -57,7 +57,7 @@ public class MyDashBoardTest extends AbstractUtils
      * <li>Check Logo the Dashboard</li>
      * </ul>
      */
-    @Test
+    @Test  (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_12091()
     {
         try
@@ -111,7 +111,7 @@ public class MyDashBoardTest extends AbstractUtils
      * <li>Check CopyRight Info on the Dashboard</li>
      * </ul>
      */
-    @Test
+    @Test (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_12092()
     {
         try
@@ -168,7 +168,7 @@ public class MyDashBoardTest extends AbstractUtils
      * <li>Check CopyRight Info on the Dashboard</li>
      * </ul>
      */
-    @Test
+    @Test (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_12017()
     {
         try
@@ -233,7 +233,7 @@ public class MyDashBoardTest extends AbstractUtils
      * <li>Check that the User Dash-board > My Sites Dashlet shows the new Site</li>
      * </ul>
      */
-    @Test
+    @Test (groups = { "CloudOnly" }, enabled = false) //duplicate test (the test is executed via WebDriver project))
     public void AONE_12072()
     {
         try

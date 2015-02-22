@@ -278,11 +278,8 @@ public class SiteUtil
             throw new UnsupportedOperationException("site name is required");
         try
         {
-            //Alfresco.cloud.constants.CURRENT_TENANT 
-            String url = drone.getCurrentUrl();
-            String target = url.substring(0, url.indexOf("/page/")) + SITE_FINDER_LOCATION_SUFFIX;
-            drone.navigateTo(target);
-            SiteFinderPage siteFinder = drone.getCurrentPage().render();
+            SharePage page = drone.getCurrentPage().render();
+            SiteFinderPage siteFinder = page.getNav().selectSearchForSites().render();
             siteFinder = siteFinder.searchForSite(siteName).render();
             return siteFinder;
         }

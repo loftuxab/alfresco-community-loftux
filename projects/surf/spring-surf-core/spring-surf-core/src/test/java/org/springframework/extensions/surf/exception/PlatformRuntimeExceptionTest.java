@@ -1,5 +1,5 @@
 /**
-¯ * Copyright (C) 2005-2009 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This file is part of the Spring Surf Extension project.
  *

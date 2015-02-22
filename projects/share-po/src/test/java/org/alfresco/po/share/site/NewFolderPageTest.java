@@ -17,8 +17,8 @@ package org.alfresco.po.share.site;
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -80,7 +80,7 @@ public class NewFolderPageTest extends AbstractTest
         newFolderPage = newFolderPage.createNewFolderWithValidation("", folderName, folderName).render();
         Assert.assertTrue(newFolderPage.getMessage(NewFolderPage.Fields.NAME).length() > 0);
         newFolderPage.selectCancel();
-        
+
         newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
         documentLibPage = newFolderPage.createNewFolderWithValidation(folderName, folderName, folderName).render();
         Assert.assertNotNull(documentLibPage);
@@ -88,5 +88,22 @@ public class NewFolderPageTest extends AbstractTest
         newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
         documentLibPage = newFolderPage.createNewFolderWithValidation(folderName + "-1").render();
         Assert.assertNotNull(documentLibPage);
+    }
+
+    @Test(groups = { "alfresco-one" }, enabled = false)
+    public void getNotificationMessageTest() throws Exception
+    {
+        String folderName = "New Folder" + 1;
+
+        NewFolderPage newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
+        newFolderPage.type(folderName);
+        newFolderPage.selectSubmitButton();
+        Assert.assertNotNull(documentLibPage);
+
+        newFolderPage = documentLibPage.getNavigation().selectCreateNewFolder();
+        newFolderPage.type(folderName);
+        newFolderPage.selectSubmitButton();
+        Assert.assertNotEquals(newFolderPage.getNotificationMessage(), "");
+
     }
 }

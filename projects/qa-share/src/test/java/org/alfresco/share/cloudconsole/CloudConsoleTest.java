@@ -6,7 +6,7 @@ import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -38,15 +38,14 @@ public class CloudConsoleTest extends AbstractUtils
     private final String PASSWORD = "wR5qiqNY";
 
     @Override
-    // TODO: Group=MyAlfresco?
-    @BeforeClass(alwaysRun = true, groups = { "Cloud2" })
+    @BeforeClass(alwaysRun = true, groups = "CloudOnly")
     public void setup() throws Exception
     {
         super.setup();
         cloudConsolePage = new CloudConsolePage(drone);
     }
 
-    @BeforeMethod(groups = { "Cloud2" })
+    @BeforeMethod(groups = "CloudOnly")
     public void beforeTest() throws Exception
     {
         String cloudConsoleUrl = ShareUser.getCloudConsoleURL(drone);
@@ -78,7 +77,7 @@ public class CloudConsoleTest extends AbstractUtils
      * enter an e-mail address, after that it should show the account details
      */
 
-    @Test(groups = { "Cloud2" })
+    @Test(groups = { "CloudOnly" })
     public void AONE_13886()
     {
         String testName = getTestName();
@@ -90,7 +89,7 @@ public class CloudConsoleTest extends AbstractUtils
         // Search
         CloudConsoleSearchResultPage resultPage = consolePage.executeSearch(testUser).render();
         
-        Assert.assertTrue(resultPage.isVisibleResults());
+        Assert.assertTrue(resultPage.isVisibleResults(), "User cannot found");
     }
 
     /**
@@ -98,7 +97,7 @@ public class CloudConsoleTest extends AbstractUtils
      * click bulk upload option
      * Users should be invited successfully
      */
-    @Test(groups = { "Cloud2" })
+    @Test(groups = { "CloudOnly" })
     public void AONE_13887()
     {
         String testName = getTestName();
@@ -106,14 +105,11 @@ public class CloudConsoleTest extends AbstractUtils
         String user2 = getUserNameFreeDomain(testName + 2);
 
         String[] usersForInvitation = { user1, user2 };
-        
-        // TODO: Avoid webdrone / share-po code (render) in the tests, to keep tests simpler and easy maintainable
-        // TODO: Avoid page chains
-        Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().render().openInviteUsersTab().render()
+        Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().openInviteUsersTab()
                 .executeCorrectBulkImport(usersForInvitation);
 
-        Assert.assertTrue(results.containsKey(user1) && results.get(user1));
-        Assert.assertTrue(results.containsKey(user2) && results.get(user2));
+        Assert.assertTrue(results.containsKey(user1) && results.get(user1), "First user is not invited");
+        Assert.assertTrue(results.containsKey(user2) && results.get(user2), "Second user is not invited");
     }
 
     /**
@@ -121,19 +117,19 @@ public class CloudConsoleTest extends AbstractUtils
      * click bulk upload option
      * all the users in the file should be uploaded successfully
      */
-    @Test(groups = { "Cloud2" })
+    @Test(groups = { "CloudOnly" })
     public void AONE_13888()
     {
         String testName = getTestName();
         String user1 = getUserNameFreeDomain(testName + 1);
         String user2 = getUserNameFreeDomain(testName + 2);
         String usersForInvitation = user1 + "\r\n" + user2;
-        File fileForBulkImport = SiteUtil.newFile(DATA_FOLDER + testName + ".txt", usersForInvitation).getAbsoluteFile();
-        Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().render().openInviteUsersTab().render()
+        File fileForBulkImport = SiteUtil.newFile(DATA_FOLDER + UNIQUE_TESTDATA_STRING+getTestName() + ".txt", usersForInvitation).getAbsoluteFile();
+        Map<String, Boolean> results = cloudConsolePage.loginAs(USERNAME, PASSWORD).render().openDashboardPage().openInviteUsersTab()
                 .executeCorrectBulkImport(fileForBulkImport);
 
-        Assert.assertTrue(results.containsKey(user1) && results.get(user1));
-        Assert.assertTrue(results.containsKey(user2) && results.get(user2));
+        Assert.assertTrue(results.containsKey(user1) && results.get(user1), "First user is not invited");
+        Assert.assertTrue(results.containsKey(user2) && results.get(user2), "Second user is not invited");
     }
 
 }

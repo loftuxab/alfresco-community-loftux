@@ -14,6 +14,8 @@
  */
 package org.alfresco.po.share.task;
 
+import java.util.List;
+
 import org.alfresco.po.share.workflow.TaskDetailsType;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -38,6 +40,7 @@ public class TaskDetails
     private boolean isEditTaskDisplayed;
     private boolean isViewTaskDisplayed;
     private boolean isViewWorkFlowDisplayed;
+    private List<String> taskLabels;
 
     public String getTaskName()
     {
@@ -107,6 +110,16 @@ public class TaskDetails
     public void setDescription(String description)
     {
         this.description = description;
+    }
+    
+    public List<String> getTaskLabels()
+    {
+        return taskLabels;
+    }
+
+    public void setTaskLabels(List<String> taskLabels)
+    {
+        this.taskLabels = taskLabels;
     }
 
     public String getStartedBy()

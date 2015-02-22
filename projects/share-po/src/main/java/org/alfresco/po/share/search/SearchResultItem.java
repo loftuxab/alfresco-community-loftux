@@ -14,6 +14,7 @@
  */
 package org.alfresco.po.share.search;
 
+import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.admin.ActionsSet;
@@ -76,11 +77,20 @@ public class SearchResultItem implements SearchResult
      */
     public String getTitle()
     {
+        AlfrescoVersion version = drone.getProperties().getVersion();
         if (title == null)
         {
             try
             {
-                title = webElement.findElement(By.cssSelector(ITEM_NAME_CSS_HOLDER+ ">" +TITLE)).getText();
+                if (version.isFacetedSearch())
+                {
+                    title = webElement.findElement(By.cssSelector(ITEM_NAME_CSS_HOLDER + ">" + TITLE)).getText();
+                }
+                else
+                {
+                    title = webElement.findElement(By.cssSelector("h3.itemname a")).getText();
+                }
+
             }
             catch (NoSuchElementException e)
             {
@@ -89,7 +99,6 @@ public class SearchResultItem implements SearchResult
         }
         return title;
     }
-
 
     /**
      * Method to Click on Download link of result item present on search results.

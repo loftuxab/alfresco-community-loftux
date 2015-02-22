@@ -267,21 +267,6 @@
             this.widgets.publishButton = Alfresco.util.createYUIButton(this, "publish-button", this.onFormPublishButtonClick);
             Dom.removeClass(this.id + "-publish-button", "hidden");
          }
-         
-         // publishing internal and external button / update internal and publish external
-         var publishExternalButtonLabel = "";
-         if (!this.options.editMode)
-         {
-            publishExternalButtonLabel = this.msg("action.publishIntAndExt");
-         }
-         else if (this.blogPostData.isPublished)
-         {
-            publishExternalButtonLabel = this.msg("action.updateIntAndExt");
-         }
-         else
-         {
-            publishExternalButtonLabel = this.msg("action.updateIntAndPublishExt");
-         }
 
          // Cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onFormCancelButtonClick);
@@ -304,11 +289,11 @@
 
          if (this.widgets.publishButton)
          {
-            this.widgets.postForm.setSubmitElements([this.widgets.saveButton, this.widgets.publishExternalButton, this.widgets.publishButton]);            
+            this.widgets.postForm.setSubmitElements([this.widgets.saveButton, this.widgets.publishButton]);            
          }
          else
          {
-            this.widgets.postForm.setSubmitElements([this.widgets.saveButton, this.widgets.publishExternalButton]);
+            this.widgets.postForm.setSubmitElements([this.widgets.saveButton]);
          }
          this.widgets.postForm.setAJAXSubmit(true,
          {

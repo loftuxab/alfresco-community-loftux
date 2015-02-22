@@ -22,8 +22,8 @@ import org.alfresco.po.share.enums.Encoder;
 import org.alfresco.po.share.site.NewFolderPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -273,5 +273,24 @@ public class DetailsPageTest extends AbstractTest
         folderDetails = documentLibPage.getFileDirectoryInfo(folderName).selectViewFolderDetails().render();
 
         Assert.assertTrue(folderDetails.isSynPanelPresent());
+    }
+    
+    @Test(dependsOnMethods="isSynPanelPresent", groups = { "Hybrid" })
+    public void isErrorEditOffline() throws Exception
+    {
+        SitePage page = drone.getCurrentPage().render();
+        documentLibPage = page.getSiteNav().selectSiteDocumentLibrary().render();
+        String fileName = "fileName" + System.currentTimeMillis();
+         
+        // Upload File
+        File file = SiteUtil.prepareFile(fileName);
+        UploadFilePage uploadForm = documentLibPage.getNavigation().selectFileUpload().render();
+        documentLibPage = uploadForm.uploadFile(file.getCanonicalPath()).render();
+        fileName = file.getName();
+        
+        DocumentDetailsPage docDetails = documentLibPage.selectFile(fileName).render();  
+        docDetails.selectEditOffLine();
+        
+        Assert.assertFalse(docDetails.isErrorEditOfflineDocument(fileName));      
     }
 }

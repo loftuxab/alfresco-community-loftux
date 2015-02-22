@@ -3,19 +3,32 @@
  */
 package org.alfresco.share.site.document;
 
-import com.google.api.services.drive.Drive;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.share.util.*;
+import static org.alfresco.share.util.ShareUserGoogleDocs.createAndSavegoogleDocBySignIn;
+
+import java.util.Map;
+
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.EditInGoogleDocsPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.FtpUtil;
+import org.alfresco.share.util.GoogleDriveUtil;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserGoogleDocs;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-import java.util.Map;
-import static org.alfresco.share.util.ShareUserGoogleDocs.createAndSavegoogleDocBySignIn;
+
+import com.google.api.services.drive.Drive;
 
 /**
  * @author Sergey Kardash

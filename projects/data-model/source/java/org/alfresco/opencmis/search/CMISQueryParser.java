@@ -233,7 +233,7 @@ public class CMISQueryParser
             Constraint constraint = buildNegation(notNode, factory, functionEvaluationContext, selectors, columnMap);
             constraints.add(constraint);
         }
-        if (constraints.size() == 1)
+        if (constraints.size() == 1 && constraints.get(0).getOccur() != Occur.EXCLUDE)
         {
             return constraints.get(0);
         } else

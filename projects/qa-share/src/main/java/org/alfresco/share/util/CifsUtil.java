@@ -1,19 +1,38 @@
 package org.alfresco.share.util;
 
-import jcifs.smb.*;
-
+import jcifs.UniAddress;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
+import jcifs.smb.SmbFileOutputStream;
+import jcifs.smb.SmbSession;
 import org.alfresco.po.share.util.PageUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 
+import javax.swing.ImageIcon;
+import java.awt.AWTException;
+import java.awt.Toolkit;
+import java.awt.Robot;
 import java.awt.Image;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.*;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -25,10 +44,11 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 {
 
     private Image image;
-    
+    private static Log logger = LogFactory.getLog(CifsUtil.class);
+
     /**
      * Method to add document to the Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -125,7 +145,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to upload document to the Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -182,20 +202,13 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
         {
             successful = false;
         }
-        finally
-        {
-            if (file.exists())
-            {
-                file.delete();
-            }
-        }
 
         return successful;
     }
 
     /**
      * Method to verify that item presents in Alfresco
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -230,7 +243,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to verify that item presents in Alfresco
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -276,7 +289,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to rename document in Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -318,7 +331,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to rename document in Alfresco via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -398,7 +411,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to check content of file
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -468,7 +481,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
 
     /**
      * Method to create folder via CIFS
-     * 
+     *
      * @param shareUrl
      * @param username
      * @param password
@@ -505,7 +518,7 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
         }
         return successful;
     }
-    
+
     public CifsUtil(Image image)
     {
         this.image = image;
@@ -552,5 +565,238 @@ public class CifsUtil extends AbstractUtils implements Transferable, ClipboardOw
     {
         // TODO Auto-generated method stub
 
+    }
+
+    public static boolean copyFolder(String shareUrl, String username, String password, String cifsPath, String destination)
+    {
+        boolean successful;
+        try
+        {
+
+            String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+            String user = username + ":" + password;
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(user);
+
+            SmbFile sFileOld = new SmbFile("smb://" + server + "/" + cifsPath, auth);
+            SmbFile sFileNew = new SmbFile("smb://" + server + "/" + destination, auth);
+
+            sFileOld.copyTo(sFileNew);
+
+            successful = true;
+        }
+        catch (Exception ex)
+        {
+            successful = false;
+        }
+        return successful;
+    }
+
+    /**
+     * Verifies if a folder or file exists each polling time untill the timeout is reached
+     * If it finds the item it returns true the moment it is found if not it will return false after the timeout
+     *
+     * @param timeoutSECONDS
+     * @param pollingTimeMILISECONDS
+     * @param path
+     * @return Boolean
+     */
+    public static Boolean checkDirOrFileExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
+    {
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                existence = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + 200;
+            }
+        }
+        return existence;
+    }
+
+    /**
+     * Verifies if a folder or file doesn't exists each polling time untill the timeout is reached
+     * If it doesn't find the item it returns true instantly if not it will return false after the timeout
+     *
+     * @param timeoutSECONDS
+     * @param pollingTimeMILISECONDS
+     * @param path
+     * @return Boolean
+     */
+    public static Boolean checkDirOrFileNotExists(int timeoutSECONDS, int pollingTimeMILISECONDS, String path)
+    {
+        long counter = 0;
+        boolean existence = false;
+        while (counter < TimeUnit.SECONDS.toMillis(timeoutSECONDS))
+        {
+            File test = new File(path);
+            if (test.exists())
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + 200;
+
+            }
+            else
+            {
+                existence = true;
+                break;
+            }
+        }
+        return existence;
+    }
+
+    /**
+     * Verifies if a hidden file doesn't exists on the specified path each 200ms untill the timeout is reached
+     * If it doesn't find the item it returns true instantly if not it will return false after the timeout
+     *
+     * @param path
+     * @param extension
+     * @param timeout
+     * @return Boolean
+     */
+    public static Boolean checkTemporaryFileDoesntExists(String path, String extension, int timeout)
+    {
+        long counter = 0;
+        boolean check = false;
+        boolean existence = true;
+        while (counter < TimeUnit.SECONDS.toMillis(timeout))
+        {
+            File test = new File(path);
+            for (File element : test.listFiles())
+            {
+                if (element.isHidden() && element.getName().contains(extension))
+                {
+                    existence = false;
+                    break;
+                }
+            }
+            if (existence)
+            {
+                check = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                counter = counter + 200;
+                existence = true;
+            }
+        }
+        return check;
+    }
+
+    public static void uploadImageInOffice(String image) throws AWTException
+    {
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        ImageIcon icon = new ImageIcon(image);
+        CifsUtil clipboardImage = new CifsUtil(icon.getImage());
+        clipboard.setContents(clipboardImage, clipboardImage);
+
+        Robot r = new Robot();
+        r.keyPress(KeyEvent.VK_CONTROL);
+        r.keyPress(KeyEvent.VK_V);
+        r.keyRelease(KeyEvent.VK_CONTROL);
+        r.keyRelease(KeyEvent.VK_V);
+    }
+
+    public static boolean downloadContent(String shareUrl, String username, String password, String cifsPath, String fileName)
+    {
+        boolean successful = false;
+        try
+        {
+
+            String user = username + ":" + password;
+            String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(user);
+
+            SmbFile sFile = new SmbFile("smb://" + server + "/" + cifsPath + "/" + fileName, auth);
+
+            FileOutputStream fileOutputStream = null;
+            SmbFileInputStream smbfileInputStream = null;
+            try
+            {
+                fileOutputStream = new FileOutputStream(downloadDirectory + fileName);
+                smbfileInputStream = new SmbFileInputStream(sFile);
+
+                byte[] buf = new byte[16 * 1024 * 1024];
+                int len;
+                while ((len = smbfileInputStream.read(buf)) != -1)
+                {
+                    fileOutputStream.write(buf, 0, len);
+                }
+                smbfileInputStream.close();
+                fileOutputStream.close();
+                successful = true;
+
+            }
+            catch (IOException ex)
+            {
+                throw new RuntimeException(ex.getMessage());
+            }
+
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+
+        return successful;
+    }
+
+    /**
+     * Authenticate a user.
+     *
+     * @param login
+     * @param password
+     * @param shareUrl
+     * @return true if the given password matches the password for this user
+     */
+
+    public static boolean doLoginCheck(String shareUrl, String login, String password)
+    {
+
+        String server = PageUtils.getAddress(shareUrl).replaceAll("(:\\d{1,5})?", "");
+        boolean userAuthenticated = false;
+
+        try
+        {
+            UniAddress dc = UniAddress.getByName(server, true);
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(server, login, password);
+            SmbSession.logon(dc, auth);
+            userAuthenticated = true;
+        }
+        catch (SmbException | UnknownHostException e)
+        {
+            logger.error("The network name cannot be found", e);
+        }
+        return userAuthenticated;
     }
 }

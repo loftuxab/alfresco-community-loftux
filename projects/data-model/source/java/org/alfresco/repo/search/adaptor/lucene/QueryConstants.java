@@ -186,7 +186,7 @@ public interface QueryConstants
     
     public static final String FIELD_FIELDS = "FIELDS";
     
-    public static final String FIELD_SUGGEST = "suggest";
+    public static final String FIELD_TAG_SUGGEST = "suggest_TAG";
    
     public static final String FIELD_VERSION = "_version_";
 }

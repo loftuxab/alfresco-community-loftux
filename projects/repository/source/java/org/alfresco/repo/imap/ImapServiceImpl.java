@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -22,10 +22,12 @@ import static org.alfresco.repo.imap.AlfrescoImapConst.DICTIONARY_TEMPLATE_PREFI
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -40,6 +42,7 @@ import java.util.TreeMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.mail.Flags;
+import javax.mail.Header;
 import javax.mail.Flags.Flag;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -53,6 +56,7 @@ import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.imap.AlfrescoImapConst.ImapViewMode;
 import org.alfresco.repo.imap.config.ImapConfigMountPointsBean;
+import org.alfresco.repo.imap.exception.AlfrescoImapRuntimeException;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
@@ -105,6 +109,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.extensions.surf.util.AbstractLifecycleBean;
 import org.springframework.extensions.surf.util.I18NUtil;
 
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.store.SimpleStoredMessage;
 
 /**
@@ -160,9 +165,12 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
     private final static Map<QName, Flags.Flag> qNameToFlag;
     private final static Map<Flags.Flag, QName> flagToQname;
 
+    private long imapServerShuffleMoveDeleteDelay = 5000L;
     private static final Timer deleteDelayTimer = new Timer();
 
     private boolean imapServerEnabled = false;
+
+    private List<String> messageHeadersToPersist = Collections.<String>emptyList();
 
     static
     {
@@ -339,6 +347,16 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
     public void setImapServerEnabled(boolean enabled)
     {
         this.imapServerEnabled = enabled;
+    }
+    
+    public void setMessageHeadersToPersist(List<String> headers)
+    {
+        this.messageHeadersToPersist  = headers;
+    }
+
+    public void setImapServerShuffleMoveDeleteDelay(long imapServerShuffleMoveDeleteDelay)
+    {
+        this.imapServerShuffleMoveDeleteDelay = imapServerShuffleMoveDeleteDelay;
     }
     
     public boolean getImapServerEnabled()
@@ -572,22 +590,35 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
                         @Override
                         public Void doWork() throws Exception
                         {
-                             // Ignore if it is NOT hidden: the shuffle may have finished; the operation may have failed
-                            if (!nodeService.exists(nodeRef) || !fileFolderService.isHidden(nodeRef))
+                            return serviceRegistry.getTransactionService().getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>()
                             {
-                                return null;
-                            }
-                            
-                            // Since this will run in a different thread, the client thread-local must be set
-                            // or else unhiding the node will not unhide it for IMAP.
-                            FileFilterMode.setClient(FileFilterMode.Client.imap);
-                            
-                            // Unhide the node, e.g. for archiving
-                            fileFolderService.setHidden(nodeRef, false);
-                            
-                            // This is the transaction-aware service
-                            fileFolderService.delete(nodeRef);
-                            return null;
+                                @Override
+                                public Void execute() throws Throwable
+                                {
+                                    // Ignore if it is NOT hidden: the shuffle may have finished; the operation may have failed
+                                    if (!nodeService.exists(nodeRef) || !fileFolderService.isHidden(nodeRef))
+                                    {
+                                        return null;
+                                    }
+
+                                    // Since this will run in a different thread, the client thread-local must be set
+                                    // or else unhiding the node will not unhide it for IMAP.
+                                    FileFilterMode.setClient(FileFilterMode.Client.imap);
+
+                                    // Unhide the node, e.g. for archiving
+                                    fileFolderService.setHidden(nodeRef, false);
+
+                                    // This is the transaction-aware service
+                                    fileFolderService.delete(nodeRef);
+
+                                    if (logger.isDebugEnabled())
+                                    {
+                                        logger.debug("Node has been async deleted " + nodeRef);
+                                    }
+
+                                    return null;
+                                }
+                            });
                         }
                     };
                     try
@@ -603,10 +634,17 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
                 }
             };
             // Schedule a real delete 5 seconds after the current time
-            deleteDelayTimer.schedule(deleteDelayTask, 5000L);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Delete timer is scheduled for " + nodeRef);
+            }
+            deleteDelayTimer.schedule(deleteDelayTask, imapServerShuffleMoveDeleteDelay);
         }
     }
     
+    /**
+     * @throws AlfrescoImapRuntimeException
+     */
     public AlfrescoImapFolder getOrCreateMailbox(AlfrescoImapUser user, String mailboxName, boolean mayExist, boolean mayCreate)
     {
         if (mailboxName == null)
@@ -659,13 +697,13 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
         }
         catch (FileNotFoundException e)
         {
-            throw new AlfrescoRuntimeException(ERROR_CANNOT_GET_A_FOLDER, new String[] { mailboxName });
+            throw new AlfrescoImapRuntimeException(ERROR_CANNOT_GET_A_FOLDER, new String[] { mailboxName }, new FolderException(FolderException.NOT_LOCAL));
         }
         if (mailFolder == null)
         {
             if (!mayCreate)
             {
-                throw new AlfrescoRuntimeException(ERROR_CANNOT_GET_A_FOLDER, new String[] { mailboxName });
+                throw new AlfrescoImapRuntimeException(ERROR_CANNOT_GET_A_FOLDER, new String[] { mailboxName }, new FolderException(FolderException.NOT_LOCAL));
             }
             if (logger.isDebugEnabled())
             {
@@ -677,7 +715,7 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
         {
             if (!mayExist)
             {
-                throw new AlfrescoRuntimeException(ERROR_FOLDER_ALREADY_EXISTS);
+                throw new AlfrescoImapRuntimeException(ERROR_FOLDER_ALREADY_EXISTS, new FolderException(FolderException.ALREADY_EXISTS_LOCALLY));
             }
         }
         String path = (null != pathElements) ? (pathElements.get(pathElements.size() - 1)) : (rootPath);
@@ -1397,8 +1435,8 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
                 if (isImapFavourite != null && isImapFavourite)
                 {
                     String siteName = key.substring(AlfrescoImapConst.PREF_IMAP_FAVOURITE_SITES.length() + 1); // count the dot
-                    boolean isMember = serviceRegistry.getSiteService().isMember(siteName, userName);
-                    if (isMember)
+                    boolean siteExists = serviceRegistry.getSiteService().getSite(siteName) != null;
+                    if (siteExists && serviceRegistry.getSiteService().isMember(siteName, userName))
                     {
                         SiteInfo siteInfo = serviceRegistry.getSiteService().getSite(siteName);
                         if (siteInfo != null)
@@ -1937,44 +1975,129 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
             });
         }
     }
-        
-    /**
-     * Return true if provided nodeRef is in Sites/.../documentlibrary
-     */
-    public boolean isNodeInSitesLibrary(final NodeRef inputNodeRef)
+
+    public NodeRef getNodeSiteContainer(final NodeRef inputNodeRef)
     {
-        return doAsSystem(new RunAsWork<Boolean>()
+        return doAsSystem(new RunAsWork<NodeRef>()
         {
             @Override
-            public Boolean doWork() throws Exception
+            public NodeRef doWork() throws Exception
             {
                 NodeRef nodeRef = inputNodeRef;
-                boolean isInDocLibrary = false;
-                NodeRef parent = nodeService.getPrimaryParent(nodeRef).getParentRef();
-                while (parent != null && !nodeService.getType(parent).equals(SiteModel.TYPE_SITE))
+                while (true)
                 {
-                    String parentName = (String) nodeService.getProperty(parent, ContentModel.PROP_NAME);
-                    if (parentName.equalsIgnoreCase("documentlibrary"))
+                    NodeRef parent = nodeService.getPrimaryParent(nodeRef).getParentRef();
+                    if (parent == null)
                     {
-                        isInDocLibrary = true;
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("The node with nodeRef:" + inputNodeRef + " is not in the site.");
+                        }
+                        nodeRef = null;
+                        break;
                     }
                     nodeRef = parent;
-                    if (nodeService.getPrimaryParent(nodeRef) != null)
+                    if (nodeService.hasAspect(parent, SiteModel.ASPECT_SITE_CONTAINER))
                     {
-                        parent = nodeService.getPrimaryParent(nodeRef).getParentRef();
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("The node with nodeRef:" + inputNodeRef + " is in the site.");
+                        }
+                        // found the container
+                        break;
                     }
                 }
-                if (parent == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    return nodeService.getType(parent).equals(SiteModel.TYPE_SITE) && isInDocLibrary;
-                }
+                return nodeRef;
             }
         });
 
+    }
+
+    public String getContentFolderUrl(NodeRef contentNodeRef)
+    {
+        String url = "";
+        String CONTAINER_URL_TEMPLATE = "%s/page/site/%s";
+        String REPOSITORY_URL_TEMPLATE = "%s/page/%s";
+
+        NodeRef siteContainerNodeRef = getNodeSiteContainer(contentNodeRef);
+
+        if (siteContainerNodeRef != null)
+        {
+            // the node is in site's container
+            // determine which one
+
+            NodeRef siteNodeRef = nodeService.getPrimaryParent(siteContainerNodeRef).getParentRef();
+            String siteName = ((String) nodeService.getProperty(siteNodeRef, ContentModel.PROP_NAME)).toLowerCase();
+            String componentId = (String) nodeService.getProperty(siteContainerNodeRef, SiteModel.PROP_COMPONENT_ID);
+            switch (componentId.toLowerCase())
+            {
+                case "datalists":
+                    url = String.format(CONTAINER_URL_TEMPLATE, getShareApplicationContextUrl(), siteName + "/data-lists");
+                    break;
+                case "wiki":
+                    url = String.format(CONTAINER_URL_TEMPLATE, getShareApplicationContextUrl(), siteName + "/wiki");
+                    break;
+                case "links":
+                    url = String.format(CONTAINER_URL_TEMPLATE, getShareApplicationContextUrl(), siteName + "/links");
+                    break;
+                case "calendar":
+                    url = String.format(CONTAINER_URL_TEMPLATE, getShareApplicationContextUrl(), siteName + "/calendar");
+                    break;
+                case "discussions":
+                    url = String.format(CONTAINER_URL_TEMPLATE, getShareApplicationContextUrl(), siteName + "/discussions-topiclist");
+                    break;
+                case "blog":
+                    url = String.format(CONTAINER_URL_TEMPLATE, getShareApplicationContextUrl(), siteName + "/blog-postlist");
+                    break;
+                case "documentlibrary":
+                    String pathFromSites = getPathFromSites(nodeService.getPrimaryParent(contentNodeRef).getParentRef());
+                    StringBuilder parsedPath = new StringBuilder();
+                    String[] pathParts = pathFromSites.split("/");
+                    if (pathParts.length > 2)
+                    {
+                        parsedPath.append(pathParts[0] + "/" + pathParts[1]);
+                        parsedPath.append("?filter=path|");
+                        for (int i = 2; i < pathParts.length; i++)
+                        {
+                            parsedPath.append("/").append(pathParts[i]);
+                        }
+                    }
+                    else
+                    {
+                        parsedPath.append(pathFromSites);
+                    }
+                    url = String.format(CONTAINER_URL_TEMPLATE, getShareApplicationContextUrl(), parsedPath.toString());
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            // the node is in repository
+            String pathFromRepo = getPathFromRepo(nodeService.getPrimaryParent(contentNodeRef));
+            StringBuilder parsedPath = new StringBuilder();
+            String[] pathParts = pathFromRepo.split("/");
+            if (pathParts.length > 1)
+            {
+                parsedPath.append(pathParts[0]);
+                parsedPath.append("?filter=path|");
+                for (int i = 1; i < pathParts.length; i++)
+                {
+                    parsedPath.append("/").append(pathParts[i]);
+                }
+            }
+            else
+            {
+                parsedPath.append(pathFromRepo);
+            }
+            url = String.format(REPOSITORY_URL_TEMPLATE, getShareApplicationContextUrl(), parsedPath.toString());
+        }
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Resolved content folder URL:" + url + " for node " + contentNodeRef);
+        }
+        return url;
     }
 
     public void setNamespaceService(NamespaceService namespaceService)
@@ -2023,6 +2146,50 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
         }
      	
         return fileName;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void persistMessageHeaders(NodeRef messageRef, MimeMessage message)
+    {
+        try
+        {
+            Enumeration<Header> headers = message.getAllHeaders();
+            List<String> messaheHeadersProperties = new ArrayList<String>();
+            while(headers.hasMoreElements())
+            {
+                Header header = headers.nextElement();
+                if (isPersistableHeader(header))
+                {
+                    messaheHeadersProperties.add(header.getName() + ImapModel.MESSAGE_HEADER_TO_PERSIST_SPLITTER + header.getValue());
+                    
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("[persistHeaders] Persisting Header " + header.getName() + " : " + header.getValue());
+                    }
+                }
+            }
+            
+            Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+            props.put(ImapModel.PROP_MESSAGE_HEADERS, (Serializable)messaheHeadersProperties);
+            
+            serviceRegistry.getNodeService().addAspect(messageRef, ImapModel.ASPECT_IMAP_MESSAGE_HEADERS, props);
+        }
+        catch(MessagingException me)
+        {
+            
+        }
+    }
+    
+    private boolean isPersistableHeader(Header header)
+    {
+        for (String headerToPersist : messageHeadersToPersist)
+        {
+            if (headerToPersist.equalsIgnoreCase(header.getName()))
+            {
+                return true;
+            }
+        }
+        return false; 
     }
     
     static class CacheItem
@@ -2079,4 +2246,27 @@ public class ImapServiceImpl implements ImapService, OnRestoreNodePolicy, OnCrea
         });
     }
 
+    @Override
+    public String getPathFromRepo(final ChildAssociationRef assocRef)
+    {
+        return doAsSystem(new RunAsWork<String>()
+        {
+            @Override
+            public String doWork() throws Exception
+            {
+                NodeRef ref = assocRef.getParentRef();
+                String name = ((String) nodeService.getProperty(ref, ContentModel.PROP_NAME)).toLowerCase();
+                ChildAssociationRef parent = nodeService.getPrimaryParent(ref);
+                QName qname = parent.getQName();
+                if (qname.equals(QName.createQName(NamespaceService.APP_MODEL_1_0_URI, "company_home")))
+                {
+                    return "repository";
+                }
+                else
+                {
+                    return getPathFromRepo(parent) + "/" + name;
+                }
+            }
+        });
+    }
 }

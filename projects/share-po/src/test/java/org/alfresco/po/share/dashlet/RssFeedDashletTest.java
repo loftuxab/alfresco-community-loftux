@@ -18,15 +18,21 @@
  */
 package org.alfresco.po.share.dashlet;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.List;
+
+import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
 
 /**
  * Tests for RSS Feed dashlet web elements
@@ -46,13 +52,15 @@ public class RssFeedDashletTest extends AbstractSiteDashletTest
 
     private static final String EXP_HELP_BALLOON_MSG = "This dashlet shows the RSS feed of your choice. Click the edit icon on the dashlet to change the feed.";
     private static final String EXP_TITLE_BY_DEFAULT = "Alfresco Blog";
-    private static final String CUSTOM_RSS_URL = "http://projects.apache.org/feeds/atom.xml";
-    private static final String EXP_CUSTOM_RSS_TITLE = "Apache Software Foundation Project Releases";
+    private static final String CUSTOM_RSS_URL = "http://rss.cnn.com/rss/edition_europe.rss";
+    private static final String EXP_CUSTOM_RSS_TITLE = "CNN.com - Europe";
+    String rssUrl = "http://feeds.reuters.com/reuters/businessNews";
+    String rssTitle = "Reuters: Business News";
 
     @BeforeClass
     public void setUp() throws Exception
     {
-        loginAs("admin", "admin");
+        loginAs(username, password);
         siteName = "rssFeedDashletTest" + System.currentTimeMillis();
         SiteUtil.createSite(drone, siteName, "description", "Public");
         navigateToSiteDashboard();
@@ -108,6 +116,26 @@ public class RssFeedDashletTest extends AbstractSiteDashletTest
             }
         }
         assertEquals(rssFeedDashlet.getTitle(), EXP_CUSTOM_RSS_TITLE);
+    }
+
+    @Test(dependsOnMethods = "configExternalRss")
+    public void getNrOfHeadlines() throws InterruptedException
+    {
+        rssFeedUrlBoxPage = rssFeedDashlet.clickConfigure().render();
+        rssFeedUrlBoxPage.fillURL(rssUrl);
+        rssFeedUrlBoxPage.selectNrOfItemsToDisplay(RssFeedUrlBoxPage.NrItems.Five);
+        rssFeedUrlBoxPage.clickOk();
+
+        for (int i = 0; i < 1000; i++)
+        {
+            if (rssFeedDashlet.getTitle().equals(rssTitle))
+            {
+                break;
+            }
+        }
+
+        List<ShareLink> links = rssFeedDashlet.getHeadlineLinksFromDashlet();
+        assertEquals(links.size(), 5);
     }
 
 }

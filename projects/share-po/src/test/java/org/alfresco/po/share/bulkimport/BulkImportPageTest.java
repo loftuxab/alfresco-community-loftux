@@ -2,7 +2,7 @@ package org.alfresco.po.share.bulkimport;
 
 import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.ShareUtil;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;

@@ -259,7 +259,7 @@ function doclibCommon()
    }
    model.viewRendererNames = ["simple", "detailed", "gallery", "filmstrip"];
    model.repositoryUrl = DocumentList.getConfigValue("DocumentLibrary", "repository-url", null);
-   model.replicationUrlMappingJSON = DocumentList.getReplicationUrlMappingJSON();
+   model.replicationUrlMapping = DocumentList.getReplicationUrlMappingJSON();
    model.rootNode = DocumentList.getConfigValue("RepositoryLibrary", "root-node", "alfresco://company/home");
    model.sortOptions = DocumentList.getSortOptions();
    model.useTitle = DocumentList.getConfigValue("DocumentLibrary", "use-title", null);

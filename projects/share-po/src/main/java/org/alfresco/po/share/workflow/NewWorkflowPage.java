@@ -103,7 +103,8 @@ public class NewWorkflowPage extends WorkFlowPage
         WebElement saveButton = drone.findAndWait(SUBMIT_BUTTON);
         String saveButtonId = saveButton.getAttribute("id");
         saveButton.click();
-        drone.waitUntilElementDeletedFromDom(By.id(saveButtonId), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+        drone.waitUntilElementDisappears(By.id(saveButtonId), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+       // drone.waitUntilElementDeletedFromDom(By.id(saveButtonId), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
         return FactorySharePage.resolvePage(drone);
     }
 

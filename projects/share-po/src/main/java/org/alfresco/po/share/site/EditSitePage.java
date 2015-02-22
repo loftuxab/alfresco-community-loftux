@@ -26,7 +26,6 @@ import org.openqa.selenium.By;
  * @author Michael Suzuki
  * @since 1.5
  */
-@SuppressWarnings("unchecked")
 public class EditSitePage extends CreateSitePage
 {
     private static final By EDIT_SITE_FORM = By.cssSelector("form#alfresco-editSite-instance-form");

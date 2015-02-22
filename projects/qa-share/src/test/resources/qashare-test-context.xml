@@ -53,7 +53,9 @@
 
     <bean id="shareTestProperties" class="org.alfresco.share.util.ShareTestProperty">
         <constructor-arg name="shareUrl" value="${share.target}" />
-        <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" /> 
+        <constructor-arg name="jmxShareUrl" value="${jmx.share.target}" />
+        <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" />
+        <constructor-arg name="wcmqs" value="${share.wcmqs.path}" /> 
         <constructor-arg name="apiUrl" value="${api.target}" />
         <constructor-arg name="gridUrl" value="${webdrone.grid.url}" />
         <constructor-arg name="username" value="${test.username}" />
@@ -101,6 +103,9 @@
         <constructor-arg name="blogUsername" value="${blogUsername}" />
         <constructor-arg name="blogPassword" value="${blogPassword}" />
         <constructor-arg name="ftpPort" value="${ftpPort}" />
+        <constructor-arg name="nfsMountPort" value="${nfsMountPort}" />
+        <constructor-arg name="mountPointHost" value="${mountPointHost}" />
+        <constructor-arg name="nfsPort" value="${nfsPort}" />
         <constructor-arg name="serverShhPort" value="${serverShhPort}" />
         <constructor-arg name="serverUser" value="${serverUser}" />
         <constructor-arg name="serverPass" value="${serverPass}" />
@@ -109,6 +114,10 @@
         <constructor-arg name="layer7Disabled" value="${layer7Disabled}" />
         <constructor-arg name="apiKey" value="${apiKey}" />
         <constructor-arg name="apiSecretKey" value="${apiSecretKey}" />
+        <constructor-arg name="keystorePath" value="${keystorePath}" />
+        <constructor-arg name="truststorePath" value="${truststorePath}" />
+        <constructor-arg name="networkPath" value="${network.map.path}" />
+        <constructor-arg name="networkDrive" value="${network.map.driver}" />
     </bean>
 
     <!-- -->
@@ -116,6 +125,7 @@
     <!-- -->
     <bean id="hybridShareTestProperties" class="org.alfresco.share.util.ShareTestProperty">
         <constructor-arg name="shareUrl" value="${share.hybrid.target}" />
+        <constructor-arg name="jmxShareUrl" value="${jmx.share.target}" />
         <constructor-arg name="apiUrl" value="${api.hybrid.target}" />
         <constructor-arg name="gridUrl" value="null" />
         <constructor-arg name="username" value="${test.hybrid.username}" />
@@ -163,15 +173,23 @@
         <constructor-arg name="blogUsername" value="${blogUsername}" />
         <constructor-arg name="blogPassword" value="${blogPassword}" />
         <constructor-arg name="ftpPort" value="${ftpPort}" />
+        <constructor-arg name="nfsMountPort" value="${nfsMountPort}" />
+        <constructor-arg name="mountPointHost" value="${mountPointHost}" />
+        <constructor-arg name="nfsPort" value="${nfsPort}" />
         <constructor-arg name="serverShhPort" value="${serverShhPort}" />
         <constructor-arg name="serverUser" value="${serverUser}" />
         <constructor-arg name="serverPass" value="${serverPass}" />
         <constructor-arg name="isSecureSession" value="${isSecureSession}" />
         <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" />
+        <constructor-arg name="wcmqs" value="${share.wcmqs.path}" />
         <constructor-arg name="replicationEndPointHost" value="${replicationEndPointHost}" />
         <constructor-arg name="layer7Disabled" value="${layer7Disabled}" />
         <constructor-arg name="apiKey" value="${apiKey}" />
         <constructor-arg name="apiSecretKey" value="${apiSecretKey}" />
+        <constructor-arg name="keystorePath" value="${keystorePath}" />
+        <constructor-arg name="truststorePath" value="${truststorePath}" />
+        <constructor-arg name="networkPath" value="${network.map.path}" />
+        <constructor-arg name="networkDrive" value="${network.map.driver}" />
     </bean>
 
     <util:constant id="englishLocale" static-field="java.util.Locale.ENGLISH" />

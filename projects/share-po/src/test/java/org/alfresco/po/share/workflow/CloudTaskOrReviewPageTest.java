@@ -29,15 +29,17 @@ import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.SharePopup;
+import org.alfresco.po.share.site.SiteFinderPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.user.CloudSyncPage;
+import org.alfresco.po.share.user.Language;
 import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.HtmlPage;
 import org.openqa.selenium.By;
 import org.testng.Assert;
@@ -122,6 +124,17 @@ public class CloudTaskOrReviewPageTest extends AbstractTest
         Assert.assertTrue(cloudTaskOrReviewPage.isAfterCompletionSelected(KeepContentStrategy.KEEPCONTENT));
         Assert.assertTrue(cloudTaskOrReviewPage.isRemoveAllButtonPresent());
         
+        List<String> formLabels = cloudTaskOrReviewPage.getAllLabels();
+        Assert.assertTrue(formLabels.contains("Message:"));
+        Assert.assertTrue(formLabels.contains("Type:"));
+        Assert.assertTrue(formLabels.contains("Due:"));
+        Assert.assertTrue(formLabels.contains("Priority:"));
+        Assert.assertTrue(formLabels.contains("Reviewers:*"));
+        Assert.assertTrue(formLabels.contains("Required approval percentage:*"));
+        Assert.assertTrue(formLabels.contains("After completion:*"));
+        Assert.assertTrue(formLabels.contains("Lock on-premise content"));
+        Assert.assertTrue(formLabels.contains("Items:*"));
+        
         // assertFalse(isButtonSubmitted());
         WorkFlowFormDetails formDetails = createWorkflowForm();
         // Fill form Detail
@@ -158,6 +171,31 @@ public class CloudTaskOrReviewPageTest extends AbstractTest
         String date = cloudTaskOrReviewPage.getItemDate(file.getName());
         Assert.assertFalse(date.isEmpty());
     }
+    
+    @Test(dependsOnMethods = "checkExceptionForNullDocs")
+    public void checkSelectCloudReviewWithLanguage()
+    {
+        SiteFinderPage siteFinder;
+        
+        SharePage page = drone.getCurrentPage().render();
+        siteFinder = page.getNav().selectSearchForSites().render();
+        siteFinder = SiteUtil.siteSearchRetry(drone, siteFinder, siteName);
+        siteFinder.selectSite(siteName);
+        
+        SitePage site = drone.getCurrentPage().render();
+        DocumentLibraryPage documentLibPage = site.getSiteNav().selectSiteDocumentLibrary().render();
+
+        DocumentDetailsPage documentDetailsPage = documentLibPage.selectFile(file.getName()).render();
+        
+        startWorkFlowPage = documentDetailsPage.selectStartWorkFlowPage().render();
+        cloudTaskOrReviewPage = ((CloudTaskOrReviewPage) startWorkFlowPage.getCloudTaskOrReviewPageInLanguage(Language.ENGLISH_US));
+        
+        cloudTaskOrReviewPage.selectTask(TaskType.CLOUD_REVIEW_TASK);
+        assertTrue(cloudTaskOrReviewPage.isTaskTypeSelected(TaskType.CLOUD_REVIEW_TASK));
+        assertFalse(cloudTaskOrReviewPage.isTaskTypeSelected(TaskType.SIMPLE_CLOUD_TASK));
+        
+        Assert.assertTrue(cloudTaskOrReviewPage.isAfterCompletionDropdownPresent());       
+    }
 
     /**
      * Created bean {@link WorkFlowFormDetails}.
@@ -172,7 +210,7 @@ public class CloudTaskOrReviewPageTest extends AbstractTest
         reviewers.add(cloudUserName);
         formDetails.setReviewers(reviewers);
         formDetails.setMessage(siteName);
-        formDetails.setDueDate("01/10/2015");
+        formDetails.setDueDate("01/10/2016");
         formDetails.setLockOnPremise(false);
         formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
         formDetails.setTaskPriority(Priority.HIGH);

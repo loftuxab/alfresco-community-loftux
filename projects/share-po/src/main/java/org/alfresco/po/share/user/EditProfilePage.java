@@ -5,10 +5,14 @@ import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.webdrone.RenderElement;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Page object to reflect Edit user profile page
@@ -17,9 +21,13 @@ import java.io.File;
  */
 public class EditProfilePage extends SharePage
 {
+    private static Log logger = LogFactory.getLog(EditProfilePage.class);
+
     private static final By SAVE_CHANGES = By.cssSelector("button[id$=default-button-save-button]");
     private static final By UPLOAD_AVATAR_BUTTON = By.xpath("//button[contains(@id,'-button-upload-button')]");
     private static final By CANCEL_BUTTON = By.xpath("//button[contains(@id,'-button-cancel-button')]");
+    private final static By lastName = By.cssSelector ("input[id$='-input-lastName']");
+
 
     /**
      * Constructor
@@ -65,6 +73,7 @@ public class EditProfilePage extends SharePage
         UploadFilePage uploadFilePage = new UploadFilePage(drone);
         uploadFilePage.upload(file.getAbsolutePath());
         drone.findAndWait(SAVE_CHANGES).click();
+        logger.info("Avatar[" + file.getName() + "] uploaded.");
     }
 
     public MyProfilePage clickCancel()
@@ -73,4 +82,28 @@ public class EditProfilePage extends SharePage
         return drone.getCurrentPage().render();
     }
 
+    private void click(By locator)
+    {
+        checkNotNull(locator);
+        WebElement element = drone.findAndWait(locator);
+        element.click();
+    }
+
+    private void fillField(By selector, String text)
+    {
+        checkNotNull(text);
+        WebElement inputField = drone.findAndWait(selector);
+        inputField.clear();
+        if (text != null)
+        {
+            inputField.sendKeys(text);
+        }
+    }
+
+    public MyProfilePage editLastName (String newLastName)
+    {
+        fillField(lastName, newLastName );
+        click(SAVE_CHANGES);
+        return drone.getCurrentPage().render();
+    }
 }

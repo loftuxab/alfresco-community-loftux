@@ -84,6 +84,21 @@
    </filter-mapping>
    
    <filter-mapping>
+      <filter-name>MTAuthentationFilter</filter-name>
+      <url-pattern>/page/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>MTAuthentationFilter</filter-name>
+      <url-pattern>/p/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>MTAuthentationFilter</filter-name>
+      <url-pattern>/proxy/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
       <filter-name>Authentication Filter</filter-name>
       <url-pattern>/page/*</url-pattern>
    </filter-mapping>
@@ -166,15 +181,6 @@
    <filter-mapping>
       <filter-name>UrlRewriteFilter</filter-name>
       <url-pattern>/s/*</url-pattern>
-   </filter-mapping>
-   
-   <filter-mapping>
-      <filter-name>MTAuthentationFilter</filter-name>
-      <url-pattern>/page/*</url-pattern>
-   </filter-mapping>
-   <filter-mapping>
-      <filter-name>MTAuthentationFilter</filter-name>
-      <url-pattern>/p/*</url-pattern>
    </filter-mapping>
    
    <!-- Spring Context Loader listener - the name of the default global context is passed to the DispatcherServlet

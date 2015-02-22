@@ -34,7 +34,7 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.share.util.api.TagsAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -206,7 +206,7 @@ public class TagsAPITests extends TagsAPI
 
     }
 
-    @Test(dependsOnMethods = "AONE_14282")
+    @Test(dependsOnMethods = "AONE_14284")
     public void AONE_14283() throws Exception
     {
         String newTag = "newtag" + System.currentTimeMillis();

@@ -39,7 +39,7 @@ import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.WebDroneType;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.share.util.api.PublicAPIRestClient;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;

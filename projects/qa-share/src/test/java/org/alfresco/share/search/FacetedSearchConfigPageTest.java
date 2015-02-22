@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.alfresco.share.search;
 
 import static org.alfresco.po.share.site.document.ContentType.PLAINTEXT;
@@ -9,7 +23,7 @@ import org.alfresco.po.share.search.FacetedSearchConfigPage;
 import org.alfresco.po.share.search.FacetedSearchPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.ContentDetails;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.SiteUtil;
@@ -30,6 +44,7 @@ import org.testng.annotations.Test;
  * @author Richard Smith
  */
 @Listeners(FailedTestListener.class)
+@Test(groups = { "TestBug" })
 public class FacetedSearchConfigPageTest extends AbstractUtils
 {
 
@@ -86,6 +101,22 @@ public class FacetedSearchConfigPageTest extends AbstractUtils
 
         // Page should have a title
         Assert.assertTrue(StringUtils.isNotEmpty(facetedSearchConfigPage.getPageTitle()), "The faceted search config page should have a title");
+
+        if(facetedSearchConfigPage.getFilters().size() > 0)
+        {
+            drone.deleteCookies();
+            drone.refresh();
+            drone.getCurrentPage().render();
+
+            // Login as admin
+            ShareUser.login(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+
+            // Navigate to the faceted search page
+            dashBoardPage = ShareUser.selectMyDashBoard(drone);
+            facetedSearchConfigPage = dashBoardPage.getNav().getFacetedSearchConfigPage().render();
+
+            Assert.assertTrue(StringUtils.isNotEmpty(facetedSearchConfigPage.getPageTitle()), "The faceted search config page should have a title");
+        }
 
         // Page should have some filters on it
         Assert.assertTrue(facetedSearchConfigPage.getFilters().size() > 0, "The faceted search config page should have some facets");
@@ -720,22 +751,6 @@ public class FacetedSearchConfigPageTest extends AbstractUtils
         trace("Createfilter_5 complete");
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.share.util.AbstractUtils#tearDown()
-     */
-    @AfterClass(alwaysRun = true)
-    public void tearDown()
-    {
-        trace("Starting tearDown");
-
-        // Logout
-        ShareUser.logout(drone);
-
-        super.tearDown();
-
-        trace("TearDown complete");
-    }
 
     private void doretrySearch(String searchTerm)
     {

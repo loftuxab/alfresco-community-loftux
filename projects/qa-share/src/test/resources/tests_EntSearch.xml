@@ -15,16 +15,33 @@
     </listeners>
 
 
-    <test name="SearchBy tests">
-        <classes>
-            <class name="org.alfresco.share.peoplefinder.SearchByTests"/>
-        </classes>
-    </test>
-
     <test name="Advance search tests">
         <classes>
             <class name="org.alfresco.share.search.AdvanceSearchTest"/>
-            <class name="org.alfresco.share.search.AdvanceSearchTest2"/>
+            <class name="org.alfresco.share.search.AdvanceSearchTest2">
+                <methods>
+                    <include name="AONE_13900"/>
+                    <include name="AONE_13904"/>
+                    <include name="AONE_13901"/>
+                    <include name="AONE_13902"/>
+                    <include name="AONE_13903"/>
+                    <include name="AONE_13905"/>
+                    <include name="AONE_13906"/>
+                    <include name="AONE_13907"/>
+                    <include name="AONE_13908"/>
+                    <include name="AONE_13909"/>
+                    <include name="AONE_13910"/>
+                    <include name="AONE_13911"/>
+                    <include name="AONE_13912"/>
+                    <include name="AONE_13913"/>
+                    <include name="AONE_13914"/>
+                    <include name="AONE_13915"/>
+                    <include name="AONE_13916"/>
+                    <include name="AONE_13917"/>
+                    <include name="AONE_13918"/>
+                    <include name="AONE_13933"/>
+                </methods>
+            </class>
         </classes>
     </test>
 
@@ -50,7 +67,16 @@
                 <include name="ALF_3266"/>
             </methods>
         </class>
-            <class name="org.alfresco.share.search.FacetedSearchPageTest1"/>
+            <class name="org.alfresco.share.search.FacetedSearchPageTest1">
+                <methods>
+                    <include name="ALF_3254"/>
+                    <include name="ALF_3253"/>
+                    <include name="ALF_3255"/>
+                    <include name="ALF_3256"/>
+                    <include name="ALF_3257"/>
+                    <include name="ALF_3252"/>
+                </methods>
+            </class>
         </classes>
     </test>
 

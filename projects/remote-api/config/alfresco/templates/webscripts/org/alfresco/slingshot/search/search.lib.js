@@ -511,69 +511,67 @@ function getItem(siteId, containerId, pathParts, node, populate)
 }
 
 /**
- * Splits the qname path to a node.
- *
+ * Splits the qname path to a node to extract Site information and display path parts.
+ * The display path will be truncated to match the overridden root node if present.
+ * 
  * Returns an array with:
- * [0] = site
- * [1] = container or null if the node does not match
+ * [0] = site or null
+ * [1] = container or null
  * [2] = remaining part of the cm:name based path to the object - as an array
  */
 function splitQNamePath(node, rootNodeDisplayPath, rootNodeQNamePath, qnameOnly)
 {
    var path = node.qnamePath,
        displayPath = qnameOnly ? null : utils.displayPath(node).split("/"),
-       parts = null,
-       overriden = false;
-
-   // restructure the display path of the node if we have an overriden root node
-   if (!qnameOnly && rootNodeDisplayPath != null && path.indexOf(rootNodeQNamePath) === 0)
-   {
-      var nodeDisplayPath = utils.displayPath(node).split("/");
-      nodeDisplayPath = nodeDisplayPath.splice(rootNodeDisplayPath.length);
-      displayPath = nodeDisplayPath;
-      overriden = true;
-   }
-
+       siteId = null,
+       containerId = null;
+   
    if (path.match("^"+SITES_SPACE_QNAME_PATH) == SITES_SPACE_QNAME_PATH)
    {
-      var tmp = path.substring(SITES_SPACE_QNAME_PATH.length),
-          pos = tmp.indexOf('/');
-      if (pos >= 1)
+      // this item is contained within a Site
+      
+      // ensure we have not matched a Site folder directly or some node created under the st:sites folder that is not a Site
+      var qpathUnderSitesFolder = path.substring(SITES_SPACE_QNAME_PATH.length),
+          positionContainer = qpathUnderSitesFolder.indexOf("/");
+      if (positionContainer !== -1)
       {
-         if (rootNodeQNamePath != null && path.indexOf(rootNodeQNamePath) === 0)
+         // Decode the Site ID from the qname path using the util method - as we may not have displayPath
+         // the displayPath will look something like this: ["", "Company Home", "Sites", "MySite", "documentLibrary", "MyFolder"]
+         var siteQName = Packages.org.alfresco.util.ISO9075.decode(qpathUnderSitesFolder.substring(0, positionContainer));
+         siteId = siteQName.substring(siteQName.indexOf(":") + 1);
+         var qpathContainer = qpathUnderSitesFolder.substring(positionContainer + 1);
+         var positionUnderContainer = qpathContainer.indexOf("/");
+         if (positionUnderContainer !== -1)
          {
-            for (var i = 0; i < rootNodeQNamePath.split("/").length-1; i++)
-            {
-               nodeDisplayPath.unshift(null);
-            }
-            displayPath = nodeDisplayPath;
-         }
-         var siteQName = Packages.org.alfresco.util.ISO9075.decode(tmp.split("/")[0]);
-             siteId = siteQName.substring(siteQName.indexOf(":") + 1);
-         tmp = tmp.substring(pos + 1);
-         pos = tmp.indexOf('/');
-         if (pos >= 1)
-         {
-            // strip container id from the path
-            var containerId = tmp.substring(0, pos);
+            // extract container id from the qname path - strip off namespace
+            containerId = qpathContainer.substring(0, positionUnderContainer);
             containerId = containerId.substring(containerId.indexOf(":") + 1);
-
-            parts = [ siteId, containerId, qnameOnly ? null : displayPath.slice(5, displayPath.length) ];
+            
+            // construct remaining part of the cm:name based display path to the object
+            // by removing everything up to the path of the item under the container folder
+            if (!qnameOnly) displayPath = displayPath.slice(5, displayPath.length);
          }
       }
    }
-
-   if (overriden && parts == null)
+   else
    {
-      displayPath.unshift("");
+      // check if we have an overridden root node and the node is under that path
+      if (!qnameOnly && rootNodeDisplayPath !== null && path.indexOf(rootNodeQNamePath) === 0)
+      {
+         // restructure the display path of the node
+         displayPath = displayPath.splice(rootNodeDisplayPath.length);
+         // empty element is required at the start of the repository paths - we want to show it as the repo root later
+         displayPath.unshift("");
+      }
    }
    
-   return (parts !== null ? parts : [ null, null, displayPath ]);
+   return [ siteId, containerId, displayPath ];
 }
 
 /**
- * Processes the search results. Filters out unnecessary nodes
- *
+ * Processes the search results, extracting the given page of results from the startIndex up to the maxPageResults
+ * from the total list of nodes passed in. Filters out unnecessary nodes
+ * 
  * @return the final search results object
  */
 function processResults(nodes, maxPageResults, startIndex, rootNode, meta)
@@ -640,6 +638,72 @@ function processResults(nodes, maxPageResults, startIndex, rootNode, meta)
       {
          totalRecords: results.length,
          totalRecordsUpper: nodes.length - failed,
+         startIndex: startIndex,
+         numberFound: meta ? meta.numberFound : -1
+      },
+      facets: meta ? meta.facets : null,
+      items: results,
+      spellcheck: meta ? meta.spellcheck : null
+   });
+}
+
+/**
+ * Processes the search results for a single page. Filters out unnecessary nodes
+ *
+ * @return the final search results object
+ */
+function processResultsSinglePage(nodes, startIndex, rootNode, meta)
+{
+   // empty cache state
+   processedCache = {};
+   var results = [],
+      failed = 0,
+      parts,
+      item,
+      rootNodeDisplayPath = rootNode ? utils.displayPath(rootNode).split("/") : null,
+      rootNodeQNamePath = rootNode ? rootNode.qnamePath : null;
+
+   if (logger.isLoggingEnabled())
+      logger.log("Processing resultset of length: " + nodes.length);
+
+   for (var i = 0, j = nodes.length; i < j; i++)
+   {
+      // For each node we extract the site/container qname path and then
+      // let the per-container helper function decide what to do.
+      try
+      {
+         parts = splitQNamePath(nodes[i], rootNodeDisplayPath, rootNodeQNamePath, false);
+         item = getItem(parts[0], parts[1], parts[2], nodes[i], true);
+         if (item !== null)
+         {
+            results.push(item);
+         }
+         else
+         {
+            failed++;
+         }
+      }
+      catch (e)
+      {
+         // THOR-833
+         if (logger.isWarnLoggingEnabled() == true)
+         {
+            logger.warn("search.lib.js: Skipping node due to exception when processing query result: " + e);
+            logger.warn("..." + nodes[i].nodeRef);
+         }
+         failed++;
+      }
+   }
+
+   if (logger.isLoggingEnabled())
+      logger.log("Filtered resultset to length: " + results.length + ". Discarded item count: " + failed);
+
+   return (
+   {
+      paging:
+      {
+         totalRecords: results.length,
+         totalRecordsUpper: -1,
          startIndex: startIndex,
          numberFound: meta ? meta.numberFound : -1
       },
@@ -747,52 +811,25 @@ function processMultiValue(propName, propValue, operand, pseudo)
  */
 function resolveRootNode(reference)
 {
-   var node = null;
    try
    {
-      if (reference == "alfresco://company/home")
-      {
-         node = "";
-      }
-      else if (reference == "alfresco://user/home")
-      {
-         node = userhome;
-      }
-      else if (reference == "alfresco://sites/home")
-      {
-         node = companyhome.childrenByXPath("st:sites")[0];
-      }
-      else if (reference == "alfresco://company/shared")
-      {
-         node = companyhome.childrenByXPath("app:shared")[0];
-      }
-      else if (reference.indexOf("://") > 0)
-      {
-         if (reference.indexOf(":") < reference.indexOf("://"))
-         {
-            var newRef = "/" + reference.replace("://", "/");
-            var newRefNodes = search.xpathSearch(newRef);
-            node = search.findNode(String(newRefNodes[0].nodeRef));
-         }
-         else
-         {
-            node = search.findNode(reference);
-         }
-      }
-      else if (reference.substring(0, 1) == "/")
-      {
-         node = search.xpathSearch(reference)[0];
-      }
+      var node = utils.resolveNodeReference(reference);
       if (node === null)
       {
-         logger.log("Unable to resolve specified root node reference: " + reference);
+         logger.warn("Unable to resolve specified root node reference: " + reference);
       }
+      else if (companyhome.nodeRef === node.nodeRef)
+      {
+         // default root node - no special handling required
+         return null;
+      }
+      return node;
    }
    catch (e)
    {
-      node = null;
+      logger.warn("Unable to resolve specified root node reference: " + reference);
+      return null;
    }
-   return node !== "" ? node : null;
 }
 
 /**
@@ -1124,7 +1161,8 @@ function getSearchResults(params)
          query: ftsQuery,
          language: "fts-alfresco",
          page: {
-            maxItems: params.maxResults + 1
+            maxItems: params.maxResults > 0 ? params.maxResults + 1 : params.pageSize,
+            skipCount: params.maxResults > 0 ? 0 : params.startIndex
          },
          templates: qt.template,
          defaultField: "keywords",
@@ -1145,12 +1183,23 @@ function getSearchResults(params)
       nodes = [];
    }
 
-   return processResults(
-      nodes,
-      params.pageSize < params.maxResults ? params.pageSize : params.maxResults,
-      params.startIndex,
-      rootNode,
-      rs.meta);
+   if (params.maxResults > 0)
+   {
+      return processResults(
+         nodes,
+         params.pageSize,
+         params.startIndex,
+         rootNode,
+         rs.meta);
+   }
+   else
+   {
+      return processResultsSinglePage(
+         nodes,
+         params.startIndex,
+         rootNode,
+         rs.meta);
+   }
 }
 
 /**

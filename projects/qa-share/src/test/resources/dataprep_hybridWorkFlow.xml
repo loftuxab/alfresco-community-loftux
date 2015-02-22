@@ -5,10 +5,11 @@
         <run>
             <include name="DataPrep.*" />
             <exclude name="NonGrid" />
+            <exclude name="Hybrid" />
         </run>
     </groups>
 
-    <test name="dataprep-HybridWorkflowSanityTest" verbose="1">
+    <!--test name="dataprep-HybridWorkflowSanityTest" verbose="1">
         <classes>
             <class name="org.alfresco.share.workflow.HybridWorkflowSanityTest" />
         </classes>
@@ -28,11 +29,6 @@
                 <class name="org.alfresco.share.workflow.HybridWorkflowTest1" />
         </classes>
     </test>
-    <test name="dataprep-HybridWorkflowTest2" verbose="1">
-        <classes>
-            <class name="org.alfresco.share.workflow.HybridWorkflowTest2" />
-        </classes>
-    </test>
     <test name="dataprep-HybridWorkflowTest3" verbose="1">
         <classes>
             <class name="org.alfresco.share.workflow.HybridWorkflowTest3" />
@@ -42,6 +38,12 @@
         <classes>
             <class name="org.alfresco.share.workflow.WorkFlowActionsTest" />
         </classes>
-    </test>
+    </test-->
 
+    <!--<test name="dataprep-CloudSyncSmokeTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.cloudsync.CloudSyncSmokeTest" />
+        </classes>
+    </test>
+    -->
 </suite>

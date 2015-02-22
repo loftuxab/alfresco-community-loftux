@@ -14,16 +14,16 @@
  */
 package org.alfresco.share.api.cmis;
 
+import java.io.File;
+import java.io.RandomAccessFile;
+
 import org.alfresco.share.enums.CMISBinding;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.RandomAccessFile;
 
 /**
  * Class to include: Tests for CMIS Append for Browser binding

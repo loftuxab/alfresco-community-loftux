@@ -18,15 +18,12 @@ import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.WebDroneImpl;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -197,8 +194,20 @@ public class CustomiseSiteDashboardPage extends SharePage
      */
     public SiteDashboardPage addAllDashlets()
     {
+        String scrollJs = "window.scrollTo(0,Math.max(document.documentElement.scrollHeight,document.body.scrollHeight,document.documentElement.clientHeight));";
         this.selectAddDashlets();
+        drone.executeJavaScript(scrollJs, "");
         removeAllDashletsWithOutConfirm();
+        int i = 0;
+        while(drone.findAll(AVAILABLE_DASHLETS).size() > 0)
+        {
+            removeAllDashletsWithOutConfirm();
+            i++;
+            if(i == 2)
+            {
+                break;
+            }
+        }
         waitUntilAlert();
         List<WebElement> dashlets = drone.findAll(AVAILABLE_DASHLETS);
         if (logger.isTraceEnabled())
@@ -211,15 +220,9 @@ public class CustomiseSiteDashboardPage extends SharePage
 
         for (WebElement source : dashlets)
         {
-            int posX = source.getSize().getWidth() / 2;
-            int posY = source.getSize().getHeight() / 2;
             target = drone.find(By.cssSelector(String.format(COLUMN_FORMAT, currentColumn)));
-            WebDriver webDriver = ((WebDroneImpl) drone).getDriver();
-            Actions builder = new Actions(webDriver);
-            builder.clickAndHold(source).pause(2000);
-            builder.moveToElement(target, posX, posY).pause(1000).perform();
-            builder.release().pause(1000).build()
-                    .perform();
+            drone.dragAndDrop(source, target);
+            drone.executeJavaScript(scrollJs, "");
 
             if (dashletCounter % MAX_DASHLETS_IN_COLUMN == 0)
             {

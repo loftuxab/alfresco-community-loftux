@@ -23,10 +23,7 @@ import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 
 /**
@@ -39,6 +36,7 @@ public class CloudSyncPage extends SharePage
 {
     private static final By SIGN_IN_BUTTON = By.cssSelector("button[id$='default-button-signIn-button']");
     public static final By DISCONNECT_BUTTON = By.cssSelector("button[id$='default-button-delete-button']");
+    private static final By EDIT_BUTTON = By.cssSelector("button[id$='default-button-edit-button']");
 
     private final Log logger = LogFactory.getLog(CloudSyncPage.class);
 
@@ -157,6 +155,10 @@ public class CloudSyncPage extends SharePage
         {
             drone.findAndWait(SIGN_IN_BUTTON).click();
         }
+        catch (StaleElementReferenceException ser)
+        {
+            selectCloudSign();
+        }
         catch (NoSuchElementException e)
         {
             logger.info("User is already connected to Cloud account");
@@ -190,5 +192,22 @@ public class CloudSyncPage extends SharePage
         {
         }
         throw new PageException("Not able click disconnect button.");
+    }
+
+    public CloudSignInPage selectEditButton()
+    {
+        try
+        {
+            drone.findAndWait(EDIT_BUTTON).click();
+        }
+        catch (StaleElementReferenceException ser)
+        {
+            selectEditButton();
+        }
+        catch (NoSuchElementException e)
+        {
+            throw new PageException("Not able to find Edit button", e);
+        }
+        return new CloudSignInPage(drone).render();
     }
 }

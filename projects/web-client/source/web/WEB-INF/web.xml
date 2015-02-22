@@ -193,6 +193,11 @@
       <filter-name>Global Authentication Filter</filter-name>
       <url-pattern>/wcs/*</url-pattern>
    </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>Global Authentication Filter</filter-name>
+      <url-pattern>/api/*</url-pattern>
+   </filter-mapping>
 
    <filter-mapping>
       <filter-name>WebDAV Authentication Filter</filter-name>
@@ -288,7 +293,7 @@
       <servlet-class>org.springframework.extensions.webscripts.servlet.WebScriptServlet</servlet-class>
       <init-param>
          <param-name>authenticator</param-name>
-         <param-value>webscripts.authenticator.basic</param-value>
+         <param-value>webscripts.authenticator.remoteuser</param-value>
       </init-param>
    </servlet>
    

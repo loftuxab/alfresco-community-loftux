@@ -7,8 +7,7 @@ import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.enums.Dashlets;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.dashlet.MyMeetingWorkSpaceDashlet;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -20,7 +19,7 @@ import org.testng.annotations.Test;
  * @author Bogdan.Bocancea
  */
 @Listeners(FailedTestListener.class)
-@Test(groups = { "alfresco-one" })
+@Test(groups = { "alfresco-one", "TestBug" })
 public class MyMeetingWorkspacesTest extends AbstractTest
 {
     private DashBoardPage dashBoard;

@@ -1,29 +1,52 @@
 package org.alfresco.share.site.document;
 
+import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
+import static org.alfresco.po.share.site.document.Categories.CATEGORY_ROOT;
+import static org.alfresco.po.share.site.document.Categories.CATEGORY_TEST_1;
+import static org.alfresco.po.share.site.document.Categories.CATEGORY_TEST_2;
+import static org.alfresco.po.share.site.document.Categories.SUB_CATEGORY_TEST;
+import static org.alfresco.po.share.site.document.DocumentAspect.CLASSIFIABLE;
+import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.IM_EDITING;
+import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.MY_FAVORITES;
+import static org.alfresco.share.util.RandomUtil.getInt;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.adminconsole.CategoryManagerPage;
-import org.alfresco.po.share.site.document.*;
-import org.alfresco.share.util.*;
+import org.alfresco.po.share.site.document.Categories;
+import org.alfresco.po.share.site.document.CategoryPage;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentAspect;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.PaginationForm;
+import org.alfresco.po.share.site.document.SelectAspectsPage;
+import org.alfresco.po.share.site.document.TreeMenuNavigation;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserRepositoryPage;
+import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.alfresco.po.share.enums.UserRole.*;
-import static org.alfresco.po.share.site.document.Categories.*;
-import static org.alfresco.po.share.site.document.TreeMenuNavigation.DocumentsMenu.*;
-import static org.alfresco.share.util.RandomUtil.getInt;
-import static org.testng.Assert.*;
-import static org.alfresco.po.share.site.document.DocumentAspect.CLASSIFIABLE;
 
 /**
  * @author Aliaksei Boole

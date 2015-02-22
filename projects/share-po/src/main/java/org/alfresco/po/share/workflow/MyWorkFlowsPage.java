@@ -362,6 +362,7 @@ public class MyWorkFlowsPage extends SharePage
                         button.click();
                         drone.waitUntilElementPresent(By.cssSelector("div#message>div.bd>span"), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
                         drone.waitUntilElementDeletedFromDom(By.cssSelector("div#message>div.bd>span"), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
+                        drone.waitUntilElementDisappears(By.xpath("//div[contains(text(), 'Workflow was successfully cancelled')]"), SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
                         break;
                     }
                 }

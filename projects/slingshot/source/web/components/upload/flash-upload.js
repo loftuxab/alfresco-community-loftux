@@ -51,6 +51,11 @@
       KeyListener = YAHOO.util.KeyListener;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+   
+   /**
     * FlashUpload constructor.
     *
     * FlashUpload is considered a singleton so constructor should be treated as private,
@@ -485,6 +490,11 @@
                correctScope: true
             });
          }
+
+         // MNT-12892 fix, dinamically calculate width of upload label
+         // from the flash-upload.css file browse div has following styles: margin-left: 10px; width: 38px; margin-right: 10px;
+         var label = Dom.getElementsByClassName("label", "div")[0];
+         label.parentNode.style.width = (10 + 38 + 10 + 1) + label.offsetWidth + "px";
 
          YAHOO.lang.later(this, 2000, function()
          {
@@ -1437,7 +1447,7 @@
                // Display the file name and size.
                progressInfo = progressInfo[0];
                this.fileStore[flashId].progressInfo = progressInfo;
-               this.fileStore[flashId].progressInfo.innerHTML = fileInfoStr;
+               this.fileStore[flashId].progressInfo.innerHTML = $html(fileInfoStr);
 
                // Save the cell element
                this.fileStore[flashId].progressInfoCell = el;

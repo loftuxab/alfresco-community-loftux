@@ -116,12 +116,12 @@ html>body .node, .reply, .comment
 
 .nodeContent ul li
 {
-   list-style-type: disc;
+   list-style-type: inherit;
 }
 
 .nodeContent ol li
 {
-   list-style-type: decimal;
+   list-style-type: inherit;
 }
 
 .nodeFooter

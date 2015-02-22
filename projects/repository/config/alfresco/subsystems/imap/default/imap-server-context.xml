@@ -184,6 +184,14 @@
         <property name="imapServerEnabled">
             <value>${imap.server.enabled}</value>
         </property>
+        <property name="messageHeadersToPersist">
+            <list>
+                <value>Message-Id</value>
+            </list>
+        </property>
+        <property name="imapServerShuffleMoveDeleteDelay">
+            <value>${imap.server.shuffle.move.delete.delay}</value>
+        </property>
     </bean>
     
     <!-- Public Imap Service -->

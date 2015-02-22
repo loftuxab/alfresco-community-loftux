@@ -22,10 +22,11 @@ public class AddUserToGroupForm extends SharePage
     private static final By USER_SEARCH_BUTTON = By.cssSelector("button[id*='search-peoplefinder-search-button-button']");
     private static final By ADD_USER_FORM = By.cssSelector("div[id*='peoplepicker_c']");
     private static final String ADD_BUTTON = "//tbody[@class='yui-dt-data']/tr//a[contains(text(),'%s')]/../../../..//button";
+    private static final By CLOSE_X = By.xpath("//div[contains(@id,'-peoplepicker')]/a");
 
     /**
      * Instantiates a Add User form.
-     * 
+     *
      * @param drone WebDriver browser client
      */
     protected AddUserToGroupForm(WebDrone drone)
@@ -35,7 +36,7 @@ public class AddUserToGroupForm extends SharePage
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.alfresco.webdrone.Render#render()
      */
     @SuppressWarnings("unchecked")
@@ -48,7 +49,7 @@ public class AddUserToGroupForm extends SharePage
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.alfresco.webdrone.Render#render()
      */
     @SuppressWarnings("unchecked")
@@ -60,7 +61,7 @@ public class AddUserToGroupForm extends SharePage
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.alfresco.webdrone.Render#render()
      */
     @SuppressWarnings("unchecked")
@@ -72,15 +73,16 @@ public class AddUserToGroupForm extends SharePage
 
     /**
      * Search user
-     * 
+     *
      * @param user
      * @return AddUserToGroupForm
      */
-    private AddUserToGroupForm searchUser(String user)
+    public AddUserToGroupForm searchUser(String user)
     {
         try
         {
             WebElement searchField = drone.findAndWait(USER_FINDER_INPUT);
+            searchField.clear();
             searchField.sendKeys(user);
             drone.findAndWait(USER_SEARCH_BUTTON).click();
 
@@ -94,7 +96,7 @@ public class AddUserToGroupForm extends SharePage
 
     /**
      * Click to the Add button
-     * 
+     *
      * @param user
      * @return GroupsPage
      */
@@ -117,7 +119,7 @@ public class AddUserToGroupForm extends SharePage
 
     /**
      * Search and add user to the another group
-     * 
+     *
      * @param user
      * @return GroupsPage
      */
@@ -136,6 +138,11 @@ public class AddUserToGroupForm extends SharePage
             throw new PageException("Add User form is not open", e);
         }
 
+    }
+
+    public void closeForm()
+    {
+        drone.findAndWait(CLOSE_X).click();
     }
 
 }

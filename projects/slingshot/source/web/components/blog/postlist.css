@@ -102,6 +102,22 @@
    border-color: #EDF5FF;
 }
 
+.alfresco-share .sticky-wrapper .blog-postlist .content ul,
+.alfresco-share .sticky-wrapper .blog-postlist .content ol
+{
+    padding: 0.5em 0 0.5em 1.3em;
+}
+
+.yuieditor ul li
+{
+   list-style-type: inherit;
+}
+
+.yuieditor ol li
+{
+   list-style-type: inherit;
+}
+
 /* List elements */
 
 .blog-postlist .post

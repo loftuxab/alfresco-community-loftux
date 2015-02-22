@@ -18,6 +18,9 @@
  */
 package org.alfresco.po.share;
 
+import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
+import org.alfresco.po.alfresco.TenantAdminConsolePage;
+import org.alfresco.po.alfresco.WebScriptsPage;
 import org.alfresco.po.share.admin.AdminConsolePage;
 import org.alfresco.po.share.admin.ManageSitesPage;
 import org.alfresco.po.share.adminconsole.NodeBrowserPage;
@@ -63,6 +66,8 @@ import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.po.share.user.NotificationPage;
 import org.alfresco.po.share.user.UserContentPage;
 import org.alfresco.po.share.user.UserSitesPage;
+import org.alfresco.po.share.user.FollowersPage;
+import org.alfresco.po.share.user.FollowingPage;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
@@ -157,6 +162,8 @@ public class FactorySharePageTest
     private final String pendingInvites = baseUrl + "%s/page/site/swsdp/pending-invites";
     private final String facetedSearchPage = baseUrl+"%s/page/dp/ws/faceted-search";
     private final String userContentPage =  baseUrl+"/page/user/admin/user-content";
+    private final String followingPage = baseUrl+"/page/user/admin/following";
+    private final String followersPage = baseUrl+"/page/user/admin/followers";
 
     @Test(groups={"unit"})
     public void resolveUrls()
@@ -268,6 +275,12 @@ public class FactorySharePageTest
             page = resolvePage(pendingInvites, "pending-invites", drone);
             Assert.assertTrue(page instanceof PendingInvitesPage);
 
+            page = resolvePage(followingPage, "following", drone);
+            Assert.assertTrue(page instanceof FollowingPage);
+
+            page = resolvePage(followersPage, "followers", drone);
+            Assert.assertTrue(page instanceof FollowersPage);
+
             //---------------search ----------------
             page = resolvePage(advanceSearch, "advanceSearch", drone);
             Assert.assertTrue(page instanceof AdvanceSearchPage);            
@@ -361,6 +374,15 @@ public class FactorySharePageTest
             //---------------User Content Page ----------------
             page = resolvePage(userContentPage, "user-content", drone);
             Assert.assertTrue(page instanceof UserContentPage);
+            //---------------Alfresco Admin Pages -------------
+            page = resolvePage("http://localhost:8080/alfresco/service/index","index", drone);
+            Assert.assertTrue(page instanceof WebScriptsPage);
+            
+            page = resolvePage("http://localhost:8080/alfresco/s/enterprise/admin/admin-tenantconsole", "admin-tenantconsole", drone);
+            Assert.assertTrue(page instanceof TenantAdminConsolePage);
+            
+            page = resolvePage("http://localhost:8080/alfresco/s/enterprise/admin/admin-repoconsole", "admin-repoconsole", drone);
+            Assert.assertTrue(page instanceof RepositoryAdminConsolePage);
 
             long duration = System.currentTimeMillis() - start;
             logger.info("Total duration of test in milliseconds: " + duration);

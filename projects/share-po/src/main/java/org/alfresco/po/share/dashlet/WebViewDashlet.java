@@ -11,7 +11,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Page object to hold Web View dashlet
- *
+ * 
  * @author Marina.Nenadovets
  */
 public class WebViewDashlet extends AbstractDashlet implements Dashlet
@@ -19,6 +19,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
     private static final By DASHLET_CONTAINER_PLACEHOLDER = By.cssSelector("div.dashlet.webview");
     private static final By IF_FRAME_WITH_SITE = By.cssSelector("iframe[class='iframe-body']");
     private static final By DEFAULT_MESSAGE = By.cssSelector("h3[class$='default-body']");
+    protected static final By DASHLET_TITLE_WEB = By.cssSelector(".title > a");
 
     /**
      * Constructor.
@@ -99,7 +100,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Method to click Configure icon
-     *
+     * 
      * @return ConfigureWebViewDashletBox page object
      */
     public ConfigureWebViewDashletBoxPage clickConfigure()
@@ -118,7 +119,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * return default text from dashlet. or throw Exception.
-     *
+     * 
      * @return
      */
     public String getDefaultMessage()
@@ -135,7 +136,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * return true if frame with url displayed.
-     *
+     * 
      * @param url
      * @return
      */
@@ -153,5 +154,22 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
         }
     }
 
+    public void clickTitle()
+    {
+        try
+        {
+            dashlet.findElement(DASHLET_TITLE_WEB).click();
+        }
+        catch (TimeoutException te)
+        {
+            throw new UnsupportedOperationException("Exceeded time to find the title.", te);
+        }
+    }
+
+    public String getWebViewDashletTitle()
+    {
+        drone.waitUntilElementPresent(DASHLET_TITLE_WEB, 6);
+        return dashlet.findElement(DASHLET_TITLE_WEB).getText();
+    }
 
 }

@@ -81,8 +81,8 @@ YAHOO.lang.augmentObject(Alfresco.CalendarView.prototype, {
          html = this.msg("label.all-day")
       } else
       {
-         var startDate = new Date(data.startAt.iso8601.split('T')[0]),
-         endDate = new Date(data.endAt.iso8601.split('T')[0]),
+         var startDate = new Date(data.from.split('T')[0]),
+         endDate = new Date(data.to.split('T')[0]),
          displayDate = new Date(data.renderDate);
          if (Alfresco.CalendarHelper.isSameDay(startDate, displayDate) && (startDate < endDate))
          {

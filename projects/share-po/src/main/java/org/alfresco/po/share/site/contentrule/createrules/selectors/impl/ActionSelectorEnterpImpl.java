@@ -1,7 +1,10 @@
 package org.alfresco.po.share.site.contentrule.createrules.selectors.impl;
 
+import org.alfresco.po.share.site.contentrule.createrules.SetPropertyValuePage;
+import org.alfresco.po.share.site.contentrule.createrules.EmailMessageForm;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.AbstractActionSelector;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -40,7 +43,8 @@ public class ActionSelectorEnterpImpl extends AbstractActionSelector
         EXTRACT_COMMON_METADATA_FIELDS(13),
         IMPORT(14),
         SPECIALISE_TYPE(15),
-        INCREMENT_COUNTER(16);
+        INCREMENT_COUNTER(16),
+        SET_PROPERTY_VALUE(17);
 
         private final int numberPosition;
 
@@ -144,13 +148,21 @@ public class ActionSelectorEnterpImpl extends AbstractActionSelector
         // todo add logic for work with PopUp menu.
     }
 
-    @Deprecated
-    public void selectSendEmail()
+    public EmailMessageForm selectSendEmail()
     {
         super.selectAction(PerformActions.SEND_MAIL.numberPosition);
         List<WebElement> messageButtons = getDrone().findAndWaitForElements(MESSAGE_BUTTON);
         messageButtons.get(messageButtons.size() - 1).click();
-        // todo add Logic for work with PopUp menu.
+        EmailMessageForm emailMessageForm = new EmailMessageForm(getDrone());
+        if (emailMessageForm.isDisplay())
+        {
+            return emailMessageForm;
+        }
+        else
+        {
+            throw new PageOperationException("Email Form didn't open.");
+        }
+
     }
 
     public void selectExtractMetadata()
@@ -187,4 +199,20 @@ public class ActionSelectorEnterpImpl extends AbstractActionSelector
         super.selectDestinationName(destinationName, folders).selectOkButton();
 
     }
+
+    public void selectSetPropertyValue(String folderName,String value)
+    {
+//        super.selectAction(PerformActions.SET_PROPERTY_VALUE.numberPosition);
+        selectSetPropertyValue();
+        super.selectPropertyValue(folderName, value);
+        SetPropertyValuePage selectValuePage = new SetPropertyValuePage(getDrone());
+        selectValuePage.selectOkButton();
+
+    }
+
+    public void selectSetPropertyValue()
+    {
+        super.selectAction(PerformActions.SET_PROPERTY_VALUE.numberPosition);
+    }
+
 }

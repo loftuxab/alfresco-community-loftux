@@ -4,7 +4,7 @@
 package org.alfresco.po.share.site.document;
 
 import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;

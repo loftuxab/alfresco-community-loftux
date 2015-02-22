@@ -22,6 +22,7 @@
    <!-- Document Library Status Evaluators -->
    <!--                                    -->
 
+   <bean id="evaluator.doclib.indicator.workingCopylocked" class="org.alfresco.web.evaluator.doclib.indicator.WorkingCopyLockedEvaluator" />
    <!-- Being edited by the current user -->
    <bean id="evaluator.doclib.indicator.editing" class="org.alfresco.web.evaluator.doclib.indicator.EditingEvaluator" />
    <!-- Locked by the current user -->
@@ -132,6 +133,13 @@
    </bean>
 
    <!-- Locked / Working Copy Banner -->
+   <bean id="evaluator.doclib.metadata.isWorkingCopyLocked" parent="evaluator.doclib.action.chainedMatchOne">
+      <property name="evaluators">
+         <list>
+            <ref bean="evaluator.doclib.indicator.workingCopylocked" />
+         </list>
+      </property>
+   </bean>
    <bean id="evaluator.doclib.metadata.isLocked" parent="evaluator.doclib.action.chainedMatchOne">
       <property name="evaluators">
          <list>
@@ -393,7 +401,6 @@
       <property name="evaluators">
          <list>
             <ref bean="evaluator.doclib.action.isWorkingCopy" />
-            <ref bean="evaluator.doclib.action.editableByCurrentUser" />
          </list>
       </property>
    </bean>

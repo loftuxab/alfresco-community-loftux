@@ -14,13 +14,13 @@
  */
 package org.alfresco.po.share;
 
-import org.alfresco.po.share.util.FailedTestListener;
+import java.util.List;
+
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.List;
 
 /**
  * @author maryia zaichanka

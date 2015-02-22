@@ -66,6 +66,25 @@ public class ActivityShareLink
         this.description = description;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param user {@link ShareLink} user link
+     *
+     */
+    public ActivityShareLink(final ShareLink user, final String description)
+    {
+        if (null == user)
+        {
+            throw new UnsupportedOperationException("Use share link is required");
+        }
+
+        this.user = user;
+        this.description = description;
+        this.document = null;
+        this.site = null;
+    }
+
     @Override
     public String toString()
     {

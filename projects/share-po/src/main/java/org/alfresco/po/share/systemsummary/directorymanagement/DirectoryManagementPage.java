@@ -1,18 +1,14 @@
 /*
  * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
  * This file is part of Alfresco
- *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,6 +20,7 @@ import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -35,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Class associated with page in admin console system summary page 'Directory Manage'
- *
+ * 
  * @author Aliaksei Boole
  */
 public class DirectoryManagementPage extends AdvancedAdminConsolePage
@@ -58,10 +55,9 @@ public class DirectoryManagementPage extends AdvancedAdminConsolePage
     private final static By DIRECTORY_INFO_ROW = By.xpath("//table[@id='dm-authtable']/tbody/tr/td/..");
     private final static By SYNC_STATUS = By.xpath("//p[@style='padding-left:3em']/b");
 
-    //TestSyncPopUp
+    // TestSyncPopUp
     private final static By RUN_TEST_SYNC = By.xpath("//input[contains(@onclick,'testSync()')]");
     private final static By TEST_STATUS = By.xpath("//p[@id='test-auth-passed']");
-
 
     public DirectoryManagementPage(WebDrone drone)
     {
@@ -92,7 +88,7 @@ public class DirectoryManagementPage extends AdvancedAdminConsolePage
 
     /**
      * Add new authChain.
-     *
+     * 
      * @param authType
      * @param authName
      */
@@ -116,7 +112,7 @@ public class DirectoryManagementPage extends AdvancedAdminConsolePage
 
     /**
      * Return list of objects associated with Auth Chain Rows in table.
-     *
+     * 
      * @return
      */
     public List<DirectoryInfoRow> getDirectoryInfoRows()
@@ -139,7 +135,7 @@ public class DirectoryManagementPage extends AdvancedAdminConsolePage
 
     /**
      * Return object by 'name' associated with Auth Chain Row in table.
-     *
+     * 
      * @param name
      * @return
      */
@@ -159,7 +155,7 @@ public class DirectoryManagementPage extends AdvancedAdminConsolePage
 
     /**
      * Remove auth chain by 'name' from alfresco.
-     *
+     * 
      * @param name
      * @return
      */
@@ -173,12 +169,30 @@ public class DirectoryManagementPage extends AdvancedAdminConsolePage
 
     /**
      * Return sync status.
-     *
+     * 
      * @return
      */
     public String getSyncStatus()
     {
         return drone.findAndWait(SYNC_STATUS).getText();
+    }
+    
+    /**
+     * Return sync status.
+     * 
+     * @return
+     */
+    public boolean isSyncStatusDisplayed()
+    {
+        try
+        {
+            return drone.find(SYNC_STATUS).isDisplayed();
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
+       
     }
 
     /**
@@ -194,7 +208,7 @@ public class DirectoryManagementPage extends AdvancedAdminConsolePage
 
     /**
      * Run test sync for auth chain selected by 'name'
-     *
+     * 
      * @param name
      * @return
      */
@@ -227,5 +241,12 @@ public class DirectoryManagementPage extends AdvancedAdminConsolePage
             inputField.sendKeys(text);
         }
     }
+
+    public DirectoryManagementPage clickSave()
+    {
+        click(SAVE_BUTTON);
+        return drone.getCurrentPage().render();
+    }
+    
 
 }

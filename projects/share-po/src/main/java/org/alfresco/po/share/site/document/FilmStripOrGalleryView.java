@@ -79,6 +79,20 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
         return tags;
     }
 
+    /**
+     * This method gets the list of in line tags after clicking on tag info icon.
+     *
+     * @return List<WebElement> collection of tags
+     */
+    @Override
+    public List<String> getInlineTagsList()
+    {
+        clickInfoIcon(false);
+        List<String> tagsList = super.getInlineTagsList();
+        focusOnDocLibFooter();
+        return tagsList;
+    }
+
     /*
      * (non-Javadoc)
      * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#getCategories()
@@ -557,6 +571,19 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
     {
         clickInfoIcon(false);
         boolean syncFail = super.isSyncFailedIconPresent(waitTime);
+        focusOnDocLibFooter();
+        return syncFail;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#isIndirectlySyncedIconPresent()
+     */
+    @Override
+    public boolean isIndirectlySyncedIconPresent()
+    {
+        clickInfoIcon(false);
+        boolean syncFail = super.isIndirectlySyncedIconPresent();
         focusOnDocLibFooter();
         return syncFail;
     }

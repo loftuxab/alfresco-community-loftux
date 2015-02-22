@@ -545,12 +545,12 @@ public abstract class CollectionUtils
             return Collections.emptyMap();
         }
 
-        List<Entry<K, V>> entriesList = new LinkedList<Entry<K, V>>(map.entrySet());
+        List<Entry<K, V>> entriesList = new LinkedList<>(map.entrySet());
 
         // Sort based on the map's values
         Collections.sort(entriesList, valueComparator);
 
-        Map<K, V> orderedMap = new LinkedHashMap<K, V>(entriesList.size());
+        Map<K, V> orderedMap = new LinkedHashMap<>(entriesList.size());
         for (Entry<K, V> entry : entriesList)
         {
             orderedMap.put(entry.getKey(), entry.getValue());
@@ -564,7 +564,7 @@ public abstract class CollectionUtils
      * <p/>
      * Call it like so: {@code CollectionUtils.<String, Integer>toEntryComparator(valueComparator);}
      * 
-     * @param entryComparator a comparator which compares the value types from a Map.
+     * @param valueComparator a comparator which compares the value types from a Map.
      * @return a comparator which takes Map.Entry objects from that Map and compares their values.
      */
     public static <K, V> Comparator<Entry<K, V>> toEntryComparator(final Comparator<V> valueComparator)

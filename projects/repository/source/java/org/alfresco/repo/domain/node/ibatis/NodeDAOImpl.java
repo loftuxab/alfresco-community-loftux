@@ -89,8 +89,8 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
     private static final String UPDATE_NODE = "alfresco.node.update_Node";
     private static final String UPDATE_NODE_BULK_TOUCH = "alfresco.node.update_NodeBulkTouch";
     private static final String DELETE_NODE_BY_ID = "alfresco.node.delete_NodeById";
-    private static final String DELETE_NODES_BY_TXN_COMMIT_TIME = "alfresco.node.delete_NodesByTxnCommitTime";
-    private static final String DELETE_NODE_PROPS_BY_TXN_COMMIT_TIME = "alfresco.node.delete_NodePropsByTxnCommitTime";
+    private static final String DELETE_NODES_BY_TXN_COMMIT_TIME = "alfresco.node.delete.delete_NodesByTxnCommitTime";
+    private static final String DELETE_NODE_PROPS_BY_TXN_COMMIT_TIME = "alfresco.node.delete.delete_NodePropsByTxnCommitTime";
     private static final String SELECT_NODE_BY_ID = "alfresco.node.select_NodeById";
     private static final String SELECT_NODE_BY_NODEREF = "alfresco.node.select_NodeByNodeRef";
     private static final String SELECT_NODES_BY_UUIDS = "alfresco.node.select_NodesByUuids";
@@ -877,15 +877,17 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
     protected List<ChildAssocEntity> selectChildNodeIds(
             Long nodeId,
             Boolean isPrimary,
-            Long minAssocIdInclusive,
+            Long minChildNodeIdInclusive,
             int maxResults)
     {
         ChildAssocEntity assoc = new ChildAssocEntity();
         NodeEntity parentNode = new NodeEntity();
         parentNode.setId(nodeId);
+        NodeEntity childNode = new NodeEntity();
+        childNode.setId(minChildNodeIdInclusive);
         assoc.setParentNode(parentNode);
         assoc.setPrimary(isPrimary);
-        assoc.setId(minAssocIdInclusive);
+        assoc.setChildNode(childNode);
         
         RowBounds rowBounds = new RowBounds(0, maxResults);
         return template.selectList(SELECT_CHILD_NODE_IDS, assoc, rowBounds);

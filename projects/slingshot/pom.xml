@@ -3,7 +3,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>LX72</version>
+        <version>LX80-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -16,6 +16,13 @@
         <maven.tomcat.path>/share</maven.tomcat.path>
         <maven.tomcat.port>${tomcat.default.share.port}</maven.tomcat.port>
         <maven.tomcat.httpsPort>${tomcat.default.share.ssl.port}</maven.tomcat.httpsPort>
+        <!-- Files to exclude from SonarQube analysis -->
+        <sonar.exclusions>
+            source/web/jquery/**, 
+            source/web/js/flash/extMouseWheel.js,
+            source/web/js/lightbox.js,
+            source/web/yui/**
+        </sonar.exclusions>
     </properties>
 
     <dependencies>
@@ -37,14 +44,6 @@
                 <exclusion>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-xjc</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.mybatis</groupId>
@@ -207,18 +206,23 @@
             <groupId>org.apache.myfaces.core</groupId>
             <artifactId>myfaces-impl</artifactId>
         </dependency>
-        <!-- Dependency on Dojo ZIP -->
+        <!-- Dependency on external Aikau project (this includes Dojo) -->
         <dependency>
-            <groupId>org.dojotoolkit</groupId>
-            <artifactId>dojo</artifactId>
-            <version>1.9.0</version>
-            <type>zip</type>
+            <groupId>org.alfresco</groupId>
+            <artifactId>aikau</artifactId>
+            <version>1.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.extensions.surf</groupId>
+                    <artifactId>spring-surf-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Dependency on YUI ZIP (custom version deployed at artifacts.alfresco.com) -->
         <dependency>
             <groupId>com.yahoo.platform.yui</groupId>
             <artifactId>yui</artifactId>
-            <version>2.9.0-alfresco-20140211</version>
+            <version>${dependency.yui.version}</version>
             <type>zip</type>
         </dependency>
 
@@ -272,7 +276,7 @@
                                 includes="alfresco/messages/**/*.properties,alfresco/site-webscripts/**/*.properties" />
                             <mapper type="regexp" from="^([^_]*).properties$" to="\1_en.properties"/>
                         </copy>
-                        <copy todir="${project.build.directory}/${build.finalName}">
+                        <copy todir="${project.build.directory}/${project.build.finalName}">
                             <fileset dir="${basedir}/source/web" includes="js/alfresco/**/i18n/*.properties" />
                             <mapper type="regexp" from="^([^_]*).properties$" to="\1_en.properties"/>
                         </copy>
@@ -292,12 +296,6 @@
                                 <exclude>WEB-INF/classes/*</exclude>
                                 <exclude>WEB-INF/lib/*</exclude>
                             </excludes>
-                        </overlay>
-                        <overlay>
-                            <groupId>org.dojotoolkit</groupId>
-                            <artifactId>dojo</artifactId>
-                            <type>zip</type>
-                            <targetPath>js/lib</targetPath>
                         </overlay>
                         <overlay>
                             <groupId>com.yahoo.platform.yui</groupId>
@@ -370,6 +368,7 @@
                             <includes>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/utilities/utilities.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/button/button-min.js</include>
+                                <include>${project.build.directory}/${project.build.finalName}/yui/button/buttonariaplugin-min.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/container/container-min.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/menu/menu-min.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/json/json-min.js</include>
@@ -406,6 +405,7 @@
                                 <include>${project.build.directory}/${project.build.finalName}/yui/get/get-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/yuiloader/yuiloader-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/button/button-debug.js</include>
+                                <include>${project.build.directory}/${project.build.finalName}/yui/button/buttonariaplugin-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/container/container-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/menu/menu-debug.js</include>
                                 <include>${project.build.directory}/${project.build.finalName}/yui/json/json-debug.js</include>

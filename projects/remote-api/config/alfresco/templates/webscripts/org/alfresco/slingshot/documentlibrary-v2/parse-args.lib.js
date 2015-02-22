@@ -161,6 +161,8 @@ var Common =
                file: node.name
             };
          }
+         // add repository path to response
+         location.repoPath = "/" + displayPaths.slice(2, displayPaths.length).join("/");
          
          return location;
       }
@@ -299,6 +301,10 @@ var ParseArgs =
       {
          location.path = ParseArgs.combinePaths(location.path, location.file);
       }
+      if (location.repoPath)
+      {
+          location.repoPath = ParseArgs.combinePaths(location.repoPath, location.file);
+      }
       if (args.filter !== "node" && !pathNode.isContainer)
       {
          location.file = "";
@@ -349,48 +355,7 @@ var ParseArgs =
     */
    resolveNode: function ParseArgs_resolveNode(reference)
    {
-      var node = null;
-      try
-      {
-         if (reference == "alfresco://company/home")
-         {
-            node = companyhome;
-         }
-         else if (reference == "alfresco://user/home")
-         {
-            node = userhome;
-         }
-         else if (reference == "alfresco://sites/home")
-         {
-            node = companyhome.childrenByXPath("st:sites")[0];
-         }
-         else if (reference == "alfresco://company/shared")
-         {
-            node = companyhome.childrenByXPath("app:shared")[0];
-         }
-         else if (reference.indexOf("://") > 0)
-         {
-            if (reference.indexOf(":") < reference.indexOf("://"))
-            {
-               var newRef = "/" + reference.replace("://", "/");
-               var newRefNodes = search.xpathSearch(newRef);
-               node = search.findNode(String(newRefNodes[0].nodeRef));
-            }
-            else
-            {
-               node = search.findNode(reference);
-            }
-         }
-         else if (reference.substring(0, 1) == "/")
-         {
-            node = search.xpathSearch(reference)[0];
-         }
-      }
-      catch (e)
-      {
-         return null;
-      }
-      return node;
+      return utils.resolveNodeReference(reference);
    },
 
    /**

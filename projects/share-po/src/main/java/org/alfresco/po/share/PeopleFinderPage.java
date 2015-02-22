@@ -14,11 +14,6 @@
  */
 package org.alfresco.po.share;
 
-import java.sql.Time;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
@@ -30,6 +25,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * People finder page object, holds all element of the html page relating to
@@ -143,6 +142,7 @@ public class PeopleFinderPage extends SharePage
     public HtmlPage searchFor(final String person)
     {
         WebElement input = drone.findAndWait(SEACH_INPUT);
+        input.clear();
         input.sendKeys(person);
         WebElement button = drone.findAndWait(SEARCH_BUTTON);
         button.click();

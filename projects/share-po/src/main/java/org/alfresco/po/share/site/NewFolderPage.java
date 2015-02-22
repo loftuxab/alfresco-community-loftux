@@ -21,9 +21,11 @@ import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderElement;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -44,6 +46,7 @@ public class NewFolderPage extends ShareDialogue
     private final By descriptionLocator = By.cssSelector("textarea[id$='default-createFolder_prop_cm_description']");
     private final By submitButton = By.cssSelector("button[id$='default-createFolder-form-submit-button']");
     private final By cancelButton = By.cssSelector("button[id$='createFolder-form-cancel-button']");
+    private final By NOTIFICATION_MESSAGE = By.cssSelector("div[style*='visible']>div>div>span.message");
 
     private final RenderElement folderTitleElement = getVisibleRenderElement(folderTitleCss);
     private final RenderElement nameElement = getVisibleRenderElement(name);
@@ -64,7 +67,6 @@ public class NewFolderPage extends ShareDialogue
         super(drone);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public NewFolderPage render(RenderTime timer)
     {
@@ -72,14 +74,12 @@ public class NewFolderPage extends ShareDialogue
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public NewFolderPage render()
     {
         return render(new RenderTime(maxPageLoadingTime));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public NewFolderPage render(final long time)
     {
@@ -346,4 +346,40 @@ public class NewFolderPage extends ShareDialogue
 
         return message;
     }
+
+    /**
+     * Mimics the action of clicking the save button.
+     *
+     */
+    public void selectSubmitButton()
+    {
+        WebElement okButton = drone.findAndWait(submitButton);
+        okButton.click();
+
+    }
+
+    /**
+     * Method finds notification message
+     *
+     * @return notification message string value
+     */
+    public String getNotificationMessage()
+    {
+        try
+        {
+            WebElement notifMessage = drone.findAndWait(NOTIFICATION_MESSAGE);
+            return notifMessage.getText();
+        }
+        catch (TimeoutException toe)
+        {
+            throw new PageException("Time out finding notification message.", toe);
+        }
+
+    }
+
+    public void type(String text)
+    {
+        clearAndType(name, text);
+    }
+
 }

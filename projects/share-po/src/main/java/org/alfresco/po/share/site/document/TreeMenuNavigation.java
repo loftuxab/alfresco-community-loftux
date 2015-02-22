@@ -93,7 +93,8 @@ public class TreeMenuNavigation extends SharePage
         OTHERS_EDITING("editingOthers"),
         RECENTLY_MODIFIED("recentlyModified"),
         RECENTLY_ADDED("recentlyAdded"),
-        MY_FAVORITES("favourites");
+        MY_FAVORITES("favourites"),
+        SYNCED_CONTENT("synced");
 
         private final String elClass;
 

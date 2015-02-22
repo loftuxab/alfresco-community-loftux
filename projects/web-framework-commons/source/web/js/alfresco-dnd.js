@@ -147,6 +147,11 @@
             this._createDraggable(elements[j], config.draggables[i].groups);
          }
       }
+	  
+      this.keyboardInstruction1 = config.keyboardInstruction1;
+      this.keyboardInstruction2 = config.keyboardInstruction2;
+      Dom.addClass(this.keyboardInstruction1, "hidden");
+      Dom.addClass(this.keyboardInstruction2, "hidden");
 
       // Return instance
       return this;
@@ -283,6 +288,9 @@
        * @type object
        */
       targets: {},
+	  
+      keyboardInstruction1: null,
+      keyboardInstruction2: null,
 
       /**
        * Fired when the user tabs from a "draggable" (or selects another draggable or something else).
@@ -333,6 +341,24 @@
          }
          this.currentEl = obj.li;
          Dom.addClass(this.currentEl, "dnd-focused");
+		 
+         if (Dom.hasClass(this.currentEl, "availableDashlet"))
+         {
+            Dom.removeClass(this.keyboardInstruction1, "hidden");
+            Dom.addClass(this.keyboardInstruction2, "hidden");
+         }
+         else
+         {
+            Dom.addClass(this.keyboardInstruction1, "hidden");
+            if (Dom.hasClass(this.currentEl, "usedDashlet"))
+            {
+               Dom.removeClass(this.keyboardInstruction2, "hidden");
+            }
+            else
+            {
+               Dom.addClass(this.keyboardInstruction2, "hidden");
+            }
+         }
 
          /**
           * Add key listeners to the a href tag that actually is the element
@@ -593,6 +619,13 @@
             Dom.addClass(copy, draggableConfig.cssClass);
          }
          copy.innerHTML = srcEl.innerHTML + "";
+
+         // update id of copied anchors
+         var anchors = copy.getElementsByTagName("a");
+         for (var i = 0, il = anchors.length; i < il; i++)
+         {
+            Alfresco.util.generateDomId(anchors[i]);
+         }
 
          // Make the draggable draggable and selectable/focusable.
          this._createDraggable(copy, draggableConfig ? draggableConfig.groups : []);

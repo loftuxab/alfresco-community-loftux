@@ -6,7 +6,7 @@
   <groupId>se.loftux.alfresco</groupId>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>LX72</version>
+  <version>LX80-SNAPSHOT</version>
   <name>Alfresco</name>
 
   <url>http://www.alfresco.org/</url>
@@ -51,6 +51,18 @@
       </snapshots>
     </repository>
     <repository>
+      <id>alfresco-public</id>
+      <url>
+      https://artifacts.alfresco.com/nexus/content/groups/public
+      </url>
+      <releases>
+         <enabled>true</enabled>
+      </releases>
+      <snapshots>
+         <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>alfresco-public-snapshots</id>
       <url>https://artifacts.alfresco.com/nexus/content/groups/public-snapshots</url>
       <releases>
@@ -62,6 +74,15 @@
     </repository>
   </repositories>
   <pluginRepositories>
+     <pluginRepository>
+      <!--
+      Only used for the customised version of yuicompressor in yuicompressor-maven-plugin
+      -->
+      <id>alfresco-public</id>
+      <url>
+      https://artifacts.alfresco.com/nexus/content/groups/public
+      </url>
+    </pluginRepository>
     <pluginRepository>
       <id>loftux-public</id>
       <url>http://artifacts.loftux.net/nexus/content/repositories/alfresco-public-group</url>
@@ -140,12 +161,7 @@
     <!-- Maven specific build properties -->
     <maven.build.sourceVersion>1.7</maven.build.sourceVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <!-- Sonar specific properties -->
-    <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
-    <sonar.exclusions />
-    <sonar.skippedModules />
-    <sonar.branch>HEAD-BUG-FIX</sonar.branch>
+    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
 
     <!-- Community build specific properties -->
     <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD</maven.scm.connection>
@@ -163,7 +179,7 @@
 
     <!-- Centralized dependency versions -->
     <dependency.lucene.version>2.4.1</dependency.lucene.version>
-    <dependency.jibx.version>1.2.5</dependency.jibx.version>
+    <dependency.jibx.version>1.2.6</dependency.jibx.version>
     <dependency.tika.version>1.6-20140428-alfresco-patched</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
     <dependency.opencmis.version>0.11.0</dependency.opencmis.version>
@@ -173,20 +189,15 @@
     <dependency.activiti.version>5.16.4</dependency.activiti.version>
     <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
     <dependency.poi.version>3.10.1</dependency.poi.version>
-    <dependency.dojo.version>1.8.3</dependency.dojo.version>
-    <dependency.mysql.version>5.1.31</dependency.mysql.version>
+    <dependency.mysql.version>5.1.34</dependency.mysql.version>
     <dependency.postgresql.version>9.3-1102-jdbc41</dependency.postgresql.version>
+    <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
-    <installer.java.version>1.7.0_67</installer.java.version>
+    <installer.java.version>1.8.0_25</installer.java.version>
     <installer.postgresql.version>9.3.5</installer.postgresql.version>
     <installer.libreoffice.version>4.2.5-alfresco</installer.libreoffice.version>
-
-    <manifest.major.version>5</manifest.major.version>
-    <manifest.minor.version>0</manifest.minor.version>
-    <manifest.servicepack.version>0</manifest.servicepack.version>
-    <manifest.implementation.version>${project.version}</manifest.implementation.version>
   </properties>
 
   <!-- Define versions of very common components -->
@@ -200,22 +211,23 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
+            <version>1.7.7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
+            <version>1.7.7</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <version>1.10.8</version>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
@@ -256,7 +268,7 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.3</version>
+            <version>2.5</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -271,12 +283,12 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.1</version>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.9</version>
+            <version>1.10</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -286,7 +298,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.8</version>
+            <version>1.9</version>
         </dependency>
         <dependency>
             <groupId>commons-digester</groupId>
@@ -311,7 +323,7 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
+            <version>3.1-HTTPCLIENT-1265</version>
         </dependency>
         <dependency>
             <groupId>commons-el</groupId>
@@ -336,7 +348,7 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.1.3</version>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>commons-modeler</groupId>
@@ -390,6 +402,16 @@
             <version>2.1</version>
         </dependency>
         <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <version>2.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.2.6</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.myfaces.core</groupId>
             <artifactId>myfaces-api</artifactId>
             <version>1.1.8</version>
@@ -412,7 +434,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.180</version>
+            <version>1.4.182</version>
         </dependency>
     </dependencies>
   </dependencyManagement>
@@ -475,6 +497,28 @@
 				</execution>
 			</executions>
 		</plugin>
+
+        <!-- If version.properties can be found, read it to set version properties for manifest -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0-alpha-2</version>
+            <executions>
+                <execution>
+                    <id>read-version-properties</id>
+                    <phase>initialize</phase>
+                    <goals>
+                        <goal>read-project-properties</goal>
+                    </goals>
+                    <configuration>
+                        <files>
+                            <file>${highest.basedir}/projects/repository/config/alfresco/version.properties</file>
+                        </files>
+                        <quiet>true</quiet>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
 
     <!-- Defining version and some configuration of Maven plugins -->
@@ -482,11 +526,11 @@
         <plugins>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.6.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.2</version>
                 <configuration>
                     <source>${maven.build.sourceVersion}</source>
                     <target>${maven.build.sourceVersion}</target>
@@ -502,7 +546,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
                 <configuration>
                     <includeEmptyDirs>true</includeEmptyDirs>
                 </configuration>
@@ -513,11 +557,19 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>2.5.3</version>
+                <!-- MASSEMBLY-747 - remove when 2.5.4 is released -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-io</artifactId>
+                        <version>2.5</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.10</version>
             </plugin>
             <plugin>
                 <artifactId>maven-help-plugin</artifactId>
@@ -525,7 +577,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.5.1</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <tagBase>https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/TAGS/CLOUD</tagBase>
@@ -535,28 +587,27 @@
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.4</version>
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.17</version>
+                <version>2.18.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
+                <version>2.18.1</version>
                 <configuration>
                     <!-- To prevent tests alfresco.log to be created in project roots and bother while synchronizing with SCM -->
                     <workingDirectory>${project.build.directory}</workingDirectory>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <runOrder>alphabetical</runOrder>
-                    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
                     <systemPropertyVariables>
                         <!-- Modified BaseTest and AVMServiceTestBase to accept these properties
                          Otherwise test were looking in hardcoded relative locations -->
                         <alfresco.test.resources.dir>${basedir}/source/test-resources</alfresco.test.resources.dir>
                         <alfresco.web.resources.dir>${basedir}/source/web</alfresco.web.resources.dir>
                         <alfresco.java.sources.dir>${basedir}/source/java</alfresco.java.sources.dir>
-						<alfresco.target.dir>${project.build.directory}</alfresco.target.dir>
+                        <alfresco.target.dir>${project.build.directory}</alfresco.target.dir>
                         <!-- Allow FTP server unit test to run unprivileged -->
                         <ftp.port>50521</ftp.port>
                         <!-- ACE-2704 turned off the ftp and transfer service receiver which must be enabled for integration test -->
@@ -582,7 +633,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.10.1</version>
                 <configuration>
                     <javadocDirectory>source/javadoc</javadocDirectory>
                     <excludePackageNames>org.customer,org.apache</excludePackageNames>
@@ -598,7 +649,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <version>1.8</version>
             </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -611,8 +662,8 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Version>${manifest.major.version}.${manifest.minor.version}.${manifest.servicepack.version}</Specification-Version>
-                            <Implementation-Version>${manifest.implementation.version}</Implementation-Version>
+                            <Specification-Version>${version.major}.${version.minor}.${version.revision}</Specification-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                             <Build-Date>${maven.build.timestamp}</Build-Date>
                         </manifestEntries>
                     </archive>
@@ -620,7 +671,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.6</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -628,8 +679,8 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Version>${manifest.major.version}.${manifest.minor.version}.${manifest.servicepack.version}</Specification-Version>
-                            <Implementation-Version>${manifest.implementation.version}</Implementation-Version>
+                            <Specification-Version>${version.major}.${version.minor}.${version.revision}</Specification-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                             <Build-Date>${maven.build.timestamp}</Build-Date>
                         </manifestEntries>
                     </archive>
@@ -642,7 +693,7 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>8.1.15.v20140411</version>
+                <version>8.1.16.v20140903</version>
                 <configuration>
                     <webAppSourceDirectory>source/web</webAppSourceDirectory>
                 </configuration>
@@ -656,9 +707,33 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.jibx</groupId>
+                <artifactId>maven-jibx-plugin</artifactId>
+                <version>${dependency.jibx.version}</version>
+                <!-- ACE-3667: Workaround for JIBX-515 -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jibx</groupId>
+                        <artifactId>jibx-bind</artifactId>
+                        <version>${dependency.jibx.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <artifactId>bcel</artifactId>
+                                <groupId>bcel</groupId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.bcel</groupId>
+                        <artifactId>bcel</artifactId>
+                        <version>6.0-RC3</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
                 <groupId>org.alfresco.maven.plugin</groupId>
                 <artifactId>alfresco-maven-plugin</artifactId>
-                <version>1.1.1</version>
+                <version>2.0.0</version>
                 <configuration>
                     <attachClasses>true</attachClasses>
                 </configuration>
@@ -671,7 +746,7 @@
                     <dependency>
                         <groupId>org.codehaus.plexus</groupId>
                         <artifactId>plexus-archiver</artifactId>
-                        <version>2.3</version>
+                        <version>2.9.1</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -730,7 +805,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1-alpha-4</version>
+                <version>2.1.2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -742,11 +817,16 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>1.9.1</version>
             </plugin>
-			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>replacer</artifactId>
-				<version>1.5.3</version>
-			</plugin>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.2.201409121644</version>
+            </plugin>
 			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 			<plugin>
 				<groupId>org.eclipse.m2e</groupId>
@@ -798,7 +878,19 @@
 									<ignore />
 								</action>
 							</pluginExecution>
-
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>org.codehaus.mojo</groupId>
+									<artifactId>properties-maven-plugin</artifactId>
+									<versionRange>[1.0-alpha-2,)</versionRange>
+									<goals>
+										<goal>read-project-properties</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<ignore/>
+								</action>
+							</pluginExecution>
         					<pluginExecution>
         						<pluginExecutionFilter>
         							<groupId>org.apache.maven.plugins</groupId>
@@ -841,7 +933,7 @@
         </plugin>
         <plugin>
             <artifactId>maven-project-info-reports-plugin</artifactId>
-            <version>2.7</version>
+            <version>2.8</version>
             <configuration>
                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
             </configuration>
@@ -861,18 +953,18 @@
         </plugin>
         <plugin>
             <artifactId>maven-surefire-report-plugin</artifactId>
-            <version>2.17</version>
+            <version>2.18.1</version>
         </plugin>
         <plugin>
             <artifactId>maven-pmd-plugin</artifactId>
-            <version>3.2</version>
+            <version>3.3</version>
             <configuration>
                 <targetJdk>${maven.build.sourceVersion}</targetJdk>
             </configuration>
         </plugin>
         <plugin>
             <artifactId>maven-jxr-plugin</artifactId>
-            <version>2.4</version>
+            <version>2.5</version>
             <configuration>
                 <aggregate>false</aggregate>
             </configuration>
@@ -897,20 +989,8 @@
     <!-- Profile to build alfresco-enterprise -->
     <profile>
         <id>enterprise</id>
-        <repositories>
-            <repository>
-                <id>alfresco-internal</id>
-                <url>https://artifacts.alfresco.com/nexus/content/groups/internal</url>
-            </repository>
-        </repositories>
         <modules>
-			<module>enterpriseprojects/repository</module>
-            <module>enterpriseprojects/repository-crypto</module>
-            <module>enterpriseprojects/remote-api</module>
-            <module>enterpriseprojects/overlays</module>
-            <module>enterpriseprojects/spring-encryptor</module>
-            <module>enterpriseprojects/server-root</module>
-            <module>enterpriseprojects/vti-bin</module>
+            <module>enterpriseprojects</module>
         </modules>
         <properties>
             <!-- Enterprise specific properties -->
@@ -978,12 +1058,11 @@
         </build>
     </profile>
 
-	<!-- Behavioral profiles inherited by all modules -->
+	<!-- Database profiles, if not using PostgreSQL -->
 	<profile>
 		<id>mysql</id>
 		<properties>
-			<db.master.url>jdbc:mysql://localhost/${db.name}</db.master.url>
-			<!-- Database properties - default values to be overridden in settings.xml -->
+			<db.master.url>jdbc:mysql://localhost/</db.master.url>
 		    <db.driver>com.mysql.jdbc.Driver</db.driver>
     		<db.url>jdbc:mysql://localhost/${db.name}</db.url>
     	</properties>
@@ -1015,6 +1094,21 @@
 			</dependency>
 		</dependencies>
 	</profile>
+
+    <profile>
+        <id>mariadb</id>
+        <properties>
+            <db.master.url>jdbc:mysql://localhost/</db.master.url>
+            <db.driver>org.gjt.mm.mysql.Driver</db.driver>
+            <db.url>jdbc:mysql://localhost/${db.name}</db.url>
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+            </dependency>
+        </dependencies>
+    </profile>
 
     <profile>
         <id>oracle</id>
@@ -1091,6 +1185,15 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <!-- MNT-13089 SQLServer needs the transaction isolation parameter increased -->
+                        <systemPropertyVariables>
+                            <db.txn.isolation>4096</db.txn.isolation>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
             </plugins>
         </build>
         <dependencies>
@@ -1098,6 +1201,24 @@
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>sqljdbc</artifactId>
                 <version>4.0</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </profile>
+
+    <profile>
+        <id>db2</id>
+        <properties>
+            <db.driver>com.ibm.db2.jcc.DB2Driver</db.driver>
+            <db.url>jdbc:db2://${db.host}:50000/${db.name}</db.url>
+            <db.username>db2admin</db.username>
+            <!-- No master URL for DB2: it's not possible to drop a database through an SQL command -->
+        </properties>
+        <dependencies>
+            <dependency>
+                <groupId>com.ibm.db2.jcc</groupId>
+                <artifactId>db2jcc4</artifactId>
+                <version>4.12.55</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -1131,7 +1252,7 @@
                         <dependency>
                             <groupId>com.h2database</groupId>
                             <artifactId>h2</artifactId>
-                            <version>1.4.180</version>
+                            <version>1.4.182</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -1149,6 +1270,70 @@
             </dependency>
         </dependencies>
     </profile>
+
+    <!-- Generate the Javadoc for Public API only (filtered on AlfrescoPublicApi annotation) -->
+    <profile>
+        <id>publicapi</id>
+        <properties>
+            <docflex.version>1.6.1</docflex.version>
+        </properties>
+        <!-- Downloads the docflex license -->
+        <dependencies>
+            <dependency>
+                <groupId>com.docflex</groupId>
+                <artifactId>docflex-alfresco-license</artifactId>
+                <version>1.0</version>
+                <type>license</type>
+            </dependency>
+        </dependencies>
+        <!-- Extracts Docflex locally -->
+        <build>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <!-- Unzips the docflex/javadoc doclet -->
+                        <execution>
+                            <id>default-cli</id>
+                            <inherited>false</inherited>
+                            <goals>
+                                <goal>unpack</goal>
+                            </goals>
+                            <configuration>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>com.docflex</groupId>
+                                        <artifactId>docflex-javadoc</artifactId>
+                                        <version>${docflex.version}</version>
+                                        <type>zip</type>
+                                    </artifactItem>
+                                </artifactItems>
+                                <outputDirectory>${project.build.directory}</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <doclet>com.docflex.javadoc.Doclet</doclet>
+                        <docletPath>${project.build.directory}/docflex-javadoc-${docflex.version}/lib/docflex-javadoc.jar</docletPath>
+                        <additionalparam>
+                            -license ${settings.localRepository}/com/docflex/docflex-alfresco-license/1.0/docflex-alfresco-license-1.0.license
+                            -template ${project.build.directory}/docflex-javadoc-${docflex.version}/templates/JavadocPro/FramedDoc.tpl
+                            -nodialog
+                            -launchviewer=false
+                            -p:filter.byAnns.include.classes=org.alfresco.api.AlfrescoPublicApi
+                            -p:docTitle "Alfresco ${project.version} Public API"
+                            -p:windowTitle "Alfresco ${project.version} Public API"
+                        </additionalparam>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+
 	<profile>
 		<id>solr-http</id>
 		<build>

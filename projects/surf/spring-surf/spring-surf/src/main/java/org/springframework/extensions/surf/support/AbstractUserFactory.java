@@ -146,7 +146,7 @@ public abstract class AbstractUserFactory extends BaseFactory implements UserFac
             session.removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
         }
         
-        // check whether there is a "USER_ID" marker in the session
+        // check whether there is a user id marker in the session
         String userId = null;
         if (session != null)
         {
@@ -158,7 +158,7 @@ public abstract class AbstractUserFactory extends BaseFactory implements UserFac
         if (userId == null)
         {
             userId = request.getRemoteUser();
-            externalAuth = userId != null;
+            externalAuth = (userId != null);
         }
 
         if (userId != null)

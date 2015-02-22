@@ -48,6 +48,11 @@ public enum UserRole
         return roleName;
     }
 
+    /**
+     * helper method to
+     * return enum for the
+     * given value
+     */
     public static UserRole getUserRoleforName(String name)
     {
         for (UserRole role : UserRole.values())

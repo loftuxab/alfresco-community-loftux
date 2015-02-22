@@ -20,6 +20,8 @@ package org.springframework.extensions.surf.mvc;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -95,6 +97,12 @@ public class ResourceController extends VirtualizedResourceController
                                     HttpServletResponse response) throws ServletException, IOException
     {
         boolean resolved = false;
+        
+        if (!isAllowedResourcePath(path))
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return true;
+        }
         
         // Check the VirtualizedResourceController first for backwards compatibility with 
         // applications built for previous Surf verions...
@@ -197,6 +205,30 @@ public class ResourceController extends VirtualizedResourceController
         }
         sb.append(dependencyPath);
         return sb.toString();
+    }
+    
+    /**
+     * Checks whether resource path provided is allowed by web framework configuration. 
+     * 
+     * @param pathToCheck resource path to check
+     * @return <code>true</code> if path is allowed to be viewed, otherwise <code>false</code>
+     */
+    public boolean isAllowedResourcePath(String pathToCheck)
+    {
+        if (!pathToCheck.startsWith(FORWARD_SLASH))
+        {
+            pathToCheck = FORWARD_SLASH + pathToCheck;
+        }
+        for (Pattern pattern : this.webframeworkConfigElement.getResourcesDeniedPaths())
+        {
+            Matcher matcher = pattern.matcher(pathToCheck);
+            if (matcher.matches())
+            {
+                // this path is configured as denied
+                return false;
+            }
+        }
+        return true;
     }
     
     /**

@@ -52,6 +52,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
 import org.alfresco.util.PropertyMap;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.TestWebScriptServer.DeleteRequest;
@@ -415,16 +416,22 @@ public class SiteServiceTest extends BaseWebScriptTest
         
         // Check the everyone has the correct membership
         // (The webscript returns the users in order to make testing easier)
-        membership = result3.getJSONObject(0);
-        assertEquals(SiteModel.SITE_MANAGER, membership.get("role"));
+        Map<String, JSONObject> membershipMap = new HashMap<String, JSONObject>();
+        for (int i = 0 ; i < membership.length(); i++)
+        {
+            membershipMap.put(result3.getJSONObject(i).getString("role"), result3.getJSONObject(i));
+        }
+
+        membership = membershipMap.get(SiteModel.SITE_MANAGER);
+        assertNotNull("The response did not contain " + SiteModel.SITE_MANAGER, membership);
         assertEquals(USER_ONE, membership.getJSONObject("authority").get("userName"));
         
-        membership = result3.getJSONObject(1);
-        assertEquals(SiteModel.SITE_CONSUMER, membership.get("role"));
+        membership = membershipMap.get(SiteModel.SITE_CONSUMER);
+        assertNotNull("The response did not contain " + SiteModel.SITE_CONSUMER, membership);
         assertEquals(USER_TWO, membership.getJSONObject("authority").get("userName"));
         
-        membership = result3.getJSONObject(2);
-        assertEquals(SiteModel.SITE_CONTRIBUTOR, membership.get("role"));
+        membership = membershipMap.get(SiteModel.SITE_CONTRIBUTOR);
+        assertNotNull("The response did not contain " + SiteModel.SITE_CONTRIBUTOR, membership);
         assertEquals(USER_NUMERIC, membership.getJSONObject("authority").get("userName"));
     }
     
@@ -877,7 +884,7 @@ public class SiteServiceTest extends BaseWebScriptTest
         String rejectURL = "page/reject-invite";
         
         // Create a nominated invitation
-        String nominatedId = createNominatedInvitation(shortName, inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, roleName, serverPath, acceptURL, rejectURL);
+        String nominatedId = createNominatedInvitation(shortName, inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, roleName, serverPath, acceptURL, rejectURL, 201);
         
         // Get the nominated invitation
         sendRequest(new GetRequest(URL_SITES + "/" + shortName + "/invitations/" + nominatedId), 200);  
@@ -978,7 +985,7 @@ public class SiteServiceTest extends BaseWebScriptTest
         String serverPath = "http://localhost:8081/share/";
         String acceptURL = "page/accept-invite";
         String rejectURL = "page/reject-invite";
-        inviteId = createNominatedInvitation(shortName, inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, roleName, serverPath, acceptURL, rejectURL);
+        inviteId = createNominatedInvitation(shortName, inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, roleName, serverPath, acceptURL, rejectURL, 201);
         
         /*
          * Positive test - get the invitation and validate that it is correct
@@ -1009,6 +1016,41 @@ public class SiteServiceTest extends BaseWebScriptTest
                        
     }
     
+    public void testInviteDisabledUser() throws Exception
+    {
+        AuthenticationUtil.pushAuthentication();
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        String username = "testUser" + System.nanoTime();
+        String siteShortName = GUID.generate();
+        try
+        {
+            createUser(username);
+            createSite("myPreset", siteShortName, "myTitle", "myDescription", SiteVisibility.PUBLIC, 200);
+
+            NodeRef personNodeRef = personService.getPerson(username);
+            String firstName = (String) nodeService.getProperty(personNodeRef, ContentModel.PROP_FIRSTNAME);
+            String lastName = (String) nodeService.getProperty(personNodeRef, ContentModel.PROP_LASTNAME);
+            String email = (String) nodeService.getProperty(personNodeRef, ContentModel.PROP_EMAIL);
+            String serverPath = "http://localhost:8081/share/";
+            String acceptURL = "page/accept-invite";
+            String rejectURL = "page/reject-invite";
+
+            authenticationService.setAuthenticationEnabled(username, false);
+            createNominatedInvitation(siteShortName, firstName, lastName, email, username, SiteModel.SITE_CONSUMER, serverPath, acceptURL, rejectURL, 500);
+            fail("The user " + username + " is disabled and cannot be invited");
+        }
+        catch (JSONException e)
+        {
+            // expected
+        }
+        finally
+        {
+            siteService.deleteSite(siteShortName);
+            deleteUser(username);
+            AuthenticationUtil.popAuthentication();
+        }
+    }
+    
     /**
      * Detailed Test of List Invitation Web Script.
      * @throws Exception
@@ -1037,7 +1079,7 @@ public class SiteServiceTest extends BaseWebScriptTest
         String rejectURL = "page/reject-invite";
         
         // Create a nominated invitation
-        String nominatedId = createNominatedInvitation(shortName, inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, roleName, serverPath, acceptURL, rejectURL);        
+        String nominatedId = createNominatedInvitation(shortName, inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, roleName, serverPath, acceptURL, rejectURL, 201);
         
         /**
          * search by user - negative test wombat does not have an invitation 
@@ -1185,7 +1227,7 @@ public class SiteServiceTest extends BaseWebScriptTest
         
     }    
     
-    private String createNominatedInvitation(String siteName, String inviteeFirstName, String inviteeLastName, String inviteeEmail, String inviteeUserName, String inviteeRoleName, String serverPath, String acceptURL, String rejectURL) throws Exception 
+    private String createNominatedInvitation(String siteName, String inviteeFirstName, String inviteeLastName, String inviteeEmail, String inviteeUserName, String inviteeRoleName, String serverPath, String acceptURL, String rejectURL, int expectedStatus) throws Exception
     {
         /*
          * Create a new nominated invitation
@@ -1210,7 +1252,7 @@ public class SiteServiceTest extends BaseWebScriptTest
         newInvitation.put("acceptURL", acceptURL);
         newInvitation.put("rejectURL", rejectURL);    
         
-        Response response = sendRequest(new PostRequest(URL_SITES + "/" + siteName + "/invitations",  newInvitation.toString(), "application/json"), 201);   
+        Response response = sendRequest(new PostRequest(URL_SITES + "/" + siteName + "/invitations",  newInvitation.toString(), "application/json"), expectedStatus);
         JSONObject top = new JSONObject(response.getContentAsString());
         JSONObject data = top.getJSONObject("data");
         String inviteId = data.getString("inviteId");

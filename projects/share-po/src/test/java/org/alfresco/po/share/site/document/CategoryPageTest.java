@@ -18,6 +18,7 @@
  */
 package org.alfresco.po.share.site.document;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -29,8 +30,8 @@ import java.util.List;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.enums.ViewType;
 import org.alfresco.po.share.site.SiteDashboardPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -39,22 +40,22 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class CategoryPageTest extends AbstractDocumentTest
 {
-    
+
     private String siteName;
     private DocumentLibraryPage documentLibPage;
     DashBoardPage dashBoard;
     DocumentDetailsPage detailsPage;
-    
+
     private String categoryTags;
     private String categoryRegions;
 
 
     /**
      * Pre test setup of a dummy file to upload.
-     * 
+     *
      * @throws Exception
      */
-    @BeforeClass(groups="alfresco-one")
+    @BeforeClass(groups = "alfresco-one")
     public void prepare() throws Exception
     {
         dashBoard = loginAs(username, password).render();
@@ -81,7 +82,7 @@ public class CategoryPageTest extends AbstractDocumentTest
 
     }
 
-    @AfterClass(groups="alfresco-one")
+    @AfterClass(groups = "alfresco-one")
     public void teardown() throws Exception
     {
         if (siteName != null)
@@ -89,8 +90,8 @@ public class CategoryPageTest extends AbstractDocumentTest
             SiteUtil.deleteSite(drone, siteName);
         }
     }
-    
-    @Test(groups = {"Enterprise4.2"})
+
+    @Test(groups = { "Enterprise4.2" })
     public void getAddAbleCatgories()
     {
         EditDocumentPropertiesPage propertiesPage = detailsPage.selectEditProperties().render();
@@ -106,8 +107,8 @@ public class CategoryPageTest extends AbstractDocumentTest
         propertiesPage = categoryPage.clickCancel().render();
         detailsPage = propertiesPage.selectCancel().render();
     }
-    
-    @Test(dependsOnMethods="getAddAbleCatgories", groups = {"Enterprise4.2"})
+
+    @Test(dependsOnMethods = "getAddAbleCatgories", groups = { "Enterprise4.2" })
     public void getAddAbleCatgoryList()
     {
         EditDocumentPropertiesPage propertiesPage = detailsPage.selectEditProperties().render();
@@ -124,8 +125,8 @@ public class CategoryPageTest extends AbstractDocumentTest
         propertiesPage = categoryPage.clickCancel().render();
         detailsPage = propertiesPage.selectCancel().render();
     }
-    
-    @Test(dependsOnMethods="getAddAbleCatgories", groups = {"Enterprise4.2"})
+
+    @Test(dependsOnMethods = "getAddAbleCatgories", groups = { "Enterprise4.2" })
     public void clickCancel()
     {
         EditDocumentPropertiesPage propertiesPage = detailsPage.selectEditProperties().render();
@@ -143,9 +144,9 @@ public class CategoryPageTest extends AbstractDocumentTest
         propertiesPage = categoryPage.clickCancel().render();
         detailsPage = propertiesPage.selectCancel().render();
     }
-    
+
     @SuppressWarnings("unchecked")
-    @Test(dependsOnMethods="clickCancel", groups = {"Enterprise4.2"})
+    @Test(dependsOnMethods = "clickCancel", groups = { "Enterprise4.2" })
     public void clickOk()
     {
         EditDocumentPropertiesPage propertiesPage = detailsPage.selectEditProperties().render();
@@ -172,38 +173,19 @@ public class CategoryPageTest extends AbstractDocumentTest
         }
         documentLibPage = detailsPage.getSiteNav().selectSiteDocumentLibrary().render();
         documentLibPage.setViewType(ViewType.DETAILED_VIEW);
-        FileDirectoryInfo  directoryInfo = documentLibPage.getFileDirectoryInfo("Test Doc");
+        FileDirectoryInfo directoryInfo = documentLibPage.getFileDirectoryInfo("Test Doc");
         addedCategoryList = directoryInfo.getCategoryList();
         assertTrue(addedCategoryList.size() > 0);
         assertTrue(addedCategoryList.contains(categoryTags));
     }
-    
-   /* @Test(dependsOnMethods="clickOk", groups = {"Enterprise4.2"})
-    public void clickRemove()
-    {
-        FileDirectoryInfo  directoryInfo = documentLibPage.getFileDirectoryInfo("Test Doc");
-        EditDocumentPropertiesPage propertiesPage = directoryInfo.selectEditProperties().render();
-        
-        CategoryPage categoryPage = propertiesPage.getCategory().render();
-        categoryPage.removeCategories(Arrays.asList(categoryTags));
-        List<String> addedCategoryList = categoryPage.getAddedCatgoryList();
-        //assertTrue(addedCategoryList.size() > 0);
-        assertFalse(addedCategoryList.contains(categoryTags));
-        propertiesPage = categoryPage.clickOk().render();
-        addedCategoryList = propertiesPage.getCategoryList();
-        //assertTrue(addedCategoryList.size() > 0);
-        assertFalse(addedCategoryList.contains(categoryTags));
-        //categoryPage = propertiesPage.getCategory().render();
-        //addedCategoryList = categoryPage.getAddedCatgoryList();
-        //assertTrue(addedCategoryList.size() > 0);
-        //assertTrue(addedCategoryList.contains(categoryTags));
-        //propertiesPage = categoryPage.clickCancel().render();
-        directoryInfo = propertiesPage.selectSave().render();
 
-        documentLibPage.setViewType(ViewType.DETAILED_VIEW);
-        directoryInfo = documentLibPage.getFileDirectoryInfo("Test Doc");
-        addedCategoryList = directoryInfo.getCategoryList();
-        //assertTrue(addedCategoryList.size() > 0);
-        assertFalse(addedCategoryList.contains(categoryTags));
-    }*/
+    @Test(dependsOnMethods = "clickOk")
+    public void checkMethodReturnCategoriesNames()
+    {
+        DocumentDetailsPage documentDetailsPage = documentLibPage.selectFile("Test Doc").render();
+        List<String> categoriesNames = documentDetailsPage.getCategoriesNames();
+        assertEquals(categoriesNames.size(),2);
+        assertEquals(categoriesNames.get(0),"Tags");
+        assertEquals(categoriesNames.get(1),"Regions");
+    }
 }

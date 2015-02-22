@@ -58,18 +58,24 @@
 
 .yuieditor ul li
 {
-   list-style-type: disc;
+   list-style-type: inherit;
 }
 
 .yuieditor ol li
 {
-   list-style-type: decimal;
+   list-style-type: inherit;
 }
 
 .topiclist
 {
    clear: left;
    margin: 0 -8px;
+}
+
+.alfresco-share .sticky-wrapper .topiclist .content ul,
+.alfresco-share .sticky-wrapper .topiclist .content ol
+{
+    padding: 0.5em 0 0.5em 1.3em;
 }
 
 /* Data table */

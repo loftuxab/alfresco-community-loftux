@@ -12,3 +12,9 @@
 {
    font-size: 81%;
 }
+
+.create-site textarea
+{
+   resize: vertical;
+   overflow: auto;
+}

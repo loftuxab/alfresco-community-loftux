@@ -14,6 +14,7 @@
  */
 package org.alfresco.share.util;
 
+import com.google.common.util.concurrent.ExecutionError;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.systemsummary.AdminConsoleLink;
 import org.alfresco.po.share.systemsummary.FileServersPage;
@@ -31,6 +32,9 @@ import org.testng.Assert;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +50,7 @@ public class FtpUtil extends AbstractUtils
     private static final String FTP_STOP = "stop";
     private static final String FTP_START = "start";
     private static final String FTP_PORT = "ftp.port";
+    private static final String FTP_ENABLED = "ftp.enabled";
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
     private static final Pattern DOMAIN_PATTERN = Pattern.compile("\\w+(\\.\\w+)*(\\.\\w{2,})");
 
@@ -106,9 +111,10 @@ public class FtpUtil extends AbstractUtils
         try
         {
             FTPClient ftpClient = connectServer(shareUrl, user, password);
+            logger.info("Connected to ftp? " + ftpClient.isConnected());
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             ftpClient.changeWorkingDirectory(remoteFolderPath);
-            ftpClient.setControlKeepAliveTimeout(600);
+            ftpClient.setControlKeepAliveTimeout(1200);
             if (ftpClient.isConnected())
                 try
                 {
@@ -120,11 +126,12 @@ public class FtpUtil extends AbstractUtils
 
                         byte[] buffer = new byte[4096];
                         int l;
+                        logger.info("Starting upload file["+contentName.getName()+"]");
                         while ((l = inputStream.read(buffer)) != -1)
                         {
                             outputStream.write(buffer, 0, l);
                         }
-
+                        logger.info("Content uploaded!");
                         inputStream.close();
                         outputStream.flush();
                         outputStream.close();
@@ -382,6 +389,7 @@ public class FtpUtil extends AbstractUtils
     {
         JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_STOP);
         JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_PORT, ftpPort);
+        JmxUtils.setAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_ENABLED, true);
         JmxUtils.invokeAlfrescoServerProperty(JMX_FILE_SERVERS_CONFIG, FTP_START);
     }
 
@@ -393,9 +401,12 @@ public class FtpUtil extends AbstractUtils
     {
         SystemSummaryPage sysSummaryPage = ShareUtil.navigateToSystemSummary(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD).render();
         FileServersPage fileServersPage = sysSummaryPage.openConsolePage(AdminConsoleLink.FileServers).render();
+        if (!fileServersPage.isFtpEnabledSelected())
+        {
+            fileServersPage.selectFtpEnabledCheckbox();
+        }
         fileServersPage.configFtpPort(port);
     }
-
 
 
     public static boolean DeleteSpace(String shareUrl, String user, String password, String remoteSpaceName, String remoteFolderPath)
@@ -692,7 +703,6 @@ public class FtpUtil extends AbstractUtils
      * @param remoteFolderName
      * @param remoteFolderPath
      * @param destination
-     *
      */
 
     public static boolean copyFolder(String shareUrl, String user, String password, String remoteFolderPath, String remoteFolderName, String destination)
@@ -815,11 +825,10 @@ public class FtpUtil extends AbstractUtils
 
     private static void copyFolderContents(FTPClient ftpClient, String remoteFolderPath, String folderName, String destination)
     {
-      try
+        try
         {
             String newDestination = destination + ftpClient.printWorkingDirectory().replace(remoteFolderPath, "");
             boolean spaceexists = ftpClient.changeWorkingDirectory(ftpClient.printWorkingDirectory() + "/" + folderName);
-
 
             if (spaceexists)
             {
@@ -906,6 +915,181 @@ public class FtpUtil extends AbstractUtils
 
     }
 
+    public static boolean editDocument(String shareUrl, String user, String password, String remoteContentName, String remoteFolderPath, String content)
+    {
 
+        OutputStream outputStream;
+        boolean result = false;
+
+        try
+        {
+            FTPClient ftpClient = connectServer(shareUrl, user, password);
+            ftpClient.changeWorkingDirectory(remoteFolderPath);
+            outputStream = ftpClient.storeFileStream(remoteContentName);
+            if (outputStream != null)
+            {
+                outputStream.write(content.getBytes());
+                outputStream.close();
+                ftpClient.logout();
+                ftpClient.disconnect();
+                result = true;
+            }
+            else
+            {
+                logger.error(ftpClient.getReplyString());
+            }
+
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+
+        return result;
+    }
+
+
+    public static void concurrentUpload(final String shareUrl, final String user, final String password, final ArrayBlockingQueue<File> fileQueue, final String remoteFolderPath)
+    {
+        int NUM_THREADS = 3;
+        ExecutorService executorService = Executors.newFixedThreadPool(NUM_THREADS);
+        List<Future> futures = new ArrayList<Future>();
+        for (int i = 0; i < NUM_THREADS; i++)
+        {
+            futures.add(executorService.submit(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    while (fileQueue.peek() != null)
+                    {
+                        File file = fileQueue.poll();
+                        if (file != null)
+                        {
+                            try
+                            {
+                                uploadContent(shareUrl, user, password, file, remoteFolderPath);
+                            }
+                            catch (ExecutionError e)
+                            {
+                                logger.error(e);
+                            }
+                        }
+                    }
+                }
+            }));
+        }
+        for (Future future : futures)
+        {
+            try
+            {
+                if (!future.isDone())
+                    future.get();
+            }
+            catch (InterruptedException e)
+            {
+                logger.error(e);
+            }
+            catch (ExecutionException ex)
+            {
+                logger.error(ex);
+            }
+        }
+
+        executorService.shutdown();
+    }
+
+    /**
+     * Method to get file size
+     *
+     * @param shareUrl
+     * @param user
+     * @param password
+     * @param ftppath
+     * @param filename
+     * @return long type
+     */
+    public static long getContentSize(String shareUrl, String user, String password, String ftppath, String filename)
+    {
+
+        long size = 0;
+        FTPClient ftpClient;
+        try
+
+        {
+            ftpClient = connectServer(shareUrl, user, password);
+
+            ftpClient.changeWorkingDirectory(ftppath);
+            for (FTPFile file : ftpClient.listFiles())
+            {
+                if (file.isFile() || file.getName().equals(filename))
+                {
+                    size = file.getSize();
+                }
+
+            }
+            logger.info("File size = " + size / (1024 * 1024) + "mb");
+
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return size;
+    }
+
+    public static boolean downloadContent(String shareUrl, String user, String password, String contentName, String remoteFolderPath)
+    {
+
+        InputStream inputStream;
+        OutputStream outputStream;
+        boolean result = false;
+
+        try
+        {
+            FTPClient ftpClient = connectServer(shareUrl, user, password);
+            logger.info("Connected to ftp? " + ftpClient.isConnected());
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+            ftpClient.changeWorkingDirectory(remoteFolderPath);
+            ftpClient.setControlKeepAliveTimeout(1200);
+            if (ftpClient.isConnected())
+                try
+                {
+                    inputStream = ftpClient.retrieveFileStream(contentName);
+                    outputStream = new FileOutputStream(downloadDirectory + contentName);
+
+                    if (inputStream != null)
+                    {
+                        byte[] buffer = new byte[4096];
+                        int l;
+                        while ((l = inputStream.read(buffer)) != -1)
+                        {
+                            outputStream.write(buffer, 0, l);
+                        }
+                        logger.info("Content uploaded!");
+                        inputStream.close();
+                        outputStream.flush();
+                        outputStream.close();
+                        ftpClient.logout();
+                        ftpClient.disconnect();
+                        result = true;
+                    }
+                    else
+                    {
+                        logger.error(ftpClient.getReplyString());
+                    }
+                }
+                catch (IOException ex)
+                {
+                    throw new RuntimeException(ex.getMessage());
+                }
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex.getMessage());
+        }
+
+        return result;
+    }
 
 }

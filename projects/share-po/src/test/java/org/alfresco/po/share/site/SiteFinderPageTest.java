@@ -14,8 +14,8 @@ import org.alfresco.po.share.AbstractTest;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.site.SiteFinderPage.ButtonType;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -164,16 +164,24 @@ public class SiteFinderPageTest extends AbstractTest
         Assert.assertEquals(siteDash.render().isSite(siteNamePublic), true);
     }
     
-    @Test(expectedExceptions = UnsupportedOperationException.class, priority=12)
-    public void test110SelectSiteNull()
+    @Test(priority=12)
+    public void test110SelectSiteByIndex()
     {
         siteFinder = SiteUtil.siteSearchRetry(drone, siteFinder, siteName).render();
+        SiteDashboardPage siteDash = siteFinder.selectSiteByIndex(0);
+        Assert.assertEquals(siteDash.render().isSite(siteName), true);
+    }
+    
+    @Test(expectedExceptions = UnsupportedOperationException.class, priority=13)
+    public void test111SelectSiteNull()
+    {
+        siteFinder = siteFinder.searchForSite(siteName).render();
         SiteDashboardPage siteDash = siteFinder.selectSite(null);
         Assert.assertEquals(siteDash.render().isSite(siteName), true);
     }
     
-    @Test(priority=13)
-    public void test111DeleteSite()
+    @Test(priority=14)
+    public void test112DeleteSite()
     {
         siteFinder = SiteUtil.siteSearchRetry(drone, siteFinder, siteName).render();
         List<String> sitesFound = siteFinder.getSiteList(); 

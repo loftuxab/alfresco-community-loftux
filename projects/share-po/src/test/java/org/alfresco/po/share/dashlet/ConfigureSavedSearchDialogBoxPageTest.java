@@ -25,7 +25,7 @@ import org.alfresco.po.share.CustomiseUserDashboardPage;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
@@ -155,7 +155,7 @@ public class ConfigureSavedSearchDialogBoxPageTest extends AbstractSiteDashletTe
         Assert.assertTrue(dashBoardPage != null);
     }
 
-    @Test(dependsOnMethods = "isHelpBalloonDisplayed")
+    @Test(dependsOnMethods = "isHelpBalloonDisplayed", groups="TestBug")
     public void dashBoardPageClickOKButton()
     {
         savedSearchDashlet = dashBoardPage.getDashlet("saved-search").render();

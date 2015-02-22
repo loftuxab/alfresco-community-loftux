@@ -5,17 +5,24 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>LX72</version>
+        <version>LX80-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <!-- Files to exclude from SonarQube analysis -->
+        <sonar.exclusions>
+            source/java/org/alfresco/repo/search/impl/parsers/CMIS*er.java,
+            source/java/org/alfresco/repo/search/impl/parsers/FTSParser.java,
+            source/java/org/alfresco/repo/search/impl/parsers/FTSLexer.java
+        </sonar.exclusions>
+    </properties>
+
     <build>
         <plugins>
-            <!--  See http://jibx.sourceforge.net/maven-jibx-plugin  -->
             <plugin>
                 <groupId>org.jibx</groupId>
                 <artifactId>maven-jibx-plugin</artifactId>
-                <version>${dependency.jibx.version}</version>
                 <configuration>
                     <load>true</load>
                     <schemaBindingDirectory>${project.build.sourceDirectory}/org/alfresco/repo/dictionary</schemaBindingDirectory>

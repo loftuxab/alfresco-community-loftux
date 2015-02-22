@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="Classes" verbose="1" preserve-order="true" parallel="classes" thread-count="1">
+<suite name="Classes" verbose="1" preserve-order="true">
     <groups>
         <run>
             <exclude name="DataPrep.*"/>
@@ -12,7 +12,7 @@
         <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
     </listeners>
 
-    <test name="RepositoryDownloadTests">
+    <!--test name="RepositoryDownloadTests">
         <classes>
             <class name="org.alfresco.share.repository.RepositoryDocumentDownloadTests"/>
         </classes>
@@ -144,12 +144,24 @@
                 </methods>
             </class>
         </classes>
-    </test>
+    </test-->
 
-    <test name="AvatarCaching">
+    <!--test name="AvatarCaching">
         <classes>
             <class name="org.alfresco.share.AvatarCaching"/>
         </classes>
+    </test-->
+
+    <test name="PerformanceTest">
+        <classes>
+            <class name="org.alfresco.share.PerformanceTest"/>
+        </classes>
     </test>
+
+    <!--test name="RepositoryFtpTest">
+        <classes>
+            <class name="org.alfresco.share.repository.RepositoryFtpTest2"/>
+        </classes>
+    </test-->
 
 </suite>

@@ -1161,6 +1161,7 @@ padding: 0;
 border: none;
 border-right: 1px solid #CBCBCB;
 text-align: left;
+cursor: default;
 }
 .yui-skin-hcBlack .yui-dt-list td {
 border-right: none;
@@ -3121,7 +3122,6 @@ display: none;
 .yui-resize {
 position: relative;
 zoom: 1;
-z-index: 0;
 }
 .yui-resize-wrap {
 zoom: 1;

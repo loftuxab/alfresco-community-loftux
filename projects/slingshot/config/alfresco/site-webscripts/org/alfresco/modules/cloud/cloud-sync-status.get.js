@@ -53,7 +53,7 @@ function main()
       {
          // Even though there's no error, lets check we've got the essential location.
          // TODO: I'm not sure when this would occur.
-         if (!nodeDetails.item.location.site)
+         if (!nodeDetails.item.location.container)
          {
             model.error = {
                code: 410,

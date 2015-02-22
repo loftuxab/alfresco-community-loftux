@@ -556,13 +556,15 @@ span.mce_alfresco-linklibrary
    border-color: transparent;
 }
 
-.yui-skin-yellowTheme div.flat-button span.yui-button-hover
+.yui-skin-yellowTheme div.flat-button span.yui-button-hover,
+.yui-skin-yellowTheme div.flat-button span.yui-button-focus
 {
    background: transparent url(images/sprite.png) repeat-x scroll 0 0;
    border-color: #808080;
 }
 
-.yui-skin-yellowTheme div.flat-button span.yui-button-hover span.first-child
+.yui-skin-yellowTheme div.flat-button span.yui-button-hover span.first-child,
+.yui-skin-yellowTheme div.flat-button span.yui-button-focus span.first-child
 {
    border-color: #808080;
 }
@@ -585,7 +587,8 @@ span.mce_alfresco-linklibrary
 
 /* Ensure hover state can be activated */
 
-.yui-skin-yellowTheme .no-check-bg div.flat-button span.yui-button-hover
+.yui-skin-yellowTheme .no-check-bg div.flat-button span.yui-button-hover,
+.yui-skin-yellowTheme .no-check-bg div.flat-button span.yui-button-focus
 {
    background: transparent url(images/sprite.png) repeat-x scroll 0 0;
    border-color: #808080;
@@ -738,6 +741,8 @@ body.yui-skin-yellowTheme .yuimenu .bd
 body.yui-skin-yellowTheme .yuimenu .bd a:focus
 {
    outline: none;
+   background-color: #f6931c;
+   color: #FFF;
 }
 
 /* YUI Menu roll over state */
@@ -752,8 +757,6 @@ body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem-selected
    background-color: #f6931c;
 }
 
-body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel,
-body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel a,
 body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem-selected div .yuimenuitemlabel,
 body.yui-skin-yellowTheme .yuimenu .bd ul li.yuimenuitem-selected div .yuimenuitemlabel a
 {
@@ -862,6 +865,13 @@ body.yui-skin-yellowTheme .categoryview .category .ygtvlph, body.yui-skin-yellow
 body.yui-skin-yellowTheme .categoryview .category .ygtvdepthcell
 {
    background-image: url(images/categoryview-sprite.gif);
+   padding: 1px;
+}
+
+body.yui-skin-yellowTheme .treeview a:focus,
+body.yui-skin-yellowTheme .category a:focus
+{
+   outline: 1px solid #ccc;
 }
 
 body.yui-skin-yellowTheme .treeview .ygtvtn,

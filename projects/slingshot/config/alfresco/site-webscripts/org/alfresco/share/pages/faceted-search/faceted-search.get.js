@@ -182,10 +182,15 @@ var sideBarMenu = {
 
 // Make a request to the Repository to get the configured facets to use in search...
 var rawFacets = [];
-var result = remote.call("/api/facet/facet-config");
-if (result.status.code == status.STATUS_OK)
+var searchConfig = config.scoped["Search"]["search"];
+var displayFacets = searchConfig.getChildValue("display-facets");
+if (displayFacets == "true")
 {
-   rawFacets = JSON.parse(result).facets;
+   var result = remote.call("/api/facet/facet-config");
+   if (result.status.code == status.STATUS_OK)
+   {
+      rawFacets = JSON.parse(result).facets;
+   }
 }
 
 // Iterate over the list of facets and create an array of widgets for each one.
@@ -438,7 +443,7 @@ var searchDocLib = {
       selectedScope: "repo",
       useInfiniteScroll: true,
       siteId: null,
-      rootNode: null,
+      rootNode: repoRootNode,
       repo: true,
       additionalControlsTarget: "FCTSRCH_RESULTS_MENU_BAR",
       additionalViewControlVisibilityConfig: hideOnZeroResultsConfig,
@@ -717,7 +722,7 @@ var main = {
                      config: {
                         visibilityConfig: hideOnZeroResultsConfig,
                         widgets: facets,
-                        additionalCssClasses: "alfresco-Twister-container"
+                        additionalCssClasses: "rounded-border"
                      }
                   },
                   {
@@ -842,8 +847,7 @@ var scopeSelection = {
 main.config.widgets.splice(2, 0, scopeSelection);
 
 // Append services with those required for search
-services.push("alfresco/services/NavigationService",
-              "alfresco/services/SearchService",
+services.push("alfresco/services/SearchService",
               "alfresco/services/ActionService",
               "alfresco/services/DocumentService",
               "alfresco/dialogs/AlfDialogService",

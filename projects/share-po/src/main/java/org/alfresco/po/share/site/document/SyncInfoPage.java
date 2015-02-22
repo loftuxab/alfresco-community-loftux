@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
@@ -25,9 +26,11 @@ import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -40,25 +43,26 @@ import org.openqa.selenium.WebElement;
  */
 public class SyncInfoPage extends SharePage
 {
-
-    private static Log logger = LogFactory.getLog(FileDirectoryInfo.class);
+    public static final By PROMPT_BUTTONS = By.cssSelector("div[id$='prompt']>div.ft>span>span>span.first-child");
+    public static final By REMOVE_CHECKBOX = By.cssSelector("input[id$='requestDeleteRemote']");
+    public static final By STATUS_HEADING = By.cssSelector(".cloud-sync-status-heading");
     private static final By CLOSE_BUTTON = By.cssSelector("div[style*='visible'] div.info-balloon .closeButton");
     private static final By IS_CLOUD_SYNC_STATUS = By.cssSelector("div[style*='visible'] div.cloud-sync-status-heading+p");
-    private static final By SYNC_LOCATION_PRESENT = By.cssSelector("p.location");
+    private static final By SYNC_LOCATION_PRESENT = By.cssSelector("p.location span:not(.document-link) a");
     private static final By REQ_SYNC_BUTTON = By.cssSelector("div[style*='visible'] div.cloud-sync-status-buttons>span:first-child>span>button");
     private static final By REQ_UNSYNC_BUTTON = By.cssSelector("div[style*='visible'] div.cloud-sync-status-buttons>span:last-child>span>button");
     private static final By SYNC_LOCATION = By.cssSelector("div[style*='visible'] .cloud-sync-details-info>p>span[class^='folder-link']>a");
     private static final By SYNC_DOCUMENT_NAME = By.cssSelector(".view-in-cloud");
     private static final By SYNC_PERIOD = By.cssSelector(".cloud-sync-details-info>p>span[title]");
     private static final String DATE_FORMAT = "EEE dd MMM yyyy HH:mm:ss";
-    public static final By PROMPT_BUTTONS = By.cssSelector("div[id$='prompt']>div.ft>span>span>span.first-child");
-    public static final By REMOVE_CHECKBOX = By.cssSelector("input[id$='requestDeleteRemote']");
-    public static final By STATUS_HEADING = By.cssSelector(".cloud-sync-status-heading");
+    private static final By INDIRECT_SYNC_LOCATION = By.cssSelector(".cloud-sync-indirect-root .view-in-cloud");
+    private static final By FAILED_SYNC = By.cssSelector("div[style*='visible'] .cloud-sync-details-failed-detailed");
+    private static final By UNABLE_RETRIEVE_LOCATION = By.xpath("//p[text()='Unable to retrieve location']");
+    private static final By SHOW_DETAILS = By.cssSelector(".cloud-sync-details-failed-show-link");
+    private static final By SYNC_FAILED_HEADER_DETAIL = By.cssSelector(".cloud-sync-error-code");
+    private static final By SYNC_FAILED_TECHNICAL_REPORT = By.cssSelector("textarea[id$='default-cloud-sync-error-details'] ");
 
-    public enum ButtonType
-    {
-        CANCEL, REMOVE;
-    }
+    private static Log logger = LogFactory.getLog(FileDirectoryInfo.class);
 
     public SyncInfoPage(WebDrone drone)
     {
@@ -114,7 +118,7 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(CLOSE_BUTTON).isDisplayed();
+            return drone.find(CLOSE_BUTTON).isDisplayed();
         }
         catch (TimeoutException nse)
         {
@@ -165,7 +169,7 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(REQ_SYNC_BUTTON, WAIT_TIME_3000).isDisplayed();
+            return drone.find(REQ_SYNC_BUTTON).isDisplayed();
         }
         catch (TimeoutException nse)
         {
@@ -183,7 +187,7 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(REQ_UNSYNC_BUTTON, WAIT_TIME_3000).isDisplayed();
+            return drone.find(REQ_UNSYNC_BUTTON).isDisplayed();
         }
         catch (TimeoutException nse)
         {
@@ -209,6 +213,11 @@ public class SyncInfoPage extends SharePage
             logger.error("Unable to find Close button on Sync Info page", e);
             throw new PageException("Not able to click on Sync Info close button.");
         }
+        catch (ElementNotVisibleException env)
+        {
+            logger.info("Nothing to close");
+            return FactorySharePage.resolvePage(drone);
+        }
     }
 
     /**
@@ -220,14 +229,12 @@ public class SyncInfoPage extends SharePage
     {
         try
         {
-            return drone.findAndWait(IS_CLOUD_SYNC_STATUS).getText();
+            return drone.find(IS_CLOUD_SYNC_STATUS).getText();
         }
-        catch (TimeoutException e)
+        catch (NoSuchElementException nse)
         {
-            logger.error("Exceeded the time to find css.", e);
+            return drone.findAndWait(By.cssSelector("div.cloud-sync-status-heading+p")).getText();
         }
-
-        throw new PageException("Not able to find Sync Info status.");
     }
 
     /**
@@ -240,7 +247,14 @@ public class SyncInfoPage extends SharePage
         StringBuilder location = new StringBuilder("");
         try
         {
-            List<WebElement> elements = drone.findAndWaitForElements(SYNC_LOCATION);
+            List<WebElement> elements;
+            drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3);
+            elements = drone.findAll(SYNC_LOCATION);
+
+            if (elements.size() == 0)
+            {
+                elements = drone.findAll(SYNC_LOCATION_PRESENT);
+            }
             int i = elements.size();
             for (WebElement webElement : elements)
             {
@@ -291,7 +305,7 @@ public class SyncInfoPage extends SharePage
         try
         {
             String syncPeriod = drone.findAndWait(SYNC_PERIOD).getAttribute("title");
-            return new SimpleDateFormat(DATE_FORMAT).parse(syncPeriod);
+            return new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH).parse(syncPeriod);
         }
         catch (TimeoutException toe)
         {
@@ -308,10 +322,9 @@ public class SyncInfoPage extends SharePage
      * Unsync button present or not.
      * 
      * @param removeContentFromCloud
-     * @see
-     *      true: Remove content from cloud.
-     *      false: Remove sync with Cloud.
      * @return
+     * @see true: Remove content from cloud.
+     *      false: Remove sync with Cloud.
      */
     public void selectUnsyncRemoveContentFromCloud(boolean removeContentFromCloud)
     {
@@ -404,4 +417,129 @@ public class SyncInfoPage extends SharePage
         return false;
 
     }
+
+    public String getCloudSyncIndirectLocation()
+    {
+        try
+        {
+            return drone.find(INDIRECT_SYNC_LOCATION).getAttribute("text");
+        }
+        catch (NoSuchElementException nse)
+        {
+            return drone.find(By.cssSelector(".cloud-sync-details-info p:nth-of-type(1)")).getAttribute("text");
+        }
+    }
+
+    public boolean isFailedInfoDisplayed()
+    {
+        try
+        {
+            drone.waitUntilElementPresent(SYNC_LOCATION_PRESENT, 3000);
+            return drone.find(FAILED_SYNC).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+            return drone.find(By.cssSelector(".cloud-sync-details-failed-detailed")).isDisplayed();
+        }
+    }
+
+    /**
+     * Unsync button enabled.
+     * 
+     * @return
+     */
+    public boolean isUnsyncButtonEnabled()
+    {
+        try
+        {
+            return drone.find(REQ_UNSYNC_BUTTON).isEnabled();
+        }
+
+        catch (TimeoutException nse)
+        {
+            logger.error("Time out finding unsync button!!", nse);
+        }
+        return false;
+    }
+
+    public boolean isUnableToRetrieveLocation()
+    {
+        try
+        {
+            return drone.find(UNABLE_RETRIEVE_LOCATION).isDisplayed();
+        }
+        catch (NoSuchElementException nse)
+        {
+
+        }
+        return false;
+
+    }
+
+    public enum ButtonType
+    {
+        CANCEL, REMOVE;
+    }
+
+    /**
+     * Method to click Show Details
+     */
+    public void clickShowDetails()
+    {
+        try
+        {
+            drone.findAndWait(SHOW_DETAILS).click();
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageOperationException("Show details element not found", nse);
+        }
+        catch (TimeoutException nse)
+        {
+            throw new PageOperationException("Timeout for finding Show Details element", nse);
+        }
+    }
+
+    /**
+     * Get the failed sync error
+     * 
+     * @return String
+     */
+    public String getSyncFailedErrorDetail()
+    {
+        try
+        {
+            return drone.findAndWait(SYNC_FAILED_HEADER_DETAIL).getText();
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageOperationException("Error element not found", nse);
+        }
+        catch (TimeoutException nse)
+        {
+            throw new PageOperationException("Timeout for finding Error header element", nse);
+        }
+    }
+
+    /**
+     * Get the technical report error when sync fails
+     * 
+     * @return String
+     */
+    public String getTechnicalReport()
+    {
+        try
+        {
+            return drone.findAndWait(SYNC_FAILED_TECHNICAL_REPORT).getText();
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageOperationException("Not able to find Sync Info Location.");
+        }
+        catch (TimeoutException nse)
+        {
+            throw new PageOperationException("Not able to find Sync Info Location.");
+        }
+    }
+
 }

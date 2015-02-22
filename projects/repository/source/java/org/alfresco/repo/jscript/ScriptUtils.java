@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,16 +18,26 @@
  */
 package org.alfresco.repo.jscript;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.alfresco.repo.nodelocator.CompanyHomeNodeLocator;
+import org.alfresco.repo.nodelocator.NodeLocatorService;
+import org.alfresco.repo.nodelocator.SharedHomeNodeLocator;
+import org.alfresco.repo.nodelocator.SitesHomeNodeLocator;
+import org.alfresco.repo.nodelocator.UserHomeNodeLocator;
+import org.alfresco.repo.nodelocator.XPathNodeLocator;
 import org.alfresco.repo.security.permissions.noop.PermissionServiceNOOPImpl;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.module.ModuleDetails;
 import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ScriptPagingDetails;
@@ -107,6 +117,71 @@ public class ScriptUtils extends BaseScopableProcessorExtension
     {
         NodeRef nodeRef = new NodeRef(nodeRefString);
         return (ScriptNode)new ValueConverter().convertValueForScript(this.services, getScope(), null, nodeRef);
+    }
+    
+    /**
+     * Use the Node Locator Service to find the a node reference from a number of possible locator types.
+     * This method is responsible for determining the locator type and then calling the Service as the
+     * Service does not know how to guess which locator to use.
+     * <p>
+     * This service supports 'virtual' nodes including the following:
+     * <p>
+     * alfresco://company/home      The Company Home root node<br>
+     * alfresco://user/home         The User Home node under Company Home<br>
+     * alfresco://company/shared    The Shared node under Company Home<br>
+     * alfresco://sites/home        The Sites home node under Company Home<br>
+     * workspace://.../...          Any standard NodeRef<br>
+     * /app:company_home/cm:...     XPath QName style node reference<br>
+     * 
+     * @param reference     The node reference - See above for list of possible node references supported.
+     * 
+     * @return ScriptNode representing the node or null if not found
+     */
+    public ScriptNode resolveNodeReference(final String reference)
+    {
+        if (reference == null)
+        {
+            throw new IllegalArgumentException("Node 'reference' argument is mandatory.");
+        }
+        
+        final NodeLocatorService locatorService = this.services.getNodeLocatorService();
+        
+        NodeRef nodeRef = null;
+        
+        switch (reference)
+        {
+            case "alfresco://company/home":
+                nodeRef = locatorService.getNode(CompanyHomeNodeLocator.NAME, null, null);
+                break;
+            case "alfresco://user/home":
+                nodeRef = locatorService.getNode(UserHomeNodeLocator.NAME, null, null);
+                break;
+            case "alfresco://company/shared":
+                nodeRef = locatorService.getNode(SharedHomeNodeLocator.NAME, null, null);
+                break;
+            case "alfresco://sites/home":
+                nodeRef = locatorService.getNode(SitesHomeNodeLocator.NAME, null, null);
+                break;
+            default:
+                if (reference.indexOf("://") > 0)
+                {
+                    NodeRef ref = new NodeRef(reference);
+                    if (this.services.getNodeService().exists(ref) && 
+                        this.services.getPermissionService().hasPermission(ref, PermissionService.READ) == AccessStatus.ALLOWED)
+                    {
+                        nodeRef = ref;
+                    }
+                }
+                else if (reference.startsWith("/"))
+                {
+                    final Map<String, Serializable> params = new HashMap<>(1, 1.0f);
+                    params.put(XPathNodeLocator.QUERY_KEY, reference);
+                    nodeRef = locatorService.getNode(XPathNodeLocator.NAME, null, params);
+                }
+                break;
+        }
+        
+        return nodeRef != null ? (ScriptNode)new ValueConverter().convertValueForScript(this.services, getScope(), null, nodeRef) : null;
     }
     
     /**
@@ -217,6 +292,13 @@ public class ScriptUtils extends BaseScopableProcessorExtension
      * Builds a paging object, from the supplied Args object.
      * Requires that the parameters have their standard names,
      *  i.e. "maxItems" and "skipCount"
+     *  
+     * @param args  Mandatory hash of paging arguments<p>
+     *              Possible arguments include:<p>
+     *              maxItems - max count of items to return, default -1 (all)<br>
+     *              skipCount - number of items to skip, default -1 (none)<br>
+     *              queryId<br>
+     *              queryExecutionId
      */
     public ScriptPagingDetails createPaging(Map<String, String> args)
     {
@@ -224,7 +306,7 @@ public class ScriptUtils extends BaseScopableProcessorExtension
         int skipCount = -1;
         String queryId = null;
         
-        if(args.containsKey("maxItems"))
+        if (args.containsKey("maxItems"))
         {
             try
             {
@@ -233,7 +315,7 @@ public class ScriptUtils extends BaseScopableProcessorExtension
             catch(NumberFormatException e)
             {}
         }
-        if(args.containsKey("skipCount"))
+        if (args.containsKey("skipCount"))
         {
             try
             {
@@ -243,7 +325,7 @@ public class ScriptUtils extends BaseScopableProcessorExtension
             {}
         }
         
-        if(args.containsKey("queryId"))
+        if (args.containsKey("queryId"))
         {
             queryId = args.get("queryId");
         }

@@ -45,8 +45,9 @@ import org.springframework.extensions.surf.util.URLDecoder;
 public abstract class AbstractMethod implements VtiMethod
 {
     private final static Log logger = LogFactory.getLog(AbstractMethod.class);
-    protected UrlHelper urlHelper;
+
     protected MethodHandler vtiHandler;
+    protected UrlHelper urlHelper;
     private WebDAVLockService lockService;
     private final static String MAGIC_STRING_IRRECOVERABLE_ERROR = "*-*-* :-| :^| :-/  :-( 8-( *-*-*";
 
@@ -67,15 +68,21 @@ public abstract class AbstractMethod implements VtiMethod
     }
 
     /**
-     * Provide the endpoint with a {@link org.alfresco.module.vti.handler.alfresco.UrlHelper}.
-     *
-     * @param urlHelper
+     * @return the urlHelper
+     */
+    public UrlHelper getUrlHelper()
+    {
+        return urlHelper;
+    }
+
+    /**
+     * @param urlHelper the urlHelper to set
      */
     public void setUrlHelper(UrlHelper urlHelper)
     {
         this.urlHelper = urlHelper;
     }
-
+    
     /** 
      * @see org.alfresco.module.vti.web.fp.VtiMethod#execute(org.alfresco.module.vti.web.fp.VtiFpRequest, org.alfresco.module.vti.web.fp.VtiFpResponse)
      */

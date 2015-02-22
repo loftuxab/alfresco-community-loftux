@@ -54,7 +54,7 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
     private WebElement selectMoreAction()
     {
         WebElement actions = selectAction();
-        getDrone().mouseOver(actions);
+        getDrone().mouseOverOnElement(actions);
         WebElement contentActions = selectAction();
         return contentActions.findElement(By.cssSelector(MORE_ACTIONS));
     }
@@ -575,6 +575,23 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
             }
         }
     }
+
+    
+    @Override
+    public void declareRecord(){
+        
+        try
+        {
+            selectMoreAction().click();
+            super.declareRecord();
+        }
+        catch (NoSuchElementException e)
+        {
+            
+            throw(e);
+        }
+    }
+
     
     /*
      * (non-Javadoc)
@@ -593,4 +610,22 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
         super.selectLocateFile();
     }
 
+
+    
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#selectPreviewWebAsset
+     */
+    @Override
+    public void selectPreviewWebAsset()
+    {
+        if (isFolder())
+        {
+            throw new UnsupportedOperationException("Option Preview Web Asset is only available to Content of type Document");
+        }
+
+        WebElement contentActions = selectAction();
+        getDrone().mouseOverOnElement(contentActions);
+        super.selectPreviewWebAsset();
+    }
 }

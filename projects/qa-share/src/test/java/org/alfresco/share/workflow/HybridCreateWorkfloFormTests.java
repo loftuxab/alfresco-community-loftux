@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) 2005-2012 Alfresco Software Limited.
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.alfresco.share.workflow;
 
 import java.util.List;
@@ -19,7 +33,7 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -80,8 +94,8 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
 
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15600() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut = 300000)
+    public void dataPrep_AONE_15600() throws Exception
     {
         dataPrep(getTestName());
     }
@@ -89,7 +103,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
     /**
      * AONE-15600:Form - Items
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15600() throws Exception
     {
         String testName = getTestName();
@@ -113,11 +127,11 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
          * - Add button
          * - Remove All button
          */
-        Assert.assertTrue(cloudTaskOrReviewPage.isAfterCompletionDropdownPresent());
-        Assert.assertTrue(cloudTaskOrReviewPage.isRemoveAllButtonPresent());
-        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent());
-        Assert.assertFalse(cloudTaskOrReviewPage.isLockOnPremiseSelected());
-        Assert.assertTrue(cloudTaskOrReviewPage.isAddButtonPresent());
+        Assert.assertTrue(cloudTaskOrReviewPage.isAfterCompletionDropdownPresent(), "Completion drop-down list is not present");
+        Assert.assertTrue(cloudTaskOrReviewPage.isRemoveAllButtonPresent(), "'Remove All' button is not presented");
+        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent(), "Selected Items section doesn't contain 'No Items Selected' message");
+        Assert.assertFalse(cloudTaskOrReviewPage.isLockOnPremiseSelected(), "Is lock on Premise selected by default");
+        Assert.assertTrue(cloudTaskOrReviewPage.isAddButtonPresent(), "Add button is not present");
 
         // ---- Step 2 ----
         // --- Step action ---
@@ -130,9 +144,11 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
          * - 'Delete content on cloud and remove sync'.
          */
         List<String> afterComplete = cloudTaskOrReviewPage.getAfterCompletionOptions();
-        Assert.assertTrue(afterComplete.contains(KeepContentStrategy.KEEPCONTENTREMOVESYNC.getStrategy()));
-        Assert.assertTrue(afterComplete.contains(KeepContentStrategy.DELETECONTENT.getStrategy()));
-        Assert.assertTrue(afterComplete.contains(KeepContentStrategy.KEEPCONTENT.getStrategy()));
+        Assert.assertTrue(afterComplete.contains(KeepContentStrategy.KEEPCONTENTREMOVESYNC.getStrategy()),
+                "Keep content on cloud and remove sync option is not displayed");
+        Assert.assertTrue(afterComplete.contains(KeepContentStrategy.DELETECONTENT.getStrategy()),
+                "Delete content on cloud and remove sync option is not displayed");
+        Assert.assertTrue(afterComplete.contains(KeepContentStrategy.KEEPCONTENT.getStrategy()), "Keep content synced on cloud option is not displayed");
 
         // ---- Step 3 ----
         // --- Step action ---
@@ -140,14 +156,15 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // --- Expected results ---
         // The value is chosen successfully.
         cloudTaskOrReviewPage.selectAfterCompleteDropDown(KeepContentStrategy.KEEPCONTENT);
-        Assert.assertTrue(cloudTaskOrReviewPage.isAfterCompletionSelected(KeepContentStrategy.KEEPCONTENT));
+        Assert.assertTrue(cloudTaskOrReviewPage.isAfterCompletionSelected(KeepContentStrategy.KEEPCONTENT),
+                "Keep content synced on cloud option cannot be selected");
 
         // ---- Step 4 ----
         // --- Step action ---
         // Verify Lock on-premise content check-box.
         // --- Expected results ---
         // The check-box is unchecked by default.
-        Assert.assertFalse(cloudTaskOrReviewPage.isLockOnPremiseSelected());
+        Assert.assertFalse(cloudTaskOrReviewPage.isLockOnPremiseSelected(), "Is lock on Premise selected by default");
 
         // ---- Step 5 ----
         // --- Step action ---
@@ -155,28 +172,28 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // --- Expected results ---
         // The check-box is checked successfully.
         cloudTaskOrReviewPage.selectLockOnPremiseCheckbox(true);
-        Assert.assertTrue(cloudTaskOrReviewPage.isLockOnPremiseSelected());
+        Assert.assertTrue(cloudTaskOrReviewPage.isLockOnPremiseSelected(), "Is lock on Premise cannot be set to true");
 
         // ---- Step 6 ----
         // --- Step action ---
         // Verify Selected Items section.
         // --- Expected results ---
         // 'No items selected' message is displayed by default.
-        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent());
+        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent(), "'No Items Selected' message' is not displayed");
 
         // ---- Step 7 ----
         // --- Step action ---
         // Verify the Add and Remove All buttons.
         // --- Expected results ---
         // Add button is enabled, Remove All button is disabled.
-        Assert.assertTrue(cloudTaskOrReviewPage.isAddButtonPresent());
-        Assert.assertFalse(cloudTaskOrReviewPage.isRemoveAllButtonEnabled());
+        Assert.assertTrue(cloudTaskOrReviewPage.isAddButtonPresent(), "Add button is not active or not displayed");
+        Assert.assertFalse(cloudTaskOrReviewPage.isRemoveAllButtonEnabled(), "Remove All button is active");
 
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15601() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut = 300000)
+    public void dataPrep_AONE_15601() throws Exception
     {
         dataPrep(getTestName());
     }
@@ -184,7 +201,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
     /**
      * AONE-15601:Form - Items - Select Items
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15601() throws Exception
     {
         String testName = getTestName();
@@ -216,14 +233,16 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
          * - OK button
          * - Cancel button
          */
-        Assert.assertFalse(selectPage.isFolderUpButtonEnabled());
-        Assert.assertEquals(selectPage.getNoItemsSelected(), "No items selected");
+        Assert.assertFalse(selectPage.isFolderUpButtonEnabled(), "Folder Up button is enabled by default");
+        Assert.assertEquals(selectPage.getNoItemsSelected(), "No items selected", "'No items selected' text is not displayed when no items are chosen");
         Assert.assertTrue(selectPage.isOkButtonPresent());
         Assert.assertTrue(selectPage.isCancelButtonPresent());
-        Assert.assertTrue(selectPage.isCompanyHomeButtonPresent());
+        Assert.assertTrue(selectPage.isCompanyHomeButtonPresent(), "Company button is not displayed");
         List<String> elements = selectPage.getDirectoriesLeftPanel();
-        Assert.assertTrue(elements.contains("Data Dictionary") && elements.contains("Guest Home") && elements.contains("Imap Attachments")
-                && elements.contains("IMAP Home") && elements.contains("Shared") && elements.contains("Sites") && elements.contains("User Homes"));
+        Assert.assertTrue(
+                elements.contains("Data Dictionary") && elements.contains("Guest Home") && elements.contains("Imap Attachments")
+                        && elements.contains("IMAP Home") && elements.contains("Shared") && elements.contains("Sites") && elements.contains("User Homes"),
+                "Default directories from Company Home are NOT displayed");
 
         // ---- Step 3 ----
         // --- Step action ---
@@ -231,7 +250,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // --- Expected results ---
         // The directory is opened. Folder Up picker becomes enabled.
         selectPage.clickElementOnLeftPanel("Sites");
-        Assert.assertTrue(selectPage.isFolderUpButtonEnabled());
+        Assert.assertTrue(selectPage.isFolderUpButtonEnabled(), "Folder Up is not active after selection child object");
 
         // ---- Step 4 ----
         // --- Step action ---
@@ -239,7 +258,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // --- Expected results ---
         // Company Home directory is opened again.
         selectPage.clickFolderUpButton();
-        Assert.assertTrue(selectPage.isCompanyHomeButtonPresent());
+        Assert.assertTrue(selectPage.isCompanyHomeButtonPresent(), "Company Home directory is not displayed after using Up button");
 
         // ---- Step 5 ----
         // --- Step action ---
@@ -255,7 +274,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // --- Expected results ---
         // Company Home directory is opened again.
         selectPage.navigateToRootDir();
-        Assert.assertTrue(selectPage.isCompanyHomeButtonPresent());
+        Assert.assertTrue(selectPage.isCompanyHomeButtonPresent(), "Company Home is not displayed after navigation");
 
         // ---- Step 7 ----
         // ---- Step 8 ----
@@ -268,10 +287,10 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // The document appears in the Selected Items section. Add icon disappears for the added document. Remove icon is present for the document which is
         // present in the Selected Items section.
         selectPage.addItemFromSite(fileName1, opSite);
-        Assert.assertFalse(selectPage.isAddIconPresent(fileName1));
+        Assert.assertFalse(selectPage.isAddIconPresent(fileName1), "Add icon is not disabled after adding the file to workflow");
         List<String> addedItems = selectPage.getAddedItems();
-        Assert.assertTrue(addedItems.contains(fileName1));
-        Assert.assertTrue(selectPage.isRemoveIconPresent(fileName1));
+        Assert.assertTrue(addedItems.contains(fileName1), "Added File is not displayed for Added section");
+        Assert.assertTrue(selectPage.isRemoveIconPresent(fileName1), "Remove button is not displayed for added content");
 
         // ---- Step 10 ----
         // --- Step action ---
@@ -280,8 +299,8 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // The document disappears from the Selected Items section. Add icon appears for the removed document in the Available Items section.
         selectPage.removeItem(fileName1);
         addedItems = selectPage.getAddedItems();
-        Assert.assertFalse(addedItems.contains(fileName1));
-        Assert.assertTrue(selectPage.isAddIconPresent(fileName1));
+        Assert.assertFalse(addedItems.contains(fileName1), "File is still displayed for added section after removing.");
+        Assert.assertTrue(selectPage.isAddIconPresent(fileName1), "Add button for the file is not displayed after removing.");
 
         // ---- Step 11 ----
         // ---- Step action ----
@@ -291,9 +310,9 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // present in the Selected Items section.
         selectPage.addItemFromSite(fileName1, opSite);
         addedItems = selectPage.getAddedItems();
-        Assert.assertTrue(addedItems.contains(fileName1));
-        Assert.assertTrue(selectPage.isRemoveIconPresent(fileName1));
-        Assert.assertFalse(selectPage.isAddIconPresent(fileName1));
+        Assert.assertTrue(addedItems.contains(fileName1), "Added File is not displayed for Added section");
+        Assert.assertTrue(selectPage.isRemoveIconPresent(fileName1), "Remove icon is not displayed for Added file");
+        Assert.assertFalse(selectPage.isAddIconPresent(fileName1), "Add icon is not disabled after adding the file to workflow");
 
         // ---- Step 12 ----
         // --- Step action ---
@@ -302,14 +321,14 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // The window is closed. No data was changed in Selected Items section - no document was added.
         selectPage.selectCloseButton();
         CloudTaskOrReviewPage cloudTaskOrReviewPage = new CloudTaskOrReviewPage(drone);
-        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent());
+        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent(), "Content has been added after closing Select window");
 
         // ---- Step 13 ----
         // ---- Step action ---
         // Verify the Remove All button.
         // ---- Expected results ----
         // The button is disabled.
-        Assert.assertFalse(cloudTaskOrReviewPage.isRemoveAllButtonEnabled());
+        Assert.assertFalse(cloudTaskOrReviewPage.isRemoveAllButtonEnabled(), "Button is enabled after closing Select window");
 
         // ---- Step 14 ----
         // --- Step action ---
@@ -327,14 +346,14 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // ---- Expected results ----
         // The window is closed. No data was changed in Selected Items section - no document was added.
         selectPage.selectCancelButton();
-        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent());
+        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent(), "Content has been added after canceling Select window");
 
         // ---- Step 16 ----
         // ---- Step action ----
         // Verify the Remove All button.
         // ----- Expected results ----
         // The button is disabled.
-        Assert.assertFalse(cloudTaskOrReviewPage.isRemoveAllButtonEnabled());
+        Assert.assertFalse(cloudTaskOrReviewPage.isRemoveAllButtonEnabled(), "Button is enabled after canceling Select window");
 
         // ---- Step 17 ----
         // --- Step action ---
@@ -355,18 +374,18 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
 
         List<SelectedWorkFlowItem> selectedWorkFlowItems = workflow.getSelectedItem(fileName1);
         String itemName = selectedWorkFlowItems.get(0).getItemName();
-        Assert.assertEquals(itemName, fileName1);
+        Assert.assertEquals(itemName, fileName1, "File was not added to workflow.");
 
         // ---- Step 19 ----
         // --- Step action ---
         // Verify the Remove All button.
         // ---- Expected results ----
         // The button is enabled.
-        Assert.assertTrue(cloudTaskOrReviewPage.isRemoveAllButtonEnabled());
+        Assert.assertTrue(cloudTaskOrReviewPage.isRemoveAllButtonEnabled(), "Remove all button is still disabled after addition file");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15602() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut = 300000)
+    public void dataPrep_AONE_15602() throws Exception
     {
         dataPrep(getTestName());
     }
@@ -374,7 +393,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
     /**
      * AONE-15602:Form - Items - Items were selected
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15602() throws Exception
     {
         String testName = getTestName();
@@ -416,12 +435,12 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         ShareLink link = selectedWorkFlowItems.get(0).getItemNameLink();
         String url = link.getHref();
 
-        Assert.assertEquals(itemName, fileName1);
-        Assert.assertTrue(cloudTaskOrReviewPage.getItemDate(fileName1).contains(current_date));
-        Assert.assertTrue(selectedWorkFlowItems.get(0).getDescription().contains("None"));
+        Assert.assertEquals(itemName, fileName1, "File with incorrect name has been added");
+        Assert.assertTrue(cloudTaskOrReviewPage.getItemDate(fileName1).contains(current_date), "Item Date is not correct for added file");
+        Assert.assertTrue(selectedWorkFlowItems.get(0).getDescription().contains("None"), "Description has been added to file");
 
-        Assert.assertTrue(selectedWorkFlowItems.get(0).isRemoveLinkPresent());
-        Assert.assertTrue(selectedWorkFlowItems.get(0).isViewMoreActionsPresent());
+        Assert.assertTrue(selectedWorkFlowItems.get(0).isRemoveLinkPresent(), "'Remove link is not displayed for the file");
+        Assert.assertTrue(selectedWorkFlowItems.get(0).isViewMoreActionsPresent(), "View more action is not displayed for the file");
 
         // ---- Step 2 ----
         // --- Step action ---
@@ -433,7 +452,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         drone.navigateTo(url);
         DocumentDetailsPage docDetails = drone.getCurrentPage().render();
         Assert.assertTrue(docDetails.isDocumentActionPresent(DocumentAction.START_WORKFLOW), "Start workflow is not present");
-        Assert.assertTrue(docDetails.getContentTitle().contains(fileName1));
+        Assert.assertTrue(docDetails.getContentTitle().contains(fileName1), "Title of new tab doesn't contain info about file");
         drone.closeTab();
 
         // ---- Step 3 -----
@@ -445,7 +464,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         cloudTaskOrReviewPage.selectViewMoreActionsBtn(fileName1);
         docDetails = drone.getCurrentPage().render();
         Assert.assertTrue(docDetails.isDocumentActionPresent(DocumentAction.START_WORKFLOW), "Start workflow is not present");
-        Assert.assertTrue(docDetails.getContentTitle().contains(fileName1));
+        Assert.assertTrue(docDetails.getContentTitle().contains(fileName1), "Title of new tab doesn't contain info about file (via View More Actions Button)");
 
         workflow = ShareUserWorkFlow.startCloudReviewTaskWorkFlow(drone).render();
         selectPage = workflow.clickAddItems();
@@ -460,7 +479,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document is removed from the Items section.
         cloudTaskOrReviewPage.selecRemoveBtn(fileName1);
-        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent());
+        Assert.assertTrue(cloudTaskOrReviewPage.isNoItemsSelectedMessagePresent(), "Failed is not removed from workFlow");
 
         // ---- Step 5 ----
         // --- Step action ---
@@ -483,10 +502,10 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         selectPage.selectOKButton();
         selectedWorkFlowItems = workflow.getSelectedItem(fileName1);
         itemName = selectedWorkFlowItems.get(0).getItemName();
-        Assert.assertEquals(itemName, fileName1);
+        Assert.assertEquals(itemName, fileName1, "First file is not added to workFlow");
         selectedWorkFlowItems = workflow.getSelectedItem(fileName2);
         itemName = selectedWorkFlowItems.get(0).getItemName();
-        Assert.assertEquals(itemName, fileName2);
+        Assert.assertEquals(itemName, fileName2, "Second file is not added to workFlow");
 
         // ---- Step 6 -----
         // --- Step action ---
@@ -494,8 +513,8 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document is removed from the Items section. All other previously added documents are still present.
         cloudTaskOrReviewPage.selecRemoveBtn(fileName1);
-        Assert.assertFalse(cloudTaskOrReviewPage.isItemAdded(fileName1));
-        Assert.assertTrue(cloudTaskOrReviewPage.isItemAdded(fileName2));
+        Assert.assertFalse(cloudTaskOrReviewPage.isItemAdded(fileName1), "First file is not removed from workFlow");
+        Assert.assertTrue(cloudTaskOrReviewPage.isItemAdded(fileName2), "Second file is removed during deletion first file");
 
         // ---- Step 7 ----
         // --- Step action ---
@@ -503,11 +522,11 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // ---- Expected results ----
         // All other previously added documents are removed.
         cloudTaskOrReviewPage.selectRemoveAllButton();
-        Assert.assertFalse(cloudTaskOrReviewPage.isItemAdded(fileName2));
+        Assert.assertFalse(cloudTaskOrReviewPage.isItemAdded(fileName2), "Remove All button doesn't work");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15603() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut = 300000)
+    public void dataPrep_AONE_15603() throws Exception
     {
         dataPrep(getTestName());
     }
@@ -515,7 +534,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
     /**
      * AONE-15603:Negative case - Destination is not specified
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15603() throws Exception
     {
         String testName = getTestName();
@@ -547,14 +566,14 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // --- Expected results ---
         // 'The value cannot be empty.' baloon pop-up is displayed above the Destination section.
         cloudTaskOrReviewPage.clickStartWorkflow();
-        Assert.assertTrue(cloudTaskOrReviewPage.isErrorBalloonPresent());
+        Assert.assertTrue(cloudTaskOrReviewPage.isErrorBalloonPresent(), "Baloon error is not displayed when Destination is not specified");
         Assert.assertEquals(cloudTaskOrReviewPage.getErrorBalloonMessage(), "The value cannot be empty.");
 
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15604() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut = 300000)
+    public void dataPrep_AONE_15604() throws Exception
     {
         String testName = getTestName() + "101";
         String cloudSite = getSiteName(testName) + "CL" + "-3";
@@ -570,7 +589,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
     /**
      * AONE-15604:Form - Items
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15604() throws Exception
     {
         String testName = getTestName() + "101";
@@ -609,12 +628,12 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // --- Expected results ---
         // 'The value cannot be empty.' balloon pop-up is displayed above the the Assignee/Reviewers section.
         cloudTaskOrReviewPage.clickStartWorkflow();
-        Assert.assertTrue(cloudTaskOrReviewPage.isErrorBalloonPresent());
+        Assert.assertTrue(cloudTaskOrReviewPage.isErrorBalloonPresent(), "Baloon error is not displayed when Assignee is not specified");
         Assert.assertEquals(cloudTaskOrReviewPage.getErrorBalloonMessage(), "The value cannot be empty.");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_15605() throws Exception
+    @Test(groups = "DataPrepHybrid", timeOut = 300000)
+    public void dataPrep_AONE_15605() throws Exception
     {
         String testName = getTestName();
         String folderName = getFolderName(testName);
@@ -632,7 +651,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
     /**
      * AONE-15605:Form - Items
      */
-    @Test(groups = "Hybrid", enabled = true)
+    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15605() throws Exception
     {
         String testName = getTestName();
@@ -676,7 +695,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // Workflow could not be started' dialog with the message '08150481 At least one content item is required to start a Cloud workflow' is displayed.
         cloudTaskOrReviewPage.clickStartWorkflow();
         String error = cloudTaskOrReviewPage.getWorkFlowCouldNotBeStartedPromptMessage();
-        Assert.assertTrue(error.contains("At least one content item is required to start a Cloud workflow"));
+        Assert.assertTrue(error.contains("At least one content item is required to start a Cloud workflow"), "Error is not displayed when no one file is added");
 
     }
 }

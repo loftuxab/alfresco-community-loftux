@@ -19,9 +19,10 @@ import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.site.NewFolderPage;
 import org.alfresco.po.share.site.UploadFilePage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,6 +54,7 @@ public class FileDirectoryInfoMoreTest extends AbstractDocumentTest
     private String userName = "FileDirectoryInfoMoreTest" + System.currentTimeMillis() + "@test.com";
     private String firstName = userName;
     private String lastName = userName;
+    private String premiunDomain;
 
     /**
      * Pre test setup of a dummy file to upload.
@@ -65,6 +67,7 @@ public class FileDirectoryInfoMoreTest extends AbstractDocumentTest
         siteName = "site" + System.currentTimeMillis();
         folderName = "The first folder";
         folder2Name = "The Second Folder";
+        premiunDomain = "cloud.test";
         folderDescription = String.format("Description of %s", folderName);
         if (!alfrescoVersion.isCloud())
         {
@@ -229,12 +232,11 @@ public class FileDirectoryInfoMoreTest extends AbstractDocumentTest
         Assert.assertTrue(documentLibPage.getFileDirectoryInfo(testSyncFailedFile.getName()).isSyncToCloudLinkPresent(), "Verifying \"Sync to Cloud\" link is present");
     }
 
-
     @Test(dependsOnMethods = "isSyncToCloudLinkPresent", groups = { "Hybrid" })
     public void isSyncFailedIconPresent()
     {
         DestinationAndAssigneePage destinationAndAssigneePage = documentLibPage.getFileDirectoryInfo(testSyncFailedFile.getName()).selectSyncToCloud().render();
-        destinationAndAssigneePage.selectNetwork("premiernet.test");
+        destinationAndAssigneePage.selectNetwork(premiunDomain);
         destinationAndAssigneePage.render();
         documentLibPage = (DocumentLibraryPage)destinationAndAssigneePage.selectSubmitButtonToSync();
         documentLibPage.render();
@@ -260,4 +262,23 @@ public class FileDirectoryInfoMoreTest extends AbstractDocumentTest
         Assert.assertTrue(documentLibPage.getFileDirectoryInfo(testSyncFailedFile.getName()).isSyncFailedIconPresent(70000));
     }
 
+    @Test(dependsOnMethods = "isSyncFailedIconPresent", groups = {"Hybrid"})
+    public void isIndirectlySyncedIconPresent()
+    {
+        ContentDetails contentDetails = new ContentDetails(testName);
+        CloudSignInPage cloudSignInPage = documentLibPage.getFileDirectoryInfo(folderName).selectSyncToCloud().render();
+        DestinationAndAssigneePage destinationAndAssigneePage = cloudSignInPage.loginAs(cloudUserName, cloudUserPassword).render();
+        destinationAndAssigneePage.selectNetwork(premiunDomain);
+        destinationAndAssigneePage.render();
+        documentLibPage = (DocumentLibraryPage)destinationAndAssigneePage.selectSubmitButtonToSync();
+        documentLibPage.render();
+        assertTrue(documentLibPage.getFileDirectoryInfo(folderName).isCloudSynced(), folderName + " wasn't synced");
+        documentLibPage.getFileDirectoryInfo(folderName).clickOnTitle().render();
+        CreatePlainTextContentPage contentPage = documentLibPage.getNavigation().selectCreateContent(ContentType.PLAINTEXT).render();
+        DocumentDetailsPage detailsPage = (DocumentDetailsPage)contentPage.createWithValidation(contentDetails);
+        documentLibPage = detailsPage.getSiteNav().selectSiteDocumentLibrary().getFileDirectoryInfo(folderName).clickOnTitle().render();
+        boolean isIconPresent = documentLibPage.getFileDirectoryInfo(testName).isIndirectlySyncedIconPresent();
+        boolean isIconPresent1 = documentLibPage.getFileDirectoryInfo(folder2Name).isIndirectlySyncedIconPresent();
+        assertTrue(isIconPresent && isIconPresent1, "Indirectly synced icon isn't present");
+    }
 }

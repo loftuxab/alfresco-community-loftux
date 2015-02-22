@@ -34,6 +34,8 @@ public interface FileDirectoryInfo
      * @return true if folder
      */
     boolean isTypeFolder();
+    boolean isFolderType();
+
 
     /**
      * Gets the description of the file or directory, if none then empty string
@@ -58,6 +60,14 @@ public interface FileDirectoryInfo
      * @return List<String> List of tags added to the content
      */
     List<String> getTags();
+
+    /**
+     * Cets the list of inline tags after clicking on tag info icon
+     * string is returned.
+     *
+     * @return List<String> List of inline tags
+     */
+    List<String> getInlineTagsList();
 
     /**
      * Get the {@link List} of added {@link Categories}.
@@ -324,6 +334,20 @@ public interface FileDirectoryInfo
      * @return SyncInfoPage
      */
     SyncInfoPage clickOnViewCloudSyncInfo();
+    
+    /**
+     * This method verifies if cloud info button is displayed
+     *
+     * @return SyncInfoPage
+     */
+    boolean isViewCloudSyncInfoDisplayed();
+    
+    /**
+     * This method verifies if cloud info button is displayed with failed
+     *
+     * @return SyncInfoPage
+     */
+    boolean isCloudSyncFailed();
 
     /**
      * Selects the "Inline Edit" link on the select data row on
@@ -810,6 +834,9 @@ public interface FileDirectoryInfo
      */
     public String getThumbnailURL();
 
+    public void declareRecord();
+    public boolean isTypeRecord();
+
     /**
      * This method verifies the Geolocation Metadata icon is present or not.
      *
@@ -833,5 +860,16 @@ public interface FileDirectoryInfo
     List<String> getDescriptionList();
 
     String getDescriptionFromInfo();
+
+    
+    /***
+     * 
+     * This method clicks on Preview Web Asset for the selected document
+     */
+    public void selectPreviewWebAsset();
+
+    public boolean isIndirectlySyncedIconPresent();
+    
+    public String getSyncInfoToolTip();
 
 }

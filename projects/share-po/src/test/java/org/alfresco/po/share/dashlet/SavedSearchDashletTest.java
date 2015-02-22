@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
@@ -125,7 +125,7 @@ public class SavedSearchDashletTest extends AbstractSiteDashletTest
         siteDashBoard = configureSavedSearchDialogBoxPage.clickOnOKButton().render();
     }
 
-    @Test(dependsOnMethods = "configureSavedSearch")
+    @Test(dependsOnMethods = "configureSavedSearch", groups="TestBug")
     public void verifySavedSearchResult()
     {
         Assert.assertNotNull(siteDashBoard);

@@ -1,25 +1,29 @@
 /*
  * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
  * This file is part of Alfresco
- *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
- *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.alfresco.share.util;
 
+import static org.alfresco.po.share.enums.CloudSyncStatus.ATTEMPTED;
+import static org.alfresco.po.share.enums.CloudSyncStatus.PENDING;
+import static org.alfresco.po.share.enums.CloudSyncStatus.SYNCED;
+
+import java.util.concurrent.TimeUnit;
+
+import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.enums.CloudSyncStatus;
 import org.alfresco.po.share.site.CreateNewFolderInCloudPage;
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
@@ -39,6 +43,7 @@ import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 
@@ -70,19 +75,19 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
         hybridDomainFree = DOMAIN_FREE;
         hybridDomainPremium = DOMAIN_PREMIUM;
-        
+
         adminUserFree = getUserNameForDomain("admin", hybridDomainFree);
         adminUserPrem = getUserNameForDomain("admin", hybridDomainPremium);
 
         CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, adminUserFree);
         CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, adminUserPrem);
-        
+
         if (hybridEnabled)
         {
             setupHybridDrone();
-            CreateUserAPI.createActivateUserAsTenantAdmin(hybridDrone, ADMIN_USERNAME, adminUserFree);
-            CreateUserAPI.createActivateUserAsTenantAdmin(hybridDrone, ADMIN_USERNAME, adminUserPrem);
-            CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, hybridDomainPremium, "1000");
+            CreateUserAPI.createActivateUserAsTenantAdmin(hybridDrone, SUPERADMIN_USERNAME, adminUserFree);
+            CreateUserAPI.createActivateUserAsTenantAdmin(hybridDrone, SUPERADMIN_USERNAME, adminUserPrem);
+            CreateUserAPI.upgradeCloudAccount(hybridDrone, SUPERADMIN_USERNAME, hybridDomainPremium, "1000");
         }
     }
 
@@ -271,7 +276,9 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
             if (!(contentName == null || contentName.isEmpty()))
             {
-                desAndAssPage = ((DestinationAndAssigneePage) (docLibpage.getFileDirectoryInfo(contentName).selectSyncToCloud())).render();
+                docLibpage.getFileDirectoryInfo(contentName).selectSyncToCloud().render();
+                drone.waitUntilElementPresent(By.cssSelector("div.hd, .dijitDialogTitleBar"), TimeUnit.MILLISECONDS.toSeconds(maxWaitTime));
+                desAndAssPage = (DestinationAndAssigneePage) FactorySharePage.resolvePage(drone);
             }
             else
             {
@@ -349,7 +356,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
      */
     public static CloudSyncPage navigateToCloudSync(WebDrone drone)
     {
-        SharePage sharePage = ShareUser.getSharePage(drone);
+        SharePage sharePage = ShareUser.getSharePage(drone).render();
 
         MyProfilePage myProfilePage = sharePage.getNav().selectMyProfile().render();
         return myProfilePage.getProfileNav().selectCloudSyncPage().render();
@@ -373,6 +380,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
 
         String status = "";
         SyncInfoPage syncInfoPage;
+        int i = 0;
 
         try
         {
@@ -394,7 +402,15 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
                         webDriverWait(driver, 1000);
                         // Expected to work for RepoPage too
                         docLibPage = refreshSharePage(driver).render();
-                        docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();
+                        if (i == 6 || i == 11 )
+                        {
+                            logger.info("Select request sync for file " + fileName);
+                            docLibPage.render();
+                            docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();
+                            docLibPage.getFileDirectoryInfo(fileName).selectRequestSync().render();
+                        }
+                        i++;
+                        docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();      
                     }
                     else
                     {
@@ -420,6 +436,98 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
     }
 
     /**
+     * This method is used to get sync status (with retry) for a content from
+     * document library page and returns true if the content has the status sync failed otherwise
+     * false. Since cloud sync is not instantaneous, the method keeps retrying
+     * until maxWaitTime_CloudSync is reached This method could be invoked after
+     * syncToCloud is initiated from document library page.
+     * 
+     * @param driver
+     * @param fileName
+     * @return boolean
+     */
+    public static boolean checkIfSyncFailed(WebDrone driver, String fileName)
+    {
+        DocumentLibraryPage docLibPage = (DocumentLibraryPage) getSharePage(driver);
+        docLibPage = docLibPage.renderItem(maxWaitTime, fileName);
+
+        try
+        {
+            RenderTime t = new RenderTime(maxWaitTimeCloudSync);
+            while (true)
+            {
+                t.start();
+                try
+                {
+                    if (docLibPage.getFileDirectoryInfo(fileName).isCloudSyncFailed())
+                    {
+                        String fileInfo = docLibPage.getFileDirectoryInfo(fileName).getContentInfo();
+                        return fileInfo.contains("failed");
+                    }
+                    else
+                    {
+                        webDriverWait(driver, 1000);
+                        // Expected to work for RepoPage too
+                        docLibPage = refreshSharePage(driver).render();
+                        docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();
+                    }
+                }
+                finally
+                {
+                    t.end();
+                }
+            }
+
+        }
+        catch (PageException e)
+        {
+        }
+        catch (PageRenderTimeException exception)
+        {
+        }
+        return false;
+    }
+
+    /**
+     * This method is used to get sync status (with retry) for a content from
+     * document library page and returns true if the content synced otherwise
+     * false. Since cloud sync is not instantaneous, the method keeps retrying
+     * until maxWaitTime_CloudSync is reached This method could be invoked after
+     * syncToCloud is initiated from document library page. If document is not synced in time
+     * a request sync is made.
+     * 
+     * @param driver
+     * @param fileName
+     * @param siteName
+     * @return boolean
+     */
+    public static void waitForSync(WebDrone driver, String fileName, String siteName)
+    {
+        int counter = 1;
+        int retryRefreshCount = 4;
+        while (counter <= retryRefreshCount)
+        {
+            if (checkIfContentIsSynced(driver, fileName))
+            {
+                break;
+            }
+            else
+            {
+                logger.info("Wait for Sync");
+
+                driver.refresh();
+                counter++;
+
+                if (counter == 2 || counter == 3)
+                {
+                    DocumentLibraryPage docLib = ShareUser.openSitesDocumentLibrary(driver, siteName).render();
+                    docLib.getFileDirectoryInfo(fileName).selectRequestSync().render();
+                }
+            }
+        }
+    }
+
+    /**
      * Navigate to Sync Info Page.
      * 
      * @param drone
@@ -430,7 +538,6 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
     {
         DocumentLibraryPage doclibPage = (DocumentLibraryPage) getSharePage(drone);
         return doclibPage.getFileDirectoryInfo(content).clickOnViewCloudSyncInfo().render();
-
     }
 
     /**
@@ -443,8 +550,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
      * @retrun - DocumentLibraryPage
      * @throw - IllegalArgumentException
      */
-    public static DocumentLibraryPage createNewFolderAndSyncContent(WebDrone drone, String contentName, DestinationAndAssigneeBean desAndAssBean,
-        String folderName)
+    public static DocumentLibraryPage createNewFolderAndSyncContent(WebDrone drone, String contentName, DestinationAndAssigneeBean desAndAssBean, String folderName)
     {
         try
         {
@@ -572,7 +678,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
      * This method is used to check if the description has been updated.
      * If the description hasn't been updated, it refreshes the page and verifies
      * the condition until given period of time
-     *
+     * 
      * @param driver
      * @param fileName
      * @param expectedDescription
@@ -619,4 +725,100 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
         return false;
     }
 
+    public static CloudSyncStatus getCloudSyncStatus(WebDrone driver, String fileName)
+    {
+        DocumentLibraryPage docLibPage = (DocumentLibraryPage) getSharePage(driver);
+        docLibPage.render();
+        SyncInfoPage syncInfoPage;
+        String status;
+
+        try
+        {
+            RenderTime t = new RenderTime(maxWaitTimeCloudSync);
+            while (true)
+            {
+                t.start();
+                try
+                {
+                    logger.info("NodeRef for File being checked: " + ShareUserSitePage.getFileDirectoryInfo(driver, fileName).getNodeRef());
+                    syncInfoPage = docLibPage.getFileDirectoryInfo(fileName).clickOnViewCloudSyncInfo().render();
+                    status = syncInfoPage.getCloudSyncStatus();
+                    syncInfoPage.clickOnCloseButton();
+
+                    // if
+                    // (status.contains(driver.getLanguageValue("sync.status.pending.text")))
+                    if (status.contains(PENDING.getValue()))
+                    {
+                        webDriverWait(driver, 1000);
+                        // Expected to work for RepoPage too
+                        docLibPage = refreshSharePage(driver).render();
+                        docLibPage = docLibPage.renderItem(maxWaitTime, fileName).render();
+                    }
+                    else if (status.contains(ATTEMPTED.getValue()))
+                    {
+                        return ATTEMPTED;
+                    }
+                    else if (status.contains(SYNCED.getValue()))
+                    {
+                        return SYNCED;
+                    }
+                }
+                finally
+                {
+                    t.end();
+                }
+            }
+        }
+        catch (PageException e)
+        {
+        }
+        catch (PageRenderTimeException exception)
+        {
+        }
+        return PENDING;
+    }
+
+    /**
+     * This method is used to wait for a file that had the name updated in cloud and waits for the updated file to appear on enterprise
+     * 
+     * @param driver
+     * @param fileName
+     */
+    public static boolean checkIfFileNameIsUpdated(WebDrone driver, String fileName)
+    {
+        DocumentLibraryPage docLibPage = (DocumentLibraryPage) getSharePage(driver);
+        boolean isFileUpdated;
+        try
+        {
+            RenderTime t = new RenderTime(maxWaitTimeCloudSync);
+            while (true)
+            {
+                t.start();
+                try
+                {
+                    isFileUpdated = docLibPage.isFileVisible(fileName);
+                    if (!isFileUpdated)
+                    {
+                        driver.refresh();
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                finally
+                {
+                    t.end();
+                }
+            }
+        }
+        catch (PageException e)
+        {
+        }
+        catch (PageRenderTimeException exception)
+        {
+        }
+
+        return false;
+    }
 }

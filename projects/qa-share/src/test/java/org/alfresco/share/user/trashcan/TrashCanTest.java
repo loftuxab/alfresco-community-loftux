@@ -18,26 +18,22 @@
  */
 package org.alfresco.share.user.trashcan;
 
-import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.share.util.AbstractCloudSyncTest;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserProfile;
 import org.alfresco.share.util.ShareUserSitePage;
-import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.apache.commons.lang3.StringUtils;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-
 /**
  * Class includes: Tests from TrashCan.
- * 
+ *
  * @author nshah
  */
 @Listeners(FailedTestListener.class)
@@ -49,7 +45,7 @@ public class TrashCanTest extends AbstractCloudSyncTest
     private String adminUserFree = ADMIN_USERNAME;
     private String testDomain = DOMAIN_HYBRID;
     private String format = "EEE d MMM YYYY";
-    
+
     /**
      * Class includes: Tests from TestLink in Area: Advanced Search Tests
      * <ul>
@@ -57,7 +53,7 @@ public class TrashCanTest extends AbstractCloudSyncTest
      * </ul>
      */
     @Override
-    @BeforeClass(alwaysRun=true)
+    @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
         super.setup();
@@ -67,7 +63,7 @@ public class TrashCanTest extends AbstractCloudSyncTest
         testName = this.getClass().getSimpleName();
     }
 
-     @Test(groups = { "DataPrepTrashCan", "HybridSync", "Enterprise42" })
+    @Test(groups = { "DataPrepTrashCan", "HybridSync", "Enterprise42" })
     public void dataPrep_TrashCan_AONE_15084() throws Exception
     {
         String testName = getTestName();
@@ -161,24 +157,24 @@ public class TrashCanTest extends AbstractCloudSyncTest
         docLibPage.isFileVisible(file);
 
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(file).isViewCloudSyncInfoLinkPresent());
-              
-        Assert.assertTrue(AbstractCloudSyncTest.checkIfContentIsSynced(drone, file), "ALF-20445: sync is not happening!!");               
+
+        Assert.assertTrue(AbstractCloudSyncTest.checkIfContentIsSynced(drone, file), "ALF-20445: sync is not happening!!");
 
         ShareUser.logout(drone);
 
         ShareUser.login(hybridDrone, user1, DEFAULT_PASSWORD);
 
-        docLibPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName);        
+        docLibPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName);
 
         Assert.assertTrue(AbstractCloudSyncTest.checkIfContentIsSynced(hybridDrone, file));
-        
+
         Assert.assertTrue(docLibPage.isFileVisible(file));
 
         ShareUser.logout(hybridDrone);
 
     }
 
-     @Test(groups = { "DataPrepTrashCan", "HybridSync", "Enterprise42" })
+    @Test(groups = { "DataPrepTrashCan", "HybridSync", "Enterprise42" })
     public void dataPrep_TrashCan_AONE_15085() throws Exception
     {
         String testName = getTestName();
@@ -219,13 +215,13 @@ public class TrashCanTest extends AbstractCloudSyncTest
     {
         String testName = getTestName();
         String user1 = getUserNameForDomain(testName, testDomain);
-        
+
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
-        
+
         String folderName = testName + System.currentTimeMillis();
-        String file = getFileName(testName)+ System.currentTimeMillis()+".text";
-        
+        String file = getFileName(testName) + System.currentTimeMillis() + ".text";
+
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
         ShareUser.openSitesDocumentLibrary(drone, opSiteName);
@@ -271,8 +267,8 @@ public class TrashCanTest extends AbstractCloudSyncTest
 
         Assert.assertTrue(doclib.getFileDirectoryInfo(folderName).isViewCloudSyncInfoLinkPresent());
 
-        Assert.assertTrue(AbstractCloudSyncTest.checkIfContentIsSynced(drone, file),"ALF-20445: sync is not happening!!");     
-        
+        Assert.assertTrue(AbstractCloudSyncTest.checkIfContentIsSynced(drone, file), "ALF-20445: sync is not happening!!");
+
         ShareUser.logout(drone);
 
         ShareUser.login(hybridDrone, user1, DEFAULT_PASSWORD);
@@ -282,7 +278,7 @@ public class TrashCanTest extends AbstractCloudSyncTest
         Assert.assertTrue(doclib.isFileVisible(folderName));
 
         Assert.assertTrue(doclib.getFileDirectoryInfo(folderName).isCloudSynced());
-        
+
         // Open Folder
         doclib = doclib.selectFolder(folderName).render();
 
@@ -291,7 +287,7 @@ public class TrashCanTest extends AbstractCloudSyncTest
 
     }
 
-     @Test(groups = { "DataPrepTrashCan", "HybridSync", "Enterprise42" })
+    @Test(groups = { "DataPrepTrashCan", "HybridSync", "Enterprise42" })
     public void dataPrep_TrashCan_AONE_15086() throws Exception
     {
         String testName = getTestName();
@@ -315,7 +311,7 @@ public class TrashCanTest extends AbstractCloudSyncTest
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
-       
+
         ShareUser.logout(drone);
 
         ShareUser.login(hybridDrone, user1, DEFAULT_PASSWORD);
@@ -323,7 +319,7 @@ public class TrashCanTest extends AbstractCloudSyncTest
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = {"HybridSync", "Enterprise42" })
+    @Test(groups = { "HybridSync", "Enterprise42" })
     public void AONE_15086() throws Exception
     {
         String testName = getTestName();
@@ -389,7 +385,7 @@ public class TrashCanTest extends AbstractCloudSyncTest
 
     }
 
-     @Test(groups = { "DataPrepTrashCan", "HybridSync", "Enterprise42" })
+    @Test(groups = { "DataPrepTrashCan", "HybridSync", "Enterprise42" })
     public void dataPrep_TrashCan_AONE_15087() throws Exception
     {
         String testName = getTestName();
@@ -428,21 +424,21 @@ public class TrashCanTest extends AbstractCloudSyncTest
 
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
-        String file = getFileName(testName)+ System.currentTimeMillis()+".text";
+        String file = getFileName(testName) + System.currentTimeMillis() + ".text";
         String folderName = testName + System.currentTimeMillis();
 
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
         ShareUser.openSitesDocumentLibrary(drone, opSiteName);
 
-        ShareUserSitePage.createFolder(drone, folderName, folderName);  
+        ShareUserSitePage.createFolder(drone, folderName, folderName);
         ShareUser.uploadFileInFolder(drone, new String[] { file });
 
         DestinationAndAssigneeBean desAndAssBean = new DestinationAndAssigneeBean();
         desAndAssBean.setNetwork(testDomain);
         desAndAssBean.setSiteName(cloudSiteName);
         AbstractCloudSyncTest.syncContentToCloud(drone, folderName, desAndAssBean);
-       
+
         ShareUser.selectContentCheckBox(drone, folderName);
 
         ShareUser.deleteSelectedContent(drone);
@@ -482,4 +478,5 @@ public class TrashCanTest extends AbstractCloudSyncTest
         ShareUser.logout(hybridDrone);
 
     }
+
 }

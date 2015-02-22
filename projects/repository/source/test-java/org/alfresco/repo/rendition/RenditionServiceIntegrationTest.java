@@ -42,6 +42,7 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.content.transform.ContentTransformerRegistry;
+import org.alfresco.repo.content.transform.UnimportantTransformException;
 import org.alfresco.repo.content.transform.magick.ImageTransformationOptions;
 import org.alfresco.repo.jscript.ClasspathScriptLocation;
 import org.alfresco.repo.model.Repository;
@@ -648,7 +649,7 @@ public class RenditionServiceIntegrationTest extends BaseAlfrescoSpringTest
         }
         
         // Give a moment for roll back of rendition and commit of node modification to occur
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         
         // Note that the node modification is retried on failure by RetryingTransactionHelper
         // and will always succeed after the rendition is complete, but due to the 
@@ -1227,7 +1228,7 @@ public class RenditionServiceIntegrationTest extends BaseAlfrescoSpringTest
         performAsyncRendition(testTargetFolder, callback, latch, results);
         
         assertNull(results.getAssoc());
-        assertEquals("Expected a RenditionServiceException", RenditionCancelledException.class, results.getThrowable().getClass());
+        assertEquals("Expected a UnimportantTransformException", UnimportantTransformException.class, results.getThrowable().getClass());
     }
 
     /**

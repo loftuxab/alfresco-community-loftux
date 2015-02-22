@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.alfresco.share.search;
 
 import org.alfresco.po.share.search.LiveSearchDocumentResult;
@@ -10,7 +24,7 @@ import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
@@ -62,7 +76,7 @@ public class LiveSearchTest extends AbstractUtils
     @Test(groups = { "DataPrepLiveSearch" })
     public void dataPrep_LiveSearch_AONE_14200() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName().replace("-", "");
         String testUser = testName + "@" + DOMAIN_LIVE_SEARCH;
         String[] testUserInfo = new String[] { testUser };
         String siteName = getSiteName(testName);
@@ -94,12 +108,12 @@ public class LiveSearchTest extends AbstractUtils
      * 6) Checks that all the links in live search results work properly
      * 7) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug"})
     public void AONE_14200()
     {
 
         // live search term is document title
-        testName = getTestName();
+        testName = getTestName().replace("-", "");
         String testUser = testName + "@" + DOMAIN_LIVE_SEARCH;
         String siteName = getSiteName(testName);
 
@@ -119,7 +133,7 @@ public class LiveSearchTest extends AbstractUtils
         }
 
         // Checks document titles
-        Assert.assertTrue(liveSearchDocumentResults.size() > 0);
+        Assert.assertTrue(liveSearchDocumentResults.size() > 0, "Failed to find document: ISSUE ACE-3319");
         List<String> documentTitles = ShareUserLiveSearch.getLiveSearchDocumentTitles(liveSearchDocumentResults);
 
         if (!documentTitles.contains(testName))
@@ -250,7 +264,7 @@ public class LiveSearchTest extends AbstractUtils
      * displayed in document search results
      * 11) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14201()
     {
 
@@ -468,7 +482,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that there are no people results
      * 6) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch"})
     public void AONE_14203()
     {
         testName = getTestName();
@@ -564,7 +578,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that there are no sites and people results returned
      * 6) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14204()
     {
         testName = getTestName();
@@ -674,7 +688,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that there are no sites and people results returned
      * 6) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14208()
     {
         testName = getTestName();
@@ -788,7 +802,7 @@ public class LiveSearchTest extends AbstractUtils
      * 4) Checks that there are no sites and people results returned
      * 5) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14209()
     {
         testName = getTestName();
@@ -889,7 +903,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that the site with name "n3w s1t3 creat3ed 99" is not returned in live search sites results
      */
 
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch" ,"TestBug"})
     public void AONE_14205()
     {
 
@@ -971,7 +985,7 @@ public class LiveSearchTest extends AbstractUtils
      * 5) Checks that the user with name "n3w.us3r.55" is not returned in live search sites results
      */
 
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14206()
     {
 
@@ -1066,7 +1080,7 @@ public class LiveSearchTest extends AbstractUtils
      * 4) Verify document with title file-1234-1 my is not displayed in document search results
      * 5) Verify there are no sites and people results
      */
-    @Test(groups = { "TestLiveSearch", "EnterpriseOnly" })
+    @Test(groups = { "TestLiveSearch", "EnterpriseOnly" ,"TestBug"})
     public void AONE_15127()
     {
         // live search term is document title
@@ -1164,7 +1178,7 @@ public class LiveSearchTest extends AbstractUtils
      * 4) Checks that the number of documents displayed is less than five and that More link is not displayed
      * 5) User logs out
      */
-    @Test(groups = { "TestLiveSearch" })
+    @Test(groups = { "TestLiveSearch","TestBug" })
     public void AONE_14207()
     {
 
@@ -1189,7 +1203,7 @@ public class LiveSearchTest extends AbstractUtils
         }
 
         // Checks document titles
-        Assert.assertTrue(liveSearchDocumentResults.size() > 0);
+        Assert.assertTrue(liveSearchDocumentResults.size() > 0, "Failed to find document: ISSUE ACE-3319");
         List<String> documentTitles = ShareUserLiveSearch.getLiveSearchDocumentTitles(liveSearchDocumentResults);
         Assert.assertTrue(documentTitles.contains(testName));
 

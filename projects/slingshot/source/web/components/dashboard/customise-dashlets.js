@@ -150,6 +150,9 @@
                break;
             }
          }
+		 
+         dndConfig.keyboardInstruction1 = Dom.get(this.id + "-keyboard-instruction1");
+         dndConfig.keyboardInstruction2 = Dom.get(this.id + "-keyboard-instruction2");
 
          var dnd = new Alfresco.util.DragAndDrop(dndConfig);
          

@@ -13,21 +13,8 @@
     <parent>
         <groupId>org.springframework.extensions.surf</groupId>
         <artifactId>spring-surf-parent</artifactId>
-        <version>LX72</version>
+        <version>LX80-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    
-    <repositories>
-        <repository>
-            <id>apache.snapshots</id>
-            <name>Apache Snapshots Repository</name>
-            <url>http://repository.apache.org/content/groups/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
 
 </project>

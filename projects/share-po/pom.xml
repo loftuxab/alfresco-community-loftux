@@ -5,72 +5,29 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>LX72</version>
+        <version>LX80-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
         <webdrone.page.render.wait.time>6000</webdrone.page.render.wait.time>
         <testng.xml>src/test/resources/testng.xml</testng.xml>
         <test.exclude>nonEnterprise</test.exclude>
-        <selenium.version>2.39.0</selenium.version>
         <testng.suite.filename>src/test/resources/testng_share_po.xml</testng.suite.filename>
-        <webdrone.version>2.6</webdrone.version>
+        <argLine>-Xms512m -Xmx1024m</argLine>
     </properties>
-    <repositories>
-        <repository>
-            <id>alfresco-public-snapshots</id>
-            <releases>
-                <enabled>false</enabled>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-             </snapshots>
-             <name>Alfresco Public Snapshots Repository</name>
-             <url>https://artifacts.alfresco.com/nexus/content/repositories/public-snapshots/</url>
-        </repository>
-    </repositories>
-    
+
     <dependencies>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
-            <version>${selenium.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-server</artifactId>
-            <version>${selenium.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>servlet-api-2.5</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>webdrone</artifactId>
-            <version>${webdrone.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>xercesImpl</artifactId>
-                    <groupId>xerces</groupId>
-                </exclusion>
-            </exclusions>
+            <version>2.7.3</version>
         </dependency>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.8.8</version>
+            <groupId>org.alfresco.test</groupId>
+            <artifactId>alfresco-testng</artifactId>
+            <version>1.1</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -96,17 +53,32 @@
                     <artifactId>xercesImpl</artifactId>
                     <groupId>xerces</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>batik</groupId>
+                    <artifactId>batik-util</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>org.apache.xmlgraphics</groupId>
+                     <artifactId>batik-ext</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xom</groupId>
+                    <artifactId>xom</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis-ext</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-			<scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.2</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -199,8 +171,8 @@
                                             <then>
                                                 <property name="installer.location" location="${basedir}/target/alf-installer.bin" />
                                                 <echo>Downloading Alfresco installer to ${installer.location}...</echo>
-                                                <sshexec username="tomcat" host="pbld01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath" command="ls -rt /data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-enterprise-*-installer-linux-x64.??? | tail -1 | tr ' ' '?' " />
-                                                <scp file="tomcat@pbld01.alfresco.com:${installerPath}" localTofile="${installer.location}" keyfile="${user.home}/.ssh/id_rsa" />
+                                                <sshexec username="tomcat" host="pbam01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath" command="ls -rt /data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-enterprise-*-installer-linux-x64.??? | tail -1 | tr ' ' '?' " />
+                                                <scp file="tomcat@pbam01.alfresco.com:${installerPath}" localTofile="${installer.location}" keyfile="${user.home}/.ssh/id_rsa" />
                                             </then>
                                         </if>
                                         <chmod file="${installer.location}" perm="a+x" verbose="true" />
@@ -291,7 +263,6 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.6.3.201306030806</version>
                         <executions>
                             <execution>
                                 <id>prepare-jacoco</id>
@@ -376,7 +347,6 @@
                                 <suiteXmlFile>src/test/resources/CalendarPageSuite.xml</suiteXmlFile>
                                 <suiteXmlFile>src/test/resources/MyProfileSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
@@ -421,7 +391,6 @@
                                 <suiteXmlFile>src/test/resources/CalendarPageSuite.xml</suiteXmlFile>
                                 <suiteXmlFile>src/test/resources/MyProfileSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
@@ -450,7 +419,6 @@
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/IntermittentTestsSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
@@ -475,7 +443,6 @@
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/InDevSuite.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>
@@ -500,7 +467,6 @@
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/testng_Hybrid.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <argLine>-Xms512m -Xmx1024m</argLine>
                             <excludedGroups>
                                 ${test.exclude}
                             </excludedGroups>

@@ -166,6 +166,7 @@ public class ReplicationJob
      * @throws ParseException
      * @throws InterruptedException
      */
+    @SuppressWarnings("deprecation")
     public ReplicationJobsPage waitUntilJobStarts(WebDrone driver) throws ParseException, InterruptedException
     {
         Date startDate = getScheduleStartDate();

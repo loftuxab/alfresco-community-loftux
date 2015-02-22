@@ -25,16 +25,16 @@
       <@region id="actions-common" scope="template" />
       <@region id="actions" scope="template" />
       <div class="yui-t1" id="alfresco-repository">
-         <div id="yui-main">
-            <div class="yui-b" id="alf-content">
-               <@region id="documentlist_v2" scope="template" />
-            </div>
-         </div>
          <div class="yui-b" id="alf-filters">
             <@region id="filter" scope="template" />
             <@region id="tree" scope="template" />
             <@region id="categories" scope="template" />
             <@region id="tags" scope="template" />
+         </div>
+         <div id="yui-main">
+            <div class="yui-b" id="alf-content">
+               <@region id="documentlist_v2" scope="template" />
+            </div>
          </div>
       </div>
 

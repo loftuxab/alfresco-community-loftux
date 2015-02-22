@@ -21,7 +21,7 @@ import org.alfresco.po.share.dashlet.TopSiteContributorDashlet;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.SiteDashboardPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;

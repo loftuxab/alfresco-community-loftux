@@ -3,7 +3,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>LX72</version>
+        <version>LX80-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco</artifactId>
@@ -85,9 +85,9 @@
             <version>4.3.1</version>
         </dependency>
         <dependency>
-            <groupId>bcel</groupId>
+            <groupId>org.apache.bcel</groupId>
             <artifactId>bcel</artifactId>
-            <version>5.1</version>
+            <version>6.0-RC3</version>
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
@@ -147,6 +147,20 @@
         <dependency>
             <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-repository</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>se.loftux.alfresco</groupId>
+            <artifactId>alfresco-remote-api</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.extensions.surf</groupId>
+            <artifactId>spring-webscripts</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
@@ -282,7 +296,6 @@
    					<execution>
    						<id>pre-exploded-war</id>
    						<goals>
-                        <goal>manifest</goal>
    							<goal>exploded</goal>
    						</goals>
    						<phase>prepare-package</phase>
@@ -428,9 +441,7 @@
                            </goals>
                            <configuration>
                              <includes>
-                               <include>**/org/alfresco/web/app/servlet/DefaultRemoteUserMapperTest.java</include>
-                               <include>**/org/alfresco/web/app/servlet/KerberosRemoteUserMapperTest.java</include>
-                               <include>**/org/alfresco/web/forms/FormsTest.java</include>
+                               <include>**/FormUIGetRestApiIT.java</include>
                              </includes>
                            </configuration>
                         </execution>

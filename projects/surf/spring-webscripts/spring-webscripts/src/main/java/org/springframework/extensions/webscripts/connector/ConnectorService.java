@@ -476,6 +476,15 @@ public class ConnectorService implements ApplicationContextAware
             throw new IllegalArgumentException("HttpSession cannot be null.");
         }
         
+        // Remap connector to use existing credential id connector session endpoint
+        // to allow an endpoint to share another endpoint credentials and connector session
+        // @see SimpleCredentialVault.retrieve()
+        EndpointDescriptor desc = this.remoteConfig.getEndpointDescriptor(endpointId);
+        if (desc.getParentId() != null)
+        {
+            endpointId = desc.getParentId();
+        }
+        
         String key = getSessionEndpointKey(endpointId);
         ConnectorSession cs = (ConnectorSession)session.getAttribute(key);
         if (cs == null)
@@ -498,6 +507,15 @@ public class ConnectorService implements ApplicationContextAware
         if (session == null)
         {
             throw new IllegalArgumentException("HttpSession cannot be null.");
+        }
+        
+        // Remap connector to use existing credential id connector session endpoint
+        // to allow an endpoint to share another endpoint credentials and connector session
+        // @see SimpleCredentialVault.retrieve()
+        EndpointDescriptor desc = this.remoteConfig.getEndpointDescriptor(endpointId);
+        if (desc.getParentId() != null)
+        {
+            endpointId = desc.getParentId();
         }
         
         String key = getSessionEndpointKey(endpointId);
@@ -573,9 +591,6 @@ public class ConnectorService implements ApplicationContextAware
         if (vault == null)
         {
             vault = (CredentialVault)provider.provide(userId);
-            
-            // load the vault
-            vault.load();
             
             // place onto session
             session.setAttribute(cacheKey, vault);

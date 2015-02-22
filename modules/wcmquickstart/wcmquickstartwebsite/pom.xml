@@ -6,7 +6,7 @@
     <parent>
         <artifactId>alfresco-wcmqs-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>LX72</version>
+        <version>LX80-SNAPSHOT</version>
     </parent>
 
     <properties>

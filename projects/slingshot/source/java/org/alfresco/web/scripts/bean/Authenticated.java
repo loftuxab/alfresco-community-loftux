@@ -31,6 +31,8 @@ import org.springframework.extensions.webscripts.servlet.WebScriptServletRequest
 
 /**
  * Test if the current user Session contains an authenticated userid.
+ * 
+ * @author Kevin Roast
  */
 public class Authenticated extends DeclarativeWebScript
 {

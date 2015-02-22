@@ -511,37 +511,6 @@
             <if test="typeQNameId != null">and type_qname_id = #{typeQNameId}</if>
     </delete>
     
-    <delete id="delete_NodesByTxnCommitTime" parameterType="TransactionQuery">
-        <![CDATA[
-        delete from alf_node
-        where
-            type_qname_id = #{typeQNameId} and
-            transaction_id <=
-            (
-                select max(txn.id) from alf_transaction txn
-                where
-                    txn.commit_time_ms < #{maxCommitTime}
-            )
-        ]]>
-    </delete>
-    
-    <delete id="delete_NodePropsByTxnCommitTime" parameterType="TransactionQuery">
-        <![CDATA[
-        delete from alf_node_properties
-        where exists
-        (
-            select 1
-            from
-                alf_node node
-                join alf_transaction txn on (txn.id = node.transaction_id)
-            where
-                node.type_qname_id = #{typeQNameId} and
-                alf_node_properties.node_id = node.id and
-                txn.commit_time_ms < #{maxCommitTime}
-        )
-        ]]>
-    </delete>
-    
     <delete id="delete_NodeProperties" parameterType="NodeProperty">
         delete from alf_node_properties
         where
@@ -920,7 +889,7 @@
             assoc.assoc_index ASC,
             assoc.id ASC
     </sql>
-    <sql id="select_ChildAssocsOfParent_Query">
+    <sql id="select_ChildAssocsOfParent_Snippet">
         <include refid="alfresco.node.select_ChildAssoc_Results"/>
         <include refid="alfresco.node.select_ChildAssoc_FromSimple"/>
         where
@@ -956,6 +925,22 @@
                 <if test="sameStore == true">and parentStore.id = childStore.id</if>
                 <if test="sameStore == false"><![CDATA[and parentStore.id <> childStore.id]]></if>
             </if>
+    </sql>
+    <sql id="select_ChildNodeIds_Limited_Snippet">
+        <![CDATA[
+        select
+            ca.id               as id,
+            ca.child_node_id    as child_node_id
+        from
+            alf_child_assoc ca
+        where
+            ca.parent_node_id = #{parentNode.id} and
+            ca.is_primary = #{isPrimary} and
+            ca.child_node_id >= #{childNode.id}
+            and 1=1
+        order by
+            ca.child_node_id
+        ]]>
     </sql>
     
     <select id="select_ChildAssocById" parameterType="ChildAssoc" resultMap="result_ChildAssoc">
@@ -1109,7 +1094,7 @@
     </select>
     
     <select id="select_ChildAssocsOfParent" parameterType="ChildAssoc" resultMap="result_ChildAssoc">
-        <include refid="alfresco.node.select_ChildAssocsOfParent_Query"/>
+        <include refid="alfresco.node.select_ChildAssocsOfParent_Snippet"/>
         <if test="ordered == true">
             <include refid="alfresco.node.select_ChildAssoc_OrderBy"/>
         </if>

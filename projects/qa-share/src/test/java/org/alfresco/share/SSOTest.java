@@ -24,7 +24,7 @@ import org.alfresco.po.share.LoginPage;
 import org.alfresco.po.share.Navigation;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.po.thirdparty.pentaho.PentahoUserConsolePage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;

@@ -18,11 +18,18 @@
  */
 package org.alfresco.po.share.dashlet;
 
+import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
@@ -93,5 +100,29 @@ public class RssFeedDashlet extends AbstractDashlet implements Dashlet
         {
             throw new ShareException("Unable to find configure button");
         }
+    }
+
+    /**
+     * Method to get the headline sites from the dashlet
+     *
+     * @return List<String>
+     */
+    public List<ShareLink> getHeadlineLinksFromDashlet()
+    {
+        List<ShareLink> rssLinks = new ArrayList<ShareLink>();
+        try
+        {
+            List<WebElement> links = drone.findAll(By.cssSelector(".headline>h4>a"));
+            for (WebElement div : links)
+            {
+                rssLinks.add(new ShareLink(div, drone));
+            }
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageException("Unable to access dashlet data", nse);
+        }
+
+        return rssLinks;
     }
 }

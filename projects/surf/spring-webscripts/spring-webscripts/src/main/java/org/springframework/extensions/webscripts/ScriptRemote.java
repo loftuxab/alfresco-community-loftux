@@ -265,19 +265,7 @@ public class ScriptRemote
     )
     public boolean isEndpointPersistent(@ScriptParameter(help="Endpoint id") String id)
     {
-        boolean persistent = false;
-        
-        RemoteConfigElement remoteConfig = getRemoteConfig();
-        if(remoteConfig != null)
-        {
-            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-            if(descriptor != null)
-            {
-                persistent = descriptor.getPersistent();
-            }
-        }
-        
-        return persistent;
+        return false;
     }    
 
     /**

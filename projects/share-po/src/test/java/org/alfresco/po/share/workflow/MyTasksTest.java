@@ -29,7 +29,7 @@ import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.task.EditTaskPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -43,6 +43,7 @@ import org.testng.annotations.Test;
  * @since 1.6.2
  */
 @Listeners(FailedTestListener.class)
+@Test(groups = {"TestBug" })
 public class MyTasksTest extends AbstractTest
 {
     private String siteName;

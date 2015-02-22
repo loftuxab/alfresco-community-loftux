@@ -14,7 +14,10 @@
  */
 package org.alfresco.po.share;
 
+import org.alfresco.po.alfresco.RepositoryAdminConsolePage;
+import org.alfresco.po.alfresco.TenantAdminConsolePage;
 import org.alfresco.po.alfresco.WebScriptsPage;
+import org.alfresco.po.alfresco.webdav.WebDavPage;
 import org.alfresco.po.share.admin.AdminConsolePage;
 import org.alfresco.po.share.admin.ManageSitesPage;
 import org.alfresco.po.share.adminconsole.CategoryManagerPage;
@@ -30,8 +33,29 @@ import org.alfresco.po.share.dashlet.InsertOrEditLinkPage;
 import org.alfresco.po.share.dashlet.mydiscussions.CreateNewTopicPage;
 import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
 import org.alfresco.po.share.reports.AdhocAnalyzerPage;
-import org.alfresco.po.share.search.*;
-import org.alfresco.po.share.site.*;
+import org.alfresco.po.share.search.AdvanceSearchCRMPage;
+import org.alfresco.po.share.search.AdvanceSearchContentPage;
+import org.alfresco.po.share.search.AdvanceSearchFolderPage;
+import org.alfresco.po.share.search.AdvanceSearchPage;
+import org.alfresco.po.share.search.AllSitesResultsPage;
+import org.alfresco.po.share.search.CopyAndMoveContentFromSearchPage;
+import org.alfresco.po.share.search.CreateNewFilterPopUpPage;
+import org.alfresco.po.share.search.FacetedSearchConfigPage;
+import org.alfresco.po.share.search.FacetedSearchPage;
+import org.alfresco.po.share.search.RepositoryResultsPage;
+import org.alfresco.po.share.search.SiteResultsPage;
+import org.alfresco.po.share.site.AddGroupsPage;
+import org.alfresco.po.share.site.CreateSitePage;
+import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
+import org.alfresco.po.share.site.CustomizeSitePage;
+import org.alfresco.po.share.site.InviteMembersPage;
+import org.alfresco.po.share.site.NewFolderPage;
+import org.alfresco.po.share.site.PendingInvitesPage;
+import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.SiteFinderPage;
+import org.alfresco.po.share.site.SiteGroupsPage;
+import org.alfresco.po.share.site.SiteMembersPage;
+import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.blog.BlogPage;
 import org.alfresco.po.share.site.blog.PostViewPage;
 import org.alfresco.po.share.site.calendar.CalendarPage;
@@ -40,16 +64,46 @@ import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
 import org.alfresco.po.share.site.datalist.DataListPage;
 import org.alfresco.po.share.site.datalist.NewListForm;
 import org.alfresco.po.share.site.discussions.DiscussionsPage;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
+import org.alfresco.po.share.site.document.CreateHtmlContentPage;
+import org.alfresco.po.share.site.document.CreatePlainTextContentPage;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.EditInGoogleDocsPage;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.InlineEditPage;
+import org.alfresco.po.share.site.document.ManagePermissionsPage;
+import org.alfresco.po.share.site.document.MyFilesPage;
+import org.alfresco.po.share.site.document.SharedFilesPage;
+import org.alfresco.po.share.site.document.TagPage;
+import org.alfresco.po.share.site.document.ViewPropertiesPage;
 import org.alfresco.po.share.site.links.LinksDetailsPage;
 import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.po.share.site.wiki.WikiPageList;
-import org.alfresco.po.share.systemsummary.*;
+import org.alfresco.po.share.systemsummary.FileServersPage;
+import org.alfresco.po.share.systemsummary.ModelAndMessagesConsole;
+import org.alfresco.po.share.systemsummary.RepositoryServerClusteringPage;
+import org.alfresco.po.share.systemsummary.SystemSummaryPage;
+import org.alfresco.po.share.systemsummary.TenantConsole;
+import org.alfresco.po.share.systemsummary.TransformationServicesPage;
 import org.alfresco.po.share.systemsummary.directorymanagement.DirectoryManagementPage;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.task.TaskDetailsPage;
-import org.alfresco.po.share.user.*;
+import org.alfresco.po.share.user.AccountSettingsPage;
+import org.alfresco.po.share.user.CloudSignInPage;
+import org.alfresco.po.share.user.CloudSyncPage;
+import org.alfresco.po.share.user.EditProfilePage;
+import org.alfresco.po.share.user.LanguageSettingsPage;
+import org.alfresco.po.share.user.MyProfilePage;
+import org.alfresco.po.share.user.NotificationPage;
+import org.alfresco.po.share.user.TrashCanPage;
+import org.alfresco.po.share.user.UserContentPage;
+import org.alfresco.po.share.user.UserSitesPage;
+import org.alfresco.po.share.user.FollowingPage;
+import org.alfresco.po.share.user.FollowersPage;
+import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
@@ -88,7 +142,7 @@ public class FactorySharePage implements PageFactory
     protected static final String FAILURE_PROMPT = "div[id='prompt']";
     protected static final String SHARE_DIALOGUE = "div.hd, .dijitDialogTitleBar";
     protected static ConcurrentHashMap<String, Class<? extends SharePage>> pages;
-    //private static final By SHARE_DIALOGUE_HEADER = By.cssSelector("div.hd");
+    protected static final By SHARE_DIALOGUE_HEADER = By.cssSelector("div.hd");
     private static final String cloudSignInDialogueHeader = "Sign in to Alfresco in the cloud";
 
     static
@@ -180,7 +234,12 @@ public class FactorySharePage implements PageFactory
         pages.put("status", StatusBulkImportPage.class);
         pages.put("inplace", InPlaceBulkImportPage.class);
         pages.put("index", WebScriptsPage.class);
+        pages.put("webdav", WebDavPage.class);
+        pages.put("admin-tenantconsole", TenantAdminConsolePage.class);
+        pages.put("admin-repoconsole", RepositoryAdminConsolePage.class);
         pages.put("user-content", UserContentPage.class);
+        pages.put("following", FollowingPage.class);
+        pages.put("followers", FollowersPage.class);
         pages.put("replication-jobs", ReplicationJobsPage.class);
         pages.put("replication-job", NewReplicationJobPage.class);
         pages.put("Home", PentahoUserConsolePage.class);
@@ -520,6 +579,10 @@ public class FactorySharePage implements PageFactory
                 else if(dialogueID.contains("Create New Filter"))
                 {
                         sharePage = new CreateNewFilterPopUpPage(drone);
+                }
+                else if(dialogueID.contains("cloud-folder-title"))
+                {
+                    sharePage = new DestinationAndAssigneePage(drone);
                 }
             }
         }

@@ -4144,12 +4144,24 @@ function AgendaEventRenderer() {
 			}
 		});
 		function updateTimeText(minuteDelta) {
+			var eventElementText = timeElement.text();
+			/* Is time event element text contains event title  */
+			var containsTitle = eventElementText.indexOf(event.title) != -1;
 			var newStart = addMinutes(cloneDate(event.start), minuteDelta);
 			var newEnd;
 			if (event.end) {
 				newEnd = addMinutes(cloneDate(event.end), minuteDelta);
 			}
-			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
+			/* MNT-10290 fix */
+			/* If time event element text contains event title put it back  */
+			if (containsTitle)
+			{
+				timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')) + " - " + event.title);
+			}
+			else
+			{
+				timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
+			}
 		}
 		function resetElement() {
 			// convert back to original slot-event

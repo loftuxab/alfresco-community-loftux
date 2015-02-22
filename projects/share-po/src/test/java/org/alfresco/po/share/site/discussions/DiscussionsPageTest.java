@@ -1,26 +1,31 @@
 package org.alfresco.po.share.site.discussions;
 
+import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.ALL;
+import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.MOST_ACTIVE;
+import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.MY_TOPICS;
+import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.NEW;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
 import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SitePageType;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.po.thirdparty.firefox.RssFeedPage;
+import org.alfresco.test.FailedTestListener;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.alfresco.po.share.site.discussions.TopicsListFilter.FilterOption.*;
-import static org.testng.Assert.*;
 
 /**
  * Holds tests for Discussion page web elements

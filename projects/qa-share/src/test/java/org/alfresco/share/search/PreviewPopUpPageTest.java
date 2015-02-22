@@ -14,7 +14,7 @@ import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSearchPage;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class PreviewPopUpPageTest extends AbstractUtils
 {
-    private static Log logger = LogFactory.getLog(BasicSearchTest.class);    
+    private static Log logger = LogFactory.getLog(PreviewPopUpPageTest.class);
 
     protected String testUser;
     
@@ -49,7 +49,7 @@ public class PreviewPopUpPageTest extends AbstractUtils
     
     // Data prep
     @Test(groups={"DataPrepSearch"})
-    public void dataPrep_ALF_3260() throws Exception
+    public void dataPrep_AONE_16061() throws Exception
     {
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
@@ -90,11 +90,13 @@ public class PreviewPopUpPageTest extends AbstractUtils
             String[] fileInfo = { fileName[index] };
             ShareUser.uploadFileInFolder(drone, fileInfo);
         }
+
+        ShareUser.logout(drone);
     }
     
     // Data prep to create image files in a site
     @Test(groups={"DataPrepSearch"})
-    public void dataPrep_ALF_3259() throws Exception
+    public void dataPrep_AONE_16060() throws Exception
     {
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
@@ -124,6 +126,8 @@ public class PreviewPopUpPageTest extends AbstractUtils
             String[] fileInfo = { fileName[index] };
             ShareUser.uploadFileInFolder(drone, fileInfo);
         }
+
+        ShareUser.logout(drone);
     }
 
     
@@ -135,7 +139,7 @@ public class PreviewPopUpPageTest extends AbstractUtils
      * </ul>
      */
     @Test
-    public void ALF_3259()
+    public void AONE_16060()
     {
 
         /**Start Test*/
@@ -174,13 +178,14 @@ public class PreviewPopUpPageTest extends AbstractUtils
 
         for (int index=0; index <= fileTypes; index++)
         {
-            PreViewPopUpImagePage preViewPopUpImagePage = facetedSearchPage.getResultByName(fileName[index]).clickImageLinkToPicture().render();;
+            PreViewPopUpImagePage preViewPopUpImagePage = facetedSearchPage.getResultByName(fileName[index]).clickImageLinkToPicture().render();
             Assert.assertTrue(preViewPopUpImagePage.isPreViewPopupPageVisible(),"Preview image is displayed successfully");
             facetedSearchPage = preViewPopUpImagePage.selectClose().render();
             Assert.assertTrue(facetedSearchPage.isTitlePresent("Search"));
 
         }
 
+        ShareUser.logout(drone);
     }
     
     /**
@@ -191,7 +196,7 @@ public class PreviewPopUpPageTest extends AbstractUtils
      * </ul>
      */
     @Test
-    public void ALF_3260()
+    public void AONE_16061()
     {
 
         /**Start Test*/
@@ -250,6 +255,8 @@ public class PreviewPopUpPageTest extends AbstractUtils
             Assert.assertTrue(facetedSearchPage.isTitlePresent("Search"));
 
         }
+
+        ShareUser.logout(drone);
     		
     }   
     

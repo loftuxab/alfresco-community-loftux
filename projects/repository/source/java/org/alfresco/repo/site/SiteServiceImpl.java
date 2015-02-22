@@ -1210,22 +1210,26 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     {
         final int maxResults = size > 0 ? size : 1000;
         final Set<String> siteNames = new TreeSet<String>();
-        authorityService.getContainingAuthoritiesInZone(AuthorityType.GROUP, userName, AuthorityService.ZONE_APP_SHARE, new AuthorityFilter(){
-            @Override
-            public boolean includeAuthority(String authority)
+        
+        // MNT-13198 - use the bridge table
+        String actualUserName = personService.getUserIdentifier(userName);
+        if(actualUserName != null)
+        {
+            Set<String> containingAuthorities = authorityService.getContainingAuthorities(AuthorityType.GROUP, actualUserName, false);
+            for(String authority : containingAuthorities)
             {
                 if (siteNames.size() < maxResults)
                 {
                     String siteName = resolveSite(authority);
                     // MNT-10836 fix, after MNT-10109 we should also check site existence
-                    if (siteName == null || getSite(siteName) == null)
+                    // A simple exists check would be better than getting the site properties etc - profiling suggests x2 faster
+                    if ((siteName != null) && hasSite(siteName))
                     {
-                        return false;
+                        siteNames.add(siteName);
                     }
-                    return siteNames.add(siteName);
                 }
-                return false;
-            }}, maxResults);
+            }
+        }
         if (siteNames.isEmpty())
         {
             return Collections.emptyList();

@@ -7,15 +7,29 @@
  */
 package org.alfresco.po.share.site.document;
 
+import static org.alfresco.po.share.site.document.DocumentAspect.CLASSIFIABLE;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.site.*;
+import org.alfresco.po.share.site.NewFolderPage;
+import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.SiteFinderPage;
+import org.alfresco.po.share.site.SitePage;
+import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
 import org.alfresco.po.share.user.CloudSyncPage;
 import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.po.share.workflow.StartWorkFlowPage;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,14 +39,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.alfresco.po.share.site.document.DocumentAspect.CLASSIFIABLE;
-import static org.testng.Assert.*;
 
 /**
  * Integration test to verify document library page is operating correctly.
@@ -292,7 +298,7 @@ public class FileDirectoryInfoTest extends AbstractDocumentTest
         Assert.assertTrue(thisRow.getVersionInfo().equalsIgnoreCase("1.0"));
     }
 
-    @Test(groups = { "alfresco-one" }, priority = 11)
+    @Test(groups = { "alfresco-one", "TestBug" }, priority = 11)
     public void test111ContentEditInfoForFile() throws Exception
     {
         // Get File

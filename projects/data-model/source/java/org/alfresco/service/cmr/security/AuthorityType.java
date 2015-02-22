@@ -18,6 +18,8 @@
  */
 package org.alfresco.service.cmr.security;
 
+import org.alfresco.api.AlfrescoPublicApi;
+
 /**
  * The types of authority that are available.
  * <p>
@@ -34,6 +36,7 @@ package org.alfresco.service.cmr.security;
  * 
  * @author Andy Hind
  */
+@AlfrescoPublicApi
 public enum AuthorityType
 {
     ADMIN

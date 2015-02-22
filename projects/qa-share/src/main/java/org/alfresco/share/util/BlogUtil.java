@@ -1,10 +1,14 @@
 package org.alfresco.share.util;
 
+import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.blog.BlogPage;
 import org.alfresco.po.thirdparty.wordpress.WordPressMainPage;
 import org.alfresco.po.thirdparty.wordpress.WordPressSignInPage;
 import org.alfresco.po.thirdparty.wordpress.WordPressUserPage;
 import org.alfresco.webdrone.WebDrone;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 /**
  * Util class to manager Blog Publishing
@@ -14,6 +18,9 @@ import org.openqa.selenium.NoSuchElementException;
  */
 public class BlogUtil extends AbstractUtils
 {
+    private static final String POST_TITLE_PREVIEW = "//div[@class='nodeTitle']/a";
+
+
     /**
      * Method to verify whether post is published to WordPress
      *
@@ -90,4 +97,32 @@ public class BlogUtil extends AbstractUtils
             drone.navigateTo(currentUrl);
         }
     }
+
+    /**
+     * Method to get postId
+     * @param drone
+     * @param siteName
+     * @param postName
+     * @return String
+     */
+
+    public static String getPostId (WebDrone drone, String siteName, String postName)
+    {
+        try
+        {
+
+            SiteDashboardPage site = ShareUser.openSiteDashboard(drone, siteName).render();
+            BlogPage blogPage = site.getSiteNav().selectBlogPage().render();
+            blogPage.openBlogPost(postName);
+            WebElement element = drone.findAndWait(By.xpath(POST_TITLE_PREVIEW));
+            String postId = element.getAttribute("href").split("\\&")[0];
+            postId = postId.split("[?=]+")[2];
+            return postId;
+        }
+        catch (NoSuchElementException ex)
+        {
+            throw new NoSuchElementException("Element not found", ex);
+        }
+    }
+
 }

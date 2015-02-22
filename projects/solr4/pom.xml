@@ -15,7 +15,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>LX72</version>
+        <version>LX80-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -130,6 +130,7 @@
         </dependency>
 
         <!-- War dependency on the Vanilla Solr WAR -->
+        <!-- source/web/js/scripts/plugins.js is patched v.4.9.1. See MNT-13130 -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>

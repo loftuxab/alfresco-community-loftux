@@ -124,9 +124,63 @@
          Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
          
          var jsNode = oRecord.getData("jsNode"),
-            nodeRef = jsNode.nodeRef;
+             nodeRef = jsNode.nodeRef,
+             name = oRecord.getData("displayName"),
+             checkbox = document.createElement("input"),
+             label = document.createElement("label");
+         checkbox.id = "checkbox-" + oRecord.getId();
+         checkbox.type = "checkbox";
+         checkbox.name = "fileChecked";
+         checkbox.value = nodeRef;
+         checkbox.checked = scope.selectedFiles[nodeRef] ? true : false;
          
-         elCell.innerHTML = '<input id="checkbox-' + oRecord.getId() + '" type="checkbox" name="fileChecked" value="'+ nodeRef + '"' + (scope.selectedFiles[nodeRef] ? ' checked="checked">' : '>');
+         label.id = "label_for_" + checkbox.id;
+         label.style.fontSize="0em";
+         label.innerHTML = (checkbox.checked ? scope.msg("checkbox.uncheck") : scope.msg("checkbox.check")) + " " + name;
+         label.setAttribute("for", checkbox.id);
+         elCell.innerHTML = '';
+         elCell.appendChild(label);
+         elCell.appendChild(checkbox);
+         Event.addListener(checkbox, "click", function(e)
+         {
+            label.innerHTML = (checkbox.checked ? scope.msg("checkbox.uncheck") : scope.msg("checkbox.check")) + " " + name;
+         }, checkbox, true);
+
+         // MNT-12522
+         var row = Dom.getAncestorByTagName(elCell, "tr");
+         Event.addListener(checkbox, "focus", function()
+         {
+            _unhighlightRows(this);
+            this.onEventHighlightRow({target : row});
+         }, this.parentDocumentList, true);
+
+         new YAHOO.util.KeyListener(checkbox,
+         {
+            keys : YAHOO.util.KeyListener.KEY.TAB,
+            shift : true
+         },
+         {
+            fn : function()
+            {
+               _unhighlightRows(this);
+               var previous = Dom.getPreviousSibling(row);
+               if (previous !== null)
+               {
+                  this.onEventHighlightRow({target : previous});
+               }
+            },
+            scope : this.parentDocumentList,
+            correctScope : true
+         }, "keydown").enable();
+
+         function _unhighlightRows(scope)
+         {
+            var highlightedRows = Dom.getElementsByClassName("yui-dt-highlighted", "tr", Dom.getAncestorByTagName(row, "tbody"));
+            for (var i = 0; i < highlightedRows.length; i++)
+            {
+               scope.onEventUnhighlightRow({target : highlightedRows[i]});
+            }
+         }
       },
       
       /**

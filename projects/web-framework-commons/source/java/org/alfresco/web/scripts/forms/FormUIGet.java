@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -648,7 +648,6 @@ public class FormUIGet extends DeclarativeWebScript
         formUIModel.put(MODEL_SUBMISSION_URL, discoverSubmissionUrl(context));
         formUIModel.put(MODEL_ARGUMENTS, discoverArguments(context));
         formUIModel.put(MODEL_DATA, discoverData(context));
-        formUIModel.put(MODEL_SHOW_CAPTION, discoverBooleanParam(context, MODEL_SHOW_CAPTION));
         formUIModel.put(MODEL_SHOW_CANCEL_BUTTON, discoverBooleanParam(context, MODEL_SHOW_CANCEL_BUTTON));
         formUIModel.put(MODEL_SHOW_RESET_BUTTON, discoverBooleanParam(context, MODEL_SHOW_RESET_BUTTON));
         formUIModel.put(MODEL_SHOW_SUBMIT_BUTTON, discoverBooleanParam(context, MODEL_SHOW_SUBMIT_BUTTON, true));
@@ -675,12 +674,37 @@ public class FormUIGet extends DeclarativeWebScript
         // properties of the model
         processFields(context, formUIModel);
         
+        // detect 'showCaption' after 'constraints' were generated
+        formUIModel.put(MODEL_SHOW_CAPTION, discoverBooleanParam(context, MODEL_SHOW_CAPTION, getDefaultShowCaption(context)));
+        
         // dump the model for debugging
         dumpFormUIModel(formUIModel);
         
         return formUIModel;
     }
     
+    /**
+     * Returns default showCaption flag
+     * 
+     * @param context The context
+     * @return Default showCaption flag
+     */
+    private boolean getDefaultShowCaption(ModelContext context)
+    {
+        if (context.getMode() == Mode.VIEW)
+        {
+            return false;
+        }
+        for (Constraint constraint : context.getConstraints())
+        {
+            if (CONSTRAINT_MANDATORY.equals(constraint.getId()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Determines the "enctype" that should be used for the form.
      * 

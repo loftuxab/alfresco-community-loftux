@@ -161,8 +161,8 @@ public class ResizeableArrayList<E> extends AbstractList<E> implements List<E>, 
      * @param comparator The {@link Comparator} to sort with
      */
     @SuppressWarnings("unchecked")
-    public <T> void sort(Comparator<T> comparator)
+    public void sort(Comparator<? super E> comparator)
     {
-        DualPivotQuickSort.sort((T[])values, 0, size -1 , comparator);
+        DualPivotQuickSort.sort((E[])values, 0, size -1 , comparator);
     }
 }

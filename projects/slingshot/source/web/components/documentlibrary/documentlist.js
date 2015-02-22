@@ -188,14 +188,25 @@
                 // target request being fired (it's possible that an element could be specified as a
                 // YUI drag and drop target for the purposes of controlling drag events without actually
                 // allowing drops to occur
-                var payload =
+		var fpanel = Dom.get("alf-filters"),
+		offset = (fpanel ? parseInt(fpanel.style.width, 10) : 160);
+				
+		if(e.clientX > offset)
                 {
-                   elementId: id,
-                   callback: this.onDropTargetOwnerCallBack,
-                   scope: this
-                }
+		    // If the current x co-ordinate of the mouse pointer is greater than the width
+		    //of the tree element then we shouldn't move folder/documents.
+		}
+                else
+		{
+                    var payload =
+                    {
+                        elementId: id,
+                        callback: this.onDropTargetOwnerCallBack,
+                        scope: this
+                    }
+		    YAHOO.Bubbling.fire("dropTargetOwnerRequest", payload);           
+		}
                 this._inFlight = true;
-                YAHOO.Bubbling.fire("dropTargetOwnerRequest", payload);
                 this._setFailureTimeout();
              }
           }
@@ -1512,16 +1523,24 @@
          // Reload the node's metadata
          var jsNode = record.jsNode,
             nodeRef = jsNode.nodeRef,
-            webscriptPath = "components/documentlibrary/data";
+            webscriptPath = "components/documentlibrary/data",
+            libraryRootParam = "";
          if ($isValueSet(this.options.siteId))
          {
+            // Site mode
             webscriptPath += "/site/" + encodeURIComponent(this.options.siteId)
+         }
+         else
+         {
+            // Repository mode
+            libraryRootParam = "&libraryRoot=" + encodeURIComponent(this.options.rootNode.toString());
          }
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + webscriptPath + "/node/" + nodeRef.uri +
                   "?filter=" + encodeURIComponent(this.currentFilter.filterId) +
-                  "&view=" + this.actionsView + "&noCache=" + new Date().getTime(),
+                  "&view=" + this.actionsView + "&noCache=" + new Date().getTime() +
+                  libraryRootParam,
             successCallback:
             {
                fn: function DL_insituCallback_refreshSuccess(response)
@@ -3437,7 +3456,6 @@
 
          // Select based upon the className of the clicked item
          this.selectFiles(Alfresco.util.findEventClass(eventTarget));
-         Event.preventDefault(domEvent);
       },
 
       /**

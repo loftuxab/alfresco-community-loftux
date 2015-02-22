@@ -1,5 +1,16 @@
 package org.alfresco.share.api;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.task.EditTaskPage;
@@ -13,20 +24,12 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.share.util.api.SiteMembershipAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.testng.Assert.*;
 
 /**
  * Class to include: Tests for SiteMembershipAPI implemented in alfresco-remote-api.
@@ -432,7 +435,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14320", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14320", groups = {"ProductBug"})
     public void AONE_14321() throws ParseException, PublicApiException
     {
         Map<String, String> param = new HashMap<String, String>();
@@ -498,7 +501,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14321", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14321",  groups = {"ProductBug"})
     public void AONE_14354() throws ParseException
     {
         try
@@ -512,7 +515,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14354", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14354",  groups = {"ProductBug"})
     public void AONE_14318() throws ParseException, PublicApiException
     {
         try
@@ -533,7 +536,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14318", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14318", groups = {"ProductBug"})
     public void AONE_14352() throws ParseException
     {
         Map<String, String> param = new HashMap<String, String>();
@@ -549,7 +552,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14352", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14352", groups = {"ProductBug"})
     public void AONE_14351() throws Exception
     {
         try
@@ -574,7 +577,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14351", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14351", groups = {"ProductBug"})
     public void AONE_14326() throws Exception
     {
         try
@@ -606,7 +609,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14326", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14326", groups = {"ProductBug"})
     public void AONE_14327() throws Exception
     {
         try
@@ -629,7 +632,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14327", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14327", groups = {"ProductBug"})
     public void AONE_14330() throws ParseException, PublicApiException
     {
         try
@@ -656,7 +659,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14330", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14330", groups = {"ProductBug"})
     public void AONE_14331() throws ParseException, PublicApiException
     {
         Date modifiedAtBefore = null;
@@ -684,7 +687,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14331", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14331", groups = {"ProductBug"})
     public void AONE_14332() throws ParseException, PublicApiException
     {
         try
@@ -708,7 +711,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14332", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14332", groups = {"ProductBug"})
     public void AONE_14333() throws ParseException, PublicApiException
     {
         try
@@ -722,7 +725,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14333", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14333", groups = {"ProductBug"})
     public void AONE_14334() throws Exception
     {
         try
@@ -736,7 +739,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14334", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14334", groups = {"ProductBug"})
     public void AONE_14335() throws Exception
     {
         DashBoardPage dashBoardPage = ShareUser.login(drone, mainUser).render();
@@ -754,7 +757,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14335", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14335", groups = {"ProductBug"})
     public void AONE_14336() throws Exception
     {
         DashBoardPage dashBoardPage = ShareUser.login(drone, mainUser).render();
@@ -772,7 +775,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14336", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14336", groups = {"ProductBug"})
     public void AONE_14338()
     {
         try
@@ -786,7 +789,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14338", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14338", groups = {"ProductBug"})
     public void AONE_14339()
     {
         try
@@ -809,7 +812,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14339", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14339", groups = {"ProductBug"})
     public void AONE_14340()
     {
         try
@@ -823,7 +826,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14340", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14340", groups = {"ProductBug"})
     public void AONE_14342() throws Exception
     {
         DashBoardPage dashBoardPage = ShareUser.login(drone, mainUser).render();
@@ -841,7 +844,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14342", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14342", groups = {"ProductBug"})
     public void AONE_14343() throws Exception
     {
         DashBoardPage dashBoardPage = ShareUser.login(drone, mainUser).render();
@@ -859,7 +862,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14343", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14343", groups = {"ProductBug"})
     public void AONE_14345() throws Exception
     {
         createSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, modSiteName2, "");
@@ -877,7 +880,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14345", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14345", groups = {"ProductBug"})
     public void AONE_14346() throws Exception
     {
         cancelSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, modSiteName2);
@@ -893,7 +896,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14346", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14346", groups = {"ProductBug"})
     public void AONE_14347() throws Exception
     {
         createSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, modSiteName2, "");
@@ -912,7 +915,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         }
     }
 
-    @Test(dependsOnMethods = "AONE_14347", alwaysRun = true)
+    @Test(dependsOnMethods = "AONE_14347", groups = {"ProductBug"})
     public void AONE_14348() throws Exception
     {
         try

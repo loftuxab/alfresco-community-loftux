@@ -33,8 +33,8 @@ import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserAdmin;
 import org.alfresco.share.util.ShareUserSearchPage;
 import org.alfresco.share.util.ShareUserSitePage;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.commons.logging.Log;
@@ -79,7 +79,7 @@ public class CmisFolderAspectUtils extends AbstractCmisSecondaryTypeIDTests
         Map<String, Object> propertyMap = new HashMap<>();
         if (!alfrescoVersion.isCloud())
         {
-            categoryNodeRef = ShareUserAdmin.getCategoryNodeRef(drone, "cm:category", "cm:Languages");
+            categoryNodeRef = ShareUserAdmin.getCategoryNodeRef(drone, "cm:category", "cm:Regions");
             propertyMap.put("cm:categories", Arrays.asList(categoryNodeRef));
         }
         ShareUser.login(drone, userName, DEFAULT_PASSWORD);
@@ -102,7 +102,7 @@ public class CmisFolderAspectUtils extends AbstractCmisSecondaryTypeIDTests
             Map<String, Object> properties = detailsPage.getProperties();
             List<Categories> categoriesList = (List<Categories>) properties.get("Categories");
             Assert.assertEquals(categoriesList.size(), 1);
-            Assert.assertEquals(categoriesList.get(0).getValue(), "Languages");
+            Assert.assertEquals(categoriesList.get(0).getValue(), "Regions");
         }
 
         ShareUser.logout(drone);

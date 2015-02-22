@@ -33,6 +33,7 @@ public class ShareTestProperty
 {
     private static final Log logger = LogFactory.getLog(ShareTestProperty.class);
     private String shareUrl; // Not final to allow test AbstractUtilsTest to set this
+    private String jmxShareUrl;
     private final String apiUrl;
     private final String cloudUrlForHybrid;
     private final String pentahoUserConsoleUrl;
@@ -74,28 +75,38 @@ public class ShareTestProperty
     private final String licenseShare;
     private final String maxWaitTimeCloudSync;
     private String ftpPort;
+    private String nfsMountPort;
+    private String mountPointHost;
+    private String nfsPort;
     private String sshHost;
     private int serverShhPort;
     private String serverUser;
     private String serverPass;
     private boolean isSecureSession;
     private String pathSharepoint;
+    private String wcmqs;
     private String layer7Disabled;
     private String apiKey;
     private String apiSecretKey;
     private String replicationEndPointHost;
+    private String keystorePath;
+    private String truststorePath;
+    private String networkPath;
+    private String networkDrive;
 
-    public ShareTestProperty(final String shareUrl, final String apiUrl, final String gridUrl, final String username, final String password, String alfrescoVersion,
+
+    public ShareTestProperty(final String shareUrl, String jmxShareUrl, final String apiUrl, final String gridUrl, final String username, final String password, String alfrescoVersion,
             String cloudUrlForHybrid, final String pentahoUserConsoleUrl, final String downloadDirectory, final String googleUserName, final String googlePassword,
             final String serviceAccountEmail, final String serviceAccountPKCS12FileName, final String googleDriveUserName, final String googleDrivePassword,
             final String serviceDriveAccountEmail, final String serviceDriveAccountPKCS12FileName, final boolean hybridEnabled,
             final String uniqueTestRunName, final String domainFree, final String domainPremium, final String domainHybrid, final String domainLiveSearch, final String defaultUser,
             final String uniqueTestDataString, final String adminUsername, final String adminPassword, final String superadminUsername,
             final String superadminPassword, final int httpSecurePort, final String headerKey, final String mimeTypes, final String jmxrmiPort, final String jmxrmiUser, final String jmxrmiPassword, final String nodePort, final String licenseShare, final String maxWaitTimeCloudSync,
-            final String blogUrl, final String blogUsername, final String blogPassword, final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String replicationEndPointHost,
-            final String layer7Disabled, final String apiKey, final String apiSecretKey)
+            final String blogUrl, final String blogUsername, final String blogPassword, final String nfsMountPort,  final String mountPointHost, final String nfsPort,final String ftpPort, final int serverShhPort, final String serverUser, final String serverPass, final boolean isSecureSession, final String pathSharepoint, final String wcmqs, final String replicationEndPointHost,
+            final String layer7Disabled, final String apiKey, final String apiSecretKey, final String keystorePath, final String truststorePath, final String networkPath, final String networkDrive)
     {
         this.shareUrl = shareUrl;
+        this.jmxShareUrl = jmxShareUrl;
         this.apiUrl = apiUrl;
         this.cloudUrlForHybrid = cloudUrlForHybrid;
         this.gridUrl = gridUrl;
@@ -136,16 +147,24 @@ public class ShareTestProperty
         this.nodePort = nodePort;
         this.licenseShare = licenseShare;
         this.maxWaitTimeCloudSync = maxWaitTimeCloudSync;
+        this.nfsMountPort = nfsMountPort;
+        this.mountPointHost = mountPointHost;
+        this.nfsPort = nfsPort;
         this.ftpPort = ftpPort;
         this.serverShhPort = serverShhPort;
         this.serverUser = serverUser;
         this.serverPass = serverPass;
         this.isSecureSession = isSecureSession;
         this.pathSharepoint = pathSharepoint;
+        this.wcmqs = wcmqs;
         this.replicationEndPointHost = replicationEndPointHost;
         this.layer7Disabled = layer7Disabled;
         this.apiKey = apiKey;
         this.apiSecretKey = apiSecretKey;
+        this.keystorePath = keystorePath;
+        this.truststorePath = truststorePath;
+        this.networkPath = networkPath;
+        this.networkDrive = networkDrive;
     }
 
     public String getMaxWaitTimeCloudSync()
@@ -161,6 +180,11 @@ public class ShareTestProperty
     public String getShareUrl()
     {
         return shareUrl;
+    }
+
+    public String getJmxShareUrl()
+    {
+        return jmxShareUrl;
     }
 
     public String getPentahoUserConsoleUrl()
@@ -403,6 +427,11 @@ public class ShareTestProperty
         this.shareUrl = shareUrl;
     }
 
+    public void setJmxShareUrl(String jmxShareUrl)
+    {
+        this.jmxShareUrl = jmxShareUrl;
+    }
+
     /**
      * Set the path to Sharepoint
      *
@@ -411,6 +440,16 @@ public class ShareTestProperty
     public void setPathSharepoint(String pathSharepoint)
     {
         this.pathSharepoint = pathSharepoint;
+    }
+    
+    /**
+     * Set the path to setWcmqs
+     *
+     * @param setWcmqs
+     */
+    public void setWcmqs(String wcmqs)
+    {
+        this.wcmqs = wcmqs;
     }
 
     /**
@@ -427,9 +466,9 @@ public class ShareTestProperty
                 + ", serviceAccountPKCS12FileName=" + serviceAccountPKCS12FileName + ", googleDriveUserName=" + googleDriveUserName
                 + ", googleDrivePassword=" + googleDrivePassword + ", serviceDriveAccountEmail=" + serviceDriveAccountEmail
                 + ", serviceDriveAccountPKCS12FileName=" + serviceDriveAccountPKCS12FileName + ", mimeTypes=" + mimeTypes + ", jmxrmiPort=" + jmxrmiPort
-                + ", jmxrmiUser=" + jmxrmiUser + ", jmxrmiPassword=" + jmxrmiPassword + ", nodePort=" + nodePort + ", ftpPort=" + ftpPort + ", blogUrl=" + blogUrl + ", blogUsername="
+                + ", jmxrmiUser=" + jmxrmiUser + ", jmxrmiPassword=" + jmxrmiPassword + ", nodePort=" + nodePort + ", nfsMountPort=" + nfsMountPort + ", mountPointHost=" + mountPointHost + ", nfsPort=" + nfsPort + ", ftpPort=" + ftpPort + ", blogUrl=" + blogUrl + ", blogUsername="
                 + blogUsername + ", blogPassword=" + blogPassword + ", serverShhPort=" + serverShhPort + ", serverUser="
-                + serverUser + ", serverPass=" + serverPass + ", isSecureSession=" + isSecureSession + "]";
+                + serverUser + ", serverPass=" + serverPass + ", isSecureSession=" + isSecureSession + ", networkPath=" + networkPath + ", networkDrive=" + networkDrive + "]";
     }
 
     /**
@@ -552,6 +591,27 @@ public class ShareTestProperty
         return ftpPort;
     }
 
+    /**
+     * @return NFS mount port
+     */
+    public String getNfsMountPort()
+    {
+        return nfsMountPort;
+    }
+
+    public String getMountPointHost()
+    {
+        return mountPointHost;
+    }
+
+    /**
+     * @return NFS server port
+     */
+    public String getNfsPort()
+    {
+        return nfsPort;
+    }
+
     public int getSshPort()
     {
         return serverShhPort;
@@ -587,6 +647,10 @@ public class ShareTestProperty
         return pathSharepoint;
     }
 
+    public String getWcmqs()
+    {
+        return wcmqs;
+    }
     public String getreplicationEndPointHost() { return  replicationEndPointHost; }
     
     /**
@@ -613,4 +677,33 @@ public class ShareTestProperty
         return apiSecretKey;
     }
 
+    public String getKeystorePath()
+    {
+        return  keystorePath;
+    }
+
+    public String getTruststorePath()
+    {
+        return  truststorePath;
+    }
+
+    public String getNetworkPath()
+    {
+        return networkPath;
+    }
+
+    public void setNetworkPath(String networkPath)
+    {
+        this.networkPath = networkPath;
+    }
+
+    public String getNetworkDrive()
+    {
+        return networkDrive;
+    }
+
+    public void setNetworkDrive(String networkDrive)
+    {
+        this.networkDrive = networkDrive;
+    }
 }

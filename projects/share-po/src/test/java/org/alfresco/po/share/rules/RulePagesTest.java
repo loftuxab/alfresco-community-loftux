@@ -31,14 +31,15 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPage;
 import org.alfresco.po.share.site.contentrule.FolderRulesPageWithRules;
 import org.alfresco.po.share.site.contentrule.createrules.CreateRulePage;
+import org.alfresco.po.share.site.contentrule.createrules.EmailMessageForm;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.ActionSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.IfSelectorCloudImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.IfSelectorEnterpImpl;
 import org.alfresco.po.share.site.contentrule.createrules.selectors.impl.WhenSelectorImpl;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -60,7 +61,7 @@ public class RulePagesTest extends AbstractTest
 
     /**
      * Pre test setup of a dummy file to upload.
-     * 
+     *
      * @throws Exception
      */
     @BeforeClass(groups = "alfresco-one")
@@ -75,7 +76,7 @@ public class RulePagesTest extends AbstractTest
 
     /**
      * Create User
-     * 
+     *
      * @throws Exception
      */
     private void createUserAndLogin() throws Exception
@@ -133,7 +134,7 @@ public class RulePagesTest extends AbstractTest
         assertEquals(folderRulesPage.getInheritRulesText(), "Inherit Rules");
     }
 
-    @Test(dependsOnMethods = "folderRulePageTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "folderRulePageTest", groups = {"alfresco-one", "TestBug"})
     public void createRulePageTest()
     {
         FolderRulesPage folderRulesPage = drone.getCurrentPage().render();
@@ -146,7 +147,7 @@ public class RulePagesTest extends AbstractTest
         assertTrue(createRulePage.isPageCorrect());
     }
 
-    @Test(dependsOnMethods = "createRulePageTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "createRulePageTest", groups = {"alfresco-one", "TestBug"})
     public void createRuleAndThenAnotherTest()
     {
         CreateRulePage createRulePage = drone.getCurrentPage().render();
@@ -157,12 +158,12 @@ public class RulePagesTest extends AbstractTest
         whenSelector.selectInbound();
 
         AlfrescoVersion version = drone.getProperties().getVersion();
-        
-        if(!version.isCloud())
+
+        if (!version.isCloud())
         {
             ActionSelectorEnterpImpl actionSelectorEnterp = createRulePage.getActionOptionsObj();
             actionSelectorEnterp.selectIncrementCounter();
-            
+
             IfSelectorEnterpImpl ifSelectorEnterp = createRulePage.getIfOptionObj();
             ifSelectorEnterp.selectAllItems();
         }
@@ -178,7 +179,7 @@ public class RulePagesTest extends AbstractTest
         assertTrue(createRulePage.isPageCorrect());
     }
 
-    @Test(dependsOnMethods = "createRuleAndThenAnotherTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "createRuleAndThenAnotherTest", groups = {"alfresco-one", "TestBug"})
     public void createNextRuleTest()
     {
         CreateRulePage createRulePage = drone.getCurrentPage().render();
@@ -189,12 +190,12 @@ public class RulePagesTest extends AbstractTest
         whenSelector.selectUpdate();
 
         AlfrescoVersion version = drone.getProperties().getVersion();
-        
-        if(!version.isCloud())
+
+        if (!version.isCloud())
         {
             ActionSelectorEnterpImpl actionSelectorEnterp = createRulePage.getActionOptionsObj();
             actionSelectorEnterp.selectExtractMetadata();
-            
+
             IfSelectorEnterpImpl ifSelectorEnterp = createRulePage.getIfOptionObj();
             ifSelectorEnterp.selectAuthor(CONTAINS, "a");
         }
@@ -210,7 +211,7 @@ public class RulePagesTest extends AbstractTest
         assertTrue(folderRulesPageWithRules.isPageCorrect(folderName));
     }
 
-    @Test(dependsOnMethods = "createNextRuleTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "createNextRuleTest", groups = {"alfresco-one", "TestBug"})
     public void foldersRuleWithRulesPageTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
@@ -218,14 +219,14 @@ public class RulePagesTest extends AbstractTest
         assertTrue(folderRulesPageWithRules.isInheritRuleToggleAvailable());
     }
 
-    @Test(dependsOnMethods = "foldersRuleWithRulesPageTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "foldersRuleWithRulesPageTest", groups = {"alfresco-one", "TestBug"})
     public void deleteRuleTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
         folderRulesPageWithRules.deleteRule("testRuleName2");
     }
 
-    @Test(dependsOnMethods = "deleteRuleTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "deleteRuleTest", groups = {"alfresco-one", "TestBug"})
     public void clickNewRuleThenCancelTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
@@ -234,7 +235,7 @@ public class RulePagesTest extends AbstractTest
         assertTrue(folderRulesPageWithRules.isPageCorrect(folderName));
     }
 
-    @Test(dependsOnMethods = "clickNewRuleThenCancelTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "clickNewRuleThenCancelTest", groups = {"alfresco-one", "TestBug"})
     public void getInheritedRulesFolderNameTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
@@ -253,12 +254,12 @@ public class RulePagesTest extends AbstractTest
         whenSelector.selectUpdate();
 
         AlfrescoVersion version = drone.getProperties().getVersion();
-        
-        if(!version.isCloud())
+
+        if (!version.isCloud())
         {
             ActionSelectorEnterpImpl actionSelectorEnterp = createRulePage.getActionOptionsObj();
             actionSelectorEnterp.selectExtractMetadata();
-            
+
             IfSelectorEnterpImpl ifSelectorEnterp = createRulePage.getIfOptionObj();
             ifSelectorEnterp.selectAuthor(CONTAINS, "a");
         }
@@ -274,11 +275,27 @@ public class RulePagesTest extends AbstractTest
         assertEquals(folderRulesPageWithRules.getInheritedRulesFolderName("testRuleName1"), folderName);
     }
 
-    @Test(dependsOnMethods = "getInheritedRulesFolderNameTest", groups = "alfresco-one")
+    @Test(dependsOnMethods = "getInheritedRulesFolderNameTest", groups = {"alfresco-one", "TestBug"})
     public void isRuleNameDisplayedTest()
     {
         FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
         assertTrue(folderRulesPageWithRules.isRuleNameDisplayed("testRuleName3"));
+    }
+
+    @Test(dependsOnMethods = "isRuleNameDisplayedTest", groups = {"EnterpriseOnly", "TestBug"})
+    public void checkEmailForm()
+    {
+        FolderRulesPageWithRules folderRulesPageWithRules = drone.getCurrentPage().render();
+        CreateRulePage createRulePage = folderRulesPageWithRules.clickNewRuleButton();
+        ActionSelectorEnterpImpl actionSelectorEnterp = createRulePage.getActionOptionsObj();
+        EmailMessageForm emailMessageForm = actionSelectorEnterp.selectSendEmail();
+        assertTrue(emailMessageForm.isDisplay());
+        emailMessageForm.addUserToRecipients(userName);
+        emailMessageForm.removeUserFromRecipients(userName);
+        emailMessageForm.fillSubjectField("test subj");
+        emailMessageForm.fillMessageArea("test body. Arrrrrrrrr!!!!");
+        emailMessageForm.clickClose();
+        assertFalse(emailMessageForm.isDisplay());
     }
 
 }

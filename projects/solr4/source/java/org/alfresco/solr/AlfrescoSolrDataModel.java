@@ -726,14 +726,17 @@ public class AlfrescoSolrDataModel implements QueryConstants
         // Can only order on single valued fields
         DataTypeDefinition dataTypeDefinition = propertyDefinition.getDataType();
         if(dataTypeDefinition.getName().equals(DataTypeDefinition.TEXT))
-        {
+        {	
             if(propertyDefinition.isMultiValued() == false)
             {
                 if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.FALSE)
-                        || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH)
-                        || isIdentifierTextProperty(propertyDefinition.getName()))
+                        || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH))
                 {
                     indexedField.addField(getFieldForText(false, false, true, propertyDefinition), false, true);
+                }
+                else if (isIdentifierTextProperty(propertyDefinition.getName()))
+                {
+                    indexedField.addField(getFieldForText(false, false, false, propertyDefinition), false, false);   
                 }
                 else
                 {
@@ -833,7 +836,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
             
             if(isSuggestable(propertyQName))
             {
-                indexedField.addField("suggest", false, false);
+                indexedField.addField("suggest_@"+propertyDefinition.getName().toString(), false, false);
             }
         }
         else
@@ -2116,6 +2119,11 @@ public class AlfrescoSolrDataModel implements QueryConstants
          if(potentialProperty.equalsIgnoreCase("score") || potentialProperty.equalsIgnoreCase("SEARCH_SCORE"))
          {
              return "score";
+         }
+         
+         if(req.getSchema().getFieldOrNull(potentialProperty) != null)
+         {
+        	 return mapNonPropertyFields(potentialProperty);
          }
          
          AlfrescoFunctionEvaluationContext functionContext = new AlfrescoSolr4FunctionEvaluationContext(getNamespaceDAO(),  getDictionaryService(CMISStrictDictionaryService.DEFAULT), NamespaceService.CONTENT_MODEL_1_0_URI, req.getSchema());

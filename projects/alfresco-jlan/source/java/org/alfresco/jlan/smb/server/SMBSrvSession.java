@@ -26,6 +26,7 @@ import java.net.SocketTimeoutException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import org.alfresco.jlan.debug.Debug;
@@ -2181,16 +2182,43 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 				addrMatch = false;
 				
 				// Check for an address/client name match
+				// MNT-12291 CLONE - disconnectClientSessions assumptions don't work on Terminal Servers
+				InetAddress address = curSess.getRemoteAddress();
+				List<String> terminalServerList = getSMBServer().getCIFSConfiguration().getTerminalServerList();
+				List<String> loadBalancerList = getSMBServer().getCIFSConfiguration().getLoadBalancerList();
 				
-				if ( curSess.getSessionId() != getSessionId()) {
+				boolean disableCheckLoadBalancer = true;
+				if(loadBalancerList != null && loadBalancerList.size() > 0)
+				{
+				    disableCheckLoadBalancer = !loadBalancerList.contains(address.getHostAddress());
+				}
+				
+				boolean disableCheckTerminalServer = true;
+				if(terminalServerList != null && terminalServerList.size() > 0)
+                                {
+				    disableCheckTerminalServer = !terminalServerList.contains(address.getHostAddress());
+                                }
+				
+				if ( curSess.getSessionId() != getSessionId() && disableCheckLoadBalancer && disableCheckTerminalServer) {
 					
-					// Check the IP address
+                                        // Check the IP address and userName
+                                        boolean userNameIsTheSame = false;
+                                        if (hasClientInformation() && curSess.hasClientInformation())
+                                        {
+                                               String userName = getClientInformation().getUserName();
+                                               String userNameSess = curSess.getClientInformation().getUserName();
+
+                                               if (userName != null && userName.equals(userNameSess))
+                                               {
+                                                      userNameIsTheSame = true;
+                                               }
+                                        }
 					
 					if ( hasRemoteAddress() && curSess.hasRemoteAddress()) {
 						
 						// Check if the IP addresses match
 						
-						if ( getRemoteAddress().equals( curSess.getRemoteAddress())) {
+						if ( getRemoteAddress().equals( curSess.getRemoteAddress()) && userNameIsTheSame) {
 							addrMatch = true;
 							addrStr = getRemoteAddress().getHostAddress();
 						}
@@ -2199,7 +2227,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 						
 						// Check if the remote NetBIOS names match
 						
-						if ( getRemoteName().equals( curSess.getRemoteName())) {
+						if ( getRemoteName().equals( curSess.getRemoteName()) && userNameIsTheSame) {
 							addrMatch = true;
 							addrStr = getRemoteName();
 						}

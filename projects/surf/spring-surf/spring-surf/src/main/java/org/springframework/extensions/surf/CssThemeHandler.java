@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.extensions.config.WebFrameworkConfigElement;
 import org.springframework.extensions.surf.support.ThreadLocalRequestContext;
 import org.springframework.extensions.surf.types.Theme;
 
@@ -85,6 +86,43 @@ public class CssThemeHandler
         this.targetGroup = targetGroup;
     }
     
+    /**
+     * The configuration that will enable us to access any default LESS configuration.
+     */
+    private WebFrameworkConfigElement webFrameworkConfigElement;
+    
+    /**
+     * Returns the configuration for the web framework.
+     * 
+     * @return
+     */
+    public WebFrameworkConfigElement getWebFrameworkConfigElement()
+    {
+        return webFrameworkConfigElement;
+    }
+
+    /**
+     * Required by Spring to inject the web framework configuration.
+     * 
+     * @param webFrameworkConfigElement
+     */
+    public void setWebFrameworkConfigElement(WebFrameworkConfigElement webFrameworkConfigElement)
+    {
+        this.webFrameworkConfigElement = webFrameworkConfigElement;
+    }
+    
+    private DependencyHandler dependencyHandler;
+    
+    public DependencyHandler getDependencyHandler()
+    {
+        return dependencyHandler;
+    }
+
+    public void setDependencyHandler(DependencyHandler dependencyHandler)
+    {
+        this.dependencyHandler = dependencyHandler;
+    }
+
     /**
      * The compiled Regular Expression defined by the tokenRegex variable.
      */

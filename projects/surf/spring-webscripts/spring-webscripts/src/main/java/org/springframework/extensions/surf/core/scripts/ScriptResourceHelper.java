@@ -30,6 +30,7 @@ public class ScriptResourceHelper
 {
     private static final String SCRIPT_ROOT = "_root";
     private static final String IMPORT_PREFIX = "<import";
+    private static final String IMPORT_COMMENT_MARKER = "//";
     private static final String IMPORT_RESOURCE = "resource=\"";
     
     /**
@@ -45,6 +46,9 @@ public class ScriptResourceHelper
      * file is executable script and no longer attempt to search for any further import directives. Therefore
      * all imports should be at the top of the script, one following the other, in the correct syntax and
      * with no comments present - the only separators valid between import directives is white space.
+     *
+     * The import lines may optionally be prefixed by "//" in order to assist with script file validation.
+     * No other comments or comment markers are permitted.
      * 
      * @param script        The script content to resolve imports in
      * 
@@ -109,6 +113,13 @@ public class ScriptResourceHelper
                 break;
             }
         }
+
+        // Allow a comment marker to immediately precede the IMPORT_PREFIX to assist JS validation.
+        if (script.startsWith(IMPORT_COMMENT_MARKER, index))
+        {
+            index += IMPORT_COMMENT_MARKER.length();
+        }
+
         // look for the "<import" directive marker
         if (script.startsWith(IMPORT_PREFIX, index))
         {

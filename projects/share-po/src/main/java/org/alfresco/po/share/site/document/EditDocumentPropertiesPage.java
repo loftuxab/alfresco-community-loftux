@@ -26,6 +26,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 {
     public enum Fields
     {
-        NAME, TITLE, DESCRIPTION, AUTHOR, PUBLISHER, CONTRIBUTOR, TYPE, IDENTIFIER, SOURCE, COVERAGE, RIGHTS, SUBJECT;
+        NAME, TITLE, DESCRIPTION, AUTHOR, PUBLISHER, CONTRIBUTOR, TYPE, IDENTIFIER, SOURCE, COVERAGE, RIGHTS, SUBJECT, SITE_CONFIGURATION, HOSTNAME
     }
 
     private final String tagName;
@@ -58,7 +59,6 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
         tagName = null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public EditDocumentPropertiesPage render(RenderTime timer)
     {
@@ -108,11 +108,10 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     /**
      * Check to see if tags are visible on the page
      * and match the given tag.
-     * 
      * @param name identifier tag name
      * @return true if name matches tag
      */
-    private boolean isTagVisible(String name)
+    public boolean isTagVisible(String name)
     {
         if (name == null || name.isEmpty())
         {
@@ -135,14 +134,12 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public EditDocumentPropertiesPage render(long time)
     {
         return render(new RenderTime(time));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public EditDocumentPropertiesPage render()
     {
@@ -152,7 +149,6 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     /**
      * Verify if edit properties element,
      * that contains the form is visible.
-     * 
      * @return true if displayed
      */
     public boolean isEditPropertiesVisible()
@@ -194,7 +190,6 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Check if tags are attached to the particular document value.
-     * 
      * @return true if tag elements are displayed
      */
     public boolean hasTags()
@@ -359,7 +354,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     {
         clickSave();
         // WEBDRONE-523: Amended to return HtmlPage rather than DocumentDetailsPage
-        return FactorySharePage.resolvePage(drone);
+        return drone.getCurrentPage();
     }
 
     /**
@@ -397,7 +392,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Returns a map of validation messages for all the fields in the form.
-     *
+     * 
      * @return The validation message or an empty string if there is no message.
      */
     public Map<Fields, String> getMessages()
@@ -489,7 +484,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * click on All Properties button on Edit Properties pop-up
-     *
+     * 
      * @return {@link EditDocumentPropertiesPage} page response
      */
     public HtmlPage selectAllProperties()
@@ -500,7 +495,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param publisher
      */
     public void setPublisher(String publisher)
@@ -518,7 +513,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param contributor
      */
     public void setContributor(String contributor)
@@ -536,7 +531,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param type
      */
     public void setType(String type)
@@ -554,7 +549,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param identifier
      */
     public void setIdentifier(String identifier)
@@ -572,7 +567,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param source
      */
     public void setSource(String source)
@@ -590,7 +585,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param coverage
      */
     public void setCoverage(String coverage)
@@ -608,7 +603,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param rights
      */
     public void setRights(String rights)
@@ -626,7 +621,7 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
 
     /**
      * Enters a value in to the properties form.
-     *
+     * 
      * @param subject
      */
     public void setSubject(String subject)
@@ -640,5 +635,79 @@ public class EditDocumentPropertiesPage extends AbstractEditProperties
     public String getSubject()
     {
         return getValue(INPUT_SUBJECT_SELECTOR);
+    }
+
+    /**
+     * Option for folder.
+     * Enters a value in the rendition configuration. Option enabled if WQS is installed.
+     *
+     * @param rendConfig
+     */
+    public void setRenditionConfig(String rendConfig)
+    {
+        setInput(drone.findAndWait(REDITION_CONFIG), rendConfig);
+    }
+
+    /**
+     * Option for folder.
+     * Get value seen on the rendition configuration. Option enabled if WQS is installed.
+     */
+    public String getRenditionConfig()
+    {
+        return getValue(REDITION_CONFIG);
+    }
+    
+    /**
+     * Enters a value in to the properties form.
+     *
+     * @param siteConfiguration
+     */
+    public void setSiteConfiguration(String siteConfiguration)
+    {
+        setInput(drone.find(INPUT_SITE_CONFIGURATION_SELECTOR), siteConfiguration);
+    }
+
+    /**
+     * Get text seen on the Site Configuration textarea.
+     */
+    public String getSiteConfiguration()
+    {
+        return drone.find(INPUT_SITE_CONFIGURATION_SELECTOR).getText();
+    }
+
+    /**
+     * Enters a value in to the properties form.
+     *
+     * @param Hostname
+     */
+    public void setSiteHostname(String Hostname)
+    {
+        setInput(drone.find(INPUT_SITE_HOSTNAME_SELECTOR), Hostname);
+    }
+
+    /**
+     * Get text seen on the Site Configuration textarea.
+     */
+    public String getSiteHostname()
+    {
+        return drone.find(INPUT_SITE_HOSTNAME_SELECTOR).getText();
+    }
+
+    /**
+     * Gets the web assets visible on the dialog.
+     *
+     * @return
+     */
+    public List<String> getWebAssets()
+    {
+        WebElement assetsList = drone.findAndWait(WEB_ASSETS_LIST);
+        List<WebElement> assets = assetsList.findElements(By.cssSelector("div"));
+        List<String> foundAssets = new ArrayList<>();
+
+        for (WebElement asset : assets)
+        {
+            foundAssets.add(asset.getText());
+        }
+        return foundAssets;
     }
 }

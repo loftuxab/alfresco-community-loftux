@@ -22,9 +22,9 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -124,6 +124,8 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
     public static final String NAME = "mail";
     public static final String PARAM_LOCALE = "locale";
     public static final String PARAM_TO = "to";
+    public static final String PARAM_CC = "cc";
+    public static final String PARAM_BCC = "bcc";
     public static final String PARAM_TO_MANY = "to_many";
     public static final String PARAM_SUBJECT = "subject";
     public static final String PARAM_SUBJECT_PARAMS = "subjectParams";
@@ -555,7 +557,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
             return messages;
         }
         
-        List<Pair<String, Locale>> recipients = getRecipients(ruleAction);
+        Collection<Pair<String, Locale>> recipients = getRecipients(ruleAction);
         
         Pair<InternetAddress, Locale> from = getFrom(ruleAction);
         
@@ -612,6 +614,53 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                     
                     // Note: there is no validation on the username to check that it actually is an email address.
                     // TODO Fix this.
+
+                    Serializable ccValue = (String)ruleAction.getParameterValue(PARAM_CC);
+                    if(ccValue != null)
+                    {
+                        if (ccValue instanceof String)
+                        {
+                        	String cc = (String)ccValue;
+                        	if(cc.length() > 0)
+                        	{
+                        		messageRef[0].setCc(cc);
+                        	}
+
+                        }
+                        else if (ccValue instanceof List<?>)
+                        {
+                        	List<String>s = (List<String>)ccValue;
+                        	messageRef[0].setCc((String[])s.toArray());
+                        }
+                        else if (ccValue.getClass().isArray())
+                        {
+                        	messageRef[0].setCc((String[])ccValue);
+                        }
+                    	
+                    }
+                    Serializable bccValue = (String)ruleAction.getParameterValue(PARAM_BCC);
+                    if(bccValue != null)
+                    {
+                        if (bccValue instanceof String)
+                        {
+                        	String bcc = (String)bccValue;
+                        	if(bcc.length() > 0)
+                        	{
+                        		messageRef[0].setBcc(bcc);
+                        	}
+
+                        }
+                        else if (bccValue instanceof List<?>)
+                        {
+                        	List<String>s = (List<String>)bccValue;
+                        	messageRef[0].setBcc((String[])s.toArray());
+                        }
+                        else if (bccValue.getClass().isArray())
+                        {
+                        	messageRef[0].setCc((String[])bccValue);
+                        }
+                    }
+                    
                 }
                 else
                 {
@@ -884,7 +933,24 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                     
                     // set subject line
                     String subject = (String)ruleAction.getParameterValue(PARAM_SUBJECT);
-                    Object[] subjectParams = (Object[])ruleAction.getParameterValue(PARAM_SUBJECT_PARAMS);
+                    Object subjectParamsObject = ruleAction.getParameterValue(PARAM_SUBJECT_PARAMS);
+                    Object[] subjectParams = null;
+                    //Javasctipt pass SubjectParams as ArrayList. see MNT-12534 
+                    if (subjectParamsObject instanceof List)
+                    {
+                        subjectParams = ((List<Object>)subjectParamsObject).toArray();
+                    }
+                    else if (subjectParamsObject instanceof Object[])
+                    {
+                        subjectParams = (Object[])subjectParamsObject;
+                    }
+                    else
+                    {
+                        if (subjectParamsObject != null)
+                        {
+                            subjectParams = new Object[]{subjectParamsObject.toString()};
+                        }
+                    }
                     String localizedSubject = getLocalizedSubject(subject, subjectParams, locale);
                     if (locale == null)
                     {
@@ -954,7 +1020,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
         } catch (Exception e)
         {
             // We're forced to catch java.lang.Exception here. Urgh.
-            if (logger.isInfoEnabled())
+            if (logger.isWarnEnabled())
             {
                 logger.warn("Unable to prepare mail message. Skipping.", e);
             }
@@ -995,14 +1061,13 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
             }
             
             // always log the failure
-            logger.error("Failed to send email to " + to, e);
+            logger.error("Failed to send email to " + to + " : " + e);
             
             // optionally ignore the throwing of the exception
             Boolean ignoreError = (Boolean)ruleAction.getParameterValue(PARAM_IGNORE_SEND_FAILURE);
             if (ignoreError == null || ignoreError.booleanValue() == false)
             {
-                Object[] args = {to, e.toString()};
-                throw new AlfrescoRuntimeException("email.outbound.err.send.failed", args, e);
+                throw new AlfrescoRuntimeException("Failed to send email to:" + to);
             }   
         }
     }
@@ -1141,10 +1206,9 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
     }
     
     @SuppressWarnings("unchecked")
-    private List<Pair<String, Locale>> getRecipients(Action ruleAction) 
+    private Collection<Pair<String, Locale>> getRecipients(Action ruleAction) 
     {
-        
-        List<Pair<String, Locale>> recipients = new LinkedList<Pair<String,Locale>>();
+        Map<String, Pair<String, Locale>> recipients = new HashMap<String, Pair<String,Locale>>();
         
         // set recipient
         String to = (String)ruleAction.getParameterValue(PARAM_TO);
@@ -1155,7 +1219,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
             {
                 locale = getLocaleForUser(to);
             }
-            recipients.add(new Pair<String, Locale>(to, locale));
+            recipients.put(to, new Pair<String, Locale>(to, locale));
         }
         else
         {
@@ -1186,7 +1250,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                         // Check the user name to be a valid email and we don't need to log an error in this case
                         // ALF-19231
                         // Validate the email, allowing for local email addresses
-                        if (authority != null && authority.length() != 0)
+                        if ((authority != null) && (authority.length() != 0) && (!recipients.containsKey(authority)))
                         {
                             if (personExists(authority))
                             {
@@ -1194,7 +1258,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                                 if (address != null && address.length() != 0 && validateAddress(address))
                                 {
                                     Locale locale = getLocaleForUser(authority);
-                                    recipients.add(new Pair<String, Locale>(address, locale));
+                                    recipients.put(authority, new Pair<String, Locale>(address, locale));
                                 }
                                 else
                                 {
@@ -1202,13 +1266,13 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                                     if (validateAddresses && emailValidator.isValid(authority))
                                     {
                                         Locale locale = getLocaleForUser(authority);
-                                        recipients.add(new Pair<String, Locale>(authority, locale));
+                                        recipients.put(authority, new Pair<String, Locale>(authority, locale));
                                     }
                                 }
                             }
                             else
                             {
-                                recipients.add(new Pair<String, Locale>(authority, null));
+                                recipients.put(authority, new Pair<String, Locale>(authority, null));
                             }
                         }
                     }
@@ -1227,6 +1291,10 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                         
                         for (String userAuth : users)
                         {
+                            if (recipients.containsKey(userAuth))
+                            {
+                                continue;
+                            }
                             if (personExists(userAuth))
                             {
                                 // Check the user name to be a valid email and we don't need to log an error in this case
@@ -1236,7 +1304,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                                 if (address != null && address.length() != 0 && validateAddress(address))
                                 {
                                     Locale locale = getLocaleForUser(userAuth);
-                                    recipients.add(new Pair<String, Locale>(address, locale));
+                                    recipients.put(userAuth, new Pair<String, Locale>(address, locale));
                                 }
                                 else
                                 {
@@ -1246,14 +1314,14 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                                         if (userAuth != null && userAuth.length() != 0)
                                         {
                                             Locale locale = getLocaleForUser(userAuth);
-                                            recipients.add(new Pair<String, Locale>(userAuth, locale));
+                                            recipients.put(userAuth, new Pair<String, Locale>(userAuth, locale));
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                recipients.add(new Pair<String, Locale>(authority, null));
+                                recipients.put(userAuth, new Pair<String, Locale>(authority, null));
                             }
                         }
                     }
@@ -1274,7 +1342,7 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
                 );
             }
         }
-        return recipients;
+        return recipients.values();
     }
     
     public boolean personExists(final String user)
@@ -1488,6 +1556,8 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
     protected void addParameterDefinitions(List<ParameterDefinition> paramList) 
     {
         paramList.add(new ParameterDefinitionImpl(PARAM_TO, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_TO)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_CC, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_CC)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_BCC, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_BCC)));
         paramList.add(new ParameterDefinitionImpl(PARAM_TO_MANY, DataTypeDefinition.ANY, false, getParamDisplayLabel(PARAM_TO_MANY), true));
         paramList.add(new ParameterDefinitionImpl(PARAM_SUBJECT, DataTypeDefinition.TEXT, true, getParamDisplayLabel(PARAM_SUBJECT)));
         paramList.add(new ParameterDefinitionImpl(PARAM_TEXT, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_TEXT)));

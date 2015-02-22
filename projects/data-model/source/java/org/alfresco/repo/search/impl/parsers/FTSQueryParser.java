@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -56,6 +56,16 @@ import org.antlr.runtime.tree.Tree;
 
 public class FTSQueryParser
 {
+    private static TestNodeBuilder testNodeBuilder = new TestNodeBuilder();
+    
+    public static void setTestNodeBuilder(TestNodeBuilder tnb)
+    {
+        testNodeBuilder = tnb;
+    }
+    
+    static final String KEY_REPLACELONESTAR = "KEY_REPLACELONESTAR";
+    static final String VALUE_REPLACELONESTAR = "ISNODE:T";
+    
     @SuppressWarnings("unused")
     static public Constraint buildFTS(String ftsExpression, QueryModelFactory factory, FunctionEvaluationContext functionEvaluationContext, Selector selector,
             Map<String, Column> columnMap, FTSParser.Mode mode, Connective defaultFieldConnective, Map<String, String> templates, String defaultField)
@@ -66,40 +76,44 @@ public class FTSQueryParser
 
         Map<String, CommonTree> templateTrees = new HashMap<String, CommonTree>();
 
-        if (templates != null)
+        if (templates == null)
         {
-            for (String name : templates.keySet())
-            {
-                FTSParser parser = null;
+            templates = new HashMap<String, String>();
+        }
+        templates.put(KEY_REPLACELONESTAR, VALUE_REPLACELONESTAR);
+        
+        for (String name : templates.keySet())
+        {
+            FTSParser parser = null;
 
-                try
+            try
+            {
+                String templateDefinition = templates.get(name);
+                CharStream cs = new ANTLRStringStream(templateDefinition);
+                FTSLexer lexer = new FTSLexer(cs);
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                parser = new FTSParser(tokens);
+                parser.setMode(mode);
+                parser.setDefaultFieldConjunction(defaultFieldConnective == Connective.AND ? true : false);
+                CommonTree ftsNode = (CommonTree) parser.ftsQuery().getTree();
+                //Check for duplicate template of properties e.g. NAME, name and NaMe.
+                if (templateTrees.containsKey(name.toLowerCase()))
                 {
-                    String templateDefinition = templates.get(name);
-                    CharStream cs = new ANTLRStringStream(templateDefinition);
-                    FTSLexer lexer = new FTSLexer(cs);
-                    CommonTokenStream tokens = new CommonTokenStream(lexer);
-                    parser = new FTSParser(tokens);
-                    parser.setMode(mode);
-                    parser.setDefaultFieldConjunction(defaultFieldConnective == Connective.AND ? true : false);
-                    CommonTree ftsNode = (CommonTree) parser.ftsQuery().getTree();
-                    //Check for duplicate template of properties e.g. NAME, name and NaMe.
-                    if(templateTrees.containsKey(name.toLowerCase())){
-                    	throw new FTSQueryException("Duplicate template of property: " + name);
-                    }
-                    
-                    templateTrees.put(name.toLowerCase(), ftsNode);
+                    throw new FTSQueryException("Duplicate template of property: " + name);
                 }
-                catch (RecognitionException e)
+
+                templateTrees.put(name.toLowerCase(), ftsNode);
+            }
+            catch (RecognitionException e)
+            {
+                if (parser != null)
                 {
-                    if (parser != null)
-                    {
-                        String[] tokenNames = parser.getTokenNames();
-                        String hdr = parser.getErrorHeader(e);
-                        String msg = parser.getErrorMessage(e, tokenNames);
-                        throw new FTSQueryException(hdr + "\n" + msg, e);
-                    }
-                    return null;
-                }
+                    String[] tokenNames = parser.getTokenNames();
+                    String hdr = parser.getErrorHeader(e);
+                    String msg = parser.getErrorMessage(e, tokenNames);
+                    throw new FTSQueryException(hdr + "\n" + msg, e);
+                 }
+                 return null;
             }
         }
 
@@ -235,44 +249,62 @@ public class FTSQueryParser
         }
     }
 
-    static private Constraint buildFTSTest(CommonTree fieldReferenceNode, CommonTree argNode, QueryModelFactory factory, FunctionEvaluationContext functionEvaluationContext,
-            Selector selector, Map<String, Column> columnMap, Map<String, CommonTree> templateTrees, String defaultField)
+    protected static class TestNodeBuilder
     {
-        CommonTree testNode = argNode;
-        // Check for template replacement
+        protected CommonTree build(CommonTree fieldReferenceNode, CommonTree argNode, QueryModelFactory factory, FunctionEvaluationContext functionEvaluationContext,
+            Selector selector, Map<String, Column> columnMap, Map<String, CommonTree> templateTrees, String defaultField)
+        {
+            CommonTree testNode = argNode;
+            // Check for template replacement
 
-        PropertyArgument parg = null;
-        if (fieldReferenceNode != null)
-        {
-            parg = buildFieldReference("", fieldReferenceNode, factory, functionEvaluationContext, selector, columnMap);
-        }
-        else
-        {
-            CommonTree specifiedFieldReferenceNode = findFieldReference(testNode);
-            if (specifiedFieldReferenceNode != null)
+            PropertyArgument parg = null;
+            if (fieldReferenceNode != null)
             {
-                parg = buildFieldReference(FTSRange.ARG_PROPERTY, specifiedFieldReferenceNode, factory, functionEvaluationContext, selector, columnMap);
+                parg = buildFieldReference("", fieldReferenceNode, factory, functionEvaluationContext, selector, columnMap);
             }
-        }
-        if (parg != null)
-        {
-            CommonTree template = templateTrees.get(parg.getPropertyName().toLowerCase());
-            if (template != null)
+            else
             {
-                testNode = copyAndReplace(template, testNode);
+                CommonTree specifiedFieldReferenceNode = findFieldReference(testNode);
+                if (specifiedFieldReferenceNode != null)
+                {
+                    parg = buildFieldReference(FTSRange.ARG_PROPERTY, specifiedFieldReferenceNode, factory, functionEvaluationContext, selector, columnMap);
+                }
             }
-        }
-        else
-        {
-            if(hasOptionalFieldReference(testNode))
+            if (parg != null)
             {
-                CommonTree template = templateTrees.get(defaultField.toLowerCase());
+                CommonTree template = templateTrees.get(parg.getPropertyName().toLowerCase());
                 if (template != null)
                 {
                     testNode = copyAndReplace(template, testNode);
                 }
             }
+            else
+            {
+                if(hasOptionalFieldReference(testNode))
+                {
+                    if (isStarWithNoField(testNode))
+                    {
+                        testNode = copyAndReplace(templateTrees.get(KEY_REPLACELONESTAR.toLowerCase()), testNode);
+                    }
+                    else
+                    {
+                        CommonTree template = templateTrees.get(defaultField.toLowerCase());
+                        if (template != null)
+                        {
+                            testNode = copyAndReplace(template, testNode);
+                        }
+                    }
+                }
+            }
+            
+            return testNode;
         }
+    }
+
+    static private Constraint buildFTSTest(CommonTree fieldReferenceNode, CommonTree argNode, QueryModelFactory factory, FunctionEvaluationContext functionEvaluationContext,
+            Selector selector, Map<String, Column> columnMap, Map<String, CommonTree> templateTrees, String defaultField)
+    {
+        CommonTree testNode = testNodeBuilder.build(fieldReferenceNode, argNode, factory, functionEvaluationContext, selector, columnMap, templateTrees, defaultField);
 
         Tree termNode;
         Float fuzzy = findFuzzy(testNode);
@@ -886,6 +918,19 @@ public class FTSQueryParser
         default:
             return false;
         }
+    }
+    
+    private static boolean isStarWithNoField(CommonTree testNode)
+    {
+        if (testNode.getType() == FTSParser.TERM && testNode.getChildCount() == 1)
+        {
+            CommonTree child = (CommonTree) testNode.getChild(0);
+            if (child.getType() == FTSParser.STAR)
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
     static private Constraint buildFuzzyTerm(Float fuzzy, CommonTree fieldReferenceNode, CommonTree testNode, QueryModelFactory factory,

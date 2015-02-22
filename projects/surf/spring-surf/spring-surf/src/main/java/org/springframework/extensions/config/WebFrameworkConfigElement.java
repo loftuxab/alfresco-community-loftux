@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -57,6 +58,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected HashMap<String, ResourceLoaderDescriptor> resourceLoaders = null;
     protected HashMap<String, ResourceResolverDescriptor> resourceResolvers = null;
     protected HashMap<String, RuntimeConfigDescriptor> runtimeConfigs = null;
+    protected List<Pattern> resourcesDeniedPaths = null;
 
     protected boolean isTimerEnabled = false;
 
@@ -164,6 +166,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         
         resourceLoaders = new HashMap<String, ResourceLoaderDescriptor>();
         resourceResolvers = new HashMap<String, ResourceResolverDescriptor>();
+        resourcesDeniedPaths = new ArrayList<Pattern>();
 
         runtimeConfigs = new HashMap<String, RuntimeConfigDescriptor>();
         
@@ -189,7 +192,8 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.pageTypes.putAll(this.pageTypes);
         combinedElement.resourceLoaders.putAll(this.resourceLoaders);
         combinedElement.resourceResolvers.putAll(this.resourceResolvers);
-        combinedElement.runtimeConfigs.putAll(this.runtimeConfigs);       
+        combinedElement.resourcesDeniedPaths.addAll(this.resourcesDeniedPaths);
+        combinedElement.runtimeConfigs.putAll(this.runtimeConfigs);
 
         // override with things from the merging object
         combinedElement.formats.putAll(configElement.formats);
@@ -200,6 +204,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.pageTypes.putAll(configElement.pageTypes);
         combinedElement.resourceLoaders.putAll(configElement.resourceLoaders);
         combinedElement.resourceResolvers.putAll(configElement.resourceResolvers);
+        combinedElement.resourcesDeniedPaths.addAll(configElement.resourcesDeniedPaths);
         combinedElement.runtimeConfigs.putAll(configElement.runtimeConfigs);
         
         // other properties
@@ -448,7 +453,12 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     public ResourceLoaderDescriptor getResourceLoaderDescriptor(String id)
     {
         return (ResourceLoaderDescriptor) this.resourceLoaders.get(id);        
-    }    
+    }
+    
+    public List<Pattern> getResourcesDeniedPaths()
+    {
+        return resourcesDeniedPaths;
+    }
     
     // resource resolvers
     public String[] getResourceResolverIds()
@@ -1225,6 +1235,18 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             }
         }
         
+        // MNT-12724 case, externally specify paths that should be denied by ResourceController
+        Element denyAccessPathsElement = elem.element("deny-access-resource-paths");
+        if (denyAccessPathsElement != null)
+        {
+            List<Element> paths = denyAccessPathsElement.elements("resource-path-pattern");
+            
+            for (Element path : paths)
+            {
+                configElement.resourcesDeniedPaths.add(Pattern.compile(path.getTextTrim()));
+            }
+        }
+        
         // When "use-checksum-dependencies" is set to true the JavaScriptDependencyDirective and
         // CssDependencyDirectives will be made available to FreeMarker templates...
         String useChecksumDependencies = elem.elementTextTrim("use-checksum-dependencies");
@@ -1297,6 +1319,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     public static final String DOJO_PACKAGE_MAIN = "main";
     public static final String DOJO_MESSAGES_OBJECT = "messages-object";
     public static final String DOJO_MESSAGES_DEFAULT_SCOPE = "default-messages-scope";
+    public static final String DOJO_DEFAULT_LESS_CONFIG = "default-less-configuration";
     
     /*
      * DOJO CONFIGURATION VALUES
@@ -1308,6 +1331,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected String  dojoBaseUrl = null;
     protected String  dojoMessagesObject = null;
     protected String  dojoMessagesDefaultScope = null;
+    protected String  dojoDefaultLessConfig = null;
     protected Map<String, String> dojoPackages = new HashMap<String, String>();
     protected Map<String, String> dojoPackagesMain = new HashMap<String, String>();
     
@@ -1357,6 +1381,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     {
         return dojoMessagesDefaultScope;
     }
+    
+    public String getDojoDefafultLessConfig()
+    {
+        return dojoDefaultLessConfig;
+    }
 
     /**
      * Processes the Dojo configuration from the supplied {@link Element}
@@ -1402,6 +1431,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             if (messagesDefaultScope != null)
             {
                 configElement.dojoMessagesDefaultScope = messagesDefaultScope;
+            }
+            String defaultLessConfig = dojoConfig.elementTextTrim(DOJO_DEFAULT_LESS_CONFIG);
+            if (defaultLessConfig != null)
+            {
+                configElement.dojoDefaultLessConfig = defaultLessConfig;
             }
             Element packages = dojoConfig.element(DOJO_PACKAGES);
             if (packages != null)
@@ -1471,6 +1505,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         if (configElement.dojoMessagesDefaultScope != null)
         {
             combinedElement.dojoMessagesDefaultScope = configElement.dojoMessagesDefaultScope;
+        }
+        combinedElement.dojoDefaultLessConfig = this.dojoDefaultLessConfig;
+        if (configElement.dojoDefaultLessConfig != null)
+        {
+            combinedElement.dojoDefaultLessConfig = configElement.dojoDefaultLessConfig;
         }
         combinedElement.dojoPackages = this.dojoPackages;
         if (configElement.dojoPackages != null)

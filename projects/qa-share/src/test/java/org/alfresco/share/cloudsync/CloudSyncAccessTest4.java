@@ -1,5 +1,5 @@
 /*
- * C opyright (C) 2005-2013 Alfresco Software Limited. This file is part of Alfresco Alfresco is free software: you can redistribute it and/or modify it under
+ * Copyright (C) 2005-2013 Alfresco Software Limited. This file is part of Alfresco Alfresco is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
  * later version. Alfresco is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. You should have received a copy of the GNU Lesser General
@@ -11,7 +11,16 @@ package org.alfresco.share.cloudsync;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
 import org.alfresco.po.share.site.SiteDashboardPage;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryNavigation;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.site.document.EditTextDocumentPage;
+import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.site.document.RevertToVersionPage;
+import org.alfresco.po.share.site.document.SyncInfoPage;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractCloudSyncTest;
@@ -20,9 +29,7 @@ import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.SiteUtil;
 import org.alfresco.share.util.api.CreateUserAPI;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -43,10 +50,6 @@ import java.util.List;
 public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 {
 
-    private static Log logger = LogFactory.getLog(CloudSyncAccessTest4.class);
-
-    private String fileName;
-
     @BeforeClass(alwaysRun = true)
     public void setup() throws Exception
     {
@@ -64,10 +67,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         testName = getTestName();
         String user1 = getUserNameForDomain(testName + "1", hybridDomainPremium);
         String user2 = getUserNameForDomain(testName + "2", hybridDomainFree);
-        String[] userInfo1 = new String[]
-                { user1 };
-        String[] userInfo2 = new String[]
-                { user2 };
+        String[] userInfo1 = new String[] { user1 };
+        String[] userInfo2 = new String[] { user2 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -108,8 +109,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
             String cloudSiteName = getSiteName(testName) + System.currentTimeMillis() + "-CL";
             String userFileName = getFileName(testName) + "-UF.txt";
-            String[] userFileInfo =
-                    { userFileName, DOCLIB };
+            String[] userFileInfo = { userFileName, DOCLIB };
 
             // Login into cloud as User1
             ShareUser.login(hybridDrone, user1, DEFAULT_PASSWORD);
@@ -147,7 +147,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             // User1 logs out from OP
             ShareUser.logout(drone);
-        } catch (Throwable e)
+        }
+        catch (Throwable e)
         {
             reportError(drone, testName, e);
         }
@@ -166,15 +167,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         testName = getTestName();
         String user1 = getUserNameForDomain(testName + "1", hybridDomainPremium);
         String user2 = getUserNameForDomain(testName + "2", hybridDomainFree);
-        String[] userInfo1 = new String[]
-                { user1 };
-        String[] userInfo2 = new String[]
-                { user2 };
+        String[] userInfo1 = new String[] { user1 };
+        String[] userInfo2 = new String[] { user2 };
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
         String userFileName = getFileName(testName) + "-UF.txt";
-        String[] userFileInfo =
-                { userFileName, DOCLIB };
+        String[] userFileInfo = { userFileName, DOCLIB };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -253,7 +251,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             // User1 logs out from OP
             ShareUser.logout(drone);
-        } catch (Throwable e)
+        }
+        catch (Throwable e)
         {
             reportError(drone, testName, e);
         }
@@ -271,12 +270,10 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
         String opSiteName = getSiteName(testName) + "-OP";
         String userFileName = getFileName(testName) + "-UF.txt";
-        String[] userFileInfo =
-                { userFileName, DOCLIB };
+        String[] userFileInfo = { userFileName, DOCLIB };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -330,19 +327,19 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             // User1 logs out from OP
             ShareUser.logout(drone);
-        } catch (Throwable e)
+        }
+        catch (Throwable e)
         {
             reportError(drone, testName, e);
         }
     }
 
     /**
-     * Data preperation for AONE-11524.
+     * Data preparation for AONE-11524.
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15465() throws Exception
     {
         String testName = getTestName();
@@ -350,8 +347,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName);
 
         // Create User (On Premise)
-        String[] userInfo =
-                { testUser };
+        String[] userInfo = { testUser };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User (Cloud)
@@ -372,14 +368,13 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
     /**
      * 1) Create a folder in cloud user. 2) Create folder in on prem user. 3)
-     * Creat sub folders and files under folder. 4) Sync Folder of on prem user
-     * along with its sybfolder. 5) Login to cloud user and go to site. 6) Check
+     * Create sub folders and files under folder. 4) Sync Folder of on prem user
+     * along with its subfolder. 5) Login to cloud user and go to site. 6) Check
      * subfolders of on prem user which are synced are appearing.
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15465() throws Exception
     {
         String testName = getTestName();
@@ -417,11 +412,9 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             // Create sub folder-2
             ShareUserSitePage.createFolder(drone, opSubFolderName2, opSubFolderName2);
             // Upload file-1
-            ShareUser.uploadFileInFolder(drone, new String[]
-                    { opFileName1, opFolderToBeSynced });
+            ShareUser.uploadFileInFolder(drone, new String[] { opFileName1, opFolderToBeSynced });
             // Upload file-2
-            docLibPage = ShareUser.uploadFileInFolder(drone, new String[]
-                    { opFileName2, opFolderToBeSynced });
+            docLibPage = ShareUser.uploadFileInFolder(drone, new String[] { opFileName2, opFolderToBeSynced });
 
             docLibPage.getSiteNav().selectSiteDocumentLibrary().render();
             DestinationAndAssigneeBean desAndAssBean = new DestinationAndAssigneeBean();
@@ -431,7 +424,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             DestinationAndAssigneePage destinationAssignee = selectSyncToCloudDocLib(drone, opFolderToBeSynced);
 
-//            AbstractCloudSyncTest.syncContentToCloud(drone, opFolderToBeSynced, desAndAssBean);
+            // AbstractCloudSyncTest.syncContentToCloud(drone, opFolderToBeSynced, desAndAssBean);
 
             // Selecting site, lock on prem as false, sub folder to sync as
             // true, and target cloud folder.
@@ -464,19 +457,19 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             Assert.assertEquals(opFileName2, docLibPage.getFileDirectoryInfo(opFileName2).getName());
             ShareUser.logout(hybridDrone);
 
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
     }
 
     /**
-     * Data preperation for AONE-11525.
+     * Data preparation for AONE-11525.
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15466() throws Exception
     {
         String testName = getTestName();
@@ -484,8 +477,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName);
 
         // Create User (On Premise)
-        String[] userInfo =
-                { testUser };
+        String[] userInfo = { testUser };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User (Cloud)
@@ -506,14 +498,13 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
     /**
      * 1) Create a folder in cloud user. 2) Create folder in on prem user. 3)
-     * Creat sub folders and files under folder. 4) Sync Folder of on prem user
-     * without its sybfolder. 5) Login to cloud user and go to site. 6) Check
+     * Create sub folders and files under folder. 4) Sync Folder of on prem user
+     * without its subfolder. 5) Login to cloud user and go to site. 6) Check
      * subfolders of on prem user which are synced must not appear.
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15466() throws Exception
     {
         String testName = getTestName();
@@ -553,16 +544,14 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             // Create sub folder-2
             ShareUserSitePage.createFolder(drone, opSubFolderName2, opSubFolderName2);
             // Upload file-1
-            ShareUser.uploadFileInFolder(drone, new String[]
-                    { opFileName1, opFolderToBeSynced });
+            ShareUser.uploadFileInFolder(drone, new String[] { opFileName1, opFolderToBeSynced });
             // Upload file-2
-            docLibPage = ShareUser.uploadFileInFolder(drone, new String[]
-                    { opFileName2, opFolderToBeSynced });
+            docLibPage = ShareUser.uploadFileInFolder(drone, new String[] { opFileName2, opFolderToBeSynced });
 
             docLibPage.getSiteNav().selectSiteDocumentLibrary().render();
             desAndAssigneePage = AbstractCloudSyncTest.selectSyncToCloudDocLib(drone, opFolderToBeSynced);
 
-//            desAndAssigneePage = (DestinationAndAssigneePage) docLibPage.getFileDirectoryInfo(opFolderToBeSynced).selectSyncToCloud();
+            // desAndAssigneePage = (DestinationAndAssigneePage) docLibPage.getFileDirectoryInfo(opFolderToBeSynced).selectSyncToCloud();
             // Selecting site, lock on prem as false, sub folder to sync as
             // true, and target cloud folder.
 
@@ -595,19 +584,19 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             ShareUser.logout(hybridDrone);
 
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
     }
 
     /**
-     * Data preperation for AONE-11526 & 7158.
+     * Data preparation for AONE-11526 & 7158.
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15446() throws Exception
     {
         String testName = getTestName();
@@ -622,7 +611,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         // Create User (Cloud)
         CreateUserAPI.CreateActivateUser(hybridDrone, adminUserPrem, userInfo);
 
-        // Creat another user in On prem.
+        // Create another user in On prem.
         userInfo = new String[] { testUser2 };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
@@ -644,8 +633,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
     }
 
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15446() throws Exception
     {
 
@@ -703,19 +691,19 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             syncInfoPage.clickOnCloseButton().render();
 
             ShareUser.logout(drone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
     }
 
     /**
-     * Data preperation for AONE-11528 & 7160.
+     * Data preparation for AONE-11528 & 7160.
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15448() throws Exception
     {
         String testName = getTestName();
@@ -724,16 +712,14 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName + "-1");
 
         // Create User (On Premise)
-        String[] userInfo =
-                { testUser };
+        String[] userInfo = { testUser };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User (Cloud)
         CreateUserAPI.CreateActivateUser(hybridDrone, adminUserPrem, userInfo);
 
-        // Creat another user in On prem.
-        userInfo = new String[]
-                { testUser2 };
+        // Create another user in On prem.
+        userInfo = new String[] { testUser2 };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Login as User (Cloud)
@@ -759,8 +745,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15448() throws Exception
     {
 
@@ -785,9 +770,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             docLibPage.selectFolder(opFolderToBeSynced);
             ShareUserSitePage.createFolder(drone, opSubFolderToBeSynced, opSubFolderToBeSynced);
 
-            docLibPage = ShareUser.uploadFileInFolder(drone, new String[]
-                    { opSubFileNameToBeSynced, opFolderToBeSynced });
-            docLibPage= docLibPage.getSiteNav().selectSiteDocumentLibrary().render();
+            docLibPage = ShareUser.uploadFileInFolder(drone, new String[] { opSubFileNameToBeSynced, opFolderToBeSynced });
+            docLibPage = docLibPage.getSiteNav().selectSiteDocumentLibrary().render();
             // sync folder
             desAndAssigneePage = (DestinationAndAssigneePage) docLibPage.getFileDirectoryInfo(opFolderToBeSynced).selectSyncToCloud();
             desAndAssigneePage.selectSite(siteName);
@@ -824,19 +808,19 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             ShareUser.logout(drone);
 
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
     }
 
     /**
-     * Data preperation for AONE-11528 & 7160.
+     * Data preparation for AONE-11528 & 7160.
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15454() throws Exception
     {
         String testName = getTestName();
@@ -844,8 +828,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName + "-1");
 
         // Create User (On Premise)
-        String[] userInfo =
-                { testUser };
+        String[] userInfo = { testUser };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User (Cloud)
@@ -869,8 +852,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      *
      * @throws Exception
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15454() throws Exception
     {
 
@@ -892,8 +874,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             for (int i = 0; i < 2; i++)
             {
-                docLibPage = ShareUser.uploadFileInFolder(drone, new String[]
-                        { opSubFileNameToBeSynced + i, DOCLIB });
+                docLibPage = ShareUser.uploadFileInFolder(drone, new String[] { opSubFileNameToBeSynced + i, DOCLIB });
             }
             docLibPage = docLibPage.getNavigation().selectAll().render();
 
@@ -912,7 +893,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             }
             ShareUser.logout(drone);
 
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -923,14 +905,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * change the property 1) Create On-Prem user 2) Create a Cloud User 3)
      * Login to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15455() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -958,8 +938,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * 9) Login as User (OP), verify Document description is updated and version
      * is changed to "1.1" from DocumentDetailsPage
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15455() throws Exception
     {
         testName = getTestName();
@@ -968,8 +947,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String cloudSiteName = getSiteName(testName) + System.currentTimeMillis() + "-CL";
         String fileName = getFileName(testName) + ".txt";
         String docDescription = testName + " - " + getFileName(testName);
-        String[] fileInfo =
-                { fileName, DOCLIB };
+        String[] fileInfo = { fileName, DOCLIB };
 
         try
         {
@@ -1034,7 +1012,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             // User1 logs out from OP
             ShareUser.logout(drone);
 
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1045,14 +1024,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * change the content 1) Create On-Prem user 2) Create a Cloud User 3) Login
      * to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15456() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -1079,8 +1056,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * "1.1" 9) Login as User (OP), verify version is updated to "1.1" from
      * DocumentDetailsPage
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15456() throws Exception
     {
         testName = getTestName();
@@ -1089,8 +1065,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSiteName = getSiteName(testName) + System.currentTimeMillis() + "-CL";
         String fileName = getFileName(testName) + ".txt";
-        String[] fileInfo =
-                { fileName, DOCLIB };
+        String[] fileInfo = { fileName, DOCLIB };
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setName(fileName);
         contentDetails.setContent(testName + getSiteName(testName));
@@ -1152,7 +1127,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             // User1 logs out from OP
             ShareUser.logout(drone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1162,14 +1138,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * 7168 - AONE-11535:Editing of the locked file 1) Create On-Prem
      * user 2) Create a Cloud User 3) Login to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15457() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -1192,8 +1166,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * document is synced 6) Verify Message on locked content 7) Verify
      * "Inline Edit" and "Edit Offline" links are not displayed
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15457() throws Exception
     {
         testName = getTestName();
@@ -1202,8 +1175,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSiteName = getSiteName(testName) + System.currentTimeMillis() + "-CL";
         String fileName = getFileName(testName) + ".txt";
-        String[] fileInfo =
-                { fileName, DOCLIB };
+        String[] fileInfo = { fileName, DOCLIB };
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setName(fileName);
         contentDetails.setContent(testName + getSiteName(testName));
@@ -1244,7 +1216,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             Assert.assertFalse(documentDetailsPage.isInlineEditLinkDisplayed());
             Assert.assertFalse(documentDetailsPage.isEditOfflineLinkDisplayed());
             ShareUser.logout(drone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1255,14 +1228,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * Create On-Prem user 2) Create a Cloud User 3) Login to On-Premise and set
      * up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15458() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -1288,8 +1259,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * 8) Verify the Sync, Lock icons are NOT displayed 9) Verify "Inline Edit"
      * and "Edit Offline" options are displayed in More options menu
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15458() throws Exception
     {
         testName = getTestName();
@@ -1298,8 +1268,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSiteName = getSiteName(testName) + System.currentTimeMillis() + "-CL";
         String fileName = getFileName(testName) + ".txt";
-        String[] fileInfo =
-                { fileName, DOCLIB };
+        String[] fileInfo = { fileName, DOCLIB };
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setName(fileName);
         contentDetails.setContent(testName + getSiteName(testName));
@@ -1349,7 +1318,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             Assert.assertTrue(documentLibraryPage.getFileDirectoryInfo(fileName).isEditOfflineLinkPresent());
 
             ShareUser.logout(drone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1363,14 +1333,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * 1) Create On-Prem user 2) Create a Cloud User 3) Login to On-Premise and
      * set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15460() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -1397,8 +1365,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * (Cloud), open site document library 8) Verify the folder created from ENT
      * exists 9) Select the folder and Verify the Synced Doc exists
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15460() throws Exception
     {
         testName = getTestName();
@@ -1453,7 +1420,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             Assert.assertEquals(documentLibraryPage.getFiles().get(0).getName(), fileName);
             ShareUser.logout(hybridDrone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1464,14 +1432,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * Create On-Prem user 2) Create a Cloud User 3) Login to On-Premise and set
      * up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15459() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -1494,8 +1460,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * page 5) Click on Document (DocumentDetailsPage) 6) Verify Sync Status,
      * Sync location and request sync icon is displayed.
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15459() throws Exception
     {
         testName = getTestName();
@@ -1504,8 +1469,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSiteName = getSiteName(testName) + System.currentTimeMillis() + "-CL";
         String fileName = getFileName(testName) + ".txt";
-        String[] fileInfo =
-                { fileName, DOCLIB };
+        String[] fileInfo = { fileName, DOCLIB };
 
         try
         {
@@ -1544,7 +1508,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             Assert.assertTrue(documentDetailsPage.isRequestSyncIconDisplayed());
             Assert.assertEquals(documentDetailsPage.getLocationInCloud(), expectedLocation);
             ShareUser.logout(drone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1555,14 +1520,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * selection window under one of the subfolders 1) Create On-Prem user 2)
      * Create a Cloud User 3) Login to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15462() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -1587,8 +1550,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * document library 8) Verify the folder created from ENT exists 9) Select
      * the folder and Verify the Synced Doc exists
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15462() throws Exception
     {
 
@@ -1598,8 +1560,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
         String cloudSiteName = getSiteName(testName) + System.currentTimeMillis() + "-CL";
         String fileName = getFileName(testName) + ".txt";
-        String[] fileInfo =
-                { fileName, DOCLIB };
+        String[] fileInfo = { fileName, DOCLIB };
         String cloudFolderName = testName + "-Folder";
         String folderName1 = getFolderName(testName + "-1");
 
@@ -1646,7 +1607,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             Assert.assertEquals(documentLibraryPage.getFiles().get(0).getName(), fileName);
             ShareUser.logout(hybridDrone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1657,14 +1619,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * selection window 1) Create On-Prem user 2) Create a Cloud User 3) Login
      * to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15464() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -1690,8 +1650,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * from ENT exists 9) Select the folder and Verify the Synced Folder and
      * document within the folder exists
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15464() throws Exception
     {
         testName = getTestName();
@@ -1701,8 +1660,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String cloudSiteName = getSiteName(testName) + System.currentTimeMillis() + "-CL";
         String fileName = getFileName(testName) + ".txt";
         String opFolderName = testName + "-OP_Folder";
-        String[] fileInfo =
-                { fileName, opFolderName };
+        String[] fileInfo = { fileName, opFolderName };
         String cloudFolderName = testName + "-Folder";
 
         try
@@ -1755,7 +1713,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             documentLibraryPage = documentLibraryPage.renderItem(maxWaitTime, fileName).render();
             Assert.assertEquals(documentLibraryPage.getFiles().get(0).getName(), fileName);
             ShareUser.logout(hybridDrone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1767,19 +1726,16 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * On-Premise and set up Cloud Sync 5) Create a site, upload a file and sync
      * the file
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15441() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
         String fileName = getFileName(testName) + ".txt";
-        String[] fileInfo =
-                { fileName, DOCLIB };
+        String[] fileInfo = { fileName, DOCLIB };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -1819,8 +1775,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * Cloud, open site document library from search 6) Verify the description
      * has been updated
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15441() throws Exception
     {
 
@@ -1861,7 +1816,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             // Verify the Description has been changed in cloud
             Assert.assertEquals(documentLibraryPage.getFileDirectoryInfo(fileName).getDescription(), propertyDescription);
             ShareUser.logout(hybridDrone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1873,14 +1829,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * site 4) Login to On-Premise and set up Cloud Sync 5) Create a site,
      * create a folder and sync the folder
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15442() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
         String opSiteName = getSiteName(testName) + "-OP";
         String cloudSiteName = getSiteName(testName) + "-CL";
         String folderName = getFolderName(testName) + "-OP";
@@ -1924,8 +1878,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * options 5) Login to Cloud, open site document library from search 6)
      * Verify the description has been updated
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15442() throws Exception
     {
 
@@ -1966,7 +1919,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             // Verify the Description has been changed in cloud
             Assert.assertEquals(documentLibraryPage.getFileDirectoryInfo(folderName).getDescription(), propertyDescription);
             ShareUser.logout(hybridDrone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -1977,14 +1931,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * folder 1) Create On-Prem user 2) Create a Cloud User 3) Login to Cloud,
      * set up Cloud Sync with the cloud user
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15443() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -2017,8 +1969,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * version 16) Login to OP, Open the site and verify there is no description
      * for File1 and File2
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15443() throws Exception
     {
 
@@ -2029,10 +1980,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String folderName = getFolderName(testName) + "-OP";
         String fileName1 = getFileName(testName) + "-1.txt";
         String fileName2 = getFileName(testName) + "-2.txt";
-        String[] fileInfo1 =
-                { fileName1, folderName };
-        String[] fileInfo2 =
-                { fileName2, folderName };
+        String[] fileInfo1 = { fileName1, folderName };
+        String[] fileInfo2 = { fileName2, folderName };
 
         String propertyDescription = String.valueOf(System.currentTimeMillis());
 
@@ -2148,7 +2097,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             Assert.assertEquals(documentLibraryPage.getFileDirectoryInfo(fileName2).getDescription(), "No Description");
 
             ShareUser.logout(drone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -2159,14 +2109,12 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * Create On-Prem user 2) Create a Cloud User 3) Login to Cloud and set up
      * Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15444() throws Exception
     {
         testName = getTestName();
         String user1 = getUserNameForDomain(testName, hybridDomainPremium);
-        String[] userInfo1 = new String[]
-                { user1 };
+        String[] userInfo1 = new String[] { user1 };
 
         // Create User1 (On-premise)
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo1);
@@ -2191,8 +2139,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * "Request Sync" from Selected Items drop down 8) Login to Cloud and verify
      * the description has been updated for both files
      */
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15444() throws Exception
     {
         testName = getTestName();
@@ -2288,7 +2235,8 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             Assert.assertTrue(checkIfDescriptionIsUpdated(hybridDrone, fileName1, file1Description));
             Assert.assertTrue(checkIfDescriptionIsUpdated(hybridDrone, fileName2, file2Description));
             ShareUser.logout(hybridDrone);
-        } catch (Throwable t)
+        }
+        catch (Throwable t)
         {
             reportError(drone, testName, t);
         }
@@ -2299,8 +2247,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * pop up. 1) Create On-Prem user 2) Create a Cloud User 3) Create site on
      * cloud user. 3) Login to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15434() throws Exception
     {
         String testName = getTestName();
@@ -2308,8 +2255,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName + "-1");
 
         // Create User (On Premise)
-        String[] userInfo =
-                { testUser };
+        String[] userInfo = { testUser };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User (Cloud)
@@ -2327,8 +2273,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         ShareUser.logout(drone);
     }
 
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15434() throws Exception
     {
 
@@ -2339,8 +2284,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSitesDocumentLibrary(drone, siteName);
-        ShareUser.uploadFileInFolder(drone, new String[]
-                { fileName, DOCLIB });
+        ShareUser.uploadFileInFolder(drone, new String[] { fileName, DOCLIB });
 
         DestinationAndAssigneeBean desAndAssBean = new DestinationAndAssigneeBean();
         desAndAssBean.setNetwork(hybridDomainPremium);
@@ -2373,8 +2317,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * info pop up. 1) Create On-Prem user 2) Create a Cloud User 3) Create site
      * on cloud user. 3) Login to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15435() throws Exception
     {
         String testName = getTestName();
@@ -2382,8 +2325,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName + "-1");
 
         // Create User (On Premise)
-        String[] userInfo =
-                { testUser };
+        String[] userInfo = { testUser };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User (Cloud)
@@ -2401,8 +2343,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         ShareUser.logout(drone);
     }
 
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15435() throws Exception
     {
         String testName = getTestName();
@@ -2442,8 +2383,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * folder. 1) Create On-Prem user 2) Create a Cloud User 3) Create site on
      * cloud user. 3) Login to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15452() throws Exception
     {
         String testName = getTestName();
@@ -2469,8 +2409,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         ShareUser.logout(drone);
     }
 
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15452() throws Exception
     {
 
@@ -2522,8 +2461,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * folder. 1) Create On-Prem user 2) Create a Cloud User 3) Create site on
      * cloud user. 3) Login to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15453() throws Exception
     {
         String testName = getTestName();
@@ -2532,15 +2470,13 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName + "-1");
 
         // Create User (On Premise)
-        String[] userInfo =
-                { testUser };
+        String[] userInfo = { testUser };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User (Cloud)
         CreateUserAPI.CreateActivateUser(hybridDrone, adminUserPrem, userInfo);
 
-        CreateUserAPI.CreateActivateUser(drone, adminUserPrem, new String[]
-                { testUser2 });
+        CreateUserAPI.CreateActivateUser(drone, adminUserPrem, testUser2);
 
         // Login as User (Cloud)
         ShareUser.login(hybridDrone, testUser, DEFAULT_PASSWORD);
@@ -2555,8 +2491,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         ShareUser.logout(drone);
     }
 
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15453() throws Exception
     {
 
@@ -2571,8 +2506,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         ShareUser.openSitesDocumentLibrary(drone, siteName);
         ShareUserSitePage.createFolder(drone, folder, folder);
-        ShareUser.uploadFileInFolder(drone, new String[]
-                { file, folder });
+        ShareUser.uploadFileInFolder(drone, new String[] { file, folder });
         DocumentLibraryPage docLibPage = ShareUserSitePage.createFolder(drone, subFolder, subFolder);
         docLibPage = docLibPage.getSiteNav().selectSiteDocumentLibrary().render();
         DestinationAndAssigneeBean desAndAssBean = new DestinationAndAssigneeBean();
@@ -2583,7 +2517,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         AbstractCloudSyncTest.syncContentToCloud(drone, folder, desAndAssBean);
 
         ShareUser.logout(drone);
-        /** login and test coditions as TestUser2 **/
+        /** login and test conditions as TestUser2 **/
         ShareUser.login(drone, testUser2, DEFAULT_PASSWORD);
 
         docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
@@ -2608,12 +2542,11 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
     }
 
     /**
-     * 7182 - AONE-11552:Unsync file by User-2(as Collabrator) to site.
+     * 7182 - AONE-11552:Unsync file by User-2(as Collaborator) to site.
      * 1) Create On-Prem user 2) Create a Cloud User 3) Create site on cloud
      * user. 3) Login to On-Premise and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15471() throws Exception
     {
         String testName = getTestName().toLowerCase();
@@ -2622,8 +2555,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName);
 
         // Create User1 (On Premise)
-        String[] userInfo =
-                { testUser1 };
+        String[] userInfo = { testUser1 };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User1 (On Premise)
@@ -2653,8 +2585,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         ShareUser.logout(drone);
     }
 
-    @Test(groups =
-            { "CloudSync" })
+    @Test(groups = { "CloudSync" })
     public void AONE_15471() throws Exception
     {
 
@@ -2666,7 +2597,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         DestinationAndAssigneeBean destAndAssBean = new DestinationAndAssigneeBean();
         destAndAssBean.setNetwork(getUserDomain(testUser2));
         destAndAssBean.setSiteName(siteName);
-        // User2 who is a Collabrator to site created by (user1) uploads a file.
+        // User2 who is a Collaborator to site created by (user1) uploads a file.
         ShareUser.login(drone, testUser2, DEFAULT_PASSWORD);
         ShareUser.openSitesDocumentLibrary(drone, siteName);
         ShareUser.uploadFileInFolder(drone, new String[] { fileName, DOCLIB });
@@ -2701,8 +2632,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
      * Create a Cloud User 3) Create site on cloud user. 3) Login to On-Premise
      * and set up Cloud Sync
      */
-    @Test(groups =
-            { "DataPrepCloudSync4", "DataPrepCloudSync" })
+    @Test(groups = { "DataPrepCloudSync4", "DataPrepCloudSync" })
     public void dataPrep_AONE_15473() throws Exception
     {
         String testName = getTestName().toLowerCase();
@@ -2710,8 +2640,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         String siteName = getSiteName(testName);
 
         // Create User (On Premise)
-        String[] userInfo =
-                { testUser };
+        String[] userInfo = { testUser };
         CreateUserAPI.CreateActivateUser(drone, adminUserPrem, userInfo);
 
         // Create User (Cloud)

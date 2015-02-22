@@ -107,7 +107,6 @@ public final class ScriptCredentialVault
         if (scriptCredentials == null)
         {
             Credentials creds = this.vault.newCredentials(endpointId);
-            this.vault.save();
             
             // update our properties map
             scriptCredentials = new ScriptCredentials(this.vault, creds);
@@ -126,7 +125,6 @@ public final class ScriptCredentialVault
     {
         // remove from the actual vault
         this.vault.remove(endpointId);
-        this.vault.save();
         
         // remove from our map
         getProperties().remove(endpointId);
@@ -172,9 +170,6 @@ public final class ScriptCredentialVault
             // store the creds back onto the actual vault
             this.vault.store(creds);
         }
-        
-        // persist the vault (if needed)
-        this.vault.save();
         
         // null our properties map so it reloads on next access
         this.properties = null;

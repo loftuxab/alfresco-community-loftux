@@ -54,6 +54,7 @@ import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -912,14 +913,69 @@ public class ImapServiceImplTest extends TestCase
         AlfrescoImapFolder destinationMailbox = imapService.getOrCreateMailbox(poweredUser, destinationPath, true, false);
         destinationMailbox.appendMessage(origMessage.getMimeMessage(), flags, null);
 
-        // Check the destination has the original file and only this file
-        FileInfo movedNode = fileFolderService.getFileInfo(origFile.getNodeRef());
-        assertNotNull("The file should exist.", movedNode);
-        assertEquals("The file name should not change.", fileName, movedNode.getName());
-        NodeRef newParentNodeRef = nodeService.getPrimaryParent(origFile.getNodeRef()).getParentRef();
-        assertEquals("The parent should change to destination.", destinationNode.getNodeRef(), newParentNodeRef);
+        // original message should be deleted or about to
+        assertTrue(!nodeService.exists(origFile.getNodeRef()) || imapService.getFlags(origFile).contains(Flags.Flag.DELETED));
+        
+        // new file should be in destination
         assertEquals("There should be only one node in the destination folder", 1, nodeService.getChildAssocs(destinationNode.getNodeRef()).size());
+        NodeRef newNodeRef = nodeService.getChildAssocs(destinationNode.getNodeRef()).get(0).getChildRef();
+        FileInfo newNodeFileInfo = fileFolderService.getFileInfo(newNodeRef);
+        assertEquals("The file name should not change.", fileName, newNodeFileInfo.getName());
+        ContentReader reader = contentService.getReader(newNodeRef, ContentModel.PROP_CONTENT);
+        String contentString = reader.getContentString();
+        // new file content should be the same as original one
+        assertEquals(contentString, nodeContent);
     }
+    
+    /**
+     * Test for MNT-12420
+     * 
+     * @throws Exception 
+     */
+    public void testMoveViaAppendAndDelete() throws Exception
+    {
+        AlfrescoImapUser poweredUser = new AlfrescoImapUser((USER_NAME + "@alfresco.com"), USER_NAME, USER_PASSWORD);
+        String fileName = "testfile" + GUID.generate();
+        String destinationName = "testFolder" + GUID.generate();
+        String destinationPath = IMAP_ROOT + AlfrescoImapConst.HIERARCHY_DELIMITER + destinationName;
+        String nodeContent = "test content";
+        NodeRef root = findCompanyHomeNodeRef();
+        AuthenticationUtil.setRunAsUserSystem();
+
+        // Create node and destination folder
+        FileInfo origFile = fileFolderService.create(root, fileName, ContentModel.TYPE_CONTENT);
+        ContentWriter contentWriter = contentService.getWriter(origFile.getNodeRef(), ContentModel.PROP_CONTENT, true);
+        contentWriter.setMimetype("text/plain");
+        contentWriter.setEncoding("UTF-8");
+        contentWriter.putContent(nodeContent);
+
+        FileInfo destinationNode = fileFolderService.create(root, destinationName, ContentModel.TYPE_FOLDER);
+        nodeService.addAspect(origFile.getNodeRef(), ImapModel.ASPECT_IMAP_CONTENT, null);
+        nodeService.addAspect(origFile.getNodeRef(), ContentModel.ASPECT_TAGGABLE, null);
+
+        // Save the message and set X-Alfresco-NodeRef-ID header
+        SimpleStoredMessage origMessage = imapService.getMessage(origFile);
+        origMessage.getMimeMessage().addHeader(AlfrescoImapConst.X_ALF_NODEREF_ID, origFile.getNodeRef().getId());
+        origMessage.getMimeMessage().saveChanges();
+
+        // Append the message to destination
+        AlfrescoImapFolder destinationMailbox = imapService.getOrCreateMailbox(poweredUser, destinationPath, true, false);
+        long uuid = destinationMailbox.appendMessage(origMessage.getMimeMessage(), flags, null);
+        
+        // Delete the node
+        imapService.setFlag(origFile, Flags.Flag.DELETED, true);
+        imapService.expungeMessage(origFile);
+
+        // Check the destination has copy of original file and only this file
+        FileInfo copiedNode = fileFolderService.getFileInfo(nodeService.getNodeRef(uuid));
+        assertNotNull("The file should exist.", copiedNode);
+        assertEquals("The file name should not change.", fileName, copiedNode.getName());
+        NodeRef copiedParentNodeRef = nodeService.getPrimaryParent(copiedNode.getNodeRef()).getParentRef();
+        assertEquals("The parent should change to destination.", destinationNode.getNodeRef(), copiedParentNodeRef);
+        assertEquals("There should be only one node in the destination folder", 1, nodeService.getChildAssocs(destinationNode.getNodeRef()).size());
+        assertTrue("New node should have original node aspects", nodeService.hasAspect(copiedNode.getNodeRef(), ContentModel.ASPECT_TAGGABLE));
+    }
+    
     
     /**
      * @param mailbox - {@link AlfrescoImapFolder} instance which should be checked

@@ -109,6 +109,7 @@ public class NewListForm extends ShareDialogue
         try
         {
             drone.findAndWait(SAVE_BTN).click();
+            waitUntilAlert(5);
         }
         catch (TimeoutException te)
         {

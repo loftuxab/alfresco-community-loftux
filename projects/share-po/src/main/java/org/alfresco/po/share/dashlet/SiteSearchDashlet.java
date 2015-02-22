@@ -125,6 +125,49 @@ public class SiteSearchDashlet extends AbstractDashlet implements Dashlet
     }
 
     /**
+     * The following items are displayed:Search field with the "Search" button;
+     */
+    public boolean isSearchFieldDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(INPUT_BOX).isDisplayed();
+        }
+        catch (TimeoutException elementException)
+        {
+
+        }
+        return false;
+    }
+
+    public boolean isSearchButtonDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(RESULT_SIZE_BUTTON).isDisplayed();
+        }
+        catch (TimeoutException elementException)
+        {
+        }
+        return false;
+    }
+
+    /**
+     * The following items are displayed: Drop down menu with the number of items to be displayed;
+     */
+    public boolean isDropDownResultsSizeDisplayed()
+    {
+        try
+        {
+            return drone.findAndWait(RESULT_SIZE_BUTTON).isDisplayed();
+        }
+        catch (TimeoutException elementException)
+        {
+        }
+        return false;
+    }
+
+    /**
      * Finds whether help icon is displayed or not.
      * 
      * @return True if the help icon displayed else false.
@@ -370,6 +413,7 @@ public class SiteSearchDashlet extends AbstractDashlet implements Dashlet
         drone.findAndWait(RESULT_SIZE_BUTTON).click();
         return resultSizeList;
     }
+
 
     /**
      * @return The Search text from input box.

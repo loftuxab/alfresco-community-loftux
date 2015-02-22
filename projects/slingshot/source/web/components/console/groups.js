@@ -1311,6 +1311,10 @@
                      query = query + "&shortNameFilter=" + encodeURIComponent(parent.query);
                  }
 
+                 // MNT-13002 fix, determine whether system groups should be displayed
+                 var showAll = Dom.get(parent.id + "-show-all").checked;
+                 query = (showAll ? query : query + "&zone=APP.DEFAULT")
+
                  return query;
 
                },

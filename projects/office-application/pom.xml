@@ -8,35 +8,15 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>se.loftux.alfresco</groupId>
-        <version>LX72</version>
+        <version>LX80-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <name>office-application</name>
-    <url>http://maven.apache.org</url>
 
-    <repositories>
-        <repository>
-            <id>alfresco-public</id>
-            <url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
-        </repository>
-        <repository>
-            <id>alfresco-public-snapshot</id>
-            <url>https://artifacts.alfresco.com/nexus/content/groups/public-snapshots/</url>
-        </repository>
-    </repositories>
-    <distributionManagement>
-        <repository>
-            <id>alfresco-internal</id>
-            <name>Alfresco Releases Repository</name>
-            <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>alfresco-internal-snapshots</id>
-            <name>Alfresco Snapshots Repository</name>
-            <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <properties>
+        <argLine>-Xms512m -Xmx1024m</argLine>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -167,7 +147,6 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Xms512m -Xmx1024m</argLine>
                     <workingDirectory>target</workingDirectory>
                 </configuration>
             </plugin>

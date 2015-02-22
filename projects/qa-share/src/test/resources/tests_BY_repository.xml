@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="Repository Tests for Sprint BY" preserve-order="true" parallel="tests" thread-count="2">
+<suite name="Repository Tests for Sprint BY" preserve-order="true" parallel="tests" thread-count="1">
 
     <groups>
         <run>
@@ -18,12 +18,44 @@
         <classes>
             <class name="org.alfresco.share.repository.MultiTenancyTest"/>
         </classes>
-    </test>-->
+    </test-->
 
-    <test name="RepositoryFtpTest">
+    <!--test name="RepositoryFtpTest">
         <classes>
-            <class name="org.alfresco.share.repository.RepositoryFtpTest"/>
+            <class name="org.alfresco.share.repository.RepositoryFtpTest">
+                <methods>
+                    <include name="AONE_6446"/>
+                    <include name="AONE_6447"/>
+                    <include name="AONE_6452"/>
+                    <include name="AONE_6449"/>
+                    <include name="AONE_6448"/>
+              </methods>
+            </class>
         </classes>
     </test>
+
+    <test name="RepositoryFtpsTest">
+        <classes>
+            <class name="org.alfresco.share.repository.RepositoryFtpsTest"/>
+        </classes>
+    </test-->
+
+
+    <test name="InbordEmailSubsystemTests">
+        <classes>
+            <class name="org.alfresco.share.repository.subsystems.InbordEmailSubsystemTests"/>
+        </classes>
+    </test>
+
+    <test name="RepositoryConfiguringCifsTests">
+        <classes>
+            <class name="org.alfresco.share.repository.RepositoryConfiguringCifsTests">
+                <methods>
+                    <include name="AONE_6380"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
 
 </suite>

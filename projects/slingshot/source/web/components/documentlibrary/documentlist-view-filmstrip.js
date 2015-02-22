@@ -53,7 +53,9 @@
       SHARE_DOCLIB_HEADER_FOOTER_HEIGHT = 315,
       FILMSTRIP_WINDOW_RESIZE_CHECK_TIME = 50,
       FILMSTRIP_WINDOW_RESIZE_MIN_TIME = 200,
-      CAROUSEL_CONTENT_MIN_HEIGHT = 372;
+      CAROUSEL_CONTENT_MIN_HEIGHT = 372,
+      WEB_PREVIEWER_HEIGHT,
+       itemHeaderHeight,
       MIMETYPE_PREFIX_IMAGE = "image/";
    
    /**
@@ -398,21 +400,62 @@
                webPreviewDivs[0].style.height = previewHeight + 'px';
             }
          }
-
-          // MNT-10678 fix. Set CAROUSEL_CONTENT_MIN_HEIGHT according web flash preview height.
-          var webPreviewersRealDivs = Dom.getElementsByClassName('real', 'div'),
-              itemHeaderHeight = Dom.get(scope.id + "-item-header-yui-rec50").offsetHeight,
-              webPreviewerHeight;
-
-          if (webPreviewersRealDivs.length !== 0)
-          {
-              webPreviewerHeight = webPreviewersRealDivs[0].offsetHeight;
-
-              CAROUSEL_CONTENT_MIN_HEIGHT = webPreviewerHeight + itemHeaderHeight;
-          }
+         var headerHeight = getHeaderHeight();
+         setImagePreviewMargin(headerHeight);
       }, this);
    };
-   
+
+   function setImagePreviewMargin(itemHeaderHeight)
+   {
+      var imagePreviewElements = Dom.getElementsByClassName('previewer Image');
+
+      if (imagePreviewElements.length == 0)
+      {
+         imagePreviewElements = Dom.getElementsByClassName('previewer WebPreviewer Image');
+
+         if (imagePreviewElements.length > 0)
+         {
+            imagePreviewElements[0].getElementsByTagName("img")[0].style.marginTop = itemHeaderHeight + "px";
+         }
+      }
+      else
+      {
+         imagePreviewElements[0].style.marginTop = itemHeaderHeight + "px";
+      }
+   }
+
+   function renderImagePreview()
+   {
+      var itemHeaderHeight = getHeaderHeight();
+      // MNT-10678 fix. Set CAROUSEL_CONTENT_MIN_HEIGHT according web flash preview height.
+      var webPreviewersRealDivs = Dom.getElementsByClassName('real', 'div');
+
+      if (webPreviewersRealDivs.length !== 0)
+      {
+         // WEB_PREVIEWER_HEIGHT = webPreviewersRealDivs[0].offsetHeight;
+         CAROUSEL_CONTENT_MIN_HEIGHT = WEB_PREVIEWER_HEIGHT + itemHeaderHeight;
+      }
+
+      setImagePreviewMargin(itemHeaderHeight);
+   }
+
+   function getHeaderHeight()
+   {
+      // Get the div for preview header
+      var elements = Dom.getElementsByClassName('alf-header');
+      var previewHeaderElement;
+      //itemHeaderHeight;
+      for (var i = 0; i < elements.length; i++)
+      {
+         if (elements[i].id.indexOf('-item-header-yui-') > 0)
+         {
+            previewHeaderElement = elements[i];
+            break;
+         }
+      }
+      return previewHeaderElement.offsetHeight;
+   }
+
    /**
     * @see Alfresco.DocumentListGalleryViewRenderer.destroyView
     */
@@ -492,11 +535,11 @@
       {
          maxItemHeight = Dom.getViewportHeight();
       }
-      if (itemHeight > maxItemHeight)
+      if ((maxItemHeight >= 0) && (itemHeight > maxItemHeight))
       {
          itemHeight = maxItemHeight;
       }
-      
+
       var filmstripItemTemplate = Dom.get(scope.id + '-filmstrip-item-template'),
          filmstripNavItemTemplate = Dom.get(scope.id + '-filmstrip-nav-item-template'),
          filmstripItem = null,
@@ -631,19 +674,37 @@
       };
       this.setupWindowResizeListener();
 
-       // MNT-10678 fix. Fix for small screen resolutions. Setting up the minimal height for Carousel Content div.
-       var carouselContentDivs = Dom.getElementsByClassName('yui-carousel-element');
-       carouselContentDivsHeight = carouselContentDivs[0].style.minHeight = CAROUSEL_CONTENT_MIN_HEIGHT + "px";
+      renderImagePreview();
 
-       // hide scrol panel for the carousel element when it's hidden.
-       var filmstripNavDiv = Dom.get(scope.id+ '-filmstrip');
-       filmstripNavDiv.style.overflow = "hidden";
-      
-      var fadeIn = new YAHOO.util.Anim(
-            container, { opacity: {from: 0, to: 1 } }, 0.4, YAHOO.util.Easing.easeOut);
+      // MNT-10678 fix. Fix for small screen resolutions. Setting up the minimal height for Carousel Content div.
+      var carouselContentDivs = Dom.getElementsByClassName('yui-carousel-element');
+      // set the carousel height
+      carouselContentDivs[0].style.minHeight = CAROUSEL_CONTENT_MIN_HEIGHT + "px";
+
+      var galeryItems = Dom.getElementsByClassName('alf-gallery-item');
+
+      for (var i = 0; i < galeryItems.length; i++)
+      {
+         if (galeryItems[i].className.indexOf('hidden') < 0)
+         {
+            galeryItems[i].style.minHeight = CAROUSEL_CONTENT_MIN_HEIGHT + "px";
+         }
+      }
+
+      // hide scrol panel for the carousel element when it's hidden.
+      var filmstripNavDiv = Dom.get(scope.id+ '-filmstrip');
+      filmstripNavDiv.style.overflow = "hidden";
+
+      var fadeIn = new YAHOO.util.Anim(container, {
+                                                     opacity:
+                                                     {
+                                                        from: 0,
+                                                        to: 1
+                                                     }
+                                                  }, 0.4, YAHOO.util.Easing.easeOut);
       fadeIn.animate();
    };
-   
+
    Alfresco.DocumentListFilmstripViewRenderer.prototype.renderWebPreview = function DL_FVR_renderWebPreview(scope, index)
    {
       var containerTarget; // This will only get set if thumbnail represents a container
@@ -657,7 +718,9 @@
          var filmstripItemId = this.getRowItemId(oRecord);
          var filmstripItem = document.getElementById(filmstripItemId);
          var galleryItemThumbnailDiv = this.getRowItemThumbnailElement(filmstripItem);
-         
+
+         WEB_PREVIEWER_HEIGHT = galleryItemThumbnailDiv.offsetHeight;
+
          var thumbnail = this.getThumbnail(
                scope, galleryItemThumbnailDiv, oRecord, null, null, '-filmstrip-main-content');
          
@@ -685,7 +748,7 @@
             }
          }
       }
-   }
+   };
    
    Alfresco.DocumentListFilmstripViewRenderer.prototype.destroyWebPreview = function DL_FVR_destroyWebPreview(scope, index)
    {

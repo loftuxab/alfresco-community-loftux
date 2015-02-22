@@ -166,7 +166,7 @@
       renderCellIcon: function UserCalendar_renderCellIcon(elCell, oRecord, oColumn, oData)
       {
          Dom.setStyle(elCell, "width", oColumn.width + "px");
-         var desc = '<div class="icon"><img src="' + Alfresco.constants.URL_RESCONTEXT + '/components/calendar/images/calendar-16.png" alt="event"/></div>';
+         var desc = '<div class="icon"><img src="' + Alfresco.constants.URL_RESCONTEXT + 'components/calendar/images/calendar-16.png" alt="event"/></div>';
          elCell.innerHTML = desc;
       },
 
@@ -177,8 +177,8 @@
       {
          var startDate = fromISO8601(oRecord.getData("startAt").iso8601),
             endDate = fromISO8601(oRecord.getData("endAt").iso8601),
-            isSameDay = (oRecord.getData("startAt").iso8601.split("T")[0] === oRecord.getData("endAt").iso8601.split("T")[0]) ? true : false,
-            isSameTime = (oRecord.getData("startAt").iso8601.split("T")[1] === oRecord.getData("endAt").iso8601.split("T")[1]) ? true : false,
+            isSameDay = (formatDate(startDate, dateMsg) === formatDate(endDate, dateMsg)) ? true : false,
+            isSameTime = (formatDate(startDate, timeMsg) === formatDate(endDate, timeMsg)) ? true : false,
             isAllDay = (oRecord.getData("allday") === "true")? true : false,
             desc = '<div class="detail"><h4><a href="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("url") + '" class="theme-color-1">' + $html(oRecord.getData("title")) + '</a></h4>';
 

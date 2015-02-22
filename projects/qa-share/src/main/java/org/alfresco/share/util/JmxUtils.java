@@ -68,7 +68,7 @@ public class JmxUtils extends AbstractUtils
 
     /**
      * Set some property in JMX.
-     *
+     * 
      * @param objectName
      * @param attributeName
      * @param attributeValue
@@ -76,9 +76,22 @@ public class JmxUtils extends AbstractUtils
      */
     public static Object setAlfrescoServerProperty(String objectName, String attributeName, Object attributeValue)
     {
+        return setAlfrescoServerProperty(shareUrl, objectName, attributeName, attributeValue);
+    }
+
+    /**
+     * Set some property in JMX.
+     * 
+     * @param objectName
+     * @param attributeName
+     * @param attributeValue
+     * @return
+     */
+    public static Object setAlfrescoServerProperty(String hostURL, String objectName, String attributeName, Object attributeValue)
+    {
         try
         {
-            JMXConnector connector = makeJmxConnector();
+            JMXConnector connector = makeJmxConnector(hostURL);
             MBeanServerConnection mBSC = connector.getMBeanServerConnection();
             ObjectName objectJmx = new ObjectName(objectName);
 
@@ -89,8 +102,8 @@ public class JmxUtils extends AbstractUtils
         }
         catch (InstanceNotFoundException ex)
         {
-            //assuming that if we've faced an exception due to Alfresco installation onto IBM Webshpere
-            //try to query Mbeans according to WAS implementation
+            // assuming that if we've faced an exception due to Alfresco installation onto IBM Webshpere
+            // try to query Mbeans according to WAS implementation
             return setAlfrescoServerProperty(getWasObjectName(objectName), attributeName, attributeValue);
         }
         catch (Exception e)
@@ -105,18 +118,27 @@ public class JmxUtils extends AbstractUtils
      */
     public static void invokeAlfrescoServerProperty(String objectName, String operation)
     {
+        invokeAlfrescoServerProperty(shareUrl, objectName, operation);
+    }
+
+    /**
+     * @param objectName
+     * @param operation
+     */
+    public static void invokeAlfrescoServerProperty(String hostURL, String objectName, String operation)
+    {
         try
         {
-            JMXConnector connector = makeJmxConnector();
+            JMXConnector connector = makeJmxConnector(hostURL);
             MBeanServerConnection mBSC = connector.getMBeanServerConnection();
             ObjectName objectJmx = new ObjectName(objectName);
-            mBSC.invoke(objectJmx, operation, new Object[] { }, new String[] { });
+            mBSC.invoke(objectJmx, operation, new Object[] {}, new String[] {});
             connector.close();
         }
         catch (InstanceNotFoundException ex)
         {
-            //assuming that if we've faced an exception due to Alfresco installation onto IBM Webshpere
-            //try to query Mbeans according to WAS implementation
+            // assuming that if we've faced an exception due to Alfresco installation onto IBM Webshpere
+            // try to query Mbeans according to WAS implementation
             invokeAlfrescoServerProperty(getWasObjectName(objectName), operation);
         }
         catch (Exception e)

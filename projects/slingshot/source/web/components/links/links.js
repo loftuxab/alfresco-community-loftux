@@ -64,6 +64,9 @@
        * The edited link CSS style.
        */
       this.EDITEDCLASS = "edit-link";
+      
+      this.PROTOCOL_STR_DELIM = /((.*):\/\/(.*))/;
+      this.PORT_STR_DELIM = /^((.*):(\d{1,})((\/.*){0,}))/;
 
       YAHOO.Bubbling.on("changeFilter", this.onChangeFilter, this);
       YAHOO.Bubbling.on("linksListRefresh", this.onLinksListRefresh, this);
@@ -318,8 +321,32 @@
             }
             var innerHtml = '<h3 class="link-title"><a href="' + linksViewUrl + '" class="theme-color-1">' + $html(name) + '</a></h3>';
             
+            var needHttpPrefix = function(userUrl)
+            {
+               // check for "://" in URI
+               if (me.PROTOCOL_STR_DELIM.test(userUrl))
+               {
+                  return false;
+               }
+               
+               // check for digits after ":"
+               if (me.PORT_STR_DELIM.test(userUrl))
+               {
+                  return true;
+               }
+               
+               // URI with port was filtered in previous block. Therefore URI with ":" no need "http" prefix
+               if (userUrl.indexOf(":")> -1)
+               {
+                  return false;
+               }
+               
+               // default value
+               return true;
+            }
+            
             innerHtml += '<div class="detail"><span class="item"><em style="padding-right: 2px; float: left">' + me.msg("details.url") + ':</em> ' +
-                         '<a style="float: left;" class="theme-color-1"' +  (internal ? '' : ' target="_blank" class="external"') + ' href=' + (url.indexOf("://") === -1 || url[0] === '/' ? 'http://' : '') +
+                         '<a style="float: left;" class="theme-color-1"' +  (internal ? '' : ' target="_blank" class="external"') + ' href=' + (needHttpPrefix(url) ? 'http://' : '') +
                          encodeURI(decodeURI(url)) + '>' + $html(url).replace(/'/g, "") + '</a></span></div>';
 
             if (!me.options.simpleView)

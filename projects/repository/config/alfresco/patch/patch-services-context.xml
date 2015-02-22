@@ -1020,33 +1020,7 @@
             <ref bean="ruleService" />
         </property>
     </bean>
-    
-    <bean id="patch.solrFacets.root" class="org.alfresco.repo.admin.patch.impl.GenericBootstrapPatch" parent="basePatch" >
-        <property name="id"><value>patch.solrFacets.root</value></property>
-        <property name="description"><value>patch.solrFacets.root.description</value></property>
-        <property name="fixesFromSchema"><value>0</value></property>
-        <property name="fixesToSchema"><value>8002</value></property>
-        <property name="targetSchema"><value>8003</value></property>
-        <property name="dependsOn" >
-            <list>
-                <ref bean="patch.updateDmPermissions" />
-            </list>
-        </property>
-        <property name="importerBootstrap">
-            <ref bean="spacesBootstrap" />
-        </property>
-        <property name="checkPath">
-            <value>${solr_facets.root}</value>
-        </property>
-        <property name="bootstrapView">
-            <props>
-                <prop key="path">${solr_facets.root.path}</prop>
-                <prop key="location">alfresco/bootstrap/solrFacetsRootFolder.xml</prop>
-                <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
-            </props>
-        </property>
-    </bean>
-    
+
     <bean id="patch.db-V5.0-upgrade-to-activiti-5.16.2" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id" value="patch.db-V5.0-upgrade-to-activiti-5.16.2" />
         <property name="description" value="patch.db-V5.0-upgrade-to-activiti-5.16.2.description" />
@@ -1106,4 +1080,72 @@
         </property>
     </bean>
 
+    <bean id="patch.db-V4.2-migrate-locale-multilingual" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
+        <property name="id" value="patch.db-V4.2-migrate-locale-multilingual" />
+        <property name="description" value="patch.schemaUpgradeScript.description" />
+        <property name="fixesFromSchema"><value>0</value></property>
+        <property name="fixesToSchema"><value>8018</value></property>
+        <property name="targetSchema"><value>8019</value></property>
+        <property name="scriptUrl">
+            <value>classpath:alfresco/dbscripts/upgrade/4.2/${db.script.dialect}/migrate-locale-multilingual.sql</value>
+        </property>
+        <property name="dependsOn" >
+            <list>
+                <ref bean="patch.db-V4.0-Node-Locale" />
+            </list>
+        </property>
+    </bean>
+
+   <bean id="patch.fixWebscriptTemplate" class="org.alfresco.repo.admin.patch.impl.FixTemplatePatch"
+      parent="basePatch">
+      <property name="id" value="patch.fixWebscriptTemplate" />
+      <property name="description" value="patch.fixWebscriptTemplate.description" />
+      <property name="fixesFromSchema">
+         <value>0</value>
+      </property>
+      <property name="fixesToSchema">
+         <value>9000</value>
+      </property>
+      <property name="targetSchema">
+         <value>9001</value>
+      </property>
+      <property name="contentService" ref="ContentService"/>
+      <property name="repository" ref="repositoryHelper"/>
+      <property name="target">
+          <value>/app:company_home/app:dictionary/cm:webscripts/cm:org/cm:alfresco/cm:sample/cm:blogsearch.get.html.ftl</value>
+      </property>
+      <property name="source">
+          <value>alfresco/bootstrap/webscripts/blogsearch.get.html.ftl</value>
+      </property>
+   </bean>
+
+    <bean id="patch.imapSpacesTemplates3" class="org.alfresco.repo.admin.patch.impl.GenericBootstrapPatch" parent="basePatch" >
+        <property name="id"><value>patch.imapSpacesTemplates3</value></property>
+        <property name="description"><value>patch.imapSpacesLocaleTemplates2.description</value></property>
+        <property name="fixesFromSchema"><value>0</value></property>
+        <property name="fixesToSchema"><value>9001</value></property>
+        <property name="targetSchema"><value>9002</value></property>
+        <property name="importerBootstrap">
+            <ref bean="spacesBootstrap" />
+        </property>
+        <property name="bootstrapView">
+            <props>
+                <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.imapConfig.childname}/${spaces.imap_templates.childname}</prop>
+                <prop key="location">alfresco/bootstrap/imapSpacesTemplates.xml</prop>
+                <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                <prop key="uuidBinding">UPDATE_EXISTING</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="patch.db-V5.0-remove-columns-after-upgrade-to-activiti-5.16.2" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
+        <property name="id" value="patch.db-V5.0-remove-columns-after-upgrade-to-activiti-5.16.2" />
+        <property name="description" value="patch.db-V5.0-remove-columns-after-upgrade-to-activiti-5.16.2.description" />
+        <property name="fixesFromSchema" value="0" />
+        <property name="fixesToSchema" value="9002" />
+        <property name="targetSchema" value="9003" />
+        <property name="scriptUrl">
+            <value>classpath:alfresco/dbscripts/upgrade/5.0/${db.script.dialect}/activiti-del-unused-after-5-16-2.sql</value>
+        </property>
+    </bean>
 </beans>

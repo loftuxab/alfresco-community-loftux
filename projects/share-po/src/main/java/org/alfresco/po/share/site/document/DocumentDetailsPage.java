@@ -16,7 +16,6 @@ package org.alfresco.po.share.site.document;
 
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.ShareDialogue;
-import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.preview.PdfJsPlugin;
 import org.alfresco.po.share.site.UpdateFilePage;
 import org.alfresco.po.share.user.CloudSignInPage;
@@ -36,7 +35,6 @@ import org.openqa.selenium.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -69,6 +67,9 @@ public class DocumentDetailsPage extends DetailsPage
     private static final String CLICK_HERE_TO_DOWNLOAD_LINK = "Click here to download it.";
     private static final String THIN_DARK_TITLE_ELEMENT = "div.node-header>div.node-info>h1.thin.dark";
     private static final String SYNC_TO_CLOUD = "a[title='Sync to Cloud'].action-link>span";
+
+    private static final String DELETE_DOCUMENT = "a[title='Delete Document'].action-link>span";
+
     private static final String UNSYNC_FROM_CLOUD = "a[title='Unsync from Cloud'].action-link>span";
     protected static final String CHECKEDOUT_MESSAGE_PLACEHOLDER = "div.node-header>div.status-banner.theme-bg-color-2.theme-border-4";
     protected static final String ACTION_SET_ID = "document.detail.action.set.id";
@@ -101,8 +102,11 @@ public class DocumentDetailsPage extends DetailsPage
     protected static final By PROMPT_PANEL_ID = By.id("prompt");
     private static final By BUTTON_TAG_NAME = By.tagName("button");
     private static final By HISTORY_VERSIONS = By.cssSelector("div[class*='document-versions'] span[class='document-version']");
+    private static final By SYNC_MESSAGE = By.xpath(".//span[contains(text(),'Sync was created')]");
 
-    private static final By DOCUMENT_BODY = By.cssSelector("div[id$='default-viewer-pageContainer-1']");
+    private static final By DOCUMENT_BODY = By.cssSelector("div[id$='document-details_x0023_default-viewer']");
+
+    private static final By VIEW_ORIGINAL_DOCUMENT = By.cssSelector("div.document-view-original>a");
 
     private static final String ERROR_EDITING_DOCUMENT = ".//*[@id='message']/div/span";
 
@@ -216,6 +220,20 @@ public class DocumentDetailsPage extends DetailsPage
         return this.documentVersion;
     }
 
+    public boolean isDeleteDocumentLinkDisplayed()
+    {
+        try
+        {
+            WebElement el = drone.find(By.cssSelector(DELETE_DOCUMENT));
+            boolean isDeleteDocument = drone.find(By.cssSelector(DELETE_DOCUMENT)).isDisplayed();
+            return isDeleteDocument;
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+    }
+
     /**
      * Verify if button on version history view is displayed
      * 
@@ -261,7 +279,7 @@ public class DocumentDetailsPage extends DetailsPage
     {
         try
         {
-            return drone.find(By.cssSelector("span.editing")).isDisplayed();
+            return drone.findAndWait(By.cssSelector("span.editing")).isDisplayed();
         }
         catch (NoSuchElementException e)
         {
@@ -454,6 +472,26 @@ public class DocumentDetailsPage extends DetailsPage
                     throw new PageException("Edit offline file download error", e);
                 }
             }
+            return new DocumentEditOfflinePage(drone);
+        }
+        catch (NoSuchElementException nse)
+        {
+            throw new PageException("Unable to edit offline", nse);
+        }
+    }
+
+    /**
+     * Select the edit off line link.
+     * 
+     * @return {@link HtmlPage} edit off line page.
+     */
+    public HtmlPage selectEditOffLine()
+    {
+        try
+        {
+            WebElement link = drone.findAndWait(By.cssSelector(EDIT_OFFLINE_LINK));
+            link.click();
+
             return new DocumentEditOfflinePage(drone);
         }
         catch (NoSuchElementException nse)
@@ -1272,6 +1310,18 @@ public class DocumentDetailsPage extends DetailsPage
     }
 
     /**
+     * Method to to verify if the download button for a version is present
+     * 
+     * @param versionNumber revision number
+     */
+    public boolean isDownloadPreviousVersion(String versionNumber)
+    {
+        WebElement downloadButton = drone.findAndWait(By.xpath("//span[contains(text(),'" + versionNumber
+                + "')]//..//..//span[@class='actions']//a[@title='Download']"));
+        return downloadButton.isDisplayed();
+    }
+
+    /**
      * Method to download the document to the specified version.
      * 
      * @param versionNumber revision number
@@ -1281,6 +1331,7 @@ public class DocumentDetailsPage extends DetailsPage
         WebElement downloadButton = drone.findAndWait(By.cssSelector("a[rel='" + versionNumber + "'] + a.download"));
         downloadButton.click();
         // Assumes driver capability settings to save file in a specific location when
+        // //span[contains(text(),'1.1')]//..//..//span[@class='actions']//a[@title='Download']
     }
 
     /**
@@ -1444,7 +1495,7 @@ public class DocumentDetailsPage extends DetailsPage
     {
         try
         {
-            return drone.find(VIEW_WORKING_COPY).isDisplayed();
+            return drone.findAndWait(VIEW_WORKING_COPY).isDisplayed();
         }
         catch (NoSuchElementException nse)
         {
@@ -1721,29 +1772,87 @@ public class DocumentDetailsPage extends DetailsPage
     /**
      * Gets the popup message error when trying to edit offline a document
      * 
-     * @return String popup message
+     * @return boolean popup message
      */
-    public String getErrorEditOfflineDocument()
+    public boolean isErrorEditOfflineDocument(String fileName)
     {
-        try
-        {
-            WebElement link = drone.find(By.cssSelector(EDIT_OFFLINE_LINK));
-            link.click();
-        }
-        catch (NoSuchElementException e)
-        {
-            throw new PageException("Unable to edit offline", e);
-        }
 
-        try
+        String errorMessage = drone.findAndWait(By.xpath(ERROR_EDITING_DOCUMENT)).getText();
+        if (errorMessage.equals("You cannot edit '" + fileName + "'."))
         {
-            WebElement element = drone.findAndWait(By.xpath(ERROR_EDITING_DOCUMENT));
-            return element.getText();
+            return true;
         }
-        catch (NoSuchElementException e)
+        else
         {
-            throw new PageException("Unable to find the popup", e);
+            return false;
         }
 
     }
+
+    /**
+     * Verify if View Original Document is displayed
+     * 
+     * @return true if present
+     */
+    public boolean isViewOriginalLinkPresent()
+    {
+        try
+        {
+            return drone.findAndWait((VIEW_ORIGINAL_DOCUMENT)).isDisplayed();
+        }
+        catch (NoSuchElementException te)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("View Original Document link is not displayed", te);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Click on View Original Document
+     * 
+     * @return new DocumentDetailsPage
+     */
+    public DocumentDetailsPage selectViewOriginalDocument()
+    {
+        try
+        {
+            WebElement link = drone.findAndWait((VIEW_ORIGINAL_DOCUMENT));
+            link.click();
+        }
+        catch (TimeoutException e)
+        {
+            throw new PageOperationException("Unable to select View Original Document ", e);
+        }
+
+        return new DocumentDetailsPage(drone);
+    }
+
+
+    /**
+     * Returns true if Sync message is present
+     *
+     * @return boolean
+     */
+
+    public boolean isSyncMessagePresent()
+    {
+        try
+        {
+            drone.waitForElement(SYNC_MESSAGE, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+            WebElement syncMessage = drone.find(SYNC_MESSAGE);
+            if (syncMessage != null)
+                return true;
+        }
+        catch(TimeoutException toe)
+        {
+            logger.error("Message element not found!!", toe);
+            return false;
+        }
+        return false;
+    }
+
 }

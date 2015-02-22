@@ -29,7 +29,7 @@
             <#-- DESCRIPTION -->
             <div class="yui-gd">
                <div class="yui-u first"><label for="${el}-description">${msg("label.description")}:</label></div>
-               <div class="yui-u"><textarea id="${el}-description" name="description" rows="3" tabindex="0"></textarea></div>
+            <div class="yui-u"><textarea id="${el}-description" name="description" rows="6" tabindex="0"></textarea></div>
             </div>
 
             <#-- SITEPRESET -->

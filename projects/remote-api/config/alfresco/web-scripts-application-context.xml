@@ -134,7 +134,16 @@
       <property name="extension"><value>js</value></property>
    </bean>
 
-   <bean id="webscripts.container" class="org.alfresco.repo.web.scripts.TenantRepositoryContainer" parent="webscripts.abstractcontainer" init-method="setup">
+   <bean id="baseAlfrescoRepositoryContainer" parent="webscripts.abstractcontainer" abstract="true">
+      <property name="notPublicExceptions">
+         <list>
+            <value>java.sql.SQLException</value>
+            <value>org.alfresco.service.cmr.repository.ContentIOException</value>
+         </list>
+      </property>
+   </bean>
+
+   <bean id="webscripts.container" class="org.alfresco.repo.web.scripts.TenantRepositoryContainer" parent="baseAlfrescoRepositoryContainer" init-method="setup">
       <property name="configService" ref="webscripts.config" />
       <property name="name"><value>Repository</value></property>
       <property name="scriptObjects">
@@ -183,13 +192,21 @@
    <!--  Web Script Authenticators -->
    <!--                            -->
 
-   <!--  HTTP Basic Authenticator (Servlet based) -->
+   <!--  HTTP Basic Authenticator (Servlet based - stateless) -->
    <bean id="webscripts.authenticator.basic" class="org.alfresco.repo.web.scripts.servlet.BasicHttpAuthenticatorFactory">
       <property name="authenticationService" ref="AuthenticationService" />
       <property name="authenticationListener" ref="webScriptAuthenticationListener"/>
    </bean>
 
-   <!--  HTTP Basic Authenticator (Servlet based) for MT -->
+   <!--  HTTP Remote User Authenticator (Servlet based - stateless) -->
+   <bean id="webscripts.authenticator.remoteuser" class="org.alfresco.repo.web.scripts.servlet.RemoteUserAuthenticatorFactory">
+      <property name="authenticationService" ref="AuthenticationService" />
+      <property name="authenticationComponent" ref="authenticationComponent" />
+      <property name="authenticationListener" ref="webScriptAuthenticationListener"/>
+      <property name="remoteUserMapper" ref="RemoteUserMapper" />
+   </bean>
+
+   <!--  HTTP Basic Authenticator (Servlet based - stateless) for MT -->
    <bean id="webscripts.authenticator.basic.tenant" class="org.alfresco.repo.web.scripts.servlet.BasicHttpAuthenticatorFactory">
       <property name="authenticationService" ref="AuthenticationService" />
       <property name="authenticationListener" ref="webScriptAuthenticationListener"/>
@@ -583,8 +600,7 @@
    <!--                         -->
 
    <bean id="webscript.org.alfresco.repository.person.user-csv-upload.get"
-         class="org.alfresco.repo.web.scripts.person.UserCSVUploadGet"
-         parent="webscript">
+	class="org.alfresco.repo.web.scripts.person.UserCSVUploadGet" parent="declarativeSpreadsheetWebScript">
       <property name="dictionaryService" ref="DictionaryService"/>
    </bean>
    
@@ -1234,7 +1250,7 @@
     <!-- Download a datalist as Excel XLS / XLSX -->
     <bean id="webscript.org.alfresco.slingshot.datalists.list.get"
           class="org.alfresco.repo.web.scripts.datalist.DataListDownloadWebScript"
-          parent="webscript">
+          parent="declarativeSpreadsheetWebScript">
         <property name="nodeService" ref="NodeService"/>
         <property name="siteService" ref="SiteService"/>
         <property name="namespaceService" ref="namespaceService"/>
@@ -1818,7 +1834,10 @@
           </props>
        </property>
     </bean>
-    
+
+	<bean id="declarativeSpreadsheetWebScript" class="org.alfresco.repo.web.scripts.DeclarativeSpreadsheetWebScript" abstract="true" parent="webscript">
+	</bean>
+
     <!-- Get/Post/Put/Delete Solr FacetConfig -->
    <bean id="baseSolrFacetConfigAdminWebscript" abstract="true" parent="webscript">
       <property name="facetService" ref="solrFacetService"/>
@@ -1884,9 +1903,24 @@
       </property>
    </bean>
    
-    <!-- AutoSuggest web script -->
-    <bean id="webscript.org.alfresco.slingshot.search.auto-suggest-search.get" class="org.alfresco.repo.web.scripts.search.AutoSuggestSearchGet" parent="webscript">
-       <property name="suggesterService" ref="suggesterService"/>
-    </bean>
+   <!-- AutoSuggest web script -->
+   <bean id="webscript.org.alfresco.slingshot.search.auto-suggest-search.get" class="org.alfresco.repo.web.scripts.search.AutoSuggestSearchGet" parent="webscript">
+      <property name="suggesterService" ref="suggesterService"/>
+   </bean>
     
+   <!-- JavaScript extensions -->
+   <!-- Extend the utils class to provide additional Remote APIs -->
+   <bean id="utilsScript" parent="baseJavaScriptExtension" class="org.alfresco.web.scripts.WebScriptUtils">
+      <property name="extensionName">
+         <value>utils</value>
+      </property>
+      <property name="serviceRegistry">
+         <ref bean="ServiceRegistry" />
+      </property>
+      <property name="nodeService" ref="nodeService"/>
+      <property name="repositoryContainer">
+         <ref bean="webscripts.container" />
+      </property>
+   </bean>
+   
 </beans>

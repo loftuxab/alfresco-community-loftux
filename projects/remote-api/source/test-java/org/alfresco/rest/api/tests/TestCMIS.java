@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -26,11 +26,13 @@ import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,6 +49,7 @@ import org.alfresco.opencmis.CMISDispatcherRegistry.Binding;
 import org.alfresco.opencmis.dictionary.CMISStrictDictionaryService;
 import org.alfresco.opencmis.dictionary.QNameFilter;
 import org.alfresco.opencmis.dictionary.QNameFilterImpl;
+import org.alfresco.opencmis.mapping.NodeRefProperty;
 import org.alfresco.repo.action.ActionModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.filestore.FileContentWriter;
@@ -62,6 +65,7 @@ import org.alfresco.rest.api.tests.RepoService.SiteInformation;
 import org.alfresco.rest.api.tests.RepoService.TestNetwork;
 import org.alfresco.rest.api.tests.RepoService.TestPerson;
 import org.alfresco.rest.api.tests.RepoService.TestSite;
+import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiClient.CmisSession;
 import org.alfresco.rest.api.tests.client.PublicApiClient.Comments;
 import org.alfresco.rest.api.tests.client.PublicApiClient.ListResponse;
@@ -84,6 +88,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.service.namespace.QName;
@@ -111,6 +116,7 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisUpdateConflictException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
@@ -147,6 +153,7 @@ public class TestCMIS extends EnterpriseTestApi
     private TenantService tenantService;
     private CMISStrictDictionaryService cmisDictionary;
     private QNameFilter cmisTypeExclusions;
+	private NodeService nodeService;
 
     @Before
     public void before() throws Exception
@@ -157,6 +164,7 @@ public class TestCMIS extends EnterpriseTestApi
         this.tenantService = (TenantService)ctx.getBean("tenantService");
         this.cmisDictionary = (CMISStrictDictionaryService)ctx.getBean("OpenCMISDictionaryService");
         this.cmisTypeExclusions = (QNameFilter)ctx.getBean("cmisTypeExclusions");
+		this.nodeService = (NodeService) ctx.getBean("NodeService");
     }
 
     private void checkSecondaryTypes(Document doc, Set<String> expectedSecondaryTypes, Set<String> expectedMissingSecondaryTypes)
@@ -1318,7 +1326,88 @@ public class TestCMIS extends EnterpriseTestApi
     }
 
     /**
-     * Test that updating properties and content does not automatically create a new version.
+     * MNT-12680 
+     * The creation date of version should be the same as creation date of the original node
+     * @throws Exception
+     */
+    @Test
+    public void testCreationDate() throws Exception
+    {
+        // create a site
+        final TestNetwork network1 = getTestFixture().getRandomNetwork();
+        String username = "user" + System.currentTimeMillis();
+        PersonInfo personInfo = new PersonInfo(username, username, username, "password", null, null, null, null, null, null, null);
+        TestPerson person1 = network1.createUser(personInfo);
+        String person1Id = person1.getId();
+
+        final String siteName = "site" + System.currentTimeMillis();
+
+        TenantUtil.runAsUserTenant(new TenantRunAsWork<NodeRef>()
+        {
+
+            @Override
+            public NodeRef doWork() throws Exception
+            {
+                SiteInformation siteInfo = new SiteInformation(siteName, siteName, siteName, SiteVisibility.PUBLIC);
+                final TestSite site = network1.createSite(siteInfo);
+                final NodeRef resNode = repoService.createDocument(site.getContainerNodeRef("documentLibrary"), "testdoc.txt", "Test Doc1 Title", "Test Doc1 Description",
+                        "Test Content");
+                return resNode;
+            }
+        }, person1Id, network1.getId());
+
+        // create a document
+        publicApiClient.setRequestContext(new RequestContext(network1.getId(), person1Id));
+        CmisSession cmisSession = publicApiClient.createPublicApiCMISSession(Binding.atom, CMIS_VERSION_10, AlfrescoObjectFactoryImpl.class.getName());
+        AlfrescoFolder docLibrary = (AlfrescoFolder) cmisSession.getObjectByPath("/Sites/" + siteName + "/documentLibrary");
+        Map<String, String> properties = new HashMap<String, String>();
+        {
+            properties.put(PropertyIds.OBJECT_TYPE_ID, TYPE_CMIS_DOCUMENT);
+            properties.put(PropertyIds.NAME, "mydoc-" + GUID.generate() + ".txt");
+        }
+        ContentStreamImpl fileContent = new ContentStreamImpl();
+        {
+            ContentWriter writer = new FileContentWriter(TempFileProvider.createTempFile(GUID.generate(), ".txt"));
+            writer.putContent("some content");
+            ContentReader reader = writer.getReader();
+            fileContent.setMimeType(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            fileContent.setStream(reader.getContentInputStream());
+        }
+
+        Document autoVersionedDoc = docLibrary.createDocument(properties, fileContent, VersioningState.MAJOR);
+        String objectId = autoVersionedDoc.getId();
+        String bareObjectId = getBareObjectId(objectId);
+        // create versions
+        for (int i = 0; i < 3; i++)
+        {
+            Document doc1 = (Document) cmisSession.getObject(bareObjectId);
+
+            ObjectId pwcId = doc1.checkOut();
+            Document pwc = (Document) cmisSession.getObject(pwcId.getId());
+
+            ContentStreamImpl contentStream = new ContentStreamImpl();
+            {
+                ContentWriter writer = new FileContentWriter(TempFileProvider.createTempFile(GUID.generate(), ".txt"));
+                writer.putContent(GUID.generate());
+                ContentReader reader = writer.getReader();
+                contentStream.setMimeType(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+                contentStream.setStream(reader.getContentInputStream());
+            }
+            pwc.checkIn(true, Collections.EMPTY_MAP, contentStream, "checkin " + i);
+        }
+        
+        GregorianCalendar cDateFirst = cmisSession.getAllVersions(bareObjectId).get(0).getCreationDate();
+        GregorianCalendar cDateSecond = cmisSession.getAllVersions(bareObjectId).get(2).getCreationDate();
+        
+        if (cDateFirst.before(cDateSecond) || cDateFirst.after(cDateSecond))
+        {
+            fail("The creation date of version should be the same as creation date of the original node");
+        }
+    }
+
+    /**
+	 * Test that updating properties does not automatically create a new version.
+	 * Test that updating content creates a new version automatically.
      * 
      */
     @Test
@@ -1367,7 +1456,7 @@ public class TestCMIS extends EnterpriseTestApi
         AlfrescoDocument doc = (AlfrescoDocument)docLibrary.createDocument(properties, fileContent, VersioningState.MAJOR);
         String versionLabel = doc.getVersionLabel();
 
-        // ...and check that updating its properties creates a new minor version...
+		// ...and check that updating its properties does not create a new version 
         properties = new HashMap<String, String>();
         {
             properties.put(PropertyIds.DESCRIPTION, GUID.generate());
@@ -1375,9 +1464,9 @@ public class TestCMIS extends EnterpriseTestApi
         AlfrescoDocument doc1 = (AlfrescoDocument)doc.updateProperties(properties);
         String versionLabel1 = doc1.getVersionLabel();
 
-        assertTrue(Double.parseDouble(versionLabel) < Double.parseDouble(versionLabel1));
+		assertEquals(versionLabel, versionLabel1);
 
-        // ...and check that updating its content does not create a new version
+		// ...and check that updating its content creates a new version
         fileContent = new ContentStreamImpl();
         {
             ContentWriter writer = new FileContentWriter(TempFileProvider.createTempFile(GUID.generate(), ".txt"));
@@ -1392,10 +1481,168 @@ public class TestCMIS extends EnterpriseTestApi
         @SuppressWarnings("unused")
         String versionLabel2 = doc2.getVersionLabel();
 
+		assertEquals("Set content stream shouldn't create a new version automatically", versionLabel1, versionLabel2);
+	}
+	
+	/**
+	 * Test that updating properties does automatically create a new version if
+	 * <b>autoVersion</b>, <b>initialVersion</b> and <b>autoVersionOnUpdateProps</b> are TRUE
+	 */
+	@Test
+	public void testVersioningUsingUpdateProperties() throws Exception
+	{
+		final TestNetwork network1 = getTestFixture().getRandomNetwork();
+
+		String username = "user" + System.currentTimeMillis();
+		PersonInfo personInfo = new PersonInfo(username, username, username, "password", null, null, null, null, null, null, null);
+		TestPerson person1 = network1.createUser(personInfo);
+		String person1Id = person1.getId();
+
+		final String siteName = "site" + System.currentTimeMillis();
+
+		TenantUtil.runAsUserTenant(new TenantRunAsWork<NodeRef>()
+		{
+			@Override
+			public NodeRef doWork() throws Exception
+			{
+				SiteInformation siteInfo = new SiteInformation(siteName, siteName, siteName, SiteVisibility.PRIVATE);
+				TestSite site = repoService.createSite(null, siteInfo);
+
+				String name = GUID.generate();
+				NodeRef folderNodeRef = repoService.createFolder(site.getContainerNodeRef("documentLibrary"), name);
+				return folderNodeRef;
+			}
+		}, person1Id, network1.getId());
+
+		// Create a document...
+		publicApiClient.setRequestContext(new RequestContext(network1.getId(), person1Id));
+		CmisSession cmisSession = publicApiClient.createPublicApiCMISSession(Binding.atom, "1.0", AlfrescoObjectFactoryImpl.class.getName());
+		AlfrescoFolder docLibrary = (AlfrescoFolder)cmisSession.getObjectByPath("/Sites/" + siteName + "/documentLibrary");
+        Map<String, String> properties = new HashMap<String, String>();
+        {
+        	properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
+        	properties.put(PropertyIds.NAME, "mydoc-" + GUID.generate() + ".txt");
+        }
+		ContentStreamImpl fileContent = new ContentStreamImpl();
+		{
+            ContentWriter writer = new FileContentWriter(TempFileProvider.createTempFile(GUID.generate(), ".txt"));
+            writer.putContent("Ipsum and so on");
+            ContentReader reader = writer.getReader();
+            fileContent.setMimeType(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            fileContent.setStream(reader.getContentInputStream());
+		}
+		AlfrescoDocument doc = (AlfrescoDocument)docLibrary.createDocument(properties, fileContent, VersioningState.MAJOR);
+		String versionLabel = doc.getVersionLabel();
+		
+		String nodeRefStr = doc.getPropertyValue(NodeRefProperty.NodeRefPropertyId).toString();
+		final NodeRef nodeRef = new NodeRef(nodeRefStr);
+		
+		TenantUtil.runAsUserTenant(new TenantRunAsWork<NodeRef>()
+		{
+			@Override
+			public NodeRef doWork() throws Exception
+			{
+				// ensure autoversioning is enabled
+				assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
+				
+				Map<QName, Serializable> versionProperties = new HashMap<QName, Serializable>();
+				versionProperties.put(ContentModel.PROP_AUTO_VERSION, true);
+				versionProperties.put(ContentModel.PROP_INITIAL_VERSION, true);
+				versionProperties.put(ContentModel.PROP_AUTO_VERSION_PROPS, true);
+				
+				nodeService.addProperties(nodeRef, versionProperties);
+				
+				return null;
+			}
+		}, person1Id, network1.getId());
+
+		// ...and check that updating its properties creates a new minor version...
+		properties = new HashMap<String, String>();
+        {
+        	properties.put(PropertyIds.DESCRIPTION, GUID.generate());
+        }
+		AlfrescoDocument doc1 = (AlfrescoDocument)doc.getObjectOfLatestVersion(false).updateProperties(properties);
+		doc1 = (AlfrescoDocument)doc.getObjectOfLatestVersion(false);
+		String versionLabel1 = doc1.getVersionLabel();
+		
         assertTrue(Double.parseDouble(versionLabel) < Double.parseDouble(versionLabel1));
 
-    }
+		// ...and check that updating its content creates a new version
+		fileContent = new ContentStreamImpl();
+		{
+            ContentWriter writer = new FileContentWriter(TempFileProvider.createTempFile(GUID.generate(), ".txt"));
+            writer.putContent("Ipsum and so on and so on");
+            ContentReader reader = writer.getReader();
+            fileContent.setMimeType(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            fileContent.setStream(reader.getContentInputStream());
+		}
+
+		doc1.setContentStream(fileContent, true);
+		
+		AlfrescoDocument doc2 = (AlfrescoDocument)doc1.getObjectOfLatestVersion(false);
+		String versionLabel2 = doc2.getVersionLabel();
+		
+		assertTrue("Set content stream should create a new version automatically", Double.parseDouble(versionLabel1) < Double.parseDouble(versionLabel2));
+		assertTrue("It should be latest version : " + versionLabel2, doc2.isLatestVersion());
+		
+		doc2.deleteContentStream();
+		AlfrescoDocument doc3 = (AlfrescoDocument)doc2.getObjectOfLatestVersion(false);
+		String versionLabel3 = doc3.getVersionLabel();
+		
+		assertTrue("Delete content stream should create a new version automatically", Double.parseDouble(versionLabel1) < Double.parseDouble(versionLabel3));
+		assertTrue("It should be latest version : " + versionLabel3, doc3.isLatestVersion());
+	}
     
+	
+	/**
+    * 1) Creating a file with incorrect char in description property
+    * 2) Get xml with incorrect char in description
+    * 3) Check xml
+    * @throws Exception
+    */
+   @Test
+   public void testGetXmlWithIncorrectDesctiption() throws Exception
+   {
+       final TestNetwork network1 = getTestFixture().getRandomNetwork();
+
+       String username = "user" + System.currentTimeMillis();
+       PersonInfo personInfo = new PersonInfo(username, username, username, "password", null, null, null, null, null, null, null);
+       TestPerson person1 = network1.createUser(personInfo);
+       String person1Id = person1.getId();
+
+       final String siteName = "site" + System.currentTimeMillis();
+       
+       NodeRef fileNode = TenantUtil.runAsUserTenant(new TenantRunAsWork<NodeRef>()
+               {
+                   @Override
+                   public NodeRef doWork() throws Exception
+                   {
+                       SiteInformation siteInfo = new SiteInformation(siteName, siteName, siteName, SiteVisibility.PUBLIC);
+                       final TestSite site = network1.createSite(siteInfo);
+                       
+                       NodeRef resNode = repoService.createDocument(site.getContainerNodeRef("documentLibrary"), "testdoc.txt", "Test Doc1 Title", "d\u0010", "Test Content");
+                       return resNode;
+                   }
+               }, person1Id, network1.getId());
+       
+       String cmisId = fileNode.getId();
+       HashMap<String, String> reqParams = new HashMap<String, String>();
+       reqParams.put("id", cmisId+";1.0");
+       reqParams.put("filter", "*");
+       reqParams.put("includeAllowableActions", "true");
+       reqParams.put("includeACL", "true");
+       reqParams.put("includePolicyIds", "true");
+       reqParams.put("includeRelationships", "both");
+       reqParams.put("renditionFilter", "*");
+       
+       publicApiClient.setRequestContext(new RequestContext(network1.getId(), person1Id));
+       HttpResponse resp = publicApiClient.get(Binding.atom, CMIS_VERSION_11, "id", reqParams);
+       String xml = resp.getResponse();
+       // Response hasn't full info at error - writer just stops at incorrect character.
+       // Therefore we can check end tag of root element
+       assertTrue("No end tag was found", xml.endsWith("</atom:entry>"));
+   }
+
     /*
      * Test that creating a document with a number of initial aspects does not create lots of initial versions
      */
@@ -2019,6 +2266,71 @@ public class TestCMIS extends EnterpriseTestApi
             String rootFolderId = repository.getRootFolderId();
     
             assertEquals(rootNodeRef.getId(), rootFolderId);
+        }
+    }
+
+    @Test
+    public void testMNT12956QueryingCMIS11UsesDictionary11() throws Exception
+    {
+        final TestNetwork network1 = getTestFixture().getRandomNetwork();
+        
+        String username = "user" + System.currentTimeMillis();
+        PersonInfo personInfo = new PersonInfo(username, username, username, TEST_PASSWORD, null, null, null, null, null, null, null);
+        TestPerson person = network1.createUser(personInfo);
+        String personId = person.getId();
+
+        final List<NodeRef> documents = new ArrayList<NodeRef>();
+        final String filename = GUID.generate();
+
+        TenantUtil.runAsUserTenant(new TenantRunAsWork<Void>()
+        {
+            @Override
+            public Void doWork() throws Exception
+            {
+                String siteName = "site" + System.currentTimeMillis();
+                SiteInformation siteInfo = new SiteInformation(siteName, siteName, siteName, SiteVisibility.PRIVATE);
+                TestSite site = repoService.createSite(null, siteInfo);
+                NodeRef docNodeRef = repoService.createDocument(site.getContainerNodeRef(DOCUMENT_LIBRARY_CONTAINER_NAME), filename, "test content");
+                documents.add(docNodeRef);
+
+                return null;
+            }
+        }, personId, network1.getId());
+
+        NodeRef docNodeRef = documents.get(0);
+        publicApiClient.setRequestContext(new RequestContext(network1.getId(), personId));
+        CmisSession atomCmisSession10 = publicApiClient.createPublicApiCMISSession(Binding.atom, CMIS_VERSION_10, AlfrescoObjectFactoryImpl.class.getName());
+        CmisSession atomCmisSession11 = publicApiClient.createPublicApiCMISSession(Binding.atom, CMIS_VERSION_11);
+
+        // query
+        {
+            // searching by NodeRef, expect result objectIds to be objectId
+            Set<String> expectedObjectIds = new HashSet<String>();
+            expectedObjectIds.add(docNodeRef.getId());
+            int numMatchingDocs = 0;
+
+            // NodeRef input
+            List<CMISNode> results = atomCmisSession11.query("SELECT cmis:objectId,cmis:name,cmis:secondaryObjectTypeIds FROM cmis:document WHERE cmis:name LIKE '" + filename + "'", false, 0, Integer.MAX_VALUE);
+            assertEquals(expectedObjectIds.size(), results.size());
+            for(CMISNode node : results)
+            {
+                String objectId = stripCMISSuffix((String)node.getProperties().get(PropertyIds.OBJECT_ID));
+                if(expectedObjectIds.contains(objectId))
+                {
+                    numMatchingDocs++;
+                }
+            }
+            assertEquals(expectedObjectIds.size(), numMatchingDocs);
+
+            try
+            {
+                results = atomCmisSession10.query("SELECT cmis:objectId,cmis:name,cmis:secondaryObjectTypeIds FROM cmis:document WHERE cmis:name LIKE '" + filename + "'", false, 0, Integer.MAX_VALUE);
+                fail("OpenCMIS 1.0 knows nothing about cmis:secondaryObjectTypeIds");
+            }
+            catch (CmisInvalidArgumentException expectedException)
+            {
+                // ok
+            }
         }
     }
 }

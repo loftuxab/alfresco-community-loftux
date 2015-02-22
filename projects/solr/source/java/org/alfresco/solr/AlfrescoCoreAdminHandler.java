@@ -321,6 +321,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             properties.setProperty("org.quartz.threadPool.makeThreadsDaemons", "true");
             properties.setProperty("org.quartz.scheduler.makeSchedulerThreadDaemon", "true");
             properties.setProperty("org.quartz.jobStore.class", "org.quartz.simpl.RAMJobStore");
+            properties.setProperty("org.quartz.scheduler.skipUpdateCheck","true");
             factory.initialize(properties);
             scheduler = factory.getScheduler();
             scheduler.start();
@@ -1091,28 +1092,20 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         orderDate = new Date();
 
         orderTextCount = 0;
-
-       
-        
+        String name = "test-" + System.nanoTime();
+        boolean remove = true;
+        File solrHome = new File(getCoreContainer().getSolrHome());
+        File templates = new File(solrHome, "templates");
+        File template = new File(templates, "test");
+        File newCore = new File(solrHome, name);
         try
         {
-            boolean remove = true;
             SolrParams params = req.getParams();
             if (params.get("remove") != null)
             {
                 remove = Boolean.valueOf(params.get("remove"));
             }
-
-            String name = "test-" + System.nanoTime();
-
             // copy core from template
-
-            File solrHome = new File(getCoreContainer().getSolrHome());
-            File templates = new File(solrHome, "templates");
-            File template = new File(templates, "test");
-
-            File newCore = new File(solrHome, name);
-
             copyDirectory(template, newCore, false);
 
             // fix configuration properties
@@ -1511,20 +1504,6 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             //
 
             testChildNameEscaping(after, core, dataModel, rootNodeRef);
-
-            // remove core
-
-            if (remove)
-            {
-                SolrCore done = coreContainer.remove(name);
-                if (done != null)
-                {
-                    done.close();
-                }
-
-                deleteDirectory(newCore);
-            }
-
         }
         catch (IOException e)
         {
@@ -1542,7 +1521,26 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         {
             e.printStackTrace();
         }
-
+        finally
+        {
+            // remove core
+            if (remove)
+            {
+                SolrCore done = coreContainer.remove(name);
+                if (done != null)
+                {
+                    done.close();
+                }
+                try
+                {
+                    deleteDirectory(newCore);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private boolean newCore(SolrQueryRequest req, SolrQueryResponse rsp)
@@ -1752,10 +1750,15 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     @SuppressWarnings("unused")
     private void runAuthTest(SolrQueryRequest req, SolrQueryResponse rsp)
     {
-
+        String name = "test-auth-" + "" + System.nanoTime();
+        SolrCore core = null;
+        boolean remove = true;
+        File solrHome = new File(getCoreContainer().getSolrHome());
+        File templates = new File(solrHome, "templates");
+        File template = new File(templates, "test");
+        File newCore = new File(solrHome, name);
         try
         {
-            boolean remove = true;
             boolean reuse = true;
             long count = 100L;
             long maxReader = 1000;
@@ -1778,8 +1781,6 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             }
 
             AlfrescoSolrDataModel dataModel = null;
-            String name = "test-auth-" + "" + System.nanoTime();
-            SolrCore core = null;
             if (reuse)
             {
                 for (String coreName : coreContainer.getCoreNames())
@@ -1801,13 +1802,6 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             {
 
                 // copy core from template
-
-                File solrHome = new File(getCoreContainer().getSolrHome());
-                File templates = new File(solrHome, "templates");
-                File template = new File(templates, "test");
-
-                File newCore = new File(solrHome, name);
-
                 copyDirectory(template, newCore, false);
 
                 // fix configuration properties
@@ -1898,18 +1892,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
             checkAuth(rsp, core, dataModel, count);
 
-            // remove core
 
-            if (remove)
-            {
-                SolrCore done = coreContainer.remove(name);
-                if (done != null)
-                {
-                    done.close();
-                }
-
-                deleteDirectory(new File(core.getCoreDescriptor().getInstanceDir()));
-            }
 
         }
         catch (IOException e)
@@ -1927,6 +1910,33 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         catch (org.apache.lucene.queryParser.ParseException e)
         {
             e.printStackTrace();
+        }
+        finally
+        {
+            // remove core
+            if (remove)
+            {
+                SolrCore done = coreContainer.remove(name);
+                if (done != null)
+                {
+                    done.close();
+                }
+                try
+                {
+                    if (core != null)
+                    {
+                        deleteDirectory(new File(core.getCoreDescriptor().getInstanceDir()));
+                    }
+                    else
+                    {
+                        deleteDirectory(newCore);
+                    }
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -2015,26 +2025,24 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     @SuppressWarnings("unused")
     private void runCmisTests(SolrQueryRequest req, SolrQueryResponse rsp)
     {
-
+        boolean remove = true;
+        String name = "test-cmis-" + "" + System.nanoTime();
         TimeZone.setDefault(null);
+        File solrHome = new File(getCoreContainer().getSolrHome());
+        File templates = new File(solrHome, "templates");
+        File template = new File(templates, "test");
+        File newCore = new File(solrHome, name);
         try
         {
-            boolean remove = true;
             SolrParams params = req.getParams();
             if (params.get("remove") != null)
             {
                 remove = Boolean.valueOf(params.get("remove"));
             }
 
-            String name = "test-cmis-" + "" + System.nanoTime();
-
             // copy core from template
 
-            File solrHome = new File(getCoreContainer().getSolrHome());
-            File templates = new File(solrHome, "templates");
-            File template = new File(templates, "test");
 
-            File newCore = new File(solrHome, name);
 
             copyDirectory(template, newCore, false);
 
@@ -2588,20 +2596,6 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
             addTypeSortTestData(core, dataModel, folder00NodeRef, rootNodeRef, baseFolderNodeRef, baseFolderQName, folder00QName, date00);
             check_order(rsp, core, dataModel);
-
-            // remove core
-
-            if (remove)
-            {
-                SolrCore done = coreContainer.remove(name);
-                if (done != null)
-                {
-                    done.close();
-                }
-
-                deleteDirectory(newCore);
-            }
-
         }
         catch (IOException e)
         {
@@ -2614,6 +2608,26 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         catch (SAXException e)
         {
             e.printStackTrace();
+        }
+        finally
+        {
+            // remove core
+            if (remove)
+            {
+                SolrCore done = coreContainer.remove(name);
+                if (done != null)
+                {
+                    done.close();
+                }
+                try
+                {
+                    deleteDirectory(newCore);
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
         // catch (org.apache.lucene.queryParser.ParseException e)
         // {

@@ -18,19 +18,12 @@
 
 package org.springframework.extensions.config;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.net.ssl.KeyManagerFactory;
-
 import org.dom4j.Element;
 import org.springframework.extensions.config.element.ConfigElementAdapter;
-import org.springframework.extensions.surf.exception.PlatformRuntimeException;
 
 /**
  * Describes the connection, authentication and endpoint properties stored
@@ -314,9 +307,9 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         private static final String DESCRIPTION = "description";
         private static final String NAME = "name";
         private static final String UNSECURE = "unsecure";
-        private static final String PERSISTENT = "persistent";
         private static final String BASIC_AUTH = "basic-auth";
         private static final String EXTERNAL_AUTH = "external-auth";
+        private static final String PARENT_ID = "parent-id";
 
         /**
          * Instantiates a new remote endpoint descriptor.
@@ -379,11 +372,6 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
             return Boolean.parseBoolean(getStringProperty(UNSECURE));
         }
         
-        public boolean getPersistent()
-        {
-            return Boolean.parseBoolean(getStringProperty(PERSISTENT));
-        }
-        
         public boolean getBasicAuth()
         {
             return Boolean.parseBoolean(getStringProperty(BASIC_AUTH));
@@ -392,6 +380,11 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         public boolean getExternalAuth()
         {
             return Boolean.parseBoolean(getStringProperty(EXTERNAL_AUTH));
+        }
+        
+        public String getParentId()
+        {
+            return getStringProperty(PARENT_ID);
         }
     }
 

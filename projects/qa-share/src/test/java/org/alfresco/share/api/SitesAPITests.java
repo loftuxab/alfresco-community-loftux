@@ -15,26 +15,49 @@
 
 package org.alfresco.share.api;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.dashlet.MySitesDashlet;
 import org.alfresco.po.share.dashlet.SiteMembersDashlet;
+import org.alfresco.po.share.enums.DataLists;
 import org.alfresco.po.share.enums.UserRole;
+import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
+import org.alfresco.po.share.site.blog.BlogPage;
+import org.alfresco.po.share.site.datalist.DataListPage;
+import org.alfresco.po.share.site.datalist.NewListForm;
+import org.alfresco.po.share.site.discussions.DiscussionsPage;
+import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiClient.ListResponse;
 import org.alfresco.rest.api.tests.client.PublicApiException;
 import org.alfresco.rest.api.tests.client.RequestContext;
-import org.alfresco.rest.api.tests.client.data.*;
+import org.alfresco.rest.api.tests.client.data.FavouriteSite;
+import org.alfresco.rest.api.tests.client.data.MemberOfSite;
+import org.alfresco.rest.api.tests.client.data.Site;
+import org.alfresco.rest.api.tests.client.data.SiteContainer;
+import org.alfresco.rest.api.tests.client.data.SiteMember;
+import org.alfresco.rest.api.tests.client.data.SiteRole;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.ShareUserMembers;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.share.util.api.SitesAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageOperationException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,16 +68,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.testng.Assert.*;
-
 /**
  * Class to include: Tests for Sites (/site, /site/siteId) and Site Members (/members) apis implemented in alfresco-remote-api.
- * 
+ *
  * @author Abhijeet Bharade
  */
 @Listeners(FailedTestListener.class)
@@ -98,7 +114,7 @@ public class SitesAPITests extends SitesAPI
         testUserAnotherDomain = getUserNameForDomain(testName, "domain1.test");
 
         logger.info("Starting Tests: " + testName);
-        siteName = getSiteName(testName);
+        siteName = getSiteName(testName + System.currentTimeMillis());
         siteName1 = getSiteName(testName + "1");
         siteName2 = getSiteName(testName + "2");
         siteName3 = getSiteName(testName + "3");
@@ -113,24 +129,21 @@ public class SitesAPITests extends SitesAPI
 
         ShareUser.login(drone, testUser);
 
-        ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC, true);
-        
-        if (!isAlfrescoVersionCloud(drone))
-        {
-            ShareUserDashboard.addPageToSite(drone, siteName, SitePageType.WIKI, SitePageType.BLOG);
+        SiteDashboardPage siteDashBoard = ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC, true);
+        CustomizeSitePage customizeSitePage = siteDashBoard.getSiteNav().selectCustomizeSite().render();
+        List<SitePageType> addPageTypes = new ArrayList<>();
+        addPageTypes.add(SitePageType.BLOG);
+        addPageTypes.add(SitePageType.WIKI);
+        customizeSitePage.addPages(addPageTypes);
 
-            SiteDashboardPage siteDashPage = ShareUser.openSiteDashboard(drone, siteName);
-                    
-            // TODO: Create new lib to create Wiki utils, navigateToWiki, createNewWiki
-            WikiPage wikiPage = siteDashPage.getSiteNav().selectSiteWikiPage().render();
-            wikiPage.clickOnNewPage();
-            wikiPage.createWikiPageTitle("Wiki Page " + Math.random());
-            List<String> textLines = new ArrayList<String>();
-            textLines.add("This is a new Wiki text!");
-            wikiPage.insertText(textLines);
-            wikiPage.clickSaveButton();
-        }
-        ShareUser.openSiteDashboard(drone, siteName);
+//        ShareUserDashboard.addPageToSite(drone, siteName, SitePageType.WIKI, SitePageType.BLOG);
+
+        SiteDashboardPage siteDashPage = ShareUser.openSiteDashboard(drone, siteName);
+        WikiPage wikiPage = siteDashPage.getSiteNav().selectSiteWikiPage().render();
+        List<String> textLines = new ArrayList<>();
+        textLines.add("This is a new Wiki text!");
+        wikiPage.createWikiPage("Wiki Page " + Math.random(), textLines);
+        ShareUser.openSiteDashboard(drone, siteName).render();
         ShareUser.createFolderInFolder(drone, folderName, folderName, DOCLIB);
 
         ShareUser.createSite(drone, siteName1, SITE_VISIBILITY_PUBLIC, true);
@@ -139,26 +152,22 @@ public class SitesAPITests extends SitesAPI
 
         ShareUser.logout(drone);
 
-        version = drone.getProperties().getVersion();
-        if (version.isCloud())
+        if (isAlfrescoVersionCloud(drone))
         {
             ShareUserMembers.inviteUserToSiteWithRole(drone, testUser, testUserAnotherDomain, siteName, UserRole.COLLABORATOR);
         }
     }
 
-
-
     @Test
     public void AONE_14271() throws Exception
     {
-
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put(SKIP_COUNT, "0");
         params.put(MAX_ITEMS, "6");
         ListResponse<Site> response = getSites(testUser, DOMAIN, params);
         assertNotNull(response);
         assertTrue(response.getPaging().getMaxItems() == 6);
-        
+
         for (Site respSite : response.getList())
         {
             if (StringUtils.isEmpty(respSite.getSiteId()))
@@ -170,7 +179,7 @@ public class SitesAPITests extends SitesAPI
 
         try
         {
-            response = getSites(testUserInvalid, DOMAIN, params);
+            getSites(testUserInvalid, DOMAIN, params);
             Assert.fail(String.format("AONE_14271: , %s, Expected Result: %s", "Test should fail as invalid username - " + testUserInvalid, 401));
         }
         catch (PublicApiException e)
@@ -178,6 +187,7 @@ public class SitesAPITests extends SitesAPI
             assertEquals(e.getHttpResponse().getStatusCode(), 401, e.getHttpResponse().toString());
         }
 
+        AlfrescoVersion version = drone.getProperties().getVersion();
         // Status: 200 for invited network
         if (version.isCloud())
         {
@@ -217,6 +227,7 @@ public class SitesAPITests extends SitesAPI
         }
 
         // Status: 200 for invited network
+        AlfrescoVersion version = drone.getProperties().getVersion();
         if (version.isCloud())
         {
             response = getSiteById(testUserAnotherDomain, DOMAIN, siteName);
@@ -240,7 +251,7 @@ public class SitesAPITests extends SitesAPI
         assertEquals(response.getPaging().getMaxItems(), new Integer(2147483));
 
         params.put(SKIP_COUNT, "0");
-        params.put(MAX_ITEMS,"1");
+        params.put(MAX_ITEMS, "1");
         response = getSites(testUser, DOMAIN, params);
 
         assertNotNull(response);
@@ -332,7 +343,6 @@ public class SitesAPITests extends SitesAPI
         assertNotNull(response);
         assertEquals(response.getPaging().getSkipCount(), new Integer(2));
         assertEquals(response.getPaging().getMaxItems(), new Integer(100));
-
 
         params = new HashMap<String, String>();
         params.put(MAX_ITEMS, "3");
@@ -517,7 +527,6 @@ public class SitesAPITests extends SitesAPI
         assertEquals(response.getMemberId().toLowerCase(), user2.toLowerCase());
         assertEquals(response.getSiteId(), siteName);
 
-
         ShareUser.login(drone, testUser);
         SiteDashboardPage siteDashBoard = ShareUser.openSiteDashboard(drone, siteName);
         SiteMembersDashlet dashlet = siteDashBoard.getDashlet("site-members").render();
@@ -579,7 +588,6 @@ public class SitesAPITests extends SitesAPI
         assertNotNull(response.getRole());
         assertEquals(response.getRole(), SiteRole.SiteCollaborator.toString());
 
-
         ShareUser.login(drone, testUser);
         SiteDashboardPage siteDashBoard = ShareUser.openSiteDashboard(drone, siteName);
         SiteMembersDashlet dashlet = siteDashBoard.getDashlet("site-members").render();
@@ -624,7 +632,7 @@ public class SitesAPITests extends SitesAPI
         {
             updateSiteMember(testUser, DOMAIN, siteName3, new SiteMember(user1, SiteRole.SiteCollaborator.toString()));
             fail("AONE_14266 - This block of code shouldn't be reached. As person is non site member. Expected error - 400. For site - " + siteName3
-                    + " and user - " + user1 + " JIRA: https://issues.alfresco.com/jira/browse/MNT-10551");
+                + " and user - " + user1 + " JIRA: https://issues.alfresco.com/jira/browse/MNT-10551");
         }
         catch (PublicApiException e)
         {
@@ -722,7 +730,7 @@ public class SitesAPITests extends SitesAPI
         org.alfresco.po.share.SiteMember member;
         try
         {
-            member = dashlet.selectMember(user3);
+            dashlet.selectMember(user3);
             fail("AONE_14267 - This block of code shouldn't be reached. As the member is removed. Expected exception - PageOperationException.");
         }
         catch (PageOperationException e1)
@@ -769,7 +777,7 @@ public class SitesAPITests extends SitesAPI
         {
             removeSiteMember(testUser, DOMAIN, siteName3, new SiteMember(user2));
             fail("AONE_14267 - This block of code shouldn't be reached. As person id is wrong. Expected error - 400. For site - " + siteName3 + " and user - "
-                    + user2);
+                + user2);
         }
         catch (PublicApiException e)
         {
@@ -1248,7 +1256,15 @@ public class SitesAPITests extends SitesAPI
     @Test
     public void AONE_14281() throws Exception
     {
-
+        //The site contains 4 containers and skipCount is specified as a value > 0 (e.g. 2), maxItems is specified as a max value of integer
+        ShareUser.login(drone, testUser);
+        ShareUser.openSiteDashboard(drone, siteName);
+        ShareUserDashboard.addPageToSite(drone, siteName, SitePageType.DISCUSSIONS, SitePageType.LINKS, SitePageType.DATA_LISTS);
+        SiteDashboardPage siteDashPage = ShareUser.openSiteDashboard(drone, siteName);
+        BlogPage blogPage = siteDashPage.getSiteNav().selectBlogPage().render();
+        blogPage.createPostInternally(testName).render();
+        DiscussionsPage discussionsPage = siteDashPage.getSiteNav().selectDiscussionsPage().render();
+        discussionsPage.createTopic(testName).render();
         HashMap<String, String> params;
         params = new HashMap<String, String>();
         params.put(SKIP_COUNT, "2");
@@ -1259,18 +1275,25 @@ public class SitesAPITests extends SitesAPI
         assertFalse(response.getPaging().getHasMoreItems());
         assertEquals(response.getPaging().getMaxItems(), new Integer(2147483));
         assertEquals(response.getPaging().getSkipCount(), new Integer(2));
+        assertEquals((int) response.getPaging().getCount(), 2);
+        assertEquals((int) response.getPaging().getTotalItems(), 4);
 
-        if (!isAlfrescoVersionCloud(drone))
-        {
-            params.clear();
-            params.put(SKIP_COUNT, "0");
-            params.put("maxItems", "1");
-            response = getSiteContainers(testUser, DOMAIN, params, siteName);
-            assertNotNull(response);
-            assertTrue(response.getPaging().getHasMoreItems());
-            assertEquals(response.getPaging().getMaxItems(), new Integer(1));
-            assertEquals(response.getPaging().getSkipCount(), new Integer(0));
-        }
+        // The site contains 6 containers
+        LinksPage linksPage = siteDashPage.getSiteNav().selectLinksPage().render();
+        linksPage.createLink(testName, testName);
+        DataListPage dataListPage = siteDashPage.getSiteNav().selectDataListPage().render();
+        dataListPage.createDataList(DataLists.CONTACT_LIST, testName, testName);
+        params.clear();
+        params.put(SKIP_COUNT, "0");
+        params.put(MAX_ITEMS, "5");
+
+        response = getSiteContainers(testUser, DOMAIN, params, siteName);
+        assertNotNull(response);
+        assertTrue(response.getPaging().getHasMoreItems());
+        assertEquals(response.getPaging().getMaxItems(), new Integer(5));
+        assertEquals(response.getPaging().getSkipCount(), new Integer(0));
+        assertEquals((int) response.getPaging().getCount(), 5);
+        assertEquals((int) response.getPaging().getTotalItems(), 6);
     }
 
     @Test
@@ -1504,7 +1527,7 @@ public class SitesAPITests extends SitesAPI
         }
     }
 
-    @Test
+    @Test(groups = {"ProductBugs"})
     public void AONE_14248() throws Exception
     {
         FavouriteSite site = new FavouriteSite(siteName);
@@ -1538,9 +1561,8 @@ public class SitesAPITests extends SitesAPI
         }
         catch (PublicApiException e)
         {
-            assertEquals(e.getHttpResponse().getStatusCode(), 404);
+            assertEquals(e.getHttpResponse().getStatusCode(), 404, e.getHttpResponse().toString());
         }
-
 
         // TODO: Testlink: Separate the steps for accepted strings in siteName
         // TODO: Testlink: Specify what response is expected for not accepted (404?), is it required?
@@ -1720,25 +1742,6 @@ public class SitesAPITests extends SitesAPI
         }
     }
 
-    @Test
-    public void AONE_14251() throws Exception
-    {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put(MAX_ITEMS, "100");
-        ListResponse<FavouriteSite> response = getFavouriteSites(testUser, DOMAIN, params, testUser);
-        assertNotNull(response);
-        assertEquals(response.getPaging().getSkipCount(), new Integer(0));
-        assertEquals(response.getPaging().getMaxItems(), new Integer(100));
-        assertFalse(response.getPaging().getHasMoreItems());
-
-        params.clear();
-        params.put(MAX_ITEMS, "1");
-        response = getFavouriteSites(testUser, DOMAIN, params, testUser);
-        assertNotNull(response);
-        assertEquals(response.getPaging().getSkipCount(), new Integer(0));
-        assertEquals(response.getPaging().getMaxItems(), new Integer(1));
-        assertTrue(response.getPaging().getHasMoreItems());
-    }
 
     @Test
     public void AONE_14259() throws Exception
@@ -1751,30 +1754,29 @@ public class SitesAPITests extends SitesAPI
             Map<String, String> param = new HashMap<String, String>();
             param.put("relations", "sites(id,role),networks(id,type)");
 
-
-            HttpResponse resp = sitesProxy.getAll("people", testUser, null, null, param, "Person id is wrong" );
+            HttpResponse resp = sitesProxy.getAll("people", testUser, null, null, param, "Person id is wrong");
             assertNotNull(resp);
             assertTrue(resp.getStatusCode() == 200, "Response code - " + resp.getStatusCode());
 
-            JSONObject entries =  resp.getJsonResponse();
+            JSONObject entries = resp.getJsonResponse();
             JSONObject relations = (JSONObject) entries.get("relations");
-            JSONObject sites = (JSONObject) ((JSONObject)relations.get("sites")).get("list");
-            JSONObject networks = (JSONObject) ((JSONObject)relations.get("networks")).get("list");
+            JSONObject sites = (JSONObject) ((JSONObject) relations.get("sites")).get("list");
+            JSONObject networks = (JSONObject) ((JSONObject) relations.get("networks")).get("list");
             JSONArray jArray1 = (JSONArray) sites.get("entries");
             JSONArray jArray2 = (JSONArray) networks.get("entries");
 
-                for (int i = 0; i < jArray1.size(); i++)
-                {
-                    JSONObject entry = (JSONObject) ((JSONObject) jArray1.get(i)).get("entry");
-                    assertNotNull(entry.get("id"));
-                    assertNotNull(entry.get("role"));
-                }
+            for (int i = 0; i < jArray1.size(); i++)
+            {
+                JSONObject entry = (JSONObject) ((JSONObject) jArray1.get(i)).get("entry");
+                assertNotNull(entry.get("id"));
+                assertNotNull(entry.get("role"));
+            }
 
-                for (int i = 0; i < jArray2.size(); i++)
-                {
+            for (int i = 0; i < jArray2.size(); i++)
+            {
                 JSONObject entry = (JSONObject) ((JSONObject) jArray2.get(i)).get("entry");
-                    assertEquals(entry.get("id"), DOMAIN, "");
-                }
+                assertEquals(entry.get("id"), DOMAIN, "");
+            }
         }
         catch (PublicApiException e)
         {

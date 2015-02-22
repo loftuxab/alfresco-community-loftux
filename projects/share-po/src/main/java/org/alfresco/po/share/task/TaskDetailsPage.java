@@ -28,6 +28,8 @@ import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -46,6 +48,9 @@ public class TaskDetailsPage extends SharePage
     private static final By MY_TASK_DETAILS = By.cssSelector(".backLink>a");
     private RenderElement menuTitle = getVisibleRenderElement(MENU_TITLE);
     private RenderElement workflowDetails = getVisibleRenderElement(WORKFLOW_DETAILS);
+    private static final By ALL_FIELD_LABELS = By.cssSelector("span[class$='viewmode-label']");
+
+    private final Log logger = LogFactory.getLog(this.getClass());
 
     private static final By ITEM_ROW = By.cssSelector("div[id$='assoc_packageItems-cntrl'] table>tbody.yui-dt-data>tr");
 
@@ -105,7 +110,8 @@ public class TaskDetailsPage extends SharePage
      */
     public int getRequiredApprovalPercentage()
     {
-        return Integer.parseInt(getElementText(By.xpath("//span[@class='viewmode-label' and contains(text(), 'Required approval percentage:')]/../span[@class='viewmode-value']")));
+        return Integer.parseInt(getElementText(By
+                .xpath("//span[@class='viewmode-label' and contains(text(), 'Required approval percentage:')]/../span[@class='viewmode-value']")));
     }
 
     /**
@@ -115,7 +121,8 @@ public class TaskDetailsPage extends SharePage
      */
     public int getActualApprovalPercentage()
     {
-        return Integer.parseInt(getElementText(By.xpath("//span[@class='viewmode-label' and contains(text(), 'Actual approval percentage:')]/../span[@class='viewmode-value']")));
+        return Integer.parseInt(getElementText(By
+                .xpath("//span[@class='viewmode-label' and contains(text(), 'Actual approval percentage:')]/../span[@class='viewmode-value']")));
     }
 
     /**
@@ -167,7 +174,8 @@ public class TaskDetailsPage extends SharePage
      */
     public TaskStatus getTaskStatus()
     {
-        return TaskStatus.getTaskFromString(getElementText(By.xpath("//span[@class='viewmode-label' and contains(text(), 'Status:')]/../span[@class='viewmode-value']")));
+        return TaskStatus.getTaskFromString(getElementText(By
+                .xpath("//span[@class='viewmode-label' and contains(text(), 'Status:')]/../span[@class='viewmode-value']")));
     }
 
     private List<WebElement> getTaskItemElements()
@@ -291,5 +299,32 @@ public class TaskDetailsPage extends SharePage
         {
             throw new PageOperationException("Unable to find \"Task History\" link", nse);
         }
+    }
+
+    /**
+     * Method to get All labels from Workflow Form
+     * 
+     * @return
+     */
+    public List<String> getAllLabels()
+    {
+        List<String> labels = new ArrayList<String>();
+        try
+        {
+            List<WebElement> webElements = drone.findAll(ALL_FIELD_LABELS);
+            for (WebElement label : webElements)
+            {
+                labels.add(label.getText());
+            }
+            return labels;
+        }
+        catch (NoSuchElementException nse)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("No labels found", nse);
+            }
+        }
+        return labels;
     }
 }

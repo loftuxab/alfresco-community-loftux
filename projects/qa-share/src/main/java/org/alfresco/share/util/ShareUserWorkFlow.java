@@ -1,4 +1,3 @@
-
 package org.alfresco.share.util;
 
 import org.alfresco.po.share.MyTasksPage;
@@ -7,6 +6,7 @@ import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.task.TaskDetailsPage;
 import org.alfresco.po.share.task.TaskStatus;
+import org.alfresco.po.share.user.Language;
 import org.alfresco.po.share.workflow.CloudTaskOrReviewPage;
 import org.alfresco.po.share.workflow.MyWorkFlowsPage;
 import org.alfresco.po.share.workflow.NewWorkflowPage;
@@ -27,7 +27,6 @@ import org.joda.time.format.DateTimeFormat;
 
 /**
  * @author Ranjith Manyam
- * 
  */
 public class ShareUserWorkFlow extends AbstractUtils
 {
@@ -93,7 +92,7 @@ public class ShareUserWorkFlow extends AbstractUtils
 
     /**
      * Method to select StartWorkflow from DocumentDetailsPage
-     *
+     * 
      * @param drone
      * @return StartWorkFlowPage
      */
@@ -230,21 +229,21 @@ public class ShareUserWorkFlow extends AbstractUtils
 
         switch (action)
         {
-        case APPROVE:
-            editTaskPage.selectApproveButton();
-            break;
-        case REJECT:
-            editTaskPage.selectRejectButton();
-            break;
-        case TASK_DONE:
-            editTaskPage.selectTaskDoneButton();
-            break;
-        case SAVE:
-            editTaskPage.selectSaveButton();
-            break;
-        case CANCEL:
-            editTaskPage.selectCancelButton();
-            break;
+            case APPROVE:
+                editTaskPage.selectApproveButton();
+                break;
+            case REJECT:
+                editTaskPage.selectRejectButton();
+                break;
+            case TASK_DONE:
+                editTaskPage.selectTaskDoneButton();
+                break;
+            case SAVE:
+                editTaskPage.selectSaveButton();
+                break;
+            case CANCEL:
+                editTaskPage.selectCancelButton();
+                break;
         }
         return ShareUser.getSharePage(drone).render();
     }
@@ -452,10 +451,9 @@ public class ShareUserWorkFlow extends AbstractUtils
         NewWorkflowPage newWorkflowPage = ((NewWorkflowPage) startWorkFlowPage.getWorkflowPage(WorkFlowType.NEW_WORKFLOW)).render();
         return newWorkflowPage;
     }
-    
+
     /**
-     * Util method to create a {@link WorkFlowType} of task for
-     * {@link WorkFlowFormDetails}
+     * Util method to create a {@link WorkFlowType} of task for {@link WorkFlowFormDetails}
      * 
      * @param drone
      * @param newWorkflow
@@ -472,6 +470,7 @@ public class ShareUserWorkFlow extends AbstractUtils
 
     /**
      * Method to get Due Date format on MyTasks page
+     * 
      * @param dueDateString
      * @return
      */
@@ -486,6 +485,37 @@ public class ShareUserWorkFlow extends AbstractUtils
         {
             return NONE;
         }
+    }
+
+    /**
+     * Method to start Cloud Review Task from any share page depending on the language set in browser
+     * 
+     * @param drone
+     * @return CloudTaskOrReviewPage
+     * @author Bogdan
+     */
+    public static CloudTaskOrReviewPage startCloudReviewTaskOtherLanguage(WebDrone drone, Language language)
+    {
+        return setCloudTaskOrReviewWorkFlowInLanguage(drone, TaskType.CLOUD_REVIEW_TASK, language);
+    }
+
+    /**
+     * Method to Navigate to MyWorkFlowsPage (WorkFlows I've started), select
+     * Start WorkFlow button, Select Cloud Task Or Review from workflows
+     * dropdown and select given TaskType from Type drop down
+     * 
+     * @param drone
+     * @param taskType
+     * @param language - The language set in browser
+     * @return CloudTaskOrReviewPage
+     * @author Bogdan
+     */
+    private static CloudTaskOrReviewPage setCloudTaskOrReviewWorkFlowInLanguage(WebDrone drone, TaskType taskType, Language language)
+    {
+        StartWorkFlowPage startWorkFlowPage = selectStartWorkFlowFromMyWorkFlowsPage(drone);
+        CloudTaskOrReviewPage cloudTaskOrReviewPage = ((CloudTaskOrReviewPage) startWorkFlowPage.getCloudTaskOrReviewPageInLanguage(language));
+        cloudTaskOrReviewPage.selectTask(taskType);
+        return cloudTaskOrReviewPage;
     }
 
 }

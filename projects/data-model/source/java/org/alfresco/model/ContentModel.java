@@ -209,6 +209,7 @@ public interface ContentModel
     public final static QName PROP_LOCK_TYPE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "lockType");
     public final static QName PROP_LOCK_LIFETIME = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "lockLifetime");
     public final static QName PROP_EXPIRY_DATE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "expiryDate");
+    public final static QName PROP_LOCK_ADDITIONAL_INFO = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "lockAdditionalInfo");
     
     // version aspect
     static final QName ASPECT_VERSIONABLE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "versionable");

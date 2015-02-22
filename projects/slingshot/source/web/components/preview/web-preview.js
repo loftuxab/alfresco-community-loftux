@@ -234,7 +234,7 @@
          this.setupPreview(false);
          
          // Refresh preview on meta-data update
-         YAHOO.Bubbling.on("metadataRefresh", this.doRefresh, this);
+         YAHOO.Bubbling.on("previewChangedEvent", this.doRefresh, this);
          
          // Post an activity feed item to record the preview of the node
          if (this.options.siteId)

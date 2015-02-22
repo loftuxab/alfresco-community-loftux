@@ -44,6 +44,7 @@
             <hr />
             <div>
                <div class="text">${msg("label.instructions")}</div>
+               <div id="${args.htmlid}-keyboard-instruction1" class="text">${msg("label.keyboard-instruction1")}</div>
                <div class="buttons" id="${args.htmlid}-toggleDashletsButtonWrapper-div">
                   <input id="${args.htmlid}-addDashlets-button" type="button" value="${msg("button.addDashlets")}" />
                </div>
@@ -68,6 +69,7 @@
             </div>
          </div>
          <div class="used">
+            <div id="${args.htmlid}-keyboard-instruction2" class="text">${msg("label.keyboard-instruction2")}</div>
             <div id="${args.htmlid}-wrapper-div" class="noOfColumns${currentLayout.noOfColumns}">
                <div class="usedActions">&nbsp;</div>
                <#list columns as column>

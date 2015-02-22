@@ -576,7 +576,7 @@
          [
             { key: "avatar", label: "Avatar", sortable: false, formatter: this.fnRenderCellAvatar(), width: this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT ? 36 : 70 },
             { key: "person", label: "Description", sortable: false, formatter: this.fnRenderCellDescription() },
-            { key: "actions", label: "Actions", sortable: false, formatter: this.fnRenderCellActions(), width: 80 }
+            { key: "actions", label: "Actions", sortable: false, formatter: this.fnRenderCellActions(), width: 120 }
          ];
 
          // DataTable definition
@@ -901,6 +901,43 @@
          dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.PeopleFinder"));
       },
       
+      _displayResultInfo: function PeopleFinder__displayResultInfo(resultNumber, maxItems)
+      {
+         var infoElementId = this.id + "-results-info";
+         var showResultInfo = function(infoElementId, newState)
+         {
+            if (newState)
+            {
+               Dom.removeClass(infoElementId, "hidden");
+            }
+            else
+            {
+               Dom.addClass(infoElementId, "hidden");
+            }
+            
+         };
+         
+         var msg = Alfresco.util.message;
+         if (resultNumber == 0)
+         {
+            // no results found
+            document.getElementById(infoElementId).innerHTML = "";
+            showResultInfo(infoElementId, false);
+         }
+         else if (resultNumber < maxItems)
+         {
+            // results found
+            document.getElementById(infoElementId).innerHTML = msg("message.results", "Alfresco.PeopleFinder", this.searchTerm, resultNumber);
+            showResultInfo(infoElementId, true);
+         }
+         else
+         {
+            // to many results
+            document.getElementById(infoElementId).innerHTML = msg("message.maxresults", "Alfresco.PeopleFinder", maxItems);
+            showResultInfo(infoElementId, true);
+         }
+      },
+      
       /**
        * Updates people list by calling data webscript
        *
@@ -934,6 +971,7 @@
                }
                this._enableSearchUI();
                this._setDefaultDataTableErrors(this.widgets.dataTable);
+               this._displayResultInfo(oResponse.results.length, this.options.maxSearchResults);
                this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
             };
 

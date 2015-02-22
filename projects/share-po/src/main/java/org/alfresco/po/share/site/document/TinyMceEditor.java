@@ -53,6 +53,8 @@ public class TinyMceEditor extends HtmlElement
     private static final String CSS_STR_TEXT_TAG = "#tinymce>p";
     public String CSS_STR_FORE_COLOUR = "div[aria-label^='Text'] button[class$='mce-open']";
     private static final String CSS_COLOR_FONT = "#tinymce>p>font";
+    private static final String CSS_EDIT = "button[id$='mce_43-open']";
+    private static final String CSS_FORMAT = "button[id$='mce_46-open']";
     private static final String CSS_UNDO = "i[class$='mce-i-undo']";
     private static final String CSS_REDO = "i[class$='mce-i-redo']";
     private static final String CSS_BULLET_TEXT = "#tinymce>ul>li";
@@ -72,7 +74,9 @@ public class TinyMceEditor extends HtmlElement
         UNDER_LINED_FMT_TXT, 
         BULLET_FMT_TXT, 
         NUMBER_FMT_TXT, 
-        COLOR, 
+        COLOR,
+        FORMAT,
+        EDIT,
         UNDO, 
         REDO, 
         DEFAULT, 
@@ -113,6 +117,10 @@ public class TinyMceEditor extends HtmlElement
             return CSS_STR_NUMBERS;
         case COLOR:
             return CSS_STR_FORE_COLOUR;
+        case FORMAT:
+        	return CSS_FORMAT;
+        case EDIT:
+        	return CSS_EDIT;
         case UNDO:
             return CSS_UNDO;
         case REDO:
@@ -286,6 +294,24 @@ public class TinyMceEditor extends HtmlElement
         clickElementOnRichTextFormatter(getCSSOfFormatType());
     }
 
+    /**
+     * click to edit button
+     */
+    public void clickEdit()
+    {
+        setFormatType(FormatType.EDIT);
+        clickElementOnRichTextFormatter(getCSSOfFormatType());
+    }
+    
+    /**
+     * click to format button
+     */
+    public void clickFormat()
+    {
+        setFormatType(FormatType.FORMAT);
+        clickElementOnRichTextFormatter(getCSSOfFormatType());
+    }
+    
     /**
      * Click to Redo the undo operation.
      */

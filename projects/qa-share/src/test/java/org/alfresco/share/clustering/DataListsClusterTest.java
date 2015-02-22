@@ -27,8 +27,8 @@ import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageOperationException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
@@ -40,7 +40,8 @@ import java.util.List;
 
 import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
 import static org.alfresco.po.share.enums.DataLists.TO_DO_LIST;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Sergey Kardash
@@ -420,7 +421,7 @@ public class DataListsClusterTest extends AbstractUtils
 
         // Verify changes are saved, row information is changed on Server A
         assertTrue(contactList.isItemDisplayed(newContactListName), "Row information is changed on Server A");
-        assertFalse(contactList.isItemDisplayed(contactListName), "Old Row is displayed in the row table. Server A");
+        assertTrue(contactList.getItemsCount() == 1, "Old Row is displayed in the row table. Server A");
 
         ShareUser.logout(drone);
 
@@ -439,7 +440,7 @@ public class DataListsClusterTest extends AbstractUtils
 
         // Verify changes are saved, row information is changed on Server B
         assertTrue(contactList.isItemDisplayed(newContactListName), "Row information is changed on Server B");
-        assertFalse(contactList.isItemDisplayed(contactListName), "Old Row is displayed in the row table. Server B");
+        assertTrue(contactList.getItemsCount() == 1, "Old Row is displayed in the row table. Server B");
 
         ShareUser.logout(drone);
     }
@@ -496,7 +497,7 @@ public class DataListsClusterTest extends AbstractUtils
         contactList.deleteAnItemWithConfirm(contactListName);
 
         // Verify Item is successfully deleted on Server A
-        assertFalse(contactList.isItemDisplayed(contactListName), "Old Row is displayed in the row table. Server A");
+        assertTrue(contactList.getItemsCount()==0, "Old Row is displayed in the row table. Server A");
 
         ShareUser.logout(drone);
 
@@ -514,7 +515,7 @@ public class DataListsClusterTest extends AbstractUtils
         dataListPage.selectDataList(dataListTitle);
 
         // Verify Item is successfully deleted on Server B
-        assertFalse(contactList.isItemDisplayed(contactListName), "Old Row is displayed in the row table. Server B");
+        assertTrue(contactList.getItemsCount() == 0, "Old Row is displayed in the row table. Server B");
 
         ShareUser.logout(drone);
     }

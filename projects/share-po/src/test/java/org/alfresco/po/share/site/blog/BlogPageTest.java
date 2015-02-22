@@ -1,25 +1,31 @@
 package org.alfresco.po.share.site.blog;
 
-import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
-import org.alfresco.po.share.site.CustomizeSitePage;
-import org.alfresco.po.share.site.SitePageType;
-import org.alfresco.po.share.util.FailedTestListener;
-import org.alfresco.po.share.util.SiteUtil;
-import org.alfresco.po.thirdparty.firefox.RssFeedPage;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import static org.alfresco.po.share.enums.BlogPostStatus.UPDATED;
+import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.ALL;
+import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.LATEST;
+import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.MY_DRAFTS;
+import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.MY_PUBLISHED;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static org.alfresco.po.share.enums.BlogPostStatus.UPDATED;
-import static org.alfresco.po.share.site.blog.BlogTreeMenuNavigation.PostsMenu.*;
-import static org.testng.Assert.*;
+import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.dashlet.AbstractSiteDashletTest;
+import org.alfresco.po.share.site.CustomizeSitePage;
+import org.alfresco.po.share.site.SitePageType;
+import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.po.thirdparty.firefox.RssFeedPage;
+import org.alfresco.test.FailedTestListener;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 /**
  * Holds tests for Blog page web elements
@@ -49,7 +55,7 @@ public class BlogPageTest extends AbstractSiteDashletTest
     String newPostName = "editPostName";
     String newPostText = "editPostText";
 
-    @BeforeClass        
+    @BeforeClass
     public void createSite() throws Exception
     {
         dashBoard = loginAs(username, password);
@@ -124,8 +130,7 @@ public class BlogPageTest extends AbstractSiteDashletTest
         assertTrue(postViewPage.verifyPostExists(text));
     }
 
-
-    @Test(dependsOnMethods = "openPost")
+    @Test(dependsOnMethods = "openPost", groups = "TestBug")
     public void createPostComment()
     {
         assertTrue(postViewPage.isAddCommentDisplayed());
@@ -133,7 +138,7 @@ public class BlogPageTest extends AbstractSiteDashletTest
         assertTrue(postViewPage.isCommentCorrect(text));
     }
 
-    @Test(dependsOnMethods = "createPostComment")
+    @Test(dependsOnMethods = "createPostComment", groups = "TestBug")
     public void editPostComment()
     {
         postViewPage.editBlogComment(text, editedText);
@@ -141,7 +146,7 @@ public class BlogPageTest extends AbstractSiteDashletTest
         assertTrue(postViewPage.isCommentCorrect(editedText));
     }
 
-    @Test(dependsOnMethods = "editPostComment")
+    @Test(dependsOnMethods = "editPostComment", groups = "TestBug")
     public void deletePostComment()
     {
         int expCount = postViewPage.getCommentCount();
@@ -150,21 +155,20 @@ public class BlogPageTest extends AbstractSiteDashletTest
         assertNotNull(postViewPage);
     }
 
-
-    @Test(dependsOnMethods = "deletePostComment")
+    @Test(dependsOnMethods = "deletePostComment", groups = "TestBug")
     public void editBlogPostAndSaveAsDraft()
     {
         postViewPage.editBlogPostAndUpdate(editedText, editedText, null);
     }
 
-    @Test(dependsOnMethods = "editBlogPostAndSaveAsDraft")
+    @Test(dependsOnMethods = "editBlogPostAndSaveAsDraft", groups = "TestBug")
     public void getPostStatus()
     {
         postStatus = postViewPage.getPostStatus();
         assertTrue(postStatus.contains(UPDATED.getPostStatus()), "The post status is incorrect");
     }
 
-    @Test(dependsOnMethods = "getPostStatus")
+    @Test(dependsOnMethods = "getPostStatus", groups = "TestBug")
     public void deletePostWithConfirm()
     {
         blogPage = postViewPage.clickBackLink().render();
@@ -174,7 +178,7 @@ public class BlogPageTest extends AbstractSiteDashletTest
         assertEquals(blogPage.getPostsCount(), expCount - 1);
     }
 
-    @Test(dependsOnMethods = "deletePostWithConfirm")
+    @Test(dependsOnMethods = "deletePostWithConfirm", groups = "TestBug")
     public void isPostPresented()
     {
         assertTrue(blogPage.isNewPostEnabled());
@@ -183,13 +187,13 @@ public class BlogPageTest extends AbstractSiteDashletTest
         Assert.assertTrue(blogPage.isPostPresented(postName), "Expected post with title '" + postName + "'");
     }
 
-    @Test(dependsOnMethods = "isPostPresented")
+    @Test(dependsOnMethods = "isPostPresented", groups = "TestBug")
     public void checkTags()
     {
         Assert.assertTrue(blogPage.checkTags(postName, tagName), "Expected tag for post with title '" + postName + "' isn't presented");
     }
 
-    @Test(dependsOnMethods = "checkTags", priority = 1, groups="ChromeIssue")
+    @Test(dependsOnMethods = "checkTags", priority = 1, groups = { "ChromeIssue", "TestBug" })
     public void clickRssFeedBtn()
     {
         rssFeedPage = postViewPage.clickRssFeedBtn(username, password).render();
@@ -199,10 +203,10 @@ public class BlogPageTest extends AbstractSiteDashletTest
         assertNotNull(postViewPage);
     }
 
-    @Test(dependsOnMethods = "checkTags", priority = 2)
+    @Test(dependsOnMethods = "checkTags", priority = 2, groups = "TestBug")
     public void editPost()
     {
-        if(!(drone.getCurrentPage() instanceof BlogPage))
+        if (!(drone.getCurrentPage() instanceof BlogPage))
         {
             blogPage = postViewPage.clickBackLink().render();
         }
@@ -212,7 +216,7 @@ public class BlogPageTest extends AbstractSiteDashletTest
         postViewPage.clickBackLink().render();
     }
 
-    @Test(dependsOnMethods = "editPost")
+    @Test(dependsOnMethods = "editPost", groups = "TestBug")
     public void removeTag()
     {
         blogPage.editPost(newPostName, newPostName, newPostText, tagName, true).render();

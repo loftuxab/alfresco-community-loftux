@@ -910,11 +910,8 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
                             {
                                 if (value instanceof ContentPropertyValue)
                                 {
-                                    if (isContentIndexedForNode)
-                                    {
-                                        addContentPropertyToDoc(doc, toClose, toDelete, nodeMetaData, propertyQname,
-                                                    (ContentPropertyValue) value);
-                                    }
+                                    addContentPropertyToDoc(doc, toClose, toDelete, nodeMetaData, propertyQname,
+                                                (ContentPropertyValue) value, isContentIndexedForNode);
                                 }
                                 else if (value instanceof MLTextPropertyValue)
                                 {
@@ -927,11 +924,8 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
                                     {
                                         if (singleValue instanceof ContentPropertyValue)
                                         {
-                                            if (isContentIndexedForNode)
-                                            {
-                                                addContentPropertyToDoc(doc, toClose, toDelete, nodeMetaData,
-                                                            propertyQname, (ContentPropertyValue) singleValue);
-                                            }
+                                            addContentPropertyToDoc(doc, toClose, toDelete, nodeMetaData,
+                                                        propertyQname, (ContentPropertyValue) singleValue, isContentIndexedForNode);
                                         }
                                         else if (singleValue instanceof MLTextPropertyValue)
                                         {
@@ -1881,7 +1875,7 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
     }
 
     private void addContentPropertyToDoc(SolrInputDocument doc, ArrayList<Reader> toClose, ArrayList<File> toDelete,
-                NodeMetaData nodeMetaData, QName propertyQName, ContentPropertyValue contentPropertyValue)
+                NodeMetaData nodeMetaData, QName propertyQName, ContentPropertyValue contentPropertyValue, boolean indexContent)
                 throws AuthenticationException, IOException
     {
         if (!coreTracker.canAddContentPropertyToDoc()) { return; }
@@ -1895,7 +1889,7 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
         doc.addField(QueryConstants.PROPERTY_FIELD_PREFIX + propertyQName.toString() + ".encoding",
                     contentPropertyValue.getEncoding());
 
-        if (false == transformContent) { return; }
+        if (false == transformContent || false == indexContent) { return; }
 
         long start = System.nanoTime();
         GetTextContentResponse response = coreTracker.getTextContent(nodeMetaData.getId(), propertyQName, null);

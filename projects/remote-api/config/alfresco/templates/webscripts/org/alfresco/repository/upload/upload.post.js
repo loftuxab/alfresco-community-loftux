@@ -267,12 +267,25 @@ function main()
           */
          if (uploadDirectory !== null && uploadDirectory.length > 0)
          {
-            destNode = destNode.childByNamePath(uploadDirectory);
-            if (destNode === null)
+            var child = destNode.childByNamePath(uploadDirectory);
+            if (child === null)
             {
                exitUpload(404, "Cannot upload file since upload directory '" + uploadDirectory + "' does not exist.");
                return;
             }
+
+            // MNT-12565
+            while (child.isDocument)
+            {
+               if (child.parent === null)
+               {
+                  exitUpload(404, "Cannot upload file. You do not have permissions to access the parent folder for the document.");
+                  return;
+               }
+               child = child.parent;
+            }
+
+            destNode = child;
          }
 
          /**
@@ -346,6 +359,7 @@ function main()
          // maintained - as upload may have been via Flash - which always sends binary mimetype and would overwrite it.
          // Also perform the encoding guess step in the write() method to save an additional Writer operation.
          newFile.properties.content.write(content, false, true);
+         newFile.save();
          
          // TODO (THOR-175) - review
          // Ensure the file is versionable (autoVersion = true, autoVersionProps = false)

@@ -1,6 +1,5 @@
 package org.alfresco.po.share.dashlet;
 
-
 import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -11,16 +10,15 @@ import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.datalist.DataListPage;
 import org.alfresco.po.share.site.datalist.NewListForm;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-
 /**
  * Tests for Data Lists dashlet web elements
- *
+ * 
  * @author Marina.Nenadovets
  */
 
@@ -66,7 +64,7 @@ public class SiteDataListsDashletTest extends AbstractSiteDashletTest
         assertFalse(siteDataListsDashlet.isBalloonDisplayed());
     }
 
-    @Test(dependsOnMethods = "verifyHelpIcon")
+    @Test(dependsOnMethods = "verifyHelpIcon", groups = "TestBug")
     public void verifyCreateDataList()
     {
         assertTrue(siteDataListsDashlet.isCreateDataListDisplayed());
@@ -79,14 +77,14 @@ public class SiteDataListsDashletTest extends AbstractSiteDashletTest
         assertTrue(drone.getCurrentPage().render() instanceof DataListPage);
     }
 
-    @Test(dependsOnMethods = "verifyCreateDataList")
+    @Test(dependsOnMethods = "verifyCreateDataList", groups = "TestBug")
     public void verifyListCountInDashlet()
     {
         navigateToSiteDashboard();
         assertEquals(siteDataListsDashlet.getListsCount(), 1);
     }
 
-    @Test(dependsOnMethods = "verifyListCountInDashlet")
+    @Test(dependsOnMethods = "verifyListCountInDashlet", groups = "TestBug")
     public void verifyIsDataListDisplayed()
     {
         assertTrue(siteDataListsDashlet.isDataListDisplayed(LIST_NAME));

@@ -2130,7 +2130,8 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj, p_oE
    var obj =
    {
       type: "button",
-      disabled: false
+      disabled: false,
+      usearia: true
    };
 
    // Any extra parameters?
@@ -2170,7 +2171,6 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj, p_oE
                      {
                         if (p_aArgs[0].keyCode == YUIKeyListener.KEY.ENTER)
                         {
-                           this.hide();
                            p_oObj.fn.call(p_oObj.scope, p_sType, p_aArgs);
                         }
                      },
@@ -2739,6 +2739,22 @@ Alfresco.util.createBalloon = function(p_context, p_params, showEvent, hideEvent
          closeButton.innerHTML = "x";
          Dom.addClass(closeButton, "closeButton");
          Event.addListener(closeButton, "click", this.hide, this, true);
+         
+         // Register the ESC key
+         this.escapeListener = new YUIKeyListener(document,
+         {
+            keys: YUIKeyListener.KEY.ESCAPE
+         },
+         {
+            fn: function(eventName, keyEvent)
+            {
+               this.hide();
+            },
+            scope: this,
+            correctScope: true
+         });
+         this.escapeListener.enable();
+         
          wrapper.appendChild(closeButton);
       }
 
@@ -5320,7 +5336,7 @@ Alfresco.util.createInsituEditor = function(p_context, p_params, p_callback)
                   if (e.keyCode == 13 && this.value.length > 0)
                   {
                      Event.stopEvent(e); // Prevent the surrounding form from being submitted
-                     _this._createTag(this.value, false);
+                     _this._createTag(this.value, false, e);
                   }
                });
 
@@ -11045,16 +11061,20 @@ Alfresco.util.RENDERLOOPSIZE = 25;
              */
             onFormSubmitFailure: function FormManager_onFormSubmitFailure(response)
             {
-         var failureMsg = null;
-         if (response.json && response.json.message && response.json.message.indexOf("Failed to persist field 'prop_cm_name'") !== -1)
-         {
-            failureMsg = this.msg("message.details.failure.name");
-         }
+               var failureMsg = null;
+               if (response.json && response.json.message && response.json.message.indexOf("Failed to persist field 'prop_cm_name'") !== -1)
+               {
+                    failureMsg = this.msg("message.details.failure.name");
+               }
+               else if (response.json && response.json.message && response.json.message.indexOf("PropertyValueSizeIsMoreMaxLengthException") !== -1)
+               {
+                    failureMsg = this.msg("message.details.failure.more.max.length");
+               }
                Alfresco.util.PopupManager.displayPrompt(
-                     {
-                        title: this.msg(this.options.failureMessageKey),
-            text: failureMsg ? failureMsg : (response.json && response.json.message ? response.json.message : this.msg("message.details.failure"))
-                     });
+               {
+                    title: this.msg(this.options.failureMessageKey),
+                    text: failureMsg ? failureMsg : (response.json && response.json.message ? response.json.message : this.msg("message.details.failure"))
+               });
             },
 
             /**

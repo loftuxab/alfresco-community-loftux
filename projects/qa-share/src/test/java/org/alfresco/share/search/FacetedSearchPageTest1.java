@@ -4,6 +4,7 @@ import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.ShareUtil;
+import org.alfresco.po.share.admin.ActionsSet;
 import org.alfresco.po.share.search.FacetedSearchPage;
 import org.alfresco.po.share.search.SearchBox;
 import org.alfresco.po.share.site.document.ContentDetails;
@@ -25,7 +26,7 @@ import org.testng.annotations.Test;
  *
  * @author charu
  */
-
+@Test(groups = { "TestBug" })
 public class FacetedSearchPageTest1 extends AbstractUtils
 {
 
@@ -108,7 +109,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = { "alfresco-one", "NonGrid" })
-    public void ALF_3251() throws Exception
+    public void AONE_16054() throws Exception
     {
         trace("Starting searchAndClickDownloadActionTest");        
         
@@ -177,11 +178,13 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         
         // Check the results
         Assert.assertTrue(facetedSearchPage.getResults().size() > 0, "After searching for text there should be some search results");
-        
-        Assert.assertTrue(facetedSearchPage.getResultByName(name).getActions().hasActionByName(actionName1));
-        Assert.assertTrue(facetedSearchPage.getResultByName(name1).getActions().hasActionByName(actionName2));        
-        Assert.assertFalse(facetedSearchPage.getResultByName(name2).getActions().hasActionByName(actionName3));        
-        Assert.assertFalse(facetedSearchPage.getResultByName(name3).getActions().hasActionByName(actionName4));        
+
+        ActionsSet actionsSet = facetedSearchPage.getResultByName(name).getActions();
+
+        Assert.assertTrue(actionsSet.hasActionByName(actionName1));
+        Assert.assertTrue(facetedSearchPage.getResultByName(name1).getActions().hasActionByName(actionName2));
+        Assert.assertFalse(facetedSearchPage.getResultByName(name2).getActions().hasActionByName(actionName3));
+        Assert.assertFalse(facetedSearchPage.getResultByName(name3).getActions().hasActionByName(actionName4));
         Assert.assertFalse(facetedSearchPage.getResultByName(name4).getActions().hasActionByName(actionName5));
 
         trace("searchAndClickDownloadActionTest complete" );
@@ -194,13 +197,12 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3252() throws Exception
+    public void AONE_16055() throws Exception
     {
         trace("Starting searchAndClickViewInBrowserActionTest");      
                 
         String actionName2 = "View In Browser";        
-        
-        String name ="b-fs-test1.txt";
+
         String name1 ="c-fs-test1.txt";
         
         // Login as user2
@@ -224,19 +226,20 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         
         // Get the current url
         String url = drone.getCurrentUrl();
-        
+        String handle1 = drone.getWindowHandle();
         //Check Actions are displayed on Facet results page for file
-        Assert.assertTrue(facetedSearchPage.getResultByName(name1).getActions().hasActionByName(actionName2));        
+       // Assert.assertTrue(facetedSearchPage.getResultByName(name1).getActions().hasActionByName(actionName2));
         
         // Click the second action        
-        facetedSearchPage.getResultByName(name).getActions().clickActionByName(actionName2);
+        facetedSearchPage.getResultByName(name1).getActions().clickActionByName(actionName2);
 
         // Get the url again
         String newUrl = drone.getCurrentUrl();
         
         // We should be on view in browser page
-        Assert.assertNotSame(url, newUrl, "After clicking on action the url should have changed");           
+        Assert.assertNotSame(url, newUrl, "After clicking on action the url should have changed");
 
+        drone.switchToWindow(handle1);
         drone.navigateTo(url);
 
         // Logout
@@ -252,7 +255,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3253() throws Exception
+    public void AONE_16056() throws Exception
     {
         trace("Starting searchAndClickEditOfflineActionTest");      
                 
@@ -261,6 +264,11 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         String name = ("c-fs-test1.txt");
         
         // Login as user1
+        userLogin1();
+
+        drone.deleteCookies();
+        drone.refresh();
+        drone.getCurrentPage().render();
         userLogin1();
 
         // Do a search 
@@ -302,7 +310,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3254() throws Exception
+    public void AONE_16057() throws Exception
     {
         trace("Starting searchAndClickDeleteDocumentActionTest");      
                 
@@ -311,6 +319,11 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         String name = "e-fs-test1.txt";
         
         // Login as user1
+        userLogin1();
+
+        drone.deleteCookies();
+        drone.refresh();
+        drone.getCurrentPage().render();
         userLogin1();
 
         // Do a search
@@ -367,7 +380,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3255() throws Exception
+    public void AONE_16058() throws Exception
     {
         trace("Starting searchAndClickManagePermissionsActionTest");      
                 
@@ -376,6 +389,11 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         String name1 = "c-fs-test1.txt";
         
         // Login as user1
+        userLogin1();
+
+        drone.deleteCookies();
+        drone.refresh();
+        drone.getCurrentPage().render();
         userLogin1();
 
         // Do a search
@@ -408,7 +426,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     */
     
     @Test(groups = "alfresco-one")
-    public void ALF_3256() throws Exception
+    public void AONE_16059() throws Exception
     {
         trace("Starting searchAndVerifyFolderActionsTest");     
             
@@ -458,7 +476,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     // This test fails since Jira id ACE-1656 has been raised 
     
     @Test(groups = "Enterprise-only")
-    public void ALF_3257() throws Exception
+    public void AONE_16048() throws Exception
     {
         trace("Starting searchForContentInUserHomeFolderTest");        
         
@@ -469,6 +487,11 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         String actionName5 = "Manage Permissions";      
                 
         // Login as user1
+        userLogin1();
+
+        drone.deleteCookies();
+        drone.refresh();
+        drone.getCurrentPage().render();
         userLogin1();
 
         String testName = getTestName();
@@ -544,7 +567,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     //This test is the verify only the same tenant user can view the file created by respective tenant
     
     @Test(groups = "CloudOnly")
-    public void ALF_3258() throws Exception
+    public void AONE_16066() throws Exception
     {
         trace("Starting searchAndVerifyMultiTenantTest");        
         

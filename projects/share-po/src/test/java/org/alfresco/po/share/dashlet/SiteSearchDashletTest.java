@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
-import org.alfresco.po.share.util.FailedTestListener;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
@@ -103,7 +103,7 @@ public class SiteSearchDashletTest extends AbstractSiteDashletTest
         Assert.assertEquals(searchDashlet.getSearchText(), searchText);
     }
     
-    @Test(dependsOnMethods="search")
+    @Test(dependsOnMethods="search", groups="TestBug")
     public void getSearchItems()
     {
         searchDashlet.search(fileName).render();
@@ -115,7 +115,7 @@ public class SiteSearchDashletTest extends AbstractSiteDashletTest
         Assert.assertNotNull(items.get(0).getThumbnail());
     }
 
-    @Test(dependsOnMethods="getSearchItems")
+    @Test(dependsOnMethods="getSearchItems", groups="TestBug")
     public void searchWithSearchLimit()
     {
         searchDashlet.search(fileName, SearchLimit.TWENTY_FIVE).render();

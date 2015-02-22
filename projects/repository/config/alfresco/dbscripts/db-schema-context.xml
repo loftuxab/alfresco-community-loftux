@@ -58,7 +58,8 @@
                 <ref bean="patch.db-V4.1-ChildAssoc-OrderBy" />
                 <ref bean="patch.db-V4.1-createIdxAlfNodeTQN" />
                 <ref bean="patch.db-V4.2-restructure-idx_alf_nprop_s-MSSQL" />
-				<ref bean="patch.db-V5.0-ContentUrlEncryptionTables" />
+                <ref bean="patch.db-V4.2-migrate-locale-multilingual" />
+                <ref bean="patch.db-V5.0-ContentUrlEncryptionTables" />
             </list>
         </property>
     </bean>
@@ -82,6 +83,7 @@
                 <ref bean="patch.db-V4.2-upgrade-to-activiti-5.13" />
                 <ref bean="patch.db-V5.0-upgrade-to-activiti-5.16.2" />
                 <ref bean="patch.db-V5.0-upgrade-to-activiti-5.16.4" />
+                <ref bean="patch.db-V5.0-remove-columns-after-upgrade-to-activiti-5.16.2" />
             </list>
         </property>
     </bean>

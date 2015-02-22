@@ -24,9 +24,6 @@ package org.springframework.extensions.webscripts.connector;
  * Credential vaults allow for the storage and retrieval of credentials by
  * credential id.
  * 
- * They can also be loaded and saved if they are backed by a persisted storage
- * location.
- * 
  * @author muzquiano
  */
 public interface CredentialVault
@@ -72,18 +69,4 @@ public interface CredentialVault
      * @return
      */
     public String[] getStoredIds();
-    
-    /**
-     * Tells the Credential Vault to load state from persisted store
-     * 
-     * @return whether the credential vault successfully loaded
-     */
-    public boolean load();
-
-    /**
-     * Tells the Credential Vault to write state to persisted store
-     * 
-     * @return whether the credential vault successfully saved
-     */
-    public boolean save();
 }

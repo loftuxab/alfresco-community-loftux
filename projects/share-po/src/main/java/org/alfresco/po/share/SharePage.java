@@ -22,6 +22,7 @@ import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
@@ -139,6 +140,9 @@ public abstract class SharePage extends Page
         {
             case Enterprise41:
                 selector = "h1.theme-color-3";
+                break;
+            case Enterprise42:
+                selector="a.alf-menu-title-text";
                 break;
             case Cloud:
                 selector = "div.alf-menu-title span.alf-menu-title-text";
@@ -533,7 +537,7 @@ public abstract class SharePage extends Page
                 }
                 break;
             }
-            return FactorySharePage.resolvePage(drone);
+            return drone.getCurrentPage();
         }
         catch (NoSuchElementException te)
         {
@@ -748,9 +752,11 @@ public abstract class SharePage extends Page
      * @param inputs
      * @return
      */
-    public void inputFromKeyborad(Keys inputs)
+    public void inputFromKeyborad(Keys ...inputs)
     {
-        drone.sendkeys(inputs);
+        Actions actions = new Actions(((WebDroneImpl)drone).getDriver());
+        actions.sendKeys(inputs);
+        actions.perform();
     }
 
 

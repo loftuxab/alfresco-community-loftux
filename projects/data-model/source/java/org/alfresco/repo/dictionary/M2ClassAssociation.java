@@ -188,7 +188,7 @@ public abstract class M2ClassAssociation
     
     public boolean isTargetMandatoryEnforced()
     {
-        return isTargetMandatoryEnforced == null ? false : isTargetMandatoryEnforced;
+        return isTargetMandatoryEnforced == null ? isTargetMandatory() : isTargetMandatoryEnforced;
     }
     
     

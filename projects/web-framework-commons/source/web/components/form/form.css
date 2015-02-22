@@ -68,6 +68,8 @@
 .form-container textarea
 {
    width: 30em;
+   clear: both;
+   display: block;
 }
 
 .form-container select

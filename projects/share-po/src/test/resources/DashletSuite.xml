@@ -129,4 +129,9 @@
             <class name="org.alfresco.po.share.dashlet.TopSiteContributorDashletTest" />
         </classes>
     </test>
+    <test name="EditingContentDashletTest">
+        <classes>
+            <class name="org.alfresco.po.share.dashlet.EditingContentDashletTest" />
+        </classes>
+    </test>
 </suite>

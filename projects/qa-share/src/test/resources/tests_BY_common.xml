@@ -2,7 +2,7 @@
 <suite name="Common tests for Sprint BY" preserve-order="true">
 <test name="Common tests" parallel="classes" thread-count="5">
 <classes>
-    <class name="org.alfresco.share.user.trashcan.TrashcanTest2">
+    <!--class name="org.alfresco.share.user.trashcan.TrashcanTest2">
         <methods>
             <include name="AONE_14180"/>
             <include name="AONE_14181"/>
@@ -17,19 +17,11 @@
             <exclude name=".*"/>
         </methods>
     </class>
-    <class name="org.alfresco.share.user.trashcan.TrashcanTest3">
+    <class name="org.alfresco.share.site.document.FilmStripDocLibTest2">
         <methods>
-            <include name="AONE_14183"/>
-            <include name="AONE_14187"/>
-            <include name="AONE_14186"/>
-            <include name="AONE_14188"/>
-            <include name="AONE_14189"/>
-            <include name="AONE_14190"/>
-            <include name="AONE_14191"/>
-            <include name="AONE_14194"/>
-            <include name="AONE_14195"/>
-            <include name="AONE_14196"/>
-            <include name="AONE_14197"/>
+            <include name="AONE_14052"/>
+            <include name="AONE_14054"/>
+            <include name="AONE_14060"/>
             <exclude name=".*"/>
         </methods>
     </class>
@@ -73,7 +65,12 @@
 <include name="AONE_14652"/>
 <include name="AONE_14653"/>
 <include name="AONE_14654"/>
+    <include name="AONE_14655"/>
+    <include name="AONE_14656"/>
+    <include name="AONE_14657"/>
+    <include name="AONE_14658"/>
 <include name="AONE_14659"/>
+    <include name="AONE_14660"/>
 <include name="AONE_14661"/>
 <include name="AONE_14662"/>
 <include name="AONE_14663"/>
@@ -120,7 +117,12 @@
 <include name="AONE_14696"/>
 <include name="AONE_14697"/>
 <include name="AONE_14698"/>
+    <include name="AONE_14699"/>
+    <include name="AONE_14700"/>
+    <include name="AONE_14701"/>
+    <include name="AONE_14702"/>
 <include name="AONE_14703"/>
+    <include name="AONE_14704"/>
 <include name="AONE_14705"/>
 <include name="AONE_14706"/>
 <include name="AONE_14707"/>
@@ -150,13 +152,17 @@
 <include name="AONE_13984"/>
 <exclude name=".*"/>
 </methods>
-</class>
+</class-->
 <class name="org.alfresco.share.dashlet.SiteSearchDashletTest">
 <methods>
-<include name="AONE_14774"/>
+<!--include name="AONE_14774"/>
 <include name="AONE_14775"/>
-<include name="AONE_14776"/>
-<include name="AONE_14781"/>
+<include name="AONE_14776"/-->
+    <include name="AONE_14777"/>
+    <include name="AONE_14778"/>
+    <include name="AONE_14779"/>
+    <include name="AONE_14780"/>
+<!--include name="AONE_14781"/>
 <include name="AONE_14782"/>
 <include name="AONE_14783"/>
 <include name="AONE_14784"/>
@@ -188,11 +194,26 @@
 <include name="AONE_14812"/>
 <include name="AONE_14813"/>
 <include name="AONE_14814"/>
-<include name="AONE_14815"/>
+<include name="AONE_14815"/-->
 <exclude name=".*"/>
 </methods>
 </class>
-<class name="org.alfresco.share.dashlet.SiteDashboardMyDiscussionTests">
+    <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest">
+        <methods>
+            <include name="AONE_14818"/>
+            <include name="AONE_14819"/>
+            <include name="AONE_14820"/>
+            <include name="AONE_14821"/>
+            <include name="AONE_14822"/>
+            <include name="AONE_14823"/>
+            <include name="AONE_14824"/>
+            <include name="AONE_14825"/>
+            <include name="AONE_14826"/>
+            <include name="AONE_14827"/>
+            <exclude name=".*"/>
+        </methods>
+    </class>
+<!--class name="org.alfresco.share.dashlet.SiteDashboardMyDiscussionTests">
 <methods>
 <include name="AONE_14766"/>
 <include name="AONE_14755"/>
@@ -407,6 +428,22 @@
             <exclude name=".*"/>
         </methods>
     </class>
+    <<class name="org.alfresco.share.user.trashcan.TrashcanTest3">
+        <methods>
+            <include name="AONE_14183"/>
+            <include name="AONE_14187"/>
+            <include name="AONE_14186"/>
+            <include name="AONE_14188"/>
+            <include name="AONE_14189"/>
+            <include name="AONE_14190"/>
+            <include name="AONE_14191"/>
+            <include name="AONE_14194"/>
+            <include name="AONE_14195"/>
+            <include name="AONE_14196"/>
+            <include name="AONE_14197"/>
+            <exclude name=".*"/>
+        </methods>
+    </class>-->
 
 </classes>
 </test>

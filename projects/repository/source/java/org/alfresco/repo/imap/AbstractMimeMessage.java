@@ -23,6 +23,7 @@ import static org.alfresco.repo.imap.AlfrescoImapConst.X_ALF_NODEREF_ID;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -31,6 +32,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.alfresco.model.ImapModel;
 import org.alfresco.repo.imap.ImapService.EmailBodyFormat;
 import org.alfresco.repo.template.TemplateNode;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -38,6 +40,7 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransacti
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -79,7 +82,7 @@ public abstract class AbstractMimeMessage extends MimeMessage
         this.serviceRegistry = serviceRegistry;
         this.imapService = serviceRegistry.getImapService();
         this.messageFileInfo = fileInfo;
-        this.isMessageInSitesLibrary = imapService.isNodeInSitesLibrary(messageFileInfo.getNodeRef());
+        this.isMessageInSitesLibrary = imapService.getNodeSiteContainer(messageFileInfo.getNodeRef()) != null ? true : false;
         RetryingTransactionHelper txHelper = serviceRegistry.getTransactionService().getRetryingTransactionHelper();
         txHelper.setMaxRetries(MAX_RETRIES);
         txHelper.setReadOnly(false);
@@ -119,6 +122,31 @@ public abstract class AbstractMimeMessage extends MimeMessage
         // Optional headers for further implementation of multiple Alfresco server support.
         setHeader(X_ALF_NODEREF_ID, messageFileInfo.getNodeRef().getId());
         // setHeader(X_ALF_SERVER_UID, imapService.getAlfrescoServerUID());
+        
+        setPersistedHeaders();
+    }
+    
+    private void setPersistedHeaders() throws MessagingException
+    {
+        NodeService nodeService = serviceRegistry.getNodeService();
+        if (nodeService.hasAspect(messageFileInfo.getNodeRef(), ImapModel.ASPECT_IMAP_MESSAGE_HEADERS))
+        {
+            @SuppressWarnings("unchecked")
+            List<String> messageHeaders = (List<String>)nodeService.getProperty(messageFileInfo.getNodeRef(), ImapModel.PROP_MESSAGE_HEADERS);
+            
+            if (messageHeaders == null)
+            {
+                return;
+            }
+            
+            for (String header : messageHeaders)
+            {
+                String headerValue = header.substring(header.indexOf(ImapModel.MESSAGE_HEADER_TO_PERSIST_SPLITTER) + 1);
+                String headerName  = header.substring(0, header.indexOf(ImapModel.MESSAGE_HEADER_TO_PERSIST_SPLITTER));
+                
+                setHeader(headerName, headerValue);
+            }
+        }
     }
 
   
@@ -188,28 +216,9 @@ public abstract class AbstractMimeMessage extends MimeMessage
         model.put("date", new Date());
         model.put("contextUrl", new String(imapService.getWebApplicationContextUrl()));
         model.put("alfTicket", new String(serviceRegistry.getAuthenticationService().getCurrentTicket()));
-        if (isMessageInSitesLibrary)
-        {
-            String pathFromSites = imapService.getPathFromSites(parent);
-            StringBuilder parsedPath = new StringBuilder();
-            String[] pathParts = pathFromSites.split("/");
-            if (pathParts.length > 2)
-            {
-                parsedPath.append(pathParts[0]).append("/").append(pathParts[1]);
-                parsedPath.append("?filter=path|");
-                for (int i = 2; i < pathParts.length; i++)
-                {
-                    parsedPath.append("/").append(pathParts[i]);
-                }
-
-            }
-            else
-            {
-                parsedPath.append(pathFromSites);
-            }
-            model.put("shareContextUrl", new String(imapService.getShareApplicationContextUrl()));
-            model.put("parentPathFromSites", parsedPath.toString());
-        }
+        String contentFolderUrl = imapService.getContentFolderUrl(ref);
+        model.put("shareContextUrl", new String(imapService.getShareApplicationContextUrl()));
+        model.put("contentFolderUrl", contentFolderUrl);
         return model;
     }
 

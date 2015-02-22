@@ -571,7 +571,8 @@ span.mce_alfresco-linklibrary
    border-color: #808080;
 }
 
-.yui-skin-greyTheme div.flat-button span.yui-button-hover span.first-child
+.yui-skin-greyTheme div.flat-button span.yui-button-hover span.first-child,
+.yui-skin-greyTheme div.flat-button span.yui-button-focus span.first-child
 {
    border-color: #808080;
 }
@@ -594,7 +595,8 @@ span.mce_alfresco-linklibrary
 
 /* Ensure hover state can be activated */
 
-.yui-skin-greyTheme .no-check-bg div.flat-button span.yui-button-hover
+.yui-skin-greyTheme .no-check-bg div.flat-button span.yui-button-hover,
+.yui-skin-greyTheme .no-check-bg div.flat-button span.yui-button-focus
 {
    background: transparent url(images/sprite.png) repeat-x scroll 0 0;
    border-color: #808080;

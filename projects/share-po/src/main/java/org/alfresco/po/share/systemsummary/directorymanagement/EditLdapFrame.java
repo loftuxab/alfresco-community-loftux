@@ -60,7 +60,7 @@ public class EditLdapFrame extends SharePage
     @RenderWebElement
     private final static By GROUP_SEARCH_BASE = By.xpath("//input[contains(@name,'groupSearchBase')]");
     @RenderWebElement
-    private final static By ADV_SETTINGS = By.xpath("//a[@class='action']");
+    private final static By ADV_SETTINGS = By.cssSelector(".action.toggler");
 
     public class AdvSettings extends SharePage
     {

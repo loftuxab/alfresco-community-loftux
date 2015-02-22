@@ -1,10 +1,57 @@
 package org.alfresco.share.sanity;
 
+import static org.alfresco.po.share.enums.DataLists.CONTACT_LIST;
+import static org.alfresco.po.share.site.calendar.CalendarPage.ActionEventVia.AGENDA_TAB;
+import static org.alfresco.po.share.site.calendar.CalendarPage.ActionEventVia.DAY_TAB;
+import static org.alfresco.po.share.site.calendar.CalendarPage.ActionEventVia.MONTH_TAB;
+import static org.alfresco.po.share.site.calendar.CalendarPage.ActionEventVia.WEEK_TAB;
+import static org.alfresco.po.share.site.document.DocumentAction.CHNAGE_TYPE;
+import static org.alfresco.po.share.site.document.DocumentAction.COPY_TO;
+import static org.alfresco.po.share.site.document.DocumentAction.DELETE_CONTENT;
+import static org.alfresco.po.share.site.document.DocumentAction.DOCUMENT_INLINE_EDIT;
+import static org.alfresco.po.share.site.document.DocumentAction.DOWNLOAD_DOCUMENT;
+import static org.alfresco.po.share.site.document.DocumentAction.DOWNLOAD_FOLDER;
+import static org.alfresco.po.share.site.document.DocumentAction.EDIT_OFFLINE;
+import static org.alfresco.po.share.site.document.DocumentAction.EDIT_PROPERTIES;
+import static org.alfresco.po.share.site.document.DocumentAction.MANAGE_ASPECTS;
+import static org.alfresco.po.share.site.document.DocumentAction.MANAGE_PERMISSION_DOC;
+import static org.alfresco.po.share.site.document.DocumentAction.MANAGE_PERMISSION_FOL;
+import static org.alfresco.po.share.site.document.DocumentAction.MANAGE_RULES;
+import static org.alfresco.po.share.site.document.DocumentAction.MOVE_TO;
+import static org.alfresco.po.share.site.document.DocumentAction.PUBLISH_ACTION;
+import static org.alfresco.po.share.site.document.DocumentAction.START_WORKFLOW;
+import static org.alfresco.po.share.site.document.DocumentAction.UPLOAD_DOCUMENT;
+import static org.alfresco.po.share.site.document.DocumentAction.VIEW_IN_EXLPORER;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.alfresco.po.share.ShareLink;
-import org.alfresco.po.share.dashlet.*;
+import org.alfresco.po.share.dashlet.AddOnsRssFeedDashlet;
+import org.alfresco.po.share.dashlet.ImagePreviewDashlet;
+import org.alfresco.po.share.dashlet.RssFeedDashlet;
+import org.alfresco.po.share.dashlet.SiteActivitiesDashlet;
+import org.alfresco.po.share.dashlet.SiteDataListsDashlet;
+import org.alfresco.po.share.dashlet.SiteLinksDashlet;
+import org.alfresco.po.share.dashlet.SiteMembersDashlet;
+import org.alfresco.po.share.dashlet.SiteSearchDashlet;
+import org.alfresco.po.share.dashlet.SiteWelcomeDashlet;
+import org.alfresco.po.share.dashlet.WebViewDashlet;
+import org.alfresco.po.share.dashlet.WikiDashlet;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.enums.ViewType;
-import org.alfresco.po.share.site.*;
+import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
+import org.alfresco.po.share.site.CustomizeSitePage;
+import org.alfresco.po.share.site.InviteMembersPage;
+import org.alfresco.po.share.site.PendingInvitesPage;
+import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.site.SiteGroupsPage;
+import org.alfresco.po.share.site.SiteMembersPage;
+import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.blog.BlogPage;
 import org.alfresco.po.share.site.blog.PostViewPage;
 import org.alfresco.po.share.site.calendar.CalendarPage;
@@ -15,7 +62,12 @@ import org.alfresco.po.share.site.datalist.items.ContactListItem;
 import org.alfresco.po.share.site.datalist.lists.ContactList;
 import org.alfresco.po.share.site.discussions.DiscussionsPage;
 import org.alfresco.po.share.site.discussions.TopicViewPage;
-import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.site.document.ConfirmDeletePage;
+import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.FolderDetailsPage;
 import org.alfresco.po.share.site.links.LinksDetailsPage;
 import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
@@ -23,24 +75,20 @@ import org.alfresco.po.share.site.wiki.WikiPageList;
 import org.alfresco.po.share.user.EditProfilePage;
 import org.alfresco.po.share.user.SelectActions;
 import org.alfresco.po.share.user.TrashCanPage;
-import org.alfresco.share.util.*;
+import org.alfresco.share.util.AbstractUtils;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserDashboard;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.share.util.ShareUserProfile;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDroneImpl;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.alfresco.po.share.site.calendar.CalendarPage.ActionEventVia.*;
-import static org.alfresco.po.share.enums.DataLists.*;
-import static org.alfresco.po.share.site.document.DocumentAction.*;
-import static org.testng.Assert.*;
 
 /**
  * This class includes Permissions Sanity tests
@@ -65,7 +113,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
     public void dataPrep_AONE_15204() throws Exception
     {
         String siteName = getSiteName(testName);
-        String user1 = username + "1";
+        String user1 = username +"1";
 
         //creating 6 users
         for (int i = 1; i <= 6; i++)
@@ -202,39 +250,8 @@ public class SitePermissionsSanityTest extends AbstractUtils
         //Verify Help icon on all the dashlets
         assertTrue(siteDashboardPage.isHelpDisplayedForAllDashlets(), "The help balloon isn't available");
 
-        //Verify actions from Welcome dashlet
-        SiteWelcomeDashlet welcomeDashlet = dashBoard.getDashlet("welcome-site").render();
-
-        //Customize the site dashboard - customize site dashboard window opens
-        List<ShareLink> elements = welcomeDashlet.getOptions();
-
-        assertEquals(elements.size(), 4, "The count of links isn't 4");
-        drone.navigateTo(elements.get(0).getHref().toString());
-        HtmlPage customizeSitePage = drone.getCurrentPage().render();
-        assertTrue(customizeSitePage instanceof CustomiseSiteDashboardPage, "The user isn't redirected to Customize Site Dashboard");
-        drone.navigateTo(siteUrl);
-
-        //Invite People - Invite People page opens
-        drone.navigateTo(elements.get(1).getHref().toString());
-        HtmlPage invitePeoplePage = drone.getCurrentPage().render();
-        assertTrue(invitePeoplePage instanceof InviteMembersPage, "The user isn't redirected to Invite People page");
-        drone.navigateTo(siteUrl);
-
-        //Upload Content - Document Library page opens, Upload dialog popups
-        drone.navigateTo(elements.get(2).getHref().toString());
-        UploadFilePage uploadFilePage = new UploadFilePage(drone).render();
-        assertTrue(uploadFilePage.isUploadInputDisplayed(), "Upload form isn't pop up");
-        drone.navigateTo(siteUrl);
-
-        // Sign Up - the user is redirected to cloud sign up
-        drone.navigateTo(elements.get(3).getHref().toString());
-
-        String expectedSignUp = "http://www.alfresco.com/products/cloud?utm_source=AlfEnt4&utm_medium=anchor&utm_campaign=claimnetwork";
-        assertEquals(drone.getCurrentUrl(), expectedSignUp);
-        drone.navigateTo(siteUrl);
-
         //Navigate to Document Library, set any view as default
-        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone);
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         assertTrue(documentLibraryPage.getNavigation().isSetDefaultViewVisible());
         documentLibraryPage.getNavigation().selectSetCurrentViewToDefault();
         ViewType actualViewType = documentLibraryPage.getNavigation().getViewType();
@@ -355,10 +372,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
 
         //Data prep for blog
         String url = "alfrescoqacloud.wordpress.com";
-        String blogUsername = "alfrescoqaauto";
-        String blogPassword = "parkh0use";
-      
-        // Removed Configure blog page since ACE-2094 and need to update the test
+
         //Create a Blog post
         blogPage.createPostInternally(testName, testName).render();
 
@@ -454,42 +468,12 @@ public class SitePermissionsSanityTest extends AbstractUtils
         //Verify Help icon on all the dashlets
         assertTrue(siteDashboardPage.isHelpDisplayedForAllDashlets(), "The help balloon isn't available");
 
-        //Verify actions from Welcome dashlet
-        SiteWelcomeDashlet welcomeDashlet = dashBoard.getDashlet("welcome-site").render();
-
-        //Go to Document Library - Document Library page opens
-        List<ShareLink> elements = welcomeDashlet.getOptions();
-
-        assertEquals(elements.size(), 4, "The count of links isn't 4");
-        drone.navigateTo(elements.get(0).getHref());
-        DocumentLibraryPage documentLibraryPage = drone.getCurrentPage().render();
-        assertTrue(documentLibraryPage instanceof DocumentLibraryPage, "The user isn't redirected to Document Library Page");
-        drone.navigateTo(siteUrl);
-
-        //View Site Members - Search for People page opens
-        drone.navigateTo(elements.get(1).getHref());
-        SiteMembersPage siteMembersPage = drone.getCurrentPage().render();
-        assertTrue(siteMembersPage instanceof SiteMembersPage, "The user isn't redirected to Members page");
-        drone.navigateTo(siteUrl);
-
-        //Upload Content - Document Library page opens, Upload dialog popups
-        drone.navigateTo(elements.get(2).getHref());
-        UploadFilePage uploadFilePage = new UploadFilePage(drone).render();
-        assertTrue(uploadFilePage.isUploadInputDisplayed(), "Upload form isn't pop up");
-        drone.navigateTo(siteUrl);
-
-        // Sign Up - the user is redirected to
-        drone.navigateTo(elements.get(3).getHref());
-        String expectedSignUp = "http://www.alfresco.com/products/cloud?utm_source=AlfEnt4&utm_medium=anchor&utm_campaign=claimnetwork";
-        assertEquals(drone.getCurrentUrl(), expectedSignUp);
-        drone.navigateTo(siteUrl);
-
         //Verify Search on site search dashlet
         SiteSearchDashlet siteSearchDashlet = ShareUserDashboard.getSiteSearchDashlet(drone).render();
         assertTrue(siteSearchDashlet.siteSearchWithRetry(itemForSearch), "Unable to use search from the dashlet");
 
         //Navigate to Document Library, set any view as default
-        documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         assertFalse(documentLibraryPage.getNavigation().isSetDefaultViewVisible(), "Set View to default is present");
 
         //Subscribe to RSS Feed
@@ -525,7 +509,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_PERMISSION_DOC), "Manage Permissions action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_ASPECTS), "Manage aspects action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(CHNAGE_TYPE), "Change type action isn't available");
-        
 
         //Verify icons near document section
         assertTrue(documentDetailsPage.isEditPropertiesIconDisplayed(), "Edit properties icon isn't displayed");
@@ -608,11 +591,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
 
         //Data prep for blog
         String url = "alfrescoqacloud.wordpress.com";
-        String blogUsername = "alfrescoqaauto";
-        String blogPassword = "parkh0use";
-
-        
-        // Removed Configure blog page since ACE-2094 and need to update the test
 
         //Create a Blog post
         blogPage.createPostInternally(testName, testName).render();
@@ -650,7 +628,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         contactList.duplicateAnItem(testName);
 
         //Browse to site Members
-        siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
+        SiteMembersPage siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
 
         //Only People and Groups tags are present
         assertTrue(siteMembersPage.isPeopleLinkPresent(), "People link is not displayed");
@@ -722,43 +700,13 @@ public class SitePermissionsSanityTest extends AbstractUtils
         //Verify Help icon on all the dashlets
         assertTrue(siteDashboardPage.isHelpDisplayedForAllDashlets(), "The help balloon isn't available");
 
-        //Verify actions from Welcome dashlet
-        SiteWelcomeDashlet welcomeDashlet = dashBoard.getDashlet("welcome-site").render();
-
-        //Go to Document Library - Document Library page opens
-        List<ShareLink> elements = welcomeDashlet.getOptions();
-
-        assertEquals(elements.size(), 4, "The count of links isn't 4");
-        drone.navigateTo(elements.get(0).getHref());
-        DocumentLibraryPage documentLibraryPage = drone.getCurrentPage().render();
-        assertTrue(documentLibraryPage instanceof DocumentLibraryPage, "The user isn't redirected to Document Library Page");
-        drone.navigateTo(siteUrl);
-
-        //View Site Members - Search for People page opens
-        drone.navigateTo(elements.get(1).getHref());
-        SiteMembersPage siteMembersPage = drone.getCurrentPage().render();
-        assertTrue(siteMembersPage instanceof SiteMembersPage, "The user isn't redirected to Members page");
-        drone.navigateTo(siteUrl);
-
-        //Upload Content - Document Library page opens, Upload dialog popups
-        drone.navigateTo(elements.get(2).getHref());
-        UploadFilePage uploadFilePage = new UploadFilePage(drone).render();
-        assertTrue(uploadFilePage.isUploadInputDisplayed(), "Upload form isn't pop up");
-        drone.navigateTo(siteUrl);
-
-        // Sign Up - the user is redirected to
-        drone.navigateTo(elements.get(3).getHref());
-        String expectedSignUp = "http://www.alfresco.com/products/cloud?utm_source=AlfEnt4&utm_medium=anchor&utm_campaign=claimnetwork";
-        assertEquals(drone.getCurrentUrl(), expectedSignUp);
-        drone.navigateTo(siteUrl);
-
         //Verify Search on site search dashlet
         SiteSearchDashlet siteSearchDashlet = ShareUserDashboard.getSiteSearchDashlet(drone).render();
         assertTrue(siteSearchDashlet.siteSearchWithRetry(itemForSearch), "Unable to use search from the dashlet");
 
         //Navigate to Document Library, set any view as default
         ShareUser.openDocumentLibrary(drone).render();
-        documentLibraryPage = new DocumentLibraryPage(drone).render();
+        DocumentLibraryPage documentLibraryPage = new DocumentLibraryPage(drone).render();
         assertFalse(documentLibraryPage.getNavigation().isSetDefaultViewVisible(), "Set View to default is present");
 
         //Subscribe to RSS Feed
@@ -914,7 +862,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         contactList.duplicateAnItem(testName);
 
         //Browse to site Members
-        siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
+        SiteMembersPage siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
 
         //Only People and Groups tags are present
         assertTrue(siteMembersPage.isPeopleLinkPresent(), "People link is not displayed");
@@ -975,44 +923,8 @@ public class SitePermissionsSanityTest extends AbstractUtils
         //Verify Help icon on all the dashlets
         assertTrue(siteDashboardPage.isHelpDisplayedForAllDashlets(), "The help balloon isn't available");
 
-        //Verify actions from Welcome dashlet
-        SiteWelcomeDashlet welcomeDashlet = dashBoard.getDashlet("welcome-site").render();
-
-        //Go to Document Library - Document Library page opens
-        List<ShareLink> elements = welcomeDashlet.getOptions();
-
-        assertEquals(elements.size(), 4, "The count of links isn't 4");
-        drone.navigateTo(elements.get(0).getHref());
-        DocumentLibraryPage documentLibraryPage = drone.getCurrentPage().render();
-        assertTrue(documentLibraryPage instanceof DocumentLibraryPage, "The user isn't redirected to Document Library Page");
-        drone.navigateTo(siteUrl);
-
-        //View Site Members - Search for People page opens
-        drone.navigateTo(elements.get(1).getHref());
-        SiteMembersPage siteMembersPage = drone.getCurrentPage().render();
-        assertTrue(siteMembersPage instanceof SiteMembersPage, "The user isn't redirected to Members page");
-        drone.navigateTo(siteUrl);
-
-        //Edit your profile - current user profile page opens
-        drone.navigateTo(elements.get(2).getHref());
-        try
-        {
-            new EditProfilePage(drone).render();
-        }
-        catch (Exception e)
-        {
-            fail("User profile page isn't opened");
-        }
-        drone.navigateTo(siteUrl);
-
-        // Sign Up - the user is redirected to
-        drone.navigateTo(elements.get(3).getHref());
-        String expectedSignUp = "http://www.alfresco.com/products/cloud?utm_source=AlfEnt4&utm_medium=anchor&utm_campaign=claimnetwork";
-        assertEquals(drone.getCurrentUrl(), expectedSignUp);
-        drone.navigateTo(siteUrl);
-
         //Navigate to Document Library, set any view as default
-        documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
+        DocumentLibraryPage documentLibraryPage = ShareUser.openDocumentLibrary(drone).render();
         assertFalse(documentLibraryPage.getNavigation().isSetDefaultViewVisible(), "Set View to default is present");
 
         //Subscribe to RSS Feed
@@ -1121,7 +1033,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertFalse(contactList.isNewItemEnabled(), "New item is enabled");
         assertFalse(contactList.isDuplicateDisplayed(testName), "Duplicate link is displayed");
 
-        siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
+        SiteMembersPage siteMembersPage = dashBoard.getSiteNav().selectMembersPage().render();
 
         //Only People and Groups tags are present
         assertTrue(siteMembersPage.isPeopleLinkPresent(), "People link is not displayed");
@@ -1536,7 +1448,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_PERMISSION_DOC), "Manage Permissions action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_ASPECTS), "Manage aspects action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(CHNAGE_TYPE), "Change type action isn't available");
-        assertTrue(documentDetailsPage.isDocumentActionPresent(PUBLISH_ACTION), "Publish action isn't available");
 
         //Verify icons near document section
         assertTrue(documentDetailsPage.isEditPropertiesIconDisplayed(), "Edit properties icon isn't displayed");
@@ -1712,10 +1623,10 @@ public class SitePermissionsSanityTest extends AbstractUtils
         SiteDashboardPage dashboard = ShareUser.openSiteDashboard(drone, siteName);
 
         //Navigate to Document Library
-        ShareUser.openDocumentLibrary(drone);
+        ShareUser.openDocumentLibrary(drone).render();
 
         //Edit collaborator document
-        ShareUser.openDocumentDetailPage(drone, fileName);
+        ShareUser.openDocumentDetailPage(drone, fileName).render();
         DocumentDetailsPage documentDetailsPage = ShareUser.editTextDocument(drone, editedItem, editedItem, editedItem);
 
         //Add a comment to the document
@@ -1739,7 +1650,6 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertTrue(documentDetailsPage.isDocumentActionPresent(START_WORKFLOW), "Start Workflow action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(MANAGE_ASPECTS), "Manage aspects action isn't available");
         assertTrue(documentDetailsPage.isDocumentActionPresent(CHNAGE_TYPE), "Change type action isn't available");
-        assertTrue(documentDetailsPage.isDocumentActionPresent(PUBLISH_ACTION), "Publish action isn't available");
 
         //Verify icons near document section
         assertTrue(documentDetailsPage.isEditPropertiesIconDisplayed(), "Edit properties icon isn't displayed");
@@ -1756,7 +1666,7 @@ public class SitePermissionsSanityTest extends AbstractUtils
         assertTrue(documentLibraryPage.getFileDirectoryInfo(editedItem).isShareLinkVisible());
 
         //Edit collaborator's Folder
-        ShareUser.editProperties(drone, folderName, editedFolder, editedFolder, editedFolder);
+        ShareUser.editProperties(drone, folderName, editedFolder, editedFolder, editedFolder).render();
 
         //Add a comment to the folder
         FolderDetailsPage folderDetailsPage = ShareUser.openFolderDetailPage(drone, editedFolder);

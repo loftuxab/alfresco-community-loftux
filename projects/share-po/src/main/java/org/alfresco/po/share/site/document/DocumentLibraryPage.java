@@ -17,6 +17,7 @@ package org.alfresco.po.share.site.document;
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.Pagination;
 import org.alfresco.po.share.enums.ViewType;
+import org.alfresco.po.share.site.NewFolderPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.webdrone.*;
 import org.alfresco.webdrone.exception.PageException;
@@ -71,6 +72,8 @@ public class DocumentLibraryPage extends SitePage
     private static String CATEGORY_ROOT_SPACER = "//span[text()='Category Root']/ancestor-or-self::table[contains(@class, 'depth0')]";
     private static By CATEGORY_ROOT_SPACER_LINK = By.xpath(CATEGORY_ROOT_SPACER + "//a");
     private static final String CHECK_BOX = "input[id^='checkbox-yui']";
+    private static final By DOCUMENT_LIBRARY = By.cssSelector("a[href$='documentlibrary']");
+    private static final By SYNC_MESSAGE = By.xpath(".//span[contains(text(),'Sync was created')]");
 
     public enum Optype
     {
@@ -565,6 +568,7 @@ public class DocumentLibraryPage extends SitePage
     public DocumentDetailsPage selectFile(final String title)
     {
         selectEntry(title).click();
+        waitUntilAlert();
         return new DocumentDetailsPage(drone);
     }
 
@@ -1103,6 +1107,30 @@ public class DocumentLibraryPage extends SitePage
         }
         throw new PageOperationException("Message element not found!!");
     }
+    
+    /**
+     * Returns true if Sync message is present
+     *
+     * @return boolean
+     */
+    
+    public boolean isSyncMessagePresent()
+    {
+        try
+        {
+            drone.waitForElement(SYNC_MESSAGE, SECONDS.convert(drone.getDefaultWaitTime(), MILLISECONDS));
+            WebElement syncMessage = drone.find(SYNC_MESSAGE);
+            if (syncMessage != null)
+                return true;
+        }
+        catch(TimeoutException toe)
+        {
+            logger.error("Message element not found!!", toe);
+            return false;
+        }
+        return false;
+    }
+    
 
     /**
      * Returns true if Cloud Sync sign up dialog is visible
@@ -1453,7 +1481,7 @@ public class DocumentLibraryPage extends SitePage
      *
      * @return List<WebElement> of all existing templates
      */
-    private List<WebElement> getTemplateList(){
+    public List<WebElement> getTemplateList(){
         drone.getCurrentPage().render();
         drone.waitUntilNotVisibleWithParitalText(By.xpath(TEMPLATE_LIST), "Loading...", SECONDS.convert(maxPageLoadingTime, MILLISECONDS));
         drone.findAndWaitForElements(By.xpath(TEMPLATE_LIST));
@@ -1557,4 +1585,42 @@ public class DocumentLibraryPage extends SitePage
         }
 
     }
+    
+    
+    /**
+     * Click on Document Library
+     * 
+     * @param drone
+     * @return
+     */
+    public static DocumentLibraryPage selectDocumentLibrary(WebDrone drone)
+    {
+        drone.findAndWait(DOCUMENT_LIBRARY).click();
+        return new DocumentLibraryPage(drone);
+    }
+
+
+    /**
+     * Create folder from template
+     *
+     * @param templateName
+     * @return {@link DocumentLibraryPage}
+     */
+    public NewFolderPage openFolderFromTemplateHover(String templateName)
+    {
+        try{
+            if(!templateName.isEmpty()){
+                getNavigation().selectCreateFolderFromTemplateHover().render();
+                drone.findAndWait(By.xpath("//div[@class='bd']//span[contains(text(), '" + templateName + "')]")).click();
+                drone.findAndWait(submitButton);
+                return new NewFolderPage(drone);
+            }
+        }
+        catch (StaleElementReferenceException ste)
+        {
+        }
+        throw new PageOperationException(String.format("Template didn't found [%s]", templateName));
+
+    }
+
 }

@@ -26,10 +26,9 @@ import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SitePage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.po.share.util.FailedTestListener;
 import org.alfresco.po.share.util.SiteUtil;
+import org.alfresco.test.FailedTestListener;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
@@ -53,12 +52,14 @@ public class SiteContentBreakdownDashletTest extends AbstractSiteDashletTest
     private static final String DOCX_TYPE = "Microsoft Word 2007";
     private static final String HTML_TYPE = "HTML";
     private static final String PDF_TYPE = "Adobe PDF Document";
+    private static final String XML_TYPE ="XML";
 
     private static int numberOfTxtFiles = 5;
     private static int numberOfDocxFiles = 4;
     private static int numberOfHtmlFiles = 2;
     private static int numberOfJpgFiles = 3;
     private static int numberOfPdfFiles = 9;
+    private static int numberOfXMLFiles = 2;
 
     DashBoardPage dashBoard;
 
@@ -81,6 +82,7 @@ public class SiteContentBreakdownDashletTest extends AbstractSiteDashletTest
         uploadFiles(docPage, numberOfJpgFiles, ".jpg");
         uploadFiles(docPage, numberOfHtmlFiles, ".html");
         uploadFiles(docPage, numberOfPdfFiles, ".pdf");
+        uploadFiles(docPage, numberOfXMLFiles, ".xml");
 
         navigateToSiteDashboard();
 
@@ -140,7 +142,8 @@ public class SiteContentBreakdownDashletTest extends AbstractSiteDashletTest
         Assert.assertTrue(mimeTypes.contains(JPEG_TYPE));
         Assert.assertTrue(mimeTypes.contains(DOCX_TYPE));
         Assert.assertTrue(mimeTypes.contains(PDF_TYPE));
-        Assert.assertTrue(mimeTypes.contains(HTML_TYPE));   
+        Assert.assertTrue(mimeTypes.contains(HTML_TYPE));
+        Assert.assertTrue(mimeTypes.contains(XML_TYPE));
                 
         
         List<String> mimeTypesData = siteContentBreakdownDashlet.getTooltipFileData();
@@ -150,7 +153,7 @@ public class SiteContentBreakdownDashletTest extends AbstractSiteDashletTest
            String [] counts = mimeType.split("-");
            String fileCount = counts[1];
 
-           Assert.assertEquals(mimeTypesData.size(), 5);
+           Assert.assertEquals(mimeTypesData.size(), 6);
             
            if (mimeType.trim().startsWith(TXT_TYPE))
            {

@@ -810,15 +810,23 @@ div.dashlet div.hdr
 
 /* 3 column layout */
 
-.yui-gb.grid .column1,
+.yui-gb.grid .column1
+{
+   width: 24%;
+   float: left;
+}
+
 .yui-gb.grid .column3
 {
    width: 24%;
+   float: right;
 }
 
 .yui-gb.grid .column2
 {
    width: 48%;
+   left: 24%;
+   position: absolute;
 }
 
 /* 4 column layout */

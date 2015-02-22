@@ -18,9 +18,9 @@
  */
 package org.alfresco.share.workflow;
 
-import org.alfresco.share.util.AbstractWorkflow;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
+import org.alfresco.share.util.AbstractWorkflow;
+import org.alfresco.test.FailedTestListener;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 

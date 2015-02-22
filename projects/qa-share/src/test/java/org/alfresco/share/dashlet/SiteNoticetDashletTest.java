@@ -18,8 +18,14 @@
  */
 package org.alfresco.share.dashlet;
 
-import org.alfresco.po.share.dashlet.*;
+import org.alfresco.po.share.dashlet.ConfigureSiteNoticeDialogBoxPage;
+import org.alfresco.po.share.dashlet.ConfigureSiteNoticeTinyMceEditor;
+import org.alfresco.po.share.dashlet.HtmlSourceEditorPage;
+import org.alfresco.po.share.dashlet.InsertOrEditAnchorPage;
+import org.alfresco.po.share.dashlet.InsertOrEditImagePage;
+import org.alfresco.po.share.dashlet.InsertOrEditLinkPage;
 import org.alfresco.po.share.dashlet.InsertOrEditLinkPage.InsertLinkPageTargetItems;
+import org.alfresco.po.share.dashlet.SiteNoticeDashlet;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.enums.TinyMceColourCode;
 import org.alfresco.po.share.site.SiteDashboardPage;
@@ -29,8 +35,8 @@ import org.alfresco.share.util.ConfigureSiteNoticeActions;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.api.CreateUserAPI;
+import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageException;
-import org.alfresco.webdrone.testng.listener.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;

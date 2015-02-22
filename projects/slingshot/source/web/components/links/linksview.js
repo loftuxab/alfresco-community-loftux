@@ -123,6 +123,9 @@
        * @see setBusy/releaseBusy
        */
       busy: false,
+      
+      PROTOCOL_STR_DELIM : /((.*):\/\/(.*))/,
+      PORT_STR_DELIM : /^((.*):(\d{1,})((\/.*){0,}))/,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -245,9 +248,33 @@
          var html = '';
          html += '<div id="' + this.id + '-linksview" class="node linksview theme-bg-2">';
          html += Alfresco.util.links.generateLinksActions(this, data, 'div');
+         
+         var needHttpPrefix = function(userUrl)
+         {
+            // check for "://" in URI
+            if (me.PROTOCOL_STR_DELIM.test(userUrl))
+            {
+               return false;
+            }
+            
+            // check for digits after ":"
+            if (me.PORT_STR_DELIM.test(userUrl))
+            {
+               return true;
+            }
+            
+            // URI with port was filtered in previous block. Therefore URI with ":" no need "http" prefix
+            if (userUrl.indexOf(":")> -1)
+            {
+               return false;
+            }
+            
+            // default value
+            return true;
+         };
 
          // Prepare url attribute
-         var href = (data.url.substring(0, 1) === "/" || data.url.indexOf("://") !== -1 ? '' : "http://") + data.url.replace(/"/g, encodeURIComponent('"'));
+         var href = (needHttpPrefix(data.url) ? 'http://' : '') + data.url.replace(/"/g, encodeURIComponent('"'));
 
          // Link details
          html += '<div class="nodeContent">';

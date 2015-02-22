@@ -152,6 +152,14 @@ public class CoreTracker implements Tracker
 
     private int socketTimeout = 120000;
 
+    private int reportBatchcount;
+
+    private long reportTimeStep;
+
+    private int trackerBatchcount;
+
+    private long trackerTimeStep;
+
     private String id;
 
     private ConcurrentLinkedQueue<Long> transactionsToReindex = new ConcurrentLinkedQueue<Long>();
@@ -267,6 +275,10 @@ public class CoreTracker implements Tracker
         maxLiveSearchers =  Integer.parseInt(p.getProperty("alfresco.maxLiveSearchers", "2"));
         isSlave =  Boolean.parseBoolean(p.getProperty("enable.slave", "false"));
         isMaster =  Boolean.parseBoolean(p.getProperty("enable.master", "true"));
+        reportBatchcount = Integer.parseInt(p.getProperty("alfresco.report.batchcount", "2000"));
+        reportTimeStep = Long.parseLong(p.getProperty("alfresco.report.timestep", "3600000"));
+        trackerBatchcount = Integer.parseInt(p.getProperty("alfresco.tracker.batchcount", "2000"));
+        trackerTimeStep = Long.parseLong(p.getProperty("alfresco.tracker.timestep", "3600000"));
 
         this.trackerStats = new TrackerStats(this.infoSrv);
         
@@ -930,7 +942,7 @@ public class CoreTracker implements Tracker
             int docCount = 0;
 
             Long fromCommitTime =  getTxFromCommitTime(txnsFound, state.getLastGoodTxCommitTimeInIndex());
-            transactions = getSomeTransactions(txnsFound, fromCommitTime, 60*60*1000L, 2000, state.getTimeToStopIndexing());
+            transactions = getSomeTransactions(txnsFound, fromCommitTime, trackerTimeStep, trackerBatchcount, state.getTimeToStopIndexing());
 
             Long maxTxnCommitTime = transactions.getMaxTxnCommitTime();
             if(maxTxnCommitTime != null)
@@ -1051,7 +1063,7 @@ public class CoreTracker implements Tracker
         do
         {
             Long fromCommitTime =  getChangeSetFromCommitTime(changeSetsFound, state.getLastGoodChangeSetCommitTimeInIndex());
-            aclChangeSets = getSomeAclChangeSets(changeSetsFound, fromCommitTime, 60*60*1000L, 2000, state.getTimeToStopIndexing());
+            aclChangeSets = getSomeAclChangeSets(changeSetsFound, fromCommitTime, trackerTimeStep, trackerBatchcount, state.getTimeToStopIndexing());
 
             Long maxChangeSetCommitTime = aclChangeSets.getMaxChangeSetCommitTime();
             if(maxChangeSetCommitTime != null)
@@ -1680,7 +1692,7 @@ public class CoreTracker implements Tracker
         long endTime = System.currentTimeMillis() + infoSrv.getHoleRetention();
         DO: do
         {
-            transactions = getSomeTransactions(txnsFound, lastTxCommitTime, 1000*60*60L, 2000, endTime);
+            transactions = getSomeTransactions(txnsFound, lastTxCommitTime, reportTimeStep, reportBatchcount, endTime);
             for (Transaction info : transactions.getTransactions())
             {
                 // include
@@ -1740,7 +1752,7 @@ public class CoreTracker implements Tracker
         BoundedDeque<AclChangeSet> changeSetsFound = new  BoundedDeque<AclChangeSet>(100);
         DO: do
         {
-            aclTransactions = getSomeAclChangeSets(changeSetsFound, lastAclTxCommitTime, 1000*60*60L, 2000, endTime);
+            aclTransactions = getSomeAclChangeSets(changeSetsFound, lastAclTxCommitTime, reportTimeStep, reportBatchcount, endTime);
             for (AclChangeSet set : aclTransactions.getAclChangeSets())
             {
                 // include

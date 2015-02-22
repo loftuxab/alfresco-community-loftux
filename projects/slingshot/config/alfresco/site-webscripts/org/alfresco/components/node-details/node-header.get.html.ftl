@@ -37,11 +37,12 @@
                <!-- Message banner -->
                <#if showOnlyLocation == "false">
                   <#if item.workingCopy??>
-                     <#assign modifyLabel = "label.editing-started-on-date-by-user">
                      <#if item.workingCopy.isWorkingCopy??>
                         <#assign lockUser = node.properties["cm:workingCopyOwner"]>
+                        <#assign modifyLabel = "label.editing-started-on-date-by-user">
                      <#else>
                         <#assign lockUser = node.properties["cm:lockOwner"]>
+                        <#assign modifyLabel = "label.modified-by-user-on-date">
                      </#if>
                      <#if lockUser??>
                         <div class="status-banner theme-bg-color-2 theme-border-4">
