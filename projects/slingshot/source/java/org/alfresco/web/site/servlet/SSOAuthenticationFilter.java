@@ -18,6 +18,9 @@
  */
 package org.alfresco.web.site.servlet;
 
+import static org.alfresco.web.site.SlingshotPageView.REDIRECT_QUERY;
+import static org.alfresco.web.site.SlingshotPageView.REDIRECT_URI;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Principal;
@@ -25,6 +28,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -76,16 +81,13 @@ import org.springframework.extensions.surf.exception.PlatformRuntimeException;
 import org.springframework.extensions.surf.site.AuthenticationUtil;
 import org.springframework.extensions.surf.types.Page;
 import org.springframework.extensions.surf.util.Base64;
-import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.Description.RequiredAuthentication;
+import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.connector.Connector;
 import org.springframework.extensions.webscripts.connector.ConnectorContext;
 import org.springframework.extensions.webscripts.connector.ConnectorService;
 import org.springframework.extensions.webscripts.connector.Response;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import static org.alfresco.web.site.SlingshotPageView.REDIRECT_URI;
-import static org.alfresco.web.site.SlingshotPageView.REDIRECT_QUERY;
 
 /**
  * SSO Authentication Filter Class for web-tier, supporting NTLM and Kerberos challenges from the repository tier.
@@ -115,6 +117,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     private static final String PAGE_SERVLET_PATH = "/page";
     private static final String LOGIN_PATH_INFORMATION = "/dologin";
     private static final String LOGIN_PARAMETER = "login";
+    private static final String ERROR_PARAMETER = "error";
     private static final String IGNORE_LINK = "/accept-invite";
     private static final String UNAUTHENTICATED_ACCESS_PROXY = "/proxy/alfresco-noauth";
 
@@ -122,6 +125,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     private String endpoint;
     private ServletContext servletContext;
     private String userHeader;
+    private Pattern userIdPattern;
     private SlingshotLoginController loginController;
 
     // Kerberos settings
@@ -164,6 +168,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     {
         if (logger.isDebugEnabled())
             logger.debug("Initializing the SSOAuthenticationFilter.");
+
         // get reference to our ServletContext
         this.servletContext = args.getServletContext();
 
@@ -177,12 +182,10 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         ConfigService configService = (ConfigService)context.getBean("web.config");
 
         // Retrieve the remote configuration
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement(
-                "remote");
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
         if (remoteConfig == null)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("There is no remote configuration.");
+            logger.error("There is no Remote configuration element. This is required to use SSOAuthenticationFilter.");
             return;
         }
 
@@ -190,8 +193,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         String endpoint = args.getInitParameter("endpoint");
         if (endpoint == null)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("There is no endpoint id in the configuration.");
+            logger.error("There is no 'endpoint' id in the SSOAuthenticationFilter init parameters. Cannot initialise filter.");
             return;
         }
 
@@ -200,30 +202,39 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         if (endpointDescriptor == null || !endpointDescriptor.getExternalAuth())
         {
             if (logger.isDebugEnabled())
-                logger.debug("Could not get endpoint descriptor for " + endpoint);
+                logger.debug("No External Auth endpoint configured for " + endpoint);
             return;
         }
 
-        // Save the endpoint, activating the filter
-        this.endpoint = endpoint;
-        if (logger.isDebugEnabled())
-            logger.debug("Endpoint is " + endpoint);
-
-        // Obtain the userHeader (if configured) from the alfresco connector
         try
         {
-            userHeader = connectorService.getConnector(endpoint).getConnectorSession().getParameter(SlingshotAlfrescoConnector.CS_PARAM_USER_HEADER);
+            Connector conn = this.connectorService.getConnector(endpoint);
+
+            // Save the endpoint, activating the filter
+            this.endpoint = endpoint;
             if (logger.isDebugEnabled())
+                logger.debug("Endpoint is " + endpoint);
+
+            // Obtain the userHeader (if configured) from the alfresco connector
+            this.userHeader = conn.getConnectorSession().getParameter(SlingshotAlfrescoConnector.CS_PARAM_USER_HEADER);
+            String userIdPattern = conn.getConnectorSession().getParameter(SlingshotAlfrescoConnector.CS_PARAM_USER_ID_PATTERN);
+            if (userIdPattern != null)
+            {
+                this.userIdPattern = Pattern.compile(userIdPattern);
+            }
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("userHeader is " + userHeader);
+                logger.debug("userIdPattern is " + userIdPattern);
+            }
         }
         catch (ConnectorServiceException e)
         {
-            logger.error("Expected to find a connector for the endpoint "+endpoint, e);
+            logger.error("Unable to find connector " + endpointDescriptor.getConnectorId() + " for the endpoint " + endpoint, e);
         }
 
         // retrieve the optional kerberos configuration
-        KerberosConfigElement krbConfig = (KerberosConfigElement) configService.getConfig("Kerberos").getConfigElement(
-                "kerberos");
+        KerberosConfigElement krbConfig = (KerberosConfigElement) configService.getConfig("Kerberos").getConfigElement("kerberos");
         if (krbConfig != null)
         {
             if (logger.isDebugEnabled())
@@ -343,8 +354,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
      */
     private ServletRequest wrapHeaderAuthenticatedRequest(ServletRequest sreq)
     {
-        if (userHeader != null &&
-            sreq instanceof HttpServletRequest)
+        if (userHeader != null && sreq instanceof HttpServletRequest)
         {
             final HttpServletRequest req = (HttpServletRequest)sreq;
             sreq = new HttpServletRequestWrapper(req)
@@ -353,11 +363,41 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                 public String getRemoteUser()
                 {
                     String remoteUser = req.getHeader(userHeader);
-                    if (remoteUser == null)
+                    if (remoteUser != null)
+                    {
+                        remoteUser = extractUserFromProxyHeader(remoteUser);
+                    }
+                    else
                     {
                         remoteUser = super.getRemoteUser();
                     }
                     return remoteUser;
+                }
+
+                /**
+                 * Extracts a user ID from the proxy header. If a user ID pattern has been configured returns the contents of the
+                 * first matching regular expression group or <code>null</code>. Otherwise returns the trimmed header contents or
+                 * <code>null</code>.
+                 */
+                private String extractUserFromProxyHeader(String userId)
+                {
+                    if (userIdPattern == null)
+                    {
+                        userId = userId.trim();
+                    }
+                    else
+                    {
+                        Matcher matcher = userIdPattern.matcher(userId);
+                        if (matcher.matches())
+                        {
+                            userId = matcher.group(1).trim();
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    return userId.length() == 0 ? null : userId;
                 }
             };
         }
@@ -465,6 +505,27 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
 
             redirectToLoginPage(req, res);
             return;
+        }
+
+        // If userHeader (X-Alfresco-Remote-User or similar) external auth - does not require a challenge/response
+        if (this.userHeader != null)
+        {
+            String userId = AuthenticationUtil.getUserId(req);
+            if (userId != null)
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("userHeader external auth - skipping auth filter...");
+                setExternalAuthSession(session);
+                onSuccess(req, res, session, req.getRemoteUser());
+                chain.doFilter(sreq, sresp);
+                return;
+            }
+            else
+            {
+                // initial external user login requires a ping check to authenticate remote Session
+                challengeOrPassThrough(chain, req, res, session);
+                return;
+            }
         }
 
         // Check if there is an authorization header with a challenge response
@@ -743,17 +804,27 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
             // In this mode we can only use vaulted credentials. Do not proxy any request headers.
             String userId = AuthenticationUtil.getUserId(req);
 
-            // If we are as yet unauthenticated but have external authentication, do the ping check as the external user.
-            // This will either establish the session or throw us out to log in as someone else!
             if (userId == null)
             {
+                // If we are as yet unauthenticated but have external authentication, do a ping check as the external user.
+                // This will either establish the session or throw us out to log in as someone else!
                 userId = req.getRemoteUser();
+             // Set the external auth flag so the UI knows we are using SSO etc.
+                session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
                 if (userId != null && logger.isDebugEnabled())
                     logger.debug("Initial login from externally authenticated user " + userId);
-
+                setExternalAuthSession(session);
             }
-            else if (logger.isDebugEnabled())
-                logger.debug("Validating repository session for  " + userId);
+            else
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("Validating repository session for " + userId);
+            }
+
+            if (userId != null && !userId.equalsIgnoreCase(req.getRemoteUser()) && session.getAttribute(NTLM_AUTH_DETAILS) == null)
+            {
+                session.removeAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH);
+            }
 
             Connector conn = connectorService.getConnector(this.endpoint, userId, session);
 
@@ -1111,9 +1182,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                     if (logger.isDebugEnabled())
                         logger.debug("User logged on via NTLM, " + ntlmDetails);
 
-                    // Set the external auth flag so the UI knows we are using SSO etc.
-                    session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
-
+                    setExternalAuthSession(session);
                     onSuccess(req, res, session, userName);
 
                     // Allow the user to access the requested page
@@ -1141,7 +1210,9 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
         if (logger.isDebugEnabled())
             logger.debug("Redirecting to the login page.");
         setRedirectUrl(req);
-        res.sendRedirect(req.getContextPath() + "/page?pt=login");
+
+        String error = req.getParameter(ERROR_PARAMETER);
+        res.sendRedirect(req.getContextPath() + "/page?pt=login" + (error == null ? "" : "&" + ERROR_PARAMETER + "=" + error));
     }
 
     /**
@@ -1151,7 +1222,7 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
      */
     private ApplicationContext getApplicationContext()
     {
-    	return WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+      return WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
     }
 
     /**
@@ -1300,25 +1371,22 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
 
                     if (Status.STATUS_OK == remoteRes.getStatus().getCode() ||
                             Status.STATUS_TEMPORARY_REDIRECT == remoteRes.getStatus().getCode())
-                   {
-                       if (logger.isDebugEnabled())
-                           logger.debug("Authentication succeded on the repo side.");
-                       // Create User ID in session so the web-framework dispatcher knows we have logged in
-                       session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userName);
+                    {
+                        if (logger.isDebugEnabled())
+                           logger.debug("Authentication succeeded on the repo side.");
 
-                       // Set the external auth flag so the UI knows we are using SSO etc.
-                       session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
+                        setExternalAuthSession(session);
+                        onSuccess(req, res, session, userName);
+                    }
+                    else if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode())
+                    {
+                        if (logger.isDebugEnabled())
+                            logger.debug("Authentication failed on repo side - beging login process again.");
+                        res.setHeader(HEADER_WWWAUTHENTICATE, authHdr);
+                        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-                       onSuccess(req, res, session, userName);
-
-                   } else if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode()) {
-                       if (logger.isDebugEnabled())
-                           logger.debug("Authentication failed on repo side - beging login process again.");
-                       res.setHeader(HEADER_WWWAUTHENTICATE, authHdr);
-                       res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-                       res.flushBuffer();
-                   }
+                        res.flushBuffer();
+                    }
                 }
                 else
                 {
@@ -1331,11 +1399,9 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
                      Status.STATUS_TEMPORARY_REDIRECT == remoteRes.getStatus().getCode())
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Authentication succeded on the repo side.");
+                    logger.debug("Authentication succeeded on the repo side.");
 
-                // Set the external auth flag so the UI knows we are using SSO etc.
-                session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
-
+                setExternalAuthSession(session);
                 onSuccess(req, res, session, userName);
             }
             else
@@ -1362,11 +1428,6 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
      */
     private void setRedirectUrl(HttpServletRequest req)
     {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Setting redirect url: " + req.getRequestURI() + " QueryString: " + req.getQueryString());
-        }
-
         HttpSession session = req.getSession();
         session.setAttribute(REDIRECT_URI, req.getRequestURI());
         if (req.getQueryString() != null)
@@ -1376,30 +1437,37 @@ public class SSOAuthenticationFilter implements Filter, CallbackHandler
     }
 
     /**
-     * Success login method handler, uses logic of {@link SlingshotLoginController} to retrieve all of the user's groups
+     * Set the external auth Session flag so the UI knows we are using SSO.
+     * A number of elements in an application may depend on this state e.g. Logout button shown etc.
+     *
+     * @param session
+     */
+    private void setExternalAuthSession(HttpSession session)
+    {
+        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
+    }
+
+    /**
+     * Success login method handler.
      *
      * @param req current http request
      * @param res current http response
      * @param session current session
      * @param username logged in user name
-     *
      */
     private void onSuccess(HttpServletRequest req, HttpServletResponse res, HttpSession session, String username)
     {
+        // Ensure User ID is in session so the web-framework knows we have logged in
+        session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
+
         try
         {
-            if (session.getAttribute(SlingshotLoginController.SESSION_ATTRIBUTE_KEY_USER_GROUPS) == null)
-            {
-                // Create User ID in session so the web-framework dispatcher knows we have logged in
-                session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
-
-                // ACE-3257 fix, retrieve all of the groups that the user is a member of...
-                loginController.onSuccess(req, res);
-            }
+            // Inform the Slingshot login controller of a successful login attempt as further processing may be required
+            this.loginController.beforeSuccess(req, res);
         }
         catch (Exception e)
         {
-            throw new AlfrescoRuntimeException("Unable to retrieve groups for currently logged in user!", e);
+            throw new AlfrescoRuntimeException("Error during loginController.onSuccess()", e);
         }
     }
 }
