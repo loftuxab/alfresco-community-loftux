@@ -221,16 +221,17 @@ public class Navigation extends SharePage
      */
     public boolean isReportingVisible()
     {
+        boolean isReportingVisible = false;
         try
         {
-            WebElement documentTitle = drone.find(By.cssSelector(REPORTING));
-            return documentTitle.isDisplayed();
+            WebElement element = drone.find(By.cssSelector(REPORTING));
+            isReportingVisible = element.isDisplayed();
         }
-        catch (NoSuchElementException nse)
+        catch (NoSuchElementException te)
         {
-            logger.error("No Reporting menu in the header " + nse);
-            throw new PageException("Unable to find Reporting menu in the header.", nse);
         }
+        return isReportingVisible;
+
     }
     
     /**
