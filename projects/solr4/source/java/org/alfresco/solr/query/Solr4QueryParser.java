@@ -3799,8 +3799,12 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             }
             for (Locale locale : (((expandedLocales == null) || (expandedLocales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : expandedLocales))
             {
-
-                addTextAttributeQuery(field, propertyDef, queryText, subQueryBuilder, analysisMode, luceneFunction, expandedFieldName, tokenisationMode, booleanQuery, locale);
+                Locale fixedLocale = locale;
+                if(fixedLocale.getLanguage().equals("*"))
+                {
+                    fixedLocale = new Locale("??");
+                }
+                addTextAttributeQuery(field, propertyDef, queryText, subQueryBuilder, analysisMode, luceneFunction, expandedFieldName, tokenisationMode, booleanQuery, fixedLocale);
 
             }
             return getNonEmptyBooleanQuery(booleanQuery);
