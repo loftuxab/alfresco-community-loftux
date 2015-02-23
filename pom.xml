@@ -127,7 +127,7 @@
     <module>modules/wcmquickstart</module>
     <module>projects/web-editor-samples/customer-site</module>
     <module>projects/mmt</module>
-    <module>projects/share-po</module>
+    <!--<module>projects/share-po</module>-->
     <module>projects/sdk/alfresco-platform-distribution</module>
   </modules>
 
