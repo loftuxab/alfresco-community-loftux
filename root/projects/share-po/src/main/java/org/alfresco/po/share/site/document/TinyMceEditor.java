@@ -292,10 +292,8 @@ public class TinyMceEditor extends HtmlElement
      */
     public void clickUndo()
     {
-        drone.executeJavaScript("$(\"i[class$='mce-i-undo']\").click();");
         setFormatType(FormatType.UNDO);
         clickElementOnRichTextFormatter(getCSSOfFormatType());
-
     }
 
     /**
@@ -321,7 +319,6 @@ public class TinyMceEditor extends HtmlElement
      */
     public void clickRedo()
     {
-        drone.executeJavaScript("$(\"i[class$='mce-i-redo']\").click();");
         setFormatType(FormatType.REDO);
         clickElementOnRichTextFormatter(getCSSOfFormatType());
     }
