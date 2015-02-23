@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
- 
+
 <beans>
 
     <!-- ContentStore subsystem that allows switching between different types e.g. unencrypted and encrypted -->
@@ -59,12 +59,12 @@
             </list>
         </property>
     </bean>
-       
+
    <!-- This content limit provider is used above (and can also be overriden, eg. by modules). -->
    <bean id="defaultContentLimitProvider" class="org.alfresco.repo.content.ContentLimitProvider$SimpleFixedLimitProvider">
        <property name="sizeLimitString" value="${system.content.maximumFileSizeLimit}"/>
    </bean>
-   
+
    <!-- deleted content will get pushed into this store, where it can be cleaned up at will -->
    <bean id="deletedContentStore" class="org.alfresco.repo.content.filestore.FileContentStore">
       <constructor-arg>
@@ -77,7 +77,7 @@
          <ref bean="deletedContentStore" />
       </property>
    </bean>
-   
+
    <!-- A list of content deletion listeners.  This is split out for re-use. -->
    <bean id="deletedContentBackupListeners" class="java.util.ArrayList">
       <constructor-arg>
@@ -86,7 +86,7 @@
          </list>
       </constructor-arg>
    </bean>
-   
+
    <!-- Performs the content cleanup -->
    <bean id="contentStoreCleaner" class="org.alfresco.repo.content.cleanup.ContentStoreCleaner" init-method="init">
       <property name="protectDays" >
@@ -124,7 +124,7 @@
          <ref bean="deletedContentBackupListeners" />
       </property>
    </bean>
-   
+
    <bean id="contentStoresToClean" class="java.util.ArrayList" >
       <constructor-arg>
          <list>
@@ -132,7 +132,7 @@
          </list>
       </constructor-arg>
    </bean>
-   
+
    <!-- Abstract bean definition defining base definition for content service -->
    <bean id="baseContentService" class="org.alfresco.repo.content.ContentServiceImpl" abstract="true" init-method="init">
       <property name="retryingTransactionHelper">
@@ -166,7 +166,7 @@
          <ref bean="transformerDebug" />
       </property>
    </bean>
-   
+
    <bean id="contentService" parent="baseContentService">
       <property name="store">
           <ref bean="fileContentStore" />
@@ -176,7 +176,7 @@
     <!-- Our common Tika configuration -->
     <bean id="tikaConfig" class="org.apache.tika.config.TikaConfig"
           factory-method="getDefaultConfig" />
-   
+
     <!-- Characterset decoder -->
     <bean id="charset.finder" class="org.alfresco.repo.content.encoding.ContentCharsetFinder">
       <property name="defaultCharset">
@@ -222,7 +222,7 @@
          <ref bean="tikaConfig"/>
       </property>
    </bean>
-   
+
    <bean id="contentFilterLanguagesConfigService" class="org.springframework.extensions.config.xml.XMLConfigService" init-method="init">
       <constructor-arg>
          <bean class="org.springframework.extensions.config.source.UrlConfigSource">
@@ -240,10 +240,10 @@
          <ref bean="contentFilterLanguagesConfigService" />
       </property>
    </bean>
-   
+
    <!-- Metadata Extraction Registry -->
    <bean id="metadataExtracterRegistry" class="org.alfresco.repo.content.metadata.MetadataExtracterRegistry" />
-   
+
    <!-- Abstract bean definition defining base definition for all metadata extracters -->
    <bean id="baseMetadataExtracter"
          class="org.alfresco.repo.content.metadata.AbstractMetadataExtracter"
@@ -262,7 +262,7 @@
          <ref bean="global-properties" />
       </property>
    </bean>
-   
+
    <!-- For coordination between OOoDirect and OOoJodconverter subsystems -->
    <bean id="jodConfig"
         class="org.alfresco.repo.management.subsystems.SubsystemProxyFactory">
@@ -285,7 +285,7 @@
          </bean>
       </property>
    </bean>
-   
+
    <!-- Import the OpenOffice extractor worker from the OOoDirect subsystem -->
    <bean id="extracter.worker.OpenOffice" class="org.alfresco.repo.management.subsystems.SubsystemProxyFactory">
       <property name="sourceApplicationContextFactory">
@@ -440,7 +440,7 @@
          </list>
       </property>
    </bean>
-   
+
    <!-- Logger for transformer log that may be accessed via JMX -->
    <bean id="transformerLog" class="org.alfresco.repo.management.subsystems.SubsystemProxyFactory">
       <property name="sourceApplicationContextFactory">
@@ -467,10 +467,10 @@
       </property>
        <property name="retryTransformOnDifferentMimeType" value="${content.transformer.retryOn.different.mimetype}"/>
    </bean>
-   
+
    <!-- Abstract bean definition defining base definition for all transformer that are not registered.
         Since 4.2 normally defined as available=false transformers in Alfresco global properties
-        rather than in Spring XML. 
+        rather than in Spring XML.
     -->
    <bean id="unregisteredBaseContentTransformer"
          class="org.alfresco.repo.content.transform.AbstractContentTransformer2"
@@ -489,7 +489,7 @@
          <ref bean="contentTransformerRegistry" />
       </property>
    </bean>
-   
+
    <!-- Abstract bean definition defining base definition for all complex transformers.
         Since 4.2 normally defined as 'pipeline' transformers in Alfresco global properties
         rather than in Spring XML.
@@ -503,7 +503,7 @@
          <ref bean="contentService" />
       </property>
    </bean>
-   
+
    <!-- Content Transformations -->
    <bean id="transformer.StringExtracter"
          class="org.alfresco.repo.content.transform.StringExtractingContentTransformer"
@@ -511,7 +511,7 @@
 
    <bean id="transformer.BinaryPassThrough"
          class="org.alfresco.repo.content.transform.BinaryPassThroughContentTransformer"
-         parent="baseContentTransformer" />     
+         parent="baseContentTransformer" />
 
    <bean id="transformer.iWorksQuicklooks"
          class="org.alfresco.repo.content.transform.AppleIWorksContentTransformer"
@@ -528,7 +528,7 @@
          parent="baseContentTransformer" >
          <property name="documentSelector" ref="pdfBoxEmbededDocumentSelector" />
    </bean>
-   
+
    <bean id="transformer.PdfBox.TextToPdf"
          class="org.alfresco.repo.content.transform.TextToPdfContentTransformer"
          parent="baseContentTransformer" >
@@ -564,7 +564,7 @@
          class="org.alfresco.repo.content.transform.HtmlParserContentTransformer"
          parent="baseContentTransformer" >
    </bean>
-   
+
    <bean id="transformer.MediaWikiParser"
          class="org.alfresco.repo.content.transform.MediaWikiContentTransformer"
          parent="baseContentTransformer">
@@ -596,14 +596,26 @@
          <ref bean="transformer.worker.OpenOffice" />
       </property>
    </bean>
-         
+
    <bean id="transformer.OutlookMsg"
          class="org.alfresco.repo.content.transform.MailContentTransformer"
          parent="baseContentTransformer" />
-         
+
    <bean id="transformer.RFC822"
          class="org.alfresco.repo.content.transform.EMLTransformer"
-         parent="baseContentTransformer" />
+         parent="baseContentTransformer" >
+      <property name="transformTo">
+         <value>text</value>
+      </property>
+   </bean>
+   <bean id="transformer.RFC822HTML"
+         class="org.alfresco.repo.content.transform.EMLTransformer"
+         parent="baseContentTransformer" >
+      <property name="transformTo">
+         <value>html</value>
+      </property>
+   </bean>
+
 
    <!-- Import the ImageMagick transformer from the third party subsystem -->
    <bean id="transformer.worker.ImageMagick" class="org.alfresco.repo.management.subsystems.SubsystemProxyFactory">
@@ -626,7 +638,7 @@
       </property>
    </bean>
 
-   <!-- This transformer allows for the indexing and therefore searching of zip files. -->   
+   <!-- This transformer allows for the indexing and therefore searching of zip files. -->
    <bean id="transformer.Archive"
          class="org.alfresco.repo.content.transform.ArchiveContentTransformer"
          parent="baseContentTransformer" >
