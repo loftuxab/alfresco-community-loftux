@@ -2510,7 +2510,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
                 if (propertyDef.getDataType().getName().equals(DataTypeDefinition.MLTEXT))
                 {
-                    throw new UnsupportedOperationException("Range is not supported against ml-text");
+                    return buildTextMLTextOrContentRange(field, part1, part2, includeLower, includeUpper, analysisMode, expandedFieldName, propertyDef, tokenisationMode);
                 }
                 else if (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
                 {
@@ -2558,32 +2558,12 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                     }
                     else 
                     {
-                        throw new UnsupportedOperationException("Range is not supported against content");
+                        return buildTextMLTextOrContentRange(field, part1, part2, includeLower, includeUpper, analysisMode, expandedFieldName, propertyDef, tokenisationMode);
                     }
                 }
                 else if (propertyDef.getDataType().getName().equals(DataTypeDefinition.TEXT))
                 {
-                    BooleanQuery booleanQuery = new BooleanQuery();
-                    List<Locale> locales = searchParameters.getLocales();
-                    List<Locale> expandedLocales = new ArrayList<Locale>();
-                    for (Locale locale : (((locales == null) || (locales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : locales))
-                    {
-                        expandedLocales.addAll(MLAnalysisMode.getLocales(mlAnalysisMode, locale, false));
-                    }
-                    for (Locale locale : (((expandedLocales == null) || (expandedLocales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : expandedLocales))
-                    {
-
-                        try
-                        {
-                            addTextRange(field, propertyDef, part1, part2, includeLower, includeUpper, analysisMode, expandedFieldName, propertyDef, tokenisationMode, booleanQuery, locale);
-                        }
-                        catch (IOException e)
-                        {
-                            throw new ParseException("Failed to tokenise: <"+ part1 + "> or <" +part2 +">   for " + propertyDef.getName() );
-                        }
-
-                    }
-                    return booleanQuery;
+                    return buildTextMLTextOrContentRange(field, part1, part2, includeLower, includeUpper, analysisMode, expandedFieldName, propertyDef, tokenisationMode);
                 }
                 else if (propertyDef.getDataType().getName().equals(DataTypeDefinition.DATETIME) || propertyDef.getDataType().getName().equals(DataTypeDefinition.DATE))
                 {
@@ -2692,6 +2672,45 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             // None property - leave alone
             throw new UnsupportedOperationException();
         }
+    }
+
+    /**
+     * @param field
+     * @param part1
+     * @param part2
+     * @param includeLower
+     * @param includeUpper
+     * @param analysisMode
+     * @param expandedFieldName
+     * @param propertyDef
+     * @param tokenisationMode
+     * @return
+     * @throws ParseException
+     */
+    private Query buildTextMLTextOrContentRange(String field, String part1, String part2, boolean includeLower, boolean includeUpper, AnalysisMode analysisMode,
+            String expandedFieldName, PropertyDefinition propertyDef, IndexTokenisationMode tokenisationMode) throws ParseException
+    {
+        BooleanQuery booleanQuery = new BooleanQuery();
+        List<Locale> locales = searchParameters.getLocales();
+        List<Locale> expandedLocales = new ArrayList<Locale>();
+        for (Locale locale : (((locales == null) || (locales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : locales))
+        {
+            expandedLocales.addAll(MLAnalysisMode.getLocales(mlAnalysisMode, locale, false));
+        }
+        for (Locale locale : (((expandedLocales == null) || (expandedLocales.size() == 0)) ? Collections.singletonList(I18NUtil.getLocale()) : expandedLocales))
+        {
+
+            try
+            {
+                addTextRange(field, propertyDef, part1, part2, includeLower, includeUpper, analysisMode, expandedFieldName, propertyDef, tokenisationMode, booleanQuery, locale);
+            }
+            catch (IOException e)
+            {
+                throw new ParseException("Failed to tokenise: <"+ part1 + "> or <" +part2 +">   for " + propertyDef.getName() );
+            }
+
+        }
+        return booleanQuery;
     }
 
 
