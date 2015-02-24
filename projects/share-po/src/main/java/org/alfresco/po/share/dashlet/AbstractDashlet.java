@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Michael Suzuki
  * @since 1.0
  */
-abstract class AbstractDashlet extends SharePage
+public abstract class AbstractDashlet extends SharePage
 {
     private static Log logger = LogFactory.getLog(AbstractDashlet.class);
     protected WebElement dashlet;

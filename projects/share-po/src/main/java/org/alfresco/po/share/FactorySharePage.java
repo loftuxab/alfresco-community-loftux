@@ -31,6 +31,7 @@ import org.alfresco.po.share.bulkimport.BulkImportPage;
 import org.alfresco.po.share.bulkimport.InPlaceBulkImportPage;
 import org.alfresco.po.share.bulkimport.StatusBulkImportPage;
 import org.alfresco.po.share.dashlet.ConfigureSiteNoticeDialogBoxPage;
+import org.alfresco.po.share.dashlet.Dashlet;
 import org.alfresco.po.share.dashlet.InsertOrEditLinkPage;
 import org.alfresco.po.share.dashlet.mydiscussions.CreateNewTopicPage;
 import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
@@ -142,11 +143,14 @@ public class FactorySharePage implements PageFactory
     protected static final String FAILURE_PROMPT = "div[id='prompt']";
     protected static final String SHARE_DIALOGUE = "div.hd, .dijitDialogTitleBar";
     protected static ConcurrentHashMap<String, Class<? extends SharePage>> pages;
+    protected static ConcurrentHashMap<String, Class<? extends Dashlet>> dashletPages;
     protected static final By SHARE_DIALOGUE_HEADER = By.cssSelector("div.hd");
     private static final String cloudSignInDialogueHeader = "Sign in to Alfresco in the cloud";
 
     static
     {
+        dashletPages = new ConcurrentHashMap<String, Class<? extends Dashlet>>();
+
         pages = new ConcurrentHashMap<String, Class<? extends SharePage>>();
         pages.put("dashboard", DashBoardPage.class);
         pages.put("site-dashboard", SiteDashboardPage.class);
@@ -245,12 +249,28 @@ public class FactorySharePage implements PageFactory
         pages.put("manage-users", AccountSettingsPage.class);
         pages.put("transformations", AlfrescoTransformationServerHistoryPage.class);
         pages.put("transformation-server", AlfrescoTransformationServerStatusPage.class);
+ 
     }
 
     public HtmlPage getPage(WebDrone drone)
     {
         return resolvePage(drone);
     }
+ 
+    public Dashlet getDashletPage(WebDrone drone, String name)
+    {
+        return resolveDashletPage(drone, name);
+    }
+    
+    public static Dashlet resolveDashletPage(final WebDrone drone, final String name)
+    {
+         
+        return instantiateDashletPage(drone, dashletPages.get(name));
+   
+    }
+    
+    
+    
 
     /**
      * Creates the appropriate page object based on the current page the {@link WebDrone} is on.
@@ -322,6 +342,7 @@ public class FactorySharePage implements PageFactory
      * @param pageClassToProxy expected Page object
      * @return {@link SharePage} page response
      */
+    
     protected static <T extends HtmlPage> T instantiatePage(WebDrone drone, Class<T> pageClassToProxy)
     {
         if (drone == null)
@@ -358,6 +379,45 @@ public class FactorySharePage implements PageFactory
         }
     }
 
+    
+    
+    protected static <T extends Dashlet> T instantiateDashletPage(WebDrone drone, Class<T> pageClassToProxy)
+    {
+        if (drone == null)
+        {
+            throw new IllegalArgumentException("WebDrone is required");
+        }
+        if (pageClassToProxy == null)
+        {
+            throw new IllegalArgumentException("Page object is required for url: " + drone.getCurrentUrl());
+        }
+        try
+        {
+            try
+            {
+                Constructor<T> constructor = pageClassToProxy.getConstructor(WebDrone.class);
+                return constructor.newInstance(drone);
+            }
+            catch (NoSuchMethodException e)
+            {
+                return pageClassToProxy.newInstance();
+            }
+        }
+        catch (InstantiationException e)
+        {
+            throw new PageException(CREATE_PAGE_ERROR_MSG, e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new PageException(CREATE_PAGE_ERROR_MSG, e);
+        }
+        catch (InvocationTargetException e)
+        {
+            throw new PageException(CREATE_PAGE_ERROR_MSG, e);
+        }
+    }
+    
+    
     /**
      * Resolves the required page based on the URL containing a keyword
      * that identify's the page the drone is currently on. Once a the name

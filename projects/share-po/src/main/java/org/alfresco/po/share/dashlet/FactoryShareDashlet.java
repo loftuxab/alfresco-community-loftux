@@ -14,8 +14,6 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import org.alfresco.po.share.dashlet.HotContentReportDashlet;
-import org.alfresco.po.share.dashlet.UserActivityReportDashlet;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
@@ -143,14 +141,6 @@ public final class FactoryShareDashlet
             if ("my-meeting-workspaces".equalsIgnoreCase(name) || Dashlets.MY_MEETING_WORKSPACES.getDashletName().equalsIgnoreCase(name))
             {
                 return new MyMeetingWorkSpaceDashlet(drone);
-            }
-            if (Dashlets.HOT_CONTENT_REPORT_DASHLET.getDashletName().equalsIgnoreCase(name))
-            {
-                return new HotContentReportDashlet(drone);
-            }
-            if (Dashlets.USER_ACIVITY_REPORT_DASHLET.getDashletName().equalsIgnoreCase(name))
-            {
-                return new UserActivityReportDashlet(drone);
             }
             if ("my-profile".equalsIgnoreCase(name)|| Dashlets.MY_PROFILE.getDashletName().equalsIgnoreCase(name))
             {
