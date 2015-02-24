@@ -37,7 +37,7 @@ public class HotContentReportDashlet extends AdhocAnalyzerDashlet
     
     private static final String NO_DATA = "span[class='noDataHeader']";
     
-    protected HotContentReportDashlet(WebDrone drone)
+    public HotContentReportDashlet(WebDrone drone)
     {
         super(drone);
     }
@@ -60,6 +60,26 @@ public class HotContentReportDashlet extends AdhocAnalyzerDashlet
             logger.error("No This report has no data. message " + nse);
             throw new PageException("Unable to find This report has no data. message.", nse);
         }
-    }    
+    }   
+
+    /**
+     * Checks if Title is displayed in a dashlet header
+     * 
+     * @return
+     */
+    public String getTitle()
+    {
+        try
+        {
+            WebElement dashletTitle = drone.find(By.xpath("//div[contains(text(),'Hot Content Report')]"));
+            return dashletTitle.getText();
+        }
+        catch (NoSuchElementException nse)
+        {
+            logger.error("No Title in Hot Content Report Dashlet header " + nse);
+            throw new PageException("Unable to find title in Hot Content Report Dashlet header.", nse);
+        }
+    }     
+    
 
 }
