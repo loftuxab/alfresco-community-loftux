@@ -65,7 +65,7 @@ public class StaticAssetCacheFilter implements Filter
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
             ServletException
     {
-        ((HttpServletResponse)res).setHeader("Cache-Control", "public, must-revalidate, max-age=" + Long.toString(this.expire));
+        ((HttpServletResponse)res).setHeader("Cache-Control", "must-revalidate, max-age=" + Long.toString(this.expire));
         chain.doFilter(req, res);
     }
     
