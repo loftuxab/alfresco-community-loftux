@@ -133,3 +133,13 @@
 {
    overflow: visible !important;
 }
+
+.site-members .uninvite button
+{  max-width: 6.5em;
+   text-align: center;    
+}
+
+.site-members .yui-dt-last .uninvite
+{   
+   padding-right: 13px;
+}
