@@ -765,12 +765,14 @@ public class AdminTools extends AbstractUtils
         // create subgroup
         newGroupPage = groupPage.navigateToCreateNewSubGroup(testGroup1).render();
         groupPage = newGroupPage.createGroup(testSubGroup, testSubGroup, NewGroupPage.ActionButton.CREATE_GROUP).render();
+        webDriverWait(drone, 1000);
         assertEquals(groupPage.countGroupPresent(testSubGroup), 2);
 
         // add test group2 to the test group1
         groupPage.clickBrowse().render();
         AddGroupForm addGroupForm = groupPage.navigateToAddGroupForm(testGroup1).render();
         groupPage = addGroupForm.addGroup(testGroup2).render();
+        webDriverWait(drone, 1000);
         assertEquals(groupPage.countGroupPresent(testGroup2), 2);
 
         // add any user to the group
