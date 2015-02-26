@@ -528,13 +528,8 @@
             parent = container;
          }
 		 
-         Alfresco.util.PopupManager.displayPrompt(
-         {
-            title: this.msg("actions." + content + ".delete"),
-            text: displayPromptText,
-            noEscape: true,
-            zIndex: zIndex,
-            buttons: [
+         var buttons =
+         [
             {
                text: this.msg("button.delete"),
                handler: function dlA_onActionDelete_delete()
@@ -550,8 +545,50 @@
                   this.destroy();
                },
                isDefault: true
-            }]
-         }, parent);
+            }
+         ];
+			
+         if (jsNode.hasAspect("sync:syncSetMemberNode"))
+         {
+            displayPromptText += this.msg("actions.synced.remove-sync");
+            buttons.unshift({
+               text: this.msg("button.unsync"),
+               handler: function dlA_onActionCloudUnsync_unsync()
+               {
+                  var requestDeleteRemote = isCloud ? false : Dom.getAttribute("requestDeleteRemote", "checked");
+                    
+                  try
+                  {
+                     Alfresco.util.Ajax.request(
+                     {
+                        url: Alfresco.constants.PROXY_URI + "enterprise/sync/syncsetmembers/" + record.jsNode.nodeRef.uri + "?requestDeleteRemote=" + requestDeleteRemote,
+                        method: Alfresco.util.Ajax.DELETE,
+                        successCallback:{
+                           fn: function cloudSync_onCloudUnsync_success()
+                           {
+                              YAHOO.Bubbling.fire("metadataRefresh");
+                              Alfresco.util.PopupManager.displayMessage(
+                              {
+                                 text: me.msg("message.unsync.success")
+                              })
+                           },
+                           scope: me
+                        },
+                        failureMessage: me.msg("message.unsync.failure")
+                     });
+                  }
+                  catch (e) {}
+               }
+            });
+         }
+         
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: this.msg("actions." + content + ".delete"),
+            text: displayPromptText,
+            noEscape: true,
+            buttons: buttons
+         });
       },
 
       /**
