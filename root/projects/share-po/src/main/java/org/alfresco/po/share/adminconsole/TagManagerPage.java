@@ -143,7 +143,7 @@ public class TagManagerPage extends AdminConsolePage
         List<WebElement> resultsName = getTagsList();
         for (WebElement resultName : resultsName)
         {
-            String name = resultName.getText();
+            String name=resultName.findElement(By.cssSelector("a")).getAttribute("title");
             if (name.matches(tagName))
             {
                 return true;
@@ -186,7 +186,7 @@ public class TagManagerPage extends AdminConsolePage
 
         for(WebElement tag : tags)
         {
-            if(tag.getText().equals(tagName))
+            if(tag.findElement(By.cssSelector("a")).getAttribute("title").equals(tagName))
             {
                 return tag;
             }
