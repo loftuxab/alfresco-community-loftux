@@ -71,12 +71,12 @@ public class WikiPage extends SitePage
     private static final By FORMAT_BUTTON = By.xpath("//div[contains(@class,'mce-menubar')]//div[5]//button");
     private static final By FORMATS_BUTTON = By.xpath("//button/span[text()='Formats']");
     private static final By HEADINGS_BUTTON = By.xpath("//div[contains(@class,'expand')]/span[text()='Headings']");
-    private static final By HEADING_1 = By.xpath("//span[contains(@style,'32px')]");
-    private static final By HEADING_2 = By.xpath("//span[contains(@style,'24px')]");
-    private static final By HEADING_3 = By.xpath("//span[contains(@style,'18.7167px')]");
-    private static final By HEADING_4 = By.xpath("//span[contains(@style,'16px')]");
-    private static final By HEADING_5 = By.xpath("//span[contains(@style,'2833px')]");
-    private static final By HEADING_6 = By.xpath("//span[contains(@style,'10.7167px')]");
+    private static final By HEADING_1 = By.xpath("//span[contains(@style,'22px')]");
+    private static final By HEADING_2 = By.xpath("//span[contains(@style,'16.5px')]");
+    private static final By HEADING_3 = By.xpath("//span[contains(@style,'12.8667px')]");
+    private static final By HEADING_4 = By.xpath("//span[contains(@style,'11px')]");
+    private static final By HEADING_5 = By.xpath("//span[contains(@style,'9.1333px')]");
+    private static final By HEADING_6 = By.xpath("//span[contains(@style,'7.36667px')]");
     private static final By CLEAR_FORMAT_BUTTON = By.xpath("//div[contains(@class,'mce-menu-item')]/i[contains(@class,'removeformat')]/following-sibling::span");
     private static final By EDIT_BUTTON = By.xpath("//div[contains(@class,'mce-menubar')]//div[2]//button");
     private static final By SELECT_ALL_BUTTON = By.xpath("//div[contains(@class,'mce-menu-item')]/i[contains(@class,'selectall')]/following-sibling::span");
