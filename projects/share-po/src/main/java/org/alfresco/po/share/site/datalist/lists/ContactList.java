@@ -92,7 +92,7 @@ public class ContactList extends AbstractDataList
     public boolean isEditDisplayed(String itemName)
     {
         boolean isDisplayed;
-        WebElement theItem = locateAnItem(itemName);
+        WebElement theItem = locateItemActions(itemName);
         try
         {
             isDisplayed = theItem.findElement(EDIT_LINK).isEnabled();
