@@ -327,7 +327,10 @@ public class CopyOrMoveContentPage extends ShareDialogue
             {
                 if (destination.getText() != null)
                 {
-                    System.out.println("Destination test" + destination.getText());
+                    if(logger.isTraceEnabled())
+                    {
+                        logger.trace("Destination test" + destination.getText());
+                    }
                     if (destination.getText().equalsIgnoreCase(destinationName))
                     {
                         destination.click();
@@ -505,14 +508,14 @@ public class CopyOrMoveContentPage extends ShareDialogue
             {
 
                 if (folder.getText().equalsIgnoreCase(folderName))
-                    System.out.println("the folder is " + folder.getText());
-
+                    if(logger.isTraceEnabled())
+                    {
+                        logger.trace("the folder is " + folder.getText());
+                    }
                     folder.click();
-
             }
             catch (Exception e)
             {
-
                 if (logger.isTraceEnabled())
                 {
                     logger.trace("Unable to get the list of folders : ", e);
