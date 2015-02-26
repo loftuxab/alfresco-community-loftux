@@ -21,7 +21,9 @@ package org.springframework.extensions.webscripts.ui.common;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -60,6 +62,7 @@ public class StringUtils
     private static final String ATTR_FORMACTION = "FORMACTION";
     private static final String ATTR_FORMMETHOD = "FORMMETHOD";
     private static final String ATTR_ACTION = "ACTION";
+    private static final String ATTR_REL = "REL";
     
     /** default list - NOTE: see spring-webscripts-application-context.xml */
     /** JavaScript event handler attributes starting with "on" are always removed */
@@ -82,6 +85,16 @@ public class StringUtils
         attrGreyList.add(ATTR_FORMMETHOD);
         attrGreyList.add(ATTR_ACTION);
     }
+    
+    /** default list - NOTE: see spring-webscripts-application-context.xml */
+    protected static Map<String,Set<String>> attrValueBlackList = new HashMap<String, Set<String>>();
+    static
+    {
+        
+        Set<String> value = new HashSet<String>();
+        value.add("IMPORT");
+        attrValueBlackList.put(ATTR_REL, value);
+    }    
     
     /** default list - NOTE: see spring-webscripts-application-context.xml */
     protected static Set<String> tagWhiteList = new HashSet<String>(64);
@@ -164,6 +177,14 @@ public class StringUtils
     public void setAttributeBlackList(Set<String> attributes)
     {
         StringUtils.attrBlackList = attributes;
+    }
+
+    /**
+     * @param attrValueBlackList Map between HTML tag attributes and set of forbidden values to be removed
+     */
+    public  void setAttributeValueBlackList(Map<String, Set<String>> attrValueBlackList)
+    {
+        StringUtils.attrValueBlackList = attrValueBlackList;
     }
 
     /**
@@ -499,6 +520,21 @@ public class StringUtils
                                     if (!safeName.startsWith(ATTR_ON_PREFIX) && !attrBlackList.contains(safeName))
                                     {
                                         String value = attr.getRawValue();
+                                        
+                                        //Check for forbidden values on particular attribute
+                                        if (attrValueBlackList.containsKey(safeName))
+                                        {
+                                            if (attr.getValue() != null)
+                                            {
+                                                String test = attr.getValue().trim().toUpperCase();
+                                                Set<String> blackValues = attrValueBlackList.get(safeName);
+                                                if (blackValues.contains(test))
+                                                {
+                                                    value = "\"\"";
+                                                }
+                                            }
+                                        }
+                                        
                                         // sanitise src and href attributes
                                         if (attrGreyList.contains(safeName))
                                         {
