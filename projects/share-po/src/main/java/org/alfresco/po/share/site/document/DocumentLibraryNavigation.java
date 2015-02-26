@@ -2150,12 +2150,12 @@ public class DocumentLibraryNavigation extends SharePage
 
             if (AlfrescoVersion.Enterprise41.equals(drone.getProperties().getVersion()))
             {
-                return drone.findAndWait(By.cssSelector(CREATE_NEW_FOLDER_BUTTON)).isDisplayed();
+                return drone.find(By.cssSelector(CREATE_NEW_FOLDER_BUTTON)).isDisplayed();
 
             }
             else
             {
-                return drone.findAndWait(By.cssSelector("span.folder-file")).isDisplayed();
+                return drone.find(By.cssSelector("span.folder-file")).isDisplayed();
             }
 
         }
