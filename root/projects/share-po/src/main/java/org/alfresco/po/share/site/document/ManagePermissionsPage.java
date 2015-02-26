@@ -1100,14 +1100,21 @@ public class ManagePermissionsPage extends SharePage
      */
     public UserRole getUserRole(String userName)
     {
-        WebElement userRow = drone.findAndWait(By.xpath(String.format(userRowLocator, userName)));
-        String theRole = userRow.findElement(By.xpath("//td[contains(@class, 'role')]//button")).getText();
-        for (UserRole allTheRoles : UserRole.values())
+        try
         {
-            if (allTheRoles.getRoleName().equals(theRole))
+            WebElement userRow = drone.findAndWait(By.xpath(String.format(userRowLocator, userName)));
+            String theRole = userRow.findElement(By.xpath("//td[contains(@class, 'role')]//button")).getText();
+            for (UserRole allTheRoles : UserRole.values())
             {
-                return allTheRoles;
+                if (allTheRoles.getRoleName().equals(theRole))
+                {
+                    return allTheRoles;
+                }
             }
+        }
+        catch (TimeoutException | NoSuchElementException e)
+        {
+            throw new PageOperationException("Unable to find either row locator for given name, or Role drop down", e);
         }
         throw new PageOperationException("Unable to find the matching role for user");
     }
