@@ -49,6 +49,8 @@ public class SiteActivitiesDashlet extends AbstractDashlet implements Dashlet
     private static final String DEFAULT_TYPE_BUTTON = "button[id$='_default-activities-button']";
     private static final String DEFAULT_HISTORY_BUTTON = "button[id$='_default-range-button']";
     private static final By DASHLET_LIST_OF_FILTER = By.cssSelector("ul.first-of-type>li>a");
+    private static final By MY_ACTIVITIES_MORE_LINK = By
+            .xpath("//div[@class='activity']/following::div[@class='hidden']/preceding-sibling::div[@class='more']/a");
 
     private List<ShareLink> userLinks;
     private List<ShareLink> documetLinks;
@@ -88,7 +90,6 @@ public class SiteActivitiesDashlet extends AbstractDashlet implements Dashlet
         return this;
     }
 
-
     /**
      * Populates all the possible links that appear on the dashlet
      * data view, the links are of user, document or site.
@@ -100,7 +101,16 @@ public class SiteActivitiesDashlet extends AbstractDashlet implements Dashlet
         activityDescriptions = new ArrayList<String>();
         try
         {
-            List<WebElement> links = drone.findAll(By.cssSelector("div[id$='default-activityList'] > div.activity"));
+            List<WebElement> linksMore = drone.findAll(MY_ACTIVITIES_MORE_LINK);
+            if (!linksMore.isEmpty())
+            {
+                for (WebElement link : linksMore)
+                {
+                    link.click();
+                }
+            }
+
+            List<WebElement> links = drone.findAll(By.cssSelector("div[id$='default-activityList'] > div.activity div:last-child[class$='content']"));
             for (WebElement div : links)
             {
                 WebElement userLink = div.findElement(By.cssSelector("a:nth-of-type(1)"));
@@ -109,7 +119,7 @@ public class SiteActivitiesDashlet extends AbstractDashlet implements Dashlet
                 WebElement documentLink = div.findElement(By.cssSelector("a:nth-of-type(2)"));
                 documetLinks.add(new ShareLink(documentLink, drone));
 
-                WebElement desc = div.findElement(By.cssSelector("div.content>span.detail"));
+                WebElement desc = div.findElement(By.cssSelector("span.detail"));
                 activityDescriptions.add(desc.getText());
             }
         }
