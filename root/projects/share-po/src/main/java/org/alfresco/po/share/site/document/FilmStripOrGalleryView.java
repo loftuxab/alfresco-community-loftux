@@ -33,6 +33,7 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
     protected String TAG_INFO = "//div[@class='detail']/span[@class='insitu-edit']/../span[@class='item']";
     protected String TAG_ICON = "//h3/span/a[text()='%s']/../../../../../../../div/div[starts-with(@class,'alf-detail')]/div/div/div/span[@title='Tag']";
     protected static final String MODIFIED_F = "//div/span[contains(text(),'Modified')]";
+    protected static final By DOC_FOOTER = By.cssSelector("div[id$='default-doclistBarBottom']");
 
     public FilmStripOrGalleryView(String nodeRef, WebElement webElement, WebDrone drone)
     {
@@ -843,6 +844,11 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
         drone.mouseOverOnElement(drone.findAndWait(By.xpath("//div[contains(@id,'default-doclistBarBottom')]")));
     }
 
+    private void focusOnUpButton()
+    {
+        drone.mouseOverOnElement(drone.findAndWait(By.cssSelector("button[id$='_default-folderUp-button-button']")));
+    }
+
     @Override
     public void contentNameEnableEdit()
     {
@@ -1101,7 +1107,8 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
         boolean geoLocation = super.isGeoLocationIconDisplayed();
         WebElement element = drone.findFirstDisplayedElement(DETAIL_WINDOW);
         String id = element.getAttribute("id");
-        focusOnDocLibFooter();
+//        focusOnDocLibFooter();
+        focusOnUpButton();
         drone.waitUntilElementDisappears(By.id(id), 30);
         return geoLocation;
     }
@@ -1117,7 +1124,8 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
         boolean exifIcon = super.isEXIFIconDisplayed();
         WebElement element = drone.findFirstDisplayedElement(DETAIL_WINDOW);
         String id = element.getAttribute("id");
-        focusOnDocLibFooter();
+//        focusOnDocLibFooter();
+        focusOnUpButton();
         drone.waitUntilElementDisappears(By.id(id), 30);
         return exifIcon;
     }
