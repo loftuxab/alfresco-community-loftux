@@ -39,12 +39,7 @@ public enum Dashlets
     USER_ACTIVITY_REPORT("User Activity Report"),
     HOT_CONTENT_REPORT("Hot Content Report"),
     WEB_QUICK_START("Web Quick Start"),
-    CONTENT_I_AM_EDITING ("Content I\'m Editing"),
-    ADHOC_ANALYZER("Custom Reports"),
-    HOT_CONTENT_REPORT_DASHLET("Hot Content Report"),
-    USER_ACIVITY_REPORT_DASHLET("User Activity Report"),
-    MOST_ACIVE_USERS_REPORT_DASHLET("Most Active Users Report"),
-    MY_ACTIVITIES_REPORT_DASHLET("My Activities Report");
+    CONTENT_I_AM_EDITING ("Content I\'m Editing");
     
 
     private String dashletName;
