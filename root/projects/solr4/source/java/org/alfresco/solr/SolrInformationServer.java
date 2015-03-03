@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Alfresco Software Limited.
+ * Copyright (C) 2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -177,7 +177,9 @@ public class SolrInformationServer implements InformationServer
     
     // Metadata pulling control
     private boolean skipDescendantDocsForSpecificTypes;
+    private boolean skipDescendantDocsForSpecificAspects;
     private Set<QName> typesForSkippingDescendantDocs = new HashSet<QName>();
+    private Set<QName> aspectsForSkippingDescendantDocs = new HashSet<QName>();
     private String skippingDocsQueryString;
     private SOLRAPIClient repositoryClient;
     
@@ -228,29 +230,68 @@ public class SolrInformationServer implements InformationServer
         dataModel = AlfrescoSolrDataModel.getInstance();
 
         skipDescendantDocsForSpecificTypes = Boolean.parseBoolean(p.getProperty("alfresco.metadata.skipDescendantDocsForSpecificTypes", "false"));
-
         if (skipDescendantDocsForSpecificTypes)
         {
-            int i = 0;
-            for (String key = new StringBuilder(PROP_PREFIX_PARENT_TYPE).append(i).toString(); p.containsKey(key); 
-                        key = new StringBuilder(PROP_PREFIX_PARENT_TYPE).append(++i).toString())
+            initSkippingDescendantDocs(p, typesForSkippingDescendantDocs, PROP_PREFIX_PARENT_TYPE, FIELD_TYPE, new DefinitionExistChecker()
             {
-                String qName = p.getProperty(key);
-                if ((null != qName) && !qName.isEmpty())
+                @Override
+                public boolean isDefinitionExists(QName qName)
                 {
-                    QName typeQName = QName.resolveToQName(dataModel.getNamespaceDAO(), qName);
-                    TypeDefinition type = dataModel.getDictionaryService(CMISStrictDictionaryService.DEFAULT).getType(typeQName);
-                    if (null != type)
-                    {
-                        typesForSkippingDescendantDocs.add(typeQName);
-                    }
+                    return (null != dataModel.getDictionaryService(CMISStrictDictionaryService.DEFAULT).getType(qName));
                 }
-            }
-            
-            skippingDocsQueryString = this.cloud.getQuery(FIELD_TYPE, OR, typesForSkippingDescendantDocs);
+            });
+        }
+        skipDescendantDocsForSpecificAspects = Boolean.parseBoolean(p.getProperty("alfresco.metadata.skipDescendantDocsForSpecificAspects", "false"));
+        if (skipDescendantDocsForSpecificAspects)
+        {
+            initSkippingDescendantDocs(p, aspectsForSkippingDescendantDocs, PROP_PREFIX_PARENT_ASPECT, FIELD_ASPECT, new DefinitionExistChecker()
+            {
+                @Override
+                public boolean isDefinitionExists(QName qName)
+                {
+                    return (null != dataModel.getDictionaryService(CMISStrictDictionaryService.DEFAULT).getAspect(qName));
+                }
+            });
         }
         
         contentStreamLimit = Integer.parseInt(p.getProperty("alfresco.contentStreamLimit", "10000000"));
+    }
+
+    private interface DefinitionExistChecker
+    {
+        boolean isDefinitionExists(QName qName);
+    }
+
+    private void initSkippingDescendantDocs(Properties p, Set<QName> dataForSkippingDescendantDocs, String propPrefixParent,
+            String skipByField, DefinitionExistChecker dec)
+    {
+        int i = 0;
+        for (String key = new StringBuilder(propPrefixParent).append(i).toString(); p.containsKey(key);
+                key = new StringBuilder(propPrefixParent).append(++i).toString())
+        {
+            String qNameInString = p.getProperty(key);
+            if ((null != qNameInString) && !qNameInString.isEmpty())
+            {
+                QName qName = QName.resolveToQName(dataModel.getNamespaceDAO(), qNameInString);
+                if (qName == null && log.isWarnEnabled())
+                {
+                    log.warn("QName was not found for " + qNameInString);
+                }
+                if (dec.isDefinitionExists(qName))
+                {
+                    dataForSkippingDescendantDocs.add(qName);
+                }
+            }
+        }
+        
+        if (null == skippingDocsQueryString)
+        {
+            skippingDocsQueryString = this.cloud.getQuery(skipByField, OR, dataForSkippingDescendantDocs);
+        }
+        else
+        {
+            skippingDocsQueryString += OR + this.cloud.getQuery(skipByField, OR, dataForSkippingDescendantDocs);
+        }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -1455,12 +1496,28 @@ public class SolrInformationServer implements InformationServer
         }
     }
 
+    private boolean shouldBeIgnoredByAnyAspect(Set<QName> aspects)
+    {
+        if (null == aspects)
+        {
+            return false;
+        }
+        for (QName aspectForSkipping : aspectsForSkippingDescendantDocs)
+        {
+            if (aspects.contains(aspectForSkipping))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void doUpdateDescendantDocs(NodeMetaData parentNodeMetaData, boolean overwrite,
                 SolrQueryRequest request, UpdateRequestProcessor processor, LinkedHashSet<Long> stack) 
                             throws AuthenticationException, IOException, JSONException
     {
-        if (skipDescendantDocsForSpecificTypes 
-                    && typesForSkippingDescendantDocs.contains(parentNodeMetaData.getType()))
+        if ((skipDescendantDocsForSpecificTypes && typesForSkippingDescendantDocs.contains(parentNodeMetaData.getType())) ||
+                (skipDescendantDocsForSpecificAspects && shouldBeIgnoredByAnyAspect(parentNodeMetaData.getAspects())))
         {
             return;
         }
@@ -1474,7 +1531,11 @@ public class SolrInformationServer implements InformationServer
 
         String query = FIELD_PARENT + ":\"" + parentNodeMetaData.getNodeRef() + "\"";
         ModifiableSolrParams params = new ModifiableSolrParams(request.getParams());
-        params.set("q", query).set("fl", FIELD_SOLR4_ID).set("fq", "NOT ( " + skippingDocsQueryString + " )");
+        params.set("q", query).set("fl", FIELD_SOLR4_ID);
+        if (skippingDocsQueryString != null && !skippingDocsQueryString.isEmpty())
+        {
+            params.set("fq", "NOT ( " + skippingDocsQueryString + " )");
+        }
         SolrDocumentList docs = cloud.getSolrDocumentList(selectRequestHandler, request, params);
         for (SolrDocument doc : docs)
         {

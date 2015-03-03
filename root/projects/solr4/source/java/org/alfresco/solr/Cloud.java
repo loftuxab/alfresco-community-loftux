@@ -59,7 +59,8 @@ public class Cloud
         {
             for (Object value : values)
             {
-                query.append(fieldName).append(":").append(value.toString()).append(operator);
+                String escapedValue = value.toString().replace(":", "\\:").replace("{", "\\{").replace("}", "\\}");
+                query.append(fieldName).append(":").append(escapedValue).append(operator);
             }
         }
 

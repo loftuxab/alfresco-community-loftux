@@ -50,6 +50,8 @@ public interface InformationServer extends InformationServerCollectionProvider
 {
     public static final String PROP_PREFIX_PARENT_TYPE = "alfresco.metadata.ignore.datatype.";
 
+    public static final String PROP_PREFIX_PARENT_ASPECT = "alfresco.metadata.ignore.aspect.";
+
     void rollback() throws IOException;
 
     void commit() throws IOException;
