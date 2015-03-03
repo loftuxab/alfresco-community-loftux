@@ -83,7 +83,7 @@ public class WebScriptServletResponse extends WebScriptResponseImpl
      */
     public void setHeader(String name, String value)
     {
-        res.setHeader(name, value);
+        res.setHeader(name, formatHeaderValue(value));
     }
 
     /* (non-Javadoc)
@@ -91,7 +91,34 @@ public class WebScriptServletResponse extends WebScriptResponseImpl
      */
     public void addHeader(String name, String value)
     {
-        res.addHeader(name, value);
+        res.addHeader(name, formatHeaderValue(value));
+    }
+
+    /*
+     * Formats, if necessary, multiline header value in order to comply with RFC2616 :
+     * Header fields can be extended over multiple lines by preceding
+     * each extra line with at least one SP or HT
+     */
+    private String formatHeaderValue(String value)
+    {
+        if (value != null)
+        {
+            int newLineIndex = value.indexOf('\n');
+            if (newLineIndex > 0)
+            {
+                value = value.trim();
+                while (newLineIndex > 0)
+                {
+                    char nextChar = value.charAt(newLineIndex + 1);
+                    if (nextChar != ' ' && nextChar != '\t')
+                    {
+                        value = value.replaceFirst("\n" + nextChar, "\n " + nextChar);
+                    }
+                    newLineIndex = value.indexOf('\n', newLineIndex + 1);
+                }
+            }
+        }
+        return value;
     }
 
     /* (non-Javadoc)
