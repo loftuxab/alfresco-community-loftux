@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Alfresco Software Limited.
+ * Copyright (C) 2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -47,6 +47,8 @@ import org.json.JSONException;
 public interface InformationServer extends InformationServerCollectionProvider
 {
     public static final String PROP_PREFIX_PARENT_TYPE = "alfresco.metadata.ignore.datatype.";
+
+    public static final String PROP_PREFIX_PARENT_ASPECT = "alfresco.metadata.ignore.aspect.";
 
     void rollback() throws IOException;
 
