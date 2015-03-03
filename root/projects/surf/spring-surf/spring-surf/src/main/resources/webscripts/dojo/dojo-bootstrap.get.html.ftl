@@ -3,10 +3,10 @@
    <#if webframeworkConfig.dojoEnabled>
       <@markup id="setDojoConfig">
          <script type="text/javascript">
-            var appContext = "${url.context}";
+            var appContext = "${url.context?js_string}";
          
             var dojoConfig = {
-               baseUrl: "${url.context}${webframeworkConfig.dojoBaseUrl}",
+               baseUrl: "${url.context?js_string}${webframeworkConfig.dojoBaseUrl}",
                tlmSiblingOfDojo: false,
                async: true,
                parseOnLoad: false,
