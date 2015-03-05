@@ -15,22 +15,11 @@
 
 package org.alfresco.po.share.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.alfresco.po.share.RepositoryPage;
-import org.alfresco.po.share.site.document.FileDirectoryInfo;
-import org.alfresco.po.share.site.document.FileDirectoryInfoImpl.ModelInfo;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.WebDroneUtil;
-import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
 
 /**
  * Model's page object, holds all element of the HTML page relating to share's repository > Models page.

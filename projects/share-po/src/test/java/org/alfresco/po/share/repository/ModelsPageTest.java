@@ -8,11 +8,15 @@
 package org.alfresco.po.share.repository;
 
 import java.io.File;
+import java.util.Map;
+
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.site.UploadFilePage;
 import org.alfresco.po.share.site.document.AbstractDocumentTest;
 import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.steps.AdminActions;
 import org.alfresco.po.share.util.SiteUtil;
@@ -43,7 +47,8 @@ public class ModelsPageTest extends AbstractDocumentTest
     
     private String modelName;
     private File modelFileDraft;
-    private File modelFileActive;
+    private File modelFileToActivate;
+    private String activeModel;
     private ContentDetails modelFileContents = new ContentDetails();
 
     /**
@@ -59,7 +64,8 @@ public class ModelsPageTest extends AbstractDocumentTest
         modelFileDraft = SiteUtil.prepareFile(modelName,  "<xml>modelName</xml>", ".xml");
         modelFileContents.setName(modelName);
         
-        modelFileActive = SiteUtil.prepareFile("Alfresco456");
+        modelFileToActivate = SiteUtil.prepareFile("Alfresco456");
+        activeModel = "NewModel";
     }
 
 
@@ -120,13 +126,14 @@ public class ModelsPageTest extends AbstractDocumentTest
         Assert.assertEquals(file.getName(), modelFileDraft.getName());
         Assert.assertTrue(file.isModelInfoPresent());
         Assert.assertFalse(file.isModelActive());
-        
-        file = modelsPage.getFileDirectoryInfo("NewModel");
-        Assert.assertNotNull(file);
-        Assert.assertTrue(file.isModelInfoPresent());
-        Assert.assertTrue(file.isModelActive());
-        Assert.assertNotNull(file.getModelName());
-        Assert.assertNotNull(file.getModelDesription());
+
+// TODO: This is to be uncommented when capability to activate a model is implemented and there is an active model in the system  
+//        file = modelsPage.getFileDirectoryInfo(activeModel);
+//        Assert.assertNotNull(file);
+//        Assert.assertTrue(file.isModelInfoPresent());
+//        Assert.assertTrue(file.isModelActive());
+//        Assert.assertNotNull(file.getModelName());
+//        Assert.assertNotNull(file.getModelDesription());
        
     }
     
@@ -179,6 +186,43 @@ public class ModelsPageTest extends AbstractDocumentTest
         Assert.assertNotNull(file);
         Assert.assertFalse(file.isModelInfoPresent());
         Assert.assertFalse(file.isModelActive());
+    }
+    
+    @Test(groups = "alfresco-one", priority = 8)
+    public void testEditPropertiesPopup() throws Exception
+    {        
+        ModelsPage modelsPage = adminActions.openRepositoryModelsPage(drone).render();
+        modelsPage = modelsPage.getNavigation().selectDetailedView().render();
+        
+        Assert.assertNotNull(modelsPage);
+        
+        FileDirectoryInfo file = modelsPage.getFileDirectoryInfo(modelFileDraft.getName());
+        Assert.assertNotNull(file);
+        
+        EditDocumentPropertiesPage editPropPage = file.selectEditProperties().render();
+        Assert.assertFalse(editPropPage.isModelActive());
+        
+        editPropPage.setModelActive();
+        Assert.assertTrue(editPropPage.isModelActive());
+        
+        editPropPage.setModelActive();
+        Assert.assertFalse(editPropPage.isModelActive());    
+        
+        editPropPage.selectCancel().render();
+    }
+    
+    @Test(groups = "alfresco-one", priority = 8)
+    public void testModelDetailsPage() throws Exception
+    {        
+        ModelsPage modelsPage = getModelsPage();        
+        Assert.assertNotNull(modelsPage);
+        
+        DocumentDetailsPage modelDetails = modelsPage.selectFile(modelFileDraft.getName()).render();
+        Assert.assertNotNull(modelDetails);
+        
+        Map<String, Object> modelProps = modelDetails.getProperties();
+        Assert.assertNotNull(modelProps.get("ModelActive"));
+                
     }
     
     private ModelsPage getModelsPage() throws Exception
