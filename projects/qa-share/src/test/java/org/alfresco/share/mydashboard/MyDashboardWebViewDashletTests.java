@@ -13,7 +13,7 @@ import org.alfresco.share.util.ShareUserDashboard;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -31,12 +31,7 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
 
         testName = this.getClass().getSimpleName();
         logger.info("Starting Tests: " + testName);
-    }
-
-    @Test(groups = { "DataPrepDashlets" })
-    public void dataPrep_2898() throws Exception
-    {
-        String testName = getTestName() + "2";
+        
         String testUser = getUserNameFreeDomain(testName);
 
         // User
@@ -53,7 +48,6 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
     @Test(groups = { "EnterpriseOnly" })
     public void AONE_2898() throws Exception
     {
-        String testName = getTestName() + "2";
         String testUser = getUserNameFreeDomain(testName);
         String url = "http://www.google.com/";
         String linkTitle = "Google";
@@ -107,8 +101,8 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
         }
 
         String newTitle = webDashlet.getWebViewDashletTitle();
-        Assert.assertTrue(newTitle.equals(linkTitle));
-
+        Assert.assertEquals(newTitle, linkTitle, "Title didn't change");
+        
         // ---- Step 6 ----
         // ---- Step action ---
         // Click the dashlet title;
@@ -116,6 +110,6 @@ public class MyDashboardWebViewDashletTests extends AbstractUtils
         // The website is opened in a separate window.
         webDashlet.clickTitle();
         Set<String> windowHandles = drone.getWindowHandles();
-        Assert.assertEquals(2, windowHandles.size());
+        Assert.assertEquals(2, windowHandles.size(), "The website is not opend in a seprate window");
     }
 }

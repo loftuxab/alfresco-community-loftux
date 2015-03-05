@@ -13,6 +13,7 @@ import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
+import org.alfresco.po.share.user.UserContentItems;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
@@ -20,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 public class ShareUserDashboard extends AbstractUtils
 {
@@ -29,6 +32,7 @@ public class ShareUserDashboard extends AbstractUtils
             .cssSelector("#page_x002e_full-width-dashlet_x002e_user_x007e_admin_x007e_dashboard_x0023_default-createSite-button");
     public static final By CREATE_SITE_BUTTON_ON_DASHLET = By
             .cssSelector("a[id^='page_x002e_component'][id$='x002e_user_x007e_admin_x007e_dashboard_x0023_default-createSite-button']");
+    public static final By DASHLET_TITLES = By.cssSelector(".title");
 
     public ShareUserDashboard()
     {
@@ -664,6 +668,25 @@ public class ShareUserDashboard extends AbstractUtils
     public static AddOnsRssFeedDashlet getAddOnsRssFeedDashlet(WebDrone driver, String name)
     {
         return FactoryShareDashlet.getPage(driver, name).render();
+    }
+    
+    public static List<String> getAllDashletTitles(WebDrone driver)
+    {
+        List<String> titles = new ArrayList<>();
+        try
+        {
+            List<WebElement> elements = driver.findAndWaitForElements(DASHLET_TITLES);
+
+            for (WebElement el : elements)
+            {
+                titles.add(el.getText());
+            }
+        }
+        catch (TimeoutException e)
+        {
+            logger.error("Unable to find titles ", e);
+        }
+        return titles;
     }
 
 }
