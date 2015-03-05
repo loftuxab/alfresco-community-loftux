@@ -68,8 +68,6 @@ public class ModelsPageTest extends AbstractDocumentTest
         activeModel = "NewModel";
     }
 
-
-
     @AfterClass(groups={"alfresco-one"})
     public void teardown()
     {
@@ -99,8 +97,7 @@ public class ModelsPageTest extends AbstractDocumentTest
         {
             // For Cloud, expected UnsupportedOperationException
             Assert.assertEquals(drone.getProperties().getVersion(), AlfrescoVersion.MyAlfresco);
-        }
-        
+        }        
     }
 
     @Test(dependsOnMethods="testNavigateToModels", groups = "alfresco-one", priority = 2)
@@ -208,10 +205,11 @@ public class ModelsPageTest extends AbstractDocumentTest
         editPropPage.setModelActive();
         Assert.assertFalse(editPropPage.isModelActive());    
         
-        editPropPage.selectCancel().render();
+        modelsPage = editPropPage.selectCancel().render();
+        Assert.assertNotNull(modelsPage);
     }
     
-    @Test(groups = "alfresco-one", priority = 8)
+    @Test(groups = "alfresco-one", priority = 9)
     public void testModelDetailsPage() throws Exception
     {        
         ModelsPage modelsPage = getModelsPage();        
@@ -221,8 +219,7 @@ public class ModelsPageTest extends AbstractDocumentTest
         Assert.assertNotNull(modelDetails);
         
         Map<String, Object> modelProps = modelDetails.getProperties();
-        Assert.assertNotNull(modelProps.get("ModelActive"));
-                
+        Assert.assertEquals(modelProps.get("ModelActive"), "No");                
     }
     
     private ModelsPage getModelsPage() throws Exception
