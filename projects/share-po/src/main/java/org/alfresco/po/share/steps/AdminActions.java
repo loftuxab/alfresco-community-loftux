@@ -5,11 +5,13 @@ import java.util.List;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.GroupsPage;
 import org.alfresco.po.share.NewUserPage;
+import org.alfresco.po.share.RepositoryPage;
 import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.exception.UnexpectedSharePageException;
 import org.alfresco.po.share.site.document.UserProfile;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.exception.PageOperationException;
 
 public class AdminActions extends DashBoardActions
 {
@@ -108,5 +110,45 @@ public class AdminActions extends DashBoardActions
         NewUserPage newPage = userPage.selectNewUser().render();
 
         return newPage.createEnterpriseUserWithGroup(userName, fName, lName, userEmail, password, groupName).render();
+    }
+    
+    /**
+     * Open DashBoard > Repository > Data Dictionary
+     * 
+     * @param WebDrone
+     * @return RepoPage
+     */
+    public HtmlPage openRepositoryDataDictionaryPage(WebDrone driver)
+    {
+        DashBoardPage dashBoard = openUserDashboard(driver);
+        RepositoryPage repoPage = dashBoard.getNav().selectRepository().render();
+
+        try
+        {
+            return repoPage.selectFolder("Data Dictionary").render();
+        }
+        catch (PageOperationException poe)
+        {
+            throw new PageOperationException("Data Dictionary Page can not be opened", poe);
+        }
+    }
+    
+    /**
+     * Open Open DashBoard > Repository > Data Dictionary > Models Page
+     * 
+     * @param WebDrone
+     * @return ModelsPage
+     */
+    public HtmlPage openRepositoryModelsPage(WebDrone driver)
+    {        
+        RepositoryPage repoPage = openRepositoryDataDictionaryPage(driver).render();
+        try
+        {            
+            return repoPage.selectFolder("Models").render();
+        }
+        catch (PageOperationException poe)
+        {
+            throw new PageOperationException("Models Page can not be opened", poe);
+        }
     }
 }

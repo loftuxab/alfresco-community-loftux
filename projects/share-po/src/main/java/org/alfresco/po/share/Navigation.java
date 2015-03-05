@@ -341,6 +341,7 @@ public class Navigation extends SharePage
      */
     public RepositoryPage selectRepository()
     {
+        ShareUtil.validateAlfrescoVersion(alfrescoVersion, RequiredAlfrescoVersion.ENTERPRISE_ONLY);
         String selector = isDojoSupport() ? "div#HEADER_REPOSITORY" : "a[id$='app_repository-button']";
         drone.find(By.cssSelector(selector)).click();
         return new RepositoryPage(drone);

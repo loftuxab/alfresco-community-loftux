@@ -874,4 +874,13 @@ public interface FileDirectoryInfo
     public GoogleDocCheckInPage selectCheckInGoogleDoc();
 
     public DocumentLibraryPage selectCancelEditingInGoogleDocs();
+
+    boolean isModelInfoPresent();
+    
+    boolean isModelActive();
+    
+    public String getModelName();
+    
+    public String getModelDesription();
+
 }
