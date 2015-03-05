@@ -382,9 +382,24 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
     @Override
     public UpdateFilePage selectUploadNewVersion()
     {
-        selectMoreAction().click();
-        return super.selectUploadNewVersion();
+       try
+        {
+            selectMoreAction().click();
+            return super.selectUploadNewVersion();
+        }
+        catch (NoSuchElementException e)
+        {
+        }
+        catch (StaleElementReferenceException st)
+        {
+            resolveStaleness();
+            selectUploadNewVersion();
+        }
+
+        throw new PageOperationException("Error in Select Delete.");
     }
+
+
 
     /*
      * (non-Javadoc)
