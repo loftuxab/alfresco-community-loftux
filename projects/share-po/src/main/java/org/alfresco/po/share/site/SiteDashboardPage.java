@@ -150,16 +150,6 @@ public class SiteDashboardPage extends SitePage implements Dashboard
         return FactoryShareDashlet.getPage(drone, name);
     }
     
-    /**
-     * Gets dashlets in the dashboard page.
-     * 
-     * @param name
-     * @return
-     */
-    public Dashlet getDashlets(final String name)
-    {
-        return FactorySharePage.resolveDashletPage(drone, name);
-    }
 
     /**
      * Return page based on name of the Dash clickable element passed.
