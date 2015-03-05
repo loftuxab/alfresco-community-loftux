@@ -35,6 +35,7 @@ import org.alfresco.po.share.dashlet.Dashlet;
 import org.alfresco.po.share.dashlet.InsertOrEditLinkPage;
 import org.alfresco.po.share.dashlet.mydiscussions.CreateNewTopicPage;
 import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
+import org.alfresco.po.share.repository.ModelsPage;
 import org.alfresco.po.share.search.AdvanceSearchCRMPage;
 import org.alfresco.po.share.search.AdvanceSearchContentPage;
 import org.alfresco.po.share.search.AdvanceSearchFolderPage;
@@ -249,14 +250,14 @@ public class FactorySharePage implements PageFactory
         pages.put("manage-users", AccountSettingsPage.class);
         pages.put("transformations", AlfrescoTransformationServerHistoryPage.class);
         pages.put("transformation-server", AlfrescoTransformationServerStatusPage.class);
- 
+        pages.put("models", ModelsPage.class);
     }
 
     public HtmlPage getPage(WebDrone drone)
     {
         return resolvePage(drone);
     }
- 
+
     public Dashlet getDashletPage(WebDrone drone, String name)
     {
         return resolveDashletPage(drone, name);
@@ -503,6 +504,10 @@ public class FactorySharePage implements PageFactory
 
         if (url.contains("/repository"))
         {
+            if (url.contains("#filter=path%7C%2FData%2520Dictionary%2FModels"))
+            {
+                return "models";
+            }
             return "repository";
         }
         // The admin console has an unusual url which we handle here

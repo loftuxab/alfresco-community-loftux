@@ -26,6 +26,7 @@ import org.alfresco.po.share.admin.ManageSitesPage;
 import org.alfresco.po.share.adminconsole.NodeBrowserPage;
 import org.alfresco.po.share.dashlet.mydiscussions.CreateNewTopicPage;
 import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
+import org.alfresco.po.share.repository.ModelsPage;
 import org.alfresco.po.share.search.AdvanceSearchContentPage;
 import org.alfresco.po.share.search.AdvanceSearchFolderPage;
 import org.alfresco.po.share.search.AdvanceSearchPage;
@@ -164,6 +165,7 @@ public class FactorySharePageTest
     private final String userContentPage =  baseUrl+"/page/user/admin/user-content";
     private final String followingPage = baseUrl+"/page/user/admin/following";
     private final String followersPage = baseUrl+"/page/user/admin/followers";
+    private final String modelsPage = baseUrl+"/repository#filter=path%7C%2FData%2520Dictionary%2FModels";
 
     @Test(groups={"unit"})
     public void resolveUrls()
@@ -388,7 +390,9 @@ public class FactorySharePageTest
             Assert.assertTrue(page instanceof SharePage);
             Assert.assertTrue(page instanceof UnknownSharePage);
             
-
+            page = resolvePage(modelsPage, "ModelsPage", drone);
+            Assert.assertTrue(page instanceof ModelsPage);
+            
             long duration = System.currentTimeMillis() - start;
             logger.info("Total duration of test in milliseconds: " + duration);
         }

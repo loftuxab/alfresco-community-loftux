@@ -289,7 +289,8 @@ public abstract class AbstractTest implements AlfrescoTests
      */
     public static void logout(WebDrone drone)
     {
-        if(drone != null){
+        if(drone != null)
+        {
             try
             {
                 if (drone.getCurrentUrl().contains(shareUrl.trim()))

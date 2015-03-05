@@ -1129,6 +1129,68 @@ public abstract class FilmStripOrGalleryView extends FileDirectoryInfoImpl
         drone.waitUntilElementDisappears(By.id(id), 30);
         return exifIcon;
     }
+    
+//    /*
+//     * (non-Javadoc)
+//     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#isModelInfoPresent()
+//     */
+//    @Override
+//    public boolean isModelInfoPresent()
+//    {
+//        clickInfoIcon(false);
+//        return super.isModelInfoPresent();
+//    }
+//    
+//    /*
+//     * (non-Javadoc)
+//     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#isModelActive()
+//     */
+//    @Override
+//    public boolean isModelActive()
+//    {
+//        clickInfoIcon(false);
+//        return super.isModelActive();
+//    }
+//    
+//    /*
+//     * (non-Javadoc)
+//     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#getModelName()
+//     */
+//    @Override
+//    public String getModelName()
+//    {
+//        clickInfoIcon(false);
+//        return super.getModelName();
+//    }
+//    
+//    /*
+//     * (non-Javadoc)
+//     * @see org.alfresco.po.share.site.document.FileDirectoryInfoInterface#getModelDesription()
+//     */
+//    @Override
+//    public String getModelDesription()
+//    {
+//        clickInfoIcon(false);
+//        return super.getModelDesription();
+//    }
+    
+    @Override
+    public boolean isModelActive()
+    {
+        throw new UnsupportedOperationException("Model info not available in Table view.");
+    }
+    
+    @Override
+    public String getModelName()
+    {
+        throw new UnsupportedOperationException("Model info not available in Table view.");
+    }
+    
+    @Override
+    public String getModelDesription()
+    {
+        throw new UnsupportedOperationException("Model info not available in Table view.");
+    }  
 
     /**
      * Method to select Check In Google Doc

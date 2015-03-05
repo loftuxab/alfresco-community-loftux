@@ -23,9 +23,9 @@ public class DashBoardActions extends CommonActions
         // Assumes User is logged in
         SharePage page = getSharePage(driver);
 
-        page.getNav().selectMyDashBoard().render();
-        logger.info("Opened User Dashboard");
-        return new DashBoardPage(driver).render();
+        logger.info("Opening User Dashboard");
+        
+        return page.getNav().selectMyDashBoard().render();
     }
 
     /**

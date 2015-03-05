@@ -190,4 +190,23 @@ public class TableViewFileDirectoryInfo extends SimpleDetailTableView
     {
         throw new UnsupportedOperationException("Version info not available in Table view.");
     }
+    
+    @Override
+    public boolean isModelActive()
+    {
+        throw new UnsupportedOperationException("Model info not available in Table view.");
+    }
+    
+    @Override
+    public String getModelName()
+    {
+        throw new UnsupportedOperationException("Model info not available in Table view.");
+    }
+    
+    @Override
+    public String getModelDesription()
+    {
+        throw new UnsupportedOperationException("Model info not available in Table view.");
+    }
+    
 }

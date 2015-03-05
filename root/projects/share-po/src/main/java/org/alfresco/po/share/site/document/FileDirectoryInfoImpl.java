@@ -14,7 +14,10 @@ package org.alfresco.po.share.site.document;
 
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.FactorySharePage;
+import org.alfresco.po.share.ShareUtil;
+import org.alfresco.po.share.ShareUtil.RequiredAlfrescoVersion;
 import org.alfresco.po.share.exception.AlfrescoVersionException;
+import org.alfresco.po.share.repository.ModelsPage;
 import org.alfresco.po.share.site.UpdateFilePage;
 import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
 import org.alfresco.po.share.user.CloudSignInPage;
@@ -121,6 +124,8 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
         protected String DOCUMENT_WEB_ASSET = "div.document-preview-webasset>a";
         protected static final String LINK_CHECKIN_GOOGLE_DOCS = "#onGoogledocsActionCheckin a";
         protected static final String LINK_CANCEL_GOOGLE_DOCS = "#onGoogledocsActionCancel a";
+        
+        private static final By MODELINFO_FIELD = By.cssSelector("td.yui-dt-col-fileName div.yui-dt-liner div span"); //By.xpath("//td/div/div/span/em"); //"../../div/div/span/em"
 
         public FileDirectoryInfoImpl(String nodeRef, WebElement webElement, WebDrone drone)
         {
@@ -3064,28 +3069,208 @@ public abstract class FileDirectoryInfoImpl extends HtmlElement implements FileD
                 }
                 return null;
         }
+        
+        /**
+         * Method to select Check In Google Doc
+         *
+         * @return GoogleDocCheckInPage
+         */
+        public GoogleDocCheckInPage selectCheckInGoogleDoc()
+        {
+            WebElement checkInGoogleDoc = findAndWait(By.cssSelector(LINK_CHECKIN_GOOGLE_DOCS));
+            checkInGoogleDoc.click();
+            return new GoogleDocCheckInPage(drone, null, false);
+        }
 
+        /**
+         * Method to select Cancel Editing in Google Docs
+         *
+         * @return DocumentLibraryPage
+         */
+        public DocumentLibraryPage selectCancelEditingInGoogleDocs()
+        {
+            WebElement checkInGoogleDoc = findAndWait(By.cssSelector(LINK_CANCEL_GOOGLE_DOCS));
+            checkInGoogleDoc.click();
+            return FactorySharePage.resolvePage(drone).render();
+        }
+        
     /**
-     * Method to select Check In Google Doc
-     *
-     * @return GoogleDocCheckInPage
-     */
-    public GoogleDocCheckInPage selectCheckInGoogleDoc()
+     * Method Returns true if Model Info is presented for the selected model
+     */       
+    @Override
+    public boolean isModelInfoPresent()
     {
-        WebElement checkInGoogleDoc = findAndWait(By.cssSelector(LINK_CHECKIN_GOOGLE_DOCS));
-        checkInGoogleDoc.click();
-        return new GoogleDocCheckInPage(drone, null, false);
+        try
+        {
+                List<WebElement> modelInfo = getModelInfoElements();
+                if(modelInfo.isEmpty())
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+        }
+        catch (TimeoutException te)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Model Info is not displayed", te);
+            }
+        }
+        return false;
+    }
+
+    
+    private List<WebElement> getModelInfoElements()
+    {
+     List<WebElement> allSpans = new ArrayList<WebElement>();
+     List<WebElement> modelInfoSpans = new ArrayList<WebElement>();
+
+     try
+     {
+         allSpans = findElements(MODELINFO_FIELD);
+
+         for (WebElement info : allSpans)
+         {
+             // Get elements where model Info is displayed
+             if(info.isDisplayed())
+             {
+                    List<WebElement> modelInfoEms = info.findElements(By.tagName("em"));
+                    if (!modelInfoEms.isEmpty())
+                    {
+                        // Span with modelInfo: add to the list
+                        modelInfoSpans.add(info);
+                    }
+             }
+         }
+     }
+     catch (TimeoutException te)
+     {
+         if (logger.isTraceEnabled())
+         {
+             logger.trace("Model Info is not displayed", te);
+         }
+     }
+     catch (NoSuchElementException nse)
+     {
+         if (logger.isTraceEnabled())
+         {
+             logger.trace("Model Info is not displayed", nse);
+         }
+     }
+     return modelInfoSpans;
+ }
+    
+    public enum ModelInfo
+    {
+        ISACTIVE, MODELNAME, MODELDESC;
+    }
+    
+    /**
+     * Returns the text value of the parent tag (span) for the selected child tag (em)
+     * @param infoRequired: ISACTIVE, MODELNAME, MODELDESC
+     * @return String text value
+     */
+    private String getModelInfo(ModelInfo infoRequired)
+    {
+        WebDroneUtil.checkMandotaryParam("Specify Which Model Info is Required", infoRequired);
+        
+        if (!(drone.getCurrentPage() instanceof ModelsPage))
+        {
+            throw new UnsupportedOperationException("Model Info is not displayed");
+        }
+
+        String infoReq = drone.getElement("model.is.active");
+
+        if(infoRequired.equals(ModelInfo.MODELNAME))
+        {
+            infoReq = drone.getElement("model.name");
+        }
+        else if (infoRequired.equals(ModelInfo.MODELDESC))
+        {
+            infoReq = drone.getElement("model.description");
+        }
+        
+        infoReq = infoReq + ": ";
+
+        try
+        {
+            List<WebElement> modelInfo = getModelInfoElements();
+
+            for (WebElement model : modelInfo)
+            {
+                String val = model.getText();
+                if (val.startsWith(infoReq)) { return val.replace(infoReq, ""); }
+            }
+        }
+        catch (Exception te)
+        {
+            throw new PageOperationException("Model Info is not displayed", te);
+        }
+        throw new PageOperationException("Model Info is not displayed");
     }
 
     /**
-     * Method to select Cancel Editing in Google Docs
-     *
-     * @return DocumentLibraryPage
+     * Method Returns true if the selected DataDictionary>model is Active 
      */
-    public DocumentLibraryPage selectCancelEditingInGoogleDocs()
+    public boolean isModelActive()
     {
-        WebElement checkInGoogleDoc = findAndWait(By.cssSelector(LINK_CANCEL_GOOGLE_DOCS));
-        checkInGoogleDoc.click();
-        return FactorySharePage.resolvePage(drone).render();
+        try
+        {
+            if ("true".equalsIgnoreCase(getModelInfo(ModelInfo.ISACTIVE))) { return true; }
+        }
+        catch(UnsupportedOperationException ue)
+        {
+            throw new UnsupportedOperationException("This operation is only supported for ModelsPage", ue);
+        }
+        catch (Exception e)
+        {
+            logger.info("Exception", e);
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Model Info is not displayed", e);
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Method Returns the DataDictionary>model Name for the selected model 
+     */
+    public String getModelName()
+    {
+        try
+        {
+            return getModelInfo(ModelInfo.MODELNAME);
+        }
+        catch(UnsupportedOperationException ue)
+        {
+            throw new UnsupportedOperationException("This operation is only supported for ModelsPage", ue);
+        }
+        catch (Exception e)
+        {
+            throw new PageOperationException("Model Name Can not be found", e);
+        }
+    }
+    
+    /**
+     * Method Returns the DataDictionary>model description for the selected model 
+     */
+    public String getModelDesription()
+    {
+        try
+        {
+            return getModelInfo(ModelInfo.MODELDESC);
+        }
+        catch(UnsupportedOperationException ue)
+        {
+            throw new UnsupportedOperationException("This operation is only supported for ModelsPage", ue);
+        }
+        catch (Exception e)
+        {            
+            throw new PageOperationException("Model Description Can not be found", e);
+        }
     }
 }
