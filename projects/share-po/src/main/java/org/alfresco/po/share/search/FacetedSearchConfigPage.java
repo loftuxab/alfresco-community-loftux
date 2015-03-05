@@ -30,14 +30,15 @@ import org.openqa.selenium.WebElement;
 
 /**
  * The Class FacetedSearchConfigPage.
- *   
+ * 
  * @author Richard Smith
  */
 @SuppressWarnings("unchecked")
 public class FacetedSearchConfigPage extends SharePage
 {
     private static final By PAGE_TITLE = By.cssSelector("h1.alfresco-header-Title");
-    private static final By FILTER = By.cssSelector("tr.alfresco-documentlibrary-views-layouts-Row");
+    //private static final By FILTER = By.cssSelector("tr.alfresco-documentlibrary-views-layouts-Row");
+    private static final By FILTER = By.cssSelector("#SEARCH_CONFIG_FACET_LIST");
     private static final By ADD_NEW_FILTER = By.id("CREATE_FACET_BUTTON");
     private static final Log logger = LogFactory.getLog(FacetedSearchConfigPage.class);
 
@@ -85,7 +86,8 @@ public class FacetedSearchConfigPage extends SharePage
         return this;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.alfresco.webdrone.Page#getTitle()
      */
     public String getTitle()
@@ -95,33 +97,33 @@ public class FacetedSearchConfigPage extends SharePage
 
     /**
      * Gets the filters.
-     *
+     * 
      * @return the filters
      */
     public List<FacetedSearchConfigFilter> getFilters()
     {
         return filters;
-    }    
-    
+    }
+
     /**
      * Gets the filter
-     *
+     * 
      * @return the filter
      */
     public FacetedSearchConfigFilter getFilter(String filterName)
     {
-    	WebDroneUtil.checkMandotaryParam("Filter Name", filterName);
-    	for (FacetedSearchConfigFilter facetedSearchConfigFilter : filters) 
-    	{
-			if(filterName.equalsIgnoreCase(facetedSearchConfigFilter.getFilterId_text()))
-			{
-				return facetedSearchConfigFilter;
-			}
-				
-		}
-    	throw new PageOperationException("Not able to find the filter named : " + filterName);
-    }   
-    
+        WebDroneUtil.checkMandotaryParam("Filter Name", filterName);
+        for (FacetedSearchConfigFilter facetedSearchConfigFilter : filters)
+        {
+            if (filterName.equalsIgnoreCase(facetedSearchConfigFilter.getFilterId_text()))
+            {
+                return facetedSearchConfigFilter;
+            }
+
+        }
+        throw new PageOperationException("Not able to find the filter named : " + filterName);
+    }
+
     /**
      * Click add new filter.
      * 
@@ -140,7 +142,7 @@ public class FacetedSearchConfigPage extends SharePage
         }
         throw new PageOperationException("Not visible Element: AddNewFilter");
     }
-    
+
     /**
      * Load elements.
      */
@@ -150,12 +152,11 @@ public class FacetedSearchConfigPage extends SharePage
         this.title = drone.find(PAGE_TITLE).getText();
 
         // Initialise the filters
-        List<WebElement> filters = drone.findAndWaitForElements(FILTER);
-        this.filters = new ArrayList<FacetedSearchConfigFilter>();
-        for (WebElement filter : filters)
-        {
-            this.filters.add(new FacetedSearchConfigFilter(drone, filter));
-        }
+       List<WebElement> filters = drone.findAndWaitForElements(FILTER);
+       this.filters = new ArrayList<FacetedSearchConfigFilter>();
+       for (WebElement filter : filters)
+       {
+           this.filters.add(new FacetedSearchConfigFilter(drone, filter));
+       }
     }
-    
 }
