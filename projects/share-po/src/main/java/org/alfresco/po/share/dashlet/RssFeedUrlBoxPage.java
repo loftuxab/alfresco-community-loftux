@@ -17,6 +17,8 @@ package org.alfresco.po.share.dashlet;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
+import java.util.NoSuchElementException;
+
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.webdrone.RenderTime;
@@ -146,7 +148,7 @@ public class RssFeedUrlBoxPage extends SharePage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find drop-down");
+            throw new ShareException("Unable to find drop-down", te);
         }
     }
 
@@ -159,7 +161,7 @@ public class RssFeedUrlBoxPage extends SharePage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find checkbox");
+            throw new ShareException("Unable to find checkbox", te);
         }
     }
     
@@ -175,7 +177,7 @@ public class RssFeedUrlBoxPage extends SharePage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find checkbox");
+            throw new ShareException("Unable to find checkbox", te);
         }
     }
     
@@ -189,7 +191,7 @@ public class RssFeedUrlBoxPage extends SharePage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find Url field");
+            throw new ShareException("Unable to find Url field", te);
         } 
     }
 
@@ -206,7 +208,7 @@ public class RssFeedUrlBoxPage extends SharePage
         }
         catch (TimeoutException te)
         {
-            throw new ShareException("Unable to find Url field");
+            throw new ShareException("Unable to find Url field", te);
         }
     }
     
@@ -218,5 +220,17 @@ public class RssFeedUrlBoxPage extends SharePage
     public void waitUntilCheckDisapperers()
     {
         drone.waitUntilElementDisappears(CHK_OPEN_IN_NEW_WINDOW, 30);
+    }
+    
+    public boolean isOkButtonEnabled()
+    {
+        try
+        {
+            return drone.find(OK_BUTTON).isEnabled();
+        }
+        catch (NoSuchElementException te)
+        {
+            throw new ShareException("Unable to find Ok button", te);
+        }
     }
 }
