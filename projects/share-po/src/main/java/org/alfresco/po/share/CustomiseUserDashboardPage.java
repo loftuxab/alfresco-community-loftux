@@ -302,6 +302,118 @@ public class CustomiseUserDashboardPage extends SharePage
 
         throw new PageOperationException("Error in adding dashlet using drag and drop");
     }
+    
+    
+    /**
+     * Add given dashlet into given column.
+     *
+     * @param dashletName
+     * @param columnNumber
+     * @return {@link SiteDashboardPage}
+     */
+    public DashBoardPage addDashlet(String dashletName, int columnNumber)
+    {
+        if (dashletName == null)
+        {
+            throw new IllegalArgumentException("Dashlet Name is required");
+        }
+
+        if (columnNumber < 1 || columnNumber > NUMBER_OF_COLUMNS)
+        {
+            throw new IllegalArgumentException("Column number should be between 1 and 4");
+        }
+
+        WebElement newDashlet = null;
+        int noOfColumns = 0;
+
+        this.selectAddDashlets();
+
+        try
+        {
+            String dashletXpath = String.format("//*[@class='availableDashlet dnd-draggable']/span[text()=\"%s\"]", dashletName);
+            WebElement element = drone.findAndWait(By.xpath(dashletXpath));
+            element.click();
+            List<WebElement> dashlets = drone.findAndWaitForElements(AVAILABLE_DASHLETS_NAMES);
+            for (WebElement source : dashlets)
+            {
+                if (source.getText().equals(dashletName))
+                {
+                    newDashlet = source;
+                    break;
+                }
+            }
+        }
+        catch (TimeoutException te)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Exceeded time to find the Available dashlet names ", te);
+            }
+        }
+
+        if (newDashlet != null)
+        {
+            try
+            {
+                String columns = drone.find(By.cssSelector("div[id$='default-wrapper-div']")).getAttribute("class");
+                if (!StringUtils.isEmpty(columns))
+                {
+                    String columnSize = columns.substring(columns.length() - 1);
+                    noOfColumns = Integer.valueOf(columnSize);
+                }
+            }
+            catch (NoSuchElementException te)
+            {
+                logger.info("Unable to find the Columns css " + te);
+            }
+
+            if (columnNumber <= noOfColumns)
+            {
+                try
+                {
+                    List<WebElement> existingDashletsInColumn = Collections.emptyList();
+                    try
+                    {
+                        existingDashletsInColumn = drone.findAndWaitForElements(By.cssSelector(String.format("ul[id$='column-ul-%d'] li",
+                                columnNumber)));
+                    }
+                    catch (TimeoutException e)
+                    {
+                        if (logger.isTraceEnabled())
+                        {
+                            logger.info("Selected column is empty", e);
+                        }
+                    }
+                    if (existingDashletsInColumn.size() < MAX_DASHLETS_IN_COLUMN)
+                    {
+                        WebElement target = drone.findAndWait(By.xpath(String.format("//ul[@class='usedList' and contains(@id,'-column-ul-%d')]", columnNumber)));
+//                        drone.executeJavaScript("window.scrollBy(0,250)", "");
+                        drone.executeJavaScript(String.format("window.scrollTo(0, '%s')", target.getLocation().getY()));
+                        drone.dragAndDrop(newDashlet, target);
+                        logger.error("The dashlet " + dashletName + " was added in column " + columnNumber);
+                        return selectOk();
+                    }
+                    else
+                    {
+                        throw new PageOperationException("Exceeded the no. of dashlets in given column.");
+                    }
+                }
+                catch (TimeoutException te)
+                {
+                    if (logger.isTraceEnabled())
+                    {
+                        logger.info("Exceeded time to find the Available dashlet names ", te);
+                    }
+                }
+            }
+            else
+            {
+                throw new PageOperationException("Expected column does not exist in available columns list.");
+            }
+        }
+
+        throw new PageOperationException("Error in adding dashlet using drag and drop");
+    }
 
     /**
      * This method used to select the ok button present on Customize site

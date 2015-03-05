@@ -63,7 +63,6 @@ public class RemoteUtil extends AbstractUtils
     public static void applyIptablesAllPorts()
     {
         initConnection();
-        getCygwinPath("C:\\Alfresco");
         commandProcessor.executeCommand("service iptables start");
         commandProcessor.executeCommand("iptables -F");
         commandProcessor.executeCommand("iptables -A INPUT -p tcp -m tcp -m multiport ! --dports " + serverShhPort + " -j DROP");

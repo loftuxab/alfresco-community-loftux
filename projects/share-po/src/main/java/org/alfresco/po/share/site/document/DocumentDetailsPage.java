@@ -60,7 +60,7 @@ public class DocumentDetailsPage extends DetailsPage
     private static final String DOCUMENT_PROPERTIES_DISPLAYED_SIZE = "span[id$='-formContainer_prop_size']";
     private static final String DOCUMENT_PREVIEWER = "div > div.web-preview > div.previewer";
     private static final String DOCUMENT_PREVIEW_WITH_FLASH_PLAYER = "div.web-preview.real";
-    private static final String DOCUMENT_PREVIEW_WITHOUT_FLASH_PLAYER = "div[id$='default-previewer-div']>img";
+    private static final String DOCUMENT_PREVIEW_WITHOUT_FLASH_PLAYER = "div[id$='default-previewer-div']>img, div[id$='default-previewer-div'] canvas";
     private static final String NO_DOCUMENT_PREVIEW = "div.message";
     private static final String FILE_ISNT_VISIBLE = "Unfortunately the file can't be viewed in your web browser.";
     private static final String DOCUMENT_CANT_BE_PREVIEWED = "This document can't be previewed.";

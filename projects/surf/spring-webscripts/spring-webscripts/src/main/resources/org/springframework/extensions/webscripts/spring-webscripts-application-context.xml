@@ -478,6 +478,20 @@
             <value>ACTION</value>
          </set>
       </property>
+      <!-- The map between HTML tag attributes and set of forbidden values that are to be removed before rendering -->
+      <!-- NOTE: define all in UPPER CASE only -->
+      <property name="attributeValueBlackList">
+         <map>
+            <entry> 
+               <key>
+                  <value>REL</value>
+               </key>
+               <set>
+                  <value>IMPORT</value>
+               </set>
+            </entry>
+         </map>  
+      </property>  
       <!-- Adds or replaces a doctype that enforces the latest browser mode: <!DOCTYPE html> -->
       <!-- NOTE: Will only be used when stripping an entire html document, not snippets -->
       <property name="overrideDocType" value="true"/>

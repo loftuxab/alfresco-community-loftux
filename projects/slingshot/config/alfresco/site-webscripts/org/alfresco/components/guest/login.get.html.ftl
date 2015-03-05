@@ -77,7 +77,7 @@
                        xhr.send('');
                     </#list>
                     <#list images as image>
-                       new Image().src = "${url.context}/res/${image}";
+                       new Image().src = "${url.context?js_string}/res/${image}";
                     </#list>
                 }, 1000);
             };

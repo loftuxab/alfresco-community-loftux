@@ -142,10 +142,6 @@ public final class FactoryShareDashlet
             {
                 return new MyMeetingWorkSpaceDashlet(drone);
             }
-            if ("adhoc-analyzer".equalsIgnoreCase(name))
-            {
-                return new AdhocAnalyzerDashlet(drone);
-            }
             if ("my-profile".equalsIgnoreCase(name)|| Dashlets.MY_PROFILE.getDashletName().equalsIgnoreCase(name))
             {
                 return new MyProfileDashlet(drone);

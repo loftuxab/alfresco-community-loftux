@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Alfresco Software Limited.
+ * Copyright (C) 2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -145,7 +145,6 @@ import org.springframework.util.FileCopyUtils;
 public class LegacySolrInformationServer implements CloseHook, InformationServer
 {
     private static final String PREFIX_ERROR = "ERROR-";
-    private static final String PROP_PREFIX_PARENT_TYPE = "alfresco.metadata.ignore.datatype.";
 
     protected final static Logger log = LoggerFactory.getLogger(LegacySolrInformationServer.class);
 
@@ -166,7 +165,9 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
 
     // Metadata pulling control
     private boolean skipDescendantAuxDocsForSpecificTypes;
+    private boolean skipDescendantAuxDocsForSpecificAspects;
     private Set<QName> typesForSkippingDescendantAuxDocs = new HashSet<QName>();
+    private Set<QName> aspectsForSkippingDescendantAuxDocs = new HashSet<QName>();
     private BooleanQuery skippingDocsQuery = new BooleanQuery();
 
     public LegacySolrInformationServer(AlfrescoCoreAdminHandler adminHandler, SolrCore core)
@@ -196,25 +197,57 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
         this.coreTracker = new MultiThreadedCoreTracker(adminHandler.getScheduler(), id, p, keyResourceLoader,
                     coreName, this);
         
-        skipDescendantAuxDocsForSpecificTypes = Boolean.parseBoolean(p.getProperty("alfresco.metadata.skipDescendantAuxDocsForSpecificTypes", "false"));
-
+        this.skipDescendantAuxDocsForSpecificTypes = Boolean.parseBoolean(p.getProperty("alfresco.metadata.skipDescendantAuxDocsForSpecificTypes", "false"));
         if (skipDescendantAuxDocsForSpecificTypes)
         {
-            int i = 0;
-            skippingDocsQuery = new BooleanQuery();
-            for (String key = new StringBuilder(PROP_PREFIX_PARENT_TYPE).append(i).toString(); p.containsKey(key); key = new StringBuilder(PROP_PREFIX_PARENT_TYPE).append(++i)
-                    .toString())
+            initSkippingDescendantAuxDocs(p, typesForSkippingDescendantAuxDocs, PROP_PREFIX_PARENT_TYPE, QueryConstants.FIELD_TYPE, new DefinitionExistChecker()
             {
-                String qName = p.getProperty(key);
-                if ((null != qName) && !qName.isEmpty())
+                @Override
+                public boolean isDefinitionExists(QName qName)
                 {
-                    QName typeQName = QName.resolveToQName(dataModel.getNamespaceDAO(), qName);
-                    TypeDefinition type = dataModel.getDictionaryService(CMISStrictDictionaryService.DEFAULT).getType(typeQName);
-                    if (null != type)
-                    {
-                        typesForSkippingDescendantAuxDocs.add(typeQName);
-                        skippingDocsQuery.add(new TermQuery(new Term(QueryConstants.FIELD_TYPE, typeQName.toString())), Occur.SHOULD);
-                    }
+                    return (null != dataModel.getDictionaryService(CMISStrictDictionaryService.DEFAULT).getType(qName));
+                }
+            });
+        }
+        this.skipDescendantAuxDocsForSpecificAspects = Boolean.parseBoolean(p.getProperty("alfresco.metadata.skipDescendantAuxDocsForSpecificAspects", "false"));
+        if (skipDescendantAuxDocsForSpecificAspects)
+        {
+            initSkippingDescendantAuxDocs(p, aspectsForSkippingDescendantAuxDocs, PROP_PREFIX_PARENT_ASPECT, QueryConstants.FIELD_ASPECT, new DefinitionExistChecker()
+            {
+                @Override
+                public boolean isDefinitionExists(QName qName)
+                {
+                    return (null != dataModel.getDictionaryService(CMISStrictDictionaryService.DEFAULT).getAspect(qName));
+                }
+            });
+        }
+    }
+
+    private interface DefinitionExistChecker
+    {
+        boolean isDefinitionExists(QName qName);
+    }
+
+    private void initSkippingDescendantAuxDocs(Properties p, Set<QName> dataForSkippingDescendantAuxDocs, String propPrefixParent,
+            String skipByField, DefinitionExistChecker dec)
+    {
+        int i = 0;
+        for (String key = new StringBuilder(propPrefixParent).append(i).toString(); p.containsKey(key);
+                key = new StringBuilder(propPrefixParent).append(++i).toString())
+        {
+            String qNameInString = p.getProperty(key);
+            if ((null != qNameInString) && !qNameInString.isEmpty())
+            {
+                QName qName = QName.resolveToQName(dataModel.getNamespaceDAO(), qNameInString);
+                if (qName == null && log.isWarnEnabled())
+                {
+                    log.warn("QName was not found for " + qNameInString);
+                }
+                if (dec.isDefinitionExists(qName))
+                {
+                    dataForSkippingDescendantAuxDocs.add(qName);
+                    // default is OR operator
+                    skippingDocsQuery.add(new TermQuery(new Term(skipByField, qName.toString())), Occur.SHOULD);
                 }
             }
         }
@@ -1102,11 +1135,28 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
 
     }
 
+    private boolean shouldBeIgnoredByAnyAspect(Set<QName> aspects)
+    {
+        if (null == aspects)
+        {
+            return false;
+        }
+        for (QName aspectForSkipping : aspectsForSkippingDescendantAuxDocs)
+        {
+            if (aspects.contains(aspectForSkipping))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void doUpdateDescendantAuxDocs(NodeMetaData parentNodeMetaData, boolean overwrite,
                 SolrIndexSearcher solrIndexSearcher, LinkedHashSet<Long> stack, DocSet skippingDocs) throws AuthenticationException,
                 IOException, JSONException
     {
-        if (skipDescendantAuxDocsForSpecificTypes && typesForSkippingDescendantAuxDocs.contains(parentNodeMetaData.getType()))
+        if ((skipDescendantAuxDocsForSpecificTypes && typesForSkippingDescendantAuxDocs.contains(parentNodeMetaData.getType())) ||
+                (skipDescendantAuxDocsForSpecificAspects && shouldBeIgnoredByAnyAspect(parentNodeMetaData.getAspects())))
         {
             return;
         }
@@ -1211,7 +1261,8 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
     {
         boolean result = false;
 
-        if (skipDescendantAuxDocsForSpecificTypes && !typesForSkippingDescendantAuxDocs.isEmpty())
+        if ((skipDescendantAuxDocsForSpecificTypes && !typesForSkippingDescendantAuxDocs.isEmpty())
+                || (skipDescendantAuxDocsForSpecificAspects && !aspectsForSkippingDescendantAuxDocs.isEmpty()))
         {
             BooleanQuery query = new BooleanQuery();
             query.add(new TermQuery(new Term(QueryConstants.FIELD_DBID, NumericEncoder.encode(dbId))), Occur.MUST);

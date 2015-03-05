@@ -371,10 +371,7 @@
          }
          
          // Make sure ok button is in the correct state if dialog is reused  
-         if (this.isFormOwner)
-         {
-            this.widgets.cancelButton.set("disabled", false);
-         }
+         this.widgets.cancelButton.set("disabled", false);
          this.form.validate();
 
          this.dialog.show();
@@ -651,10 +648,7 @@
       onFailure: function AmSD_onFailure(response)
       {
          // Make sure ok button is in the correct state if dialog is reused
-         if (this.isFormOwner)
-         {
-            this.widgets.cancelButton.set("disabled", false);
-         }
+         this.widgets.cancelButton.set("disabled", false);
          this.form.validate();
 
          // Invoke the callback if one was supplied

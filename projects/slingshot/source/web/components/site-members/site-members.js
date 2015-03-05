@@ -543,7 +543,8 @@
       renderCellUninvite: function SiteMembers_renderCellUninvite(elCell, oRecord, oColumn, oData)
       {
          Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
+         Dom.addClass(elCell.parentNode, "uninvite");
+       
          if (this.isCurrentUserSiteAdmin)
          {
             // create HTML for representing buttons
@@ -563,6 +564,8 @@
                    scope: this
                 }
             });
+
+            button.addClass("uninvite");
 
             // store the buttons
             this.buttons[userName + "-button"] =

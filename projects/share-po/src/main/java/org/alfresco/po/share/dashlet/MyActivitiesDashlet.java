@@ -53,6 +53,8 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
     private static final By RSS_FEED_BUTTON = By.cssSelector(".titleBarActionIcon.rss");
     private static final By HISTORY_BUTTON = By.cssSelector("button[id$='default-range-button']");
     private static final By DASHLET_LIST_OF_FILTER = By.cssSelector("div.activities div.visible ul.first-of-type li a");
+    private static final By MY_ACTIVITIES_MORE_LINK = By
+            .xpath("//div[@class='activity']/following::div[@class='hidden']/preceding-sibling::div[@class='more']/a");
 
     public enum LinkType
     {
@@ -96,26 +98,36 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
 
         try
         {
-            List<WebElement> links = drone.findAll(By.cssSelector("div[id$='default-activityList'] > div.activity"));
+            List<WebElement> linksMore = drone.findAll(MY_ACTIVITIES_MORE_LINK);
+            if (!linksMore.isEmpty())
+            {
+                for (WebElement link : linksMore)
+                {
+                    link.click();
+                }
+            }
+
+            List<WebElement> links = drone.findAll(By.cssSelector("div[id$='default-activityList'] > div.activity div:last-child[class$='content']"));
 
             for (WebElement div : links)
             {
-                WebElement userLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class^='theme-color']"));
+                WebElement userLink = div.findElement(By.cssSelector("div.content>span.detail>a[class^='theme-color']"));
+
                 ShareLink user = new ShareLink(userLink, drone);
 
                 String description = div.findElement(By.cssSelector("div.content>span.detail")).getText();
 
-                if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a")).size() < 2)
+                if (div.findElements(By.cssSelector("div.content>span.detail>a")).size() < 2)
                 {
                     activity.add(new ActivityShareLink(user, description));
                 }
 
-                else if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a")).size() == 2)
+                else if (div.findElements(By.cssSelector("div.content>span.detail>a")).size() == 2)
                 {
 
-                    if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a[class^='theme-color']")).size() > 1)
+                    if (div.findElements(By.cssSelector("div.content>span.detail>a[class^='theme-color']")).size() > 1)
                     {
-                        List<WebElement> userLinks = div.findElements(By.cssSelector("div.activity>div.content>span.detail>a[class^='theme-color']"));
+                        List<WebElement> userLinks = div.findElements(By.cssSelector("div.content>span.detail>a[class^='theme-color']"));
                         for (WebElement element : userLinks)
                         {
                             shareLinks.add(new ShareLink(element, drone));
@@ -124,18 +136,18 @@ public class MyActivitiesDashlet extends AbstractDashlet implements Dashlet
                     }
                     else
                     {
-                        WebElement siteLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class^='site-link']"));
+                        WebElement siteLink = div.findElement(By.cssSelector("div.content>span.detail>a[class^='site-link']"));
                         ShareLink site = new ShareLink(siteLink, drone);
                         activity.add(new ActivityShareLink(user, site, description));
                     }
                 }
 
-                else if (div.findElements(By.cssSelector("div.activity>div.content>span.detail>a")).size() > 2)
+                else if (div.findElements(By.cssSelector("div.content>span.detail>a")).size() > 2)
                 {
-                    WebElement siteLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class^='site-link']"));
+                    WebElement siteLink = div.findElement(By.cssSelector("div.content>span.detail>a[class^='site-link']"));
                     ShareLink site = new ShareLink(siteLink, drone);
 
-                    WebElement documentLink = div.findElement(By.cssSelector("div.activity>div.content>span.detail>a[class*='item-link']"));
+                    WebElement documentLink = div.findElement(By.cssSelector("div.content>span.detail>a[class*='item-link']"));
                     ShareLink document = new ShareLink(documentLink, drone);
                     activity.add(new ActivityShareLink(user, document, site, description));
                 }

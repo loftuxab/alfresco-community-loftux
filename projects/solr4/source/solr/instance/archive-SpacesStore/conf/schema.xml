@@ -730,6 +730,11 @@
       <dynamicField name="content@m___t@*"          type="text___"           indexed="true" omitNorms="false"  stored="false"  multiValued="true" />
 
 
+      <!-- Suggestion -->
+      <dynamicField name="suggest_*"               type="text_shingle"    indexed="false"  omitNorms="true"  stored="false"  multiValued="true" />
+
+      <copyField source="suggest_*" dest="suggest" />
+
    </fields>
 
    <uniqueKey>id</uniqueKey>
