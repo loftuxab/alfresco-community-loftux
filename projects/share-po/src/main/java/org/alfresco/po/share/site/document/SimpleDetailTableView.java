@@ -384,7 +384,10 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
     {
        try
         {
-            selectMoreAction().click();
+            WebElement actions = selectAction();
+            drone.mouseOver(actions);
+            WebElement contentActions = selectAction();
+            contentActions.findElement(By.cssSelector(MORE_ACTIONS)).click();
             return super.selectUploadNewVersion();
         }
         catch (NoSuchElementException e)
@@ -398,8 +401,6 @@ public abstract class SimpleDetailTableView extends FileDirectoryInfoImpl
 
         throw new PageOperationException("Error in Select Delete.");
     }
-
-
 
     /*
      * (non-Javadoc)
