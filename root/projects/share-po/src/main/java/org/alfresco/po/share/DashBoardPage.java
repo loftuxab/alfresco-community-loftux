@@ -104,15 +104,5 @@ public class DashBoardPage extends SharePage implements Dashboard
         return FactoryShareDashlet.getPage(drone, name);
     }
     
-    /**
-     * Gets dashlets in the dashboard page.
-     * 
-     * @param name
-     * @return
-     */
-    public Dashlet getDashlets(final String name)
-    {
-        return FactorySharePage.resolveDashletPage(drone, name);
-    }
-
+ 
 }
