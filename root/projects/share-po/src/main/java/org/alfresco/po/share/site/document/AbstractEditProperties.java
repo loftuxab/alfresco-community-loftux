@@ -249,6 +249,23 @@ public abstract class AbstractEditProperties extends ShareDialogue
         drone.findAndWait(CHECK_BOX_MODEL_ACTIVE).click();
 
     }
+    
+    /**
+     * Method to check if Model is Active
+     */
+
+    public boolean isModelActive()
+    {
+        try
+        {
+            return drone.findAndWait(CHECK_BOX_MODEL_ACTIVE).isSelected();
+        }
+        catch (TimeoutException te)
+        {
+
+        }
+        return false;
+    }
 
     /**
      * Method to set Workflow Deployed check box
