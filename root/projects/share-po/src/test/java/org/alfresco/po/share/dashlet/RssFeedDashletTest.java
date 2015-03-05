@@ -124,6 +124,7 @@ public class RssFeedDashletTest extends AbstractSiteDashletTest
         rssFeedUrlBoxPage = rssFeedDashlet.clickConfigure().render();
         rssFeedUrlBoxPage.fillURL(rssUrl);
         rssFeedUrlBoxPage.selectNrOfItemsToDisplay(RssFeedUrlBoxPage.NrItems.Five);
+        assertTrue(rssFeedUrlBoxPage.isOkButtonEnabled());
         rssFeedUrlBoxPage.clickOk();
 
         for (int i = 0; i < 1000; i++)
