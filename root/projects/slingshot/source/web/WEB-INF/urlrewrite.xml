@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.0//EN" "http://tuckey.org/res/dtds/urlrewrite3.0.dtd">
 <urlrewrite use-query-string="true" decode-using="null">
+   
+   <rule>
+      <from>^/page/(.*dashboard)/$</from>
+      <to type="redirect">/share/page/$1</to>
+   </rule>
 
    <!-- Quick Share doc -->
    <rule>
