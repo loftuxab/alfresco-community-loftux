@@ -62,15 +62,15 @@ public class SiteSearchDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized SiteSearchDashlet render(RenderTime timer)
+    public SiteSearchDashlet render(RenderTime timer)
     {
         try
         {
             while (true)
             {
-                timer.start();
                 synchronized (this)
                 {
+                    timer.start();
                     try
                     {
                         this.wait(WAIT_TIME);
@@ -91,11 +91,11 @@ public class SiteSearchDashlet extends AbstractDashlet implements Dashlet
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for SiteSearchDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {

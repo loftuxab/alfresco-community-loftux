@@ -50,6 +50,8 @@ public class WikiDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
+                    scrollDownToDashlet();
+                    getFocus();
                     this.dashlet = drone.find(DASHLET_CONTAINER_PLACEHOLDER);
                     break;
                 }

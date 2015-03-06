@@ -1,7 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <suite name="Dashlet Suite" verbose="6" preserve-order="true" parallel="tests" thread-count="1">
-    <!--<test name="ConfigureSavedSearchDialogBoxPageTest">
+    <test name="ConfigureSavedSearchDialogBoxPageTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.ConfigureSavedSearchDialogBoxPageTest" />
         </classes>
@@ -32,28 +32,28 @@
             <class name="org.alfresco.po.share.dashlet.ImagePreviewDashletTest" />
         </classes>
     </test>
-    <test name="MyDiscussionsDashletTest">
+<!--    <test name="MyDiscussionsDashletTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.MyDiscussionsDashletTest" />
         </classes>
-    </test>
+    </test>-->
     <test name="MySiteDashletTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.MySiteDashletTest" />
         </classes>
     </test>
-    &lt;!&ndash; WEBDRONE-746 FIXME
+    <!--WEBDRONE-746 FIXME
     <test name="MyTasksDashletTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.MyTasksDashletTest" />
         </classes>
     </test>
-    &ndash;&gt;
-    <test name="RssFeedDashletTest">
+    -->
+<!--    <test name="RssFeedDashletTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.RssFeedDashletTest" />
         </classes>
-    </test>
+    </test>-->
     <test name="SavedSearchDashletTest">
         <classes>
             <class name="org.alfresco.po.share.dashlet.SavedSearchDashletTest" />
@@ -133,5 +133,5 @@
         <classes>
             <class name="org.alfresco.po.share.dashlet.EditingContentDashletTest" />
         </classes>
-    </test>-->
+    </test>
 </suite>

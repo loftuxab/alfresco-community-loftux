@@ -47,7 +47,7 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized MyCalendarDashlet render(RenderTime timer)
+    public MyCalendarDashlet render(RenderTime timer)
     {
         try
         {
@@ -68,17 +68,16 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
                 {
                     scrollDownToDashlet();
                     getFocus();
-                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    this.dashlet = drone.find(DASHLET_CONTAINER_PLACEHOLDER);
                     break;
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for MyCalendarDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {
@@ -265,7 +264,7 @@ public class MyCalendarDashlet extends AbstractDashlet implements Dashlet
     /**
      * Return the name of the event.
      * 
-     * @param eventName
+     * @param event
      * @return
      */
     public boolean isRepeating(String event)

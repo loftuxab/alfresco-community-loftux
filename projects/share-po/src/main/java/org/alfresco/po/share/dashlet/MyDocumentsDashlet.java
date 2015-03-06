@@ -78,7 +78,7 @@ public class MyDocumentsDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized MyDocumentsDashlet render(RenderTime timer)
+    public MyDocumentsDashlet render(RenderTime timer)
     {
         try
         {
@@ -97,17 +97,18 @@ public class MyDocumentsDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
-                    this.dashlet = drone.findAndWait(By.cssSelector(DASHLET_DIV_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    scrollDownToDashlet();
+                    getFocus(By.cssSelector(DASHLET_DIV_CONTAINER_PLACEHOLDER));
+                    this.dashlet = drone.find(By.cssSelector(DASHLET_DIV_CONTAINER_PLACEHOLDER));
                     break;
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for SiteWelcomeDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {

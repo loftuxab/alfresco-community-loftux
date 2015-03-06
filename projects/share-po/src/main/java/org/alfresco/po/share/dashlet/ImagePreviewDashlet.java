@@ -45,7 +45,7 @@ public class ImagePreviewDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized ImagePreviewDashlet render(RenderTime timer)
+    public ImagePreviewDashlet render(RenderTime timer)
     {
         try
         {
@@ -74,12 +74,11 @@ public class ImagePreviewDashlet extends AbstractDashlet implements Dashlet
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for ImagePreviewDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {
