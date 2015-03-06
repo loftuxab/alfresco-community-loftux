@@ -165,7 +165,7 @@ public class CreateNewFolderInCloudPage extends SharePage
     {
         try
         {
-            drone.findAndWait(NAME_LABEL);
+            drone.find(NAME_LABEL);
             return true;
         }
         catch (TimeoutException te)
@@ -178,7 +178,7 @@ public class CreateNewFolderInCloudPage extends SharePage
     {
         try
         {
-            drone.findAndWait(DESCRIPTION_LABEL);
+            drone.find(DESCRIPTION_LABEL);
             return true;
         }
         catch (TimeoutException te)
