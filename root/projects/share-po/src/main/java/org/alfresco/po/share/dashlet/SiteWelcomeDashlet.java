@@ -14,8 +14,6 @@
  */
 package org.alfresco.po.share.dashlet;
 
-import java.util.List;
-
 import org.alfresco.po.share.ShareLink;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.webdrone.HtmlPage;
@@ -29,19 +27,21 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 /**
  * Site Welcome dashlet object, holds all element of the HTML relating to site welcome dashlet.
- * 
+ *
  * @author Shan Nagarajan
  * @since 1.6.1
  */
 public class SiteWelcomeDashlet extends AbstractDashlet implements Dashlet
 {
-    private static Log logger = LogFactory.getLog(SiteWelcomeDashlet.class);
     private static final String REMOVE_WELCOME_DASHLET = ".welcome-close-button";
     private static final String DASHLET_CONTAINER_PLACEHOLDER = "div.dashlet.dynamic-welcome";
     private static final String PROMPT_PANEL_ID = "prompt.panel.id";
     private static final String OPTIONS_CSS_LOCATION = ".welcome-details-column-info>a";
+    private static Log logger = LogFactory.getLog(SiteWelcomeDashlet.class);
 
     /**
      * Constructor.
@@ -53,7 +53,7 @@ public class SiteWelcomeDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized SiteWelcomeDashlet render(RenderTime timer)
+    public SiteWelcomeDashlet render(RenderTime timer)
     {
         try
         {
@@ -72,23 +72,23 @@ public class SiteWelcomeDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
-                    if (isWelcomeMessageDisplayed())
+                    scrollDownToDashlet();
+                    getFocus(By.cssSelector(DASHLET_CONTAINER_PLACEHOLDER));
+                    dashlet = drone.find(By.cssSelector(DASHLET_CONTAINER_PLACEHOLDER));
+                    if (logger.isTraceEnabled())
                     {
-                        dashlet = drone.find(By.cssSelector(DASHLET_CONTAINER_PLACEHOLDER));
-                        if (logger.isTraceEnabled())
-                        {
-                            logger.trace("== found it == " + dashlet.isDisplayed());
-                        }
-                        break;
+                        logger.trace("== found it == " + dashlet.isDisplayed());
                     }
+                    break;
+
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for SiteWelcomeDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {
@@ -119,7 +119,7 @@ public class SiteWelcomeDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Find Welcome Dashlet remove button and close the dashlet.
-     * 
+     *
      * @return {@link HtmlPage} page response
      */
     public synchronized HtmlPage removeDashlet()
@@ -148,7 +148,7 @@ public class SiteWelcomeDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * The Welcome Dashlet shows some options on this Dashlet.
-     * 
+     *
      * @return {@link List}<ShareLink> site links
      */
     public synchronized List<ShareLink> getOptions()
@@ -158,7 +158,7 @@ public class SiteWelcomeDashlet extends AbstractDashlet implements Dashlet
 
     /**
      * Check if welcome message is displayed.
-     * 
+     *
      * @return true if displayed.
      */
     public boolean isWelcomeMessageDisplayed()

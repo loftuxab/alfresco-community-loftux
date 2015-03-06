@@ -5,6 +5,8 @@ import org.alfresco.po.share.site.datalist.NewListForm;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
 
 import java.util.Collections;
@@ -22,6 +24,7 @@ public class SiteDataListsDashlet extends AbstractDashlet implements Dashlet
     private static final By DASHLET_CONTAINER_PLACEHOLDER = By.cssSelector("div.dashlet.site-data-lists");
     private static final By CREATE_DATA_LIST = By.cssSelector("a[href='data-lists#new']");
     private static final By DATA_LIST_IN_DASHLET = By.cssSelector("div#list>a");
+    private static Log logger = LogFactory.getLog(SiteDataListsDashlet.class);
 
     /**
      * Constructor.
@@ -34,7 +37,7 @@ public class SiteDataListsDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized SiteDataListsDashlet render(RenderTime timer)
+    public SiteDataListsDashlet render(RenderTime timer)
     {
         try
         {
@@ -53,17 +56,18 @@ public class SiteDataListsDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
-                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    scrollDownToDashlet();
+                    getFocus(DASHLET_CONTAINER_PLACEHOLDER);
+                    this.dashlet = drone.find(DASHLET_CONTAINER_PLACEHOLDER);
                     break;
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for SiteDataListsDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {

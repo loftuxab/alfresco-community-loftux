@@ -61,7 +61,7 @@ public class SavedSearchDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized SavedSearchDashlet render(RenderTime timer)
+    public SavedSearchDashlet render(RenderTime timer)
     {
         try
         {
@@ -90,12 +90,11 @@ public class SavedSearchDashlet extends AbstractDashlet implements Dashlet
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for SavedSearchDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {

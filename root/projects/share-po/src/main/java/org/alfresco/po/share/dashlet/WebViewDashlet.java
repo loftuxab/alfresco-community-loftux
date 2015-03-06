@@ -5,6 +5,8 @@ import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageOperationException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -16,6 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class WebViewDashlet extends AbstractDashlet implements Dashlet
 {
+    private static Log logger = LogFactory.getLog(WebViewDashlet.class);
     private static final By DASHLET_CONTAINER_PLACEHOLDER = By.cssSelector("div.dashlet.webview");
     private static final By IF_FRAME_WITH_SITE = By.cssSelector("iframe[class='iframe-body']");
     private static final By DEFAULT_MESSAGE = By.cssSelector("h3[class$='default-body']");
@@ -32,7 +35,7 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized WebViewDashlet render(RenderTime timer)
+    public WebViewDashlet render(RenderTime timer)
     {
         try
         {
@@ -51,17 +54,18 @@ public class WebViewDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
-                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    scrollDownToDashlet();
+                    getFocus();
+                    this.dashlet = drone.find(DASHLET_CONTAINER_PLACEHOLDER);
                     break;
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for WebViewDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {

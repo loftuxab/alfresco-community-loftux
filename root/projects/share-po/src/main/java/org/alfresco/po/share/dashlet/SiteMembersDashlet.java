@@ -26,10 +26,7 @@ import org.alfresco.webdrone.exception.PageOperationException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import java.util.List;
 
@@ -41,12 +38,12 @@ import java.util.List;
  */
 public class SiteMembersDashlet extends AbstractDashlet implements Dashlet
 {
-    private static Log logger = LogFactory.getLog(SiteMembersDashlet.class);
     private static final String DATA_LIST_CSS_LOCATION = "div.detail-list-item > div.person > h3 > a";
     private static final By DASHLET_CONTAINER_PLACEHOLDER = By.cssSelector("div.dashlet.colleagues");
     private static final By INVITE_LINK = By.cssSelector("div.dashlet.colleagues>div.toolbar>div>span>span>a[href='invite']");
     private static final By ALL_MEMBERS_LINK = By.cssSelector("div.dashlet.colleagues>div.toolbar>div>span>span>[href$='site-members']");
     private static final By USER_LINK = By.cssSelector("h3>.theme-color-1");
+    private static Log logger = LogFactory.getLog(SiteMembersDashlet.class);
     private WebElement dashlet;
 
     /**
@@ -82,21 +79,39 @@ public class SiteMembersDashlet extends AbstractDashlet implements Dashlet
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized SiteMembersDashlet render(RenderTime timer)
+    public SiteMembersDashlet render(RenderTime timer)
     {
         try
         {
             while (true)
             {
+                timer.start();
+                synchronized (this)
+                {
+                    try
+                    {
+                        this.wait(50L);
+                    }
+                    catch (InterruptedException e)
+                    {
+                    }
+                }
                 try
                 {
-                    timer.start();
-                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    getFocus(DASHLET_CONTAINER_PLACEHOLDER);
+                    this.dashlet = drone.find(DASHLET_CONTAINER_PLACEHOLDER);
                     break;
                 }
-                catch (Exception e)
+
+                catch (NoSuchElementException e)
                 {
+                    logger.error("The placeholder for SiteMembersDashlet dashlet was not found ", e);
                 }
+                catch (StaleElementReferenceException ste)
+                {
+                    logger.error("DOM has changed therefore page should render once change", ste);
+                }
+
                 finally
                 {
                     timer.end();
@@ -130,7 +145,7 @@ public class SiteMembersDashlet extends AbstractDashlet implements Dashlet
         {
             throw new IllegalArgumentException("Name value of link is required");
         }
-        
+
         try
         {
             List<WebElement> userRowList = dashlet.findElements(By.cssSelector("div.person"));
@@ -146,11 +161,11 @@ public class SiteMembersDashlet extends AbstractDashlet implements Dashlet
                 }
             }
         }
-        catch(NoSuchElementException nse)
+        catch (NoSuchElementException nse)
         {
             logger.error("Unabled to find the member css.", nse);
         }
-        
+
         throw new PageOperationException("Could not find site member for name - " + emailId);
     }
 
