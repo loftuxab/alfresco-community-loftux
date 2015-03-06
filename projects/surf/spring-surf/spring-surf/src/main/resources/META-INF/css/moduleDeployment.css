@@ -59,7 +59,8 @@ select
 
 .scrollableContainer
 {
-   width: 400px;
+   width: 405px;
+   height:180px;
    -moz-overflow: auto; /* Mozilla */
    -ms-overflow: auto;  /*Microsoft */
    -webkit-overflow: auto; /* Webkit */
