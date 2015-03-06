@@ -182,6 +182,7 @@ public class SolrInformationServer implements InformationServer
     private Set<QName> aspectsForSkippingDescendantDocs = new HashSet<QName>();
     private String skippingDocsQueryString;
     private SOLRAPIClient repositoryClient;
+    private boolean isSkippingDocsInitialized = false;
     
     protected final static Logger log = LoggerFactory.getLogger(SolrInformationServer.class);
     protected enum FTSStatus {New, Dirty, Clean};
@@ -229,6 +230,16 @@ public class SolrInformationServer implements InformationServer
         
         dataModel = AlfrescoSolrDataModel.getInstance();
 
+        contentStreamLimit = Integer.parseInt(p.getProperty("alfresco.contentStreamLimit", "10000000"));
+    }
+
+    synchronized public void initSkippingDescendantDocs()
+    {
+        if (isSkippingDocsInitialized)
+        {
+            return;
+        }
+        Properties p = core.getResourceLoader().getCoreProperties();
         skipDescendantDocsForSpecificTypes = Boolean.parseBoolean(p.getProperty("alfresco.metadata.skipDescendantDocsForSpecificTypes", "false"));
         if (skipDescendantDocsForSpecificTypes)
         {
@@ -253,8 +264,7 @@ public class SolrInformationServer implements InformationServer
                 }
             });
         }
-        
-        contentStreamLimit = Integer.parseInt(p.getProperty("alfresco.contentStreamLimit", "10000000"));
+        isSkippingDocsInitialized = true;
     }
 
     private interface DefinitionExistChecker

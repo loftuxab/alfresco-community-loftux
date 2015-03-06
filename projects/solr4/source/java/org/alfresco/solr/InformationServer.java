@@ -125,4 +125,6 @@ public interface InformationServer extends InformationServerCollectionProvider
     Transaction getMaxTransactionIdAndCommitTimeInIndex();
 
     AlfrescoCoreAdminHandler getAdminHandler();
+
+    void initSkippingDescendantDocs();
 }
