@@ -205,6 +205,10 @@ public class ModelTracker extends AbstractTracker implements Tracker
                 }
 
                 trackModelsImpl();
+                if (onlyFirstTime)
+                {
+                    infoSrv.initSkippingDescendantDocs();
+                }
                 hasModels = true;
             }
             finally
