@@ -103,6 +103,7 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.Version;
 import org.apache.solr.core.CoreDescriptorDecorator;
+import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.search.SyntaxError;
@@ -462,8 +463,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
     
     private File getResourceDirectory()
     {
-        File f = new File("alfrescoResources");
-        return f;
+        return new File(SolrResourceLoader.locateSolrHome(), "conf");
     }  
     
     /**
