@@ -258,7 +258,7 @@ public abstract class AbstractEditProperties extends ShareDialogue
     {
         try
         {
-            return drone.findAndWait(CHECK_BOX_MODEL_ACTIVE).isSelected();
+            return drone.find(CHECK_BOX_MODEL_ACTIVE).isSelected();
         }
         catch (TimeoutException te)
         {
