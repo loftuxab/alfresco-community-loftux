@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.po.share.util.PageUtils;
+import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -91,7 +92,7 @@ public class ActionsSet
      * @param actionName the action name
      * @param dialogButtonName the name of the dialog button to click
      */
-    public void clickActionByNameAndDialogByButtonName(String actionName, String dialogButtonName)
+    public HtmlPage clickActionByNameAndDialogByButtonName(String actionName, String dialogButtonName)
     {
         // Click the action
         clickActionByName(actionName);
@@ -114,6 +115,7 @@ public class ActionsSet
                 }
             }
         }
+        return drone.getCurrentPage().render();
     }
 
     /**
