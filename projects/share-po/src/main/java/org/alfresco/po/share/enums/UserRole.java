@@ -66,4 +66,12 @@ public enum UserRole
         throw new NoSuchElementException("No Role for value - " + name);
     }
 
+    /**
+     * helper method to
+     * return siteRole for API requests in correct format (without spaces)
+     */
+    public String getSiteRole()
+    {
+        return roleName.replace(" ", "");
+    }
 }
