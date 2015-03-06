@@ -841,11 +841,12 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             docLibNav.isCreateContentPresent(ContentType.GOOGLESPREADSHEET));
         ShareUserSitePage.navigateToFolder(drone, folderName).render();
         ShareUserGoogleDocs.createAndSavegoogleDocBySignIn(drone, fileName, ContentType.GOOGLEDOCS).render();
-        Assert.assertTrue(docsPage.isFileVisible(fileName), "The document wasn't created");
+        Assert.assertTrue(docsPage.isFileVisible(fileName+".docx"), "The document wasn't created");
         // Login to cloud and verify the synced files appeared
         ShareUser.login(hybridDrone, adminUserPrem, DEFAULT_PASSWORD);
-        docsPage = ShareUser.openSitesDocumentLibrary(hybridDrone, siteName);
-        assertTrue(docsPage.isItemVisble(fileName) && docsPage.getFileDirectoryInfo(fileName).isCloudSynced(), "The item wasn't synced to Cloud");
+        ShareUser.openSiteDocumentLibraryFromSearch(hybridDrone, siteName);
+        docsPage=docsPage.selectFolder(folderName).render();
+        assertTrue(docsPage.isItemVisble(fileName+".docx") && docsPage.getFileDirectoryInfo(fileName).isCloudSynced(), "The item wasn't synced to Cloud");
     }
 
     /**
