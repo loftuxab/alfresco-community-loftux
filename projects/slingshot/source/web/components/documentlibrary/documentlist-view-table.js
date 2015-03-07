@@ -312,7 +312,8 @@
          var currentColumnDefinitionsCall = scope.widgets.dataTable.getColumnSet().getDefinitions();
          
          // currentColumnDefinitionsCall changes during iteration
-         for (var i = 0; i < currentColumnDefinitionsCall.length; i++)
+         // therefore we use countdown
+         for (var i = currentColumnDefinitionsCall.length-1; i >= 0 ; i--)
          {
             switch (currentColumnDefinitionsCall[i].key)
             {
