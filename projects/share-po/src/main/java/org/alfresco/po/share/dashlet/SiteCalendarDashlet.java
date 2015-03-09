@@ -63,7 +63,11 @@ public class SiteCalendarDashlet extends AbstractDashlet implements Dashlet
                 }
                 catch (NoSuchElementException e)
                 {
-                    logger.info("The Dashlate was not found " + e);
+                    logger.info("The placeholder for SiteCalendarDashlet dashlet was not found  " + e);
+                }
+                catch (StaleElementReferenceException ste)
+                {
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {

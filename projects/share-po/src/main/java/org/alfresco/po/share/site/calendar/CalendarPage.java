@@ -904,6 +904,7 @@ public class CalendarPage extends SitePage
             logger.info("Check that link with name " + eventName + " presented at the current tab");
             if (!eventName.isEmpty())
             {
+                waitUntilAlert();
                 String linkEventXpath = String.format(eventType.getXpathLocator(), eventName);
                 WebElement element = drone.find(By.xpath(linkEventXpath));
                 return element.isDisplayed();

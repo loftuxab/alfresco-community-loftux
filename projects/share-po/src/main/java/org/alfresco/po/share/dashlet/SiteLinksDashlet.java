@@ -43,7 +43,7 @@ public class SiteLinksDashlet extends AbstractDashlet implements Dashlet
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized SiteLinksDashlet render(RenderTime timer)
+    public SiteLinksDashlet render(RenderTime timer)
     {
         try
         {
@@ -62,17 +62,18 @@ public class SiteLinksDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
-                    this.dashlet = drone.findAndWait((DASHLET_CONTAINER_PLACEHOLDER), 100L, 10L);
+                    scrollDownToDashlet();
+                    getFocus(DASHLET_CONTAINER_PLACEHOLDER);
+                    this.dashlet = drone.find(DASHLET_CONTAINER_PLACEHOLDER);
                     break;
                 }
                 catch (NoSuchElementException e)
                 {
-
+                    logger.error("The placeholder for SiteLinksDashlet dashlet was not found ", e);
                 }
                 catch (StaleElementReferenceException ste)
                 {
-                    // DOM has changed therefore page should render once change
-                    // is completed
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
                 finally
                 {

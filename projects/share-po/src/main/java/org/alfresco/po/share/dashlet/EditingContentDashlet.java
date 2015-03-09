@@ -77,12 +77,18 @@ public class EditingContentDashlet extends AbstractDashlet implements Dashlet
                 }
                 try
                 {
+                    scrollDownToDashlet();
+                    getFocus(DASHLET_CONTAINER_PLACEHOLDER);
                     this.dashlet = drone.find((DASHLET_CONTAINER_PLACEHOLDER));
                     break;
                 }
-                catch (NoSuchElementException nse)
+                catch (NoSuchElementException e)
                 {
-                    logger.info("The Dashlate was not found " + nse);
+                    logger.error("The placeholder for EditingContentDashlet dashlet was not found ", e);
+                }
+                catch (StaleElementReferenceException ste)
+                {
+                    logger.error("DOM has changed therefore page should render once change", ste);
                 }
 
                 finally

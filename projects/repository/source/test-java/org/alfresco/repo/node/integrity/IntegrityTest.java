@@ -245,6 +245,20 @@ public class IntegrityTest extends TestCase
         checkIntegrityNoFailure();
     }
     
+    public void testCreateWithNullMandatoryProperty() throws Exception
+    {
+        allProperties.put(TEST_PROP_TEXT_A, null);
+        NodeRef nodeRef = createNode("abc", TEST_TYPE_WITH_PROPERTIES, allProperties);
+        checkIntegrityExpectFailure("Failed to detect null mandatory properties", 1);
+    }
+    
+    public void testCreateWithEmptyMandatoryProperty() throws Exception
+    {
+        allProperties.put(TEST_PROP_TEXT_A, "");
+        NodeRef nodeRef = createNode("abc", TEST_TYPE_WITH_PROPERTIES, allProperties);
+        checkIntegrityNoFailure();
+    }
+    
     public void testMandatoryPropertiesRemoved() throws Exception
     {
         NodeRef nodeRef = createNode("abc", TEST_TYPE_WITH_PROPERTIES, allProperties);

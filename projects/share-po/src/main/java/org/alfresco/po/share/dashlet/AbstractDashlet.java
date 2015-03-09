@@ -458,4 +458,12 @@ public abstract class AbstractDashlet extends SharePage
             throw new PageException("Unable to find No data found message.", nse);
         }
     }
+
+    /**
+     * This method gets the focus by placing mouse over on Dashlet.
+     */
+    protected void getFocus(By dashletPlaceholder)
+    {
+        drone.mouseOver(drone.findAndWait(dashletPlaceholder));
+    }
 }

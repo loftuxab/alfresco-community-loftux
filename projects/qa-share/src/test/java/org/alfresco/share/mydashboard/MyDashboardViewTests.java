@@ -1,5 +1,7 @@
 package org.alfresco.share.mydashboard;
 
+import java.util.List;
+
 import org.alfresco.po.share.dashlet.MyActivitiesDashlet;
 import org.alfresco.po.share.dashlet.MyDocumentsDashlet;
 import org.alfresco.po.share.dashlet.MySitesDashlet;
@@ -50,23 +52,13 @@ public class MyDashboardViewTests extends AbstractUtils
         Assert.assertTrue(myDocuments.isHelpIconDisplayed(), "Help icon missing");
     }
 
-    @Test(groups = { "DataPrepDashlets" })
-    public void dataPrep_AONE_2820() throws Exception
-    {
-        String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName);
-
-        // Create User
-        String[] testUserInfo = new String[] { testUser };
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
-    }
-
     @Test(groups = { "EnterpriseOnly"}, timeOut = 280000  )
     public void AONE_2820() throws Exception
     {
         String testName = getTestName();
-        String testUser = getUserNameFreeDomain(testName);
-
+        String testUser = getUserNameFreeDomain(testName);     
+        String[] testUserInfo = new String[] { testUser };
+        CreateUserAPI.createEnterpriseUserAPI(drone, ADMIN_USERNAME, testUserInfo);
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         // ---- Step 1 ----
@@ -75,6 +67,8 @@ public class MyDashboardViewTests extends AbstractUtils
         // ---- Expected results ----
         // The dashbord is modified.
         ShareUserDashboard.removeDashletFromUserDashboard(drone, Dashlets.MY_TASKS);
+        List<String> titles = ShareUserDashboard.getAllDashletTitles(drone);
+        Assert.assertFalse(titles.contains("My Tasks"));
         ShareUser.logout(drone);
 
         // ---- Step 2 ----
@@ -90,8 +84,7 @@ public class MyDashboardViewTests extends AbstractUtils
         // Create a new user with the same username .
         // ---- Expected results ----
         // New user is created.
-        String[] testUserInfo = new String[] { testUser };
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
+        CreateUserAPI.createEnterpriseUserAPI(drone, ADMIN_USERNAME, testUserInfo);
 
         // ---- Step 4 ----
         // ---- Step action ---

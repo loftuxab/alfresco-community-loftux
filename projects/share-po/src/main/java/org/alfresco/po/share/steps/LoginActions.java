@@ -40,7 +40,7 @@ public class LoginActions extends CommonActions
 
     /**
      * User Log-in followed by deletion of session cookies Assumes User is *NOT* logged in.
-     *
+     * 
      * @param drone WebDrone Instance
      * @param userInfo String username, password
      * @return boolean true: if log in succeeds
@@ -93,7 +93,7 @@ public class LoginActions extends CommonActions
 
     /**
      * User Log out using logout URL Assumes User is logged in.
-     *
+     * 
      * @param drone WebDrone Instance
      */
     public HtmlPage logout(WebDrone drone)
@@ -103,7 +103,7 @@ public class LoginActions extends CommonActions
         try
         {
             SharePage page = drone.getCurrentPage().render();
-            page.getNav().logout();
+            currentPage = page.getNav().logout().render();
         }
         catch (Exception e)
         {

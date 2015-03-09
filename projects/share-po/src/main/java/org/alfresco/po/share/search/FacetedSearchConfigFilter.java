@@ -29,13 +29,15 @@ public class FacetedSearchConfigFilter
 
     private static final By I_EDIT_CTRL = By.cssSelector("img.editIcon");
     private static final By I_EDIT_INPUT = By.cssSelector("input.dijitInputInner");
-    private static final By I_EDIT_DD_CTRL = By.cssSelector("div.alfresco-forms-controls-DojoSelect table.dijitSelect");
+    // private static final By I_EDIT_DD_CTRL = By.cssSelector("div.alfresco-forms-controls-DojoSelect table.dijitSelect");
+    private static final By I_EDIT_DD_CTRL = By.cssSelector("div.control-row table.dijitSelect");
     private static final String I_EDIT_DD_CTRL_MENU_MOD = "_dropdown";
     private static final By I_EDIT_DD_POPUPMENU_ITEM = By.cssSelector("tr.dijitMenuItem");
     private static final By I_EDIT_SAVE = By.cssSelector("span.action.save");
-    private static final By CONFIRM_DELETE = By.cssSelector("div[style*='opacity: 1']>div>div>span>span>span[class='dijitReset dijitStretch dijitButtonContents']");
+    private static final By CONFIRM_DELETE = By
+            .cssSelector("div[style*='opacity: 1']>div>div>span>span>span[class='dijitReset dijitStretch dijitButtonContents']");
     private static Log logger = LogFactory.getLog(FacetedSearchConfigFilter.class);
-    //private static final By I_EDIT_CANCEL = By.cssSelector("span.action.cancel");
+    // private static final By I_EDIT_CANCEL = By.cssSelector("span.action.cancel");
 
     private WebDrone drone;
 
@@ -53,69 +55,68 @@ public class FacetedSearchConfigFilter
 
     private WebElement filterShow;
     private String filterShow_text;
-    
+
     private String filterDefault_text;
-    
+
     private String filterAvailability_text;
-    
+
     private WebElement filterdelete;
     private String filterdelete_text;
-    
 
     /**
      * Instantiates a new faceted search result - some items may be null.
-     *
+     * 
      * @param drone the drone
      * @param filter the filter
      */
     public FacetedSearchConfigFilter(WebDrone drone, WebElement filter)
     {
-        
+
         this.drone = drone;
-        
-        if(filter.findElements(FILTER_ID).size() > 0)
+
+        if (filter.findElements(FILTER_ID).size() > 0)
         {
             filterId = filter.findElement(FILTER_ID);
             filterId_text = filterId.getText();
         }
-        if(filter.findElements(FILTER_NAME).size() > 0)
+        if (filter.findElements(FILTER_NAME).size() > 0)
         {
             filterName = filter.findElement(FILTER_NAME);
             filterName_text = filterName.getText();
         }
-        if(filter.findElements(FILTER_PROPERTY).size() > 0)
+        if (filter.findElements(FILTER_PROPERTY).size() > 0)
         {
             filterProperty = filter.findElement(FILTER_PROPERTY);
             filterProperty_text = filterProperty.getText();
         }
-        if(filter.findElements(FILTER_TYPE).size() > 0)
+        if (filter.findElements(FILTER_TYPE).size() > 0)
         {
             filterType = filter.findElement(FILTER_TYPE);
             filterType_text = filterType.getText();
         }
-        if(filter.findElements(FILTER_SHOW).size() > 0)
+        if (filter.findElements(FILTER_SHOW).size() > 0)
         {
             filterShow = filter.findElement(FILTER_SHOW);
             filterShow_text = filterShow.getText();
         }
-        if(filter.findElements(FILTER_DEFAULT).size() > 0)
+        if (filter.findElements(FILTER_DEFAULT).size() > 0)
         {
             filterDefault_text = filter.findElement(FILTER_DEFAULT).getText();
         }
-        if(filter.findElements(FILTER_AVAILABILITY).size() > 0)
+        if (filter.findElements(FILTER_AVAILABILITY).size() > 0)
         {
             filterAvailability_text = filter.findElement(FILTER_AVAILABILITY).getText();
         }
-        if(filter.findElements(FILTER_DELETE).size() > 0)
+        if (filter.findElements(FILTER_DELETE).size() > 0)
         {
-        	filterdelete= filter.findElement(FILTER_DELETE);
-        	filterdelete_text = filterdelete.getText();
+            filterdelete = filter.findElement(FILTER_DELETE);
+            filterdelete_text = filterdelete.getText();
         }
     }
 
     /**
      * Gets the filter id.
-     *
+     * 
      * @return the filter id
      */
     public WebElement getFilterId()
@@ -125,7 +126,7 @@ public class FacetedSearchConfigFilter
 
     /**
      * Gets the filter id_text.
-     *
+     * 
      * @return the filter id_text
      */
     public String getFilterId_text()
@@ -135,7 +136,7 @@ public class FacetedSearchConfigFilter
 
     /**
      * Gets the filter name_text.
-     *
+     * 
      * @return the filter name_text
      */
     public String getFilterName_text()
@@ -145,7 +146,7 @@ public class FacetedSearchConfigFilter
 
     /**
      * Edits the filter name.
-     *
+     * 
      * @param name the name
      */
     public void editFilterName(String name)
@@ -155,17 +156,17 @@ public class FacetedSearchConfigFilter
 
     /**
      * Gets the filter property_text.
-     *
+     * 
      * @return the filter property_text
      */
     public String getFilterProperty_text()
     {
         return filterProperty_text;
     }
-    
+
     /**
      * Edits the filter property.
-     *
+     * 
      * @param property the property
      */
     public void editFilterProperty(String property)
@@ -175,7 +176,7 @@ public class FacetedSearchConfigFilter
 
     /**
      * Gets the filter type_text.
-     *
+     * 
      * @return the filter type_text
      */
     public String getFilterType_text()
@@ -185,17 +186,17 @@ public class FacetedSearchConfigFilter
 
     /**
      * Edits the filter type.
-     *
+     * 
      * @param type the type
      */
     public void editFilterType(String type)
     {
         iEditDD(this.filterType, type);
     }
-    
+
     /**
      * Gets the filter show_text.
-     *
+     * 
      * @return the filter show_text
      */
     public String getFilterShow_text()
@@ -205,7 +206,7 @@ public class FacetedSearchConfigFilter
 
     /**
      * Gets the filter show_i edit.
-     *
+     * 
      * @return the filter show_i edit
      */
     public void editFilterShow(String show)
@@ -213,9 +214,14 @@ public class FacetedSearchConfigFilter
         iEditDD(this.filterShow, show);
     }
 
+    public void editFilterNew(String value)
+    {
+
+    }
+
     /**
      * Gets the filter default_text.
-     *
+     * 
      * @return the filter default_text
      */
     public String getFilterDefault_text()
@@ -225,27 +231,27 @@ public class FacetedSearchConfigFilter
 
     /**
      * Gets the filter availability_text.
-     *
+     * 
      * @return the filter availability_text
      */
     public String getFilterAvailability_text()
     {
         return filterAvailability_text;
     }
-    
+
     /**
      * Gets the filter availability_text.
-     *
+     * 
      * @return the filter availability_text
      */
     public String getFilterDelete_text()
     {
         return filterdelete_text;
     }
-    
+
     /**
      * In line edit.
-     *
+     * 
      * @param control the control
      * @param value the value
      */
@@ -263,7 +269,7 @@ public class FacetedSearchConfigFilter
 
     /**
      * In line edit drop down.
-     *
+     * 
      * @param control the control
      * @param value the value
      */
@@ -289,9 +295,9 @@ public class FacetedSearchConfigFilter
 
         // Iterate pop up menu items
         boolean found = false;
-        for(WebElement menuItem : menuItems)
+        for (WebElement menuItem : menuItems)
         {
-            if(menuItem.getText().equalsIgnoreCase(value))
+            if (menuItem.getText().equalsIgnoreCase(value))
             {
                 menuItem.click();
                 found = true;
@@ -300,56 +306,55 @@ public class FacetedSearchConfigFilter
         }
 
         // No item match - re-click the select control
-        if(!found)
+        if (!found)
         {
             selectControl.click();
         }
-        
+
         // Click the save button
         control.findElement(I_EDIT_SAVE).click();
     }
-    
+
     /**
      * Gets the clickDelete_Filter.
-     *      
      */
     public void deleteFilter(boolean selectYes)
     {
-		try 
-		{
-			WebElement filterdelete = this.filterdelete.findElement(CLICK_DELETE_IMAGE);
-			if (filterdelete.isDisplayed()) 
-			{
-				filterdelete.click();
-				List<WebElement> buttonNames = drone.findAndWaitForElements(CONFIRM_DELETE);
+        try
+        {
+            WebElement filterdelete = this.filterdelete.findElement(CLICK_DELETE_IMAGE);
+            if (filterdelete.isDisplayed())
+            {
+                filterdelete.click();
+                List<WebElement> buttonNames = drone.findAndWaitForElements(CONFIRM_DELETE);
 
-				String buttonName = "Yes";
-				if(!selectYes)
-				{
-					buttonName = "No";
-				}
-				// Iterate list of buttons
-				for (WebElement button : buttonNames) 
-				{
-					if (button.getText().equalsIgnoreCase(buttonName) && (button.isDisplayed())) 
-					{
-						button.click();
-						drone.waitUntilVisible(By.cssSelector("div.bd"), "Successfully deleted", 10);
-						drone.waitUntilNotVisibleWithParitalText(By.cssSelector("div.bd"), "Successfully deleted", 10);
-						break;	
-					}				
-				}
-				
-			}
-		} catch (NoSuchElementException e) 
-		{
-			if (logger.isTraceEnabled()) 
-			{
-				logger.trace("Unable to select the button");
-			}
-		}
-		
-	}
-    
-    
+                String buttonName = "Yes";
+                if (!selectYes)
+                {
+                    buttonName = "No";
+                }
+                // Iterate list of buttons
+                for (WebElement button : buttonNames)
+                {
+                    if (button.getText().equalsIgnoreCase(buttonName) && (button.isDisplayed()))
+                    {
+                        button.click();
+                        drone.waitUntilVisible(By.cssSelector("div.bd"), "Successfully deleted", 10);
+                        drone.waitUntilNotVisibleWithParitalText(By.cssSelector("div.bd"), "Successfully deleted", 10);
+                        break;
+                    }
+                }
+
+            }
+        }
+        catch (NoSuchElementException e)
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Unable to select the button");
+            }
+        }
+
+    }
+
 }
