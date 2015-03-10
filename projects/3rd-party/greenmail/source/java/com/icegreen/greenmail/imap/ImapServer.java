@@ -12,29 +12,47 @@ package com.icegreen.greenmail.imap;
 
 import com.icegreen.greenmail.AbstractServer;
 import com.icegreen.greenmail.Managers;
+import com.icegreen.greenmail.util.DummySSLServerSocketFactory;
 import com.icegreen.greenmail.util.ServerSetup;
 
 import java.io.IOException;
 import java.net.BindException;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.Iterator;
 
-public final class ImapServer extends AbstractServer {
+import javax.net.ssl.SSLServerSocket;
+
+public class ImapServer extends AbstractServer {
 
     public ImapServer(ServerSetup setup, Managers managers) {
         super(setup, managers);
     }
-
+    
+    protected synchronized ServerSocket openServerSocket() throws IOException {
+        ServerSocket ret;
+        if (setup.isSecure()) {
+            ret = (SSLServerSocket) DummySSLServerSocketFactory.getDefault().createServerSocket(
+                    setup.getPort(), 0, bindTo);
+        } else {
+            ret = new ServerSocket(setup.getPort(), 0, bindTo);
+        }
+        return ret;
+    }
 
 
     public synchronized void quit() {
         try {
-            for (Iterator iterator = handlers.iterator(); iterator.hasNext();) {
+            List copyOfData = new ArrayList(handlers);
+            for (Iterator iterator = copyOfData.iterator(); iterator.hasNext();)
+            {
                 ImapHandler imapHandler = (ImapHandler) iterator.next();
                 imapHandler.resetHandler();
-                handlers.clear();
             }
+            handlers.clear();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

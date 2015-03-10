@@ -107,5 +107,7 @@ public interface ImapSession {
     ImapSessionFolder getSelected();
 
     void unsolicitedResponses(ImapResponse request, boolean omitExpunged) throws FolderException;
+    
+    String getSessionId();
 
 }

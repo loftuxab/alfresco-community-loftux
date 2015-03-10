@@ -18,6 +18,9 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
@@ -35,6 +38,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import com.icegreen.greenmail.imap.ImapConstants;
+import com.icegreen.greenmail.imap.commands.IdRange;
 
 /**
  * @author Wael Chatila
@@ -325,4 +329,66 @@ public class GreenMailUtil {
         Transport.send(mimeMessage, tos);
     }
 
+    public static IdRange[] convertUidsToIdRangeArray(List<Long> uids)
+    {
+        if (uids == null || uids.size() == 0)
+        {
+            return new IdRange[0];
+        }
+
+        List<Long> uidsLocal = new LinkedList<Long>(uids);
+        Collections.sort(uidsLocal);
+
+        List<IdRange> ids = new LinkedList<IdRange>();
+
+        IdRange currentIdRange = new IdRange(uidsLocal.get(0));
+        for (Long uid : uidsLocal)
+        {
+            if (uid == currentIdRange.getHighVal())
+            {
+            }
+            else if (uid > currentIdRange.getHighVal() && (uid == currentIdRange.getHighVal() + 1))
+            {
+                currentIdRange = new IdRange(currentIdRange.getLowVal(), uid);
+            }
+            else
+            {
+                ids.add(currentIdRange);
+                currentIdRange = new IdRange(uid);
+            }
+        }
+
+        if (!ids.contains(currentIdRange))
+        {
+            ids.add(currentIdRange);
+        }
+
+        return ids.toArray(new IdRange[ids.size()]);
+    }
+
+    public static String uidsToRangeString(List<Long> uids)
+    {
+        return idRangesToString(convertUidsToIdRangeArray(uids));
+    }
+
+    public static String idRangeToString(IdRange idRange)
+    {
+        return idRange.getHighVal() == idRange.getLowVal() ? "" + idRange.getLowVal() : idRange.getLowVal() + ":" + idRange.getHighVal();
+    }
+
+    public static String idRangesToString(IdRange[] idRanges)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for (IdRange idRange : idRanges)
+        {
+            if (sb.length() > 0)
+            {
+                sb.append(",");
+            }
+            sb.append(idRangeToString(idRange));
+        }
+
+        return sb.toString();
+    }
 }

@@ -19,7 +19,8 @@ import com.icegreen.greenmail.store.MailFolder;
  * @author Darrell DeBoer <darrell@apache.org>
  * @version $Revision: 109034 $
  */
-class ExpungeCommand extends SelectedStateCommand {
+class ExpungeCommand extends SelectedStateCommand implements UidEnabledCommand
+{
     public static final String NAME = "EXPUNGE";
     public static final String ARGS = null;
 
@@ -29,7 +30,33 @@ class ExpungeCommand extends SelectedStateCommand {
     protected void doProcess(ImapRequestLineReader request,
                              ImapResponse response,
                              ImapSession session)
-            throws ProtocolException, FolderException {
+            throws ProtocolException, FolderException 
+    {
+        doProcessInternal(request, response, session, false);
+    }
+    
+    /**
+     * @see UidEnabledCommand#doProcess
+     */
+    public void doProcess(ImapRequestLineReader request,
+                          ImapResponse response,
+                          ImapSession session,
+                          boolean useUids)
+     throws ProtocolException, FolderException
+    {
+        doProcessInternal(request, response, session, useUids);
+    }
+    
+    private void doProcessInternal(ImapRequestLineReader request,
+            ImapResponse response,
+            ImapSession session,
+            boolean useUids) throws ProtocolException, FolderException
+    { 
+        IdRange[] idSet = new IdRange[0];
+        if (useUids)
+        {
+            idSet = parser.parseIdRange(request);
+        }
         parser.endLine(request);
 
         if (session.getSelected().isReadonly()) {
@@ -37,10 +64,24 @@ class ExpungeCommand extends SelectedStateCommand {
         }
 
         MailFolder folder = session.getSelected();
-        folder.expunge();
+        if (useUids)
+        {
+            for (long uid : folder.getMessageUids())
+            {
+                if (includes(idSet, uid))
+                {
+                    response.expungeResponse(folder.getMsn(uid));
+                    folder.expunge(uid);
+                }
+            }
+        }
+        else
+        {
+            folder.expunge();
+        }
 
         session.unsolicitedResponses(response);
-        response.commandComplete(this);
+        response.commandComplete(this);    	
     }
 
     /**

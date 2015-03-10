@@ -13,7 +13,11 @@ import com.icegreen.greenmail.imap.ProtocolException;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.store.MailFolder;
 
+import javax.mail.Flags;
 import javax.mail.Message;
+import javax.mail.search.FlagTerm;
+import javax.mail.search.HeaderTerm;
+import javax.mail.search.MessageIDTerm;
 import javax.mail.search.SearchTerm;
 
 /**
@@ -25,6 +29,9 @@ import javax.mail.search.SearchTerm;
 class SearchCommand extends SelectedStateCommand implements UidEnabledCommand {
     public static final String NAME = "SEARCH";
     public static final String ARGS = "<search term>";
+    
+    public static final String FLAG_DELETED = "DELETED";
+    public static final String HEADER = "HEADER";
 
     private SearchCommandParser parser = new SearchCommandParser();
 
@@ -94,18 +101,42 @@ class SearchCommand extends SelectedStateCommand implements UidEnabledCommand {
                 throws ProtocolException {
             // Dummy implementation
             // Consume to the end of the line.
+            StringBuilder sb = new StringBuilder();
             char next = request.nextChar();
             while (next != '\n') {
+                sb.append(next);
                 request.consume();
                 next = request.nextChar();
             }
-
-            // Return a search term that matches everything.
-            return new SearchTerm() {
-                public boolean match(Message message) {
-                    return true;
-                }
-            };
+            String searchCriteria = sb.toString().trim();
+            
+            if (log.isDebugEnabled())
+            {
+                log.debug("Search criteria : " + searchCriteria);
+            }
+            
+            // MNT-12585 workaround, handle UID SEARCH DELETED correctly
+            if (FLAG_DELETED.equals(searchCriteria))
+            {
+                Flags flags = new Flags(Flags.Flag.DELETED);
+                return new FlagTerm(flags, true);
+            }
+            else if (searchCriteria.toLowerCase().contains("HEADER Message-ID".toLowerCase()))
+            {
+                String[] headersCriteria = searchCriteria.split("\"");
+                String messageId = headersCriteria[headersCriteria.length - 1];
+                
+                return new MessageIDTerm(messageId);
+            }
+            else
+            {
+                // Return a search term that matches everything.
+                return new SearchTerm() {
+                    public boolean match(Message message) {
+                        return true;
+                    }
+                };
+            }
         }
 
     }

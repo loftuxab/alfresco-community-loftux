@@ -12,6 +12,9 @@ import java.io.UnsupportedEncodingException;
 
 import javax.mail.Flags;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.icegreen.greenmail.imap.commands.ImapCommand;
 import com.icegreen.greenmail.store.MessageFlags;
 import com.icegreen.greenmail.util.InternetPrintWriter;
@@ -23,6 +26,8 @@ import com.icegreen.greenmail.util.InternetPrintWriter;
 public class ImapResponse implements ImapConstants {
     private InternetPrintWriter writer;
     private String tag = UNTAGGED;
+    private StringBuffer stringBuffer;
+    private static final Logger log = LoggerFactory.getLogger(ImapResponse.class);
 
     public ImapResponse(OutputStream output) {
         try {
@@ -30,6 +35,7 @@ public class ImapResponse implements ImapConstants {
         } catch (UnsupportedEncodingException e) {
             this.writer = new InternetPrintWriter(new OutputStreamWriter(output), true);
         }
+        this.stringBuffer = new StringBuffer();
     }
 
     public void setTag(String tag) {
@@ -212,42 +218,53 @@ public class ImapResponse implements ImapConstants {
     }
 
     private void untagged() {
-        writer.print(UNTAGGED);
+        print(UNTAGGED);
+
     }
 
     private void tag() {
-        writer.print(tag);
+        print(tag);
     }
 
     private void commandName(ImapCommand command) {
         String name = command.getName();
-        writer.print(SP);
-        writer.print(name);
+        print(SP);
+        print(name);
     }
 
     private void message(String message) {
         if (message != null) {
-            writer.print(SP);
-            writer.print(message);
+            print(SP);
+            print(message);
         }
     }
 
     private void message(int number) {
-        writer.print(SP);
-        writer.print(number);
+        print(SP);
+        print(number);
     }
 
     private void responseCode(String responseCode) {
         if (responseCode != null) {
-            writer.print(" [");
-            writer.print(responseCode);
-            writer.print("]");
+            print(" [");
+            print(responseCode);
+            print("]");
         }
     }
 
     private void end() {
         writer.println();
         writer.flush();
+        if (log.isDebugEnabled()){
+        	stringBuffer.append('\n');
+        }
+    }
+    
+    private void print(Object value){
+    	writer.print(value);
+    	if (log.isDebugEnabled()){
+    		stringBuffer.append(value);
+    	}
     }
 
     public void permanentFlagsResponse(Flags flags) {
@@ -255,5 +272,11 @@ public class ImapResponse implements ImapConstants {
         message(OK);
         responseCode("PERMANENTFLAGS " + MessageFlags.format(flags));
         end();
+    }
+    
+    public void debugResponse(ImapSession session){
+    	if(log.isDebugEnabled()){
+    		log.debug("[SessionId:" + session.getSessionId() + "] " + stringBuffer.toString());
+    	}
     }
 }
