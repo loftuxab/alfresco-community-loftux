@@ -13,6 +13,9 @@ import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.store.MessageFlags;
 
 import javax.mail.Flags;
+
+import org.safehaus.uuid.UUIDGenerator;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,6 +30,7 @@ public final class ImapSessionImpl implements ImapSession {
 
     private String clientHostName;
     private String clientAddress;
+    private String sessionId;
 
     // TODO these shouldn't be in here - they can be provided directly to command components.
     private ImapHandler handler;
@@ -43,6 +47,7 @@ public final class ImapSessionImpl implements ImapSession {
         this.handler = handler;
         this.clientHostName = clientHostName;
         this.clientAddress = clientAddress;
+        this.sessionId = UUIDGenerator.getInstance().generateRandomBasedUUID().toString();
     }
 
     public ImapHostManager getHost() {
@@ -147,5 +152,9 @@ public final class ImapSessionImpl implements ImapSession {
     public ImapSessionState getState() {
         return this.state;
     }
+    
+    public String getSessionId() {
+		return sessionId;
+	}
 
 }

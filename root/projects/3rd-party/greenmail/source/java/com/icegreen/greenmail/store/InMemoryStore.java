@@ -467,7 +467,7 @@ public class InMemoryStore
             return matchedUids;
         }
 
-        public void copyMessage(long uid, MailFolder toFolder)
+        public long copyMessage(long uid, MailFolder toFolder)
                 throws FolderException {
             SimpleStoredMessage originalMessage = getMessage(uid);
             MimeMessage newMime = null;
@@ -481,7 +481,20 @@ public class InMemoryStore
             newFlags.add(originalMessage.getFlags());
             Date newDate = originalMessage.getInternalDate();
 
-            toFolder.appendMessage(newMime, newFlags, newDate);
+            return toFolder.appendMessage(newMime, newFlags, newDate);
+        }
+
+        public void expunge(long uid) throws FolderException {
+            for (int i = 0; i < mailMessages.size(); i++) {
+                SimpleStoredMessage message = (SimpleStoredMessage) mailMessages.get(i);
+                if (message.getUid() == uid) {
+                    if (message.getFlags().contains(Flags.Flag.DELETED))
+                    {
+                        expungeMessage(i + 1);
+                    }
+                    break;
+                }
+            }
         }
 
         public void expunge() throws FolderException {

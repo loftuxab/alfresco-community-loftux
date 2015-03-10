@@ -119,4 +119,8 @@ abstract class CommandTemplate
     public CommandParser getParser() {
         return parser;
     }
+    
+    public boolean isLoginCommand(){
+    	return LoginCommand.NAME.equals(getName());
+    }
 }

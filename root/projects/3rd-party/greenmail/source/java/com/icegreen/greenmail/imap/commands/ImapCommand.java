@@ -44,4 +44,6 @@ public interface ImapCommand {
     void process(ImapRequestLineReader request,
                  ImapResponse response,
                  ImapSession session);
+    
+    boolean isLoginCommand();
 }

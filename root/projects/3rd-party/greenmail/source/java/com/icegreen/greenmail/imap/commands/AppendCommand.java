@@ -30,6 +30,7 @@ import java.util.Date;
 class AppendCommand extends AuthenticatedStateCommand {
     public static final String NAME = "APPEND";
     public static final String ARGS = "<mailbox> [<flag_list>] [<date_time>] literal";
+    public static final String APPENDUID = "APPENDUID";
 
     private AppendCommandParser parser = new AppendCommandParser();
 
@@ -60,10 +61,27 @@ class AppendCommand extends AuthenticatedStateCommand {
             throw e;
         }
 
-        folder.appendMessage(message, flags, datetime);
+        long uid = folder.appendMessage(message, flags, datetime);
 
         session.unsolicitedResponses(response);
+        
+        // APPENDUID response code, fix for MNT-12584
+//        response.commandComplete(this, generateAppenduidResponseCode(folder, uid));
         response.commandComplete(this);
+    }
+
+    /**
+     * Generates <b>APPENDUID</b> response code (see <a href="http://tools.ietf.org/html/rfc2359#page-3">http://tools.ietf.org/html/rfc2359</a>)
+     * using format : <i>APPENDUID UIDVALIDITY MESSAGE-UID</i>. For example <i>APPENDUID 38505 3955</i>
+     * 
+     * @param currentMailbox imap folder which is target of copy command
+     * @param copiedUidsFrom List of source uids which was successfully copied
+     * @param copiedUidsTo List of message uids which was successfully copied
+     * @return
+     */
+    private String generateAppenduidResponseCode(MailFolder mailbox, long uid)
+    {
+        return APPENDUID + SP + mailbox.getUidValidity() + SP + uid;
     }
 
     /**

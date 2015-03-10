@@ -202,12 +202,16 @@ public class ImapSessionFolder implements MailFolder, FolderListener {
         _folder.expunge();
     }
 
+    public void expunge(long uid) throws FolderException {
+        _folder.expunge(uid);
+    }
+
     public long[] search(SearchTerm searchTerm) {
         return _folder.search(searchTerm);
     }
 
-    public void copyMessage(long uid, MailFolder toFolder) throws FolderException {
-        _folder.copyMessage(uid, toFolder);
+    public long copyMessage(long uid, MailFolder toFolder) throws FolderException {
+        return _folder.copyMessage(uid, toFolder);
     }
 
     public void addListener(FolderListener listener) {

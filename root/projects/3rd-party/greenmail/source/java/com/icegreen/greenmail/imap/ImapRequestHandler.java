@@ -89,6 +89,9 @@ public final class ImapRequestHandler {
         }
 
         command.process(request, response, session);
+        request.debugRequest(command.isLoginCommand(), session);
+        response.debugResponse(session);
+        
     }
 
 

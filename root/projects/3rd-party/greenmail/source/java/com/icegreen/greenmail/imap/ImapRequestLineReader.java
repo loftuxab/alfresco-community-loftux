@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Wraps the client input reader with a bunch of convenience methods, allowing lookahead=1
  * on the underlying character stream.
@@ -25,6 +28,9 @@ import java.io.OutputStream;
 public class ImapRequestLineReader {
     private InputStream input;
     private OutputStream output;
+    
+    private static final Logger log = LoggerFactory.getLogger(ImapRequestLineReader.class);
+    private StringBuffer debugBuffer;
 
     private boolean nextSeen = false;
     private char nextChar; // unknown
@@ -32,6 +38,7 @@ public class ImapRequestLineReader {
     ImapRequestLineReader(InputStream input, OutputStream output) {
         this.input = input;
         this.output = output;
+        this.debugBuffer = new StringBuffer();
     }
 
     /**
@@ -82,6 +89,7 @@ public class ImapRequestLineReader {
             nextChar = (char) next;
 //            System.out.println( "Read '" + nextChar + "'" );
         }
+
         return nextChar;
     }
 
@@ -125,6 +133,9 @@ public class ImapRequestLineReader {
      */
     public char consume() throws ProtocolException {
         char current = nextChar();
+        if (log.isDebugEnabled()){
+        	debugBuffer.append(current);     	
+        }
         nextSeen = false;
         nextChar = 0;
         return current;
@@ -141,6 +152,7 @@ public class ImapRequestLineReader {
     public void read(char[] holder) throws ProtocolException {
         int readTotal = 0;
         try {
+        	
             byte[] bytes = new byte[holder.length];
             while (readTotal < holder.length) {
                 int count = 0;
@@ -187,5 +199,15 @@ public class ImapRequestLineReader {
             next = nextChar();
         }
         consume();
+    }
+    
+    public void debugRequest(boolean isLoginRequest, ImapSession session){
+        if(log.isDebugEnabled()){
+        	String debugRequest = debugBuffer.toString().trim();
+        	if (isLoginRequest){
+        		debugRequest = debugRequest.substring(0, debugBuffer.indexOf("\""));
+        	}
+        	log.debug("[SessionId:" + session.getSessionId() + "] " + debugRequest);
+        }
     }
 }
