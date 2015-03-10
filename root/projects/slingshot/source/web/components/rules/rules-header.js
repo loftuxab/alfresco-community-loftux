@@ -330,11 +330,11 @@
                      {
                         me.options.inheritRules = !!((data.inheritRules === "true"));
                         var status = (me.options.inheritRules)? "on": "off";
-                        Alfresco.util.PopupManager.displayMessage(
+                        var dlg = Alfresco.util.PopupManager.displayMessage(
                            {
                               text: this.msg("message.inheritToggle-success-" + status)
                            });
-                        YAHOO.Bubbling.fire("inheritChange");
+                        dlg.subscribe("destroy", function(){YAHOO.Bubbling.fire("inheritChange")});
                      }
                   },
                   scope: this
