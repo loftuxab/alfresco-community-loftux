@@ -343,7 +343,7 @@
          }, "keyup");
          this.form.addValidation(this.id + "-prop_intervalCount", function ReplicationJob_onFormControlsLoaded_fnValidateIntervalCount(field, args, event, form, silent, message)
          {
-            return !(scope.isScheduleEnabled() && isNaN(field.value));
+            return !(scope.isScheduleEnabled() && isNaN(parseInt(field.value)));
          }, null, "blur");
 
          // Validator - Interval Period
