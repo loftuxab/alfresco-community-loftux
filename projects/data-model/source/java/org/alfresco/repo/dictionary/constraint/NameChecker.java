@@ -40,6 +40,22 @@ public class NameChecker implements InitializingBean
 
     private Constraint nameConstraint;
     
+    // namespaceURI of the constraint
+    private String namespaceURI = NamespaceService.CONTENT_MODEL_1_0_URI;
+    
+    //constraint local name
+    private String constraintLocalName ="filename";  
+    
+    public void setNamespaceURI(String namespaceURI)
+    {
+        this.namespaceURI = namespaceURI;
+    }
+    
+    public void setConstraintLocalName(String constraintLocalName)
+    {
+        this.constraintLocalName = constraintLocalName;
+    }
+    
     public DictionaryService getDictionaryService()
     {
         return dictionaryService;
@@ -58,7 +74,7 @@ public class NameChecker implements InitializingBean
     {
         PropertyCheck.mandatory(this, "dictionaryService", dictionaryService);
 
-        QName qNameConstraint = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "filename");
+        QName qNameConstraint = QName.createQName(namespaceURI, constraintLocalName);
         ConstraintDefinition constraintDef = dictionaryService.getConstraint(qNameConstraint);
         if (constraintDef == null)
         {
