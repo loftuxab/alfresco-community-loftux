@@ -87,6 +87,11 @@ public abstract class AbstractVtiPathHelperTestBase<T extends VtiPathHelper>
      */
     protected FileInfo makeFileInfo(final NodeRef nodeRef, final QName type)
     {
+        return makeFileInfo(nodeRef, type, null);
+    }
+
+    protected FileInfo makeFileInfo(final NodeRef nodeRef, final QName type, final String name)
+    {
         return new FileInfo()
         {
             private static final long serialVersionUID = 1L;
@@ -124,7 +129,7 @@ public abstract class AbstractVtiPathHelperTestBase<T extends VtiPathHelper>
             @Override
             public String getName()
             {
-                return null;
+                return name;
             }
 
             @Override
