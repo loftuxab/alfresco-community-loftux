@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -21,20 +21,14 @@ package org.alfresco.module.vti.handler.alfresco;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
-import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.QName;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -130,17 +124,22 @@ public class VtiPathHelperTest extends AbstractVtiPathHelperTestBase<VtiPathHelp
 
         String siteUUID = "2c122359-7fe2-4927-83ef-afe612cdf1c1";
         NodeRef siteRef = new NodeRef(ROOT_NODE_REF.getStoreRef(), siteUUID);
-        FileInfo siteFileInfo = makeFileInfo(siteRef, ContentModel.TYPE_CONTENT);
+        FileInfo siteFileInfo = makeFileInfo(siteRef, ContentModel.TYPE_CONTENT, "testSite");
 
         when(fileFolderService.getFileInfo(nodeRef)).thenReturn(nodeFileInfo);
         when(fileFolderService.getFileInfo(siteRef)).thenReturn(siteFileInfo);
 
-        String documentUrl = "/alfresco/_IDX_SITE_" + siteUUID + "/_IDX_NODE_" + nodeUUID + "/file1.docx";
+        String documentUrl = "_IDX_SITE_" + siteUUID + "/_IDX_NODE_" + nodeUUID + "/file1.docx";
         FileInfo resolvedNode = pathHelper.resolvePathFileInfo(documentUrl);
         assertEquals(nodeFileInfo, resolvedNode);
         
-        String siteUrl = "/alfresco/_IDX_SITE_" + siteUUID + "/";
+        String siteUrl = "_IDX_SITE_" + siteUUID + "/";
         FileInfo resolvedSite = pathHelper.resolvePathFileInfo(siteUrl);
         assertEquals(siteFileInfo, resolvedSite);
+        
+        siteUrl = "_IDX_SITE_" + siteUUID + "/fol1/fol2/folr3/filex.docx";
+        when(fileFolderService.resolveNamePath(ROOT_NODE_REF, Arrays.asList("testSite/fol1/fol2/folr3/filex.docx".split("/")))).thenReturn(nodeFileInfo);
+        resolvedNode = pathHelper.resolvePathFileInfo(siteUrl);
+        assertEquals(nodeFileInfo, resolvedNode);
     }
 }
