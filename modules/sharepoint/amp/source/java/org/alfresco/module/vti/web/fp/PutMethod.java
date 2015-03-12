@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,6 +18,7 @@
  */
 package org.alfresco.module.vti.web.fp;
 
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -30,10 +31,12 @@ import org.alfresco.service.cmr.repository.NodeRef;
 public class PutMethod extends org.alfresco.repo.webdav.PutMethod
 {
     private String alfrescoContext;
+    private VtiPathHelper pathHelper;
     
-    public PutMethod(String ctx)
+    public PutMethod(VtiPathHelper pathHelper)
     {
-        alfrescoContext = ctx;
+        this.alfrescoContext = pathHelper.getAlfrescoContext();
+        this.pathHelper = pathHelper;
     }
     
     /**
@@ -42,7 +45,7 @@ public class PutMethod extends org.alfresco.repo.webdav.PutMethod
     @Override
     protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path) throws FileNotFoundException
     {
-        FileInfo nodeInfo = super.getNodeForPath(rootNodeRef, path);
+        FileInfo nodeInfo = pathHelper.resolvePathFileInfo(path);
         FileInfo workingCopy = getWorkingCopy(nodeInfo.getNodeRef());
         return workingCopy != null ? workingCopy : nodeInfo;
     }

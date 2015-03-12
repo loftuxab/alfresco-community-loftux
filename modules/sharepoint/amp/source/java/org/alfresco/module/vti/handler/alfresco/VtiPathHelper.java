@@ -222,9 +222,18 @@ public class VtiPathHelper extends AbstractLifecycleBean
                             break;
                         }
                     }
+                    
+                    if (alternateIdentificator.equals(ALTERNATE_PATH_SITE_IDENTIFICATOR) && parts.length > 1)
+                    {
+                        parts[0] = fileInfo.getName();
+                        fileInfo = fileFolderService.resolveNamePath(rootNodeRef, Arrays.asList(parts));
+                    }
                 }
             }
             catch (InvalidNodeRefException e)
+            {
+            }
+            catch (FileNotFoundException e)
             {
             }
             
@@ -248,7 +257,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
 
         return fileInfo;
     }
-
+    
     /**
      * Resolves file info for file with URL path in parent directory with file info
      *

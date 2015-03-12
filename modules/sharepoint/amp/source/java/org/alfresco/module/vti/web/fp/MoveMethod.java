@@ -20,7 +20,12 @@ package org.alfresco.module.vti.web.fp;
 
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.repo.webdav.WebDAVServerException;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Implements the WebDAV MOVE method with VTI specific behaviours
@@ -28,10 +33,12 @@ import org.alfresco.repo.webdav.WebDAVServerException;
 public class MoveMethod extends org.alfresco.repo.webdav.MoveMethod
 {
     private String alfrescoContext;
+    private VtiPathHelper pathHelper;
 
-    public MoveMethod(String alfrescoContext)
+    public MoveMethod(VtiPathHelper pathHelper)
     {
-        this.alfrescoContext = alfrescoContext;
+        this.alfrescoContext = pathHelper.getAlfrescoContext();
+        this.pathHelper = pathHelper;
     }
 
     /**
@@ -59,6 +66,35 @@ public class MoveMethod extends org.alfresco.repo.webdav.MoveMethod
     @Override
     public String getPath()
     {
-       return AbstractMethod.getPathWithoutContext(alfrescoContext, m_request);
+        String path = AbstractMethod.getPathWithoutContext(alfrescoContext, m_request);
+
+        if (path.contains(VtiPathHelper.ALTERNATE_PATH_DOCUMENT_IDENTIFICATOR))
+        {
+            logger.warn("Found  '_IDX_NODE_' entry in node path for MOVE METHOD. Error (additional support is required), if it is not part of original path.");
+        }
+
+        if (path.contains(VtiPathHelper.ALTERNATE_PATH_SITE_IDENTIFICATOR))
+        {
+            String[] parts = path.split("/");
+
+            for (int i = 0; i < parts.length; i++)
+            {
+                if (parts[i].contains(VtiPathHelper.ALTERNATE_PATH_SITE_IDENTIFICATOR))
+                {
+                    parts[i] = pathHelper.resolvePathFileInfo(parts[i]).getName();
+                    path = StringUtils.join(parts, "/");
+                    break;
+                }
+            }
+        }
+
+        return path;
+    }
+    
+    @Override
+    protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path) throws FileNotFoundException
+    {
+        FileInfo nodeInfo = pathHelper.resolvePathFileInfo(path);
+        return nodeInfo;
     }
 }
