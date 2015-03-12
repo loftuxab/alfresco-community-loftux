@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2013 Alfresco Software Limited.
+* Copyright (C) 2005-2015 Alfresco Software Limited.
 *
 * This file is part of Alfresco
 *
@@ -23,7 +23,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.alfresco.repo.webdav.WebDAV;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -38,10 +38,12 @@ import org.springframework.extensions.surf.util.URLDecoder;
 public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
 {
     private String alfrescoContext;
+    private VtiPathHelper pathHelper;
 
-    public PropPatchMethod(String alfrescoContext)
+    public PropPatchMethod(VtiPathHelper pathHelper)
     {
-        this.alfrescoContext = alfrescoContext;
+        this.alfrescoContext = pathHelper.getAlfrescoContext();
+        this.pathHelper = pathHelper;
     }
     
     /**
@@ -50,7 +52,7 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
     @Override
     protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path) throws FileNotFoundException
     {
-        FileInfo nodeInfo = super.getNodeForPath(rootNodeRef, URLDecoder.decode(path));
+        FileInfo nodeInfo = pathHelper.resolvePathFileInfo(URLDecoder.decode(path));
         FileInfo workingCopy = getWorkingCopy(nodeInfo.getNodeRef());
         return workingCopy != null ? workingCopy : nodeInfo;
     }

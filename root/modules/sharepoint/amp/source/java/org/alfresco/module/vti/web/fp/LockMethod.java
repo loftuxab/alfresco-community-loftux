@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2013 Alfresco Software Limited.
+* Copyright (C) 2005-2015 Alfresco Software Limited.
 *
 * This file is part of Alfresco
 *
@@ -25,6 +25,7 @@ import java.util.Collections;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.webdav.WebDAVServerException;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -43,10 +44,12 @@ import org.dom4j.io.OutputFormat;
 public class LockMethod extends org.alfresco.repo.webdav.LockMethod
 {
     private String alfrescoContext;
+    private VtiPathHelper pathHelper;
 
-    public LockMethod(String alfrescoContext)
+    public LockMethod(VtiPathHelper pathHelper)
     {
-        this.alfrescoContext = alfrescoContext;
+        this.alfrescoContext = pathHelper.getAlfrescoContext();
+        this.pathHelper = pathHelper;
     }
 
     /** 
@@ -55,7 +58,7 @@ public class LockMethod extends org.alfresco.repo.webdav.LockMethod
     @Override
     protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path) throws FileNotFoundException
     {
-        FileInfo nodeInfo = super.getNodeForPath(rootNodeRef, path);
+        FileInfo nodeInfo = pathHelper.resolvePathFileInfo(path);
         FileInfo workingCopy = getWorkingCopy(nodeInfo.getNodeRef());
         return workingCopy != null ? workingCopy : nodeInfo;
     }

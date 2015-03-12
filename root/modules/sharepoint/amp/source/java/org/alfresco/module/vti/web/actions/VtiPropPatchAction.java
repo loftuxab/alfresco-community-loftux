@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2010 Alfresco Software Limited.
+* Copyright (C) 2005-2015 Alfresco Software Limited.
 *
 * This file is part of Alfresco
 *
@@ -28,7 +28,7 @@ public class VtiPropPatchAction extends VtiWebDavAction implements VtiAction
     @Override
     public WebDAVMethod getWebDAVMethod()
     {
-        return new PropPatchMethod(pathHelper.getAlfrescoContext());
+        return new PropPatchMethod(pathHelper);
     }
 
 }

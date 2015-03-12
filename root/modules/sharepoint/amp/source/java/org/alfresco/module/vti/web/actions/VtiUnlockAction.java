@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -31,7 +31,7 @@ public class VtiUnlockAction extends VtiWebDavAction implements VtiAction
 {
     @Override
     public WebDAVMethod getWebDAVMethod()
-    {
-        return new UnlockMethod(pathHelper.getAlfrescoContext());
+    { 
+        return new UnlockMethod(pathHelper);
     }
 }

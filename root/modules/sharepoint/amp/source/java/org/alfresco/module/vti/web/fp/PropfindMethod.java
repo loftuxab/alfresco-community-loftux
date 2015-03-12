@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.alfresco.UrlHelper;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.repo.webdav.LockInfo;
 import org.alfresco.repo.webdav.WebDAV;
@@ -91,10 +92,12 @@ public class PropfindMethod extends WebDAVMethod
 
     private String alfrescoContext;
     private UrlHelper urlHelper;
+    private VtiPathHelper pathHelper;
 
-    public PropfindMethod(String alfrescoContex, UrlHelper urlHelper)
+    public PropfindMethod(VtiPathHelper pathHelper, UrlHelper urlHelper)
     {
-        this.alfrescoContext = alfrescoContex;
+        this.alfrescoContext = pathHelper.getAlfrescoContext();
+        this.pathHelper = pathHelper;
         this.urlHelper = urlHelper;
         namespaceMap.put("urn:schemas-microsoft-com:office:office", "Office");
         namespaceMap.put("http://schemas.microsoft.com/repl/", "Repl");
@@ -153,22 +156,21 @@ public class PropfindMethod extends WebDAVMethod
         }
 
         FileInfo pathNodeInfo = null;
-        try
-        {
-            // Check that the path exists
-            pathNodeInfo = getDAVHelper().getNodeForPath(getRootNodeRef(), m_strPath);
-            
-            // Note the null check, as root node may be null in cloud.
-            if (pathNodeInfo.getNodeRef() != null && getFileFolderService().isHidden(pathNodeInfo.getNodeRef()))
-            {
-                // ALF-17662, the path is hidden - send a 404 error back to the client
-                m_response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-        }
-        catch (FileNotFoundException e)
+
+        // Check that the path exists
+        pathNodeInfo = pathHelper.resolvePathFileInfo(m_strPath);
+
+        if (pathNodeInfo == null)
         {
             // The path is not valid - send a 404 error back to the client
+            m_response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        // Note the null check, as root node may be null in cloud.
+        if (pathNodeInfo.getNodeRef() != null && getFileFolderService().isHidden(pathNodeInfo.getNodeRef()))
+        {
+            // ALF-17662, the path is hidden - send a 404 error back to the client
             m_response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
