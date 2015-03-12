@@ -37,8 +37,7 @@ import org.openqa.selenium.WebElement;
 public class FacetedSearchConfigPage extends SharePage
 {
     private static final By PAGE_TITLE = By.cssSelector("h1.alfresco-header-Title");
-    //private static final By FILTER = By.cssSelector("tr.alfresco-documentlibrary-views-layouts-Row");
-    private static final By FILTER = By.cssSelector("#SEARCH_CONFIG_FACET_LIST");
+    private static final By FILTER = By.cssSelector("tr.alfresco-lists-views-layouts-Row.alfresco-lists-views-layout-_MultiItemRendererMixin--item");
     private static final By ADD_NEW_FILTER = By.id("CREATE_FACET_BUTTON");
     private static final Log logger = LogFactory.getLog(FacetedSearchConfigPage.class);
 

@@ -37,7 +37,7 @@ import org.openqa.selenium.WebElement;
 public class SearchBox extends HtmlElement
 {
     private final Log logger = LogFactory.getLog(SearchBox.class);
-    private final By selector;
+    private final By selector = By.id("HEADER_SEARCHBOX_FORM_FIELD");
 
     /**
      * Constructor.
@@ -45,8 +45,6 @@ public class SearchBox extends HtmlElement
     public SearchBox(WebDrone drone, boolean isDojoSupport)
     {
         super(drone);
-        String searchField = isDojoSupport ? "input.alf-search-box-text" : "input[id$='searchText']";
-        selector = By.cssSelector(searchField);
     }
 
     /**
