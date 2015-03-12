@@ -50,7 +50,7 @@ public class LiveSearchDropdown extends SharePage
     private static final String PEOPLE_TITLE = "div[data-dojo-attach-point='titleNodePeople']";
 
     // Close button
-    private static final String CLOSE_DROPDOWN = ".alf-search-box-clear a";
+    private static final String CLOSE_DROPDOWN = ".alfresco-header-SearchBox-clear a";
 
     // Document results
     private static final String DOCUMENT_RESULTS = "div[data-dojo-attach-point='containerNodeDocs'] div.alf-livesearch-item";
