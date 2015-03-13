@@ -72,7 +72,7 @@ public class ActionsSet
      * 
      * @param actionName the action name
      */
-    public void clickActionByName(String actionName)
+    public HtmlPage clickActionByName(String actionName)
     {
 
         // Iterate over the menuRows and click the control that matches the named action
@@ -84,6 +84,8 @@ public class ActionsSet
                 break;
             }
         }
+        
+        return this.drone.getCurrentPage().render();
     }
 
     /**
