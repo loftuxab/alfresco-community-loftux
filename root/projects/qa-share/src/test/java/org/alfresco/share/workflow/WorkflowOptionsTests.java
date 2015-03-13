@@ -25,6 +25,7 @@ import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.task.TaskStatus;
 import org.alfresco.po.share.workflow.AssignmentPage;
 import org.alfresco.po.share.workflow.CloudTaskOrReviewPage;
@@ -37,7 +38,6 @@ import org.alfresco.po.share.workflow.TaskType;
 import org.alfresco.po.share.workflow.WorkFlowDetailsPage;
 import org.alfresco.po.share.workflow.WorkFlowFormDetails;
 import org.alfresco.po.share.workflow.WorkFlowType;
-import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.AbstractWorkflow;
 import org.alfresco.share.util.EditTaskAction;
 import org.alfresco.share.util.ShareUser;
@@ -1412,7 +1412,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
 
         // Open Document library, Upload a file
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName));
 
         ShareUser.uploadFileInFolder(drone, opFileInfo1).render();
 
@@ -1511,7 +1511,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
 
         // Open Document library, Upload a file
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName));
 
         ShareUser.uploadFileInFolder(drone, opFileInfo1).render();
 
@@ -1608,7 +1608,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
 
         // Open Document library, Upload a file
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName));
 
         ShareUser.uploadFileInFolder(drone, opFileInfo1).render();
 
@@ -1704,7 +1704,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         // Create Site
         ShareUser.createSite(hybridDrone, cloudSiteName1, SITE_VISIBILITY_PUBLIC);
 
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, getSiteShortname(cloudSiteName1), "SiteCollaborator", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, siteActions.getSiteShortname(cloudSiteName1), "SiteCollaborator", "");
         ShareUser.logout(hybridDrone);
 
         // Login as User1 (OP)
@@ -1735,7 +1735,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
         ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
 
         // Open Document library, Upload a file
-        DocumentLibraryPage docLibPage = SiteUtil.openSiteDocumentLibraryURL(drone, AbstractUtils.getSiteShortname(opSiteName));
+        DocumentLibraryPage docLibPage = SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName));
 
         // Select StartWorkflow
         StartWorkFlowPage startWorkFlowPage = docLibPage.getFileDirectoryInfo(fileName).selectStartWorkFlow().render();
@@ -2437,7 +2437,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             Assert.assertEquals(e.getMessage(), "Sync Folder is disabled");
         }
 
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName3));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName3));
 
         // Select StartWorkflow for cloud user1 on contributor site for folder3
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName8);
@@ -2463,7 +2463,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
             Assert.assertEquals(e.getMessage(), "Sync Folder is disabled");
         }
 
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName3));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName3));
 
         // Select StartWorkflow for cloud user1 on contributor site for folder3
         cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName9).render();
@@ -2547,7 +2547,7 @@ public class WorkflowOptionsTests extends AbstractWorkflow
     /**
      * Method to select the sitename of destination and clicks on sync button
      * 
-     * @param drone
+     * @param assigneePage
      * @param network
      * @param siteName
      * @param folderName

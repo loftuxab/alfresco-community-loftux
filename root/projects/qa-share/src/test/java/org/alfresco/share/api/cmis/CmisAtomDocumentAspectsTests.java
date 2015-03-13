@@ -18,6 +18,7 @@ package org.alfresco.share.api.cmis;
 import java.util.Arrays;
 import java.util.List;
 
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.share.enums.CMISBinding;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
@@ -56,7 +57,7 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         String[] testUserInfo = new String[] { testUser };
 
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
-        siteName = getSiteShortname(getSiteName(testName));
+        siteName = siteActions.getSiteShortname(getSiteName(testName));
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 

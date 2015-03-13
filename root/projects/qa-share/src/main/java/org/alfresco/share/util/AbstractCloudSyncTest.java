@@ -31,6 +31,7 @@ import org.alfresco.po.share.site.document.DocumentLibraryNavigation;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.SyncInfoPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.user.CloudSyncPage;
 import org.alfresco.po.share.user.MyProfilePage;
@@ -67,6 +68,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
     protected String hybridDomainPremium;
     protected String adminUserFree;
     protected String adminUserPrem;
+    protected SiteActions siteActions = new SiteActions();
 
     @Override
     public void setup() throws Exception

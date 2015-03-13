@@ -37,10 +37,10 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.blog.BlogPage;
 import org.alfresco.po.share.site.datalist.DataListPage;
-import org.alfresco.po.share.site.datalist.NewListForm;
 import org.alfresco.po.share.site.discussions.DiscussionsPage;
 import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiClient.ListResponse;
 import org.alfresco.rest.api.tests.client.PublicApiException;
@@ -94,6 +94,7 @@ public class SitesAPITests extends SitesAPI
     private AlfrescoVersion version;
     private String testUserAnotherDomain;
     private static Log logger = LogFactory.getLog(SitesAPITests.class);
+    private SiteActions siteActions = new SiteActions();
 
     // int totalSites = 0;
 
@@ -195,7 +196,7 @@ public class SitesAPITests extends SitesAPI
             assertNotNull(response);
             assertTrue(response.getList().size() == 1);
             Site site = response.getList().get(0);
-            assertTrue(site.getSiteId().contains(ShareUser.getSiteShortname(siteName)), "Site - " + site + " should contain name - " + siteName);
+            assertTrue(site.getSiteId().contains(siteActions.getSiteShortname(siteName)), "Site - " + site + " should contain name - " + siteName);
         }
     }
 
@@ -204,7 +205,7 @@ public class SitesAPITests extends SitesAPI
     {
         Site response = getSiteById(testUser, DOMAIN, siteName);
         assertNotNull(response);
-        assertEquals(response.getSiteId(), ShareUser.getSiteShortname(siteName));
+        assertEquals(response.getSiteId().toLowerCase(), siteActions.getSiteShortname(siteName).toLowerCase());
 
         try
         {
@@ -232,7 +233,7 @@ public class SitesAPITests extends SitesAPI
         {
             response = getSiteById(testUserAnotherDomain, DOMAIN, siteName);
             assertNotNull(response);
-            assertEquals(response.getSiteId(), ShareUser.getSiteShortname(siteName));
+            assertEquals(response.getSiteId().toLowerCase(), siteActions.getSiteShortname(siteName).toLowerCase());
         }
     }
 
@@ -1498,7 +1499,7 @@ public class SitesAPITests extends SitesAPI
         boolean siteFound = false;
         for (Site respSite : response.getList())
         {
-            if (respSite.getSiteId().equalsIgnoreCase(getSiteShortname(siteName)))
+            if (respSite.getSiteId().equalsIgnoreCase(siteActions.getSiteShortname(siteName)))
             {
                 siteFound = true;
                 break;
@@ -1537,7 +1538,7 @@ public class SitesAPITests extends SitesAPI
 
         response = getFavouriteSite(user1, DOMAIN, user1, siteName);
         assertNotNull(response);
-        assertEquals(response.getSiteId(), ShareUser.getSiteShortname(siteName));
+        assertEquals(response.getSiteId().toLowerCase(), siteActions.getSiteShortname(siteName).toLowerCase());
 
         ShareUser.login(drone, user1);
         MySitesDashlet dashlet = ((DashBoardPage) drone.getCurrentPage()).getDashlet("my-sites").render();
@@ -1576,7 +1577,7 @@ public class SitesAPITests extends SitesAPI
         FavouriteSite response = getFavouriteSite(testUser, DOMAIN, testUser, siteName);
         assertNotNull(response);
         assertTrue(response instanceof FavouriteSite);
-        assertEquals(response.getSiteId(), ShareUser.getSiteShortname(siteName));
+        assertEquals(response.getSiteId().toLowerCase(), siteActions.getSiteShortname(siteName).toLowerCase());
 
         try
         {

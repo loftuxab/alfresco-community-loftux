@@ -23,6 +23,7 @@ import org.alfresco.po.share.search.FacetedSearchConfigPage;
 import org.alfresco.po.share.search.FacetedSearchPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
@@ -32,7 +33,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -56,6 +56,7 @@ public class FacetedSearchConfigPageTest extends AbstractUtils
     private FacetedSearchPage facetedSearchPage;
     private FacetedSearchConfigPage facetedSearchConfigPage;
     private SiteDashboardPage siteDashboardPage;
+    private SiteActions siteActions = new SiteActions();
 
     /*
      * (non-Javadoc)
@@ -685,7 +686,7 @@ public class FacetedSearchConfigPageTest extends AbstractUtils
 
         // Navigate to the test site
         dashBoardPage = ShareUser.openUserDashboard(drone).render();
-        siteDashboardPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        siteDashboardPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
 
         // Do a header search for the letter fileInfo
         facetedSearchPage = (FacetedSearchPage) siteDashboardPage.getSearch().search("apple").render();
@@ -731,7 +732,7 @@ public class FacetedSearchConfigPageTest extends AbstractUtils
 
         // Navigate to the test site
         dashBoardPage = ShareUser.openUserDashboard(drone).render();
-        siteDashboardPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        siteDashboardPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
 
         // Do a header search for text
         facetedSearchPage = (FacetedSearchPage) siteDashboardPage.getSearch().search("apple").render();

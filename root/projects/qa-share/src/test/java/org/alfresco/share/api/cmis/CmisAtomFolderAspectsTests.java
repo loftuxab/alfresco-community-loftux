@@ -17,6 +17,7 @@ package org.alfresco.share.api.cmis;
 
 import java.util.Arrays;
 
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.share.enums.CMISBinding;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserSitePage;
@@ -53,7 +54,7 @@ public class CmisAtomFolderAspectsTests extends CmisFolderAspectUtils
 
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo);
 
-        siteName = getSiteShortname(getSiteName(testName));
+        siteName = siteActions.getSiteShortname(getSiteName(testName));
 
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         // This util has been purposely used since beforeClass runs for dataprep

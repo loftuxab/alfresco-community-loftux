@@ -19,6 +19,7 @@ import org.alfresco.po.share.site.document.EditTextDocumentPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.SyncInfoPage;
 import org.alfresco.po.share.site.document.UserProfile;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractCloudSyncTest;
@@ -104,7 +105,7 @@ public class CloudSyncAccessTest extends AbstractCloudSyncTest
 
             ShareUser.login(drone, onPremUser, DEFAULT_PASSWORD);
 
-            SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(siteName));
+            SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(siteName));
 
             DocumentLibraryPage libPage = ShareUser.uploadFileInFolder(drone, new String[]
             { fileName, DOCLIB });
@@ -113,7 +114,7 @@ public class CloudSyncAccessTest extends AbstractCloudSyncTest
             libPage.getFileDirectoryInfo(fileName).selectSyncToCloud();
             Assert.assertTrue(libPage.isSignUpDialogVisible(), "Sign up dialog should appear");
             // Back to Doclib
-            SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(siteName));
+            SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(siteName));
 
             // Cloud Sync Dialog Checks on Doc Details Page
             DocumentDetailsPage documentDetailsPage = libPage.selectFile(fileName).render();
@@ -1166,7 +1167,7 @@ public class CloudSyncAccessTest extends AbstractCloudSyncTest
             String user1SiteName = getSiteName(testName) + "-U1";
             String fileName = getFileName(testName) + ".txt";
 
-            CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, user1, user2, getSiteShortname(user1SiteName), "SiteCollaborator", "");
+            CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, user1, user2, siteActions.getSiteShortname(user1SiteName), "SiteCollaborator", "");
 
             // Login into OP as User1
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -1298,7 +1299,7 @@ public class CloudSyncAccessTest extends AbstractCloudSyncTest
             ShareUser.logout(hybridDrone);
 
             // Invite User1 to join User2's site
-            CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser2, cloudUser1, getSiteShortname(user2SiteName), "SiteCollaborator", "");
+            CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser2, cloudUser1, siteActions.getSiteShortname(user2SiteName), "SiteCollaborator", "");
             // Login into OP as User1
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 

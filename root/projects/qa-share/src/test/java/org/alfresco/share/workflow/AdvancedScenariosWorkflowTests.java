@@ -26,6 +26,7 @@ import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.task.TaskDetails;
 import org.alfresco.po.share.task.TaskDetailsPage;
@@ -110,7 +111,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         ShareUser.createSite(hybridDrone, cloudSite1Name, SITE_VISIBILITY_PUBLIC);
 
         // Inviting user2 as consumer to the site.
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, getSiteShortname(cloudSite1Name), "SiteConsumer", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, siteActions.getSiteShortname(cloudSite1Name), "SiteConsumer", "");
 
         ShareUser.logout(hybridDrone);
 

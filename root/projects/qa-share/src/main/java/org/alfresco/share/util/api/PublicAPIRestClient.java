@@ -8,6 +8,7 @@
 
 package org.alfresco.share.util.api;
 
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.webdrone.WebDrone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +28,7 @@ public class PublicAPIRestClient extends AlfrescoHttpClient
     private static String dpURL = "https://dp.alfresco.me";
     private final static String DP_USER = "meenal.bhave@alfresco.com";
     private final static String DP_PASS = "alfresco";
+    private static SiteActions siteActions = new SiteActions();
     
     @Override
     public void setup() throws Exception
@@ -55,7 +57,7 @@ public class PublicAPIRestClient extends AlfrescoHttpClient
 
         String[] authDetails = getAuthDetails(authUser);
         String[] headers = { "Content-Type", "application/json;charset=utf-8", "key", getHeaderKey() };
-        String[] body = { "id", getSiteShortname(siteID) };
+        String[] body = { "id", siteActions.getSiteShortname(siteID) };
 
         HttpPost request = generatePostRequest(reqURL, headers, body);
         HttpClient client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);

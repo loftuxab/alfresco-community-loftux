@@ -15,6 +15,7 @@
 package org.alfresco.share.util.api;
 
 import org.alfresco.po.share.site.document.DocumentAspect;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.filestore.FileContentWriter;
 import org.alfresco.rest.api.tests.client.PublicApiClient.CmisSession;
@@ -54,6 +55,7 @@ public class CmisUtils extends PublicAPIAbstract
 {
 
     private static Log logger = LogFactory.getLog(CmisUtils.class);
+    protected SiteActions siteActions = new SiteActions();
 
     /**
      * Creates a CMIS session using the publicApiClient

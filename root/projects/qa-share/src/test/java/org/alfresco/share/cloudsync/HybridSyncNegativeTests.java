@@ -15,6 +15,7 @@ import org.alfresco.po.share.site.document.ManagePermissionsPage.ButtonType;
 import org.alfresco.po.share.site.document.SyncInfoPage;
 import org.alfresco.po.share.site.document.UserProfile;
 import org.alfresco.po.share.site.document.VersionDetails;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractWorkflow;
 import org.alfresco.share.util.ShareUser;
@@ -506,7 +507,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         ShareUserSitePage.createFolder(hybridDrone, folderName, "").render();
 
         // One user should be invited to the site as Collaborator or Contributor
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, cloudUser2, getSiteShortname(cloudSiteName), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, cloudUser2, siteActions.getSiteShortname(cloudSiteName), "SiteContributor", "");
         ShareUser.logout(hybridDrone);
 
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
@@ -635,7 +636,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
 
         // User2 should be invited to the site as Collaborator
-        ShareUserMembers.inviteUserToSiteWithRole(drone, opUser1, opUser2, getSiteShortname(opSiteName), UserRole.COLLABORATOR);
+        ShareUserMembers.inviteUserToSiteWithRole(drone, opUser1, opUser2, siteActions.getSiteShortname(opSiteName), UserRole.COLLABORATOR);
 
         // Login to User1, set up the cloud sync
         ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);

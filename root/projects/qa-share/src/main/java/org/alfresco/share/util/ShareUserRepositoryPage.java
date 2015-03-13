@@ -11,6 +11,7 @@ import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.enums.ViewType;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.document.*;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.util.PageUtils;
 import org.alfresco.po.share.workflow.CompanyHome;
 import org.alfresco.po.share.workflow.SelectContentPage;
@@ -28,6 +29,7 @@ public class ShareUserRepositoryPage extends AbstractUtils
     private static final String DATA_DICTIONARY_FOLDER = "Data Dictionary";
     private static final String NODE_TEMPLATES_FOLDER = "Node Templates";
     private static WebDrone drone;
+    private static SiteActions siteActions = new SiteActions();
 
 
     public ShareUserRepositoryPage()
@@ -397,7 +399,7 @@ public class ShareUserRepositoryPage extends AbstractUtils
     {
         String url = drone.getCurrentUrl();
         //http://127.0.0.1:8081/share  /page/repository#filter=path|%2FUser%2520Homes%2F userEnterprise42-5405%40freetht1.test-1  |&page=1
-        String target = url.substring(0, url.indexOf("/page/")) + "/page/repository#filter=path|%2FSites%2F" + SiteUtil.getSiteShortname(siteName)
+        String target = url.substring(0, url.indexOf("/page/")) + "/page/repository#filter=path|%2FSites%2F" + siteActions.getSiteShortname(siteName)
             + "|&page=1";
 
         drone.navigateTo(target);

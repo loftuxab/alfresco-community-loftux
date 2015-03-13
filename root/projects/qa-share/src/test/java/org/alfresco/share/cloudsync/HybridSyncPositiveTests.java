@@ -4,6 +4,7 @@ import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryNavigation;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.SyncInfoPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractWorkflow;
@@ -270,7 +271,7 @@ public class HybridSyncPositiveTests extends AbstractWorkflow
                 // Cloud user logins and create site.
                 ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
                 ShareUser.createSite(hybridDrone, cloudSiteName, SITE_VISIBILITY_PUBLIC);
-                CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, getSiteShortname(cloudSiteName), "SiteCollaborator", "");
+                CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, siteActions.getSiteShortname(cloudSiteName), "SiteCollaborator", "");
                 ShareUser.logout(hybridDrone);
 
                 // Login to User1, set up the cloud sync
