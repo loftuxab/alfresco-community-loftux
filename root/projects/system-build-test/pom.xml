@@ -9,16 +9,20 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <solr.config.folder>${project.build.outputDirectory}/solrconf</solr.config.folder>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.alfresco</groupId>
-            <artifactId>alfresco-solr</artifactId>
+            <artifactId>alfresco-solr4</artifactId>
             <version>${project.version}</version>
             <classifier>classes</classifier>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
-            <artifactId>alfresco-solr</artifactId>
+            <artifactId>alfresco-solr4</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
         </dependency>
@@ -31,17 +35,17 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
-            <version>7.3.0.v20110203</version>
+            <version>8.1.10.v20130312</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>7.3.0.v20110203</version>
+            <version>8.1.10.v20130312</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>7.3.0.v20110203</version>
+            <version>8.1.10.v20130312</version>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
@@ -59,22 +63,33 @@
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>		
     </dependencies>
 
   <build>
+    <!-- keystore is both accessed from the classpath and the filesystem, so it needs to be copied twice... -->
     <resources>
       <resource>
         <directory>keystore</directory>
         <targetPath>${project.build.directory}/keystore</targetPath>
       </resource>
     </resources>
-
+    <testResources>
+      <testResource>
+        <directory>keystore</directory> 
+      </testResource>
+    </testResources>
     <plugins>
+      <!-- Tests are only run if integration-tests profile is activated -->
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <includes>
-            <include>**/MiscSystemTestSuite.*</include>
+            <include/>
           </includes>
         </configuration>
       </plugin>
@@ -99,12 +114,68 @@
                   <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                   <destFileName>alfresco.war</destFileName>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.alfresco</groupId>
+                  <artifactId>alfresco-solr4</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>ssl</classifier>
+                  <type>war</type>
+                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                  <destFileName>solr.war</destFileName>
+                </artifactItem>	
+              </artifactItems>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>unpack-solr</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+                <goal>unpack</goal>
+            </goals>
+            <configuration>
+                <artifactItems>
+                <artifactItem>
+                  <groupId>org.alfresco</groupId>
+                  <artifactId>alfresco-solr4</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>config-ssl</classifier>
+                  <type>zip</type>
+                  <outputDirectory>${solr.config.folder}</outputDirectory>
+                </artifactItem>	
               </artifactItems>
             </configuration>
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <executions>
+          <execution>
+            <id>replace-solrcore.properties</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <file>${solr.config.folder}/*-SpacesStore/conf/solrcore.properties</file>
+              </includes>
+              <replacements>
+                <replacement>
+                  <token>@@ALFRESCO_SOLR4_DATA_DIR@@</token>
+                  <value>${solr.config.folder}</value>
+                </replacement>
+              </replacements>
+              <regex>false</regex>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
+
     <pluginManagement>
     	<plugins>
     		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
@@ -140,4 +211,57 @@
     </pluginManagement>
   </build>
 
+    <profiles>
+        <profile>
+            <id>integration-tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Wipe the database before starting tests -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>sql-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>wipe-database</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <sqlCommand>${db.drop.command}</sqlCommand>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>create-database</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <sqlCommand>${db.create.command}</sqlCommand>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/MiscSystemTestSuite.*</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <solr.solr.home>${solr.config.folder}</solr.solr.home>
+                                <solr.solr.model.dir>${solr.config.folder}/models</solr.solr.model.dir>
+                                <solr.solr.content.dir>${solr.config.folder}/content</solr.solr.content.dir>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

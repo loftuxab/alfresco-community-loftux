@@ -155,6 +155,15 @@
         <finalName>solr4</finalName>
         <plugins>
             <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/CMISDataCreatorTest.java</exclude> <!-- Run in system-build-test -->
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <attachClasses>true</attachClasses>

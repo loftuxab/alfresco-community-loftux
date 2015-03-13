@@ -101,9 +101,7 @@
     <module>projects/solr4</module>
     <module>projects/solr</module>
     <module>projects/file-transfer-receiver</module>
-    <!-- Currently being worked out... see BDE-118
     <module>projects/system-build-test</module>
-    -->
     <module>modules/sharepoint/amp</module>
     <module>modules/wcmquickstart</module>
     <module>projects/web-editor-samples/customer-site</module>
@@ -1010,7 +1008,6 @@
             <module>packaging</module>
             <module>projects/qa-share</module>
             <module>projects/share</module>
-            <module>projects/system-build-test</module>
             <module>enterpriseprojects/packaging</module>
             <module>enterpriseprojects/packaging/rpm</module>
             <module>privatemodules</module>
