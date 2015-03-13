@@ -1805,7 +1805,7 @@ public class DocumentDetailsPage extends DetailsPage
     {
         try
         {
-            return drone.findAndWait((VIEW_ORIGINAL_DOCUMENT)).isDisplayed();
+            return drone.find((VIEW_ORIGINAL_DOCUMENT)).isDisplayed();
         }
         catch (NoSuchElementException te)
         {
