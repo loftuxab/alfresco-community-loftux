@@ -83,6 +83,7 @@
   </distributionManagement>
 
   <modules>
+    <module>projects/3rd-party</module>
     <module>projects/surf</module>
     <module>projects/core</module>
     <module>projects/data-model</module>
