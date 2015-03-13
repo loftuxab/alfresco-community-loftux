@@ -47,7 +47,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -187,36 +187,36 @@ public class EmbeddedSolrTest  extends TestCase
                 
             }
           
-            PostMethod post = new PostMethod(url.toString());
+            GetMethod get = new GetMethod(url.toString());
             
             try
             {
-                httpClient.executeMethod(post);
+                httpClient.executeMethod(get);
 
-                if(post.getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY || post.getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY)
+                if(get.getStatusCode() == HttpStatus.SC_MOVED_PERMANENTLY || get.getStatusCode() == HttpStatus.SC_MOVED_TEMPORARILY)
                 {
-                    Header locationHeader = post.getResponseHeader("location");
+                    Header locationHeader = get.getResponseHeader("location");
                     if (locationHeader != null)
                     {
                         String redirectLocation = locationHeader.getValue();
-                        post.setURI(new URI(redirectLocation, true));
-                        httpClient.executeMethod(post);
+                        get.setURI(new URI(redirectLocation, true));
+                        httpClient.executeMethod(get);
                     }
                 }
 
-                if (post.getStatusCode() != HttpServletResponse.SC_OK)
+                if (get.getStatusCode() != HttpServletResponse.SC_OK)
                 {
-                    throw new LuceneQueryParserException("Request failed " + post.getStatusCode() + " " + url.toString());
+                    throw new LuceneQueryParserException("Request failed " + get.getStatusCode() + " " + url.toString());
                 }
 
-                Reader reader = new BufferedReader(new InputStreamReader(post.getResponseBodyAsStream()));
+                Reader reader = new BufferedReader(new InputStreamReader(get.getResponseBodyAsStream()));
                 // TODO - replace with streaming-based solution e.g. SimpleJSON ContentHandler
                 JSONObject json = new JSONObject(new JSONTokener(reader));
                 return json;
             }
             finally
             {
-                post.releaseConnection();
+                get.releaseConnection();
             }
         }
         catch (UnsupportedEncodingException e)
