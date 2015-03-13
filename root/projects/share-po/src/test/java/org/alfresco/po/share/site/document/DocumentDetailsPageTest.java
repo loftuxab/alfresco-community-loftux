@@ -45,7 +45,6 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     private static Log logger = LogFactory.getLog(DocumentDetailsPageTest.class);
     private static final String COMMENT = "adding a comment to document is easy!!.";
     private static final String EDITED_COMMENT = "editing a comment is even easier!";
-
     private String siteName;
     private File file;
     private String fileName;
@@ -98,7 +97,9 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     public void uploadFile() throws Exception
     {
         if (logger.isTraceEnabled())
+        {
             logger.trace("====uploadFile====");
+        }
         SitePage site = (SitePage) drone.getCurrentPage();
         site.render();
         DocumentLibraryPage docPage = site.getSiteNav().selectSiteDocumentLibrary().render();
@@ -136,27 +137,36 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     {
         DocumentDetailsPage docDetailsPage = selectDocument(file).render();
         if (logger.isTraceEnabled())
+        {
             logger.trace("====updateAnExistingFile====");
+        }
         // Assert the current file exists and is version 1
         Assert.assertEquals(file.getName(), docDetailsPage.getDocumentTitle());
         Assert.assertEquals(docDetailsPage.getDocumentVersion(), "1.0");
         if (logger.isTraceEnabled())
+        {
             logger.trace("---update with minor version----");
+        }
         // Update file with a minor version
         UpdateFilePage updatePage = docDetailsPage.selectUploadNewVersion().render();
         if (logger.isTraceEnabled())
+        {
             logger.trace("---selected new version to upload----");
+        }
         updatePage.selectMinorVersionChange();
         updatePage.setComment("Reloading the file with correct image");
         updatePage.uploadFile(file.getCanonicalPath());
         docDetailsPage = updatePage.submit().render();
         if (logger.isTraceEnabled())
+        {
             logger.trace("---upload submited----");
-
+        }
         Assert.assertEquals(docDetailsPage.getDocumentVersion(), "1.1");
         Assert.assertEquals("Reloading the file with correct image", docDetailsPage.getCommentsOfLastCommit());
         if (logger.isTraceEnabled())
+        {
             logger.trace("---update with major version----");
+        }
     }
 
     // Grouped as bug Due to https://issues.alfresco.com/jira/browse/ACE-1628 ACE Bug
@@ -170,7 +180,6 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
         updatePage.setComment("Reloading the final image");
         updatePage.uploadFile(file.getCanonicalPath());
         docDetailsPage = updatePage.submit().render();
-
         Assert.assertEquals("2.0", docDetailsPage.getDocumentVersion());
         Assert.assertEquals("Reloading the final image", docDetailsPage.getCommentsOfLastCommit());
         Assert.assertEquals(true, docDetailsPage.isUploadNewVersionDisplayed());
@@ -186,7 +195,9 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     {
         DocumentDetailsPage docDetailsPage = selectDocument(file).render();
         if (logger.isTraceEnabled())
+        {
             logger.trace("====addLikeDislike====");
+        }
         DocumentDetailsPage docsPage = drone.getCurrentPage().render();
         Assert.assertEquals("0", docsPage.getLikeCount());
         Assert.assertFalse(docsPage.isLiked());
@@ -205,7 +216,9 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     public void favouriteUnfavourite() throws Exception
     {
         if (logger.isTraceEnabled())
+        {
             logger.trace("====favouriteUnfavourite====");
+        }
         DocumentDetailsPage docsPage = drone.getCurrentPage().render();
         Assert.assertFalse(docsPage.isFavourite());
         Assert.assertNotNull(docsPage.getToolTipForFavourite());
@@ -238,7 +251,9 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     public void addComments() throws Exception
     {
         if (logger.isTraceEnabled())
+        {
             logger.trace("====addComments====");
+        }
         DocumentDetailsPage docsPage = drone.getCurrentPage().render();
         Assert.assertEquals(docsPage.getCommentCount(), 0);
         docsPage = docsPage.addComment(COMMENT).render();
@@ -257,7 +272,9 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     public void removeComment() throws Exception
     {
         if (logger.isTraceEnabled())
+        {
             logger.trace("====removeComment====");
+        }
         DocumentDetailsPage docsPage = drone.getCurrentPage().render();
         Assert.assertEquals(docsPage.getCommentCount(), 1);
         docsPage.removeComment(COMMENT);
@@ -272,14 +289,12 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
         DocumentDetailsPage docDetailsPage = selectDocument(file).render();
         newfile = File.createTempFile(fileName, fileExt);
         newfile.createNewFile();
-
         docDetailsPage = docDetailsPage.selectDownload(newfile).render();
         long fileSize = newfile.length();
         if (fileSize < 1)
             saveScreenShot("DocumentDetailsPageTest.downloadFile");
         Assert.assertTrue(fileSize > 0);
         Assert.assertTrue(docDetailsPage.isDocumentDetailsPage());
-
         String size = docDetailsPage.getDocumentSize();
         Assert.assertEquals(size, "33 bytes");
     }
@@ -294,8 +309,9 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     public void testIsPreviewDisplayed() throws Exception
     {
         if (logger.isTraceEnabled())
+        {
             logger.trace("====testIsPreviewDisplayed====");
-
+        }
         DocumentDetailsPage docDetailsPage = drone.getCurrentPage().render();
         Assert.assertTrue(docDetailsPage.isFlashPreviewDisplayed());
     }
@@ -309,7 +325,9 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     public void deleteAnExistingFile()
     {
         if (logger.isTraceEnabled())
+        {
             logger.trace("====deleteAnExistingFile====");
+        }
         DocumentDetailsPage docDetailsPage = drone.getCurrentPage().render();
         DocumentLibraryPage docLibPage = docDetailsPage.delete().render();
         Assert.assertFalse(docLibPage.isFileVisible(file.getName()));
@@ -324,7 +342,9 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     public void testIsNoPreviewMessageDisplayed() throws Exception
     {
         if (logger.isTraceEnabled())
+        {
             logger.trace("====testIsNoPreviewMessageDisplayed====");
+        }
         SitePage site = drone.getCurrentPage().render();
         DocumentLibraryPage docPage = site.getSiteNav().selectSiteDocumentLibrary().render();
         UploadFilePage upLoadPage = docPage.getNavigation().selectFileUpload().render();
@@ -334,7 +354,6 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
         EditDocumentPropertiesPage editPropertiesPage = docDetailsPage.selectEditProperties().render();
         editPropertiesPage.selectMimeType(MimeType.AlfrescContentPackage);
         docDetailsPage = editPropertiesPage.selectSave().render();
-
         Assert.assertTrue(docDetailsPage.isNoPreviewMessageDisplayed());
     }
 
@@ -383,24 +402,32 @@ public class DocumentDetailsPageTest extends AbstractDocumentTest
     {
         DocumentDetailsPage docDetailsPage = drone.getCurrentPage().render();
         if (logger.isTraceEnabled())
+        {
             logger.trace("====editOffline====");
+        }
         docDetailsPage.selectEditOffLine(null).render();
         Assert.assertTrue(docDetailsPage.isCheckedOut());
 
         UpdateFilePage updatePage = docDetailsPage.selectUploadNewVersion().render();
         if (logger.isTraceEnabled())
+        {
             logger.trace("---selected new version to upload----");
+        }
         updatePage.selectMinorVersionChange();
         updatePage.setComment("Reloading the file with correct image");
         updatePage.uploadFile(uploadFile.getCanonicalPath());
         updatePage.render();
         docDetailsPage = updatePage.submit().render();
         if (logger.isTraceEnabled())
+        {
             logger.trace("---upload submited----");
+        }
 
         Assert.assertFalse(docDetailsPage.isCheckedOut());
         if (logger.isTraceEnabled())
+        {
             logger.trace("---update with major version----");
+        }
         docDetailsPage.getSiteNav().selectSiteDocumentLibrary().render();
     }
 
