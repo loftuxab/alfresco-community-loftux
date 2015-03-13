@@ -17,6 +17,7 @@ import org.alfresco.po.share.dashlet.SiteActivitiesDashlet;
 import org.alfresco.po.share.dashlet.SiteActivitiesUserFilter;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.AccountSettingsPage;
 import org.alfresco.po.share.user.CloudForgotPasswordPage;
 import org.alfresco.po.share.user.Language;
@@ -47,6 +48,7 @@ public class LocalizationTests extends AbstractUtils
 
     private String userCloudEmail;
     private String userCoundPassword;
+    private SiteActions siteActions = new SiteActions();
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -1170,7 +1172,7 @@ public class LocalizationTests extends AbstractUtils
 
         ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC).render(5000);
 
-        CreateUserAPI.inviteUserToSite(drone, testUser1, testUser2, getSiteShortname(siteName), "SiteCollaborator", "");
+        CreateUserAPI.inviteUserToSite(drone, testUser1, testUser2, siteActions.getSiteShortname(siteName).toLowerCase(), "SiteCollaborator", "");
 
         // read from property file the value for the give key
         String formattedEmailSubject;
@@ -1261,7 +1263,7 @@ public class LocalizationTests extends AbstractUtils
 
         ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC).render(5000);
 
-        CreateUserAPI.inviteUserToSite(drone, testUser1, testUser2, getSiteShortname(siteName), "SiteCollaborator", "");
+        CreateUserAPI.inviteUserToSite(drone, testUser1, testUser2, siteActions.getSiteShortname(siteName).toLowerCase(), "SiteCollaborator", "");
 
         // read from property file the value for the give key
         String emailSubject = PropertiesUtil.getPropertyValue(getLocalizationFile(language), "invitationsubject");

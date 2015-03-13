@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiClient;
@@ -80,7 +81,7 @@ public class CmisBrowserTests extends CmisUtils
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser);
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser2);
         ShareUser.login(drone, testUser2);
-        ShareUser.createSite(drone, getSiteShortname(siteName), SITE_VISIBILITY_PUBLIC);
+        ShareUser.createSite(drone, siteActions.getSiteShortname(siteName), SITE_VISIBILITY_PUBLIC);
         ShareUser.openDocumentLibrary(drone);
         cmisParameters = new HashMap<>();
     }

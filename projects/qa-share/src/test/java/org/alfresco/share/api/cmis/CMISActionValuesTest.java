@@ -24,6 +24,7 @@ import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
 import org.alfresco.po.share.site.document.VersionDetails;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.rest.api.tests.client.PublicApiClient.CmisSession;
 import org.alfresco.rest.api.tests.client.data.CMISNode;
@@ -124,7 +125,7 @@ public abstract class CMISActionValuesTest extends CmisUtils
 
         ShareUser.login(drone, testUser);
 
-        ShareUser.createSite(drone, getSiteShortname(siteName), SITE_VISIBILITY_PUBLIC, true);
+        ShareUser.createSite(drone, siteActions.getSiteShortname(siteName), SITE_VISIBILITY_PUBLIC, true);
         ShareUser.createFolderInFolder(drone, folderName, folderName, DOCLIB);
         folderRef = ShareUser.getGuid(drone, folderName);
 

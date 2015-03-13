@@ -5,6 +5,7 @@ import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
 import org.alfresco.po.share.site.document.DocumentLibraryNavigation;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractWorkflow;
@@ -82,7 +83,7 @@ public class HybridSyncNegativeTests2 extends AbstractWorkflow
         ShareUser.login(hybridDrone, cloudUser1, DEFAULT_PASSWORD);
         ShareUser.createSite(hybridDrone, cloudSiteName1, SITE_VISIBILITY_PUBLIC);
         ShareUser.createSite(hybridDrone, cloudSiteName2, SITE_VISIBILITY_PUBLIC);
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, getSiteShortname(cloudSiteName1), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, siteActions.getSiteShortname(cloudSiteName1), "SiteContributor", "");
 
         ShareUser.logout(hybridDrone);
 
@@ -192,7 +193,7 @@ public class HybridSyncNegativeTests2 extends AbstractWorkflow
         ShareUser.createSite(hybridDrone, cloudSiteName1, SITE_VISIBILITY_PUBLIC);
         ShareUser.createSite(hybridDrone, cloudSiteName2, SITE_VISIBILITY_PUBLIC);
 
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, getSiteShortname(cloudSiteName1), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, siteActions.getSiteShortname(cloudSiteName1), "SiteContributor", "");
 
         ShareUser.logout(hybridDrone);
 
@@ -303,7 +304,7 @@ public class HybridSyncNegativeTests2 extends AbstractWorkflow
         ShareUser.createSite(hybridDrone, cloudSiteName1, SITE_VISIBILITY_PUBLIC);
         ShareUser.createSite(hybridDrone, cloudSiteName2, SITE_VISIBILITY_PUBLIC);
 
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, getSiteShortname(cloudSiteName1), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, siteActions.getSiteShortname(cloudSiteName1), "SiteContributor", "");
         ShareUser.logout(hybridDrone);
 
         // Login to User1, set up the cloud sync
@@ -420,7 +421,7 @@ public class HybridSyncNegativeTests2 extends AbstractWorkflow
         ShareUser.createSite(hybridDrone, cloudSiteName1, SITE_VISIBILITY_PUBLIC);
         ShareUser.createSite(hybridDrone, cloudSiteName2, SITE_VISIBILITY_PUBLIC);
 
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, getSiteShortname(cloudSiteName1), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser1, cloudUser2, siteActions.getSiteShortname(cloudSiteName1), "SiteContributor", "");
         ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName1);
         for (int i = 1; i < 11; i++)
         {

@@ -28,6 +28,7 @@ import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.SyncInfoPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.po.share.task.TaskDetails;
 import org.alfresco.po.share.task.TaskDetailsPage;
@@ -838,8 +839,8 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         ShareUser.logout(hybridDrone);
 
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, getSiteShortname(cloudSite), "SiteContributor", "");
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
 
         // Login as User1 (OP)
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
@@ -1100,8 +1101,8 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         ShareUser.logout(hybridDrone);
 
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, getSiteShortname(cloudSite), "SiteContributor", "");
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
 
         // Login as User1 (OP)
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
@@ -1293,8 +1294,8 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         ShareUser.logout(hybridDrone);
 
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, getSiteShortname(cloudSite), "SiteContributor", "");
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
 
         // Login as User1 (OP)
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -1519,7 +1520,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
 
         ShareUser.logout(hybridDrone);
 
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
 
         // Login as User1 (OP)
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -1678,8 +1679,8 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
 
         // Invite Reviewer1 and Reviewer 2 to the site as Contributors
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, getSiteShortname(cloudSite), "SiteContributor", "");
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer1, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser, reviewer2, siteActions.getSiteShortname(cloudSite), "SiteContributor", "");
 
         // Login as User1 (OP)
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -2240,7 +2241,7 @@ public class HybridWorkflowSanityTest extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
 
         // CloudUser2 invites CloudUser1 to join the site as Consumer
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser2, cloudUser1, getSiteShortname(cloudSite5), "SiteConsumer", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, cloudUser2, cloudUser1, siteActions.getSiteShortname(cloudSite5), "SiteConsumer", "");
 
         // Login as CloudUser3 and create a site
         ShareUser.login(hybridDrone, cloudUser3, DEFAULT_PASSWORD);

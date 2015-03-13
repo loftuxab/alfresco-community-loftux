@@ -58,6 +58,8 @@ TransactionService transactionService = (TransactionService)context.getBean("tra
          </div>
          
          <div class="index-list">
+            <h4><%=descriptorService.getServerDescriptor().getEdition()%>&nbsp;-&nbsp;<%=descriptorService.getServerDescriptor().getVersion()%></h4>
+            <p></p>
             <p><a href="http://docs.alfresco.com/">Online Documentation</a></p>
             <p></p>
             <p><a href="<%=UrlUtil.getShareUrl(sysAdminParams)%>">Alfresco Share</a></p>
@@ -82,6 +84,7 @@ TransactionService transactionService = (TransactionService)context.getBean("tra
    else
    {
 %>
+            <p><a href="./s/admin">Alfresco Administration Console</a> (admin only)</p>
             <p></p>
             <p><a href="http://forums.alfresco.com/">Alfresco Forums</a></p>
             <p><a href="http://issues.alfresco.com/">Alfresco JIRA</a></p>

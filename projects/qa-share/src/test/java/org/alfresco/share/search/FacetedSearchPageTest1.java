@@ -10,6 +10,7 @@ import org.alfresco.po.share.search.SearchBox;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.apache.commons.logging.Log;
@@ -45,6 +46,8 @@ public class FacetedSearchPageTest1 extends AbstractUtils
     private String testUser2;
     private String testUser3;
     private static final String USER_HOMES_FOLDER = "User Homes";
+    private SiteActions siteActions = new SiteActions();
+
     /* (non-Javadoc)
      * @see org.alfresco.share.util.AbstractUtils#setup()
      * 
@@ -631,7 +634,7 @@ public class FacetedSearchPageTest1 extends AbstractUtils
         ShareUser.login(drone, testUser1, DEFAULT_PASSWORD);
 
         // Navigate to the document library page and delete all content
-        SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName));
+        SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(this.siteName));
         ShareUser.openDocumentLibrary(drone);
         ShareUser.deleteAllContentFromDocumentLibrary(drone);
 

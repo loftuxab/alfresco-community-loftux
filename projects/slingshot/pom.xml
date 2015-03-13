@@ -18,7 +18,7 @@
         <maven.tomcat.httpsPort>${tomcat.default.share.ssl.port}</maven.tomcat.httpsPort>
         <!-- Files to exclude from SonarQube analysis -->
         <sonar.exclusions>
-            source/web/jquery/**, 
+            source/web/jquery/**,
             source/web/js/flash/extMouseWheel.js,
             source/web/js/lightbox.js,
             source/web/yui/**
@@ -210,7 +210,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>aikau</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.8.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.extensions.surf</groupId>
@@ -251,7 +251,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
     </dependencies>
 
     <build>
@@ -428,7 +428,7 @@
                     </aggregations>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
@@ -457,7 +457,7 @@
                         </includes>
                     </scanTargetPattern>
                  </scanTargetPatterns> -->
-                  
+
                   <!-- Sets the port when using mvn jetty:run-forked -->
                   <jvmArgs>-Djetty.port=8089</jvmArgs>
                   <!-- Override the system properties to set a port that *should* be unused -->
@@ -482,7 +482,7 @@
                         <resourceBase>tests/testApp</resourceBase>
                         <resourceBase>${project.build.directory}/${project.build.finalName}</resourceBase>
                      </resourceBases>
-                     <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames> 
+                     <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
                    </webApp>
                    <webAppSourceDirectory>tests/testApp</webAppSourceDirectory>
                    <classesDirectory>tests/testApp/WEB-INF/classes</classesDirectory>

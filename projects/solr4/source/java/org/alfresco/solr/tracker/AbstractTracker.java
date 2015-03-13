@@ -140,6 +140,7 @@ public abstract class AbstractTracker implements Tracker
                 this.invalidateTrackerState();
                 getTrackerState();
                 state.setRunning(true);
+                infoSrv.registerTrackerThread();
             }
         }
         finally
@@ -196,6 +197,7 @@ public abstract class AbstractTracker implements Tracker
             readWriteLock.writeLock().lock();
             try
             {
+                infoSrv.unregisterTrackerThread();
                 state.setRunning(false);
                 state.setCheck(false);
             }

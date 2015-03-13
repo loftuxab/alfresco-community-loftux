@@ -936,26 +936,6 @@ public abstract class AbstractUtils implements AlfrescoTests
     }
 
     /**
-     * Helper to consistently get the Site Short Name.
-     *
-     * @param siteName String Name of the test for uniquely identifying / mapping
-     *                 test data with the test
-     * @return String site short name
-     */
-    public static String getSiteShortname(String siteName)
-    {
-        String siteShortname = "";
-        String[] unallowedCharacters = { "_", "!" };
-
-        for (String removeChar : unallowedCharacters)
-        {
-            siteShortname = siteName.replace(removeChar, "");
-        }
-
-        return siteShortname.toLowerCase();
-    }
-
-    /**
      * Helper to consistently get the filename.
      *
      * @param partFileName String Part Name of the file for uniquely identifying /

@@ -10,7 +10,6 @@ import org.alfresco.po.share.EditUserPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.UserProfilePage;
 import org.alfresco.po.share.UserSearchPage;
-import org.alfresco.po.share.dashlet.MyTasksDashlet;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.exception.ShareException;
 import org.alfresco.po.share.site.AddGroupsPage;
@@ -22,6 +21,7 @@ import org.alfresco.po.share.site.SiteMembersPage;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
 import org.alfresco.po.share.site.document.ManagePermissionsPage.ButtonType;
 import org.alfresco.po.share.site.document.UserProfile;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.webdrone.HtmlPage;
@@ -40,6 +40,7 @@ public class ShareUserMembers extends AbstractUtils
 {
 
     private static Log logger = LogFactory.getLog(ShareUserMembers.class);
+    private static SiteActions siteActions = new SiteActions();
 
     /**
      * Default Constructor
@@ -189,7 +190,7 @@ public class ShareUserMembers extends AbstractUtils
         {
             if (isAlfrescoVersionCloud(driver))
             {
-                retVal = CreateUserAPI.inviteUserToSiteWithRoleAndAccept(driver, invitingUser, userJoiningSite, getSiteShortname(siteName), role.getRoleName(),
+                retVal = CreateUserAPI.inviteUserToSiteWithRoleAndAccept(driver, invitingUser, userJoiningSite, siteActions.getSiteShortname(siteName), role.getRoleName(),
                         "");
             }
             else

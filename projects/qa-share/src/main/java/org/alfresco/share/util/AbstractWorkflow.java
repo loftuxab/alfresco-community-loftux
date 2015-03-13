@@ -22,6 +22,7 @@ import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.MyTasksPage;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.task.TaskStatus;
 import org.alfresco.po.share.workflow.WorkFlowFormDetails;
 import org.alfresco.share.util.api.CreateUserAPI;
@@ -56,6 +57,7 @@ public abstract class AbstractWorkflow extends AbstractCloudSyncTest
     private static Log logger = LogFactory.getLog(AbstractWorkflow.class);
 
     protected final String APPROVAL_PERCENTAGE_HELP_TEXT = "This field must have a value between 1 and 100.";
+    protected SiteActions siteActions = new SiteActions();
 
     /**
      * 

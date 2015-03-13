@@ -30,6 +30,6 @@ public class VtiMoveAction extends VtiWebDavAction implements VtiAction
     @Override
     public WebDAVMethod getWebDAVMethod()
     {
-        return new MoveMethod(pathHelper.getAlfrescoContext());
+        return new MoveMethod(pathHelper);
     }
 }

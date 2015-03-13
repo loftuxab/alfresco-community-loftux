@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.MyTasksPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.task.EditTaskPage;
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiClient.ListResponse;
@@ -51,6 +52,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
     private static String modSiteName3;
     private static String probeSite;
     private static String privateSiteName;
+    private SiteActions siteActions = new SiteActions();
     private static Log logger = LogFactory.getLog(SiteMembershipAPITests.class);
 
     @Override
@@ -97,7 +99,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
 
         SiteMembershipRequest siteMembershipRequest = createSiteMembershipRequest(requestForUser, DOMAIN, requestForUser, modSiteName, MESSAGE);
         assertNotNull(siteMembershipRequest);
-        assertEquals(ShareUser.getSiteShortname(modSiteName), siteMembershipRequest.getId().toLowerCase());
+        assertEquals(siteActions.getSiteShortname(modSiteName).toLowerCase(), siteMembershipRequest.getId().toLowerCase());
     }
 
     @Test(enabled = true)
@@ -105,7 +107,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
     {
         SiteMembershipRequest siteMembershipRequest = createSiteMembershipRequest(requestForUser, DOMAIN, requestForUser, siteName2, "");
         assertNotNull(siteMembershipRequest);
-        assertEquals(siteMembershipRequest.getId().toLowerCase(), ShareUser.getSiteShortname(siteName2));
+        assertEquals(siteMembershipRequest.getId().toLowerCase(), siteActions.getSiteShortname(siteName2).toLowerCase());
     }
 
     @Test(enabled = true, dependsOnMethods = "AONE_14314")
@@ -114,11 +116,11 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
 
         SiteMembershipRequest siteMembershipRequest = createSiteMembershipRequest(requestForUser, DOMAIN, "-me-", siteName, "");
         assertNotNull(siteMembershipRequest);
-        assertEquals(ShareUser.getSiteShortname(siteName), siteMembershipRequest.getId().toLowerCase());
+        assertEquals(siteActions.getSiteShortname(siteName).toLowerCase(), siteMembershipRequest.getId().toLowerCase());
 
-        siteMembershipRequest = createSiteMembershipRequest(requestForUser, DOMAIN, "-me-", getSiteShortname(modSiteName2), MESSAGE);
+        siteMembershipRequest = createSiteMembershipRequest(requestForUser, DOMAIN, "-me-", siteActions.getSiteShortname(modSiteName2).toLowerCase(), MESSAGE);
         assertNotNull(siteMembershipRequest);
-        assertEquals(ShareUser.getSiteShortname(modSiteName2), siteMembershipRequest.getId().toLowerCase());
+        assertEquals(siteActions.getSiteShortname(modSiteName2).toLowerCase(), siteMembershipRequest.getId().toLowerCase());
         assertEquals(MESSAGE.toLowerCase(), siteMembershipRequest.getMessage().toLowerCase());
 
         ShareUser.login(drone, mainUser);
@@ -150,7 +152,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
 
         SiteMembershipRequest siteMembershipRequest = createSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, siteName, null);
         assertNotNull(siteMembershipRequest);
-        assertEquals(ShareUser.getSiteShortname(siteName), siteMembershipRequest.getId().toLowerCase());
+        assertEquals(siteActions.getSiteShortname(siteName).toLowerCase(), siteMembershipRequest.getId().toLowerCase());
 
         try
         {
@@ -172,12 +174,12 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         assertEquals(modSiteName.toLowerCase(), siteMembershipRequest.getId().toLowerCase());
         siteMembershipRequest = null;
 
-        siteMembershipRequest = updateSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, getSiteShortname(modSiteName), MESSAGE);
+        siteMembershipRequest = updateSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, siteActions.getSiteShortname(modSiteName).toLowerCase(), MESSAGE);
         assertNotNull(siteMembershipRequest);
         assertEquals(MESSAGE.toLowerCase(), siteMembershipRequest.getMessage().toLowerCase());
         Date firstMod = siteMembershipRequest.getModifiedAt();
 
-        siteMembershipRequest = updateSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, getSiteShortname(modSiteName), MESSAGE);
+        siteMembershipRequest = updateSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, siteActions.getSiteShortname(modSiteName).toLowerCase(), MESSAGE);
         assertNotNull(siteMembershipRequest);
         assertEquals(MESSAGE.toLowerCase(), siteMembershipRequest.getMessage().toLowerCase());
         assertTrue(firstMod.before(siteMembershipRequest.getModifiedAt()));
@@ -190,11 +192,11 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
 
         SiteMembershipRequest siteMembershipRequest = createSiteMembershipRequest(requestForUser, DOMAIN, requestForUser, modSiteName3, "");
         assertNotNull(siteMembershipRequest);
-        assertEquals(ShareUser.getSiteShortname(modSiteName3), siteMembershipRequest.getId().toLowerCase());
+        assertEquals(siteActions.getSiteShortname(modSiteName3).toLowerCase(), siteMembershipRequest.getId().toLowerCase());
 
         try
         {
-            updateSiteMembershipRequest(requestForUser, DOMAIN, requestForUser1, getSiteShortname(modSiteName3), MESSAGE);
+            updateSiteMembershipRequest(requestForUser, DOMAIN, requestForUser1, siteActions.getSiteShortname(modSiteName3), MESSAGE);
             fail("AONE_14329: username error - " + requestForUser1);
         }
         catch (PublicApiException e)
@@ -204,7 +206,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
 
         try
         {
-            updateSiteMembershipRequest(requestForUser, DOMAIN, requestForUser + "aa", getSiteShortname(modSiteName3), MESSAGE);
+            updateSiteMembershipRequest(requestForUser, DOMAIN, requestForUser + "aa", siteActions.getSiteShortname(modSiteName3).toLowerCase(), MESSAGE);
             fail("AONE_14329: username error - " + requestForUser + "aa");
         }
         catch (PublicApiException e)
@@ -220,11 +222,11 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
 
         SiteMembershipRequest siteMembershipRequest = createSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, siteName2, MESSAGE);
         assertNotNull(siteMembershipRequest);
-        assertEquals(ShareUser.getSiteShortname(siteName2), siteMembershipRequest.getId().toLowerCase());
+        assertEquals(siteActions.getSiteShortname(siteName2).toLowerCase(), siteMembershipRequest.getId().toLowerCase());
 
         try
         {
-            cancelSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, getSiteShortname(siteName2));
+            cancelSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, siteActions.getSiteShortname(siteName2).toLowerCase());
             fail("AONE_14317: cannot cancel SMR for a public site");
         }
         catch (PublicApiException e)
@@ -267,7 +269,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
     {
         try
         {
-            cancelSiteMembershipRequest(requestForUser, DOMAIN, requestForUser + "fff", getSiteShortname(modSiteName));
+            cancelSiteMembershipRequest(requestForUser, DOMAIN, requestForUser + "fff", siteActions.getSiteShortname(modSiteName).toLowerCase());
             fail("Delete SMR when personid is different than auth user should fail with 404");
         }
         catch (PublicApiException e)
@@ -285,13 +287,13 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
         assertNotNull(siteMembershipRequest);
         assertEquals(modSiteName3.toLowerCase(), siteMembershipRequest.getId().toLowerCase());
 
-        HttpResponse response = cancelSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, getSiteShortname(modSiteName3));
+        HttpResponse response = cancelSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, siteActions.getSiteShortname(modSiteName3).toLowerCase());
         assertNotNull(response);
         assertEquals(response.getStatusCode(), 204);
 
         try
         {
-            cancelSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, getSiteShortname(modSiteName3));
+            cancelSiteMembershipRequest(requestForUser1, DOMAIN, requestForUser1, siteActions.getSiteShortname(modSiteName3).toLowerCase());
             fail("Delete deleted SMR: should return 404");
         }
         catch (PublicApiException e)
@@ -350,7 +352,7 @@ public class SiteMembershipAPITests extends SiteMembershipAPI
     {
         SiteMembershipRequest siteMembershipRequest = createSiteMembershipRequest(requestForUser, DOMAIN, requestForUser, probeSite, "");
         assertNotNull(siteMembershipRequest);
-        assertEquals(ShareUser.getSiteShortname(probeSite), siteMembershipRequest.getId().toLowerCase());
+        assertEquals(siteActions.getSiteShortname(probeSite).toLowerCase(), siteMembershipRequest.getId().toLowerCase());
 
         ShareUser.login(drone, mainUser);
         SiteUtil.changeSiteVisibility(drone, probeSite, true, false);

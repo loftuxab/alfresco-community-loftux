@@ -7,9 +7,8 @@
  */
 function main()
 {
-   var surl = url.service + (url.service.lastIndexOf('/') !== url.service.length() - 1 ? '/' : "");
    status.code = 301;
-   status.location = surl + Admin.getDefaultTool();
+   status.location = url.serviceContext + Admin.getDefaultToolURI();
    status.redirect = true;
 }
 

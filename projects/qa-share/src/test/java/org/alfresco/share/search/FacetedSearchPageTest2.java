@@ -8,6 +8,7 @@ import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.search.CopyAndMoveContentFromSearchPage;
 import org.alfresco.po.share.search.FacetedSearchPage;
 import org.alfresco.po.share.site.document.ContentDetails;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.OpCloudTestContext;
 import org.alfresco.share.util.ShareUser;
@@ -47,7 +48,8 @@ public class FacetedSearchPageTest2 extends AbstractUtils
     private String testUser1;
     private String testUser2;
     private String testUser3;    
-    protected String parentFolderPath;    
+    protected String parentFolderPath;
+    private SiteActions siteActions = new SiteActions();
     
     /* (non-Javadoc)
      * @see org.alfresco.share.util.AbstractUtils#setup()
@@ -1130,12 +1132,12 @@ public class FacetedSearchPageTest2 extends AbstractUtils
         ShareUser.login(drone, testUser1, DEFAULT_PASSWORD);
 
         // Navigate to the document library page and delete all content
-        SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName));
+        SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(this.siteName));
         
         // ShareUser.openUserDashboard(drone);
         SiteUtil.deleteSite(drone, siteName);
         
-        SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName1));
+        SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(this.siteName1));
         SiteUtil.deleteSite(drone, siteName1);        
         
         ShareUser.logout(drone);

@@ -2,23 +2,30 @@
 
 <@page title=msg("admin-console.tool.admin-communitysummary.label") readonly=true>
    
+   <div class="column-full">
+      <@section label=msg("communitysummary.repository") />
+      <@field value=alfrescoAttributes["edition"] label=msg("communitysummary.system-information.alfresco-edition") />
+      <@field value=alfrescoAttributes["version"] label=msg("communitysummary.system-information.alfresco-version") />
+      <@field value=alfrescoAttributes["versionLabel"] label=msg("communitysummary.system-information.version-label") description=msg("communitysummary.system-information.version-label.description") />
+      <@field value=alfrescoAttributes["schema"] label=msg("communitysummary.system-information.schema") description=msg("communitysummary.system-information.schema.description") />
+      <@field value=alfrescoAttributes["id"] label=msg("communitysummary.system-information.id") description=msg("communitysummary.system-information.id.description") />
+   </div>
+   
    <@section label=msg("communitysummary.system-information") />
    <div class="column-left">
-      <#--<@attrfield attribute=sysPropsAttributes["alfresco.home"] label=msg("communitysummary.system-information.alfresco-home") />
-      <@attrfield attribute=alfrescoAttributes["Edition"] label=msg("communitysummary.system-information.alfresco-edition") />
-      <@attrfield attribute=alfrescoAttributes["VersionNumber"] label=msg("communitysummary.system-information.alfresco-version") />
-      <@attrfield attribute=sysPropsAttributes["java.home"] label=msg("communitysummary.system-information.java-home") />
-      <@attrfield attribute=sysPropsAttributes["java.version"] label=msg("communitysummary.system-information.java-version") />
-      <@attrfield attribute=sysPropsAttributes["java.vm.vendor"] label=msg("communitysummary.system-information.java-vm-vendor") />-->
+      <@field value=sysPropsAttributes["java.home"] label=msg("communitysummary.system-information.java-home") />
+      <@field value=sysPropsAttributes["java.version"] label=msg("communitysummary.system-information.java-version") />
+      <@field value=sysPropsAttributes["java.vm.vendor"] label=msg("communitysummary.system-information.java-vm-vendor") />
+      <@field value=sysPropsAttributes["os.name"] label=msg("communitysummary.system-information.operating-system") />
+      <@field value=sysPropsAttributes["os.version"] label=msg("communitysummary.system-information.version") />
+      <@field value=sysPropsAttributes["os.arch"] label=msg("communitysummary.system-information.architecture") />
    </div>
-
+   
    <div class="column-right">
-      <#--<@attrfield attribute=sysPropsAttributes["os.name"] label=msg("communitysummary.system-information.operating-system") />
-      <@attrfield attribute=sysPropsAttributes["os.version"] label=msg("communitysummary.system-information.version") />
-      <@attrfield attribute=sysPropsAttributes["os.arch"] label=msg("communitysummary.system-information.architecture") />
-      <@attrfield attribute=memoryAttributes["FreeMemory"] label=msg("communitysummary.system-information.free-memory") />
-      <@attrfield attribute=memoryAttributes["MaxMemory"] label=msg("communitysummary.system-information.maximum-memory") />
-      <@attrfield attribute=memoryAttributes["TotalMemory"] label=msg("communitysummary.system-information.total-memory") />-->
+      <@field value=memoryAttributes["FreeMemory"] label=msg("communitysummary.system-information.free-memory") />
+      <@field value=memoryAttributes["MaxMemory"] label=msg("communitysummary.system-information.maximum-memory") />
+      <@field value=memoryAttributes["TotalMemory"] label=msg("communitysummary.system-information.total-memory") />
+      <@field value=memoryAttributes["AvailableProcessors"] label=msg("communitysummary.system-information.cpus") />
    </div>
    
 </@page>

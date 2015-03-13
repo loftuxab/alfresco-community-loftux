@@ -21,6 +21,7 @@ import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.FolderDetailsPage;
 import org.alfresco.po.share.site.document.RevertToVersionPage;
 import org.alfresco.po.share.site.document.SyncInfoPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractCloudSyncTest;
@@ -120,7 +121,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             ShareUser.logout(hybridDrone);
 
             // User 1 sends the invite to User 2 to join Site
-            CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, user1, user2, getSiteShortname(cloudSiteName), "SiteCollaborator", "");
+            CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, user1, user2, siteActions.getSiteShortname(cloudSiteName), "SiteCollaborator", "");
 
             // Login as User1
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -190,7 +191,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         ShareUser.logout(hybridDrone);
 
         // Cloud User 1 sends the invite to Cloud User 2 to join Site
-        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, user1, user2, getSiteShortname(cloudSiteName), "SiteCollaborator", "");
+        CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, user1, user2, siteActions.getSiteShortname(cloudSiteName), "SiteCollaborator", "");
 
         // Login as User1
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);

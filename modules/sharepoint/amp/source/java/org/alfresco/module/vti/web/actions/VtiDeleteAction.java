@@ -32,7 +32,7 @@ public class VtiDeleteAction extends VtiWebDavAction implements VtiAction
     @Override
     public WebDAVMethod getWebDAVMethod()
     {
-        return new DeleteMethod(pathHelper.getAlfrescoContext());
+        return new DeleteMethod(pathHelper);
     }
 
 }

@@ -516,7 +516,7 @@ public class SiteActions extends CommonActions
             siteShortname = siteName.replace(removeChar, "");
         }
 
-        return siteShortname.toLowerCase();
+        return siteShortname;
     }
 
     /**
