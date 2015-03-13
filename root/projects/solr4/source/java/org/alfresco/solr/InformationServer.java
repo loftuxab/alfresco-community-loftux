@@ -127,4 +127,8 @@ public interface InformationServer extends InformationServerCollectionProvider
     AlfrescoCoreAdminHandler getAdminHandler();
 
     void initSkippingDescendantDocs();
+    
+    void registerTrackerThread();
+
+    void unregisterTrackerThread();
 }

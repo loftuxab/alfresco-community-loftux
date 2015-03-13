@@ -18,7 +18,52 @@
  */
 package org.alfresco.solr;
 
-import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.*;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_ACLID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_ACLTXCOMMITTIME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_ACLTXID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_ANCESTOR;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_ASPECT;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_ASSOCTYPEQNAME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_DBID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_DENIED;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_DOC_TYPE;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_EXCEPTION_MESSAGE;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_EXCEPTION_STACK;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_FIELDS;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_FTSSTATUS;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_GEO;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_INACLTXID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_INTXID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_ISNODE;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_LID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_NPATH;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_NULLPROPERTIES;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_OWNER;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_PARENT;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_PARENT_ASSOC_CRC;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_PATH;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_PNAME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_PRIMARYASSOCQNAME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_PRIMARYASSOCTYPEQNAME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_PRIMARYPARENT;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_PROPERTIES;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_QNAME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_READER;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SITE;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SOLR4_ID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SUGGEST;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_ACLTXCOMMITTIME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_ACLTXID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_INACLTXID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_INTXID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_TXCOMMITTIME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_TXID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_TAG;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_TENANT;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_TXCOMMITTIME;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_TXID;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_TYPE;
+import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_VERSION;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +87,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -188,6 +234,12 @@ public class SolrInformationServer implements InformationServer
     protected enum FTSStatus {New, Dirty, Clean};
     
     private ConcurrentLRUCache<String, Boolean> isIdIndexCache = new ConcurrentLRUCache<String, Boolean>(60*60*100, 60*60*50);
+    
+    private ReentrantReadWriteLock activeTrackerThreadsLock = new ReentrantReadWriteLock();
+    
+    private HashSet<Long> activeTrackerThreads = new HashSet<Long>();
+    
+    private ReentrantReadWriteLock commitAndRollbackLock = new ReentrantReadWriteLock();
     
     // write a BytesRef as a byte array
     JavaBinCodec.ObjectResolver resolver = new JavaBinCodec.ObjectResolver()
@@ -670,18 +722,28 @@ public class SolrInformationServer implements InformationServer
     @Override
     public void commit() throws IOException
     {
-        SolrQueryRequest request = null;
-        UpdateRequestProcessor processor = null;
+        // avoid multiple commits and warming searchers
+        commitAndRollbackLock.writeLock().lock();
         try
         {
-            request = getLocalSolrQueryRequest();
-            processor = this.core.getUpdateProcessingChain(null).createProcessor(request, new SolrQueryResponse());
-            processor.processCommit(new CommitUpdateCommand(request, false));
+            canUpdate();
+            SolrQueryRequest request = null;
+            UpdateRequestProcessor processor = null;
+            try
+            {
+                request = getLocalSolrQueryRequest();
+                processor = this.core.getUpdateProcessingChain(null).createProcessor(request, new SolrQueryResponse());
+                processor.processCommit(new CommitUpdateCommand(request, false));
+            }
+            finally
+            {
+                if(processor != null) {processor.finish();}
+                if(request != null) {request.close();}
+            }
         }
         finally
         {
-            if(processor != null) {processor.finish();}
-            if(request != null) {request.close();}
+            commitAndRollbackLock.writeLock().unlock();
         }
     }
     
@@ -1199,6 +1261,7 @@ public class SolrInformationServer implements InformationServer
     @Override
     public void indexAclTransaction(AclChangeSet changeSet, boolean overwrite) throws IOException
     {
+        canUpdate();
         SolrQueryRequest request = null;
         UpdateRequestProcessor processor = null;
         try
@@ -2624,6 +2687,7 @@ public class SolrInformationServer implements InformationServer
     @Override
     public void indexTransaction(Transaction info, boolean overwrite) throws IOException
     {
+        canUpdate();
         SolrQueryRequest request = null;
         UpdateRequestProcessor processor = null;
         try
@@ -2788,19 +2852,94 @@ public class SolrInformationServer implements InformationServer
     @Override
     public void rollback() throws IOException
     {
-        SolrQueryRequest request = null;
-        UpdateRequestProcessor processor = null;
+        commitAndRollbackLock.writeLock().lock();
         try
         {
-            request = getLocalSolrQueryRequest();
-            processor = this.core.getUpdateProcessingChain(null).createProcessor(request, new SolrQueryResponse());
-            processor.processRollback(new RollbackUpdateCommand(request));
+            activeTrackerThreadsLock.writeLock().lock();
+            try
+            {
+                activeTrackerThreads.clear();
+                
+                SolrQueryRequest request = null;
+                UpdateRequestProcessor processor = null;
+                try
+                {
+                    request = getLocalSolrQueryRequest();
+                    processor = this.core.getUpdateProcessingChain(null).createProcessor(request, new SolrQueryResponse());
+                    processor.processRollback(new RollbackUpdateCommand(request));
+                }
+                finally
+                {
+                    if(processor != null) {processor.finish();}
+                    if(request != null) {request.close();}
+                }
+            }
+            finally
+            {
+                activeTrackerThreadsLock.writeLock().unlock();
+            }
+           
         }
         finally
         {
-            if(processor != null) {processor.finish();}
-            if(request != null) {request.close();}
+            commitAndRollbackLock.writeLock().unlock();
         }
         
+    }
+    
+    private void canUpdate()
+    {
+        activeTrackerThreadsLock.readLock().lock();
+        try
+        {
+            if(activeTrackerThreads.contains(Thread.currentThread().getId()))
+            {
+                return;
+            }
+            else
+            {
+                throw new TrackerStateException("The trackers work was rolled back by another tracker error");
+            }
+        }
+        finally
+        {
+            activeTrackerThreadsLock.readLock().unlock();
+        }
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.solr.InformationServer#registerTrackerThread()
+     */
+    @Override
+    public void registerTrackerThread()
+    {
+        activeTrackerThreadsLock.writeLock().lock();
+        try
+        {
+            activeTrackerThreads.add(Thread.currentThread().getId());
+        }
+        finally
+        {
+            activeTrackerThreadsLock.writeLock().unlock();
+        }
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.solr.InformationServer#unregisterTrackerThread()
+     */
+    @Override
+    public void unregisterTrackerThread()
+    {
+        activeTrackerThreadsLock.writeLock().lock();
+        try
+        {
+            activeTrackerThreads.remove(Thread.currentThread().getId());
+        }
+        finally
+        {
+            activeTrackerThreadsLock.writeLock().unlock();
+        }
     }
 }
