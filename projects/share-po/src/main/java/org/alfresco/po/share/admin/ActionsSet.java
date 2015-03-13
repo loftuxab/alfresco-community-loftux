@@ -85,7 +85,7 @@ public class ActionsSet
             }
         }
         
-        return this.drone.getCurrentPage().render();
+        return this.drone.getCurrentPage();
     }
 
     /**
@@ -117,7 +117,7 @@ public class ActionsSet
                 }
             }
         }
-        return drone.getCurrentPage().render();
+        return drone.getCurrentPage();
     }
 
     /**
