@@ -51,7 +51,6 @@ import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_QNAME
 import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_READER;
 import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SITE;
 import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SOLR4_ID;
-import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SUGGEST;
 import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_ACLTXCOMMITTIME;
 import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_ACLTXID;
 import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_S_INACLTXID;
