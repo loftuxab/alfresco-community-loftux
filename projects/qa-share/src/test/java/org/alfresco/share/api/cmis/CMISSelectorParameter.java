@@ -3,6 +3,7 @@
  */
 package org.alfresco.share.api.cmis;
 
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiClient;
 import org.alfresco.rest.api.tests.client.PublicApiException;
@@ -81,7 +82,7 @@ public abstract class CMISSelectorParameter extends CmisUtils
 
         ShareUser.login(drone, testUser);
 
-        ShareUser.createSite(drone, getSiteShortname(siteName), SITE_VISIBILITY_PUBLIC, true);
+        ShareUser.createSite(drone, siteActions.getSiteShortname(siteName), SITE_VISIBILITY_PUBLIC, true);
         ShareUser.createFolderInFolder(drone, folderName, folderName, DOCLIB);
         folderRef = ShareUser.getGuid(drone, folderName);
 

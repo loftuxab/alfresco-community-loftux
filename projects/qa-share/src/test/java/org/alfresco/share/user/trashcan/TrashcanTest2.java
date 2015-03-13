@@ -37,6 +37,7 @@ import org.alfresco.po.share.site.links.LinksDetailsPage;
 import org.alfresco.po.share.site.links.LinksPage;
 import org.alfresco.po.share.site.wiki.WikiPage;
 import org.alfresco.po.share.site.wiki.WikiPageList;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.po.share.user.TrashCanDeleteConfirmationPage;
 import org.alfresco.po.share.user.TrashCanEmptyConfirmationPage;
@@ -71,12 +72,13 @@ import org.testng.annotations.Test;
 public class TrashcanTest2 extends AbstractUtils
 {
     private static final Logger logger = Logger.getLogger(TrashcanTest2.class);
+    private SiteActions siteActions = new SiteActions();
 
     private String format = "EEE d MMM YYYY";
 
     private String getCustomRoleName(String siteName, UserRole role)
     {
-        return String.format("site_%s_%s", ShareUser.getSiteShortname(siteName), StringUtils.replace(role.getRoleName().trim(), " ", ""));
+        return String.format("site_%s_%s", siteActions.getSiteShortname(siteName), StringUtils.replace(role.getRoleName().trim(), " ", ""));
     }
 
     @Override
@@ -567,8 +569,8 @@ public class TrashcanTest2 extends AbstractUtils
 
         ShareUserProfile.deleteTrashCanItem(drone, siteName2);
 
-        Assert.assertFalse(SiteUtil.getSiteFinder(drone).getSiteList().contains(ShareUser.getSiteShortname(siteName1)));
-        Assert.assertFalse(SiteUtil.getSiteFinder(drone).getSiteList().contains(ShareUser.getSiteShortname(siteName2)));
+        Assert.assertFalse(SiteUtil.getSiteFinder(drone).getSiteList().contains(siteActions.getSiteShortname(siteName1)));
+        Assert.assertFalse(SiteUtil.getSiteFinder(drone).getSiteList().contains(siteActions.getSiteShortname(siteName2)));
 
         docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
         Assert.assertFalse(docLibPage.isFileVisible(fileName1));

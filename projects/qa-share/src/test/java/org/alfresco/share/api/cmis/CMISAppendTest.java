@@ -7,6 +7,7 @@ import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.VersionDetails;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.share.enums.CMISBinding;
 import org.alfresco.share.util.ShareUser;
@@ -48,6 +49,7 @@ public abstract class CMISAppendTest extends CmisUtils
     protected String fileNameRef;
     protected String targetNodeRef;
     protected final String fileNameContent = "This is main file content";
+    private SiteActions siteActions = new SiteActions();
 
     protected String
             FILE_5MB = "FILE1_5MB-FILE";
@@ -72,7 +74,7 @@ public abstract class CMISAppendTest extends CmisUtils
 
         ShareUser.login(drone, testUser);
 
-        ShareUser.createSite(drone, getSiteShortname(siteName), SITE_VISIBILITY_PUBLIC, true);
+        ShareUser.createSite(drone, siteActions.getSiteShortname(siteName), SITE_VISIBILITY_PUBLIC, true);
         ShareUser.createFolderInFolder(drone, folderName, folderName, DOCLIB);
         folderRef = ShareUser.getGuid(drone, folderName);
 

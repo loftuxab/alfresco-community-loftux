@@ -8,6 +8,7 @@ import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.OpCloudTestContext;
@@ -58,6 +59,7 @@ public class FacetedSearchPageTest extends AbstractUtils
     private SiteDashboardPage siteDashboardPage;
     private String siteName;
     private String testUser;
+    private SiteActions siteActions = new SiteActions();
 
     /*
      * (non-Javadoc)
@@ -480,7 +482,7 @@ public class FacetedSearchPageTest extends AbstractUtils
 
         // Navigate to the test site
         dashBoardPage = ShareUser.openUserDashboard(drone).render();
-        siteDashboardPage = SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName));
+        siteDashboardPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(this.siteName));
 
         // Do a header search for the letter 'a'
         facetedSearchPage = siteDashboardPage.getSearch().search("a").render();
@@ -539,7 +541,7 @@ public class FacetedSearchPageTest extends AbstractUtils
 
         // Navigate to the test site
         dashBoardPage = ShareUser.openUserDashboard(drone).render();
-        siteDashboardPage = SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName));
+        siteDashboardPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(this.siteName));
 
         // Do a header search for the letter 'a'
         facetedSearchPage = siteDashboardPage.getSearch().search("a").render();
@@ -671,7 +673,7 @@ public class FacetedSearchPageTest extends AbstractUtils
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         // Navigate to the document library page and delete all content
-        SiteUtil.openSiteURL(drone, getSiteShortname(this.siteName));
+        SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(this.siteName));
         ShareUser.openDocumentLibrary(drone);
         ShareUser.deleteAllContentFromDocumentLibrary(drone);
 

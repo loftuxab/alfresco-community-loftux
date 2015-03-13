@@ -12,6 +12,7 @@ import org.alfresco.po.share.dashlet.MyTasksDashlet;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.task.TaskDetailsPage;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.workflow.AssignmentPage;
@@ -1263,7 +1264,7 @@ public class HybridWorkflowTest3 extends AbstractWorkflow
         AbstractCloudSyncTest.disconnectCloudSync(drone);
 
         // Create Site
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName));
 
         ShareUser.uploadFileInFolder(drone, fileInfo).render();
 
@@ -1363,7 +1364,7 @@ public class HybridWorkflowTest3 extends AbstractWorkflow
         ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
 
         // Open Document library, Upload a file
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName));
 
         ShareUser.uploadFileInFolder(drone, opFileInfo).render();
 
@@ -1616,7 +1617,7 @@ public class HybridWorkflowTest3 extends AbstractWorkflow
         ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
 
         // Open Document library, Upload a file
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName));
 
         ShareUser.uploadFileInFolder(drone, opFileInfo).render();
 
@@ -1743,7 +1744,7 @@ public class HybridWorkflowTest3 extends AbstractWorkflow
         ShareUser.login(drone, opUser1, DEFAULT_PASSWORD);
 
         // Open Document library, Upload a file
-        SiteUtil.openSiteDocumentLibraryURL(drone, getSiteShortname(opSiteName));
+        SiteUtil.openSiteDocumentLibraryURL(drone, siteActions.getSiteShortname(opSiteName));
 
         ShareUser.uploadFileInFolder(drone, opFileInfo).render();
 
@@ -2770,7 +2771,7 @@ public class HybridWorkflowTest3 extends AbstractWorkflow
     /**
      * Method to select the sitename of destination and clicks on sync button
      * 
-     * @param drone
+     * @param assigneePage
      * @param network
      * @param siteName
      * @param folderName

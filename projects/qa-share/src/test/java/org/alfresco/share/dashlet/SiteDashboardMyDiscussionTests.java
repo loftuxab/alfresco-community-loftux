@@ -37,6 +37,7 @@ import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.discussions.DiscussionsPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
@@ -85,6 +86,8 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
     private static final String TOPIC_DETAILS_TEXT_THREE = "topic text 3";
     private static final String TOPIC_DETAILS_CREATED_ON = "Created on:";
     private static final String NUMBER_OF_REPLIES = "There is 1 reply.";
+
+    private SiteActions siteActions = new SiteActions();
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -621,7 +624,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
 
         // Invited User logs in
         ShareUser.login(drone, testUser1, DEFAULT_PASSWORD);
-        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
 
         // invited user creates a topic2 for the site
@@ -644,7 +647,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
 
         // site creator logs in and opens My Discussion dashlet on site dashboard
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
-        siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
         myDiscussionsDashlet.selectTopicsFilter(MY_TOPICS).render();
 
@@ -656,7 +659,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
         Assert.assertNotNull(myTopicsTitles, "Expected topic title isn't presented");
         Assert.assertEquals(myTopicsTitles.get(0).getDescription(), TOPIC_DETAILS_TITLE_ONE, "Expected topic title isn't presented");
 
-        siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
         myDiscussionsDashlet.selectTopicsFilter(ALL_TOPICS).render();
 
@@ -739,7 +742,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
         Assert.assertEquals(topicDetailsPage.getTopicTitle(), TOPIC_DETAILS_TITLE_THREE, "Expected topic title isn't presented");
         Assert.assertEquals(topicDetailsPage.getTopicText(), TOPIC_DETAILS_TEXT_THREE, "Expected topic text isn't presented");
 
-        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
 
         // Select Topics updated in the last day value from drop-down menu;
@@ -883,7 +886,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
         ShareUser.login(drone, testUser1, DEFAULT_PASSWORD);
 
         // Open My Discussions - dashlet create a topic1 for a site
-        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
 
         // Click on New Topic button
@@ -909,7 +912,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
         // Open My Discussions - dashlet create a topic2 for a site
         if (!isAlfrescoVersionCloud(drone))
         {
-            siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+            siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         }
         else
         {
@@ -958,7 +961,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
 
         // Open My Discussions dashlet
-        siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
         myDiscussionsDashlet.selectTopicsFilter(ALL_TOPICS).render();
 
@@ -979,7 +982,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
         Assert.assertEquals(topicDetailsPage.getTopicCreatedBy(), TOPIC_DETAILS_CREATED_ON, "Expected info " + TOPIC_DETAILS_CREATED_ON + " isn't presented");
         Assert.assertEquals(topicDetailsPage.getTopicText(), TOPIC_DETAILS_TEXT_ONE, "Expected topic text isn't presented");
 
-        siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
 
         // Verify that invited user's name link is not active
@@ -992,7 +995,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
         // verify User Profile page is displayed
         Assert.assertTrue(myProfilePage.titlePresent(), "Expected profile title isn't presented");
 
-        siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
         myDiscussionsDashlet.selectTopicsFilter(ALL_TOPICS).render();
 
@@ -1075,7 +1078,7 @@ public class SiteDashboardMyDiscussionTests extends AbstractUtils
         Assert.assertEquals(topicDetailsPage.getTopicTitle(), TOPIC_DETAILS_TITLE_TWO, "Expected topic title isn't presented");
         Assert.assertEquals(topicDetailsPage.getTopicText(), TOPIC_DETAILS_TEXT_TWO, "Expected topic text isn't presented");
 
-        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName1));
+        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName1));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
         myDiscussionsDashlet.selectTopicsFilter(MY_TOPICS).render();
 

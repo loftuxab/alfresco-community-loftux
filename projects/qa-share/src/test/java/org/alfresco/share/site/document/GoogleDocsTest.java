@@ -13,6 +13,7 @@ import org.alfresco.po.share.site.document.DocumentLibraryNavigation;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditInGoogleDocsPage;
 import org.alfresco.po.share.site.document.GoogleDocsUpdateFilePage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.share.util.AbstractCloudSyncTest;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ActivityType;
@@ -48,6 +49,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
 
     protected String testUser;
     protected String siteName = "";
+    private SiteActions siteActions = new SiteActions();
 
     private static final String TEST_TXT_FILE = "Test2.txt";
     private static final String TEST_DOC_FILE = "Test3.doc";
@@ -1229,7 +1231,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
             // SiteAdmin login.
             ShareUser.login(secondDrone, siteAdmin, DEFAULT_PASSWORD);
 
-            SiteUtil.openSiteDocumentLibraryURL(secondDrone, getSiteShortname(siteName));
+            SiteUtil.openSiteDocumentLibraryURL(secondDrone, siteActions.getSiteShortname(siteName));
 
             // Assign Consumer Role to InvitedUser
             DocumentDetailsPage detailsPage = ShareUser.openDocumentDetailPage(secondDrone, fileName);

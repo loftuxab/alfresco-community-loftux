@@ -38,6 +38,7 @@ import org.alfresco.po.share.site.EditSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SiteFinderPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
 import org.apache.commons.logging.Log;
@@ -65,6 +66,7 @@ public class SiteUtil extends AbstractUtils
     private static final String SITE_DOCLIB_SUFFIX = "documentlibrary";
     private final static Log logger = LogFactory.getLog(SiteUtil.class);
     private final static String ERROR_MESSAGE_PATTERN = "Failed to create a new site %n Site Name: %s";
+    private static SiteActions siteActions = new SiteActions();
 
     /**
      * Constructor.
@@ -235,7 +237,7 @@ public class SiteUtil extends AbstractUtils
      * Attempts to delete specified site(s) using share
      * 
      * @param loginUserName
-     * @param siteName String site name
+     * @param siteNames String site name
      */
     public static void deleteSitesAsUser(WebDrone drone, String loginUserName, Set<String> siteNames)
     {
@@ -338,7 +340,7 @@ public class SiteUtil extends AbstractUtils
      * 
      * @param drone
      * @param siteName
-     * @return {@link SiteDashBoardPage}
+     * @return {@link SiteDashboardPage}
      */
     public static SiteDashboardPage openSiteFromSearch(WebDrone drone, String siteName)
     {
@@ -353,12 +355,12 @@ public class SiteUtil extends AbstractUtils
      * 
      * @param drone
      * @param siteShortURL
-     * @return {@link SiteDashBoardPage}
+     * @return {@link SiteDashboardPage}
      */
     public static SiteDashboardPage openSiteURL(WebDrone drone, String siteShortURL)
     {
         String url = drone.getCurrentUrl();
-        String target = url.substring(0, url.indexOf("/page/")) + SITE_DASH_LOCATION_SUFFIX + getSiteShortname(siteShortURL) + "/dashboard";
+        String target = url.substring(0, url.indexOf("/page/")) + SITE_DASH_LOCATION_SUFFIX + siteActions.getSiteShortname(siteShortURL) + "/dashboard";
         drone.navigateTo(target);
         SiteDashboardPage siteDashboardPage = ShareUser.getSharePage(drone).render();
 
@@ -396,7 +398,7 @@ public class SiteUtil extends AbstractUtils
      * 
      * @param drone
      * @param siteShortURL
-     * @return {@link SiteDashBoardPage}
+     * @return {@link DocumentLibraryPage}
      */
     public static DocumentLibraryPage openSiteDocumentLibraryURL(WebDrone drone, String siteShortURL)
     {
@@ -460,7 +462,7 @@ public class SiteUtil extends AbstractUtils
             {
 
                 siteCreated = false;
-                openSiteURL(drone, getSiteShortname(siteName));
+                openSiteURL(drone, siteActions.getSiteShortname(siteName));
             }
             return siteCreated;
         }

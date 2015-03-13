@@ -39,6 +39,7 @@ import org.alfresco.po.share.dashlet.mydiscussions.TopicDetailsPage;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.SiteDashboardPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.MyProfilePage;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
@@ -76,6 +77,8 @@ public class MyDashboardMyDiscussionTests extends AbstractUtils
     private static final String TOPIC_USER_DETAILS_TEXT_THREE = "topic text 3";
     private static final String TOPIC_DETAILS_CREATED_ON = "Created on:";
     private static final String NUMBER_OF_REPLIES = "There is 1 reply.";
+
+    private SiteActions siteActions = new SiteActions();
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -703,7 +706,7 @@ public class MyDashboardMyDiscussionTests extends AbstractUtils
         // Get My Discussions Dashlet
         // Invited User logs in
         ShareUser.login(drone, testUser1, DEFAULT_PASSWORD);
-        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
 
         // invited user creates a topic2 for the site
@@ -823,7 +826,7 @@ public class MyDashboardMyDiscussionTests extends AbstractUtils
         ShareUser.login(drone, testUser1, DEFAULT_PASSWORD);
 
         // Open My Discussions - dashlet create a topic1 for a site
-        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
 
         // Click on New Topic button
@@ -849,7 +852,7 @@ public class MyDashboardMyDiscussionTests extends AbstractUtils
         // Open My Discussions - dashlet create a topic2 for a site
         if (!isAlfrescoVersionCloud(drone))
         {
-            siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+            siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         }
         else
         {
@@ -1008,7 +1011,7 @@ public class MyDashboardMyDiscussionTests extends AbstractUtils
         Assert.assertEquals(topicDetailsPage.getTopicTitle(), TOPIC_USER_DETAILS_TITLE_ONE, "Expected topic title isn't presented");
         Assert.assertEquals(topicDetailsPage.getTopicText(), TOPIC_USER_DETAILS_TEXT_ONE, "Expected topic text isn't presented");
 
-        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, getSiteShortname(siteName));
+        SiteDashboardPage siteDashPage = SiteUtil.openSiteURL(drone, siteActions.getSiteShortname(siteName));
         drone.findAndWaitWithRefresh(By.xpath(String.format("//a[text()='%s']", TOPIC_USER_DETAILS_TITLE_ONE)));
         myDiscussionsDashlet = siteDashPage.getDashlet(MY_DISCUSSIONS).render();
 

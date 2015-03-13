@@ -25,6 +25,7 @@ import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.FolderDetailsPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.share.util.ShareUser;
 import org.alfresco.share.util.ShareUserRepositoryPage;
@@ -49,6 +50,8 @@ public class UtilsTest extends AbstractUtils
     protected String testUserPass = DEFAULT_PASSWORD;
 
     protected String testDomain = "utils";
+
+    private SiteActions siteActions = new SiteActions();
 
     /**
      * Class includes: Tests for utilities written for qa-share: Not to be executed in a test run for Ent / Cloud
@@ -85,7 +88,7 @@ public class UtilsTest extends AbstractUtils
             ShareUser.createSite(drone, siteName + "M", SITE_VISIBILITY_MODERATED);
             ShareUser.createSite(drone, siteName + "PR", SITE_VISIBILITY_PRIVATE);
 
-            String siteurl = getSiteShortname(siteName);
+            String siteurl = siteActions.getSiteShortname(siteName);
             SiteDashboardPage sitedash = SiteUtil.openSiteURL(drone, siteurl);
             Assert.assertTrue(sitedash.isSite(siteName));
 

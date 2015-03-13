@@ -24,6 +24,7 @@ import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FolderDetailsPage;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.SelectActions;
 import org.alfresco.po.share.user.TrashCanItem;
 import org.alfresco.po.share.user.TrashCanPage;
@@ -50,10 +51,11 @@ import org.testng.annotations.Test;
 public class TrashcanTest3 extends AbstractUtils
 {
     private static final Logger logger = Logger.getLogger(TrashcanTest3.class);
+    private SiteActions siteActions = new SiteActions();
 
     private String getCustomRoleName(String siteName, UserRole role)
     {
-        return String.format("site_%s_%s", ShareUser.getSiteShortname(siteName), StringUtils.replace(role.getRoleName().trim(), " ", ""));
+        return String.format("site_%s_%s", siteActions.getSiteShortname(siteName), StringUtils.replace(role.getRoleName().trim(), " ", ""));
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.DestinationAndAssigneeBean;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractCloudSyncTest;
 import org.alfresco.share.util.ShareUser;
@@ -1004,7 +1005,7 @@ public class CloudSyncAccessTest3 extends AbstractCloudSyncTest
             ShareUser.login(hybridDrone, user1, DEFAULT_PASSWORD);
             ShareUser.createSite(hybridDrone, cloudSite1, SITE_VISIBILITY_PUBLIC);
             // Invite User2 to the site as Collaborator
-            CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, user1, user2, getSiteShortname(cloudSite1), "SiteConsumer", "");
+            CreateUserAPI.inviteUserToSiteWithRoleAndAccept(hybridDrone, user1, user2, siteActions.getSiteShortname(cloudSite1), "SiteConsumer", "");
 
             ShareUser.logout(hybridDrone);
 
