@@ -31,6 +31,8 @@ import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.CharsRef;
+import org.apache.lucene.util.UnicodeUtil;
 import org.apache.solr.schema.SchemaField;
 import org.apache.solr.schema.StrField;
 import org.springframework.extensions.surf.util.I18NUtil;
@@ -52,6 +54,30 @@ public class AlfrescoCollatableTextFieldType extends StrField
         return new SortField(field.getName(), new TextSortFieldComparatorSource(), reverse);
     }
 
+    
+    
+
+    /* (non-Javadoc)
+     * @see org.apache.solr.schema.StrField#marshalSortValue(java.lang.Object)
+     */
+    @Override
+    public Object marshalSortValue(Object value)
+    {
+        return value;
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.apache.solr.schema.StrField#unmarshalSortValue(java.lang.Object)
+     */
+    @Override
+    public Object unmarshalSortValue(Object value)
+    {
+        return value;
+    }
+
+
+
 
     public static class TextSortFieldComparatorSource extends FieldComparatorSource
     {
@@ -68,7 +94,8 @@ public class AlfrescoCollatableTextFieldType extends StrField
 
     }
 
-
+    
+    
     /*
      * Adapted from org.apache.lucene.search.FieldComparator.TermValComparator<T>
      */

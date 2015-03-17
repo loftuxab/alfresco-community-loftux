@@ -46,12 +46,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
     @Override
     public void prepare(ResponseBuilder rb) throws IOException
     {
-        SolrQueryRequest req = rb.req;
-        SolrParams params = req.getParams();
         
-        ModifiableSolrParams fixed = new ModifiableSolrParams();
-        fixFacetParams(fixed, params, rb);
-        req.setParams(fixed);
        
     }
 
@@ -191,7 +186,12 @@ public class RewriteFacetParametersComponent extends SearchComponent
     @Override
     public void process(ResponseBuilder rb) throws IOException
     {
-       // Nothing to do
+        SolrQueryRequest req = rb.req;
+        SolrParams params = req.getParams();
+        
+        ModifiableSolrParams fixed = new ModifiableSolrParams();
+        fixFacetParams(fixed, params, rb);
+        req.setParams(fixed);
     }
 
     /* (non-Javadoc)

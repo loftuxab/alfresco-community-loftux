@@ -848,16 +848,24 @@
        <str name="df">suggest</str>
      </lst>
 
-    <!-- If the default list of SearchComponents is not desired, that
-         list can either be overridden completely, or components can be
-         prepended or appended to the default list.  (see below)
-      -->
-    <!--
-       <arr name="components">
-         <str>nameOfCustomComponent1</str>
-         <str>nameOfCustomComponent2</str>
-       </arr>
-      -->
+
+   <arr name="components">
+      <str>setLocale</str>
+      <str>ensureModels</str>
+      <str>rewriteFacetParameters</str>
+      <str>query</str>
+      <str>facet</str>
+      <str>mlt</str>
+      <str>highlight</str>
+      <str>stats</str>
+      <str>debug</str>
+      <str>clearLocale</str>
+      <str>rewriteFacetCounts</str>
+      <!--<str>addTxId</str>-->
+      <str>setProcessedDenies</str>
+    </arr>
+
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
     </requestHandler>
 
   <!-- A request handler that returns indented JSON by default -->
@@ -868,6 +876,7 @@
        <str name="indent">true</str>
        <str name="df">suggest</str>
      </lst>
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
 
 
@@ -1835,6 +1844,7 @@
       <!-- <str>addTxId</str> -->
       <str>setProcessedDenies</str>
     </arr>
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
 
 
@@ -1868,6 +1878,7 @@
       <str>spellcheck</str>
       <str>setProcessedDenies</str>
     </arr>
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
 
  <requestHandler name="/cmis" class="org.apache.solr.handler.component.AlfrescoSearchHandler" lazy="true" >
@@ -1889,6 +1900,7 @@
       <!--<str>addTxId</str>-->
       <str>setProcessedDenies</str>
     </arr>
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
 
 
