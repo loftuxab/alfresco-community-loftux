@@ -100,6 +100,7 @@ import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.Version;
 import org.apache.solr.core.CoreDescriptorDecorator;
@@ -333,9 +334,9 @@ public class AlfrescoSolrDataModel implements QueryConstants
     
     public static Term getLongTerm(String field, long longValue)
     {
-        BytesRef bytes = new BytesRef();
-        NumericUtils.longToPrefixCoded(longValue, 0, bytes);
-        return new Term(field,bytes);
+        BytesRefBuilder bytesBuilder = new BytesRefBuilder();
+        NumericUtils.longToPrefixCoded(longValue, 0, bytesBuilder);
+        return new Term(field, bytesBuilder.get());
     }
     
     public static Term getLongTerm(String field, String stringValue)

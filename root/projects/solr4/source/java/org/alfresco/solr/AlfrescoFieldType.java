@@ -261,10 +261,7 @@ public class AlfrescoFieldType extends FieldType
         {
             return null;
         }
-        BytesRef spare = new BytesRef();
-        String stringVal = (String) value;
-        UnicodeUtil.UTF16toUTF8(stringVal, 0, stringVal.length(), spare);
-        return spare;
+        return new BytesRef((String) value);
     }
     
     protected boolean supportsAnalyzers() 
