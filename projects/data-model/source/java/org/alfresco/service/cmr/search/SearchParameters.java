@@ -307,10 +307,6 @@ public class SearchParameters implements BasicSearchParameters
      */
     public void addStore(StoreRef store)
     {
-        if (stores.size() != 0)
-        {
-            throw new IllegalStateException("At the moment, there can only be one store set for the search");
-        }
         stores.add(store);
     }
 
