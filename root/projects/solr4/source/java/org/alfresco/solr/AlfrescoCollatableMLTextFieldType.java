@@ -53,6 +53,27 @@ public class AlfrescoCollatableMLTextFieldType extends StrField
     }
 
 
+    /* (non-Javadoc)
+     * @see org.apache.solr.schema.StrField#marshalSortValue(java.lang.Object)
+     */
+    @Override
+    public Object marshalSortValue(Object value)
+    {
+        return value;
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.apache.solr.schema.StrField#unmarshalSortValue(java.lang.Object)
+     */
+    @Override
+    public Object unmarshalSortValue(Object value)
+    {
+        return value;
+    }
+
+
+    
     public static class MLTextSortFieldComparatorSource extends FieldComparatorSource
     {
 
