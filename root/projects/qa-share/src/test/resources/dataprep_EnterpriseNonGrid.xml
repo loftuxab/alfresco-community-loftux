@@ -1,0 +1,70 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Classes" preserve-order="true">
+    <groups>
+        <run>
+            <include name="DataPrep.*"/>
+            <exclude name=".*Bug.*"/>
+        </run>
+    </groups>
+
+    <listeners>
+        <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
+    </listeners>
+
+    <test name="dataprep">
+        <groups>
+            <run>
+                <include name="DataPrep.*"/>
+                <exclude name=".*Bug.*"/>
+            </run>
+        </groups>
+        <classes>
+            <!--class name="org.alfresco.share.DownloadFilesAndFoldersTest"/>
+            <class name="org.alfresco.share.site.document.GoogleDocsTest"/>
+            <class name="org.alfresco.share.site.document.GalleryViewTest">
+                <methods>
+                    <include name="dataprep_AONE_14014"/>
+                    <include name="dataprep_AONE_14010"/>
+                    <include name="dataprep_AONE_15058"/>
+                    <include name="dataPrep_AONE_14025"/>
+                    <include name="dataprep_AONE_15055"/>
+                </methods>
+            </class>
+            <class name="org.alfresco.share.site.document.FilmStripDocLibTest">
+                <methods>
+                    <include name="dataPrep_FilmStrip_AONE_14045"/>
+                    <include name="dataPrep_FilmStrip_AONE_14048"/>
+                    <include name="dataPrep_FilmStrip_AONE_14053"/>
+                    <include name="dataPrep_FilmStrip_AONE_14058"/>
+                </methods>
+            </class>
+            <class name="org.alfresco.share.sanity.SharedFilesTest">
+                <methods>
+                    <include name="dataPrep_AONE_15229"/>
+                    <include name="dataPrep_AONE_15230"/>
+                    <include name="dataPrep_AONE_15231"/>
+                </methods>
+            </class>
+            <class name="org.alfresco.share.user.SiteNotificationsTest">
+                <methods>
+                    <include name="dataPrep_AONE_14162"/>
+                </methods>
+            </class>
+            <class name="org.alfresco.share.sanity.SearchTest">
+                <methods>
+                    <include name="dataPrep_AONE_8278"/>
+                </methods>
+            </class>
+            <class name="org.alfresco.share.search.AdvanceSearchTest">
+                <methods>
+                    <include name="dataPrep_AONE_13948"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class-->
+
+            <!--class name="org.alfresco.share.AvatarCaching"/-->
+            <class name="org.alfresco.share.PerformanceTest"/>
+
+        </classes>
+    </test>
+</suite>

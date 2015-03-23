@@ -1,0 +1,30 @@
+Index: root/projects/web-framework-commons/source/web/modules/editors/tinymce/plugins/textcolor/plugin.js
+===================================================================
+--- root/projects/web-framework-commons/source/web/modules/editors/tinymce/plugins/textcolor/plugin.js	(revision 97200)
++++ root/projects/web-framework-commons/source/web/modules/editors/tinymce/plugins/textcolor/plugin.js	(working copy)
+@@ -159,15 +159,19 @@
+ 	}
+ 
+ 	function applyFormat(format, value) {
+-		editor.focus();
+-		editor.formatter.apply(format, {value: value});
+-		editor.nodeChanged();
++		editor.undoManager.transact(function() {
++			editor.focus();
++			editor.formatter.apply(format, {value: value});
++			editor.nodeChanged();
++		});
+ 	}
+ 
+ 	function removeFormat(format) {
+-		editor.focus();
+-		editor.formatter.remove(format, {value: null}, null, true);
+-		editor.nodeChanged();
++		editor.undoManager.transact(function() {
++			editor.focus();
++			editor.formatter.remove(format, {value: null}, null, true);
++			editor.nodeChanged();
++		});
+ 	}
+ 
+ 	function onPanelClick(e) {

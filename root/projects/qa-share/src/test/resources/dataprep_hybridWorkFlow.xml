@@ -1,0 +1,49 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Classes" verbose="1" preserve-order="true" parallel="classes" thread-count="7">
+
+    <groups>
+        <run>
+            <include name="DataPrep.*" />
+            <exclude name="NonGrid" />
+            <exclude name="Hybrid" />
+        </run>
+    </groups>
+
+    <!--test name="dataprep-HybridWorkflowSanityTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.workflow.HybridWorkflowSanityTest" />
+        </classes>
+    </test>
+    <test name="dataprep-WorkFlowOptionsMessageTest" verbose="1">
+        <classes>
+                <class name="org.alfresco.share.workflow.WorkFlowOptionsMessageTest" />
+        </classes>
+    </test>
+    <test name="dataprep-CloudReviewTaskTest" verbose="1">
+        <classes>
+                <class name="org.alfresco.share.workflow.CloudReviewTaskTest" />
+        </classes>
+    </test>
+    <test name="dataprep-HybridWorkflowTest1" verbose="1">
+        <classes>
+                <class name="org.alfresco.share.workflow.HybridWorkflowTest1" />
+        </classes>
+    </test>
+    <test name="dataprep-HybridWorkflowTest3" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.workflow.HybridWorkflowTest3" />
+        </classes>
+    </test>
+    <test name="dataprep-WorkFlowActionsTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.workflow.WorkFlowActionsTest" />
+        </classes>
+    </test-->
+
+    <!--<test name="dataprep-CloudSyncSmokeTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.cloudsync.CloudSyncSmokeTest" />
+        </classes>
+    </test>
+    -->
+</suite>
