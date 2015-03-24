@@ -103,6 +103,7 @@
   </distributionManagement>
 
   <modules>
+    <module>projects/3rd-party</module>
     <module>projects/surf</module>
     <module>projects/core</module>
     <module>projects/data-model</module>
@@ -120,9 +121,7 @@
     <module>projects/solr4</module>
     <module>projects/solr</module>
     <module>projects/file-transfer-receiver</module>
-    <!-- Currently being worked out... see BDE-118
     <module>projects/system-build-test</module>
-    -->
     <module>modules/sharepoint/amp</module>
     <module>modules/wcmquickstart</module>
     <module>projects/web-editor-samples/customer-site</module>
@@ -174,7 +173,7 @@
     <maven.license.name>GNU Lesser General Public License v3.0 or later</maven.license.name>
     <maven.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</maven.license.url>
 
-    <alfresco.googledocs.version>3.0.0-34</alfresco.googledocs.version>
+    <alfresco.googledocs.version>3.0.0</alfresco.googledocs.version>
     <!-- Default location of the root of the checkout. To be overrided if project is deeper than 2 levels -->
     <highest.basedir>${basedir}/../..</highest.basedir>
 
@@ -1029,7 +1028,6 @@
             <module>packaging</module>
             <module>projects/qa-share</module>
             <module>projects/share</module>
-            <module>projects/system-build-test</module>
             <module>enterpriseprojects/packaging</module>
             <module>enterpriseprojects/packaging/rpm</module>
             <module>privatemodules</module>

@@ -37,7 +37,7 @@ import javax.net.ssl.SSLContext;
 import junit.framework.TestCase;
 
 import org.apache.solr.common.SolrException;
-import org.eclipse.jetty.http.security.Password;
+import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.security.Authenticator;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.SecurityHandler;
@@ -148,10 +148,8 @@ public class RepoJettyStartTest extends TestCase
 
             // SOLR
 
-            ClassPathResource cpr = new ClassPathResource("apache-solr-1.4.1.war");
+            ClassPathResource cpr = new ClassPathResource("solr.war");
             String solrWarPath = cpr.getURI().toString();
-            File solrHome = cpr.getFile().getParentFile();
-            System.setProperty("solr.solr.home", cpr.getFile().getParent());
 
             System.out.println("[" + new Date() + "] startJetty: warPath = " + solrWarPath);
 
@@ -175,26 +173,6 @@ public class RepoJettyStartTest extends TestCase
             solr_sh.setLoginService(solr_loginService);
 
             solrWebAppContext.setWar(solrWarPath);
-            File libDir = new File(solrHome, "lib");
-            StringBuffer extraClassPath = new StringBuffer();
-            File[] jars = libDir.listFiles(new FilenameFilter()
-            {
-                
-                @Override
-                public boolean accept(File dir, String name)
-                {
-                    return name.endsWith(".jar");
-                }
-            });
-            for(File jar : jars)
-            {
-                if(extraClassPath.length() > 0)
-                {
-                    extraClassPath.append(';');
-                }
-                extraClassPath.append(jar.getCanonicalPath());
-            }
-            //solrWebAppContext.setExtraClasspath(extraClassPath.toString());
 
             handlerList.addHandler(solrWebAppContext);
 

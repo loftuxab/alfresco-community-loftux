@@ -49,7 +49,7 @@ public class MiscSystemTestSuite extends TestSuite
         suite.addTestSuite(SiteActivitySystemTest.class);
         
         // SOLR
-        suite.addTestSuite(SOLRAPIClientTest.class);
+        // suite.addTestSuite(SOLRAPIClientTest.class);
         
         // stop (embedded) Jetty
         suite.addTestSuite(RepoJettyStopTest.class);

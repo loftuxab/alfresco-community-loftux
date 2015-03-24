@@ -45,7 +45,9 @@ public class RepoJettyStopTest extends TestCase
             out.write(("\r\n").getBytes());
             out.flush();
             s.close();
-            
+			
+			//give jetty 10sec to stop
+            Thread.sleep(10000);            
             System.out.println("["+new Date()+"] stopJetty: ... embedded Jetty server stopped !");
         }
         catch (Exception e)

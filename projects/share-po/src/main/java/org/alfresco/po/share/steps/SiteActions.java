@@ -38,6 +38,7 @@ import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
 import org.alfresco.po.share.site.document.CreatePlainTextContentPage;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.ConfirmDeletePage.Action;
 import org.alfresco.webdrone.HtmlPage;
@@ -726,4 +727,39 @@ public class SiteActions extends CommonActions
 
         return getSharePage(drone).render();
     }
+    
+    /**
+     * In the document library page select edit properties to set a new title , description or name for the content
+     * Assume the user is logged in and a documentLibraryPage of the selected site is open
+     * 
+     * @author sprasanna
+     * @param - Webdrone
+     * @param - String contentName
+     * @param - String newContentName
+     * @param - String title
+     * @param - String descirption
+     */
+    public DocumentLibraryPage editProperties(WebDrone drone, String contentName, String newContentName, String title, String description)
+    {
+        DocumentLibraryPage documentLibraryPage = ((DocumentLibraryPage) getSharePage(drone)).render();
+        EditDocumentPropertiesPage editProp = documentLibraryPage.getFileDirectoryInfo(contentName).selectEditProperties().render();
+        // Check the newContent is present
+        if (newContentName != null)
+        {
+            editProp.setName(newContentName);
+        }
+        // Check the newContent is present
+        if (title != null)
+        {
+            editProp.setDocumentTitle(title);
+        }
+        // Check the newContent is present
+        if (description != null)
+        {
+            editProp.setDescription(description);
+        }
+
+        return editProp.selectSave().render();
+    }
+    
 }

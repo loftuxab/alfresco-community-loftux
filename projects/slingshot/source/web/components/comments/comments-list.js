@@ -524,7 +524,7 @@
          html += '      <div class="buttons">';
          html += '         <input type="submit" id="' + rowId + '-submit" value=""/>';
          html += '         <input type="reset"  id="' + rowId + '-cancel" value="" />';
-         html += '         <a href="#" name=".onHelpLinkClick" title="' + this.msg("link.deleteComment") + '" class="' + this.id + ' help-link" style="float:right;">&nbsp;&nbsp;&nbsp;</a>';
+         html += '         <a href="#" name=".onHelpLinkClick" title="' + this.msg("link.showHelp") + '" class="' + this.id + ' help-link" style="float:right;">&nbsp;&nbsp;&nbsp;</a>';
          html += '      </div>';
          html += '   </form>';
          html += '   <div class="clear"></div>';
