@@ -67,7 +67,7 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
-        </dependency>		
+        </dependency>
     </dependencies>
 
   <build>
@@ -80,7 +80,7 @@
     </resources>
     <testResources>
       <testResource>
-        <directory>keystore</directory> 
+        <directory>keystore</directory>
       </testResource>
     </testResources>
     <plugins>
@@ -115,14 +115,14 @@
                   <destFileName>alfresco.war</destFileName>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.alfresco</groupId>
+                  <groupId>se.loftux.alfresco</groupId>
                   <artifactId>alfresco-solr4</artifactId>
                   <version>${project.version}</version>
                   <classifier>ssl</classifier>
                   <type>war</type>
                   <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                   <destFileName>solr.war</destFileName>
-                </artifactItem>	
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
@@ -136,13 +136,13 @@
             <configuration>
                 <artifactItems>
                 <artifactItem>
-                  <groupId>org.alfresco</groupId>
+                  <groupId>se.loftux.alfresco</groupId>
                   <artifactId>alfresco-solr4</artifactId>
                   <version>${project.version}</version>
                   <classifier>config-ssl</classifier>
                   <type>zip</type>
                   <outputDirectory>${solr.config.folder}</outputDirectory>
-                </artifactItem>	
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>

@@ -41,7 +41,7 @@
             <version>1.5.2</version>
         </dependency>
         <dependency>
-            <groupId>org.alfresco</groupId>
+            <groupId>se.loftux.alfresco</groupId>
             <artifactId>alfresco-greenmail</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -813,7 +813,7 @@
             <build>
                 <resources>
                     <resource>
-                         <directory>${highest.basedir}/enterpriseprojects/repository/config</directory> 
+                         <directory>${highest.basedir}/enterpriseprojects/repository/config</directory>
                          <includes>
                              <include>alfresco/ibatis/*Oracle*/**</include>
                              <include>alfresco/dbscripts/**/*Oracle*/**</include>
@@ -822,7 +822,7 @@
                 </resources>
                 <testResources>
                     <testResource>
-                         <directory>${highest.basedir}/enterpriseprojects/repository/source/test-resources</directory> 
+                         <directory>${highest.basedir}/enterpriseprojects/repository/source/test-resources</directory>
                          <includes>
                              <include>scriptexec/*Oracle*/**</include>
                          </includes>
@@ -835,7 +835,7 @@
             <build>
                 <resources>
                     <resource>
-                         <directory>${highest.basedir}/enterpriseprojects/repository/config</directory> 
+                         <directory>${highest.basedir}/enterpriseprojects/repository/config</directory>
                          <includes>
                              <include>alfresco/ibatis/*SQLServer*/**</include>
                              <include>alfresco/dbscripts/**/*SQLServer*/**</include>
@@ -844,7 +844,7 @@
                 </resources>
                 <testResources>
                     <testResource>
-                         <directory>${highest.basedir}/enterpriseprojects/repository/source/test-resources</directory> 
+                         <directory>${highest.basedir}/enterpriseprojects/repository/source/test-resources</directory>
                          <includes>
                              <include>scriptexec/*SQLServer*/**</include>
                          </includes>
@@ -857,7 +857,7 @@
             <build>
                 <resources>
                     <resource>
-                         <directory>${highest.basedir}/enterpriseprojects/repository/config</directory> 
+                         <directory>${highest.basedir}/enterpriseprojects/repository/config</directory>
                          <includes>
                              <include>alfresco/ibatis/*DB2*/**</include>
                              <include>alfresco/dbscripts/**/*DB2*/**</include>
@@ -866,7 +866,7 @@
                 </resources>
                 <testResources>
                     <testResource>
-                         <directory>${highest.basedir}/enterpriseprojects/repository/source/test-resources</directory> 
+                         <directory>${highest.basedir}/enterpriseprojects/repository/source/test-resources</directory>
                          <includes>
                              <include>scriptexec/*DB2*/**</include>
                          </includes>
@@ -981,7 +981,7 @@
         </resources>
         <testResources>
             <testResource>
-                 <directory>source/test-resources</directory> 
+                 <directory>source/test-resources</directory>
             </testResource>
         </testResources>
 
