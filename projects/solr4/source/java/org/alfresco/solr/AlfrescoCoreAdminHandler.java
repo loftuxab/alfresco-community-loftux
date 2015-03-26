@@ -373,6 +373,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             CoreDescriptor dcore = new CoreDescriptor(coreContainer, coreName, newCore.toString());
 //            dcore.setCoreProperties(null);
             SolrCore core = coreContainer.create(dcore);
+            coreContainer.register(coreName, core, false);
             rsp.add("core", core.getName());
 
             return true;
@@ -440,26 +441,44 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
     private boolean removeCore(SolrQueryRequest req, SolrQueryResponse rsp)
     {
-        String store = "";
-        SolrParams params = req.getParams();
-        if (params.get("storeRef") != null)
+        try
         {
-            store = params.get("storeRef");
+            String store = "";
+            SolrParams params = req.getParams();
+            if (params.get("storeRef") != null)
+            {
+                store = params.get("storeRef");
+            }
+
+            if ((store == null) || (store.length() == 0)) { return false; }
+
+            StoreRef storeRef = new StoreRef(store);
+            String coreName = storeRef.getProtocol() + "-" + storeRef.getIdentifier();
+            if (params.get("coreName") != null)
+            {
+                coreName = params.get("coreName");
+            }
+
+            File solrHome = new File(coreContainer.getSolrHome());
+            File newCore = new File(solrHome, coreName);
+
+            // remove core
+
+            SolrCore done = coreContainer.remove(coreName);
+            if (done != null)
+            {
+                done.close();
+            }
+
+            AlfrescoCoreAdminHandler.deleteDirectory(newCore);
+
+            return true;
         }
-
-        if ((store == null) || (store.length() == 0)) { return false; }
-
-        StoreRef storeRef = new StoreRef(store);
-        String coreName = storeRef.getProtocol() + "-" + storeRef.getIdentifier();
-        if (params.get("coreName") != null)
+        catch (IOException e)
         {
-            coreName = params.get("coreName");
+            e.printStackTrace();
+            return false;
         }
-
-        // remove core
-        coreContainer.unload(coreName, true, true, true);
-
-        return true;
     }
 
 

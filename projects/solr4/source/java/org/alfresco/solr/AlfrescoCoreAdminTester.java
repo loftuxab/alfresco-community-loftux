@@ -300,6 +300,7 @@ public class AlfrescoCoreAdminTester
 
             CoreDescriptor dcore = new CoreDescriptor(adminHandler.getCoreContainer(), name, newCore.toString());
             SolrCore core = adminHandler.getCoreContainer().create(dcore);
+            adminHandler.getCoreContainer().register(name, core, false);
             before.add("core", core.getName());
 
             AlfrescoSolrDataModel dataModel = AlfrescoSolrDataModel.getInstance();
@@ -792,7 +793,13 @@ public class AlfrescoCoreAdminTester
 
             if (remove)
             {
-                adminHandler.getCoreContainer().unload(name, true, true, true);
+                SolrCore done = adminHandler.getCoreContainer().remove(name);
+                if (done != null)
+                {
+                    done.close();
+                }
+
+                AlfrescoCoreAdminHandler.deleteDirectory(newCore);
             }
 
         }
@@ -879,6 +886,7 @@ public class AlfrescoCoreAdminTester
 
                 CoreDescriptor dcore = new CoreDescriptor(adminHandler.getCoreContainer(), name, newCore.toString());
                 core = adminHandler.getCoreContainer().create(dcore);
+                adminHandler.getCoreContainer().register(name, core, false);
                 rsp.add("core", core.getName());
 
                 dataModel = AlfrescoSolrDataModel.getInstance();
@@ -968,7 +976,13 @@ public class AlfrescoCoreAdminTester
 
             if (remove)
             {
-                adminHandler.getCoreContainer().unload(name, true, true, true);
+                SolrCore done = adminHandler.getCoreContainer().remove(name);
+                if (done != null)
+                {
+                    done.close();
+                }
+
+                AlfrescoCoreAdminHandler.deleteDirectory(new File(core.getCoreDescriptor().getInstanceDir()));
             }
 
         }
@@ -1100,6 +1114,7 @@ public class AlfrescoCoreAdminTester
 
             CoreDescriptor dcore = new CoreDescriptor(adminHandler.getCoreContainer(), name, newCore.toString());
             SolrCore core = adminHandler.getCoreContainer().create(dcore);
+            adminHandler.getCoreContainer().register(name, core, false);
             rsp.add("core", core.getName());
 
             AlfrescoSolrDataModel dataModel = AlfrescoSolrDataModel.getInstance();
@@ -1745,7 +1760,13 @@ public class AlfrescoCoreAdminTester
 
             if (remove)
             {
-                adminHandler.getCoreContainer().unload(name, true, true, true);
+                SolrCore done = adminHandler.getCoreContainer().remove(name);
+                if (done != null)
+                {
+                    done.close();
+                }
+
+                AlfrescoCoreAdminHandler.deleteDirectory(newCore);
             }
 
         }
