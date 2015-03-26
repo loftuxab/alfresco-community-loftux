@@ -4,7 +4,7 @@
     <parent>
         <groupId>se.loftux.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>LX80-SNAPSHOT</version>
+        <version>LX80</version>
     </parent>
     <artifactId>alfresco-packaging</artifactId>
     <packaging>pom</packaging>
