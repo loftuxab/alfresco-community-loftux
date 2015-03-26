@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
 <beans>
-   
+
     <bean id="PatchService" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="proxyInterfaces">
             <value>org.alfresco.repo.admin.patch.PatchService</value>
@@ -27,7 +27,7 @@
             </props>
         </property>
     </bean>
-    
+
     <bean id="patchComponent" class="org.alfresco.repo.admin.patch.PatchServiceImpl" >
         <property name="descriptorService">
             <ref bean="descriptorComponent" />
@@ -53,7 +53,7 @@
         <property name="authenticationContext" ref="authenticationContext" />
         <property name="tenantAdminService" ref="TenantAdminService" />
     </bean>
-    
+
      <!-- base patch definition -->
     <bean id="baseWorkflowPatch" abstract="true" parent="basePatch" depends-on="patchComponent" init-method="init">
         <property name="tenantAdminService" ref="TenantAdminService" />
@@ -61,7 +61,7 @@
             <value>${system.workflow.deployWorkflowsInTenant}</value>
         </property>
     </bean>
-    
+
     <!-- Example patches -->
     <bean id="patch.sample.01" class="org.alfresco.repo.admin.patch.SamplePatch" parent="basePatch" >
         <property name="id"><value>Sample01</value></property>
@@ -94,21 +94,21 @@
     <!--              -->
     <!-- Helper beans -->
     <!--              -->
-    
+
     <bean id="bootstrapSpacesMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basenames">
             <list>
-                <value>alfresco/messages/bootstrap-spaces</value> 
+                <value>alfresco/messages/bootstrap-spaces</value>
             </list>
         </property>
     </bean>
-    
+
     <!--==============================-->
     <!--====== RETIRED PATCHES =======-->
     <!--==============================-->
 
 	<import resource="classpath:alfresco/patch/retired-patches-context.xml" />
-    
+
     <!--===========================-->
     <!--====== LIVE PATCHES =======-->
     <!--===========================-->
@@ -160,7 +160,7 @@
             </map>
         </property>
     </bean>
-    
+
     <bean id="patch.exampleJavaScript" class="org.alfresco.repo.admin.patch.impl.GenericBootstrapPatch" parent="basePatch" >
         <property name="id"><value>patch.exampleJavaScript</value></property>
         <property name="description"><value>patch.exampleJavaScript.description</value></property>
@@ -190,7 +190,7 @@
         <property name="contentService" ref="ContentService"/>
         <property name="fileFolderService" ref="FileFolderService"/>
     </bean>
-    
+
     <bean id="patch.updateMimetypes4" class="org.alfresco.repo.admin.patch.impl.GenericMimetypeRenamePatch" parent="basePatch" >
         <property name="id"><value>patch.updateMimetypes4</value></property>
         <property name="description"><value>patch.updateMimetypes4.description</value></property>
@@ -279,7 +279,7 @@
         <property name="fileFolderService" ref="FileFolderService"/>
         <property name="repository" ref="repositoryHelper"/>
     </bean>
-    
+
     <bean id="patch.db-V4.0-SolrTracking" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id" value="patch.db-V4.0-SolrTracking" />
         <property name="description" value="patch.schemaUpgradeScript.description" />
@@ -290,7 +290,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.0/${db.script.dialect}/Solr-Tracking.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.addDutchEmailTemplatesPatch" class="org.alfresco.repo.admin.patch.impl.AddDutchEmailTemplatesPatch" parent="basePatch">
         <property name="id"><value>patch.addDutchEmailTemplatesPatch</value></property>
         <property name="description"><value>patch.addDutchEmailTemplatesPatch.description</value></property>
@@ -303,7 +303,7 @@
         <property name="fileFolderService" ref="FileFolderService"/>
         <property name="repository" ref="repositoryHelper"/>
     </bean>
-    
+
     <bean id="patch.fixBpmPackages" class="org.alfresco.repo.admin.patch.impl.FixBpmPackagesPatch" parent="basePatch">
         <property name="id"><value>patch.fixBpmPackages</value></property>
         <property name="description"><value>patch.fixBpmPackages.description</value></property>
@@ -312,7 +312,7 @@
         <property name="targetSchema"><value>5025</value></property>
         <property name="importerBootstrap">
             <ref bean="spacesBootstrap" />
-        </property>     
+        </property>
         <property name="policyFilter">
             <ref bean="policyBehaviourFilter" />
         </property>
@@ -333,7 +333,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/3.4/${db.script.dialect}/alter-jBPM331-CLOB-columns-to-nvarchar.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.imapUnsubscribedAspect" class="org.alfresco.repo.admin.patch.impl.ImapUnsubscribedAspectPatch" parent="basePatch">
         <property name="id"><value>patch.imapUnsubscribedAspect</value></property>
         <property name="description"><value>patch.imapUnsubscribedAspect.description</value></property>
@@ -350,7 +350,7 @@
             <ref bean="personService" />
         </property>
     </bean>
-    
+
     <bean id="patch.db-V4.0-Activiti-task-id-indexes" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id" value="patch.db-V4.0-Activiti-task-id-indexes" />
         <property name="description" value="patch.schemaUpgradeScript.description" />
@@ -361,7 +361,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.0/${db.script.dialect}/ActivitiTaskIdIndexes.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.db-V4.0-TenantTables" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V4.0-TenantTables</value></property>
         <property name="description"><value>patch.schemaUpgradeScript.description</value></property>
@@ -372,7 +372,7 @@
             <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/AlfrescoCreate-TenantTables.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.remoteCredentialsContainer" class="org.alfresco.repo.admin.patch.impl.GenericBootstrapPatch" parent="basePatch" >
         <property name="id"><value>patch.remoteCredentialsContainer</value></property>
         <property name="description"><value>patch.remoteCredentialsContainer.description</value></property>
@@ -464,8 +464,8 @@
         <property name="targetSchema"><value>6008</value></property>
         <property name="siteService" ref="siteService" />
         <property name="hiddenAspect" ref="hiddenAspect" />
-    </bean>    
-    
+    </bean>
+
     <!-- noop: executed in patch.redeployParallelActivitiWorkflows-after-5-11-upgrade, after database has been upgraded -->
     <bean id="patch.redeployParallelActivitiWorkflows" class="org.alfresco.repo.admin.patch.impl.NoOpPatch" parent="basePatch">
         <property name="id"><value>patch.redeployParallelActivitiWorkflows</value></property>
@@ -517,7 +517,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.1/${db.script.dialect}/increase-column-size-activiti.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.updateMimetypesSVG" class="org.alfresco.repo.admin.patch.impl.GenericMimetypeRenamePatch" parent="basePatch" >
         <property name="id"><value>patch.updateMimetypesSVG</value></property>
         <property name="description"><value>patch.updateMimetypesSVG.description</value></property>
@@ -565,7 +565,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.1/${db.script.dialect}/NodeDeleted.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.updateMimetypesVISIO" class="org.alfresco.repo.admin.patch.impl.GenericMimetypeRenamePatch" parent="basePatch" >
         <property name="id"><value>patch.updateMimetypesVISIO</value></property>
         <property name="description"><value>patch.updateMimetypesVISIO.description</value></property>
@@ -602,7 +602,7 @@
             <value>true</value>
         </property>
     </bean>
-    
+
     <bean id="patch.db-V3.4-JBPM-varinst-indexes" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V3.4-JBPM-varinst-indexes</value></property>
         <property name="description"><value>patch.schemaUpgradeScript.description</value></property>
@@ -613,7 +613,7 @@
             <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/AlfrescoPostCreate-JBPM-varinst-indexes.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.db-V4.1-remove-column-activiti" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id" value="patch.db-V4.1-remove-column-activiti" />
         <property name="description" value="patch.removeColumnActiviti.description" />
@@ -624,7 +624,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.1/${db.script.dialect}/remove-column-activiti.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.db-V4.2-upgrade-to-activiti-5.10" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V4.2-upgrade-to-activiti-5.10</value></property>
         <property name="description"><value>patch.upgradeToActiviti5-10.description</value></property>
@@ -635,7 +635,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.2/${db.script.dialect}/activiti-upgrade-5-10.sql</value>
         </property>
     </bean>
-      
+
     <bean id="patch.emailAliasableAspect" class="org.alfresco.repo.admin.patch.impl.AliasableAspectPatch" parent="basePatch">
         <property name="id"><value>patch.emailAliasableAspect</value></property>
         <property name="description"><value>patch.emailAliasableAspect.description</value></property>
@@ -658,7 +658,7 @@
             <ref bean="policyBehaviourFilter"/>
         </property>
     </bean>
-    
+
     <bean id="patch.db-V4.1-rename-constraint-activiti" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V4.1-rename-constraint-activiti</value></property>
         <property name="description"><value>patch.renameConstraintActiviti.description</value></property>
@@ -680,7 +680,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.2/${db.script.dialect}/add-activti-index-historic-activity.sql</value>
         </property>
     </bean>
-    
+
      <bean id="patch.db-V4.2-upgrade-to-activiti-5.11" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V4.2-upgrade-to-activiti-5.11</value></property>
         <property name="description"><value>patch.upgradeToActiviti5-11.description</value></property>
@@ -691,7 +691,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.2/${db.script.dialect}/activiti-upgrade-5-11.sql</value>
         </property>
     </bean>
-    
+
      <bean id="patch.db-V4.1-drop-alfqname-fk-indexes" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id" value="patch.db-V4.1-drop-alfqname-fk-indexes" />
         <property name="description" value="patch.schemaUpgradeScript.description" />
@@ -756,7 +756,7 @@
         <property name="checkPath">
             <value>/${spaces.company_home.childname}/${spaces.shared.childname}</value>
         </property>
-      
+
         <property name="renamePath">
             <value>/${spaces.company_home.childname}/cm:shared</value>
         </property>
@@ -770,7 +770,7 @@
         <!--  Do we deferr running the shared folder patch? -->
         <property name="deferred"><value>${system.patch.sharedFolder.deferred}</value></property>
     </bean>
-    
+
     <bean id="patch.db-V4.2-metadata-query-indexes" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V4.2-metadata-query-indexes</value></property>
         <property name="description"><value>patch.db-V4.2-metadata-query-indexes.description</value></property>
@@ -782,7 +782,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.2/${db.script.dialect}/metadata-query-indexes.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.redeployActivitiWorkflowsForCategory" class="org.alfresco.repo.admin.patch.impl.GenericWorkflowPatch" parent="baseWorkflowPatch" >
         <property name="id"><value>patch.redeployActivitiWorkflowsForCategory</value></property>
         <property name="description"><value>patch.redeployActivitiWorkflowsForCategory.description</value></property>
@@ -809,7 +809,7 @@
             </list>
         </property>
     </bean>
-    
+
      <bean id="patch.db-V4.2-upgrade-to-activiti-5.13" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V4.2-upgrade-to-activiti-5.13</value></property>
         <property name="description"><value>patch.upgradeToActiviti5-13.description</value></property>
@@ -853,7 +853,7 @@
             </list>
         </property>
     </bean>
-    
+
     <bean id="patch.db-V4.1-fix-Repo-seqs-order" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id" value="patch.db-V4.1-fix-Repo-seqs-order" />
         <property name="description" value="patch.schemaUpgradeScript.description" />
@@ -864,7 +864,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.1/${db.script.dialect}/fix-Repo-seqs-order.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.db-V4.1-ChildAssoc-OrderBy" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V4.1-ChildAssoc-OrderBy</value></property>
         <property name="description"><value>patch.schemaUpgradeScript.description</value></property>
@@ -875,7 +875,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.1/${db.script.dialect}/ChildAssoc-OrderBy.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.db-V4.1-createIdxAlfNodeTQN" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id"><value>patch.db-V4.1-createIdxAlfNodeTQN</value></property>
         <property name="description"><value>patch.schemaUpgradeScript.description</value></property>
@@ -886,7 +886,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.1/${db.script.dialect}/createIdxAlfNodeTQN.sql</value>
         </property>
     </bean>
- 
+
     <bean id="patch.db-V4.2-restructure-idx_alf_nprop_s-MSSQL" class="org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch" parent="basePatch">
         <property name="id" value="patch.db-V4.2-restructure-idx_alf_nprop_s-MSSQL" />
         <property name="description" value="patch.schemaUpgradeScript.description" />
@@ -897,7 +897,7 @@
             <value>classpath:alfresco/dbscripts/upgrade/4.2/${db.script.dialect}/restructure-idx_alf_nprop_s-MSSQL.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.siteAdministrators" class="org.alfresco.repo.admin.patch.impl.AddGroupAuthorityPatch" parent="basePatch" >
         <property name="id"><value>patch.siteAdministrators</value></property>
         <property name="description"><value>patch.siteAdministrators.description</value></property>
@@ -929,7 +929,7 @@
              </bean>
         </property>
     </bean>
-    
+
     <bean id="patch.alfrescoSearchAdministrators" class="org.alfresco.repo.admin.patch.impl.AddGroupAuthorityPatch" parent="basePatch" >
         <property name="id"><value>patch.alfrescoSearchAdministrators</value></property>
         <property name="description"><value>patch.alfrescoSearchAdministrators.description</value></property>
@@ -961,7 +961,7 @@
              </bean>
         </property>
     </bean>
-    
+
     <!-- Add cm:indexControl aspect to surf-config folders and their children -->
     <bean id="patch.surfConfigFolder" class="org.alfresco.repo.admin.patch.impl.SurfConfigFolderPatch" parent="basePatch" >
         <property name="id"><value>patch.surfConfigFolder</value></property>
@@ -982,7 +982,7 @@
         <!--  Do we deferr running the surf-config folder patch? -->
         <property name="deferred"><value>${system.patch.surfConfigFolder.deferred}</value></property>
     </bean>
- 
+
     <bean id="patch.renameSiteAuthorityDisplayName"
         class="org.alfresco.repo.admin.patch.impl.RenameSiteAuthorityDisplayName"
         parent="basePatch">
@@ -1047,7 +1047,7 @@
             <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/AlfrescoCreate-ContentUrlEncryptionTables.sql</value>
         </property>
     </bean>
-    
+
     <bean id="patch.eol-wcmwf" class="org.alfresco.repo.admin.patch.impl.GenericWorkflowPatch" parent="baseWorkflowPatch" >
         <property name="id"><value>patch.eol-wcmwf</value></property>
         <property name="description"><value>patch.eol-wcmwf.description</value></property>
@@ -1098,10 +1098,10 @@
          <value>0</value>
       </property>
       <property name="fixesToSchema">
-         <value>9000</value>
+         <value>8019</value>
       </property>
       <property name="targetSchema">
-         <value>9001</value>
+         <value>8020</value>
       </property>
       <property name="contentService" ref="ContentService"/>
       <property name="repository" ref="repositoryHelper"/>
@@ -1117,8 +1117,8 @@
         <property name="id"><value>patch.imapSpacesTemplates3</value></property>
         <property name="description"><value>patch.imapSpacesLocaleTemplates2.description</value></property>
         <property name="fixesFromSchema"><value>0</value></property>
-        <property name="fixesToSchema"><value>9001</value></property>
-        <property name="targetSchema"><value>9002</value></property>
+        <property name="fixesToSchema"><value>8020</value></property>
+        <property name="targetSchema"><value>8021</value></property>
         <property name="importerBootstrap">
             <ref bean="spacesBootstrap" />
         </property>
@@ -1136,8 +1136,8 @@
         <property name="id" value="patch.db-V5.0-remove-columns-after-upgrade-to-activiti-5.16.2" />
         <property name="description" value="patch.db-V5.0-remove-columns-after-upgrade-to-activiti-5.16.2.description" />
         <property name="fixesFromSchema" value="0" />
-        <property name="fixesToSchema" value="9002" />
-        <property name="targetSchema" value="9003" />
+        <property name="fixesToSchema" value="8021" />
+        <property name="targetSchema" value="8022" />
         <property name="scriptUrl">
             <value>classpath:alfresco/dbscripts/upgrade/5.0/${db.script.dialect}/activiti-del-unused-after-5-16-2.sql</value>
         </property>
