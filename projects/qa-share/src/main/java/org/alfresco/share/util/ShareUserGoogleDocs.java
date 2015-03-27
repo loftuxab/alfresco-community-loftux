@@ -3,6 +3,7 @@ package org.alfresco.share.util;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.FactorySharePage;
 import org.alfresco.po.share.SharePage;
+import org.alfresco.po.share.SharePopup;
 import org.alfresco.po.share.UserProfilePage;
 import org.alfresco.po.share.UserSearchPage;
 import org.alfresco.po.share.site.document.ContentType;
@@ -20,10 +21,14 @@ import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.testng.Assert;
 
 import java.util.Set;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class ShareUserGoogleDocs extends AbstractCloudSyncTest
 {
@@ -47,7 +52,7 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
      * @param drone WebDrone
      * @return EditInGoogleDocsPage
      */
-    public static EditInGoogleDocsPage signIntoEditGoogleDocFromDetailsPage(WebDrone drone)
+    public static EditInGoogleDocsPage signIntoEditGoogleDocFromDetailsPage(WebDrone drone) throws InterruptedException
     {
         DocumentDetailsPage detailsPage = ShareUser.getSharePage(drone).render();
         detailsPage.render();
@@ -62,7 +67,7 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
      * @param drone WebDrone
      * @return EditInGoogleDocsPage
      */
-    public static EditInGoogleDocsPage signIntoResumeEditGoogleDocFromDetailsPage(WebDrone drone)
+    public static EditInGoogleDocsPage signIntoResumeEditGoogleDocFromDetailsPage(WebDrone drone) throws InterruptedException
     {
         DocumentDetailsPage detailsPage = ShareUser.getSharePage(drone).render();
         detailsPage.render();
@@ -93,36 +98,38 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
      * filename through google authorization. And Saves the document return to
      * the document library page. User should be already logged
      *
-     * @param drone WebDrone
-     * @param fileName String
+     * @param drone       WebDrone
+     * @param fileName    String
      * @param contentType ContentType
      * @return DocumentLibraryPage
      * @throws Exception
      */
     public static DocumentLibraryPage createAndSavegoogleDocBySignIn(WebDrone drone, String fileName, ContentType contentType) throws Exception
     {
-        DocumentLibraryPage docLibPage = ShareUser.getSharePage(drone).render();
-
-        GoogleDocsAuthorisation googleAuthorisationPage = docLibPage.getNavigation().selectCreateContent(contentType).render();
-        googleAuthorisationPage.render();
-
-        EditInGoogleDocsPage googleDocsPage = signInGoogleDocs(drone, googleAuthorisationPage);
+        DocumentLibraryPage docLibPage;
+        String docTitle = "";
+        EditInGoogleDocsPage googleDocsPage = createGoogleDocWithoutSave(drone, fileName, contentType);
         if (isGoogleDocsV3)
         {
-            switchToGoogleWindow(drone);
-        }
-        String docTitle = googleDocsPage.getDocumentTitle();
-        if (!(fileName == null))
-        {
-            googleDocsPage = renameGoogleDocName(fileName, googleDocsPage);
-        }
-        if (isGoogleDocsV3)
-        {
+            switch (contentType)
+            {
+                case GOOGLEDOCS:
+                    docTitle = "Untitled Document.docx";
+                    break;
+                case GOOGLESPREADSHEET:
+                    docTitle = "Untitled Document.xlsx";
+                    break;
+                case GOOGLEPRESENTATION:
+                    docTitle = "Untitled Document.pptx";
+                    break;
+            }
             closeAndSwitchToShare(drone).render();
+            Thread.sleep(10000);
             docLibPage = ShareUser.getSharePage(drone).render();
+            docLibPage.render();
             try
             {
-                docLibPage.getFileDirectoryInfo(docTitle).selectCheckInGoogleDoc().submit();
+                docLibPage.getFileDirectoryInfo(docTitle).selectCheckInGoogleDoc();
             }
             catch (TimeoutException e)
             {
@@ -133,15 +140,35 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
         {
             docLibPage = googleDocsPage.selectSaveToAlfresco().render();
         }
-
         return docLibPage.render();
+    }
+
+    public static EditInGoogleDocsPage createGoogleDocWithoutSave(WebDrone drone, String fileName, ContentType contentType) throws Exception
+    {
+        DocumentLibraryPage docLibPage = ShareUser.getSharePage(drone).render();
+
+        GoogleDocsAuthorisation googleAuthorisationPage = docLibPage.getNavigation().selectCreateContent(contentType).render();
+        googleAuthorisationPage.render();
+
+        EditInGoogleDocsPage googleDocsPage = signInGoogleDocs(drone, googleAuthorisationPage);
+        googleDocsPage.setGoogleCreate(true);
+
+        if (isGoogleDocsV3)
+        {
+            googleDocsPage = switchToGoogleWindow(drone);
+        }
+        if (!(fileName == null))
+        {
+            return renameGoogleDocName(fileName, googleDocsPage);
+        }
+        throw new PageOperationException("Filename param must not be null : error creating GoogleDoc");
     }
 
     /**
      * This method provides the user to edit google docs name with the given
      * name.
      *
-     * @param fileName String
+     * @param fileName       String
      * @param googleDocsPage EditInGoogleDocsPage
      * @return EditInGoogleDocsPage
      */
@@ -156,7 +183,7 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
      * value is true for saving the new google doc otherwise existing google
      * doc.
      *
-     * @param drone WebDrone
+     * @param drone       WebDrone
      * @param isCreateDoc boolean
      * @return SharPage
      */
@@ -193,7 +220,7 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
      * value is true for saving the new google doc otherwise existing google
      * doc. Methods used for edition by concurrent user's
      *
-     * @param drone WebDrone
+     * @param drone       WebDrone
      * @param isCreateDoc boolean
      * @return SharePage
      */
@@ -223,11 +250,17 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
             HtmlPage currentPage = FactorySharePage.resolvePage(drone);
             if (currentPage instanceof DocumentLibraryPage)
             {
-                return ((DocumentLibraryPage) currentPage).getFileDirectoryInfo(docTitle).selectCancelEditingInGoogleDocs().render();
+                ((DocumentLibraryPage) currentPage).getFileDirectoryInfo(docTitle).selectCancelEditingInGoogleDocs().render();
             }
             else if (currentPage instanceof DocumentDetailsPage)
             {
-                return ((DocumentDetailsPage) currentPage).clickCancelEditingInGoogleDocs().render();
+                ((DocumentDetailsPage) currentPage).clickCancelEditingInGoogleDocs().render();
+            }
+            HtmlPage thePage = FactorySharePage.resolvePage(drone).render();
+            if (thePage instanceof SharePopup)
+            {
+                ((SharePopup) thePage).clickYes();
+                drone.waitUntilElementDeletedFromDom(By.cssSelector("span[class='message']"), SECONDS.convert(maxWaitTime, MILLISECONDS));
             }
         }
         else
@@ -257,13 +290,23 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
      * @param googleAuth GoogleDocsAuthorisation
      * @return EditInGoogleDocsPage
      */
-    public static EditInGoogleDocsPage signInGoogleDocs(WebDrone driver, GoogleDocsAuthorisation googleAuth)
+    public static EditInGoogleDocsPage signInGoogleDocs(WebDrone driver, GoogleDocsAuthorisation googleAuth) throws InterruptedException
     {
+        int i = 0;
         GoogleSignUpPage signUpPage = googleAuth.submitAuth().render();
         signUpPage.signUp(googleUserName, googlePassword);
         if (isGoogleDocsV3)
         {
             switchToGoogleWindow(driver);
+        }
+        while (!(driver.getCurrentPage() instanceof EditInGoogleDocsPage))
+        {
+            webDriverWait(driver, 10000);
+            i++;
+            if (i == retrySearchCount)
+            {
+                break;
+            }
         }
         return FactorySharePage.resolvePage(driver).render();
     }
@@ -271,8 +314,8 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
     /**
      * Saves the google doc with the given comments as minor or major version.
      *
-     * @param drone WebDrone
-     * @param comments String
+     * @param drone          WebDrone
+     * @param comments       String
      * @param isMinorVersion boolean
      * @return GoogleDocsUpdateFilePage
      */
@@ -302,7 +345,7 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
      * This method is used to delete the given user profile.
      *
      * @param testUser String
-     * @param drone WebDrone
+     * @param drone    WebDrone
      * @return {@link UserSearchPage}
      */
     protected UserSearchPage deleteUser(WebDrone drone, String testUser)
