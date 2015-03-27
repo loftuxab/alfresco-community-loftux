@@ -10,11 +10,11 @@
     <bean id="shareProperties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:wqs.properties</value>
                 <value>classpath:sharepo.properties</value>
                 <value>classpath:sharepo.hybrid.properties</value>
                 <value>classpath:test.properties</value>
                 <value>classpath:data.properties</value>
+                <value>classpath:wqs.properties</value>
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
