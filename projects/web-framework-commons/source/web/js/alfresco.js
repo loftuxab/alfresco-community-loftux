@@ -2915,6 +2915,10 @@ Alfresco.util.createBalloon = function(p_context, p_params, showEvent, hideEvent
       }
       var fullScreenInstance = this;
 
+      Event.addListener(document, "MSFullscreenChange", function()
+      {
+         fullScreenInstance.onFullScreenChange();
+      });
       Event.addListener(document, "fullscreenchange", function()
       {
          fullScreenInstance.onFullScreenChange();
@@ -2994,12 +2998,16 @@ Alfresco.util.createBalloon = function(p_context, p_params, showEvent, hideEvent
             return;
          }
          var container = Dom.get(this.context);
-         if (container.requestFullscreen || container.mozRequestFullScreen || container.webkitRequestFullScreen)
+         if (container.msRequestFullscreen || container.requestFullscreen || container.mozRequestFullScreen || container.webkitRequestFullScreen)
          {
             Dom.addClass(container, 'alf-fullscreen');
             Dom.addClass(container, 'alf-entering-true-fullscreen');
          }
-         if (container.requestFullscreen)
+         if (container.msRequestFullscreen)
+         {
+            container.msRequestFullscreen();
+         }
+         else if (container.requestFullscreen)
          {
             container.requestFullscreen();
          }
@@ -3037,7 +3045,11 @@ Alfresco.util.createBalloon = function(p_context, p_params, showEvent, hideEvent
             this.toggleFullWindow();
             return;
          }
-         if (document.exitFullscreen)
+         if (document.msExitFullscreen)
+         {
+            document.msExitFullscreen();
+         }
+         else if (document.exitFullscreen)
          {
             document.exitFullscreen();
          }
