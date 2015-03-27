@@ -2003,10 +2003,12 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
     *
     * @method numberRange
     * @param field {object} The element representing the field the validation is for
-    * @param args {object} Object representing the minimum and maximum value, for example
+    * @param args {object} Object representing the minimum and maximum value, and optionally
+    *         a "repeating" flag, for example
     *        {
-    *           min: 18;
-    *           max: 30;
+    *           min: 18,
+    *           max: 30,
+    *           repeating: true
     *        }
     * @param event {object} The event that caused this handler to be called, maybe null
     * @param form {object} The forms runtime class instance the field is being managed by
@@ -2023,7 +2025,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
 
       if (value.length > 0)
       {
-         if (isNaN(value))
+         if (!Alfresco.forms.validation.number(field, args, null, null, true, null))
          {
             valid = false;
          }
@@ -2032,6 +2034,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             // ACE-3690: NaN instead of -1 to indicate a non-present value
             var min = NaN;
             var max = NaN;
+            var repeating = false;
 
             if (args.min !== undefined)
             {
@@ -2053,14 +2056,47 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                max = parseInt(args.maxValue);
             }
 
-            if (!isNaN(min) && value < min)
+            // determine if field has repeating values
+            if (args !== null && args.repeating)
             {
-               valid = false;
+               repeating = true;
             }
 
-            if (!isNaN(max) && value > max)
+            var valid = true;
+            if (repeating)
             {
-               valid = false;
+               // as it's repeating there could be multiple comma separated values
+               var values = value.split(",");
+               for (var i = 0; i < values.length; i++)
+               {
+                  if (min != -1 && values[i] < min)
+                  {
+                     valid = false;
+                  }
+
+                  if (max != -1 && values[i] > max)
+                  {
+                     valid = false;
+                  }
+
+                  if (!valid)
+                  {
+                     // stop as soon as we find an invalid value
+                     break;
+                  }
+               }
+            }
+            else
+            {
+            if (!isNaN(min) && value < min)
+               {
+                  valid = false;
+               }
+
+            if (!isNaN(max) && value > max)
+               {
+                  valid = false;
+               }
             }
          }
       }
