@@ -422,7 +422,22 @@ public class UrlConfigSource extends BaseConfigSource implements ServletContextA
             }
             catch (MalformedURLException ex)
             {
-                return jarUrl;
+                // BEA WebLogic Server 12 fix, we know that there is jar separator and zip protocol
+                if (jarUrl.getProtocol().equals(ResourceUtils.URL_PROTOCOL_ZIP))
+                {
+                    try
+                    {
+                        return new URL(ResourceUtils.FILE_URL_PREFIX + jarFile);
+                    }
+                    catch (MalformedURLException mue)
+                    {
+                        return jarUrl;
+                    }
+                }
+                else
+                {
+                    return jarUrl;
+                }
             }
         }
         else
