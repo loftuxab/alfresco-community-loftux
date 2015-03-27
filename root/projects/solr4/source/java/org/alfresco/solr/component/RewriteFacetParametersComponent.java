@@ -117,7 +117,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
             }    
             else
             {
-                fixed.add(name, params.getParams(name));
+                fixed.set(name, params.getParams(name));
             }
         }
     }
@@ -140,16 +140,16 @@ public class RewriteFacetParametersComponent extends SearchComponent
                     String source = name.substring(2, index);
                     if(fieldMappings.containsKey(source))
                     {
-                        fixed.add("f."+fieldMappings.get(source)+name.substring(index), params.getParams(name));
+                        fixed.set("f."+fieldMappings.get(source)+name.substring(index), params.getParams(name));
                     }
                     else
                     {
-                        fixed.add(name, params.getParams(name));
+                        fixed.set(name, params.getParams(name));
                     }
                 }
                 else
                 {
-                    fixed.add(name, params.getParams(name));
+                    fixed.set(name, params.getParams(name));
                 }
             }       
         }
@@ -175,7 +175,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
                 }
                 newFacetFields.add(mappedField);
             }
-            fixed.add(paramName,  newFacetFields.toArray(new String[newFacetFields.size()]));
+            fixed.set(paramName,  newFacetFields.toArray(new String[newFacetFields.size()]));
         }
     }
 
