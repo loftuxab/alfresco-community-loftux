@@ -183,9 +183,12 @@ public class ModuleDeploymentService
             this.saveDeployedModuleConfigurations();
             result = (module != null);
         }
-        if (logger.isErrorEnabled())
+        else
         {
-            logger.error("A request was made to add an Extension Module but dynamic modules are disabled");
+            if (logger.isErrorEnabled())
+            {
+                logger.error("A request was made to add an Extension Module but dynamic modules are disabled");
+            }
         }
         return result;
     }
