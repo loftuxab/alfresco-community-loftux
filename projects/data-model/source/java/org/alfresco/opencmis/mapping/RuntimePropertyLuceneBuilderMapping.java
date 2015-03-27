@@ -44,7 +44,7 @@ public class RuntimePropertyLuceneBuilderMapping implements PropertyLuceneBuilde
     private Map<String, CMISPropertyLuceneBuilder> luceneBuilders = new HashMap<String, CMISPropertyLuceneBuilder>();
 
     /**
-     * @param cmis dictionary
+     * @param cmisDictionaryService cmisDictionaryService
      */
     public void setCmisDictionaryService(CMISDictionaryService cmisDictionaryService)
     {
@@ -52,7 +52,7 @@ public class RuntimePropertyLuceneBuilderMapping implements PropertyLuceneBuilde
     }
 
     /**
-     * @param dictionary service
+     * @param dictionaryService dictionaryService
      */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -110,7 +110,8 @@ public class RuntimePropertyLuceneBuilderMapping implements PropertyLuceneBuilde
     /**
      * Register pre-defined Property Accessor
      * 
-     * @param propertyAccessor
+     * @param name
+     * @param luceneBuilder
      */
     private void registerPropertyLuceneBuilder(String name, CMISPropertyLuceneBuilder luceneBuilder)
     {

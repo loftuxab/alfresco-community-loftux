@@ -67,7 +67,7 @@ public class EncApRepPart {
 	/**
 	 * Class constructor
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	public EncApRepPart(byte[] blob) throws IOException {
@@ -113,8 +113,8 @@ public class EncApRepPart {
 	/**
 	 * Set the sub-key and type
 	 * 
-	 * @param int keyType
-	 * @param byte[] subkey
+	 * @param keyType int
+	 * @param subkey byte[]
 	 */
 	public final void setSubkey(int keyType, byte[] subkey) {
 		m_subKeyType = keyType;
@@ -124,7 +124,7 @@ public class EncApRepPart {
 	/**
 	 * Parse the ASN/1 encoded AP-REP encrypted part
 	 * 
-	 * @param byte[] apRep
+	 * @param apRep byte[]
 	 * @exception IOException
 	 */
 	public final void parseApRep(byte[] apRep)

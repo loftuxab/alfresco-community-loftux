@@ -96,7 +96,7 @@ public class ServiceStatusExList implements DCEReadableList {
 	 * 
 	 * @param buf DCEBuffer
 	 * @exception DCEBufferException
-	 * @see DCESerializable#readObject(DCEBuffer)
+	 * @see org.alfresco.jlan.smb.dcerpc.DCEReadable#readObject(DCEBuffer)
 	 */
 	public void readObject(DCEBuffer buf)
 		throws DCEBufferException {

@@ -200,7 +200,7 @@ public abstract class AbstractCannedQuery<R> implements CannedQuery<R>
      * The implementation may optimally select, filter, sort and apply permissions.
      * If not, however, the subsequent post-query methods
      * ({@link #applyPostQuerySorting(List, CannedQuerySortDetails)},
-     *  {@link #applyPostQueryPermissions(List, String)} and
+     *  {@link #applyPostQueryPermissions(List, int)} and
      *  {@link #applyPostQueryPaging(List, CannedQueryPageDetails)}) can
      * be used to trim the results as required.
      * 
@@ -219,7 +219,7 @@ public abstract class AbstractCannedQuery<R> implements CannedQuery<R>
     }
     
     /**
-     * Called before {@link #applyPostQueryPermissions(List)} to allow the results to be sorted prior to permission checks.
+     * Called before {@link #applyPostQueryPermissions(List, int)} to allow the results to be sorted prior to permission checks.
      * Note that the {@link #query()} implementation may optimally sort results during retrieval, in which case this method does not need to be implemented.
      * 
      * @param results               the results to sort
@@ -288,7 +288,7 @@ public abstract class AbstractCannedQuery<R> implements CannedQuery<R>
     }
     
     /**
-     * Called after the {@link #applyPostQuerySorting(List) sorting phase} to pull out results specific
+     * Called after the {@link #applyPostQuerySorting(List, CannedQuerySortDetails) sorting phase} to pull out results specific
      * to the required pages.  Note that the {@link #query()} implementation may optimally
      * create page-specific results, in which case this method does not need to be implemented.
      * <p/>

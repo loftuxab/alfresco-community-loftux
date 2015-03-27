@@ -31,10 +31,9 @@ public class CalendarUtil
     /**
      * Return valid startTime and endTime for a single day based on current day
      * 
-     * @param fieldForCalendar
-     *            - the calendar field
-     * @param timeToAdd
-     *            - specified amount of time
+     * @param startDateTime String
+     * @param endDateTime String
+     * @param allDay String
      * @return
      */
     public static Map<String, String> setTimeForSingleDay(String startDateTime, String endDateTime, boolean
@@ -58,7 +57,8 @@ public class CalendarUtil
      * 
      * @param addMonths
      * @param addDays
-     * @param addHours
+     * @param startTime
+     * @param endTime
      * @param allDay
      * @return
      */
@@ -124,9 +124,11 @@ public class CalendarUtil
 
     /**
      * Converts the date value to new time zone
-     * 
+     *
      * @param dateValue
-     * @param hours
+     * @param initialTZ
+     * @param finalTZ
+     * @param allday
      * @return
      * @throws Exception
      */
@@ -183,7 +185,6 @@ public class CalendarUtil
      * Returns the time in format h:mm a
      * 
      * @param dateValue
-     * @param hours
      * @return
      * @throws Exception
      */
@@ -202,7 +203,8 @@ public class CalendarUtil
      * Returns the date value in new format
      * 
      * @param dateValue
-     * @param hours
+     * @param newFormatValue
+     * @param allDay
      * @return
      * @throws Exception
      */

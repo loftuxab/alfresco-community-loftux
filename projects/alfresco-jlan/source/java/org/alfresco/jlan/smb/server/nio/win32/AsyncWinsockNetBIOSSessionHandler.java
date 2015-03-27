@@ -58,7 +58,7 @@ public class AsyncWinsockNetBIOSSessionHandler extends SessionHandlerBase {
 	/**
 	 * Class constructor
 	 * 
-	 * @param name String
+	 * @param lana int
 	 * @param nbName NetBIOSName
 	 * @param server NetworkServer
 	 */

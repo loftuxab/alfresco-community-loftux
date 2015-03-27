@@ -51,7 +51,7 @@ public class TcpipSMBPacketHandler extends SocketPacketHandler {
 	 * Read a packet from the input stream
 	 * 
 	 * @return SMBSrvPacket
-	 * @exception IOexception If a network error occurs
+	 * @exception IOException If a network error occurs
 	 */
 	public SMBSrvPacket readPacket()
 		throws IOException {
@@ -144,7 +144,7 @@ public class TcpipSMBPacketHandler extends SocketPacketHandler {
 	 * @param pkt SMBSrvPacket
 	 * @param len int
 	 * @param writeRaw boolean
-	 * @exception IOexception If a network error occurs
+	 * @exception IOException If a network error occurs
 	 */
 	public void writePacket(SMBSrvPacket pkt, int len, boolean writeRaw)
 		throws IOException {

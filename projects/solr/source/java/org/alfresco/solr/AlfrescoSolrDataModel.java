@@ -1721,10 +1721,6 @@ public class AlfrescoSolrDataModel
 
     }
 
-    /**
-     * @param defaultAnalyzer
-     * @return
-     */
     public SolrLuceneAnalyser getSolrLuceneAnalyser()
     {
         return new SolrLuceneAnalyser(getDictionaryService(CMISStrictDictionaryService.DEFAULT), getMLAnalysisMode(), alfrescoDataType.getDefaultAnalyzer(), this);

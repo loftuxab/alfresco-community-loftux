@@ -89,8 +89,8 @@ public abstract class AbstractAsynchronouslyRefreshedCache<T>
 	    }
 
 	    /**
-	     * @param threadPool
-	     *            the threadPool to set
+	     * @param threadPoolExecutor
+	     *            the threadPoolExecutor to set
 	     */
 	    public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor)
 	    {

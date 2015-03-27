@@ -75,7 +75,7 @@ public class CachedNetworkFile extends DBNetworkFile {
 	 * @param fid int
 	 * @param stid int
 	 * @param did int
-	 * @param stateProxy FileStateProxy
+	 * @param state FileStateProxy
 	 * @param segment FileSegment
 	 * @param loader FileLoader
 	 */

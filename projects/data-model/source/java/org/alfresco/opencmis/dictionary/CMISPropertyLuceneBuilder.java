@@ -32,94 +32,94 @@ import org.alfresco.repo.search.impl.querymodel.PredicateMode;
 public interface CMISPropertyLuceneBuilder
 {
     /**
-     * @param lqp
+     * @param lqpa
      * @param value
      * @param mode
      * @param luceneFunction 
      * @return the query - may be null if no query is required
-     * @throws ParseException
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneEquality(LuceneQueryParserAdaptor<Q, S, E> lqpa, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param not
      * @return the query - may be null if no query is required
-     * @throws ParseException
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneExists(LuceneQueryParserAdaptor<Q, S, E> lqpa, Boolean not) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param value
      * @param mode
      * @param luceneFunction 
      * @return the query - may be null if no query is required
-     * @throws ParseException 
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneGreaterThan(LuceneQueryParserAdaptor<Q, S, E> lqpa, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param value
      * @param mode
      * @param luceneFunction 
      * @return the query - may be null if no query is required
-     * @throws ParseException 
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneGreaterThanOrEquals(LuceneQueryParserAdaptor<Q, S, E> lqpa, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param values
      * @param not
      * @param mode
      * @return the query - may be null if no query is required
-     * @throws ParseException 
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneIn(LuceneQueryParserAdaptor<Q, S, E> lqpa, Collection<Serializable> values, Boolean not, PredicateMode mode) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param value
      * @param mode
      * @param luceneFunction 
      * @return the query - may be null if no query is required
-     * @throws ParseException 
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneInequality(LuceneQueryParserAdaptor<Q, S, E> lqpa, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param value
      * @param mode
      * @param luceneFunction 
      * @return the query - may be null if no query is required
-     * @throws ParseException 
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneLessThan(LuceneQueryParserAdaptor<Q, S, E> lqpa, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param value
      * @param mode
      * @param luceneFunction 
      * @return the query - may be null if no query is required
-     * @throws ParseException 
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneLessThanOrEquals(LuceneQueryParserAdaptor<Q, S, E> lqpa, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param value
      * @param not
      * @return the query - may be null if no query is required
-     * @throws ParseException 
+     * @throws java.text.ParseException
      */
     public <Q, S, E extends Throwable> Q buildLuceneLike(LuceneQueryParserAdaptor<Q, S, E> lqpa, Serializable value, Boolean not) throws E;
 
     /**
-     * @param lqp TODO
+     * @param lqpa TODO
      * @return the sort field
      * @throws E 
      */

@@ -511,8 +511,7 @@ public class NFSConfigSection extends ConfigSection {
    * Set the RPC authenticator to be used to authenticate access to the RPC based services (portmapper, mount
    * server and NFS server)
    *
-   * @param authClass String
-   * @param params ConfigElement
+   * @param auth RpcAuthenticator
    * @return int
    * @exception InvalidConfigurationException
    */

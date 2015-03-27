@@ -260,10 +260,10 @@ public class BridgeTable<T>
     }
 
     /**
-     * @param parentsDescendants
      * @param toAdd
      * @param position
      * @param target
+     * @param node
      */
     private void add(HashMap<Integer, HashMap<T, Counter>> toAdd, Integer position, HashMap<Integer, HashMap<T, Counter>> target, T node)
     {
@@ -312,10 +312,10 @@ public class BridgeTable<T>
     }
 
     /**
-     * @param parentsDescendants
-     * @param toAdd
+     * @param toRemove
      * @param position
      * @param target
+     * @param node
      */
     private void remove(HashMap<Integer, HashMap<T, Counter>> toRemove, Integer position, HashMap<Integer, HashMap<T, Counter>> target, T node)
     {

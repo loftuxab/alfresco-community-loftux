@@ -50,11 +50,6 @@ public class Exists extends BaseFunction
         args.put(ARG_NOT, new BaseArgumentDefinition(Multiplicity.SINGLE_VALUED, ARG_NOT, DataTypeDefinition.BOOLEAN, false));
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public Exists()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, args);

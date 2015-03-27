@@ -50,7 +50,7 @@ public class NetBIOSSMBChannelHandler extends ChannelPacketHandler {
 	 * Read a packet from the input stream
 	 * 
 	 * @return SMBSrvPacket
-	 * @exception IOexception If a network error occurs
+	 * @exception IOException If a network error occurs
 	 */
 	public SMBSrvPacket readPacket()
 		throws IOException {
@@ -149,7 +149,7 @@ public class NetBIOSSMBChannelHandler extends ChannelPacketHandler {
 	 * @param pkt SMBSrvPacket
 	 * @param len int
 	 * @param writeRaw boolean
-	 * @exception IOexception If a network error occurs
+	 * @exception IOException If a network error occurs
 	 */
 	public void writePacket(SMBSrvPacket pkt, int len, boolean writeRaw)
 		throws IOException {

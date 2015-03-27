@@ -109,8 +109,6 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
     /**
      * Construct
      * 
-     * @param namespaceDAO
-     *            namespace data access
      */
     public DictionaryDAOImpl()
     {

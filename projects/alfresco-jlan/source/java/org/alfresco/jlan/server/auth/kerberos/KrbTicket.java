@@ -58,7 +58,7 @@ public class KrbTicket {
 	/**
 	 * Class constructor
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	public KrbTicket(byte[] blob)
@@ -118,7 +118,7 @@ public class KrbTicket {
 	/**
 	 * Parse a Kerberos ticket blob
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	public final void parseTicket( byte[] blob)

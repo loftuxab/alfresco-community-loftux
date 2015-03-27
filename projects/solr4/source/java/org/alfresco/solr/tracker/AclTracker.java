@@ -473,8 +473,8 @@ public class AclTracker extends AbstractTracker
     }
 
     /**
-     * @param acl
-     * @param readers
+     * @param aclReaderList
+     * @param overwrite
      */
     protected void indexAcl(List<AclReaders> aclReaderList, boolean overwrite) throws IOException
     {
@@ -630,7 +630,6 @@ public class AclTracker extends AbstractTracker
     }
     
     /**
-     * @param reader
      * @throws AuthenticationException
      * @throws IOException
      * @throws JSONException

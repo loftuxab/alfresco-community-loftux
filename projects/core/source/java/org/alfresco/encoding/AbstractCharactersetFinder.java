@@ -161,7 +161,7 @@ public abstract class AbstractCharactersetFinder implements CharactersetFinder
      * The interface contract is that the data buffer must not be altered in any way.
      * 
      * @param buffer            the buffer of data no bigger than the requested
-     *                          {@linkplain #getBestBufferSize() best buffer size}.  This can,
+     *                          {@linkplain #getBufferSize() best buffer size}.  This can,
      *                          very efficiently, be turned into an <tt>InputStream</tt> using a
      *                          <tt>ByteArrayInputStream<tt>. 
      * @return                  Returns the charset or <tt>null</tt> if an accurate conclusion

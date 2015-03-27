@@ -206,7 +206,7 @@ public final class DataPacker {
    * @param bytarray Byte array containing the short value to be unpacked.
    * @param pos      Offset to start unpacking the short value.
    * @return         Unpacked short value.
-   * @exception      java.lang.IndexOutOfBoiundsException   If there is not enough data in the buffer.
+   * @exception      java.lang.IndexOutOfBoundsException   If there is not enough data in the buffer.
    */
   public final static int getIntelShort(byte[] bytarray, int pos)
   	throws java.lang.IndexOutOfBoundsException {

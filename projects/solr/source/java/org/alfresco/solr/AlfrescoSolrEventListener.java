@@ -1455,7 +1455,6 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         int owner;
 
         /**
-         * @param doc
          * @param dbid
          */
         public CacheEntry(long dbid)
@@ -1497,7 +1496,7 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         }
 
         /**
-         * @param alcid
+         * @param aclid
          *            the alcid to set
          */
         public void setAclid(long aclid)
@@ -1734,12 +1733,18 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         /**
          * @param tracker
          * @param oldIndexedByDocId
-         * @param oldAllLeafDocs
          * @param oldAclIdByDocId
+         * @param oldTxByDocId
+         * @param oldAclTxByDocId
          * @param indexedByDocId
          * @param allLeafDocs
          * @param aclIdByDocId
+         * @param txIdByDocId
+         * @param aclTxIdByDocId
          * @param unmatchedByDBID
+         * @param deleted
+         * @param reader
+         * @param ownerIdManager
          */
         public void updateCache(CacheUpdateTracker tracker, ResizeableArrayList<CacheEntry> oldIndexedByDocId, long[] oldAclIdByDocId, long[] oldTxByDocId, long[] oldAclTxByDocId,
                 ResizeableArrayList<CacheEntry> indexedByDocId, OpenBitSet allLeafDocs, long[] aclIdByDocId, long[] txIdByDocId, long[] aclTxIdByDocId, HashMap<Long, CacheEntry> unmatchedByDBID,

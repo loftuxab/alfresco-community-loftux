@@ -254,7 +254,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
     }
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param field
      * @return
      * @throws E 

@@ -88,7 +88,7 @@ public class RemoteOpLockDetails extends OpLockDetailsAdapter implements Seriali
 	 * Class constructor
 	 *
 	 * @param clNode ClusterNode
-	 * @param localOplock OpLockDetails
+	 * @param localOpLock OpLockDetails
 	 * @param stateCache ClusterFileStateCache
 	 */
 	protected RemoteOpLockDetails( ClusterNode clNode, OpLockDetails localOpLock, ClusterFileStateCache stateCache) {

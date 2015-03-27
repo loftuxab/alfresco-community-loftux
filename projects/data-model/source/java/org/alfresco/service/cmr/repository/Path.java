@@ -448,7 +448,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
         private int position = -1;
         
         /**
-         * @param ref a reference to the specific parent-child association
+         * @param attribute QName
          */
         public AttributeElement(QName attribute)
         {

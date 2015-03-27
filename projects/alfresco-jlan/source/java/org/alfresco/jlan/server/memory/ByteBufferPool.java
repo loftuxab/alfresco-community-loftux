@@ -41,9 +41,9 @@ public class ByteBufferPool {
 	/**
 	 * Class constuctor
 	 * 
-	 * @param Buffer sizes int[]
-	 * @param Initial allocations for each size int[]
-	 * @param Maximim allocations for each size int[]
+	 * @param bufSizes Buffer sizes int[]
+	 * @param initAlloc Initial allocations for each size int[]
+	 * @param maxAlloc Maximim allocations for each size int[]
 	 */
 	public ByteBufferPool( int[] bufSizes, int[] initAlloc, int[] maxAlloc) {
 		

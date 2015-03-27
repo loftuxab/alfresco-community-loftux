@@ -163,7 +163,6 @@ public interface PropertyDefinition extends ClassAttributeDefinition
 
     /**
      * @param locale
-     * @param resourceBundleClassLoader
      * @return
      */
     public String resolveAnalyserClassName(Locale locale);

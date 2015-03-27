@@ -1837,8 +1837,8 @@ public abstract class AbstractUtils implements AlfrescoTests
     /**
      * Checks if a browser window is open with an URL matching the given string.
      *
-     * @param windowName
      * @param driver     driverObj
+     * @param URL URL
      * @return boolean
      */
     public boolean isWindowWithURLOpened(WebDrone driver, String URL)
@@ -1861,7 +1861,7 @@ public abstract class AbstractUtils implements AlfrescoTests
      * Create a new temporary file -fullname- based on source File
      *
      * @param source
-     * @param location
+     * @param fullname
      * @return File
      * @author Paul Brodner
      */

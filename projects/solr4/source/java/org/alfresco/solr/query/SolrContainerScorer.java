@@ -73,18 +73,12 @@ public class SolrContainerScorer extends Scorer
      * 
      * @param weight -
      *            curently unsued
-     * @param tps -
-     *            the term positions for the terms we are trying to find
      * @param root -
      *            the term positions for documents with multiple entries - this
      *            may be null, or contain no matches - it specifies those things
      *            that appear under multiple categories etc.
      * @param positions -
      *            the structured field positions - where terms should appear
-     * @param similarity -
-     *            used in the abstract scorer implementation
-     * @param norms -
-     *            unused
      */
     public SolrContainerScorer(Weight weight, DocsAndPositionsEnum root, StructuredFieldPosition[] positions)
     {

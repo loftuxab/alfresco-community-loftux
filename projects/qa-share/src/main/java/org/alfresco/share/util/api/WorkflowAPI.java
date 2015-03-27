@@ -45,8 +45,7 @@ public class WorkflowAPI extends PublicAPIAbstract
      * 
      * @param authUser
      * @param domain
-     * @param userRequestingSM
-     * @param siteMembershipRequestID
+     * @param taskID
      * @return boolean
      * @throws PublicApiException
      */
@@ -168,7 +167,6 @@ public class WorkflowAPI extends PublicAPIAbstract
      * 
      * @param authUser
      * @param domain
-     * @param taskID
      * @param params
      * @return {@link JSONObject}
      * @throws PublicApiException
@@ -208,8 +206,7 @@ public class WorkflowAPI extends PublicAPIAbstract
      * @param authUser
      * @param domain
      * @param taskId
-     * @param taskJson
-     * @param selectedFields
+     * @param json
      * @param variableName
      * @return {@link JSONObject}
      * @throws PublicApiException
@@ -229,8 +226,7 @@ public class WorkflowAPI extends PublicAPIAbstract
      * @param authUser
      * @param domain
      * @param taskId
-     * @param json
-     * @param item
+     * @param itemId
      * @return {@link HttpResponse}
      * @throws PublicApiException
      */

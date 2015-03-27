@@ -63,7 +63,7 @@ public class GrantFileAccessTask extends RemoteStateTask<FileAccessToken> {
 	 * 
 	 * @param mapName String
 	 * @param key String
-	 * @param openParams GrantAccessParams 
+	 * @param params GrantAccessParams
 	 * @param debug boolean
 	 * @param timingDebug boolean
 	 */

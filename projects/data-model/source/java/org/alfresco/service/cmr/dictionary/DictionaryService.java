@@ -283,7 +283,7 @@ public interface DictionaryService extends MessageLookup
     /**
      * Gets the definition of the constraint
      * 
-     * @param constraintName the constraint name
+     * @param constraintQName the constraint name
      * @return the constraint definition (or null, if it doesn't exist)
      * 
      * @since 3.2.1

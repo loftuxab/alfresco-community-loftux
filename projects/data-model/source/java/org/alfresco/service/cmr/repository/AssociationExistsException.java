@@ -37,7 +37,7 @@ public class AssociationExistsException extends RuntimeException
     private QName qname;
     
     /**
-     * @see #AssociationExistsException(NodeRef, NodeRef, QName, Throwable)
+     * @see #AssociationExistsException(Long, Long, org.alfresco.service.namespace.QName, Throwable)
      */
     public AssociationExistsException(Long sourceNodeId, Long targetNodeId, QName qname)
     {

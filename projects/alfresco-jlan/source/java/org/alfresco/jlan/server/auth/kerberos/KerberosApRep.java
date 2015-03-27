@@ -53,7 +53,7 @@ public class KerberosApRep {
 	/**
 	 * Class constructor
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	public KerberosApRep(byte[] blob)
@@ -95,9 +95,9 @@ public class KerberosApRep {
 	/**
 	 * Set the encrypted AP-REP data
 	 * 
-	 * @param int encType
-	 * @param byte[] encBlob
-	 * @param int encVno
+	 * @param  encType int
+	 * @param  encData byte[]
+	 * @param  encVno int
 	 */
 	public final void setEncryptedPart( int encType, byte[] encData, int encVno)
 	{
@@ -109,7 +109,7 @@ public class KerberosApRep {
 	/**
 	 * Parse an AP-REP blob
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	private final void parseApRep( byte[] blob)
@@ -220,7 +220,7 @@ public class KerberosApRep {
 	/**
 	 * Parse a response token to get the AP-REP
 	 * 
-	 * @param byte[] respToken
+	 * @param respToken byte[]
 	 * @exception IOException
 	 */
 	public final void parseResponseToken( byte[] respToken)

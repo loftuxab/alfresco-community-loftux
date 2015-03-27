@@ -1342,7 +1342,7 @@ public class HazelCastClusterFileStateCache extends ClusterFileStateCache implem
 	/**
 	 * Start the cluster
 	 * 
-	 * @throw Exception
+	 * @throws Exception
 	 */
 	public void startCluster()
 		throws Exception {
@@ -1413,8 +1413,8 @@ public class HazelCastClusterFileStateCache extends ClusterFileStateCache implem
 	/**
 	 * Request an oplock break
 	 * 
-	 * @param clNode ClusterNode
-	 * @param clState ClusterFileState
+	 * @param path String
+	 * @param oplock OpLockDetails
 	 * @param sess SMBSrvSession
 	 * @param pkt SMBSrvPacket
 	 * @exception IOException
@@ -2084,7 +2084,7 @@ public class HazelCastClusterFileStateCache extends ClusterFileStateCache implem
 	/**
 	 * Release access to a file
 	 * 
-	 * @params fstate FileState
+	 * @param fstate FileState
 	 * @param token FileAccessToken
 	 * @return int
 	 */
@@ -2703,7 +2703,7 @@ public class HazelCastClusterFileStateCache extends ClusterFileStateCache implem
     /**
      * Cluster topic message listener
      * 
-     * @param msg ClusterMessage
+     * @param hzMessage ClusterMessage
      */
 	public void onMessage(Message<ClusterMessage> hzMessage) {
 		

@@ -301,7 +301,7 @@ class FindInfoPacker {
   /**
    * Clear the next structure offset
    * 
-   * @param dataBuf DataBuffer
+   * @param buf DataBuffer
    * @param level int
    * @param offset int
    */

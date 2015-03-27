@@ -1018,11 +1018,10 @@ public class DictionaryDAOTest
 
     /**
      * @param dictionaryDAO
-     * @param b
-     * @param c
-     * @param d
-     * @param e
-     * @param f
+     * @param withModelBundle boolean
+     * @param withInheritedTypeBundle
+     * @param withTypeBundle
+     * @param withPropertyBundle
      * @return
      */
     private M2Model createTypeModel(DictionaryDAOImpl dictionaryDAO, boolean withModelBundle, boolean withInheritedTypeBundle, boolean withTypeBundle, boolean withPropertyBundle)

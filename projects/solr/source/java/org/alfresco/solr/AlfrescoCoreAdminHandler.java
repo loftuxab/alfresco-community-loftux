@@ -363,7 +363,8 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
 
     /**
-     * @param solrResourceLoader
+     * @param coreContainer
+     * @param resource
      */
     private void initResourceBasedLogging(CoreContainer coreContainer, String resource)
     {
@@ -5532,18 +5533,21 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
 
     /**
+     * @param report
      * @param core
+     * @param handler
+     * @param query
+     * @param count
+     * @param sort
+     * @param sorted
      * @param locale
      *            TODO
      * @param rows
      *            TODO
      * @param start
      *            TODO
-     * @param filter
+     * @param filters
      *            TODO
-     * @param req
-     * @param rsp
-     * @param dataModel
      * @throws IOException
      */
     @SuppressWarnings({ "unused", "unchecked", "rawtypes" })
@@ -6913,8 +6917,14 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
 
     /**
-     * @param i
-     * @param j
+     *
+     * @param core
+     * @param dataModel
+     * @param rootNodeRef
+     * @param txid
+     * @param dbid
+     * @param acltxid
+     * @param aclid
      * @throws IOException
      */
     private void addStoreRoot(SolrCore core, AlfrescoSolrDataModel dataModel, NodeRef rootNodeRef, int txid, int dbid, int acltxid, int aclid) throws IOException

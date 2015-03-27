@@ -26,7 +26,7 @@ import org.apache.solr.handler.component.SearchComponent;
 /**
  * Sets a boolean flag ("processedDenies") in the JSON response indicating that
  * the results (should) have been processed with respect to anyDenyDenies
- * (i.e. {@link AbstractQParser} has added the correct clause to the search query).
+ * (i.e. {@link org.alfresco.solr.query.AbstractQParser} has added the correct clause to the search query).
  * 
  * @author Matt Ward
  */

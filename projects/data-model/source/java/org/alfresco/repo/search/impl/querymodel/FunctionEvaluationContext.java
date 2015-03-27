@@ -65,110 +65,107 @@ public interface FunctionEvaluationContext
     public Float getScore();
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param value
      * @param mode
      * @param luceneFunction
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneEquality(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
      * Note: null and not null are not required to support functions from the spec
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param not
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneExists(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Boolean not) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param value
      * @param mode
      * @param luceneFunction
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneGreaterThan(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param value
      * @param mode
      * @param luceneFunction
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneGreaterThanOrEquals(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param value
      * @param mode
      * @param luceneFunction
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneLessThan(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param value
      * @param mode
      * @param luceneFunction
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneLessThanOrEquals(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
      * Note: Like is not required to support functions from the spec
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param value
      * @param not
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneLike(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, Boolean not) throws E;
 
     /**
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param value
      * @param mode
      * @param luceneFunction
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneInequality(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
      * Note: In is not required to support functions from the spec
-     * @param lqp
+     * @param lqpa
      * @param propertyName
      * @param values
      * @param not
      * @param mode
      * @return the query
-     * @throws ParseException
+     * @throws E
      */
     public <Q, S, E extends Throwable> Q buildLuceneIn(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Collection<Serializable> values, Boolean not, PredicateMode mode) throws E;
 
     /**
+     * @param lqpa
      * @param propertyName
-     * @param luceneContext 
-     * @param locales 
-     * @param analysisMode 
-     * @param reader 
      * @return the field used for sorting the given property
      * @throws E 
      */
@@ -205,7 +202,7 @@ public interface FunctionEvaluationContext
     public LuceneFunction getLuceneFunction(FunctionArgument functionArgument);
 
     /**
-     * @param type
+     * @param selector
      * @param propertyName
      */
     public void checkFieldApplies(Selector selector, String propertyName);

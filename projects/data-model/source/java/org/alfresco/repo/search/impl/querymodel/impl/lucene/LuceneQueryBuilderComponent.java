@@ -36,7 +36,7 @@ public interface LuceneQueryBuilderComponent<Q, S, E extends Throwable>
      * @param luceneContext
      * @param functionContext
      * @return - the lucene query fragment for this component
-     * @throws ParseException
+     * @throws java.text.ParseException
      */
     public Q addComponent(Set<String> selectors, Map<String, Argument> functionArgs, LuceneQueryBuilderContext<Q, S, E> luceneContext, FunctionEvaluationContext functionContext) throws E;
 }

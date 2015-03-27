@@ -35,7 +35,7 @@ import org.alfresco.jlan.smb.SMBDate;
  * return either file names, via the nextFileName () method, or can return FileInfo objects for each
  * file found, via the nextFileInfo () method.
  * 
- * @see DiskSession
+ * @see org.alfresco.jlan.client.DiskSession
  * 
  * @author gkspencer
  */

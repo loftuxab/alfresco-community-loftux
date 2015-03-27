@@ -171,7 +171,7 @@ public interface ContentWriter extends ContentAccessor
      *  to be written, then the guessing will occur once the
      *  content write has completed.
      *  
-     * @param The filename of the content (if known)
+     * @param filename The filename of the content (if known)
      */
     public void guessMimetype(String filename);
     

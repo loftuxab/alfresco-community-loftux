@@ -874,7 +874,7 @@ public final class SessionFactory {
 	 * @param shr PC share information and access control information.
 	 * @param pkt SMB negotiate packet containing the receive negotiate packet.
 	 * @param netSess NetBIOS transport session connected to the remote file server.
-	 * @param dia SMB dialect that has been negotiated for this session.
+	 * @param dialect SMB dialect that has been negotiated for this session.
 	 * @param settings Session settings
 	 * @return SMBDiskSession if the request was successful, else null
 	 * @exception java.io.IOException If an I/O error occurs.
@@ -940,7 +940,7 @@ public final class SessionFactory {
 	 * @param shr PC share information and access control information.
 	 * @param pkt SMB negotiate packet containing the received negotiate response.
 	 * @param netSess Network transport session connected to the remote file server.
-	 * @param dia SMB dialect that has been negotiated for this session.
+	 * @param dialect SMB dialect that has been negotiated for this session.
 	 * @param settings Session settings
 	 * @return SMBIPCSession if successful, else null
 	 * @exception java.io.IOException If an I/O error occurs
@@ -995,7 +995,7 @@ public final class SessionFactory {
 	 * @param shr PC share information and access control information.
 	 * @param pkt SMB negotiate packet containing the received negotiate response.
 	 * @param netSess Network transport session connected to the remote file server.
-	 * @param dia SMB dialect that has been negotiated for this session.
+	 * @param dialect SMB dialect that has been negotiated for this session.
 	 * @param settings Session settings
 	 * @return SMBPrinterSession if successful, else null
 	 * @exception java.io.IOException If an I/O error occurs
@@ -1061,7 +1061,7 @@ public final class SessionFactory {
 	 * @param shr PC share information and access control information.
 	 * @param pkt SMB negotiate packet containing the receive negotiate packet.
 	 * @param netSess Network transport session connected to the remote file server.
-	 * @param dia SMB dialect that has been negotiated for this session.
+	 * @param dialect SMB dialect that has been negotiated for this session.
 	 * @param settings Session settings
 	 * @return SMBSession if the request was successful, else null
 	 * @exception java.io.IOException If an I/O error occurs
@@ -1659,8 +1659,8 @@ public final class SessionFactory {
 	 * 
 	 * @param shr Remote share information object.
 	 * @return SMBAdminSession used to perform admin operations
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 
@@ -1678,8 +1678,8 @@ public final class SessionFactory {
 	 * @param shr Remote share information object.
 	 * @param settings Session settings
 	 * @return SMBAdminSession used to perform admin operations
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public AdminSession OpenAdminSession(PCShare shr, SessionSettings settings)
@@ -1701,8 +1701,8 @@ public final class SessionFactory {
 	 * 
 	 * @param shr Remote share information object.
 	 * @return SMBSession used to access the remote share.
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public DiskSession OpenDisk(PCShare shr)
@@ -1719,8 +1719,8 @@ public final class SessionFactory {
 	 * @param shr Remote share information object.
 	 * @param settings Session settings
 	 * @return SMBSession used to access the remote share.
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public DiskSession OpenDisk(PCShare shr, SessionSettings settings)
@@ -1738,8 +1738,8 @@ public final class SessionFactory {
 	 * @param shr Remote share information object.
 	 * @param sess Existing connection to the remote server.
 	 * @return SMBSession used to access the remote share.
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public DiskSession OpenDisk(PCShare shr, Session sess)
@@ -1801,8 +1801,8 @@ public final class SessionFactory {
 	 * 
 	 * @param shr Remote share information object.
 	 * @return SMBSession used to access the pipe/IPC session.
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public IPCSession OpenPipe(PCShare shr)
@@ -1819,8 +1819,8 @@ public final class SessionFactory {
 	 * @param shr Remote share information object.
 	 * @param settings Session settings
 	 * @return SMBSession used to access the pipe/IPC session.
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public IPCSession OpenPipe(PCShare shr, SessionSettings settings)
@@ -1837,8 +1837,8 @@ public final class SessionFactory {
 	 * @param shr Remote share information object.
 	 * @param pipeName String
 	 * @return DataPipeFile used to read/write to the named pipe
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public DataPipeFile OpenDataPipe(PCShare shr, String pipeName)
@@ -1856,8 +1856,8 @@ public final class SessionFactory {
 	 * 
 	 * @param settings Session settings
 	 * @return DataPipeFile used to read/write to the named pipe
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public DataPipeFile OpenDataPipe(PCShare shr, String pipeName, SessionSettings settings)
@@ -1950,8 +1950,8 @@ public final class SessionFactory {
 	 * @param shr Remote share information object.
 	 * @param settings Session settings
 	 * @return SMBSession used to access the remote share.
-	 * @exception java.io.Exception Network I/O error occurred.
-	 * @exception java.net.UnkownHostException Remote node is unknown.
+	 * @exception java.io.IOException Network I/O error occurred.
+	 * @exception java.net.UnknownHostException Remote node is unknown.
 	 * @exception SMBException Failed to setup a new SMB session
 	 */
 	static final public PrintSession OpenPrinter(PCShare shr, SessionSettings settings)

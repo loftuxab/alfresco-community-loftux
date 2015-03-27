@@ -49,11 +49,6 @@ public class FTSPrefixTerm extends BaseFunction
         args.put(ARG_PROPERTY, new BaseArgumentDefinition(Multiplicity.SINGLE_VALUED, ARG_PROPERTY, DataTypeDefinition.ANY, false));
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public FTSPrefixTerm()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, args);

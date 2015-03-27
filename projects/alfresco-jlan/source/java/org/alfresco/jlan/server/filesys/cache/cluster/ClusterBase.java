@@ -110,7 +110,7 @@ public abstract class ClusterBase implements ClusterInterface {
 	/**
 	 * Start the cluster
 	 * 
-	 * @throw Exception
+	 * @throws Exception
 	 */
 	public abstract void startCluster()
 		throws Exception;
@@ -118,7 +118,7 @@ public abstract class ClusterBase implements ClusterInterface {
 	/**
 	 * Shutdown the cluster
 	 * 
-	 * @throw Exception
+	 * @throws Exception
 	 */
 	public abstract void shutdownCluster()
 		throws Exception;

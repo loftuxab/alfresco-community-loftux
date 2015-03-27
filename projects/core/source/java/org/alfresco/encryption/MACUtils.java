@@ -135,9 +135,7 @@ public class MACUtils
 	 * Assumes message has been decrypted
 	 * @param keyAlias
 	 * @param expectedMAC
-	 * @param timestamp
-	 * @param ipAddress
-	 * @param message
+	 * @param macInput
 	 * @return
 	 */
 	public boolean validateMAC(String keyAlias, byte[] expectedMAC, MACInput macInput)

@@ -197,8 +197,7 @@ public class CMISStrictDictionaryService extends CMISAbstractDictionaryService
     /**
      * Create Type Definitions
      * 
-     * @param registry
-     * @param classQNames
+     * @param classQName
      */
     private AbstractTypeDefinitionWrapper createTypeDef(QName classQName)
     {

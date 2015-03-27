@@ -239,8 +239,8 @@ public abstract class AbstractWorkflow extends AbstractCloudSyncTest
 
     /**
      * @param siteName
-     * @param cloudUser
      * @param approvalPercentage
+     * @param cloudUsers
      * @return {@link WorkFlowFormDetails}
      */
     protected WorkFlowFormDetails createWorkFlowDetails(String siteName, int approvalPercentage, String... cloudUsers)
@@ -271,7 +271,6 @@ public abstract class AbstractWorkflow extends AbstractCloudSyncTest
      * This method creates 5 reviewers in HYBRID_DOMAIN. Also upgrades the
      * HYBRID_DOMAIN.
      * 
-     * @param drone
      * @throws Exception
      */
     protected void initialUsersCreation() throws Exception
@@ -421,7 +420,7 @@ public abstract class AbstractWorkflow extends AbstractCloudSyncTest
      * is not displayed, retry for defined time(maxWaitTime_CloudSync)
      * 
      * @param drone
-     * @param fileName
+     * @param taskName
      * @param isTaskExpected
      * @return boolean
      */

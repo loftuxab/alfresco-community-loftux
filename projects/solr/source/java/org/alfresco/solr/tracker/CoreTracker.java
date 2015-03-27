@@ -921,8 +921,6 @@ public class CoreTracker implements Tracker
     }
 
     /**
-     * @param solrIndexSearcher
-     * @param reader
      * @throws AuthenticationException
      * @throws IOException
      * @throws JSONException
@@ -1047,7 +1045,6 @@ public class CoreTracker implements Tracker
     }
 
     /**
-     * @param reader
      * @throws AuthenticationException
      * @throws IOException
      * @throws JSONException
@@ -1653,8 +1650,10 @@ public class CoreTracker implements Tracker
     }
 
     /**
-     * @param acl
-     * @param readers
+     *
+     * @param aclReaderList
+     * @param overwrite
+     * @throws IOException
      */
     protected void indexAcl(List<AclReaders> aclReaderList, boolean overwrite) throws IOException
     {

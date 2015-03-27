@@ -53,11 +53,6 @@ public class Child extends BaseFunction
         args.put(ARG_SELECTOR, new BaseArgumentDefinition(Multiplicity.SINGLE_VALUED, ARG_SELECTOR, DataTypeDefinition.TEXT, false));
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public Child()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, args);

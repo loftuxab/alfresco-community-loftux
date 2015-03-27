@@ -51,7 +51,7 @@ public class DataUpdateMessage extends ClusterMessage {
 	 * @param targetNode String
 	 * @param fromNode ClusterNode
 	 * @param path String
-	 * @parma startUpdate boolean
+	 * @param startUpdate boolean
 	 */
 	public DataUpdateMessage( String targetNode, ClusterNode fromNode, String path, boolean startUpdate) {
 		super ( targetNode, fromNode, ClusterMessageType.DataUpdate);

@@ -168,7 +168,7 @@ public class ListOfValuesConstraint extends AbstractConstraint
     /**
      * Set the values that are allowed by the constraint.
      *  
-     * @param values a list of allowed values
+     * @param allowedValues a list of allowed values
      */
     public void setAllowedValues(List<String> allowedValues)
     {

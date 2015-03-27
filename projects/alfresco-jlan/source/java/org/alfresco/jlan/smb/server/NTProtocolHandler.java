@@ -1812,7 +1812,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 	 * Process a transaction buffer
 	 * 
 	 * @param tbuf TransactBuffer
-	 * @param smbtPkt SMBSrvPacket
+	 * @param smbPkt SMBSrvPacket
 	 * @exception IOException If a network error occurs
 	 * @exception SMBSrvException If an SMB error occurs
 	 */
@@ -1959,7 +1959,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception IOException
-	 * @exception SMBSrvPacket
+	 * @exception SMBSrvException
 	 */
 	protected final void procLockingAndX(SMBSrvPacket smbPkt)
 		throws IOException, SMBSrvException {
@@ -7811,7 +7811,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 	 * @param pkt SMBSrvPacket
 	 * @param disk DiskInterface
 	 * @param params FileOpenParams
-	 * @param conn TreeConnection
+	 * @param tree TreeConnection
 	 * @exception DeferredPacketException	If an oplock break has been started
 	 * @exception AccessDeniedException 	If the oplock break send fails
 	 */

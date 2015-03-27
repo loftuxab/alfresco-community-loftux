@@ -150,7 +150,7 @@ public class ByteBufferList {
 	/**
 	 * Allocate a buffer
 	 * 
-	 * @param long waitTime
+	 * @param  waitTime long
 	 * @return byte[]
 	 */
 	public final byte[] allocateBuffer( long waitTime) {

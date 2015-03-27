@@ -119,7 +119,7 @@ public class TypeConverter
      * type. Wrapper around the Collection version for arrays.
      * 
      * @param propertyType - the target property type
-     * @param value - the value to be converted
+     * @param values - the value to be converted
      * @return - the converted value as the correct type
      * @throws DictionaryException if the property type's registered java class is invalid
      * @throws TypeConversionException if the conversion cannot be performed
@@ -145,7 +145,7 @@ public class TypeConverter
      * type.
      * 
      * @param propertyType - the target property type
-     * @param value - the value to be converted
+     * @param values - the value to be converted
      * @return - the converted value as the correct type
      * @throws DictionaryException if the property type's registered java class is invalid
      * @throws TypeConversionException if the conversion cannot be performed
@@ -175,7 +175,7 @@ public class TypeConverter
      * 
      * @param <T> The target type for the result of the conversion
      * @param c - a class for the target type
-     * @param value - the collection to be converted
+     * @param values - the collection to be converted
      * @return - the converted collection
      * @throws TypeConversionException if the conversion cannot be performed
      */
@@ -287,7 +287,7 @@ public class TypeConverter
      * Get the bollean value for the value object
      * May have conversion failure
      * 
-     * @param float
+     * @param value Object
      * @return
      */
     public final float floatValue(Object value)
@@ -303,7 +303,7 @@ public class TypeConverter
      * Get the bollean value for the value object
      * May have conversion failure
      * 
-     * @param double
+     * @param value Object
      * @return
      */
     public final double doubleValue(Object value)
@@ -421,9 +421,8 @@ public class TypeConverter
      * Note: Takes into account the class of the object and any interfaces it may
      *       also support.
      * 
-     * @param <F>
      * @param <T>
-     * @param source
+     * @param value
      * @param dest
      * @return
      */

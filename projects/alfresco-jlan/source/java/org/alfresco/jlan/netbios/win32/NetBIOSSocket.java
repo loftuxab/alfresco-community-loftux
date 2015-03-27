@@ -337,7 +337,7 @@ public class NetBIOSSocket {
 	 * 
 	 * @return NetBIOSSocket
 	 * @exception NetBIOSSocketException
-	 * @exception winsockNetBIOSException
+	 * @exception WinsockNetBIOSException
 	 */
 	public final NetBIOSSocket accept()
 		throws WinsockNetBIOSException, NetBIOSSocketException {

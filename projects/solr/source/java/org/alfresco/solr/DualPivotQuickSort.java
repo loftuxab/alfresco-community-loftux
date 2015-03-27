@@ -22,7 +22,7 @@ import java.util.Comparator;
 
 /**
  * Implementation of the Dual Pivot Quick Sort algorithm, based on the paper by Vladimir Yaroslavskiy,
- * available at {@link http://iaroslavski.narod.ru/quicksort/DualPivotQuicksort.pdf}.
+ * available at <a href="http://iaroslavski.narod.ru/quicksort/DualPivotQuicksort.pdf">DualPivotQuicksort.pdf</a>.
  * 
  * This provides an in-place sorting mechanism, to allow the reuse of arrays containing a large number of objects, reducing
  * the number of temporary object created by the Alfresco Solr indexing service. 

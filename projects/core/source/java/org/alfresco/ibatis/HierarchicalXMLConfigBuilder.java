@@ -50,7 +50,7 @@ import org.springframework.core.io.Resource;
 
 
 /**
- * Extends the MyBatis XMLConfigBuilder to allow the selection of a {@link ResourceLoader}
+ * Extends the MyBatis XMLConfigBuilder to allow the selection of a {@link org.springframework.core.io.ResourceLoader}
  * that will be used to load the resources specified in the <b>mapper</b>'s <b>resource</b>.
  * <p>
  * By using the <b>resource.dialect</b> placeholder with hierarchical resource loading,
@@ -65,12 +65,12 @@ import org.springframework.core.io.Resource;
  * &lt;/configuration&gt;
  * <p/>
  * 
- * Much of the implementation is a direct copy of the MyBatis {@link XMLConfigBuilder}; some
+ * Much of the implementation is a direct copy of the MyBatis {@link org.apache.ibatis.builder.xml.XMLConfigBuilder}; some
  * of the <tt>protected</tt> methods do not have access to the object's state and can therefore
  * not be overridden successfully: <a href=https://issues.apache.org/jira/browse/IBATIS-589>IBATIS-589</a>
 
  * Pending a better way to extend/override, much of the implementation is a direct copy of the MyBatis 
- * {@link SqlSessionFactoryBean}; some of the <tt>protected</tt> methods do not have access to the object's state 
+ * {@link org.mybatis.spring.SqlSessionFactoryBean}; some of the <tt>protected</tt> methods do not have access to the object's state
  * and can therefore not be overridden successfully. 
  * 
  * This is equivalent to HierarchicalSqlMapConfigParser which extended iBatis (2.x).

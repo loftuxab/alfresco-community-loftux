@@ -21,7 +21,7 @@ package org.alfresco.util.transaction;
 /**
  * Listener for Alfresco-specific transaction callbacks.
  *
- * @see org.alfresco.util.transaction.AlfrescoTransactionSupport
+ * @see org.alfresco.repo.transaction.AlfrescoTransactionSupport
  * 
  * @author Derek Hulley
  */

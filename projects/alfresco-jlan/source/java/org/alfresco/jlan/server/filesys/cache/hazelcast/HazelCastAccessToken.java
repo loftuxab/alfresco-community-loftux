@@ -99,7 +99,7 @@ public class HazelCastAccessToken implements Serializable, FileAccessToken {
 	 * @param clName String
 	 * @param pid int
 	 * @param oplock int
-	 * @param oplockNotAvailable boolean
+	 * @param oplockNotAvail boolean
 	 */
 	protected HazelCastAccessToken( String clName, int pid, int oplock, boolean oplockNotAvail) {
 		m_ownerName = clName;

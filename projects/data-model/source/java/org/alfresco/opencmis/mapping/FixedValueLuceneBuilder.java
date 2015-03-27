@@ -42,8 +42,6 @@ public class FixedValueLuceneBuilder extends BaseLuceneBuilder
     /**
      * Construct
      * 
-     * @param serviceRegistry
-     * @param propertyName
      * @param value
      */
     public FixedValueLuceneBuilder(Serializable value)

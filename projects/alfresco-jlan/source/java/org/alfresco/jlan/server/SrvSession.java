@@ -590,7 +590,6 @@ public abstract class SrvSession {
 	/**
 	 * Set the Driver State.   A place for the content driver to 
 	 * store state in the session.
-	 * @param driverState
 	 */
 	public String toString() {
 		StringBuilder str = new StringBuilder();

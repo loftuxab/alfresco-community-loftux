@@ -53,11 +53,6 @@ public class FTSProximity extends BaseFunction
         args.put(ARG_SLOP, new BaseArgumentDefinition(Multiplicity.SINGLE_VALUED, ARG_SLOP, DataTypeDefinition.INT, false));
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public FTSProximity()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, args);

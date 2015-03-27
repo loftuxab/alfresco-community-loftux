@@ -268,8 +268,6 @@ class SMBSrvTransPacket extends SMBTransPacket {
 
 	/**
 	 * Return the position of the parameter block within the received packet.
-	 * 
-	 * @param prmblk Array to unpack the parameter block words into.
 	 */
 
 	public final int getRxParameterBlock() {

@@ -217,7 +217,7 @@ public class Win32NetBIOSPacketHandler extends PacketHandler {
 	 * 
 	 * @param pkt SMBSrvPacket
 	 * @param len int
-	 * @paam writeRaw boolean
+	 * @param writeRaw boolean
 	 * @throws IOException
 	 */
 	public void writePacket(SMBSrvPacket pkt, int len, boolean writeRaw)

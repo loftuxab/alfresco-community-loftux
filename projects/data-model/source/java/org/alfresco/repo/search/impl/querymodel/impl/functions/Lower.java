@@ -48,11 +48,6 @@ public class Lower extends BaseFunction
         args.put(ARG_ARG, new BaseArgumentDefinition(Multiplicity.SINGLE_VALUED, ARG_ARG, DataTypeDefinition.ANY, true));
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public Lower()
     {
         super(NAME, DataTypeDefinition.TEXT, args);

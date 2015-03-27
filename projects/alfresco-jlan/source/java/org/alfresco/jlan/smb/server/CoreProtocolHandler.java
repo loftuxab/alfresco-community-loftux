@@ -333,7 +333,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt Response SMB packet.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procCloseFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -440,7 +440,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procCreateDirectory(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -568,7 +568,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procCreateFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -707,7 +707,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.server.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procCreateTemporaryFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -719,7 +719,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procDeleteDirectory(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -843,7 +843,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procDeleteFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -955,7 +955,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt Response SMB packet.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procDiskAttributes(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -1083,7 +1083,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procEcho(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -1131,7 +1131,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procFlushFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -1233,7 +1233,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt Response SMB packet.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procGetFileAttributes(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -1366,7 +1366,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procGetFileInformation(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -1532,7 +1532,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.server.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procLockFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -1608,7 +1608,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt Response SMB packet.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procOpenFile(SMBSrvPacket smbPkt)
 		throws IOException, SMBSrvException {
@@ -1759,7 +1759,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.server.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procProcessExit(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -1819,7 +1819,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt Response SMB packet.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procReadFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -1970,7 +1970,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procRenameFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -2096,7 +2096,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt Response SMB packet.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected final void procSearch(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -2793,7 +2793,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procSetFileAttributes(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -2907,7 +2907,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procSetFileInformation(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -3034,8 +3034,8 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt Response SMB packet.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
-	 * @exception org.alfresco.aifs.smb.TooManyConnectionsException Too many concurrent connections
+	 * @exception SMBSrvException The exception description.
+	 * @exception TooManyConnectionsException Too many concurrent connections
 	 *                on this session.
 	 */
 
@@ -3221,7 +3221,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt Response SMB packet.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procTreeDisconnect(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -3307,7 +3307,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.server.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procUnLockFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -3383,7 +3383,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected final void procUnsupported(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -3398,7 +3398,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procWriteFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -3532,7 +3532,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected void procWriteAndCloseFile(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {

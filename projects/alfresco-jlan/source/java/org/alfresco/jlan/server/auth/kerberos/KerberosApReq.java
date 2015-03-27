@@ -69,7 +69,7 @@ public class KerberosApReq {
 	/**
 	 * Class constructor
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	public KerberosApReq(byte[] blob)
@@ -151,7 +151,7 @@ public class KerberosApReq {
 	/**
 	 * Parse an AP-REQ blob
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	private final void parseApReq( byte[] blob)
@@ -285,7 +285,7 @@ public class KerberosApReq {
 	/**
 	 * Parse a mech token to get the AP-REQ
 	 * 
-	 * @param byte[] mechToken
+	 * @param mechToken byte[]
 	 * @exception IOException
 	 */
 	public final void parseMechToken( byte[] mechToken)

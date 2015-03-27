@@ -27,7 +27,7 @@ public class UnzipDownload
      * This method is used to unzip and extract the folder or files of the downloaded archieve 
      * 
      * @param zipFile input zip file
-     * @param output zip file output folder
+     * @param outputFolder zip file output folder
      * @return boolean : This is true if unzip is successful, otherwise false.
      */
     public boolean unzip(String zipFile, String outputFolder)

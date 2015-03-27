@@ -73,7 +73,7 @@ public class ClusterConfigSection extends ConfigSection {
 	  /**
 	   * Set the Hazelcast configuration file path
 	   * 
-	   * @param configPath String
+	   * @param path String
 	   */
 	  public void setConfigFile( String path) {
 		  m_configFile = path;

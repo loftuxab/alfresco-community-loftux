@@ -113,7 +113,7 @@ public abstract class RequestPostProcessor {
 	/**
 	 * Dequeue a post processor from the queue
 	 * 
-	 * @retun RequestPostProcessor
+	 * @return RequestPostProcessor
 	 */
 	public static RequestPostProcessor dequeuePostProcessor() {
 		

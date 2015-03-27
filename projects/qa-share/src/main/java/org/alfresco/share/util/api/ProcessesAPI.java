@@ -43,9 +43,9 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Gets a list Favourite object for a particular person Id.
      * 
-     * @param authUser
-     * @param domain
-     * @param favMap
+     * @param authUser String
+     * @param domain String
+     * @param params Map<String, String>
      * @return ListResponse<Favourite>
      * @throws PublicApiException 
      */
@@ -60,9 +60,9 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Gets a list Favourite object for a particular person Id.
      * 
-     * @param authUser
-     * @param domain
-     * @param favMap
+     * @param authUser String
+     * @param domain String
+     * @param processInstanceId String
      * @return ListResponse<Favourite>
      * @throws PublicApiException
      */
@@ -77,10 +77,9 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Gets a list Favourite object for a particular person Id.
      * 
-     * @param authUser
-     * @param domain
-     * @param itemId
-     * @param favMap
+     * @param authUser String
+     * @param domain String
+     * @param processInstanceId String
      * @return ListResponse<Favourite>
      * @throws PublicApiException
      */
@@ -96,11 +95,10 @@ public class ProcessesAPI extends PublicAPIAbstract
      * Gets a list JSONObject object for a particular processInstanceId, String
      * itemId
      * 
-     * @param authUser
-     * @param domain
-     * @param itemId
-     * @param itemId
-     * @param favMap
+     * @param authUser String
+     * @param domain String
+     * @param processInstanceId String
+     * @param itemId String
      * @return ListResponse<Favourite>
      * @throws PublicApiException
      */
@@ -116,10 +114,10 @@ public class ProcessesAPI extends PublicAPIAbstract
      * Get the process tasks for a particular processInstanceId filtered by
      * params
      * 
-     * @param authUser
-     * @param domain
-     * @param processInstanceId
-     * @param params
+     * @param authUser String
+     * @param domain String
+     * @param processInstanceId String
+     * @param params Map<String, String>
      * @return {@link JSONObject}
      * @throws PublicApiException
      */
@@ -134,9 +132,9 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Get the process variables for a particular processInstanceId.
      * 
-     * @param authUser
-     * @param domain
-     * @param processInstanceId
+     * @param authUser String
+     * @param domain String
+     * @param processInstanceId String
      * @return {@link JSONObject}
      * @throws PublicApiException
      */
@@ -152,10 +150,10 @@ public class ProcessesAPI extends PublicAPIAbstract
      * Get the process image for a particular processInstanceId filtered by
      * params
      * 
-     * @param authUser
-     * @param domain
-     * @param processInstanceId
-     * @param params
+     * @param authUser String
+     * @param domain String
+     * @param processInstanceId String
+     * @param params Map<String, String>
      * @return {@link JSONObject}
      * @throws PublicApiException
      */
@@ -171,10 +169,10 @@ public class ProcessesAPI extends PublicAPIAbstract
      * Get the process activities for a particular processInstanceId filtered by
      * params
      * 
-     * @param authUser
-     * @param domain
-     * @param processInstanceId
-     * @param params
+     * @param authUser String
+     * @param domain String
+     * @param processInstanceId String
+     * @param params Map<String, String>
      * @return {@link JSONObject}
      * @throws PublicApiException
      */
@@ -189,10 +187,9 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Create process with a process JSON.
      * 
-     * @param authUser
-     * @param domain
-     * @param processInstanceId
-     * @param params
+     * @param authUser String
+     * @param domain String
+     * @param processJson JSONObject
      * @return {@link ProcessInfo}
      * @throws PublicApiException
      */
@@ -207,11 +204,10 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Create process item for a particular processId.
      * 
-     * @param authUser
-     * @param domain
-     * @param processJson
-     * @param processId
-     * @param items
+     * @param authUser String
+     * @param domain String
+     * @param processId String
+     * @param items JSONObject
      * @return {@link HttpResponse}
      * @throws PublicApiException
      */
@@ -225,13 +221,11 @@ public class ProcessesAPI extends PublicAPIAbstract
 
     /**
      * Create process variable for a particular processId.
-     * 
-     * @param authUser
-     * @param domain
-     * @param processJson
-     * @param processId
-     * @param items
-     * @param variables
+     *
+     * @param authUser String
+     * @param domain String
+     * @param processId String
+     * @param variables JSONObject
      * @return {@link HttpResponse}
      * @throws PublicApiException
      */
@@ -246,11 +240,11 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Update process variable for a particular processId and variableName.
      * 
-     * @param authUser
-     * @param domain
-     * @param processId
-     * @param variableName
-     * @param variable
+     * @param authUser String
+     * @param domain String
+     * @param processId String
+     * @param variableName String
+     * @param variable JSONObject
      * @return {@link JSONObject}
      * @throws PublicApiException
      */
@@ -265,12 +259,11 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Update process variable for a particular processId
      * 
-     * @param authUser
-     * @param domain
-     * @param processId
-     * @param variableName
-     * @param variableArray
-     * @param variable
+     * @param authUser String
+     * @param domain String
+     * @param processId String
+     * @param variableName String
+     * @param variable JSONObject
      * @return {@link JSONObject}
      * @throws PublicApiException
      */
@@ -307,9 +300,9 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Delete process for a particular processId.
      * 
-     * @param authUser
-     * @param domain
-     * @param processId
+     * @param authUser String
+     * @param domain String
+     * @param processId String
      * @return {@link JSONObject}
      * @throws PublicApiException
      */
@@ -324,10 +317,10 @@ public class ProcessesAPI extends PublicAPIAbstract
     /**
      * Delete process item for a particular processId.
      * 
-     * @param authUser
-     * @param domain
-     * @param processId
-     * @param itemId
+     * @param authUser String
+     * @param domain String
+     * @param processId String
+     * @param itemId String
      * @return {@link JSONObject}
      * @throws PublicApiException
      */

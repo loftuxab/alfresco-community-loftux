@@ -101,7 +101,7 @@ public class CannedQueryParameters
      * @param parameterBean         the values that the query will be based on or <tt>null</tt>
      *                              if not relevant to the query
      * @param sortDetails           the type of sorting to be applied or <tt>null</tt> for none
-     * @param pageRequest           the type of paging to be applied or <tt>null</tt> for none
+     * @param pagingRequest           the type of paging to be applied or <tt>null</tt> for none
      */
     public CannedQueryParameters(
             Object parameterBean,

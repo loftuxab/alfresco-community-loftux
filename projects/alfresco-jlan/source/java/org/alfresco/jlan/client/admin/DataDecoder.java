@@ -37,7 +37,7 @@ final class DataDecoder {
 	 * @param buf Byte array containing the data to be unpacked
 	 * @param off Offset within the buffer that the data begins
 	 * @param desc Data descriptor string
-	 * @param vec Vector to store the decoded objects into
+	 * @param objs Vector to store the decoded objects into
 	 * @param conv Converter used to locate strings within a data block.
 	 * @return Offset within the data buffer at the end of this data block
 	 */

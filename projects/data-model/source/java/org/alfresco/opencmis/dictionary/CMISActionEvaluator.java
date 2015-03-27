@@ -32,7 +32,7 @@ public interface CMISActionEvaluator
     /**
      * Determines if an action is allowed on an object
      * 
-     * @param object
+     * @param nodeInfo
      * @return
      */
     public boolean isAllowed(CMISNodeInfo nodeInfo);

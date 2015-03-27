@@ -196,7 +196,7 @@ public class CMISMapping implements InitializingBean
     }
 
     /**
-     * @param dictionary service
+     * @param dictionaryService dictionaryService
      */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -204,7 +204,7 @@ public class CMISMapping implements InitializingBean
     }
 
     /**
-     * @param namespace service
+     * @param namespaceService service
      */
     public void setNamespaceService(NamespaceService namespaceService)
     {
@@ -478,7 +478,6 @@ public class CMISMapping implements InitializingBean
     /**
      * Is this a valid CMIS secondary type?
      * 
-     * @param dictionaryService
      * @param typeQName
      * @return
      */
@@ -519,7 +518,6 @@ public class CMISMapping implements InitializingBean
     /**
      * Is this a valid CMIS policy type?
      * 
-     * @param dictionaryService
      * @param typeQName
      * @return
      */
@@ -566,7 +564,6 @@ public class CMISMapping implements InitializingBean
      * Is an association valid in CMIS? It must be a non-child relationship and
      * the source and target must both be valid CMIS types.
      * 
-     * @param dictionaryService
      * @param associationQName
      * @return
      */
@@ -629,7 +626,6 @@ public class CMISMapping implements InitializingBean
     /**
      * Is this a valid CMIS item type?
      * 
-     * @param dictionaryService
      * @param typeQName
      * @return
      */
@@ -729,8 +725,7 @@ public class CMISMapping implements InitializingBean
     /**
      * Get the CMIS property type for a property
      * 
-     * @param dictionaryService
-     * @param propertyQName
+     * @param datatype
      * @return
      */
     public PropertyType getDataType(DataTypeDefinition datatype)
@@ -749,7 +744,6 @@ public class CMISMapping implements InitializingBean
     }
 
     /**
-     * @param namespaceService
      * @param propertyQName
      * @return
      */

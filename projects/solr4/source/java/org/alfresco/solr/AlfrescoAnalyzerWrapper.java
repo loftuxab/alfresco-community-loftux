@@ -37,7 +37,7 @@ public class AlfrescoAnalyzerWrapper extends AnalyzerWrapper
     IndexSchema schema;
     
     /**
-     * @param reuseStrategy
+     * @param schema
      */
     public AlfrescoAnalyzerWrapper(IndexSchema schema)
     {

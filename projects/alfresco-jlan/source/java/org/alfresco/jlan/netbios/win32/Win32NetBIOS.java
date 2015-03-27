@@ -775,7 +775,7 @@ public class Win32NetBIOS {
 	 * 
 	 * @param sockPtr int
 	 * @return int
-	 * @throws winsockNetBIOSException
+	 * @throws WinsockNetBIOSException
 	 */
 	public static native int getSocketReceiveBufferSize( int sockPtr)
 		throws WinsockNetBIOSException;
@@ -795,7 +795,7 @@ public class Win32NetBIOS {
 	 * 
 	 * @param sockPtr int
 	 * @return int
-	 * @throws winsockNetBIOSException
+	 * @throws WinsockNetBIOSException
 	 */
 	public static native int getSocketSendBufferSize( int sockPtr)
 		throws WinsockNetBIOSException;

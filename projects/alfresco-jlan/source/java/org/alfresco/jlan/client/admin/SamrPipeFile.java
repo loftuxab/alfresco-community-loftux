@@ -1014,7 +1014,7 @@ public class SamrPipeFile extends IPCPipeFile {
 	/**
 	 * Open a user and return the policy handle required to perform other functions on the user
 	 * 
-	 * @param handle domHandle PolicyHandle
+	 * @param domHandle domHandle PolicyHandle
 	 * @param rid RID
 	 * @return PolicyHandle
 	 * @throws IOException
@@ -1031,8 +1031,8 @@ public class SamrPipeFile extends IPCPipeFile {
 	/**
 	 * Open a user and return the policy handle required to perform other functions on the user
 	 * 
-	 * @param domHandle PolicyHandle
-	 * @param rid int
+	 * @param domain String
+	 * @param userName String
 	 * @return PolicyHandle
 	 * @throws IOException
 	 * @throws SMBException
@@ -1068,7 +1068,7 @@ public class SamrPipeFile extends IPCPipeFile {
 	/**
 	 * Open a user and return the policy handle required to perform other functions on the user
 	 * 
-	 * @param handle domHandle PolicyHandle
+	 * @param domHandle domHandle PolicyHandle
 	 * @param rid int
 	 * @return PolicyHandle
 	 * @throws IOException
@@ -1251,7 +1251,6 @@ public class SamrPipeFile extends IPCPipeFile {
 	 * @return RIDList
 	 * @throws IOException
 	 * @throws SMBException
-	 * @throws SaveException
 	 */
 	public final RIDList getAliasesForUser(String domain, String userName)
 		throws IOException, SMBException {

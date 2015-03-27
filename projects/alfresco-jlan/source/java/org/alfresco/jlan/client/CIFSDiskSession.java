@@ -1269,7 +1269,7 @@ public final class CIFSDiskSession extends DiskSession {
 	/**
 	 * Cancel an outstanding request. Used to cancel change notifications.
 	 * 
-	 * @param req AsynchRequest
+	 * @param areq AsynchRequest
 	 * @exception IOException
 	 * @exception SMBException If an SMB level error occurs
 	 */

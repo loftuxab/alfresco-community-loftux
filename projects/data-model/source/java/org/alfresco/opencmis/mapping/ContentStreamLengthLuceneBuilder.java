@@ -38,7 +38,7 @@ public class ContentStreamLengthLuceneBuilder extends AbstractSimpleLuceneBuilde
     /**
      * Construct
      * 
-     * @param serviceRegistry
+     * @param dictionaryService
      */
     public ContentStreamLengthLuceneBuilder(DictionaryService dictionaryService)
     {
