@@ -622,7 +622,7 @@ public abstract class AbstractWQS implements AlfrescoTests
     public void waitForWcmqsToLoad()
     {
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        RenderTime timer = new RenderTime(9000);
+        RenderTime timer = new RenderTime(240000);
         try
         {
             while (true)

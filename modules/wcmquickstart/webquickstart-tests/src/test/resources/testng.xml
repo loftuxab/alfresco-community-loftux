@@ -14,11 +14,11 @@
         </run>
     </groups>
 
-   <test name="BlogWQS">
+<!--   <test name="BlogWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web.blog"/>
         </packages>
-    </test>
+    </test>-->
     <test name="ContactWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web.contact"/>
@@ -27,6 +27,11 @@
     <test name="NewsWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web.news"/>
+        </packages>
+    </test>
+    <test name="Share WQS">
+        <packages>
+            <package name="org.alfresco.test.wqs.share"/>
         </packages>
     </test>
     <test name="PublicationsWQS">
@@ -47,11 +52,6 @@
     <test name="MainWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web"/>
-        </packages>
-    </test>
-    <test name="Share WQS">
-        <packages>
-            <package name="org.alfresco.test.wqs.share"/>
         </packages>
     </test>
 

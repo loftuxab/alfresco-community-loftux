@@ -19,11 +19,13 @@ import org.alfresco.po.share.ShareUtil;
 import org.alfresco.po.share.dashlet.SiteWebQuickStartDashlet;
 import org.alfresco.po.share.dashlet.WebQuickStartOptions;
 import org.alfresco.po.share.enums.Dashlets;
+import org.alfresco.po.share.enums.DataLists;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.CustomizeSitePage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.SitePageType;
 import org.alfresco.po.share.site.datalist.DataListPage;
+import org.alfresco.po.share.site.datalist.NewListForm;
 import org.alfresco.po.share.site.datalist.items.VisitorFeedbackRow;
 import org.alfresco.po.share.site.datalist.items.VisitorFeedbackRowProperties;
 import org.alfresco.po.share.site.datalist.lists.VisitorFeedbackList;
@@ -121,7 +123,11 @@ public class BlogComponent extends AbstractWQS
         CustomizeSitePage customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite().render();
         List<SitePageType> addPageTypes = new ArrayList<SitePageType>();
         addPageTypes.add(SitePageType.DATA_LISTS);
-        customizeSitePage.addPages(addPageTypes).render();
+        SiteDashboardPage siteDashboardPage1 = customizeSitePage.addPages(addPageTypes).render();
+        NewListForm dataListPage = siteDashboardPage1.getSiteNav().selectDataListPage().render();
+        dataListPage.selectListType(DataLists.VISITOR_LIST);
+        dataListPage.inputTitleField("Visitor Feedback List");
+        dataListPage.clickSave().render();
 
         // Site Dashboard is rendered with Data List link
         siteActions.openSiteDashboard(drone, siteName).render();
