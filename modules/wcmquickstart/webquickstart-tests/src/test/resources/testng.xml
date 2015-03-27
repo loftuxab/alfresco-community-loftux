@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="WQS Tests" verbose="6" preserve-order="true" parallel="classes" thread-count="1">
+<suite name="WQS Tests" verbose="6" preserve-order="true" >
     <groups>
         <run>
 
@@ -13,23 +13,8 @@
             <exclude name="download"/>
         </run>
     </groups>
-    <test name="AweWQS">
-        <packages>
-            <package name="org.alfresco.test.wqs.web.awe"/>
-        </packages>
-    </test>
-    <test name="Share WQS">
-        <packages>
-            <package name="org.alfresco.test.wqs.share"/>
-        </packages>
-    </test>
-    <test name="MainWQS">
-        <packages>
-            <package name="org.alfresco.test.wqs.web"/>
-        </packages>
-    </test>
 
-    <test name="BlogWQS">
+   <test name="BlogWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web.blog"/>
         </packages>
@@ -52,6 +37,21 @@
     <test name="SearchWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web.search"/>
+        </packages>
+    </test>
+    <test name="AweWQS">
+        <packages>
+            <package name="org.alfresco.test.wqs.web.awe"/>
+        </packages>
+    </test>
+    <test name="MainWQS">
+        <packages>
+            <package name="org.alfresco.test.wqs.web"/>
+        </packages>
+    </test>
+    <test name="Share WQS">
+        <packages>
+            <package name="org.alfresco.test.wqs.share"/>
         </packages>
     </test>
 

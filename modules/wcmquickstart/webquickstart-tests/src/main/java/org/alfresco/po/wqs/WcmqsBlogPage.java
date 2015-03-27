@@ -207,7 +207,7 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
      *
      * @param title - Blog post title
      */
-    public void openBlogPost(String title)
+    public HtmlPage openBlogPost(String title)
     {
         WebDroneUtil.checkMandotaryParam("title", title);
         try
@@ -218,6 +218,7 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
         {
             throw new PageOperationException("Exceeded time to find blog post. " + e.toString());
         }
+        return FactoryWqsPage.resolveWqsPage(drone).render();
     }
 
     /**

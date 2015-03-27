@@ -136,7 +136,10 @@ public class EditingItemsTests extends AbstractWQS
         // Open "Ethical funds" blog post;
         // ---- Expected results ----
         // Blog post is opened;
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
+
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
         Assert.assertTrue(blogPostPage.getTitle().contains(blogName), "Blog :" + blogName + " was not found.");
 
         // ---- Step 3 ----
@@ -218,7 +221,10 @@ public class EditingItemsTests extends AbstractWQS
         // Open "Ethical funds" blog post;
         // ---- Expected results ----
         // Blog post is opened;
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
         Assert.assertTrue(blogPostPage.getTitle().contains(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP), "Blog :" + WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP
                 + " was not found.");
 
@@ -301,7 +307,10 @@ public class EditingItemsTests extends AbstractWQS
         // Open "Ethical funds" blog post;
         // ---- Expected results ----
         // Blog post is opened;
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
         Assert.assertTrue(blogPostPage.getTitle().contains(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS), "Blog :" + WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS
                 + " was not found.");
 

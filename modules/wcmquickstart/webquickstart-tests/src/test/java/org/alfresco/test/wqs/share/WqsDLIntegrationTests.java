@@ -13,6 +13,7 @@ import org.alfresco.po.share.site.datalist.items.VisitorFeedbackRow;
 import org.alfresco.po.share.site.datalist.lists.VisitorFeedbackList;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.wqs.*;
+import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
 import org.apache.log4j.Logger;
@@ -69,6 +70,7 @@ public class WqsDLIntegrationTests extends AbstractWQS
         addPageTypes.add(SitePageType.DATA_LISTS);
         customizeSitePage.addPages(addPageTypes).render();
 
+
         // Site Dashboard is rendered with Data List link
         siteActions.openSiteDashboard(drone, siteName).render();
 
@@ -100,8 +102,9 @@ public class WqsDLIntegrationTests extends AbstractWQS
     /**
      * AONE-5593:Verify correct displaying of comments in Share Data lists
      */
-    @Test(groups = {"WQSShare", "EnterpriseOnly"})
-    public void AONE_5593() throws Exception
+    @AlfrescoTest(testlink="AONE-5593")
+    @Test(groups = "WQS")
+    public void verifyCommentsShareDataLists() throws Exception
     {
         String visitorName = "name " + getTestName().replace("_", "");
         String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
@@ -166,7 +169,7 @@ public class WqsDLIntegrationTests extends AbstractWQS
         // Recently created comment for blog is present in data list;
         VisitorFeedbackList feedbackList = new VisitorFeedbackList(drone);
         feedbackList.render();
-        VisitorFeedbackRow newFeedback = feedbackList.getRowForSpecificValues(visitorEmail, visitorComment, visitorName, visitorWebsite);
+        VisitorFeedbackRow newFeedback = feedbackList.getRowForSpecificValues(visitorEmail, visitorComment, visitorName, visitorWebsite).render();
         Assert.assertEquals(newFeedback.getVisitorComment(), visitorComment, "Recently created comment for blog is not present in data list");
         Assert.assertEquals(newFeedback.getRelevantAsset(), blogName, "Blog file name is not present in data list");
 
@@ -176,8 +179,9 @@ public class WqsDLIntegrationTests extends AbstractWQS
     /**
      * AONE-5594:Verify correct work of report post function
      */
-    @Test(groups = {"WQSShare", "EnterpriseOnly"})
-    public void AONE_5594() throws Exception
+    @AlfrescoTest(testlink="AONE-5594")
+    @Test(groups = "WQS")
+    public void verifyReportPostFunction() throws Exception
     {
         String visitorName = "name " + getTestName().replace("_", "");
         String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
@@ -244,7 +248,7 @@ public class WqsDLIntegrationTests extends AbstractWQS
         // "Comment has been flagged" contains "false" value;
         VisitorFeedbackList feedbackList = new VisitorFeedbackList(drone);
         feedbackList.render();
-        VisitorFeedbackRow newFeedback = feedbackList.getRowForSpecificValues(visitorEmail, visitorComment, visitorName, visitorWebsite);
+        VisitorFeedbackRow newFeedback = feedbackList.getRowForSpecificValues(visitorEmail, visitorComment, visitorName, visitorWebsite).render();
         Assert.assertEquals(newFeedback.getCommnetFlag(), "false", "Comment has been flagged field is " + newFeedback.getCommnetFlag());
 
         ShareUtil.logout(drone);
