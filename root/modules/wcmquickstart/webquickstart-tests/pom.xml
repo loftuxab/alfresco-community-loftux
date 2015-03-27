@@ -222,7 +222,7 @@
                                         <chmod file="target/alf-installer.bin" perm="a+x" verbose="true"/>
                                         <echo>Installing Alfresco...</echo>
                                         <exec dir="target" executable="${basedir}/target/alf-installer.bin" failonerror="true">
-                                            <arg line="--mode unattended --alfresco_admin_password admin --disable-components postgres --jdbc_username alfresco --jdbc_password alfresco --prefix ${basedir}/target/alf-installation"/>
+                                            <arg line="--mode unattended --alfresco_admin_password admin --disable-components postgres --enable-components alfrescowcmqs --jdbc_username alfresco --jdbc_password alfresco --prefix ${basedir}/target/alf-installation"/>
                                         </exec>
                                     </target>
                                 </configuration>
