@@ -290,8 +290,6 @@ public class HazelCastClusterFileState extends ClusterFileState {
 	
 	/**
 	 * Set the time the state was added to the near-cache
-	 * 
-	 * @return long
 	 */
 	public final void setNearCacheTime() {
 		m_nearCacheTime = System.currentTimeMillis();

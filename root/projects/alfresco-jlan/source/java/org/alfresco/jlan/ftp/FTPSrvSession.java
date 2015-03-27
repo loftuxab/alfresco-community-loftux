@@ -3925,7 +3925,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
     /**
      * Process a clear command channel command
      * 
-     * @param req FTPRequest
+     * @param ftpReq FTPRequest
      * @exception IOException
      */
     protected final void procClearCommandChannel( FTPRequest ftpReq)

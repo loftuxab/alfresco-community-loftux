@@ -423,10 +423,8 @@ public class HttpClientFactory
         /**
          * For testing purposes.
          * 
-         * @param solrResourceLoader
-         * @param alfrescoHost
-         * @param alfrescoPort
-         * @param encryptionParameters
+         * @param httpClient
+         * @param encryptionService
          */
         public SecureHttpClient(HttpClient httpClient, EncryptionService encryptionService)
         {

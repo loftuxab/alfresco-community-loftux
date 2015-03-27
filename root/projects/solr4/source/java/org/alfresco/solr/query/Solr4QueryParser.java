@@ -4798,9 +4798,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
     
     /**
      * @param first
-     * @param booleanQuery
      * @param field
-     * @param firstQuery
+     * @return SpanOrQuery
      * @throws IOException
      */
     private SpanOrQuery buildSpanOrQuery(String first, FieldInstance field) throws IOException

@@ -54,20 +54,20 @@ public class SolrPathQuery extends Query
 
     private List<StructuredFieldPosition> pathStructuredFieldPositions = new ArrayList<StructuredFieldPosition>();
 
-    private DictionaryService dictionarySertvice;
+    private DictionaryService dictionaryService;
 
     private boolean repeats = false;
 
     /**
      * The base query
      * 
-     * @param query
+     * @param dictionaryService DictionaryService
      */
 
-    public SolrPathQuery(DictionaryService dictionarySertvice)
+    public SolrPathQuery(DictionaryService dictionaryService)
     {
         super();
-        this.dictionarySertvice = dictionarySertvice;
+        this.dictionaryService = dictionaryService;
     }
 
     public void setQuery(List<StructuredFieldPosition> path)
@@ -261,7 +261,7 @@ public class SolrPathQuery extends Query
         @Override
         public Scorer scorer(AtomicReaderContext context, Bits acceptDocs) throws IOException
         {
-            return SolrPathScorer.createPathScorer(SolrPathQuery.this, context, acceptDocs, this, dictionarySertvice, repeats);
+            return SolrPathScorer.createPathScorer(SolrPathQuery.this, context, acceptDocs, this, dictionaryService, repeats);
         }
     }
 

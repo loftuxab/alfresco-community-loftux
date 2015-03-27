@@ -67,8 +67,8 @@ public class LuceneAnalyser extends AbstractAnalyzer
     /**
      * Constructs with a default standard analyser
      * 
-     * @param defaultAnalyzer
-     *            Any fields not specifically defined to use a different analyzer will use the one provided here.
+     * @param dictionaryService DictionaryService
+     * @param mlAlaysisMode MLAnalysisMode
      */
     public LuceneAnalyser(DictionaryService dictionaryService, MLAnalysisMode mlAlaysisMode)
     {
@@ -349,7 +349,7 @@ public class LuceneAnalyser extends AbstractAnalyzer
     /**
      * Find an instantiate an analyser. The shuld all be thread sade as Analyser.tokenStream should be re-entrant.
      * 
-     * @param dataType
+     * @param propertyDef
      * @return
      */
     private Analyzer loadAnalyzer( PropertyDefinition propertyDef )

@@ -58,7 +58,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 
 /**
- * Extends the MyBatis-Spring support by allowing a choice of {@link ResourceLoader}. The
+ * Extends the MyBatis-Spring support by allowing a choice of {@link org.springframework.core.io.ResourceLoader}. The
  * {@link #setResourceLoader(HierarchicalResourceLoader) ResourceLoader} will be used to load the <b>SqlMapConfig</b>
  * file and use a {@link HierarchicalXMLConfigBuilder} to read the individual MyBatis (3.x) resources.
  * <p/>

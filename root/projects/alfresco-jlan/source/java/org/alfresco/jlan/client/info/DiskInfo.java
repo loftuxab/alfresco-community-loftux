@@ -27,7 +27,7 @@ import org.alfresco.jlan.smb.PCShare;
  *  <p>The DiskInfo class contains the details of a remote disk share. This
  *  class is returned by the DiskSession.getDiskInformation () method.
  * 
- * @see DiskSession
+ * @see org.alfresco.jlan.client.DiskSession
  * 
  * @author gkspencer
  */

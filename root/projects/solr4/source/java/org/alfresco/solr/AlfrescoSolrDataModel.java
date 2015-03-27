@@ -173,9 +173,6 @@ public class AlfrescoSolrDataModel implements QueryConstants
     private HashMap<String, Set<String>> modelErrors = new HashMap<String, Set<String>>();
 
     
-    /**
-     * @param id
-     */
     public AlfrescoSolrDataModel()
     {
         tenantService = new SingleTServiceImpl();
@@ -242,7 +239,6 @@ public class AlfrescoSolrDataModel implements QueryConstants
     
     /**
      * 
-     * @param tenant
      * @param aclChangeSetId
      * @return <TENANT>:CHANGE_SET:<aclChangeSetId <- max in doc if compressed>
      */
@@ -316,7 +312,6 @@ public class AlfrescoSolrDataModel implements QueryConstants
     
     /**
      * 
-     * @param tenant
      * @param txId
      * @return <TENANT>:CHANGE_SET:<txId <- max in doc if compressed>
      */
@@ -346,10 +341,6 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
     
     
-    /**
-     * @param id
-     * @return
-     */
     public static AlfrescoSolrDataModel getInstance()
     {
         readWriteLock.readLock().lock();
@@ -390,7 +381,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
     
     /**
      * TODO: Fix to load type filter/exclusions from somewhere sensible
-     * @return
+     * @return QNameFilter
      */
     private QNameFilter getQNameFilter()
     {
@@ -435,7 +426,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
     
     /**
-     * @return
+     * @return ClassLoader
      */
     public ClassLoader getResourceClassLoader()
     {
@@ -767,8 +758,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
     /**
      * Get all the field names into which we must copy the source data
      * 
-     * @param propertyQName
-     * @return
+     * @param propertyQName QName
+     * @return IndexedField
      */
     public IndexedField getIndexedFieldNamesForProperty(QName propertyQName)
     {
@@ -850,8 +841,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
 
     /**
-     * @param propertyDefinition
-     * @return
+     * @param propertyQName QName
+     * @return boolean
      */
     private boolean isIdentifierTextProperty(QName propertyQName)
     {
@@ -937,8 +928,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
     
     /**
-     * @param dataType
-     * @return
+     * @param dataType DataTypeDefinition
+     * @return boolean
      */
     private boolean isPrimitive(DataTypeDefinition dataType)
     {
@@ -1081,8 +1072,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
     
 
     /**
-     * @param propertyQName
-     * @return
+     * @param propertyQName QName
+     * @return PropertyDefinition
      */
     public PropertyDefinition getPropertyDefinition(QName propertyQName)
     {
@@ -1163,7 +1154,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
     
     
     /**
-     * @param model
+     * @param model M2Model
+     * @return boolean
      */
     public boolean putModel(M2Model model)
     {
@@ -1584,7 +1576,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
 
     /**
-     * @param schema
+     * @param alfrescoFieldType AlfrescoFieldType
      */
     public void setAlfrescoFieldType(AlfrescoFieldType alfrescoFieldType)
     {
@@ -1592,7 +1584,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
 
     /**
-     * @return
+     *
+     * @return List<AlfrescoModel>
      */
     public List<AlfrescoModel> getAlfrescoModels()
     {
@@ -1608,7 +1601,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
 
     /**
-     * @return
+     * @return Map<String, Set<String>>
      */
     public Map<String, Set<String>> getModelErrors()
     {
@@ -1952,9 +1945,9 @@ public class AlfrescoSolrDataModel implements QueryConstants
         boolean sort;
         
         /**
-         * @param prefix
-         * @param localised2
-         * @param sort2
+         * @param field String
+         * @param localised boolean
+         * @param sort boolean
          */
         public FieldInstance(String field, boolean localised, boolean sort)
         {
@@ -1980,14 +1973,15 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
 
     /**
-     * @param cmsWithAlfrescoExtensions
-     * @param searchParametersAndFilter
-     * @param req
-     * @param queryModelQuery
-     * @param cmisVersion
-     * @param altDic
-     * @return
-     * @throws Exception 
+     *
+     * @param mode CMISQueryMode
+     * @param searchParametersAndFilter Pair<SearchParameters, Boolean>
+     * @param req SolrQueryRequest
+     * @param queryModelQuery Query
+     * @param cmisVersion CmisVersion
+     * @param alternativeDictionary String
+     * @return Query
+     * @throws ParseException
      */
      public Query getCMISQuery(CMISQueryMode mode, Pair<SearchParameters, Boolean> searchParametersAndFilter, SolrQueryRequest req, org.alfresco.repo.search.impl.querymodel.Query queryModelQuery, CmisVersion cmisVersion, String alternativeDictionary) throws ParseException
     {
@@ -2045,10 +2039,10 @@ public class AlfrescoSolrDataModel implements QueryConstants
      }
 
     /**
-     * @param searchParametersAndFilter
-     * @param req
-     * @return
-     * @throws SyntaxError 
+     * @param searchParametersAndFilter Pair<SearchParameters, Boolean>
+     * @param req SolrQueryRequest
+     * @return Query
+     * @throws ParseException
      */
      public Query getFTSQuery(Pair<SearchParameters, Boolean> searchParametersAndFilter, SolrQueryRequest req) throws ParseException
      {
@@ -2104,12 +2098,13 @@ public class AlfrescoSolrDataModel implements QueryConstants
          return contextAwareQuery;
      }
      
-     /**
-      * @param builder
-      * @param propertyBuilder
-      * @param c
-      * @return
-      */
+    /**
+     *
+     * @param potentialProperty String
+     * @param fieldUse FieldUse
+     * @param req SolrQueryRequest
+     * @return String
+     */
      public String  mapProperty(String  potentialProperty,  FieldUse fieldUse, SolrQueryRequest req)
      {
          if(potentialProperty.equals("asc") || potentialProperty.equals("desc") || potentialProperty.equals("_docid_"))
@@ -2157,8 +2152,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
        
      }
      /**
-      * @param luceneField
-      * @return
+      * @param queryField String
+      * @return String
       */
      public String mapNonPropertyFields(String queryField)
      {
@@ -2175,9 +2170,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
      }
 
      /**
-      * @param second
-      * @param sort
-      * @return
+      * @param ending String
+      * @return ContentFieldType
       */
      public ContentFieldType getTextField(String ending)
      {

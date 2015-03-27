@@ -443,8 +443,8 @@ public class StandaloneFileStateCache extends FileStateCache {
 	/**
 	 * Request an oplock break
 	 * 
-	 * @param clNode ClusterNode
-	 * @param clState ClusterFileState
+	 * @param path String
+	 * @param oplock OpLockDetails
 	 * @exception IOException
 	 */
 	public void requestOplockBreak( String path, OpLockDetails oplock)

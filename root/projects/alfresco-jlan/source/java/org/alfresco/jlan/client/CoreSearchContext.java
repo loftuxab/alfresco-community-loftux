@@ -57,8 +57,6 @@ class CoreSearchContext extends SearchContext {
 	 * Construct an SMB search context on the specified disk session.
 	 * 
 	 * @param sess Disk session that this search is associated with.
-	 * @param dir Directory/file name string, which may contain wildcards.
-	 * @param attr File attributes bit mask.
 	 */
 	protected CoreSearchContext(DiskSession sess) {
 		super(sess);

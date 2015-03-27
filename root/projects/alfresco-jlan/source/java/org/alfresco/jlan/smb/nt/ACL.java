@@ -283,7 +283,6 @@ public class ACL {
 	 * Save the access control list to the specified buffer
 	 * 
 	 * @param buf DataBuffer
-	 * @param off int
 	 * @return int
 	 * @exception SaveException
 	 */

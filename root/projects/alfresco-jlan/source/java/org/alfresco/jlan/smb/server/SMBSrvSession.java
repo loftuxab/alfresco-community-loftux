@@ -2262,7 +2262,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	/**
 	 * Set the hostname the client used to mount a network drive
 	 * 
-	 * @param inProgress boolean
+	 * @param hostName String
 	 */
 	public void setShareHostName(String hostName) {
 		m_shareHostName = hostName;
@@ -2270,8 +2270,6 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 
 	/**
 	 * Get the hostname the client used to mount a network drive
-	 * 
-	 * @param inProgress boolean
 	 */
 	public String getShareHostName() {
 		return m_shareHostName;

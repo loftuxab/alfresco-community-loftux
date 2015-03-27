@@ -40,7 +40,7 @@ public interface LuceneQueryBuilder <Q, S, E extends Throwable>
      * @param luceneContext
      * @param functionContext
      * @return - the query
-     * @throws ParseException
+     * @throws java.text.ParseException
      */
     public Q buildQuery(Set<String> selectors,  LuceneQueryBuilderContext<Q, S, E> luceneContext, FunctionEvaluationContext functionContext) throws E;
 

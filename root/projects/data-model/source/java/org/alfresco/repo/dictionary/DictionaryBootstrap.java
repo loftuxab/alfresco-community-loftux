@@ -89,7 +89,7 @@ public class DictionaryBootstrap implements DictionaryListener
     /**
      * Sets the initial list of models to bootstrap with
      * 
-     * @param modelResources the model names
+     * @param labels the labels
      */
     public void setLabels(List<String> labels)
     {

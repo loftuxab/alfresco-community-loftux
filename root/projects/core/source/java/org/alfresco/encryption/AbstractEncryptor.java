@@ -162,7 +162,7 @@ public abstract class AbstractEncryptor implements Encryptor
     /**
      * {@inheritDoc}
      * <p/>
-     * Serializes and {@link #encrypt(byte[]) encrypts} the input data.
+     * Serializes and {@link #encrypt(String, AlgorithmParameters, byte[]) encrypts} the input data.
      */
     @Override
     public Pair<byte[], AlgorithmParameters> encryptObject(String keyAlias, AlgorithmParameters params, Object input)
@@ -184,7 +184,7 @@ public abstract class AbstractEncryptor implements Encryptor
     /**
      * {@inheritDoc}
      * <p/>
-     * {@link #decrypt(byte[]) Decrypts} and deserializes the input data
+     * {@link #decrypt(String, AlgorithmParameters, byte[]) Decrypts} and deserializes the input data
      */
     @Override
     public Object decryptObject(String keyAlias, AlgorithmParameters params, byte[] input)

@@ -98,7 +98,7 @@ public class AsyncWinsockCIFSWriteRequest implements ThreadRequest {
 	/**
 	 * Return the CIFS request details as a string
 	 * 
-	 * @reurun String
+	 * @return String
 	 */
 	public String toString() {
 		StringBuilder str = new StringBuilder();

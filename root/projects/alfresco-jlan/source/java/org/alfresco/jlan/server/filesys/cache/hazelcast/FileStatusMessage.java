@@ -50,7 +50,7 @@ public class FileStatusMessage extends ClusterMessage {
 	 * 
 	 * @param targetNode String
 	 * @param path String
-	 * @parma fileSts int
+	 * @param fileSts int
 	 */
 	public FileStatusMessage( String targetNode, String path, int fileSts) {
 		super ( targetNode, ClusterMessageType.FileStateUpdate);

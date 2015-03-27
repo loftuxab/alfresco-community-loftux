@@ -4991,7 +4991,6 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
      * @param booleanQuery
      * @param mlAnalysisMode
      * @param locale
-     * @param textFieldName
      * @throws ParseException
      */
     protected abstract void addTextAttributeQuery(String field, String queryText, SubQuery subQueryBuilder, AnalysisMode analysisMode, LuceneFunction luceneFunction,

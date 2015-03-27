@@ -52,7 +52,6 @@ public interface CharactersetFinder
      * The current state of the stream will be restored before the method returns.
      * 
      * @param is                an input stream that must support marking
-     * @param defaultCharset    the character set to use if nothing could be taken from the stream
      * @return                  Returns the encoding of the stream,
      *                          or <tt>null</tt> if encoding cannot be identified
      */

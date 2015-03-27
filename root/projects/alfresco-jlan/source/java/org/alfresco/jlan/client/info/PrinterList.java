@@ -52,7 +52,7 @@ public class PrinterList implements Serializable {
 	/**
 	 * Add a printer queue information object to the list.
 	 * 
-	 * @param srvinf PrintQueueInfo to add to the list.
+	 * @param prninf PrintQueueInfo to add to the list.
 	 */
 	public final void addPrinterInfo(PrintQueueInfo prninf) {
 		m_list.add(prninf);

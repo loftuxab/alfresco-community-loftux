@@ -586,7 +586,7 @@ class LanManProtocolHandler extends CoreProtocolHandler {
 	 * 
 	 * @param smbPkt SMBSrvPacket
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	protected final void procFindClose(SMBSrvPacket smbPkt)
 		throws java.io.IOException, SMBSrvException {
@@ -737,7 +737,7 @@ class LanManProtocolHandler extends CoreProtocolHandler {
 	/**
 	 * Process the logoff request.
 	 * 
-	 * @param outPkt SMBSrvPacket
+	 * @param smbPkt SMBSrvPacket
 	 * @exception IOException
 	 * @exception SMBSrvException
 	 */
@@ -2866,7 +2866,7 @@ class LanManProtocolHandler extends CoreProtocolHandler {
 	 * Process a transact2 file system query request.
 	 * 
 	 * @param tbuf Transaction request details
-	 * @param smbtPkt SMBSrvPacket
+	 * @param smbPkt SMBSrvPacket
 	 * @exception IOException
 	 * @exception SMBSrvException
 	 */
@@ -3655,7 +3655,7 @@ class LanManProtocolHandler extends CoreProtocolHandler {
 	 * @return boolean true if the packet was processed, else false
 	 * @exception IOException
 	 * @exception SMBSrvException
-	 * @exception tooManyConnectionsException
+	 * @exception TooManyConnectionsException
 	 */
 	public boolean runProtocol( SMBSrvPacket smbPkt)
 		throws IOException, SMBSrvException, TooManyConnectionsException {

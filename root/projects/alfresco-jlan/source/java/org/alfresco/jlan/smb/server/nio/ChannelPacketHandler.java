@@ -47,10 +47,11 @@ public abstract class ChannelPacketHandler extends PacketHandler {
 	/**
 	 * Class constructor
 	 * 
-	 * @param sock Socket
+	 * @param sockChannel SocketChannel
 	 * @param typ int
 	 * @param name String
-	 * @param shortName String 2param packetPool CIFSPacketPool
+	 * @param shortName String
+     * @param packetPool CIFSPacketPool
 	 * @exception IOException If a network error occurs
 	 */
 	public ChannelPacketHandler(SocketChannel sockChannel, int typ, String name, String shortName, CIFSPacketPool packetPool)

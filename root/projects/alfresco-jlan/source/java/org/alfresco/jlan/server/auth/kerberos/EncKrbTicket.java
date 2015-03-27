@@ -70,7 +70,7 @@ public class EncKrbTicket {
 	/**
 	 * Class constructor
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	public EncKrbTicket( byte[] blob)
@@ -142,7 +142,7 @@ public class EncKrbTicket {
 	/**
 	 * Parse an encrypted Kerberos ticket part
 	 * 
-	 * @param byte[] encPart
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	public void parseEncTicket( byte[] blob)

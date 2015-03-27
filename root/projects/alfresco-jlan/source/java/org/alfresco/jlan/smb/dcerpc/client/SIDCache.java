@@ -57,7 +57,7 @@ public class SIDCache {
 	/**
 	 * Add a SID to the cache
 	 * 
-	 * @param index String
+	 * @param name String
 	 * @param sid SID
 	 */
 	public final void addSID(String name, SID sid) {

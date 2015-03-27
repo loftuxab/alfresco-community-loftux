@@ -83,7 +83,7 @@ public interface SearchService
      *            the query language
      * @param query -
      *            the query string - which may include parameters
-     * @param queryParameterDefinition -
+     * @param queryParameterDefinitions -
      *            query parameter definitions - the default value is used for
      *            the value.
      * @return Returns the query results
@@ -152,7 +152,7 @@ public interface SearchService
      * @param followAllParentLinks -
      *            if false ".." follows only the primary parent links, if true
      *            it follows all
-     * @param langauage -
+     * @param language -
      *            the xpath variant
      * @return a list of all the node refs of the selected nodes
      */
@@ -202,7 +202,7 @@ public interface SearchService
      * @param followAllParentLinks -
      *            if false ".." follows only the primary parent links, if true
      *            it follows all
-     * @param langauage -
+     * @param language -
      *            the xpath variant
      * @return a list of property values
      */

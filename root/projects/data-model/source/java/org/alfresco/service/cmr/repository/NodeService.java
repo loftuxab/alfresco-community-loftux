@@ -71,7 +71,7 @@ public interface NodeService
      * may create the store in any number of locations, including a database or
      * Subversion.
      * 
-     * @param protocolthe implementation protocol
+     * @param protocol implementation protocol
      * @param identifier the protocol-specific identifier
      * @return Returns a reference to the store
      * @throws StoreExistsException
@@ -190,7 +190,7 @@ public interface NodeService
      * @param assocQName the qualified name of the new child association
      * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if either the parent node or move node reference is invalid
-     * @throws CyclicChildRelationshipException if the child partakes in a cyclic relationship after the add
+     * @throws org.alfresco.service.cmr.repository.CyclicChildRelationshipException if the child partakes in a cyclic relationship after the add
      * 
      * @see #getPrimaryParent(NodeRef)
      */
@@ -325,7 +325,7 @@ public interface NodeService
      * @param qname             the qualified name of the association
      * @return                  Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
-     * @throws CyclicChildRelationshipException if the child partakes in a cyclic relationship after the add
+     * @throws org.alfresco.service.cmr.repository.CyclicChildRelationshipException if the child partakes in a cyclic relationship after the add
      */
     @Auditable(parameters = {"parentRef", "childRef", "assocTypeQName", "qname"})
     public ChildAssociationRef addChild(
@@ -343,7 +343,7 @@ public interface NodeService
      * @param qname             the qualified name of the association
      * @return                  Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
-     * @throws CyclicChildRelationshipException if the child partakes in a cyclic relationship after the add
+     * @throws org.alfresco.service.cmr.repository.CyclicChildRelationshipException if the child partakes in a cyclic relationship after the add
      */
     @Auditable(parameters = {"parentRefs", "childRef", "assocTypeQName", "qname"})
     public List<ChildAssociationRef> addChild(
@@ -453,7 +453,7 @@ public interface NodeService
      * 
      * @param nodeRef   a reference to an existing node
      * @param qname the fully qualified name of the property
-     * @param propertyValue the value of the property - never null
+     * @param value the value of the property - never null
      * @throws InvalidNodeRefException if the node could not be found
      */
     @Auditable(parameters = {"nodeRef", "qname", "value"})
@@ -597,7 +597,7 @@ public interface NodeService
     /**
      * Retrieve immediate children of a given node where the child nodes are in the given inclusive list.
      * @param nodeRef           the parent node - usually a <b>container</b>
-     * @param childNodeTypes    the types that the children may be.  Subtypes are not automatically calculated
+     * @param childNodeTypeQNames    the types that the children may be.  Subtypes are not automatically calculated
      *                          and the list must therefore be exhaustive.
      * @return                  Returns a list of <code>ChildAssociationRef</code> instances.
      * @throws InvalidNodeRefException      if the node could not be found
@@ -742,7 +742,7 @@ public interface NodeService
     /**
      * Gets an association by ID.
      * 
-     * @param assocId
+     * @param id
      *            the association id
      * @return the association, or <code>null</code> if it does not exist
      */

@@ -161,7 +161,7 @@ public abstract class BaseApplicationContextHelper
     
     /**
      * Closes and releases the application context.  On the next call to
-     * {@link #getApplicationContext()}, a new context will be given.
+     * {@link #getApplicationContext(String[])} , a new context will be given.
      */
     public static synchronized void closeApplicationContext()
     {

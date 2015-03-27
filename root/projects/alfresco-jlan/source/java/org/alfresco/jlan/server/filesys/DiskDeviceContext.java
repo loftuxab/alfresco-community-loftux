@@ -375,7 +375,7 @@ public class DiskDeviceContext extends DeviceContext {
     /**
      * Set/clear the requires file state cache flag
      * 
-     * @boolean reqStateCache boolean
+     * @param reqStateCache boolean
      */
     public final void setRequiresStateCache( boolean reqStateCache) {
     	m_requireStateCache = reqStateCache;

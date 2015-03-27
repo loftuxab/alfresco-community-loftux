@@ -51,11 +51,6 @@ public class FTSFuzzyTerm extends BaseFunction
         
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public FTSFuzzyTerm()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, args);

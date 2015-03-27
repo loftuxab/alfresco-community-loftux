@@ -43,7 +43,6 @@ public class TagsAPI extends PublicAPIAbstract
      * 
      * @param authUser
      * @param domain
-     * @param nodeId
      * @param params
      * @return a {@link ListResponse} of {@link Tag}
      * @throws PublicApiException

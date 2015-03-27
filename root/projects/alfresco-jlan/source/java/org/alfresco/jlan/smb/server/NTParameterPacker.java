@@ -168,7 +168,7 @@ class NTParameterPacker {
 	 * Reset the parameter packer/reader to use the new buffer/offset
 	 * 
 	 * @param buf byte[]
-	 * @param off int
+	 * @param pos int
 	 */
 	public final void reset(byte[] buf, int pos) {
 		m_buf = buf;

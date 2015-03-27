@@ -126,7 +126,7 @@ public class ClusterMessage implements Serializable {
 	/**
 	 * Check if the from node is valid
 	 * 
-	 * @boolean
+	 * @return boolean
 	 */
 	public final boolean hasFromNode() {
 		return ( m_fromNode != null && m_fromNode.length() > 0) ? true : false;

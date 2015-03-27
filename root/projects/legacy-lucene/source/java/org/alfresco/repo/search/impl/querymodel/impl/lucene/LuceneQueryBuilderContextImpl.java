@@ -51,7 +51,7 @@ public class LuceneQueryBuilderContextImpl implements LuceneQueryBuilderContext<
      * @param namespacePrefixResolver
      * @param tenantService
      * @param searchParameters
-     * @param config
+     * @param defaultSearchMLAnalysisMode
      * @param indexReader
      */
     public LuceneQueryBuilderContextImpl(DictionaryService dictionaryService, NamespacePrefixResolver namespacePrefixResolver, TenantService tenantService,

@@ -53,7 +53,6 @@ public class NIOCIFSThreadRequest implements ThreadRequest {
 	 * 
 	 * @param sess SMBSrvSession
 	 * @param selKey SelectionKey
-	 * @param handler CIFSRequestHandler
 	 */
 	public NIOCIFSThreadRequest( SMBSrvSession sess, SelectionKey selKey) {
 		m_sess         = sess;
@@ -215,7 +214,7 @@ public class NIOCIFSThreadRequest implements ThreadRequest {
 	/**
 	 * Return the CIFS request details as a string
 	 * 
-	 * @reurun String
+	 * @return String
 	 */
 	public String toString() {
 		StringBuilder str = new StringBuilder();

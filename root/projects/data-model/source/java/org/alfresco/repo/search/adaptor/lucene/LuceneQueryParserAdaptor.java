@@ -40,22 +40,22 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
 {
 
     /**
-     * @param field
-     * @param queryText
-     * @param analysisMode
-     * @param luceneFunction
+     * @param field String
+     * @param queryText String
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
      * @return
      */
     Q getFieldQuery(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param field
-     * @param lower
-     * @param upper
-     * @param includeLower
-     * @param includeUpper
-     * @param analysisMode
-     * @param luceneFunction
+     * @param field String
+     * @param lower String
+     * @param upper String
+     * @param includeLower boolean
+     * @param includeUpper boolean
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
      * @return
      */
     Q getRangeQuery(String field, String lower, String upper, boolean includeLower, boolean includeUpper, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
@@ -78,9 +78,9 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     Q getMatchNoneQuery() throws E;
 
     /**
-     * @param field
-     * @param sqlLikeClause
-     * @param analysisMode
+     * @param field String
+     * @param sqlLikeClause String
+     * @param analysisMode AnalysisMode
      * @return
      */
     Q getLikeQuery(String field, String sqlLikeClause, AnalysisMode analysisMode) throws E;
@@ -91,7 +91,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     SearchParameters getSearchParameters();
 
     /**
-     * @param field
+     * @param field String
      * @return
      */
     String getSortField(String field) throws E;
@@ -99,10 +99,10 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     /**
      * Wrap generating a potentially complex id + version query
      * 
-     * @param field
-     * @param stringValue
-     * @param analysisMode
-     * @param luceneFunction
+     * @param field String
+     * @param stringValue String
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
      * @return
      */
     Q getIdentifierQuery(String field, String stringValue, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
@@ -110,41 +110,41 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     /**
      * Wrap generating a potentially complex id + version query
      * 
-     * @param field
-     * @param stringValue
-     * @param identifier
+     * @param field String
+     * @param stringValue String
+     * @param analysisMode AnalysisMode
      * @return
      */
     Q getIdentifieLikeQuery(String field, String stringValue, AnalysisMode analysisMode) throws E;
 
     /**
-     * @param noLocalField
+     * @param noLocalField String
      * @return
      */
     boolean sortFieldExists(String noLocalField);
 
     /**
-     * @param field
-     * @param value
+     * @param field String
+     * @param value String
      * @return
-     * @throws ParseException 
+     * @throws E
      */
     Q getFieldQuery(String field, String value) throws E;
 
     /**
-     * @param list 
-     * @param functionContext 
+     * @param list List
+     * @param functionContext FunctionEvaluationContext
      * @return
      * @throws E 
      */
     S buildSort(List<Ordering> list, FunctionEvaluationContext functionContext) throws E;
 
     /**
-     * @param luceneFieldName
-     * @param term
-     * @param minSimilarity
+     * @param luceneFieldName String
+     * @param term String
+     * @param minSimilarity Float
      * @return
-     * @throws ParseException 
+     * @throws E
      */
     Q getFuzzyQuery(String luceneFieldName, String term, Float minSimilarity) throws E;
 
@@ -163,37 +163,37 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     int getPhraseSlop();
 
     /**
-     * @param luceneFieldName
-     * @param term
-     * @param analysisMode
-     * @param slop
-     * @param luceneFunction
+     * @param luceneFieldName String
+     * @param term String
+     * @param analysisMode AnalysisMode
+     * @param slop Integer
+     * @param luceneFunction LuceneFunction
      * @return
      */
     Q getFieldQuery(String luceneFieldName, String term, AnalysisMode analysisMode, Integer slop, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param luceneFieldName
-     * @param term
-     * @param analysisMode
+     * @param luceneFieldName String
+     * @param term String
+     * @param analysisMode AnalysisMode
      * @return
      */
     Q getPrefixQuery(String luceneFieldName, String term, AnalysisMode analysisMode) throws E;
 
     /**
-     * @param luceneFieldName
-     * @param first
-     * @param last
-     * @param slop
-     * @param inOrder
+     * @param luceneFieldName String
+     * @param first String
+     * @param last String
+     * @param slop int
+     * @param inOrder boolean
      * @return
      */
     Q getSpanQuery(String luceneFieldName, String first, String last, int slop, boolean inOrder) throws E;
 
     /**
-     * @param luceneFieldName
-     * @param term
-     * @param mode
+     * @param luceneFieldName String
+     * @param term String
+     * @param mode AnalysisMode
      * @return
      */
     Q getWildcardQuery(String luceneFieldName, String term, AnalysisMode mode) throws E;
@@ -220,7 +220,8 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     Q getMatchAllNodesQuery();
 
     /**
-     * @param propertyDef
+     * @param field String
+     * @param propertyDef PropertyDefinition
      * @return
      */
     String getDatetimeSortField(String field, PropertyDefinition propertyDef); 

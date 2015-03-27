@@ -73,7 +73,7 @@ public class KrbAuthenticator {
 	/**
 	 * Class constructor
 	 * 
-	 * @param byte[] blob
+	 * @param blob byte[]
 	 * @exception IOException
 	 */
 	public KrbAuthenticator( byte[] blob)
@@ -144,7 +144,7 @@ public class KrbAuthenticator {
 	/**
 	 * Parse the ASN/1 encoded authenticator
 	 * 
-	 * @param byte[] auth
+	 * @param auth byte[]
 	 * @exception IOException
 	 */
 	public final void parseAuthenticator( byte[] auth)

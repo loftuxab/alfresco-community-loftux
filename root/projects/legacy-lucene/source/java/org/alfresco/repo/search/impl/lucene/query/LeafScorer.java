@@ -130,14 +130,13 @@ public class LeafScorer extends Scorer
      * @param level0
      * @param containerScorer
      * @param sfps
-     * @param allNodes
+     * @param followParentInLevel0
      * @param selfIds
      * @param reader
      * @param similarity
      * @param norms
      * @param dictionaryService
      * @param repeat
-     * @param tp
      */
     public LeafScorer(Weight weight, TermPositions root, TermPositions level0, ContainerScorer containerScorer, StructuredFieldPosition[] sfps, boolean followParentInLevel0,
             HashMap<String, Counter> selfIds, IndexReader reader, Similarity similarity, byte[] norms, DictionaryService dictionaryService, boolean repeat)

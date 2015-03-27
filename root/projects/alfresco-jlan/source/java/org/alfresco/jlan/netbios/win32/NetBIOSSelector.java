@@ -86,7 +86,7 @@ public class NetBIOSSelector {
 	 * @param ops int
 	 * @return NetBIOSSelectionKey
 	 * @exception IOException
-	 * @exception IllegalblockingModeException
+	 * @exception IllegalBlockingModeException
 	 */
 	protected final NetBIOSSelectionKey registerSocket(NetBIOSSocket socket, int ops)
 		throws IOException, IllegalBlockingModeException {

@@ -47,11 +47,6 @@ public class Score extends BaseFunction
         args.put(ARG_QUALIFIER, new BaseArgumentDefinition(Multiplicity.SINGLE_VALUED, ARG_QUALIFIER, DataTypeDefinition.ANY, true));
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public Score()
     {
         super(NAME, DataTypeDefinition.FLOAT, args);

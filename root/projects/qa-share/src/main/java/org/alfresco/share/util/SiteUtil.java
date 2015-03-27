@@ -236,8 +236,9 @@ public class SiteUtil extends AbstractUtils
     /***
      * Attempts to delete specified site(s) using share
      * 
+     * @param drone
      * @param loginUserName
-     * @param siteNames String site name
+     * @param siteNames Set<String> site names
      */
     public static void deleteSitesAsUser(WebDrone drone, String loginUserName, Set<String> siteNames)
     {
@@ -340,7 +341,7 @@ public class SiteUtil extends AbstractUtils
      * 
      * @param drone
      * @param siteName
-     * @return {@link SiteDashboardPage}
+     * @return {@link org.alfresco.po.share.site.SiteDashboardPage}
      */
     public static SiteDashboardPage openSiteFromSearch(WebDrone drone, String siteName)
     {
@@ -355,7 +356,7 @@ public class SiteUtil extends AbstractUtils
      * 
      * @param drone
      * @param siteShortURL
-     * @return {@link SiteDashboardPage}
+     * @return {@link org.alfresco.po.share.site.SiteDashboardPage}
      */
     public static SiteDashboardPage openSiteURL(WebDrone drone, String siteShortURL)
     {
@@ -398,7 +399,7 @@ public class SiteUtil extends AbstractUtils
      * 
      * @param drone
      * @param siteShortURL
-     * @return {@link DocumentLibraryPage}
+     * @return {@link org.alfresco.po.share.site.SiteDashboardPage}
      */
     public static DocumentLibraryPage openSiteDocumentLibraryURL(WebDrone drone, String siteShortURL)
     {

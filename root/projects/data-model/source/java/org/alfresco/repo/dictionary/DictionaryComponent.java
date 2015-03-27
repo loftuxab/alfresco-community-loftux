@@ -55,7 +55,7 @@ public class DictionaryComponent implements DictionaryService, TenantDeployer
     /**
      * Sets the Meta Model DAO
      * 
-     * @param metaModelDAO  meta model DAO
+     * @param dictionaryDAO  dictionary DAO
      */
     public void setDictionaryDAO(DictionaryDAO dictionaryDAO)
     {

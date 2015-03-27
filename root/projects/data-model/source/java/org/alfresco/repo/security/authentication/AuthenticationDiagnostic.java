@@ -72,7 +72,6 @@ public class AuthenticationDiagnostic implements Serializable
      * 
      * @param key
      * @param success
-     * @param args
      */
     public void addStep(String key, boolean success)
     {

@@ -102,7 +102,6 @@ public class CommentsAPI extends PublicAPIAbstract
      * @param authUser
      * @param domain
      * @param nodeId
-     * @param commentId
      * @param comment
      * @return {@link Comment}
      * @throws PublicApiException

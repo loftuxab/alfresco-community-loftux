@@ -616,7 +616,7 @@ public class ProcessesAPITests extends ProcessesAPI
 
     /**
      * @param siteName
-     * @param cloudUser
+     * @param assignee
      * @return {@link WorkFlowFormDetails}
      */
     public WorkFlowFormDetails createWorkFlowDetails(String siteName, String... assignee)

@@ -467,7 +467,7 @@ public class WorkflowAPITests extends WorkflowAPI
 
     /**
      * @param siteName
-     * @param cloudUser
+     * @param assignee
      * @return {@link WorkFlowFormDetails}
      */
     protected WorkFlowFormDetails createWorkFlowDetails(String siteName, String... assignee)

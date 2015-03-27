@@ -59,8 +59,7 @@ public class KeystoreKeyProvider extends AbstractKeyProvider
 
 	/**
      * 
-     * @param encryptionParameters
-     * @param keyResourceLoader
+     * @param keyStore
      */
     public KeystoreKeyProvider(AlfrescoKeyStore keyStore)
     {

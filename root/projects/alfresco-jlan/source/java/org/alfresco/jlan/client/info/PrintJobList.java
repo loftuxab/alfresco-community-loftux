@@ -50,7 +50,7 @@ public final class PrintJobList implements java.io.Serializable {
 	/**
 	 * Add a print job object to the list.
 	 * 
-	 * @param srvinf PrintJob to add to the list.
+	 * @param prnjob PrintJob to add to the list.
 	 */
 	public final void addPrintJob(PrintJob prnjob) {
 		m_list.add(prnjob);

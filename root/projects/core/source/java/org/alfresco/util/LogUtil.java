@@ -32,7 +32,7 @@ import org.apache.commons.logging.Log;
  * }
  * </pre>
  * 
- * @see org.alfresco.i18n.I18NUtil
+ * @see org.springframework.extensions.surf.util.I18NUtil
  * @since 2.1
  * 
  * @author Derek Hulley

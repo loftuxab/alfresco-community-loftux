@@ -56,7 +56,7 @@ public class SrvsvcDCEHandler implements DCEHandler {
 	 * @param sess SMBSrvSession
 	 * @param inBuf DCEBuffer
 	 * @param pipeFile DCEPipeFile
-	 * @paam smbPkt SMBSrvPacket
+	 * @param smbPkt SMBSrvPacket
 	 * @exception IOException
 	 * @exception SMBSrvException
 	 */

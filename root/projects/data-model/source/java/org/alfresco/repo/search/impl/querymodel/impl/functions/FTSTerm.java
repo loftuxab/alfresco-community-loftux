@@ -54,11 +54,6 @@ public class FTSTerm extends BaseFunction
         args.put(ARG_TOKENISATION_MODE, new BaseArgumentDefinition(Multiplicity.SINGLE_VALUED, ARG_TOKENISATION_MODE, DataTypeDefinition.ANY, false));
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public FTSTerm()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, args);

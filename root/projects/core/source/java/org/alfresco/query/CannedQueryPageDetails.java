@@ -21,9 +21,9 @@ package org.alfresco.query;
 /**
  * Details for canned queries supporting paged results.
  * <p/>
- * Results are {@link #setSkipResults(int) skipped}, chopped into pages of
- * {@link #setPageSize(int) appropriate size} before the {@link #setPageCount(int) start page}
- * and {@link #setPageNumber(int) number} are returned.
+ * Results are {@link #skipResults skipped}, chopped into pages of
+ * {@link #pageSize appropriate size} before the {@link #pageCount start page}
+ * and {@link #pageNumber number} are returned.
  * 
  * @author Derek Hulley
  * @since 4.0

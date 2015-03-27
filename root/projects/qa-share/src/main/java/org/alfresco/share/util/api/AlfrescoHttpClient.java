@@ -420,8 +420,8 @@ public class AlfrescoHttpClient extends AbstractUtils
     /**
      * Helper to check the actual Result Vs expected
      * 
-     * @param HttpResponse actualResponse
-     * @param int expectedResponseCode
+     * @param actualResponse HttpResponse
+     * @param expectedResponseCode int
      * @return Boolean <true> when actual matches expected response
      */
     protected static Boolean checkHttpResponse(HttpResponse actualResponse, int expectedResponseCode)

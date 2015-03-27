@@ -6,7 +6,7 @@ public interface RefreshableCacheListener
 	 /**
      * Callback made when a cache refresh occurs
      * 
-     * @param               the cache event
+     * @param  refreshableCacheEvent             the cache event
      */
     public void onRefreshableCacheEvent(RefreshableCacheEvent refreshableCacheEvent);
 

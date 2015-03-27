@@ -42,8 +42,8 @@ public class NetLogonPipeFile extends IPCPipeFile {
 	 * @param pkt DCEPacket
 	 * @param handle int
 	 * @param name String
-	 * @param maxTxSize int
-	 * @param maxRxSize int
+	 * @param maxTx int
+	 * @param maxRx int
 	 */
 	public NetLogonPipeFile(IPCSession sess, DCEPacket pkt, int handle, String name, int maxTx, int maxRx) {
 		super(sess, pkt, handle, name, maxTx, maxRx);

@@ -208,7 +208,7 @@ public class ServiceStatusInfo implements DCEReadable {
 	 * 
 	 * @param buf DCEBuffer
 	 * @exception DCEBufferException
-	 * @see DCESerializable#readObject(DCEBuffer)
+	 * @see DCEReadable#readObject(DCEBuffer)
 	 */
 	public void readObject(DCEBuffer buf)
 		throws DCEBufferException {

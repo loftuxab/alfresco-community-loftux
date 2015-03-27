@@ -55,7 +55,6 @@ public abstract class RpcNetworkServer extends NetworkServer implements RpcProce
 	 *
 	 * @param name String
 	 * @param config ServerConfiguration
-	 * @param rpcRegPort int
 	 */
 	public RpcNetworkServer(String name, ServerConfiguration config) {
 		super(name, config);

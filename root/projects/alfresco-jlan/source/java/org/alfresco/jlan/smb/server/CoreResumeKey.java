@@ -199,7 +199,9 @@ class CoreResumeKey {
   /**
    * Set the resume key reserved byte value.
    *
-   * @param param byte
+   * @param buf byte[]
+   * @param pos int
+   * @param val byte
    */
   public static final void setReservedByte(byte[] buf, int pos, byte val) {
     buf[pos] = val;

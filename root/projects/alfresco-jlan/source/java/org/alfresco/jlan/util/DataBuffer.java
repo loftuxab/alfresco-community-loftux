@@ -292,7 +292,7 @@ public class DataBuffer {
 	/**
 	 * Get a fixed length string from the buffer
 	 * 
-	 * @param maxlen int
+	 * @param len int
 	 * @param uni boolean
 	 * @return String
 	 */

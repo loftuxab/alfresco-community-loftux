@@ -1062,9 +1062,6 @@ public class FileTransferReceiverTest extends TestCase
         return node;
     }
 
-    /**
-     * @return
-     */
     private void modifyParentNode(NodeRef parentFolder, TransferManifestNormalNode nodeToMove ) throws Exception
     {
 

@@ -33,11 +33,6 @@ public class NotEquals extends BaseComparison
 {
     public final static String NAME = "NotEquals";
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public NotEquals()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, ARGS);

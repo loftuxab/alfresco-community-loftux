@@ -189,10 +189,11 @@ public class CMISQueryParser
     }
 
     /**
-     * @param queryNode
+     * @param orNode
      * @param factory
+     * @param functionEvaluationContext
      * @param selectors
-     * @param columns
+     * @param columnMap
      * @return
      */
     private Constraint buildDisjunction(CommonTree orNode, QueryModelFactory factory,
@@ -218,8 +219,9 @@ public class CMISQueryParser
     /**
      * @param andNode
      * @param factory
+     * @param functionEvaluationContext
      * @param selectors
-     * @param columns
+     * @param columnMap
      * @return
      */
     private Constraint buildConjunction(CommonTree andNode, QueryModelFactory factory,
@@ -245,8 +247,9 @@ public class CMISQueryParser
     /**
      * @param notNode
      * @param factory
+     * @param functionEvaluationContext
      * @param selectors
-     * @param columns
+     * @param columnMap
      * @return
      */
     private Constraint buildNegation(CommonTree notNode, QueryModelFactory factory,
@@ -266,10 +269,11 @@ public class CMISQueryParser
     }
 
     /**
-     * @param notNode
+     * @param testNode
      * @param factory
+     * @param functionEvaluationContext
      * @param selectors
-     * @param columns
+     * @param columnMap
      * @return
      */
     private Constraint buildTest(CommonTree testNode, QueryModelFactory factory,
@@ -286,10 +290,11 @@ public class CMISQueryParser
     }
 
     /**
-     * @param orNode
+     * @param predicateNode
      * @param factory
+     * @param functionEvaluationContext
      * @param selectors
-     * @param columns
+     * @param columnMap
      * @return
      */
     private Constraint buildPredicate(CommonTree predicateNode, QueryModelFactory factory,

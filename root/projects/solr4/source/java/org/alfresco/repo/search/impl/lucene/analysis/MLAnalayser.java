@@ -83,7 +83,7 @@ public class MLAnalayser extends Analyzer
         MLTokenizer mltokenizer;
         
         /**
-         * @param arg0
+         * @param source
          */
         public LocaleAwareTokenStreamComponents(final MLTokenizer source)
         {

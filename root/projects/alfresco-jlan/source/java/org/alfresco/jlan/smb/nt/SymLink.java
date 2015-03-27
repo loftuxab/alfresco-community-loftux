@@ -86,7 +86,7 @@ public class SymLink {
   /**
    * Parse a symlink reparse point structure to get the symlink details
    * 
-   * @param dataBuf DataBuffer
+   * @param symlinkBuf DataBuffer
    */
   public final void parseDataBuffer( DataBuffer symlinkBuf) {
     

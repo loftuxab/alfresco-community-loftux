@@ -57,11 +57,6 @@ public class In extends BaseFunction
         args.put(ARG_NOT, new BaseArgumentDefinition(Multiplicity.ANY, ARG_NOT, DataTypeDefinition.ANY, false));
     }
     
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public In()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, args);   

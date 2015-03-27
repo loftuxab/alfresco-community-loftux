@@ -109,9 +109,7 @@ public interface DataTypeDefinition
     public String getDefaultAnalyserClassName();
 
     /**
-     * @param defaultAnalyserResourceBundleName
      * @param locale
-     * @param resourceBundleClassLoader
      * @return
      */
     public String resolveAnalyserClassName(Locale locale);

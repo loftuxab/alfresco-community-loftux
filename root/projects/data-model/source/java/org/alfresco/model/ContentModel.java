@@ -376,7 +376,7 @@ public interface ContentModel
      * This association type has been deprecated.
      * From Alfresco 3.3 this association no longer exists and has been replaced with
      * {@link RenditionModel#ASSOC_RENDITION rn:rendition} association. From Alfresco
-     * 3.3 onwards {@link QNamePatch a patch} is executed at startup which renames
+     * 3.3 onwards {@link #org.alfresco.repo.admin.patch.impl.QNamePatch a patch} is executed at startup which renames
      * the cm:thumbnails QName to rn:rendition in the database.
      * <P/>
      * This field has been updated to point to that association and references to this

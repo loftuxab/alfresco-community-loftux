@@ -61,7 +61,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     }
 
     /**
-     * @see org.alfresco.config.ConfigElement#getChildren()
+     * @see ConfigElement#getChildren()
      */
     @Override
     public List<ConfigElement> getChildren()
@@ -71,7 +71,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     }
 
     /**
-     * @see org.alfresco.config.ConfigElement#combine(org.alfresco.config.ConfigElement)
+     * @see ConfigElement#combine(org.springframework.extensions.config.ConfigElement)
      */
     @Override
     public ConfigElement combine(ConfigElement configElement)
@@ -186,7 +186,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
      * @param dataType the dataType for which control-params are required.
      * @return an unmodifiable List of the associated <code>ControlParam</code> objects.
      * 
-     * @see org.alfresco.web.config.ControlParam
+     * @see ControlParam
      */
     public List<ControlParam> getControlParamsAsListFor(String dataType)
     {

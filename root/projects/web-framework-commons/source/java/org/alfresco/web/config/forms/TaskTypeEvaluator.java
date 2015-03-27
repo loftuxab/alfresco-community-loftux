@@ -53,7 +53,7 @@ public class TaskTypeEvaluator extends ServiceBasedEvaluator
     /**
      * Determines whether the given node type matches the path of the given object.
      * 
-     * @see org.alfresco.config.evaluator.Evaluator#applies(java.lang.Object,
+     * @see org.springframework.extensions.config.evaluator.Evaluator#applies(java.lang.Object,
      *      java.lang.String)
      */
     public boolean applies(Object obj, String condition)

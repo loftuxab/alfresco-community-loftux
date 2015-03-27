@@ -444,15 +444,16 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
     }
 
     /**
-     * @param field
+     *
      * @param queryText
      * @param subQueryBuilder
      * @param analysisMode
      * @param luceneFunction
      * @param booleanQuery
-     * @param mlAnalysisMode
      * @param locale
      * @param textFieldName
+     * @param tokenisationMode
+     * @param preferredTokenisationMode
      * @throws ParseException
      */
     private void addLocaleSpecificMLOrTextAttribute(String queryText, SubQuery subQueryBuilder, AnalysisMode analysisMode, LuceneFunction luceneFunction,

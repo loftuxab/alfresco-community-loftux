@@ -46,7 +46,7 @@ public class Control
     /**
      * Constructs a Control object with the specified template.
      * 
-     * @param template.
+     * @param template String
      */
     public Control(String template)
     {

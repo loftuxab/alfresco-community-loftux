@@ -65,7 +65,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     }
 
     /**
-     * @see org.alfresco.config.ConfigElement#getChildren()
+     * @see ConfigElement#getChildren()
      */
     @Override
     public List<ConfigElement> getChildren()
@@ -75,7 +75,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     }
 
     /**
-     * @see org.alfresco.config.ConfigElement#combine(org.alfresco.config.ConfigElement)
+     * @see ConfigElement#combine(org.springframework.extensions.config.ConfigElement)
      */
     @Override
     public ConfigElement combine(ConfigElement configElement)

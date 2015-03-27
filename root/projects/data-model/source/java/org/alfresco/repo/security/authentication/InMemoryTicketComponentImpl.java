@@ -71,7 +71,7 @@ public class InMemoryTicketComponentImpl implements TicketComponent
     }
     
     /**
-     * @param singleTicketPerUser the singleTicketPerUser to set
+     * @param useSingleTicketPerUser the useSingleTicketPerUser to set
      */
     public void setUseSingleTicketPerUser(boolean useSingleTicketPerUser)
     {

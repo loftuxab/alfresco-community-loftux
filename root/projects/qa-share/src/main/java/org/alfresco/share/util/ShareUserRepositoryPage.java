@@ -202,10 +202,10 @@ public class ShareUserRepositoryPage extends AbstractUtils
      * This method does the copy or move the folder or document into another
      * folder. User should be on RepositoryPage Page.
      *
+     * @param drone
+     * @param sourceFolder
+     * @param destinationFolders
      * @param isCopy
-     * @param testFolderName
-     * @param copyFolderName
-     * @param docLibPage
      * @return CopyOrMoveContentPage
      */
     public static CopyOrMoveContentPage copyOrMoveToFolderInRepository(WebDrone drone, String sourceFolder, String[] destinationFolders, boolean isCopy)
@@ -283,7 +283,7 @@ public class ShareUserRepositoryPage extends AbstractUtils
      *            String Path for the folder to be created, under
      *            DocumentLibrary : such as ConstRepo + file.seperator +
      *            parentFolderName1 + file.seperator + parentFolderName2
-     * @throws Excetion
+     * @throws Exception
      */
     public static RepositoryPage createFolderInFolderInRepository(WebDrone driver, String folderName, String folderDesc, String parentFolderPath) throws Exception
     {
@@ -294,8 +294,8 @@ public class ShareUserRepositoryPage extends AbstractUtils
      * Navigates to the Path specified, Starting from the Repository Page.
      * Assumes User is logged in and a specific Site is open.
      *
-     * @param fileName
-     * @param parentFolderPath
+     * @param driver
+     * @param fileInfo
      *            : such as Repository + file.seperator + parentFolderName1
      * @throws SkipException
      *             if error in this API
@@ -391,8 +391,8 @@ public class ShareUserRepositoryPage extends AbstractUtils
      * getting to the site dashboard
      *
      * @param drone
-     * @param siteShortURL
-     * @return {@link SiteDashBoardPage
+     * @param siteName
+     * @return {@link org.alfresco.po.share.site.SiteDashboardPage}
      *
      */
     public static RepositoryPage openSiteFromSitesFolderOfRepository(WebDrone drone, String siteName)
@@ -427,8 +427,8 @@ public class ShareUserRepositoryPage extends AbstractUtils
      * method to Navigate folder
      *
      * @param drone
-     * @param List
-     *            of Folders
+     * @param folderPath
+     *           List of Folders
      */
     public static RepositoryPage navigateFoldersInRepositoryPage(WebDrone drone, String... folderPath)
     {
@@ -499,7 +499,6 @@ public class ShareUserRepositoryPage extends AbstractUtils
      *
      * @param drone
      * @param contentName
-     * @param isFile
      * @return DetailsPage
      */
     public static DetailsPage getContentDetailsPage(WebDrone drone, String contentName)
@@ -517,7 +516,6 @@ public class ShareUserRepositoryPage extends AbstractUtils
      *
      * @param drone
      * @param fileName
-     * @param mimeType
      * @param details
      * @return
      */
@@ -652,7 +650,6 @@ public class ShareUserRepositoryPage extends AbstractUtils
      * Get properties.
      * @param drone
      * @param folderName
-     * @param aspect
      * @return
      */
     public static Map<String, Object> getProperties(WebDrone drone, String folderName)

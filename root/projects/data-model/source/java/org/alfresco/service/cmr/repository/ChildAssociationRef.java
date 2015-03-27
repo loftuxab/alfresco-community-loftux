@@ -99,7 +99,7 @@ public class ChildAssociationRef
      * Constructs a <b>non-primary</b>, -1th sibling parent-child association
      * reference.
      * 
-     * @see ChildAssociationRef#ChildAssocRef(QName, NodeRef, QName, NodeRef, boolean, int)
+     * @see ChildAssociationRef#ChildAssociationRef(org.alfresco.service.namespace.QName, NodeRef, org.alfresco.service.namespace.QName, NodeRef)
      */
     public ChildAssociationRef(QName assocTypeQName, NodeRef parentRef, QName childQName, NodeRef childRef)
     {

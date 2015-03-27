@@ -99,9 +99,9 @@ public class CoreServerConfigSection extends ConfigSection {
 	/**
 	 * Set the memory pool packet sizes/allocations
 	 * 
-	 * @param Buffer sizes int[]
-	 * @param Initial allocations for each size int[]
-	 * @param Maximim allocations for each size int[]
+	 * @param pktSizes Buffer sizes int[]
+	 * @param initAlloc Initial allocations for each size int[]
+	 * @param maxAlloc Maximim allocations for each size int[]
 	 * @exception InvalidConfigurationException
 	 */
 	public final void setMemoryPool(int[] pktSizes, int[] initAlloc, int[] maxAlloc)

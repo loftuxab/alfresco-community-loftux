@@ -78,7 +78,8 @@ public class ShareUserAdmin extends AbstractUtils
 
     /**
      * @param driver WebDriver Instance
-     * @param userName- check whether this user is in group
+     * @param fName String
+     * @param uName check whether this user is in group
      * @param groupName - Check whether user in this specific group Name
      *            Verify user is a member of group
      * @return Boolean
@@ -107,7 +108,7 @@ public class ShareUserAdmin extends AbstractUtils
     /**
      * @param driver WebDriver Instance
      * @param fName- check whether this fName matches with users first name in group
-     * @param lName - check whether this lName matches with users first name in group
+     * @param uName - check whether this uName matches with users first name in group
      *            Verify user is in ALFRESCO_ADMINISTRATORS group
      * @return Boolean
      */

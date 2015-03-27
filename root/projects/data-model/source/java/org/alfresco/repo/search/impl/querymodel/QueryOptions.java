@@ -461,7 +461,7 @@ public class QueryOptions
     }
     
     /**
-     * @param tenants the tenants to set
+     * @param excludeTenantFilter boolean
      */
     public void setExcludeTenantFilter(boolean excludeTenantFilter)
     {

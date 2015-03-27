@@ -79,7 +79,7 @@ class PipeLanmanHandler {
 	 * @param trans Packet to use for reply
 	 * @return true if the transaction has been handled, else false.
 	 * @exception java.io.IOException The exception description.
-	 * @exception org.alfresco.aifs.smb.SMBSrvException The exception description.
+	 * @exception SMBSrvException The exception description.
 	 */
 	public final static boolean processRequest(TransactBuffer tbuf, SMBSrvSession sess, SMBSrvPacket trans)
 		throws IOException, SMBSrvException {

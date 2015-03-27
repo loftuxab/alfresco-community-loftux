@@ -363,7 +363,7 @@ public class ISO9075
     }
 
     /**
-     * @param queryName
+     * @param toLowerCaseEncoded
      * @return
      */
     public static Object lowerCaseEncodedSQL(String toLowerCaseEncoded)

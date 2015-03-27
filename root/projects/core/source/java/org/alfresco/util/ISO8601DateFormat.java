@@ -251,7 +251,7 @@ public class ISO8601DateFormat
      * The time-information for the will be reset to zero.
      * 
      * @param isoDate the day (formatted sYYYY-MM-DD) or a full date (sYYYY-MM-DDThh:mm:ss.sssTZD)
-     * @param timeZone the timezone to use
+     * @param timezone the timezone to use
      * @return the parsed date
      * 
      * @throws AlfrescoRuntimeException if the parsing failed.

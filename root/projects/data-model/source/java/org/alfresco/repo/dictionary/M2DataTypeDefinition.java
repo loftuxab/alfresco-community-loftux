@@ -160,9 +160,7 @@ import org.alfresco.service.namespace.QName;
     }
     
     /**
-     * @param dataType
      * @param locale
-     * @param resourceBundleClassLoader
      * @return
      */
     @Override

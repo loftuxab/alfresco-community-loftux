@@ -638,7 +638,7 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 	/**
 	 * Process the socket event
 	 * 
-	 * @param eventIdx int
+	 * @param eventId int
 	 */
 	private void processSocketEvent( int eventId) {
 		

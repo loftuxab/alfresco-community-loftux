@@ -752,7 +752,7 @@ public final class NetBIOSSession extends NetworkSession {
 	/**
 	 * Find a NetBIOS name on the network
 	 *
-	 * @param nbname   NetBIOS name to search for
+	 * @param nbName   NetBIOS name to search for
 	 * @param tmo      Timeout value for receiving incoming datagrams
 	 * @param lookupTypes Types of name lookup to use (DNS and/or NetBIOS)
 	 * @param sess     NetBIOS session to use to override various settings
@@ -2185,7 +2185,7 @@ public final class NetBIOSSession extends NetworkSession {
 	 * name.
 	 * 
 	 * @param template String
-	 * @exception NameTemplateExcepition
+	 * @exception NameTemplateException
 	 */
 	public final static void setCallerNameTemplate(String template)
 		throws NameTemplateException {

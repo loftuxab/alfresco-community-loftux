@@ -424,8 +424,8 @@ public abstract class FileStateCache {
 	/**
 	 * Request an oplock break
 	 * 
-	 * @param clNode ClusterNode
-	 * @param clState ClusterFileState
+	 * @param path String
+	 * @param oplock OpLockDetails
 	 * @param sess SMBSrvSession
 	 * @param pkt SMBSrvPacket
 	 * @exception IOException
@@ -768,7 +768,7 @@ public abstract class FileStateCache {
 	/**
 	 * Release access to a file
 	 * 
-	 * @params fstate FileState
+	 * @param fstate FileState
 	 * @param token FileAccessToken
 	 * @return int
 	 */

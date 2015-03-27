@@ -369,7 +369,7 @@ public class FileTransferReceiver implements TransferReceiver
     }
 
     /**
-     * @param stagingFolder
+     * @param file
      */
     private void deleteFile(File file)
     {

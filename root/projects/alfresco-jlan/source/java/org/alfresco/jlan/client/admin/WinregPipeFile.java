@@ -145,7 +145,7 @@ public class WinregPipeFile extends IPCPipeFile {
 	/**
 	 * Open a registry key.
 	 * 
-	 * @param handle RegistryKey
+	 * @param root RegistryKey
 	 * @param key String
 	 * @return RegistryKey
 	 * @exception IOException
@@ -199,7 +199,7 @@ public class WinregPipeFile extends IPCPipeFile {
 	/**
 	 * Open a registry key.
 	 * 
-	 * @param handle RegistryKey
+	 * @param root RegistryKey
 	 * @param key RegistryKey
 	 * @return RegistryKey
 	 * @exception IOException
@@ -251,7 +251,7 @@ public class WinregPipeFile extends IPCPipeFile {
 
 	/**
 	 * Close a hive or key.
-	 * 
+	 *
 	 * @param handle RegistryKey
 	 * @exception IOException
 	 * @exception SMBException
@@ -297,7 +297,7 @@ public class WinregPipeFile extends IPCPipeFile {
 
 	/**
 	 * Flush a key so updates are actually in the registry.
-	 * 
+	 *
 	 * @param handle RegistryKey
 	 * @exception IOException
 	 * @exception SMBException
@@ -308,7 +308,7 @@ public class WinregPipeFile extends IPCPipeFile {
 
 	/**
 	 * Return information about a registry key.
-	 * 
+	 *
 	 * @param handle RegistryKey
 	 * @param cls String
 	 * @return RegistryKeyInfo
@@ -359,10 +359,10 @@ public class WinregPipeFile extends IPCPipeFile {
 	}
 
 	/**
-	 * 
+	 *
 	 * Return the value for the specified key and parameter
-	 * 
-	 * @param handle RegistryKey
+	 *
+	 * @param key RegistryKey
 	 * @param name String
 	 * @return RegistryValue
 	 * @exception IOException
@@ -379,8 +379,8 @@ public class WinregPipeFile extends IPCPipeFile {
 
 	/**
 	 * Return the value for the specified key and parameter
-	 * 
-	 * @param handle RegistryKey
+	 *
+	 * @param key RegistryKey
 	 * @param regval RegistryValue
 	 * @return RegistryValue
 	 * @exception IOException
@@ -451,8 +451,8 @@ public class WinregPipeFile extends IPCPipeFile {
 
 	/**
 	 * Return the default value for the specified key
-	 * 
-	 * @param handle RegistryKey
+	 *
+	 * @param key RegistryKey
 	 * @return RegistryValue
 	 * @exception IOException
 	 * @exception SMBException
@@ -634,7 +634,7 @@ public class WinregPipeFile extends IPCPipeFile {
 	/**
 	 * Return the sub-keys for the specified registry key
 	 * 
-	 * @param key RegistryKey
+	 * @param parentKey RegistryKey
 	 * @return List<RegistryKey>
 	 * @exception IOException
 	 * @exception SMBException

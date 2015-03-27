@@ -403,7 +403,7 @@ public class ShareUserMembers extends AbstractUtils
      * This method allows the Site Manager to remove the site member for the
      * public sites.
      * 
-     * @param drone
+     * @param driver
      * @param siteMember
      * @param siteName
      * @return {@link SiteMembersPage}
@@ -429,7 +429,7 @@ public class ShareUserMembers extends AbstractUtils
      * Utility to promote the user as network admin (for the given domain) Only
      * suitable for Enterprise: As Admin Console is not available for Cloud
      * 
-     * @param drone
+     * @param driver
      *            WebDrone Instance
      * @param authUser
      *            String authenticating user
@@ -468,8 +468,8 @@ public class ShareUserMembers extends AbstractUtils
      * logged in
      * 
      * @param driver
-     * @param String
-     *            userinfo such as username
+     * @param userinfo
+     *            String such as username
      * @return {@link}EditUserPage
      */
     private static EditUserPage navigateToEditUser(WebDrone driver, String userinfo)
@@ -727,8 +727,6 @@ public class ShareUserMembers extends AbstractUtils
      * @param driver
      * @param candidate
      * @param isUser
-     * @param role
-     * @param toggleInheritPermission
      * @return
      */
     public static ManagePermissionsPage searchAndAddUserOrGroupWithoutSave(WebDrone driver, String candidate, boolean isUser)

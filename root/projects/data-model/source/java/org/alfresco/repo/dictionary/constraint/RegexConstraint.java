@@ -81,7 +81,7 @@ public class RegexConstraint extends AbstractConstraint
 
     /**
      * Set the regular expression used to evaluate String values
-     * @param regular expression similar to the {@link String#matches(java.lang.String)} argument
+     * @param expression regular expression similar to the {@link String#matches(java.lang.String)} argument
      */
     public void setExpression(String expression)
     {

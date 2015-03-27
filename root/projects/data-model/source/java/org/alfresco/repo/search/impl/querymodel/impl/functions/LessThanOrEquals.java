@@ -33,11 +33,6 @@ public class LessThanOrEquals extends BaseComparison
 {
     public final static String NAME = "LessThanOrEquals";
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public LessThanOrEquals()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, ARGS);

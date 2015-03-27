@@ -67,7 +67,7 @@ public class PathQuery extends Query
     /**
      * The base query
      * 
-     * @param query
+     * @param dictionarySertvice
      */
 
     public PathQuery(DictionaryService dictionarySertvice)

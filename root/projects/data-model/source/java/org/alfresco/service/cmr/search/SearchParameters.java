@@ -1385,8 +1385,8 @@ public class SearchParameters implements BasicSearchParameters
     
     /**
      * @param length
-     * @param useInMemorySort2
-     * @param maxRawResultSetSizeForInMemorySort2
+     * @param useInMemorySortDefault
+     * @param maxRawResultSetSizeForInMemorySortDefault
      * @return
      */
     public boolean usePostSort(int length, boolean useInMemorySortDefault, int maxRawResultSetSizeForInMemorySortDefault)

@@ -19,7 +19,7 @@ public class EncryptDecryptPassword {
 
 	/**
 	 * 
-	 * @param password
+	 * @param str
 	 * @return encrypted password
 	 */
 
@@ -36,7 +36,7 @@ public class EncryptDecryptPassword {
 
 	/**
 	 * 
-	 * @param encrypted
+	 * @param encstr
 	 *            password
 	 * @return decrypted password
 	 */

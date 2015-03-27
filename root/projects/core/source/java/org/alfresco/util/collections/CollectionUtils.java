@@ -80,7 +80,7 @@ public abstract class CollectionUtils
      * 
      * @param first  first set. can be null.
      * @param second second set. can be null.
-     * @param if the result is empty, should we return null?
+     * @param emptyResultIsNull if the result is empty, should we return null?
      * @return the union of both sets or null.
      */
     public static <T> Set<T> nullSafeMerge(Set<T> first, Set<T> second, boolean emptyResultIsNull)
@@ -114,7 +114,7 @@ public abstract class CollectionUtils
      * 
      * @param first  first map. can be null.
      * @param second second map. can be null.
-     * @param if the result is empty, should we return null?
+     * @param emptyResultIsNull if the result is empty, should we return null?
      * @return the union of both maps, or null.
      */
     public static <K, V> Map<K, V> nullSafeMerge(Map<K, V> first, Map<K, V> second, boolean emptyResultIsNull)
@@ -385,8 +385,8 @@ public abstract class CollectionUtils
     }
 
     /**
-     * @param entries
-     * @param function
+     * @param values
+     * @param transformer
      * @return
      */
     public static <F, T> Map<F, T> transformToMap(Collection<F> values,

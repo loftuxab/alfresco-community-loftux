@@ -89,7 +89,7 @@ public abstract class CMISAbstractDictionaryService extends AbstractLifecycleBea
     /**
      * Set the property accessor mapping service
      * 
-     * @param accessor mapping
+     * @param accessorMapping mapping
      */
     public void setPropertyAccessorMapping(PropertyAccessorMapping accessorMapping)
     {
@@ -99,7 +99,7 @@ public abstract class CMISAbstractDictionaryService extends AbstractLifecycleBea
     /**
      * Set the property lucene mapping service
      * 
-     * @param lucene mapping
+     * @param luceneBuilderMapping mapping
      */
     public void setPropertyLuceneBuilderMapping(PropertyLuceneBuilderMapping luceneBuilderMapping)
     {

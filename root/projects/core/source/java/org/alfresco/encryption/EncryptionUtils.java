@@ -67,7 +67,6 @@ public interface EncryptionUtils
      * as expected and that the timestamp is recent.
      * 
      * @param req
-     * @param remoteIP
      * @param decryptedBody
      * @return true if the method request is authentic, false otherwise
      */

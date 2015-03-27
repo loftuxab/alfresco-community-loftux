@@ -51,13 +51,14 @@ public class Lucene4QueryBuilderContextSolrImpl implements LuceneQueryBuilderCon
 
     /**
      * Context for building lucene queries
-     * 
+     *
      * @param dictionaryService
      * @param namespacePrefixResolver
      * @param tenantService
      * @param searchParameters
-     * @param config
-     * @param indexReader
+     * @param defaultSearchMLAnalysisMode
+     * @param req
+     * @param model
      */
     public Lucene4QueryBuilderContextSolrImpl(DictionaryService dictionaryService, NamespacePrefixResolver namespacePrefixResolver, TenantService tenantService,
             SearchParameters searchParameters, MLAnalysisMode defaultSearchMLAnalysisMode, SolrQueryRequest req, AlfrescoSolrDataModel model)

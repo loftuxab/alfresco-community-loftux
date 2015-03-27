@@ -88,7 +88,7 @@ public class AuthSSLProtocolSocketFactory implements SecureProtocolSocketFactory
 	 * Constructor for AuthSSLProtocolSocketFactory. Either a keystore or truststore file
 	 * must be given. Otherwise SSL context initialization error will result.
 	 * 
-	 * @param parameters SSL parameters to use.
+	 * @param sslKeyStore SSL parameters to use.
 	 * @param keyResourceLoader loads key resources from an arbitrary source e.g. classpath
 	 */
 	public AuthSSLProtocolSocketFactory(AlfrescoKeyStore sslKeyStore, AlfrescoKeyStore sslTrustStore, KeyResourceLoader keyResourceLoader)
@@ -142,8 +142,8 @@ public class AuthSSLProtocolSocketFactory implements SecureProtocolSocketFactory
 	 *  
 	 * @param host the host name/IP
 	 * @param port the port on the host
-	 * @param clientHost the local host name/IP to bind the socket to
-	 * @param clientPort the port on the local machine
+	 * @param localAddress the local host name/IP to bind the socket to
+	 * @param localPort the port on the local machine
 	 * @param params {@link HttpConnectionParams Http connection parameters}
 	 * 
 	 * @return Socket a new socket

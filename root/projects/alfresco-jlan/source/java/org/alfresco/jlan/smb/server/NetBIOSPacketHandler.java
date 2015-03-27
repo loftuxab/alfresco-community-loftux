@@ -51,7 +51,7 @@ public class NetBIOSPacketHandler extends SocketPacketHandler {
 	 * Read a packet from the input stream
 	 * 
 	 * @return SMBSrvPacket
-	 * @exception IOexception If a network error occurs
+	 * @exception IOException If a network error occurs
 	 */
 	public final SMBSrvPacket readPacket()
 		throws IOException {
@@ -149,7 +149,7 @@ public class NetBIOSPacketHandler extends SocketPacketHandler {
 	 * @param pkt SMBSrvPacket
 	 * @param len int
 	 * @param writeRaw boolean
-	 * @exception IOexception If a network error occurs
+	 * @exception IOException If a network error occurs
 	 */
 	public final void writePacket(SMBSrvPacket pkt, int len, boolean writeRaw)
 		throws IOException {

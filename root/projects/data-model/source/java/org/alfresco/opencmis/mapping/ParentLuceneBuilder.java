@@ -45,7 +45,7 @@ public class ParentLuceneBuilder extends BaseLuceneBuilder
 	/**
      * Construct
      * 
-     * @param serviceRegistry
+     * @param dictionaryService
      */
     public ParentLuceneBuilder(DictionaryService dictionaryService)
     {
