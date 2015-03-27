@@ -54,6 +54,7 @@ public class PublicationActions extends AbstractWQS
     private String siteName;
     private String ipAddress;
     private String hostName;
+    private String[] loginInfo;
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -64,6 +65,7 @@ public class PublicationActions extends AbstractWQS
         testName = this.getClass().getSimpleName();
         siteName = testName + System.currentTimeMillis();
         ipAddress = getIpAddress();
+        loginInfo = new String[] {ADMIN_USERNAME, ADMIN_PASSWORD};
         logger.info(" wcmqs url : " + wqsURL);
         logger.info("Start Tests from: " + testName);
 
@@ -135,6 +137,7 @@ public class PublicationActions extends AbstractWQS
         WcmqsHomePage wcmqsHomePage = FactoryWqsPage.resolveWqsPage(drone).render();
         wcmqsHomePage.mouseOverMenu("publications");
         Assert.assertTrue(wcmqsHomePage.isResearchReportsDisplayed());
+        wcmqsHomePage.mouseOverMenu("publications");
         Assert.assertTrue(wcmqsHomePage.isWhitePapersDisplayed());
 
         //click on research reports and check if the correct page opened
@@ -190,38 +193,36 @@ public class PublicationActions extends AbstractWQS
         for (int i = 0; i < 7; i++)
         {
             wcmqsAllPublicationsPage.getAllPublictionsTitles().get(i).openLink();
-            WcmqsHomePage wcmqsHomePage1 = new WcmqsHomePage(drone);
-            wcmqsHomePage1.render();
+            WcmqsPublicationPage pageFound = new WcmqsPublicationPage(drone);
             Boolean check = false;
             for (String PageTitle : WcmqsPublicationPage.PUBLICATION_PAGES)
             {
-                if (wcmqsHomePage1.getTitle().contains(PageTitle))
+                if (pageFound.getTitle().contains(PageTitle))
                 {
                     check = true;
                     break;
                 }
             }
             Assert.assertTrue(check, "Publication page did not open correctly");
-            wcmqsAllPublicationsPage = wcmqsHomePage1.selectMenu("publications").render();
+            wcmqsAllPublicationsPage = pageFound.selectMenu("publications").render();
         }
 
         //open publications page using the publication image and check if you reached the correct page
         for (int i = 0; i < 7; i++)
         {
             wcmqsAllPublicationsPage.getAllPublictionsImages().get(i).openLink();
-            WcmqsHomePage wcmqsHomePage1 = new WcmqsHomePage(drone);
-            wcmqsHomePage1.render();
+            WcmqsPublicationPage pageFound = new WcmqsPublicationPage(drone);;
             Boolean check = false;
             for (String PageTitle : WcmqsPublicationPage.PUBLICATION_PAGES)
             {
-                if (wcmqsHomePage1.getTitle().contains(PageTitle))
+                if (pageFound.getTitle().contains(PageTitle))
                 {
                     check = true;
                     break;
                 }
             }
             Assert.assertTrue(check, "Publication page did not open correctly");
-            wcmqsAllPublicationsPage = wcmqsHomePage1.selectMenu("publications").render();
+            wcmqsAllPublicationsPage = pageFound.selectMenu("publications").render();
         }
     }
 
@@ -303,19 +304,19 @@ public class PublicationActions extends AbstractWQS
     {
 
         // ---- Data prep ----
-        siteActions.openSiteDashboard(drone, siteName).render();
+        loginActions.loginToShare(drone, loginInfo, shareUrl);
         DocumentLibraryPage documentLibPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        documentLibPage.selectFolder("Alfresco Quick Start");
-        documentLibPage.selectFolder("Quick Start Editorial");
-        documentLibPage.selectFolder("root");
-        documentLibPage.selectFolder("publications");
+
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + "publications";
+        documentLibPage = siteActions.navigateToFolder(drone, folderPath).render();
+
         documentLibPage.getFileDirectoryInfo("WCM.pdf").addTag("tag2");
         documentLibPage.selectFolder("white-papers");
         documentLibPage.getFileDirectoryInfo("Datasheet_OEM.pdf").addTag("tag1");
         documentLibPage.getNavigation().clickFolderUp();
-        documentLibPage = new DocumentLibraryPage(drone);
         documentLibPage.selectFolder("research-reports");
         documentLibPage.getFileDirectoryInfo("Enterprise_Network_0410.pdf").addTag("tag2");
+        ShareUtil.logout(drone);
 
         // ---- Step 1 ----
         // ---- Step action ----

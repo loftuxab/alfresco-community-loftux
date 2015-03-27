@@ -47,7 +47,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
     public static final String ARTICLE_1 = "article1.html";
     public static final String ARTICLE_6 = "article6.html";
     public static final String ARTICLE_5 = "article5.html";
-    protected static String TITLES_NEWS = "ul.services-wrapper div.service-txt h3 a";
+    protected static String TITLES_NEWS = "ul.newslist-wrapper>li>h4>a";
     protected static By RIGHT_TITLES_NEWS = By.cssSelector("div[id='right'] ul");
     private final By NEWS_MENU = By.cssSelector("a[href$='news/']");
 

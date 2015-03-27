@@ -260,8 +260,7 @@ public class NewsComponent extends AbstractWQS
 
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.render();
-        WcmqsNewsPage newsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.MARKETS);
-        newsPage.render();
+        WcmqsNewsPage newsPage = wcmqsHomePage.openNewsPageFolder(WcmqsNewsPage.MARKETS).render();
         Assert.assertNotEquals(newsPage.getHeadlineTitleNews().size(), 0, "List of news titles is empty.");
 
         // ---- Step 3 ----
@@ -277,8 +276,6 @@ public class NewsComponent extends AbstractWQS
         // AWE actions (Edit, Create Article, Delete icons)
 
         newsPage.clickLinkByTitle(newsTitle1);
-        WcmqsLoginPage loginPage = new WcmqsLoginPage(drone);
-        loginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
         WcmqsNewsArticleDetails newsDetailsPage = new WcmqsNewsArticleDetails(drone);
         newsDetailsPage.render();
         Assert.assertEquals(newsDetailsPage.getTitleOfNewsArticle(), newsTitle1, "Article title is not " + newsTitle1);
