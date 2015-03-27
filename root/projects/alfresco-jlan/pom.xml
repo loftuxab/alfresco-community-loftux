@@ -66,6 +66,23 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <!-- Windows DLL to be packaged separately. Used in the distribution -->
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>create-dll-jar</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>windll</classifier>
+                            <classesDirectory>${basedir}/jni</classesDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>        
     </build>
 
