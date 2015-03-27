@@ -1,5 +1,4 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wqs-tests</artifactId>
     <packaging>jar</packaging>
@@ -68,7 +67,6 @@
             <version>1.8.3</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -104,8 +102,6 @@
                 </configuration>
             </plugin>
         </plugins>
-
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -146,12 +142,20 @@
                         <enableAssertions>false</enableAssertions>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.7</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.ant</groupId>
+                            <artifactId>ant</artifactId>
+                            <version>1.9.4</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
             </plugins>
-
         </pluginManagement>
-
     </build>
-
     <profiles>
         <profile>
             <id>wqs-tests</id>
@@ -163,12 +167,8 @@
                             <suiteXmlFiles>
                                 <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <excludedGroups>
-                                ${test.exclude}
-                            </excludedGroups>
-                            <groups>
-                                ${test.include}
-                            </groups>
+                            <excludedGroups>${test.exclude}</excludedGroups>
+                            <groups>${test.include}</groups>
                             <workingDirectory>target</workingDirectory>
                             <!--parallel>classes</parallel-->
                             <!--<systemPropertyVariables>-->
