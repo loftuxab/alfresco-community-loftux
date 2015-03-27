@@ -124,10 +124,6 @@ public class BlogComponent extends AbstractWQS
         List<SitePageType> addPageTypes = new ArrayList<SitePageType>();
         addPageTypes.add(SitePageType.DATA_LISTS);
         SiteDashboardPage siteDashboardPage1 = customizeSitePage.addPages(addPageTypes).render();
-        NewListForm dataListPage = siteDashboardPage1.getSiteNav().selectDataListPage().render();
-        dataListPage.selectListType(DataLists.VISITOR_LIST);
-        dataListPage.inputTitleField("Visitor Feedback List");
-        dataListPage.clickSave().render();
 
         // Site Dashboard is rendered with Data List link
         siteActions.openSiteDashboard(drone, siteName).render();
