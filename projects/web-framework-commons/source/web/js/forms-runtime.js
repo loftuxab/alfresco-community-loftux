@@ -1162,6 +1162,9 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
 
             if (Alfresco.logger.isDebugEnabled())
                Alfresco.logger.debug("Submission prevented as validation failed");
+            
+            // Enable submit buttons
+            this._toggleSubmitElements(true);
          }
       },
       
