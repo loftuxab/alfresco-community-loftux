@@ -116,11 +116,12 @@ public class BlogComponent extends AbstractWQS
         documentPropertiesPage.setSiteHostname("localhost");
         documentPropertiesPage.clickSave();
 
-        siteActions.openSiteDashboard(drone, siteName);
+        siteActions.openSiteDashboard(drone, siteName).render();
         // Data Lists component is added to the site
         CustomizeSitePage customizeSitePage = siteDashboardPage.getSiteNav().selectCustomizeSite().render();
         List<SitePageType> addPageTypes = new ArrayList<SitePageType>();
         addPageTypes.add(SitePageType.DATA_LISTS);
+        customizeSitePage.addPages(addPageTypes).render();
 
         // Site Dashboard is rendered with Data List link
         siteActions.openSiteDashboard(drone, siteName).render();
@@ -323,7 +324,7 @@ public class BlogComponent extends AbstractWQS
     public void commentBlogPost() throws Exception
     {
 
-        String visitorName = "name " + getTestName();
+        String visitorName = "name" + getTestName();
         String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
         String visitorWebsite = "website " + getTestName();
         String visitorComment = "Comment by " + visitorName;
@@ -406,6 +407,7 @@ public class BlogComponent extends AbstractWQS
         assertThat(newFeedback.getVisitorEmail(), is(equalTo(visitorEmail)));
         assertThat(newFeedback.getVisitorComment(), is(equalTo(visitorComment)));
         assertThat(newFeedback.getVisitorWebsite(), is(equalTo(visitorWebsite)));
+        ShareUtil.logout(drone);
 
     }
 
@@ -416,7 +418,7 @@ public class BlogComponent extends AbstractWQS
     @Test(groups = {"WQS", "EnterpriseOnly"})
     public void verifyCommentsNumberValue() throws Exception
     {
-        String visitorName = "name " + getTestName();
+        String visitorName = "name" + getTestName();
         String visitorEmail = getTestName() + "@" + DOMAIN_FREE;
         String visitorWebsite = "website " + getTestName();
         String visitorComment = "Comment by " + visitorName;
@@ -469,6 +471,7 @@ public class BlogComponent extends AbstractWQS
         VisitorFeedbackRow testrow = feedbackList.getRowForVisitorEmail(visitorEmail);
         testrow.clickDuplicateOnRow();
         assertThat("Check if the duplicate message appears!", testrow.isDuplicateMessageDisplayed());
+        ShareUtil.logout(drone);
 
         // ---- Step 5 ----
         // ---- Step action ----
@@ -1004,6 +1007,7 @@ public class BlogComponent extends AbstractWQS
 
         visitorFeedbackRowProperties.setFeedbackSubject(feedBack);
         visitorFeedbackRowProperties.clickSave();
+        ShareUtil.logout(drone);
 
         // ---- Step 8 ----
         // ---- Step action ----
@@ -1092,7 +1096,6 @@ public class BlogComponent extends AbstractWQS
     {
 
         // ---- Data prep ----
-        siteActions.openSiteDashboard(drone, siteName);
         DocumentLibraryPage documentLibPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
 
         documentLibPage.selectFolder("Alfresco Quick Start");

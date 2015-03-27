@@ -10,9 +10,11 @@ import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
+import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.wqs.WcmqsHomePage;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
@@ -95,7 +97,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
     }
 
 
-   @AfterClass(alwaysRun = true)
+    @AfterClass(alwaysRun = true)
     public void tearDownAfterClass()
     {
         logger.info("Delete the site after all tests where run.");
@@ -112,12 +114,27 @@ public class CreatingItemsViaAWE extends AbstractWQS
         String blogPostContent = testName + "_" + System.currentTimeMillis() + "_content";
 
         navigateTo(wqsURL);
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
-        WcmqsEditPage editPage = createBlogPost(blogPostPage);
-        verifyAllFields(editPage);
-        fillInNameAndContentFieldsForBlogPost(editPage, blogPostName, blogPostTitle, blogPostContent);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsEditPage editPage = blogPostPage.createArticle().render();
+
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
+        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
+        Assert.assertEquals(blogPostContent, blogPostPage.getContent());
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForBlogPost(siteName, blogPostName, blogPostContent);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + WcmqsBlogPage.BLOG;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(blogPostName).render();
+
+        Assert.assertEquals(blogPostName, blogPostDetailsPage.getDocumentTitle());
+        Assert.assertTrue(blogPostDetailsPage.getDocumentBody().contains(blogPostContent));
         ShareUtil.logout(drone);
     }
 
@@ -130,12 +147,28 @@ public class CreatingItemsViaAWE extends AbstractWQS
         String blogPostContent = testName + "_" + System.currentTimeMillis() + "_content";
 
         navigateTo(wqsURL);
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
-        WcmqsEditPage editPage = createBlogPost(blogPostPage);
-        verifyAllFields(editPage);
-        fillInNameAndContentFieldsForBlogPost(editPage, blogPostName, blogPostTitle, blogPostContent);
+
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
+        WcmqsEditPage editPage = blogPostPage.createArticle().render();
+
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
+        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
+        Assert.assertEquals(blogPostContent, blogPostPage.getContent());
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForBlogPost(siteName, blogPostName, blogPostContent);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + WcmqsBlogPage.BLOG;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(blogPostName).render();
+
+        Assert.assertEquals(blogPostName, blogPostDetailsPage.getDocumentTitle());
+        Assert.assertTrue(blogPostDetailsPage.getDocumentBody().contains(blogPostContent));
         ShareUtil.logout(drone);
     }
 
@@ -148,12 +181,28 @@ public class CreatingItemsViaAWE extends AbstractWQS
         String blogPostContent = testName + "_" + System.currentTimeMillis() + "_content";
 
         navigateTo(wqsURL);
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
-        WcmqsEditPage editPage = createBlogPost(blogPostPage);
-        verifyAllFields(editPage);
-        fillInNameAndContentFieldsForBlogPost(editPage, blogPostName, blogPostTitle, blogPostContent);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
+        WcmqsEditPage editPage = blogPostPage.createArticle().render();
+
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
+        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
+        Assert.assertEquals(blogPostContent, blogPostPage.getContent());
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForBlogPost(siteName, blogPostName, blogPostContent);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + WcmqsBlogPage.BLOG;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(blogPostName).render();
+
+        Assert.assertEquals(blogPostName, blogPostDetailsPage.getDocumentTitle());
+        Assert.assertTrue(blogPostDetailsPage.getDocumentBody().contains(blogPostContent));
+
         ShareUtil.logout(drone);
     }
 
@@ -167,11 +216,24 @@ public class CreatingItemsViaAWE extends AbstractWQS
 
         navigateTo(wqsURL);
         WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.GLOBAL, WcmqsNewsPage.EUROPE_DEPT_CONCERNS);
-        WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
-        verifyAllFields(editPage);
-        fillInNameAndContentForNewsArticle(editPage, newsArticleName, newsArticleTitle, newsArticleContent);
+        WcmqsEditPage editPage = newsArticleDetails.clickCreateButton().render();
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
+        Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForNewsArticle(newsArticleName, newsArticleContent, WcmqsNewsPage.GLOBAL, siteName);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.GLOBAL;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
+
+        Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
+        Assert.assertTrue(blogPostDetailsPage.getDocumentBody().contains(newsArticleContent));
+
         ShareUtil.logout(drone);
     }
 
@@ -185,11 +247,24 @@ public class CreatingItemsViaAWE extends AbstractWQS
 
         navigateTo(wqsURL);
         WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.GLOBAL, WcmqsNewsPage.FTSE_1000);
-        WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
-        verifyAllFields(editPage);
-        fillInNameAndContentForNewsArticle(editPage, newsArticleName, newsArticleTitle, newsArticleContent);
+        WcmqsEditPage editPage = newsArticleDetails.clickCreateButton().render();
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
+        Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForNewsArticle(newsArticleName, newsArticleContent, WcmqsNewsPage.GLOBAL, siteName);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.GLOBAL;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
+
+        Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
+        Assert.assertTrue(blogPostDetailsPage.getDocumentBody().contains(newsArticleContent));
+
         ShareUtil.logout(drone);
     }
 
@@ -203,11 +278,24 @@ public class CreatingItemsViaAWE extends AbstractWQS
 
         navigateTo(wqsURL);
         WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.COMPANIES, WcmqsNewsPage.GLOBAL_CAR_INDUSTRY);
-        WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
-        verifyAllFields(editPage);
-        fillInNameAndContentForNewsArticle(editPage, newsArticleName, newsArticleTitle, newsArticleContent);
+        WcmqsEditPage editPage = newsArticleDetails.clickCreateButton().render();
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
+        Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForNewsArticle(newsArticleName, newsArticleContent, WcmqsNewsPage.COMPANIES, siteName);
+
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.COMPANIES;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
+
+        Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
+        Assert.assertTrue(blogPostDetailsPage.getDocumentBody().contains(newsArticleContent));
+
         ShareUtil.logout(drone);
     }
 
@@ -221,11 +309,24 @@ public class CreatingItemsViaAWE extends AbstractWQS
 
         navigateTo(wqsURL);
         WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.COMPANIES, WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS);
-        WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
-        verifyAllFields(editPage);
-        fillInNameAndContentForNewsArticle(editPage, newsArticleName, newsArticleTitle, newsArticleContent);
+        WcmqsEditPage editPage = newsArticleDetails.clickCreateButton().render();
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
+        Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForNewsArticle(newsArticleName, newsArticleContent, WcmqsNewsPage.COMPANIES, siteName);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.COMPANIES;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage postDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
+
+        Assert.assertEquals(newsArticleName, postDetailsPage.getDocumentTitle());
+        Assert.assertTrue(postDetailsPage.getDocumentBody().contains(newsArticleContent));
+
         ShareUtil.logout(drone);
     }
 
@@ -239,11 +340,24 @@ public class CreatingItemsViaAWE extends AbstractWQS
 
         navigateTo(wqsURL);
         WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.MARKETS, WcmqsNewsPage.INVESTORS_FEAR);
-        WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
-        verifyAllFields(editPage);
-        fillInNameAndContentForNewsArticle(editPage, newsArticleName, newsArticleTitle, newsArticleContent);
+        WcmqsEditPage editPage = newsArticleDetails.clickCreateButton().render();
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
+        Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForNewsArticle(newsArticleName, newsArticleContent, WcmqsNewsPage.MARKETS, siteName);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.MARKETS;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
+
+        Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
+        Assert.assertTrue(blogPostDetailsPage.getDocumentBody().contains(newsArticleContent));
+
         ShareUtil.logout(drone);
     }
 
@@ -257,11 +371,24 @@ public class CreatingItemsViaAWE extends AbstractWQS
 
         navigateTo(wqsURL);
         WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.MARKETS, WcmqsNewsPage.HOUSE_PRICES);
-        WcmqsEditPage editPage = createNewsArticle(newsArticleDetails);
-        verifyAllFields(editPage);
-        fillInNameAndContentForNewsArticle(editPage, newsArticleName, newsArticleTitle, newsArticleContent);
+        WcmqsEditPage editPage = newsArticleDetails.clickCreateButton().render();
+        Assert.assertNotNull(editPage.getArticleDetails());
+
+        WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
+        Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
-        verifyInDocumentLibraryForNewsArticle(newsArticleName, newsArticleContent, WcmqsNewsPage.COMPANIES, siteName);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.MARKETS;
+        DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
+        waitForDocumentsToIndex();
+        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
+
+        Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
+        Assert.assertTrue(blogPostDetailsPage.getDocumentBody().contains(newsArticleContent));
+
         ShareUtil.logout(drone);
     }
 
@@ -312,7 +439,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(documentLibraryPage);
 
         // Wait 2 minutes to allow refresh query to execute
-        wait(MAX_WAIT_TIME_MINUTES);
+        waitForDocumentsToIndex();
 
         // ---- Step 3 ----
         // ---- Step actions ----

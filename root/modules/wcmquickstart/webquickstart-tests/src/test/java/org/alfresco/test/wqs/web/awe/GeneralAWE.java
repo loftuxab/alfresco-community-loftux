@@ -8,12 +8,13 @@ import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
-import org.alfresco.test.AlfrescoTest;
-import org.alfresco.test.FailedTestListener;
-import org.alfresco.test.wqs.AbstractWQS;
 import org.alfresco.po.wqs.WcmqsBlogPage;
 import org.alfresco.po.wqs.WcmqsBlogPostPage;
 import org.alfresco.po.wqs.WcmqsEditPage;
+import org.alfresco.po.wqs.WcmqsHomePage;
+import org.alfresco.test.AlfrescoTest;
+import org.alfresco.test.FailedTestListener;
+import org.alfresco.test.wqs.AbstractWQS;
 import org.apache.log4j.Logger;
 import org.springframework.social.alfresco.api.entities.Site;
 import org.testng.Assert;
@@ -89,7 +90,6 @@ public class GeneralAWE extends AbstractWQS
     }
 
 
-
     @AfterClass(alwaysRun = true)
     public void tearDownAfterClass()
     {
@@ -121,7 +121,9 @@ public class GeneralAWE extends AbstractWQS
         // ---- Expected results ----
         // Blog post is opened;
 
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
         Assert.assertNotNull(blogPostPage);
 
         // ---- Step 3 ----
@@ -146,7 +148,7 @@ public class GeneralAWE extends AbstractWQS
     /*
      * AONE-5651 Orientation
      */
-    @AlfrescoTest(testlink="AONE-5651")
+    @AlfrescoTest(testlink = "AONE-5651")
     @Test(groups = {"WQS"})
     public void orientation() throws Exception
     {
@@ -165,7 +167,9 @@ public class GeneralAWE extends AbstractWQS
         // ---- Expected results ----
         // Blog post is opened;
 
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
         Assert.assertNotNull(blogPostPage);
 
         // ---- Step 3 ----
@@ -199,7 +203,7 @@ public class GeneralAWE extends AbstractWQS
     /*
      * AONE-5652 Creating any article via AWE
      */
-    @AlfrescoTest(testlink="AONE-5652")
+    @AlfrescoTest(testlink = "AONE-5652")
     @Test(groups = {"WQS"})
     public void createArticleViaAwe() throws Exception
     {
@@ -218,7 +222,9 @@ public class GeneralAWE extends AbstractWQS
         // ---- Expected results ----
         // Article is opened;
 
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
 
         // ---- Step 3 ----
         // ---- Step action ----
@@ -252,7 +258,7 @@ public class GeneralAWE extends AbstractWQS
         editPage.editTitle(articleTitle);
         editPage.editDescription(articleDescription);
         editPage.insertTextInContent(articleContent);
-        WcmqsBlogPage blogPage = editPage.clickSubmitButton().render();
+        blogPage = editPage.clickSubmitButton().render();
 
         WcmqsBlogPostPage newBlogPostPage = waitAndOpenBlogPost(blogPage, articleTitle, 4);
 
@@ -266,7 +272,7 @@ public class GeneralAWE extends AbstractWQS
     /*
      * AONE-5653 Creating any article via AWE - Cancel
      */
-    @AlfrescoTest(testlink="AONE-5653")
+    @AlfrescoTest(testlink = "AONE-5653")
     @Test(groups = {"WQS"})
     public void createAndCancelArticleViaAwe() throws Exception
     {
@@ -285,7 +291,9 @@ public class GeneralAWE extends AbstractWQS
         // ---- Expected results ----
         // Article is opened;
 
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
 
         // ---- Step 3 ----
         // ---- Step action ----
@@ -334,7 +342,7 @@ public class GeneralAWE extends AbstractWQS
     /*
      * AONE-5654 Editing any article via AWE
      */
-    @AlfrescoTest(testlink="AONE-5654")
+    @AlfrescoTest(testlink = "AONE-5654")
     @Test(groups = {"WQS"})
     public void editArticleViaAwe() throws Exception
     {
@@ -353,7 +361,9 @@ public class GeneralAWE extends AbstractWQS
         // ---- Expected results ----
         // Article is opened;
 
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
         Assert.assertNotNull(blogPostPage);
 
         // ---- Step 3 ----
@@ -381,7 +391,7 @@ public class GeneralAWE extends AbstractWQS
         editPage.editTitle(articleTitle);
         editPage.editDescription(articleDescription);
         editPage.insertTextInContent(articleContent);
-        WcmqsBlogPage blogPage = editPage.clickSubmitButton().render();
+        blogPage = editPage.clickSubmitButton().render();
 
         String editedTitle = beforeEditTitle + articleTitle;
         blogPostPage = waitAndOpenBlogPost(blogPage, articleTitle, 4);
@@ -397,7 +407,7 @@ public class GeneralAWE extends AbstractWQS
     /*
      * AONE-5655 Editing any article via AWE - Cancel
      */
-    @AlfrescoTest(testlink="AONE-5655")
+    @AlfrescoTest(testlink = "AONE-5655")
     @Test(groups = {"WQS"})
     public void editAndCancelArticleViaAwe() throws Exception
     {
@@ -416,7 +426,9 @@ public class GeneralAWE extends AbstractWQS
         // ---- Expected results ----
         // Article is opened;
 
-        WcmqsBlogPostPage blogPostPage = openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
         Assert.assertNotNull(blogPostPage);
 
         // ---- Step 3 ----

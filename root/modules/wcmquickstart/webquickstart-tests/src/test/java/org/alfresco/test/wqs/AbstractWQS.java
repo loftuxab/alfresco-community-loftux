@@ -16,6 +16,8 @@ package org.alfresco.test.wqs;
 
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.MyTasksPage;
+import org.alfresco.po.share.dashlet.NoSuchDashletExpection;
+import org.alfresco.po.share.dashlet.SiteWelcomeDashlet;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
@@ -23,13 +25,6 @@ import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.steps.LoginActions;
 import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.util.ShareTestProperty;
-import org.alfresco.test.AlfrescoTests;
-import org.alfresco.test.util.BasicAuthPublicApiFactory;
-import org.alfresco.test.util.SiteService;
-import org.alfresco.test.util.UserService;
-import org.alfresco.webdrone.WebDrone;
-import org.alfresco.webdrone.WebDroneImpl;
-import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.po.wqs.FactoryWqsPage;
 import org.alfresco.po.wqs.WcmqsBlogPage;
 import org.alfresco.po.wqs.WcmqsBlogPostPage;
@@ -38,11 +33,24 @@ import org.alfresco.po.wqs.WcmqsHomePage;
 import org.alfresco.po.wqs.WcmqsLoginPage;
 import org.alfresco.po.wqs.WcmqsNewsArticleDetails;
 import org.alfresco.po.wqs.WcmqsNewsPage;
+import org.alfresco.test.AlfrescoTests;
+import org.alfresco.test.util.BasicAuthPublicApiFactory;
+import org.alfresco.test.util.SiteService;
+import org.alfresco.test.util.UserService;
+import org.alfresco.webdrone.HtmlPage;
+import org.alfresco.webdrone.RenderTime;
+import org.alfresco.webdrone.WebDrone;
+import org.alfresco.webdrone.WebDroneImpl;
+import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.interactions.Actions;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.testng.Assert;
@@ -93,6 +101,7 @@ public abstract class AbstractWQS implements AlfrescoTests
     protected final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
     protected final String QUICK_START_EDITORIAL = "Quick Start Editorial";
     protected final String ROOT = "root";
+    protected final String DOCLIB = "DocumentLibrary";
     protected String testName;
     protected WebDrone drone;
     protected LoginActions loginActions = new LoginActions();
@@ -345,6 +354,13 @@ public abstract class AbstractWQS implements AlfrescoTests
         return stringBuilder.toString();
     }
 
+    /**
+     * Open the article from the selected category
+     *
+     * @param newsCategory
+     * @param newsTitle
+     * @return WcmqsNewsArticleDetails
+     */
     public WcmqsNewsArticleDetails openNewsFromCategory(String newsCategory, String newsTitle)
     {
 
@@ -362,14 +378,6 @@ public abstract class AbstractWQS implements AlfrescoTests
         }
     }
 
-    public WcmqsEditPage createNewsArticle(WcmqsNewsArticleDetails newsArticleDetails)
-    {
-        newsArticleDetails.clickCreateButton();
-        WcmqsEditPage editPage = new WcmqsEditPage(drone).render();
-        Assert.assertNotNull(editPage);
-        return editPage;
-    }
-
     /**
      * Method that waits for the news article to appear on the page for maximum minutesToWait
      * and then opens
@@ -379,7 +387,7 @@ public abstract class AbstractWQS implements AlfrescoTests
      * @param minutesToWait
      */
 
-    public void waitAndOpenNewsArticle(WcmqsNewsPage newsPage, String newsArticleTitle, int minutesToWait)
+    public WcmqsNewsArticleDetails waitAndOpenNewsArticle(WcmqsNewsPage newsPage, String newsArticleTitle, int minutesToWait)
     {
         int waitInMilliSeconds = 3000;
         int maxTimeWaitInMilliSeconds = 60000 * minutesToWait;
@@ -409,84 +417,15 @@ public abstract class AbstractWQS implements AlfrescoTests
             }
 
         }
-
+        return FactoryWqsPage.resolveWqsPage(drone).render();
     }
 
-    public void fillInNameAndContentForNewsArticle(WcmqsEditPage editPage, String newsArticleName, String newsArticleTitle, String newsArticleContent)
-    {
-        String foundTitle;
-        String foundContent;
-
-        editPage.editName(newsArticleName);
-        editPage.editTitle(newsArticleTitle);
-        editPage.insertTextInContent(newsArticleContent);
-        editPage.clickSubmitButton();
-
-        WcmqsNewsPage newNewsPage = new WcmqsNewsPage(drone).render();
-        newNewsPage = newNewsPage.openNewsPageFolder(WcmqsNewsPage.GLOBAL);
-        waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
-        WcmqsNewsArticleDetails newNewsArticleDetails = new WcmqsNewsArticleDetails(drone).render();
-
-        foundTitle = newNewsArticleDetails.getTitleOfNewsArticle();
-        foundContent = newNewsArticleDetails.getBodyOfNewsArticle();
-        Assert.assertEquals(newsArticleTitle, foundTitle);
-        Assert.assertEquals(newsArticleContent, foundContent);
-    }
-
-    /*
-     * The user most login in Share
-     */
-
-    public void verifyInDocumentLibraryForNewsArticle(String newsArticleName, String newsArticleContent, String category, String siteName)
-    {
-
-        String foundTitle;
-        String foundContent;
-
-        DocumentLibraryPage documentLibraryPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.NEWS).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(category).render();
-        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
-
-        foundTitle = blogPostDetailsPage.getDocumentTitle();
-        foundContent = blogPostDetailsPage.getDocumentBody();
-
-        Assert.assertEquals(newsArticleName, foundTitle);
-        Assert.assertTrue(foundContent.contains(newsArticleContent));
-    }
 
     public void navigateTo(String url)
     {
         drone.navigateTo(url);
     }
 
-    public WcmqsBlogPostPage openBlogPost(String blogPost)
-    {
-
-        WcmqsHomePage homePage = FactoryWqsPage.resolveWqsPage(drone).render();
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        blogPage.openBlogPost(blogPost);
-
-        WcmqsBlogPostPage blogPostPage = new WcmqsBlogPostPage(drone);
-        blogPostPage.render();
-        Assert.assertNotNull(blogPostPage);
-        return blogPostPage;
-    }
-
-    public WcmqsEditPage createBlogPost(WcmqsBlogPostPage blogPostPage)
-    {
-        WcmqsEditPage editPage = blogPostPage.createArticle().render();
-        Assert.assertNotNull(editPage);
-        return editPage;
-    }
-
-    public void verifyAllFields(WcmqsEditPage editPage)
-    {
-        Assert.assertNotNull(editPage.getArticleDetails());
-    }
 
     /**
      * Method that waits for the blog post to appear on the page for maximum minutesToWait
@@ -541,48 +480,27 @@ public abstract class AbstractWQS implements AlfrescoTests
 
     }
 
-    public void fillInNameAndContentFieldsForBlogPost(WcmqsEditPage editPage, String blogPostName, String blogPostTitle, String blogPostContent)
-    {
-        String foundTitle;
-        String foundContent;
 
-        editPage.editName(blogPostName);
-        editPage.editTitle(blogPostTitle);
-        editPage.insertTextInContent(blogPostContent);
-        editPage.clickSubmitButton();
-
-        WcmqsBlogPage newBlogPage = new WcmqsBlogPage(drone).render();
-        waitAndOpenBlogPost(newBlogPage, blogPostTitle, MAX_WAIT_TIME_MINUTES);
-        WcmqsBlogPostPage newBlogPost = new WcmqsBlogPostPage(drone).render();
-
-        foundTitle = newBlogPost.getTitle();
-        foundContent = newBlogPost.getContent();
-        Assert.assertEquals(blogPostTitle, foundTitle);
-        Assert.assertEquals(blogPostContent, foundContent);
-    }
-
-    /*
-     * The user most login in Share
+    /**
+     * Assume the WcmqsEditPage is opened. Add name, title and content, then submit the form
+     *
+     * @param postName
+     * @param postTitle
+     * @param postContent
+     * @return HtmlPage (WcmqsBlogPage or WcmqsNewsPage)
      */
 
-    public void verifyInDocumentLibraryForBlogPost(String siteName, String blogPostName, String blogPostContent)
+    public HtmlPage fillWqsCreateForm(String postName, String postTitle, String postContent)
     {
+        WcmqsEditPage editPage = new WcmqsEditPage(drone);
 
-        String foundTitle;
-        String foundContent;
+        editPage.editName(postName);
+        editPage.editTitle(postTitle);
+        editPage.insertTextInContent(postContent);
 
-        DocumentLibraryPage documentLibraryPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsBlogPage.BLOG).render();
-        DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(blogPostName).render();
-
-        foundTitle = blogPostDetailsPage.getDocumentTitle();
-        foundContent = blogPostDetailsPage.getDocumentBody();
-        Assert.assertEquals(blogPostName, foundTitle);
-        Assert.assertTrue(foundContent.contains(blogPostContent));
+        return editPage.clickSubmitButton();
     }
+
 
     public DocumentLibraryPage navigateToWqsFolderFromRoot(DocumentLibraryPage documentLibraryPage, String folderName)
     {
@@ -625,6 +543,10 @@ public abstract class AbstractWQS implements AlfrescoTests
         }
     }
 
+    /**
+     * Get the IP address of the shareUrl
+     * @return String
+     */
     public String getIpAddress()
     {
         String hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
@@ -644,14 +566,14 @@ public abstract class AbstractWQS implements AlfrescoTests
 
 
     /*
-     * This method makes sure the admin is logged in WQS for edit mode.
+     * Make sure the admin is logged in WQS for edit mode.
      * When open an article for the first time, the Login dialog is displayed.
      */
 
     public void loginToWqs()
     {
 
-       if(drone.isElementDisplayed(By.cssSelector("div[id='awe-login']")))
+        if (drone.isElementDisplayed(By.cssSelector("div[id='awe-login']")))
         {
             WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
             wcmqsLoginPage.render();
@@ -673,6 +595,10 @@ public abstract class AbstractWQS implements AlfrescoTests
         }
     }
 
+    /**
+     * Assume the user is on HomePage.
+     * This method is used to make sure the user is logged in before doing any other action.
+     */
 
     public void loginToWqsFromHomePage()
     {
@@ -689,38 +615,94 @@ public abstract class AbstractWQS implements AlfrescoTests
         loginToWqs();
     }
 
+    /**
+     * Before navigating to WQS, the imported files need time to index
+     */
 
     public void waitForWcmqsToLoad()
     {
-        boolean wqsLoad = false;
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        long waitInMilliSeconds = 3000;
-        long maxTimeWaitInMilliSeconds = maxWaitTime;
-
-        while (!wqsLoad && maxTimeWaitInMilliSeconds > 0)
+        RenderTime timer = new RenderTime(9000);
+        try
         {
-            navigateTo(wqsURL);
-            if (homePage.isAlfrescoLogoDisplay())
+            while (true)
             {
-                wqsLoad = true;
-            }
-            else
-            {
+                timer.start();
                 synchronized (this)
                 {
                     try
                     {
-                        logger.info("Waiting for WQS to load.");
-                        wait(waitInMilliSeconds);
+                        this.wait(50L);
                     }
-                    catch (InterruptedException ex)
+                    catch (InterruptedException e)
                     {
                     }
                 }
-                drone.refresh();
-                maxTimeWaitInMilliSeconds = maxTimeWaitInMilliSeconds - waitInMilliSeconds;
+                try
+                {
+                    navigateTo(wqsURL);
+                    if(homePage.isAlfrescoLogoDisplay())
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        drone.refresh();
+                        navigateTo(wqsURL);
+                    }
+                }
+                catch (StaleElementReferenceException ste)
+                {
+                    logger.error("DOM has changed therefore page should render once change", ste);
+                }
+                finally
+                {
+                    timer.end();
+                }
             }
+        }
+        catch (PageRenderTimeException te)
+        {
+            throw new PageException("The WQS page was not loading");
+        }
+    }
 
+
+    /**
+     * Method that navigates back to home page
+     *
+     * @return
+     */
+    public HtmlPage returnToHomePage()
+    {
+        try
+        {
+            drone.find(By.cssSelector("div[id='logo']>a")).click();
+        }
+        catch (NoSuchElementException e)
+        {
+            logger.error("The logo was not found ", e);
+
+        }
+        return FactoryWqsPage.resolveWqsPage(drone);
+    }
+
+
+    /**
+     * Any updates on documents from wqs or share need a time to index
+     */
+    public void waitForDocumentsToIndex()
+    {
+        synchronized (this)
+        {
+            try
+            {
+                logger.info("Waiting for WQS to load.");
+                wait(3000);
+            }
+            catch (InterruptedException ex)
+            {
+            }
         }
     }
 }

@@ -123,11 +123,12 @@ public class WcmqsLoginPage extends SharePage
             inputUserName(userName);
             inputPassword(password);
             clickLoginButton();
+            drone.waitUntilElementPresent(By.cssSelector("button[id='awe--loginToggle-button']"), 3);
 
         }
-        catch (UnsupportedOperationException uso)
+        catch (UnsupportedOperationException| IllegalArgumentException e)
         {
-            throw new PageOperationException("Can not navigate to Wcmqs Home Page");
+            throw new PageOperationException("The login was not successfully ", e);
         }
     }
 

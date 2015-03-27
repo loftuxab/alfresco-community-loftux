@@ -8,6 +8,7 @@ import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
+import org.alfresco.po.wqs.WcmqsHomePage;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
@@ -15,6 +16,7 @@ import org.alfresco.po.wqs.WcmqsBlogPage;
 import org.alfresco.po.wqs.WcmqsBlogPostPage;
 import org.alfresco.po.wqs.WcmqsNewsArticleDetails;
 import org.alfresco.po.wqs.WcmqsNewsPage;
+import org.alfresco.test.wqs.web.news.NewsComponent;
 import org.apache.log4j.Logger;
 import org.springframework.social.alfresco.api.entities.Site;
 import org.testng.Assert;
@@ -123,7 +125,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsBlogPostPage wcmqsBlogPostPage = openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage wcmqsBlogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
         Assert.assertNotNull(wcmqsBlogPostPage, "Blog Post " + WcmqsBlogPage.ETHICAL_FUNDS + " is not opened");
 
         // ---- Step 3 ----
@@ -174,7 +178,7 @@ public class DeleteItemsViaAWE extends AbstractWQS
         documentLibPage.selectFolder(QUICK_START_EDITORIAL);
         documentLibPage.selectFolder(ROOT);
         documentLibPage.selectFolder(WcmqsBlogPage.BLOG);
-
+        waitForDocumentsToIndex();
         Assert.assertFalse(documentLibPage.isFileVisible(WcmqsBlogPage.BLOG_1), "Ethical funds page hasn't been deleted correctly");
         ShareUtil.logout(drone);
 
@@ -202,7 +206,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsBlogPostPage wcmqsBlogPostPage = openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage wcmqsBlogPostPage = blogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
         Assert.assertNotNull(wcmqsBlogPostPage, "Blog Post " + WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP + " is not opened");
 
         // ---- Step 3 ----
@@ -255,6 +261,7 @@ public class DeleteItemsViaAWE extends AbstractWQS
         documentLibPage.selectFolder(QUICK_START_EDITORIAL);
         documentLibPage.selectFolder(ROOT);
         documentLibPage.selectFolder(WcmqsBlogPage.BLOG);
+        waitForDocumentsToIndex();
         Assert.assertFalse(documentLibPage.isFileVisible(WcmqsBlogPage.BLOG_2), "Company organizes workshop page hasn't been deleted correctly");
         ShareUtil.logout(drone);
     }
@@ -280,7 +287,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsBlogPostPage wcmqsBlogPostPage = openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
+        WcmqsBlogPostPage wcmqsBlogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
         Assert.assertNotNull(wcmqsBlogPostPage, "Blog Post " + WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS + " is not opened");
 
         // ---- Step 3 ----
@@ -415,6 +424,7 @@ public class DeleteItemsViaAWE extends AbstractWQS
         documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
         documentLibPage.selectFolder(WcmqsNewsPage.GLOBAL);
 
+        waitForDocumentsToIndex();
         Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_4),
                 "Europe dept concerns ease but bank fears remain page hasn't been deleted correctly");
         ShareUtil.logout(drone);
@@ -558,7 +568,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // File is deleted and no more dislpayed in the list of articles;
 
-        WcmqsNewsPage newsPage = newsArticleDetails.confirmArticleDelete().render();
+        newsArticleDetails.confirmArticleDelete().render();
+        WcmqsHomePage homePage = returnToHomePage().render();
+        WcmqsNewsPage newsPage = homePage.selectMenu("news").render();
         Assert.assertTrue(newsPage.checkIfBlogIsDeleted(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY), "Deleting Blog Post " + WcmqsNewsPage.GLOBAL_CAR_INDUSTRY
                 + " failed. The blog is displayed.");
 
@@ -575,7 +587,7 @@ public class DeleteItemsViaAWE extends AbstractWQS
         documentLibPage.selectFolder(ROOT);
         documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
         documentLibPage.selectFolder(WcmqsNewsPage.COMPANIES);
-
+        waitForDocumentsToIndex();
         Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_2), "Global car industry page hasn't been deleted correctly");
         ShareUtil.logout(drone);
     }
@@ -654,7 +666,7 @@ public class DeleteItemsViaAWE extends AbstractWQS
         documentLibPage.selectFolder(ROOT);
         documentLibPage.selectFolder(WcmqsNewsPage.NEWS);
         documentLibPage.selectFolder(WcmqsNewsPage.COMPANIES);
-
+        waitForDocumentsToIndex();
         Assert.assertFalse(documentLibPage.isFileVisible(WcmqsNewsPage.ARTICLE_1),
                 "Fresh flight to Swiss franc as Europe's bond strains return page hasn't been deleted correctly");
         ShareUtil.logout(drone);

@@ -36,6 +36,7 @@ public class ContactWorkflowTests extends AbstractWQS
     private String testName;
     private String siteName;
     private String ipAddress;
+    private String[] loginInfo;
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -46,14 +47,15 @@ public class ContactWorkflowTests extends AbstractWQS
         testName = this.getClass().getSimpleName();
         siteName = testName + System.currentTimeMillis();
         ipAddress = getIpAddress();
+        loginInfo = new String[] { ADMIN_USERNAME, ADMIN_PASSWORD };
         logger.info(" wcmqs url : " + wqsURL);
         logger.info("Start Tests from: " + testName);
 
         // User login
         // ---- Step 1 ----
         // ---- Step Action -----
-        // WCM Quick Start is installed; - is not required to be executed automatically
-        ShareUtil.loginAs(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
+        // WCM Quick Start is installed; is not required to be executed automatically
+        loginActions.loginToShare(drone, loginInfo, shareUrl);
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -141,7 +143,7 @@ public class ContactWorkflowTests extends AbstractWQS
         // ---- Expected results ----
         // Admin is logged in Alfresco Share;
 
-        ShareUtil.loginAs(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
+        loginActions.loginToShare(drone, loginInfo, shareUrl);
 
         // ---- Step 4 ----
         // ---- Step action ----
@@ -187,7 +189,7 @@ public class ContactWorkflowTests extends AbstractWQS
         // ---- Expected results ----
         // Admin is logged in Alfresco Share;
 
-        ShareUtil.loginAs(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
+        loginActions.loginToShare(drone, loginInfo, shareUrl);
 
         // ---- Step 2 ----
         // ---- Step action ----
