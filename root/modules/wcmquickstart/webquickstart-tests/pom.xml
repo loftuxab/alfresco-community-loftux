@@ -290,7 +290,13 @@
             </build>
         </profile>
         <profile>
-            <id>disable-singleTicket</id>
+            <id>disable-singleticket</id>
+            <activation>
+                <property>
+                    <name>disable.singleticket</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <!-- Set authentication.ticket.useSingleTicketPerUser=false -->
@@ -307,8 +313,10 @@
                                     <target>
                                         <property location="target/alf-installation/tomcat/shared/classes/alfresco-global.properties" name="alf.prop"/>
                                         <echo append="true" output="${alf.prop}"/>
-                                        <echo append="true" output="${alf.prop}"># Disable parallel mode
-                                            authentication.ticket.useSingleTicketPerUser=false</echo>
+                                        <echo append="true" output="${alf.prop}">
+                                            # Disable parallel mode
+                                            authentication.ticket.useSingleTicketPerUser=false
+                                        </echo>
                                         <echo append="true" output="${alf.prop}"/>
                                     </target>
                                 </configuration>
