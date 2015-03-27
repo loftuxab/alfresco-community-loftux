@@ -22,6 +22,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -533,17 +534,12 @@ public class CreateUserAPI extends AlfrescoHttpClient
         }
 
         String reqURL = getAPIURL(drone) + apiContextCloudInternal + "sites/" + siteShortname + "/invitations";
-
         logger.info("Request URL - " + reqURL + " for Site Invitation");
-
         String[] authDetails = getAuthDetails(invitingUsername);
-
         String[] headers = getRequestHeaders(null);
-
         HttpClient client = null;
         HttpPost request = null;
         HttpResponse response = null;
-
         JSONObject body = new JSONObject();
         body.put("inviterEmail", invitingUsername);
         body.put("inviteeEmails", (new JSONArray()).put(email));
@@ -555,9 +551,7 @@ public class CreateUserAPI extends AlfrescoHttpClient
             client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
             request = generatePostRequest(reqURL, headers, body);
             response = executeRequest(client, request);
-
             String result = JSONUtil.readStream(response.getEntity()).toJSONString();
-
             String regKey = getParameterValue("invitations", "key", result);
             String regId = getParameterValue("invitations", "id", result);
             return new String[] { regKey, regId };
@@ -587,11 +581,9 @@ public class CreateUserAPI extends AlfrescoHttpClient
 
         String[] authDetails = getAuthDetails(invitedUserEmail);
         String[] headers = getRequestHeaders(null);
-
         HttpGet request = generateGetRequest(reqURL, headers);
         HttpClient client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
         HttpResponse response = executeRequestHttpResp(client, request);
-
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
         {
             logger.info("Invite is actioned by user: " + invitedUserEmail);
@@ -602,7 +594,7 @@ public class CreateUserAPI extends AlfrescoHttpClient
     }
 
     /**
-     * Use this method for Enterprise and Cloud to create user and add it to specific group
+     * * Use this method for Enterprise and Cloud to create user and add it to specific group
      * Implementation for cloud requires the tenant to be upgraded from free network
      * Hence This requires admin console / admin access
      * Implementation for Enterprise requires admin user who can create and add users to specified group
@@ -633,4 +625,86 @@ public class CreateUserAPI extends AlfrescoHttpClient
 
         return result;
     }
+
+    /**
+     * Use this method for Enterprise to invite user to a site with role and accept.
+     * 
+     * @param drone
+     * @param invitingUserName
+     * @param siteName
+     * @param role (SITEMANAGER, SITECOLLABORATOR, SITECONTRIBUTOR, SITECONSUMER)
+     * @return boolean <true> if invitation succeded
+     * @throws Exception
+     */
+    public static Boolean inviteUserToSiteEnterpriseAPI(WebDrone drone, String invitingUserName, String userToInvite, String siteName, String role)
+            throws Exception
+    {
+        if (isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use in Cloud");
+        }
+        String serverPath = dronePropertiesMap.get(drone).getShareUrl();
+        serverPath = serverPath.replace("http://", "");
+        serverPath = serverPath.replaceAll(":(.*)", "");
+        serverPath = serverPath.replaceAll("/share", "");
+        String url = getAPIURL(drone) + "invite/start?inviteeFirstName=" + userToInvite + "&inviteeLastName=" + "lastName" + "&inviteeEmail=" + userToInvite
+                + "@test.com" + "&inviteeUserName=" + userToInvite + "&siteShortName=" + siteName + "&inviteeSiteRole=" + role + "&serverPath=" + serverPath
+                + "&acceptUrl=" + "page/accept-invite" + "&rejectUrl=" + "page/reject-invite";
+        logger.info("Using Url - " + url + " to invite user " + userToInvite);
+        String[] authDetails = getAuthDetails(invitingUserName);
+        String[] headers = getRequestHeaders("application/json;charset=utf-8");
+        HttpGet request = generateGetRequest(url, headers);
+        HttpClient client = getHttpClientWithBasicAuth(url, authDetails[0], authDetails[1]);
+        HttpResponse response = executeRequestHttpResp(client, request);
+        try
+        {
+            switch (response.getStatusLine().getStatusCode())
+            {
+                case HttpStatus.SC_OK:
+                    logger.info("User successfully invited: " + userToInvite);
+                    String result = JSONUtil.readStream(response.getEntity()).toJSONString();
+                    String inviteId = getParameterValue("inviteId", "", result);
+                    String inviteTicket = getParameterValue("inviteTicket", "", result);
+                    return acceptSiteInviteEnterpriseAPI(drone, userToInvite, inviteId, inviteTicket);
+                default:
+                    logger.error("Unable to invite user: " + response.toString());
+                    break;
+            }
+        }
+        finally
+        {
+            releaseConnection(client, response.getEntity());
+        }
+        return false;
+    }
+
+    /**
+     * Accept site invite API.
+     * 
+     * @param drone
+     * @param inviteUser
+     * @param inviteId
+     * @param inviteTicket
+     * @return boolean <true> if the invitation is accepted
+     * @throws Exception
+     */
+    private static boolean acceptSiteInviteEnterpriseAPI(WebDrone drone, String inviteUser, String inviteId, String inviteTicket) throws Exception
+    {
+        if (isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use for Cloud");
+        }
+        String url = getAPIURL(drone) + "invite/" + inviteId + "/" + inviteTicket + "/accept";
+        HttpPut request = new HttpPut(url);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpResponse response = client.execute(request);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        {
+            logger.info("Invite is accepted by user: " + inviteUser);
+            return true;
+        }
+        logger.error("Invite could not be actioned by user: " + inviteUser);
+        return false;
+    }
+
 }
