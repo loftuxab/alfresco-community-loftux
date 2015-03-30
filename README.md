@@ -10,11 +10,20 @@ The intention is to keep the code line as close as possible to the Alfresco offi
 The master branch is always a mirror to the Alfresco Gtihub master branch.  
 The loftux branch is the one we commit our changes to, and this is the branch you should check out and build against.  
 
-     git checkout loftux  
-     ant -f loftux.xml distribute
+    git checkout loftux  
+    ./mvnLoftuxWrapper.sh install
+
+The result of build is found in  
+
+    projects/web-client/target/alfresco.war  
+    projects/slingshot/target/share.war  
+    projects/solr4/target/solr4.war  
+    projects/solr4/target/solr4-config-ssl.zip
+
+The entire project us built (except installer), look for other components in target folders.
 
 ## Issues
-We use the issue tracker to record the changes we have made to code. The changes we make are on behalf of Loftux AB customers. If you are not a Loftux AB customer, please file issues only if you are sure that the issue is due to a change that was made by us. All other issues should be filed in the official Alfresco issue tracker https://issues.alfresco.com. Before you do that, make sure that the issue can be reproduced by an Alfresco official build. 
+We use the issue tracker to record the changes we have made to code. The changes we make are on behalf of Loftux AB customers. If you are not a Loftux AB customer, please file issues only if you are sure that the issue is due to a change that was made by us. All other issues should be filed in the official Alfresco issue tracker https://issues.alfresco.com. Before you do that, make sure that the issue can be reproduced by an Alfresco official build.
 We will be somewhat restrictive with accepting issues from non-customers, since we do not have the resources to research the issues and fix them. But if you already have a patch or a proposed fix, then we will try to incorporate them.
 
 ## Should I use this source?
