@@ -9,5 +9,12 @@
          <region-id>left1</region-id>
          <url>/search/results</url>
       </component>
+      <component>
+         <region-id>right1</region-id>
+         <url>/list/narrow</url>
+         <properties>
+            <collection>latest.articles</collection>
+         </properties>         
+      </component>
    </components>
 </page>
