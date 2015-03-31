@@ -53,6 +53,10 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
     protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path) throws FileNotFoundException
     {
         FileInfo nodeInfo = pathHelper.resolvePathFileInfo(URLDecoder.decode(path));
+        if (nodeInfo == null)
+        {
+        	throw new FileNotFoundException(path);
+        }
         FileInfo workingCopy = getWorkingCopy(nodeInfo.getNodeRef());
         return workingCopy != null ? workingCopy : nodeInfo;
     }

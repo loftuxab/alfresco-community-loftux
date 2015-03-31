@@ -249,7 +249,7 @@ public class VtiFilter implements Filter
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Return VTI answer for HEAD request");
+                logger.debug("Return VTI answer for " + httpMethod + " request");
             }
             httpResponse.setHeader("Public-Extension", "http://schemas.microsoft.com/repl-2");
             if (METHOD_GET.equals(httpMethod))
