@@ -46,6 +46,10 @@ public class UnlockMethod extends org.alfresco.repo.webdav.UnlockMethod
     protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path) throws FileNotFoundException
     {
         FileInfo nodeInfo = pathHelper.resolvePathFileInfo(path);
+        if (nodeInfo == null)
+        {
+        	throw new FileNotFoundException(path);
+        }
         FileInfo workingCopy = getWorkingCopy(nodeInfo.getNodeRef());
         return workingCopy != null ? workingCopy : nodeInfo;
     }
