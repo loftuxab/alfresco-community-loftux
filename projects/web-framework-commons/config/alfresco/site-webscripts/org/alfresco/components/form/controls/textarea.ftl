@@ -11,7 +11,11 @@
       <#if field.control.params.activateLinks?? && field.control.params.activateLinks == "true">
          <#assign fieldValue=field.value?html?replace("((http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?\\^=%&:\\/~\\+#]*[\\w\\-\\@?\\^=%&\\/~\\+#])?)", "<a href=\"$1\" target=\"_blank\">$1</a>", "r")>
       <#else>
-         <#assign fieldValue=field.value?html>
+            <#if field.control.params.saveLineBreaks?? && field.control.params.saveLineBreaks == "true">
+               <#assign fieldValue=field.value?html?replace("\n", "<br>")>
+            <#else>
+            <#assign fieldValue=field.value?html>
+            </#if>
       </#if>
       <span class="viewmode-value"><#if fieldValue == "">${msg("form.control.novalue")}<#else>${fieldValue}</#if></span>
    </div>
