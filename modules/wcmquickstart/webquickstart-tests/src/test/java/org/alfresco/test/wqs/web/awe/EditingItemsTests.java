@@ -65,21 +65,12 @@ public class EditingItemsTests extends AbstractWQS
         logger.info(" wcmqs url : " + wqsURL);
         logger.info("Start Tests from: " + testName);
 
-//        setSiteAsHostName(siteName);
-        // User login
-        // ---- Step 1 ----
-        // ---- Step Action -----
-        // WCM Quick Start is installed; - is not required to be executed automatically
+
         loginActions.loginToShare(drone, loginInfo, shareUrl);
 
-        // ---- Step 2 ----
-        // ---- Step Action -----
-        // Site "My Web Site" is created in Alfresco Share;
+
         siteService.create(ADMIN_USERNAME, ADMIN_PASSWORD, DOMAIN_FREE, siteName, "", Site.Visibility.PUBLIC);
 
-        // ---- Step 3 ----
-        // ---- Step Action -----
-        // WCM Quick Start Site Data is imported;
         SiteDashboardPage siteDashBoard = (SiteDashboardPage) siteActions.openSiteDashboard(drone, siteName);
         CustomiseSiteDashboardPage customiseSiteDashboardPage = siteDashBoard.getSiteNav().selectCustomizeDashboard().render();
         siteDashBoard = customiseSiteDashboardPage.addDashlet(Dashlets.WEB_QUICK_START, 1).render();
@@ -112,7 +103,6 @@ public class EditingItemsTests extends AbstractWQS
         logger.info("Delete the site after all tests where run.");
         siteService.delete(ADMIN_USERNAME, ADMIN_PASSWORD, DOMAIN_FREE, siteName);
         super.tearDown();
-
     }
 
 

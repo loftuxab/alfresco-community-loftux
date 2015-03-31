@@ -18,6 +18,9 @@ import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.util.UserService;
 import org.alfresco.test.wqs.AbstractWQS;
+import org.alfresco.test.wqs.web.blog.BlogComponent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.springframework.social.alfresco.api.entities.Site;
@@ -38,7 +41,7 @@ import static org.testng.Assert.assertTrue;
 @Listeners(FailedTestListener.class)
 public class WqsShareTests extends AbstractWQS
 {
-    private static final Logger logger = Logger.getLogger(WqsShareTests.class);
+    private static final Log logger = LogFactory.getLog(WqsShareTests.class);
     String newsName;
     String wqsURL;
     String siteName;
