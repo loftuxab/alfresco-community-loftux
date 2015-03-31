@@ -42,6 +42,8 @@ import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
 import org.alfresco.po.wqs.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.springframework.social.alfresco.api.entities.Site;
 import org.testng.Assert;
@@ -67,7 +69,8 @@ import static org.hamcrest.Matchers.*;
 @Listeners(FailedTestListener.class)
 public class BlogComponent extends AbstractWQS
 {
-    private static final Logger logger = Logger.getLogger(BlogComponent.class);
+//    private static final Logger logger = Logger.getLogger(BlogComponent.class);
+private static final Log logger = LogFactory.getLog(BlogComponent.class);
     private String siteName;
     private String ipAddress;
     private String[] loginInfo;

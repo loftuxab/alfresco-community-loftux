@@ -124,7 +124,6 @@ public abstract class AbstractWQS implements AlfrescoTests
     public static long maxWaitTime = 30000;
     private static Log logger = LogFactory.getLog(AbstractWQS.class);
 
-
     @BeforeSuite(alwaysRun = true)
     @Parameters({"contextFileName"})
     public static void setupContext(@Optional("wqs-context.xml") String contextFileName)
@@ -134,9 +133,9 @@ public abstract class AbstractWQS implements AlfrescoTests
         ctx = new ClassPathXmlApplicationContext(contextXMLList.toArray(new String[contextXMLList.size()]));
         testProperties = (ShareTestProperty) ctx.getBean("shareTestProperties");
         wqsTestProperties = (WqsTestProperty) ctx.getBean("wqsProperties");
-
-        wqsURL = wqsTestProperties.getWcmqs();
         shareUrl = testProperties.getShareUrl();
+        wqsURL = wqsTestProperties.getWcmqs().replace((shareUrl).replaceAll(".*\\//|\\:.*", ""), getIpAddress());
+
         ADMIN_USERNAME = testProperties.getUsername();
         ADMIN_PASSWORD = testProperties.getPassword();
         alfrescoVersion = testProperties.getAlfrescoVersion();
@@ -145,18 +144,12 @@ public abstract class AbstractWQS implements AlfrescoTests
 
     public void setup() throws Exception
     {
-
         siteService = (SiteService) ctx.getBean("siteService");
         userService = (UserService) ctx.getBean("userService");
         dataPrepProperties = (BasicAuthPublicApiFactory) ctx.getBean("basicAuthPublicApiFactory");
         drone = (WebDrone) ctx.getBean("webDrone");
-
-        droneMap.put("std_drone", drone);
-        dronePropertiesMap.put(drone, testProperties);
         drone.maximize();
-
         maxWaitTime = ((WebDroneImpl) drone).getMaxPageRenderWaitTime();
-
     }
 
     /**
@@ -547,7 +540,7 @@ public abstract class AbstractWQS implements AlfrescoTests
      * Get the IP address of the shareUrl
      * @return String
      */
-    public String getIpAddress()
+    public static String getIpAddress()
     {
         String hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
         String ipAddress = "";
@@ -615,6 +608,7 @@ public abstract class AbstractWQS implements AlfrescoTests
         loginToWqs();
     }
 
+
     /**
      * Before navigating to WQS, the imported files need time to index
      */
@@ -663,7 +657,7 @@ public abstract class AbstractWQS implements AlfrescoTests
         }
         catch (PageRenderTimeException te)
         {
-            throw new PageException("The WQS page was not loading");
+            throw new PageException("The WQS page was not loading at " + wqsURL);
         }
     }
 

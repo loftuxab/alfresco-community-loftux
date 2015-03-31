@@ -12,10 +12,13 @@ import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
+import org.alfresco.test.wqs.web.blog.BlogComponent;
 import org.alfresco.test.wqs.web.search.SearchTests;
 import org.alfresco.po.wqs.FactoryWqsPage;
 import org.alfresco.po.wqs.WcmqsContactPage;
 import org.alfresco.po.wqs.WcmqsHomePage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.springframework.social.alfresco.api.entities.Site;
 import org.testng.Assert;
@@ -31,7 +34,7 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class ContactWorkflowTests extends AbstractWQS
 {
-    private static final Logger logger = Logger.getLogger(SearchTests.class);
+    private static final Log logger = LogFactory.getLog(ContactWorkflowTests.class);
 
     private String testName;
     private String siteName;
