@@ -2369,10 +2369,22 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
          if (collapse)
          {
             YUIDom.replaceClass(p_obj.controller, config.CLASS_OPEN, config.CLASS_CLOSED);
+                  if (p_obj.filterName)
+                  {
+                      // Update local collapsed preferences : add item
+                      Alfresco.util.createTwister.collapsed = !Alfresco.util.createTwister.collapsed ? 
+                              p_obj.filterName : Alfresco.util.createTwister.collapsed.concat(",").concat(p_obj.filterName); 
+                  }
          }
          else
          {
             YUIDom.replaceClass(p_obj.controller, config.CLASS_CLOSED, config.CLASS_OPEN);
+                  if (p_obj.filterName)
+                  {
+                      // Update local collapsed preferences : remove item
+                      var replaceRegExp = new RegExp(p_obj.filterName + ",|," + p_obj.filterName + "|" + p_obj.filterName);
+                      Alfresco.util.createTwister.collapsed = Alfresco.util.createTwister.collapsed.replace(replaceRegExp, "");
+                  }
          }
          YUIDom.setStyle(p_obj.panel, "display", collapse ? "none" : "block");
 
