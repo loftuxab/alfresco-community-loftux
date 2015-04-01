@@ -11203,6 +11203,21 @@ Alfresco.util.RENDERLOOPSIZE = 25;
                   {
                      document.location.href = history.state.previous_url;
                   }
+                  else if (document.location.href == document.referrer)
+                  {
+                     if (this.options.defaultUrl)
+                     {
+                        /**
+                         * Now we know that there was no previous page, lets use the default url that was provided for this form
+                         */
+                        document.location.href = this.options.defaultUrl;
+                     }
+                     else
+                     {
+                        // What a sad form, fallback to use the sites default url if provided, otherwise assume the context will work
+                        document.location.href = this.getSiteDefaultUrl() || Alfresco.constants.URL_CONTEXT;
+                     }
+                  }
                   else
                   {
                      /**
