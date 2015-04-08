@@ -300,7 +300,28 @@ Alfresco.util.onlineEditUrlAos = function(aos, record)
    {
       throw new Error("Alfresco.util.onlineEditUrlAos: Sanity checks failed.");
    }
-   return Alfresco.util.combinePaths(aos.baseUrl, record.webdavUrl.substring(7));
+   // obtain the path in the repository from the webdav URL
+   var pathInRepository = record.webdavUrl.substring(7);
+   // Construct a URL from the path in the repo
+   var result = Alfresco.util.combinePaths(aos.baseUrl, pathInRepository);
+   // Check if the length of the encoded path exceeds 256 characters. If so, use the nodeid instead of the path
+   if (encodeURI(result).length > 256)
+   {
+      var filenameSepIdx = record.webdavUrl.lastIndexOf("/");
+      if(filenameSepIdx < 0)
+      {
+         throw new Error("Alfresco.util.onlineEditUrlAos: Missing filename in webdav URL.");
+      }
+      var filename = record.webdavUrl.substring(filenameSepIdx + 1);
+      result = Alfresco.util.combinePaths(aos.baseUrl, "_aos_nodeid", record.nodeRef.split("/").pop(), filename)
+   }
+   // If URL still exceeds 256 characters, we also need to replace the filename
+   if(encodeURI(result).length > 256)
+   {
+      var fileextSepIdx = record.webdavUrl.lastIndexOf(".");
+      result = Alfresco.util.combinePaths(aos.baseUrl, "_aos_nodeid", record.nodeRef.split("/").pop(), "Document", fileextSepIdx > 0 ? record.webdavUrl.substring(fileextSepIdx + 1) : '');
+   }
+   return result;
 };
 
 /**
