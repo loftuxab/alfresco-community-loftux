@@ -156,7 +156,7 @@ public class ContactWorkflowTests extends AbstractWQS
 
         String taskName = "Contact request from " + visitorName;
         MyTasksPage myTasksPage = siteActions.getSharePage(drone).getNav().selectMyTasks().render();
-        waitForCommentPresent(myTasksPage, taskName);
+//        Assert.assertTrue(myTasksPage.findTaskRow(taskName).isDisplayed());
         Assert.assertTrue(myTasksPage.isTaskPresent(taskName), "Task: " + taskName + " is not present.");
 
         ShareUtil.logout(drone);

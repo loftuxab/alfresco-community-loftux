@@ -16,11 +16,8 @@ package org.alfresco.test.wqs;
 
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.po.share.dashlet.NoSuchDashletExpection;
-import org.alfresco.po.share.dashlet.SiteWelcomeDashlet;
 import org.alfresco.po.share.site.document.ContentDetails;
 import org.alfresco.po.share.site.document.ContentType;
-import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.steps.LoginActions;
 import org.alfresco.po.share.steps.SiteActions;
@@ -47,16 +44,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.interactions.Actions;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Optional;
@@ -79,34 +74,7 @@ import java.util.Random;
  */
 public abstract class AbstractWQS implements AlfrescoTests
 {
-    protected static ApplicationContext ctx;
-    protected static String shareUrl;
-    protected static String wqsURL;
-    protected static AlfrescoVersion alfrescoVersion;
-    protected static String ADMIN_USERNAME;
-    protected static String ADMIN_PASSWORD;
-
-    protected static Map<WebDrone, ShareTestProperty> dronePropertiesMap = new HashMap<WebDrone, ShareTestProperty>();
-    Map<String, WebDrone> droneMap = new HashMap<String, WebDrone>();
-    protected static ShareTestProperty testProperties;
-    protected SiteService siteService;
-    protected UserService userService;
-    protected static BasicAuthPublicApiFactory dataPrepProperties;
-    private static WqsTestProperty wqsTestProperties;
-
-    protected static String UNIQUE_TESTDATA_STRING = "newdata";
-    protected static String DOMAIN_FREE = "freethtnew.test";
-    protected static String DOMAIN_HYBRID = "hybridnew.test";
-
-    protected final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
-    protected final String QUICK_START_EDITORIAL = "Quick Start Editorial";
-    protected final String ROOT = "root";
-    protected final String DOCLIB = "DocumentLibrary";
-    protected String testName;
-    protected WebDrone drone;
-    protected LoginActions loginActions = new LoginActions();
-    protected SiteActions siteActions = new SiteActions();
-
+    public static final String SLASH = File.separator;
     protected static final String SITE_WEB_QUICK_START_DASHLET = "site-wqs";
     protected static final String QUICK_START_LIVE = "Quick Start Live";
     protected static final String NEWS = "news";
@@ -114,15 +82,36 @@ public abstract class AbstractWQS implements AlfrescoTests
     protected static final String ACCOUNTING = "accounting";
     protected static final String ACCOUNTING_DATA = "Accounting";
     protected static final String DEFAULT_PASSWORD = "password";
-
-    public static final String SLASH = File.separator;
     private static final String SRC_ROOT = System.getProperty("user.dir") + SLASH;
-    private static String RESULTS_FOLDER = SRC_ROOT + "test-output" + SLASH;
     protected static final String DATA_FOLDER = SRC_ROOT + "testdata" + SLASH;
-
-    protected long MAX_WAIT_TIME_MINUTES = 120000;
     public static long maxWaitTime;
+    protected static ApplicationContext ctx;
+    protected static String shareUrl;
+    protected static String wqsURL;
+    protected static AlfrescoVersion alfrescoVersion;
+    protected static String ADMIN_USERNAME;
+    protected static String ADMIN_PASSWORD;
+    protected static Map<WebDrone, ShareTestProperty> dronePropertiesMap = new HashMap<WebDrone, ShareTestProperty>();
+    protected static ShareTestProperty testProperties;
+    protected static BasicAuthPublicApiFactory dataPrepProperties;
+    protected static String UNIQUE_TESTDATA_STRING = "newdata";
+    protected static String DOMAIN_FREE = "freethtnew.test";
+    protected static String DOMAIN_HYBRID = "hybridnew.test";
+    private static WqsTestProperty wqsTestProperties;
+    private static String RESULTS_FOLDER = SRC_ROOT + "test-output" + SLASH;
     private static Log logger = LogFactory.getLog(AbstractWQS.class);
+    protected final String ALFRESCO_QUICK_START = "Alfresco Quick Start";
+    protected final String QUICK_START_EDITORIAL = "Quick Start Editorial";
+    protected final String ROOT = "root";
+    protected final String DOCLIB = "DocumentLibrary";
+    protected SiteService siteService;
+    protected UserService userService;
+    protected String testName;
+    protected WebDrone drone;
+    protected LoginActions loginActions = new LoginActions();
+    protected SiteActions siteActions = new SiteActions();
+    protected long MAX_WAIT_TIME_MINUTES = 120000;
+    Map<String, WebDrone> droneMap = new HashMap<String, WebDrone>();
 
     @BeforeSuite(alwaysRun = true)
     @Parameters({"contextFileName"})
@@ -142,13 +131,40 @@ public abstract class AbstractWQS implements AlfrescoTests
 
     }
 
+    /**
+     * Get the IP address of the shareUrl
+     *
+     * @return String
+     */
+    public static String getIpAddress()
+    {
+        String hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
+        String ipAddress = "";
+        try
+        {
+            ipAddress = InetAddress.getByName(hostName).toString().replaceAll(".*/", "");
+            logger.info("Ip address from Alfresco server was obtained");
+        }
+        catch (IOException | SecurityException e)
+        {
+            logger.error("Ip address from Alfresco server could not be obtained");
+        }
+
+        return ipAddress;
+    }
+
+    @BeforeClass(alwaysRun = true)
+    public void getWebDrone() throws Exception
+    {
+        drone = (WebDrone) ctx.getBean("webDrone");
+        drone.maximize();
+    }
+
     public void setup() throws Exception
     {
         siteService = (SiteService) ctx.getBean("siteService");
         userService = (UserService) ctx.getBean("userService");
         dataPrepProperties = (BasicAuthPublicApiFactory) ctx.getBean("basicAuthPublicApiFactory");
-        drone = (WebDrone) ctx.getBean("webDrone");
-        drone.maximize();
         maxWaitTime = ((WebDroneImpl) drone).getMaxPageRenderWaitTime();
     }
 
@@ -185,7 +201,6 @@ public abstract class AbstractWQS implements AlfrescoTests
         return userName;
     }
 
-
     /**
      * Helper to consistently get the filename.
      *
@@ -210,29 +225,10 @@ public abstract class AbstractWQS implements AlfrescoTests
             logger.trace("shutting web drone");
         }
         // Close the browser
-        for (Map.Entry<String, WebDrone> entry : droneMap.entrySet())
+        if (drone != null)
         {
-            try
-            {
-                if (entry.getValue() != null)
-                {
-                    try
-                    {
-                        entry.getValue().quit();
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error("If it's tests associated with admin-console-summary-page. it's normal. If not - we have a problem.");
-                    }
-
-                    logger.info(entry.getKey() + " closed");
-                    logger.info("[Suite ] : End of Tests in: " + this.getClass().getSimpleName());
-                }
-            }
-            catch (Exception e)
-            {
-                logger.error("Failed to close previous instance of brower:" + entry.getKey(), e);
-            }
+            drone.quit();
+            drone = null;
         }
     }
 
@@ -412,17 +408,16 @@ public abstract class AbstractWQS implements AlfrescoTests
         return FactoryWqsPage.resolveWqsPage(drone).render();
     }
 
-
     public void navigateTo(String url)
     {
         drone.navigateTo(url);
     }
 
-
     /**
      * Method that waits for the blog post to appear on the page for maximum minutesToWait
      * and then opens it.
-     *  @param blogPage
+     *
+     * @param blogPage
      * @param blogPostTitle
      */
 
@@ -470,7 +465,6 @@ public abstract class AbstractWQS implements AlfrescoTests
 
     }
 
-
     /**
      * Assume the WcmqsEditPage is opened. Add name, title and content, then submit the form
      *
@@ -490,7 +484,6 @@ public abstract class AbstractWQS implements AlfrescoTests
 
         return editPage.clickSubmitButton();
     }
-
 
     public DocumentLibraryPage navigateToWqsFolderFromRoot(DocumentLibraryPage documentLibraryPage, String folderName)
     {
@@ -531,27 +524,6 @@ public abstract class AbstractWQS implements AlfrescoTests
             }
 
         }
-    }
-
-    /**
-     * Get the IP address of the shareUrl
-     * @return String
-     */
-    public static String getIpAddress()
-    {
-        String hostName = (shareUrl).replaceAll(".*\\//|\\:.*", "");
-        String ipAddress = "";
-        try
-        {
-            ipAddress = InetAddress.getByName(hostName).toString().replaceAll(".*/", "");
-            logger.info("Ip address from Alfresco server was obtained");
-        }
-        catch (IOException | SecurityException e)
-        {
-            logger.error("Ip address from Alfresco server could not be obtained");
-        }
-
-        return ipAddress;
     }
 
 
@@ -632,7 +604,7 @@ public abstract class AbstractWQS implements AlfrescoTests
                 try
                 {
                     navigateTo(wqsURL);
-                    if(homePage.isAlfrescoLogoDisplay())
+                    if (homePage.isAlfrescoLogoDisplay())
                     {
                         break;
                     }
