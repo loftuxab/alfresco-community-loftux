@@ -62,6 +62,7 @@ public class SearchTests extends AbstractWQS
 
     @Override
     @BeforeClass(alwaysRun = true)
+    @Test(groups = {"WQS", "EnterpriseOnly"})
     public void setup() throws Exception
     {
         super.setup();
@@ -178,7 +179,7 @@ public class SearchTests extends AbstractWQS
         Assert.assertTrue(wcmqsSearchPage.verifyNumberOfSearchResultsHeader(expectedNumberOfSearchedItems, searchedText), "The header is not: Showing "
                 + expectedNumberOfSearchedItems + " of " + expectedNumberOfSearchedItems + " results for \"" + searchedText + "\" within the website...");
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty.");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertEquals(wcmqsSearchPage.getWcmqsSearchPagePagination(), "Page 1 of 1", "The pagination form is not (Page 1 of 1)");
     }
 
@@ -293,7 +294,7 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(blogHouse5710), "Search Results list does not contain title: "
                 + blogHouse5710);
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains(blogTechno5710), "Search Results list contains title: " + blogTechno5710);
@@ -326,7 +327,7 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(blogTechno5710), "Search Results list does not contain title: "
                 + blogTechno5710);
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains(blogHouse5710), "Search Results list contains title: " + blogHouse5710);
@@ -358,7 +359,7 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(blogTrance5710), "Search Results list does not contain title: "
                 + blogTrance5710);
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains(blogHouse5710), "Search Results list contains title: " + blogHouse5710);
@@ -413,7 +414,7 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results list does not contain title: "
                 + "Blog H5711");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5711"), "Search Results list contains title: " + "Blog Te5711");
@@ -444,7 +445,7 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5711"), "Search Results list does not contain title: "
                 + "Blog Te5711");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results list contains title: " + "Blog H5711");
@@ -475,7 +476,7 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Tr5711"), "Search Results list does not contain title: "
                 + "Blog Tr5711");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results list contains title: " + "Blog H5711");
@@ -517,7 +518,7 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.BlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News9test 5713"), "Search Results list does not contain title: "
                 + "News9test 5713");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog3test 5713"), "Search Results list contains title: "
@@ -590,7 +591,7 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.BlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results list does not contain title: "
                 + "Blog H5712");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5712"), "Search Results list contains title: " + "Blog Te5712");
@@ -621,7 +622,7 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5712"), "Search Results list does not contain title: "
                 + "Blog Te5712");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results list contains title: " + "Blog H5712");
@@ -652,7 +653,7 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Tr5712"), "Search Results list does not contain title: "
                 + "Blog Tr5712");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results list contains title: " + "Blog H5712");
@@ -701,7 +702,7 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results list is not empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+
     }
 
     /*
@@ -742,7 +743,7 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results list is empty");
-        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
+//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Global car industry"), "Search Results list does not contain title: "
                 + "Global car industry");
     }

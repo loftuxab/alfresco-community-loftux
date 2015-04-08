@@ -409,11 +409,11 @@ public class CreatingItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // HTML article is successfully created;
         DocumentLibraryPage documentLibraryPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.NEWS).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.GLOBAL).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(ROOT).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(WcmqsNewsPage.NEWS).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(WcmqsNewsPage.GLOBAL).render();
 
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setName(articleName);
@@ -430,16 +430,17 @@ public class CreatingItemsViaAWE extends AbstractWQS
         // Section.articles folder is opened;
         SiteDashboardPage siteDashboard = siteActions.openSiteDashboard(drone, siteName).render();
         documentLibraryPage = siteDashboard.getSiteNav().selectSiteDocumentLibrary().render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.NEWS).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.GLOBAL).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(WcmqsNewsPage.COLLECTIONS);
+        documentLibraryPage = documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(ROOT).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(WcmqsNewsPage.NEWS).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(WcmqsNewsPage.GLOBAL).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(WcmqsNewsPage.COLLECTIONS).render();
         Assert.assertNotNull(documentLibraryPage);
 
         // Wait 2 minutes to allow refresh query to execute
         waitForDocumentsToIndex();
+        drone.refresh();
 
         // ---- Step 3 ----
         // ---- Step actions ----
