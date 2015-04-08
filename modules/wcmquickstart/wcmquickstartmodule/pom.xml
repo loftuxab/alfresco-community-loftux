@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
-            <artifactId>alfresco</artifactId>
+            <artifactId>alfresco-platform</artifactId>
             <classifier>classes</classifier>
             <version>${project.version}</version>
             <scope>provided</scope>

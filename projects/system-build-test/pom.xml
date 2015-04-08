@@ -60,7 +60,7 @@
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
-            <artifactId>alfresco</artifactId>
+            <artifactId>alfresco-platform</artifactId>
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
@@ -109,7 +109,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.alfresco</groupId>
-                  <artifactId>alfresco</artifactId>
+                  <artifactId>alfresco-platform</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                   <outputDirectory>${project.build.outputDirectory}</outputDirectory>
