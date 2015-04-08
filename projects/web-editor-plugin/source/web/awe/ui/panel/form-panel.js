@@ -157,12 +157,15 @@
          this.widgets.panel.render(Dom.get(this.id));
          
          // subscribe to the close (cross) icon close event
-         var fnHideEventHandler = function AweFormPanel_fnHideEventHandler()
+         var fnHideEventHandler = function AweFormPanel_fnHideEventHandler(p_sType, p_aArgs)
          {
-            this.hide();
-            YAHOO.org.springframework.extensions.webeditor.module.Ribbon.resizeRibbon();
+            if(p_aArgs[0][0] == "visible" && p_aArgs[0][1] == false)
+            {
+               this.destroy();
+               YAHOO.org.springframework.extensions.webeditor.module.Ribbon.resizeRibbon();
+            }
          }
-         this.widgets.panel.hideEvent.subscribe(fnHideEventHandler, this, true);
+         this.widgets.panel.cfg.configChangedEvent.subscribe(fnHideEventHandler, this, true);
 
          YAHOO.Bubbling.on('beforeFormRuntimeInit', function(e, args) 
          {
@@ -175,7 +178,7 @@
                fn: function()
                {
                   // Unhook close button
-                  this.widgets.panel.hideEvent.unsubscribe(fnHideEventHandler, null, this);
+                  this.widgets.panel.cfg.configChangedEvent.unsubscribe(fnHideEventHandler, null, this);
                   this.widgets.panel.hide();
                   YAHOO.org.springframework.extensions.webeditor.module.Ribbon.resizeRibbon();
                   

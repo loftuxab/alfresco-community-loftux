@@ -129,6 +129,14 @@
       hide: function Awe_Panel_hide()
       {
          this.widgets.panel.hide();
+      },
+	  
+      /**
+       * function AwePanel_destroy
+       *
+       */
+      destroy: function Awe_Panel_destroy()
+      {
          if (this.options.destroyPanelOnHide)
          {
             this.widgets.panel.destroy();
