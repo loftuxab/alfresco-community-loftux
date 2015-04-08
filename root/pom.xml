@@ -612,6 +612,7 @@
                 <configuration>
                     <javadocDirectory>source/javadoc</javadocDirectory>
                     <excludePackageNames>org.customer,org.apache</excludePackageNames>
+                    <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
             <plugin>
