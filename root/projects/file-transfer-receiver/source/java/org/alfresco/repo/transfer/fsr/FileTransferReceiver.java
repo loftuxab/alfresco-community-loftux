@@ -244,7 +244,7 @@ public class FileTransferReceiver implements TransferReceiver
             // let's run postCommit
             if (postCommit != null && postCommit.size() > 0)
             {
-                for (FSRScriptRunnable runnable : postCommit)
+                for (FSRRunnable runnable : postCommit)
                 {
                     try
                     {
