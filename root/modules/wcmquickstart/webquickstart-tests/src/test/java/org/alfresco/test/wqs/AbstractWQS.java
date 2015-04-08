@@ -120,8 +120,8 @@ public abstract class AbstractWQS implements AlfrescoTests
     private static String RESULTS_FOLDER = SRC_ROOT + "test-output" + SLASH;
     protected static final String DATA_FOLDER = SRC_ROOT + "testdata" + SLASH;
 
-    protected long MAX_WAIT_TIME_MINUTES;
-    public static long maxWaitTime = 30000;
+    protected long MAX_WAIT_TIME_MINUTES = 120000;
+    public static long maxWaitTime;
     private static Log logger = LogFactory.getLog(AbstractWQS.class);
 
     @BeforeSuite(alwaysRun = true)
@@ -149,7 +149,7 @@ public abstract class AbstractWQS implements AlfrescoTests
         dataPrepProperties = (BasicAuthPublicApiFactory) ctx.getBean("basicAuthPublicApiFactory");
         drone = (WebDrone) ctx.getBean("webDrone");
         drone.maximize();
-        MAX_WAIT_TIME_MINUTES = ((WebDroneImpl) drone).getMaxPageRenderWaitTime();
+        maxWaitTime = ((WebDroneImpl) drone).getMaxPageRenderWaitTime();
     }
 
     /**
@@ -688,8 +688,8 @@ public abstract class AbstractWQS implements AlfrescoTests
         {
             try
             {
-                logger.info("Waiting for WQS to load.");
-                wait(3000);
+                logger.info("Waiting 2 minutes for documents to index.");
+                wait(MAX_WAIT_TIME_MINUTES);
             }
             catch (InterruptedException ex)
             {

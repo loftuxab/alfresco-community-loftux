@@ -298,7 +298,7 @@ public class PublicationActions extends AbstractWQS
      * AONE-5666:Tags
      */
     @AlfrescoTest(testlink="AONE-5666")
-    @Test(groups = "WQS")
+    @Test(groups = {"WQS", "ProductBug"})
     public void verifyTags() throws Exception
     {
 
@@ -398,7 +398,7 @@ public class PublicationActions extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Enterprise Network"),
-                "Tag search did not return Enterprise Network");
+                "Tag search did not return Enterprise Network --- SEE MNT-12860");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Alfresco WCM"), "Tag search did not return Alfresco WCM");
 
         // ---- Step 9 ----
