@@ -53,7 +53,6 @@ public class PublicationActions extends AbstractWQS
     private String testName;
     private String siteName;
     private String ipAddress;
-    private String hostName;
     private String[] loginInfo;
 
     @Override

@@ -122,7 +122,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
-        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle, MAX_WAIT_TIME_MINUTES);
+        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle);
         Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
         Assert.assertEquals(blogPostContent, blogPostPage.getContent());
 
@@ -156,7 +156,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
-        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle, MAX_WAIT_TIME_MINUTES);
+        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle);
         Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
         Assert.assertEquals(blogPostContent, blogPostPage.getContent());
 
@@ -189,7 +189,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
-        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle, MAX_WAIT_TIME_MINUTES);
+        blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle);
         Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
         Assert.assertEquals(blogPostContent, blogPostPage.getContent());
 
@@ -220,7 +220,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
-        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
 
@@ -251,7 +251,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
-        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
 
@@ -282,7 +282,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
-        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
         loginActions.loginToShare(drone, loginInfo, shareUrl);
@@ -313,7 +313,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
-        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
 
@@ -344,7 +344,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
-        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
 
@@ -375,7 +375,7 @@ public class CreatingItemsViaAWE extends AbstractWQS
         Assert.assertNotNull(editPage.getArticleDetails());
 
         WcmqsNewsPage newNewsPage = fillWqsCreateForm(newsArticleName, newsArticleTitle, newsArticleContent).render();
-        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle, MAX_WAIT_TIME_MINUTES);
+        newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
 
