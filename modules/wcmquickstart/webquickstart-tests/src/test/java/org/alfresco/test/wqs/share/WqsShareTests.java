@@ -171,6 +171,17 @@ public class WqsShareTests extends AbstractWQS
         wqsDashlet.selectWebsiteDataOption(WebQuickStartOptions.FINANCE);
         wqsDashlet.clickImportButtton();
         assertTrue(wqsDashlet.isImportMessageDisplayed());
+        DocumentLibraryPage documentLibPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        documentLibPage.selectFolder("Alfresco Quick Start");
+        EditDocumentPropertiesPage documentPropertiesPage = documentLibPage.getFileDirectoryInfo("Quick Start Editorial").selectEditProperties().render();
+        documentPropertiesPage.setSiteHostname(ipAddress);
+        documentPropertiesPage.clickSave();
+
+        // Change property for quick start live to ip address
+        documentLibPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
+        documentPropertiesPage.setSiteHostname("localhost");
+        documentPropertiesPage.clickSave();
+
         ShareUtil.logout(drone);
     }
 
@@ -319,7 +330,7 @@ public class WqsShareTests extends AbstractWQS
         // ---- Expected Results ----
         // Folder is opened successfully;
         DocumentLibraryPage documentLibraryPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START);
+        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
 
         // ---- Step 2 ----
         // ---- Step Action ----
@@ -336,24 +347,26 @@ public class WqsShareTests extends AbstractWQS
         // Site Configuration field contains "isEditorial=true" data;
 
         String siteConfiguration = editDocumentPropertiesPage.getSiteConfiguration();
+        editDocumentPropertiesPage.selectCancel().render();
         Assert.assertTrue(siteConfiguration.contains(expectedSiteConfiguration));
+        ShareUtil.logout(drone);
         // ---- Step 4 ----
         // ---- Step Action ----
         // Navigate WCMQS site, edit any item and save changes;
         // ---- Expected Results ----
         // Site is opened successfully, item's changes saved correctly;
 
-        ShareUtil.logout(drone);
+
         drone.navigateTo(wqsURL);
         WcmqsHomePage wqsPage = new WcmqsHomePage(drone).render();
 
         WcmqsNewsArticleDetails wcmqsNewsArticle = wqsPage.selectFirstArticleFromLeftPanel().render();
-        WcmqsEditPage wcmqsEditPage = wcmqsNewsArticle.clickEditButton();
+        WcmqsEditPage wcmqsEditPage = wcmqsNewsArticle.clickEditButton().render();
         WcmqsArticleDetails wcmqsArticleDetails = wcmqsEditPage.getArticleDetails();
         newsArticleName = wcmqsArticleDetails.getName();
 
         wcmqsEditPage.editTitle(testName);
-        wcmqsEditPage.clickSubmitButton();
+        wcmqsEditPage.clickSubmitButton().render();
 
         WcmqsNewsPage wcmqsNewsPage = new WcmqsNewsPage(drone);
         newsArticleTitle = wcmqsNewsPage.getNewsTitle(newsArticleName);
