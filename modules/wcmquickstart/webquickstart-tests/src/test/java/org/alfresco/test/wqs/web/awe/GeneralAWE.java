@@ -260,7 +260,7 @@ public class GeneralAWE extends AbstractWQS
         editPage.insertTextInContent(articleContent);
         blogPage = editPage.clickSubmitButton().render();
 
-        WcmqsBlogPostPage newBlogPostPage = waitAndOpenBlogPost(blogPage, articleTitle, 4);
+        WcmqsBlogPostPage newBlogPostPage = waitAndOpenBlogPost(blogPage, articleTitle);
 
         String actualTitle = newBlogPostPage.getTitle();
         String actualContent = newBlogPostPage.getContent();
@@ -382,8 +382,8 @@ public class GeneralAWE extends AbstractWQS
         // Information is changed successfully, data is saved and displayed correctly;
         String beforeEditTitle = editPage.getArticleDetails().getTitle();
 
-        String articleName = testName + "name.html";
-        String articleTitle = testName + "title";
+        String articleName = testName + System.currentTimeMillis()+ "name.html";
+        String articleTitle = testName + System.currentTimeMillis() + "title";
         String articleDescription = testName + "description";
         String articleContent = testName + "content";
 
@@ -394,7 +394,7 @@ public class GeneralAWE extends AbstractWQS
         blogPage = editPage.clickSubmitButton().render();
 
         String editedTitle = beforeEditTitle + articleTitle;
-        blogPostPage = waitAndOpenBlogPost(blogPage, articleTitle, 4);
+        blogPostPage = waitAndOpenBlogPost(blogPage, articleTitle);
 
         String actualTitle = blogPostPage.getTitle();
         String actualContent = blogPostPage.getContent();

@@ -120,7 +120,7 @@ public abstract class AbstractWQS implements AlfrescoTests
     private static String RESULTS_FOLDER = SRC_ROOT + "test-output" + SLASH;
     protected static final String DATA_FOLDER = SRC_ROOT + "testdata" + SLASH;
 
-    protected static final int MAX_WAIT_TIME_MINUTES = 4;
+    protected long MAX_WAIT_TIME_MINUTES;
     public static long maxWaitTime = 30000;
     private static Log logger = LogFactory.getLog(AbstractWQS.class);
 
@@ -149,7 +149,7 @@ public abstract class AbstractWQS implements AlfrescoTests
         dataPrepProperties = (BasicAuthPublicApiFactory) ctx.getBean("basicAuthPublicApiFactory");
         drone = (WebDrone) ctx.getBean("webDrone");
         drone.maximize();
-        maxWaitTime = ((WebDroneImpl) drone).getMaxPageRenderWaitTime();
+        MAX_WAIT_TIME_MINUTES = ((WebDroneImpl) drone).getMaxPageRenderWaitTime();
     }
 
     /**
@@ -377,16 +377,15 @@ public abstract class AbstractWQS implements AlfrescoTests
      *
      * @param newsPage
      * @param newsArticleTitle
-     * @param minutesToWait
      */
 
-    public WcmqsNewsArticleDetails waitAndOpenNewsArticle(WcmqsNewsPage newsPage, String newsArticleTitle, int minutesToWait)
+    public WcmqsNewsArticleDetails waitAndOpenNewsArticle(WcmqsNewsPage newsPage, String newsArticleTitle)
     {
-        int waitInMilliSeconds = 3000;
-        int maxTimeWaitInMilliSeconds = 60000 * minutesToWait;
+        long waitInSeconds = 3;
+        long maxTimeWaitInSeconds = 3 * MAX_WAIT_TIME_MINUTES;
         boolean newsArticleFound = false;
 
-        while (!newsArticleFound && maxTimeWaitInMilliSeconds > 0)
+        while (!newsArticleFound && maxTimeWaitInSeconds > 0)
         {
             try
             {
@@ -399,14 +398,14 @@ public abstract class AbstractWQS implements AlfrescoTests
                 {
                     try
                     {
-                        this.wait(waitInMilliSeconds);
+                        this.wait(waitInSeconds);
                     }
                     catch (InterruptedException ex)
                     {
                     }
                 }
                 drone.refresh();
-                maxTimeWaitInMilliSeconds = maxTimeWaitInMilliSeconds - waitInMilliSeconds;
+                maxTimeWaitInSeconds = maxTimeWaitInSeconds - waitInSeconds;
             }
 
         }
@@ -423,20 +422,18 @@ public abstract class AbstractWQS implements AlfrescoTests
     /**
      * Method that waits for the blog post to appear on the page for maximum minutesToWait
      * and then opens it.
-     *
-     * @param blogPage
+     *  @param blogPage
      * @param blogPostTitle
-     * @param minutesToWait
      */
 
-    public WcmqsBlogPostPage waitAndOpenBlogPost(WcmqsBlogPage blogPage, String blogPostTitle, int minutesToWait)
+    public WcmqsBlogPostPage waitAndOpenBlogPost(WcmqsBlogPage blogPage, String blogPostTitle)
     {
-        int waitInMilliSeconds = 3000;
-        int maxTimeWaitInMilliSeconds = 60000 * minutesToWait;
+        long waitInSeconds = 3;
+        long maxTimeWaitInSeconds = 3 * MAX_WAIT_TIME_MINUTES;
         boolean newsArticleFound = false;
         WcmqsBlogPostPage blogPost = null;
 
-        while (!newsArticleFound && maxTimeWaitInMilliSeconds > 0)
+        while (!newsArticleFound && maxTimeWaitInSeconds > 0)
         {
             try
             {
@@ -452,14 +449,14 @@ public abstract class AbstractWQS implements AlfrescoTests
                     try
                     {
                         logger.info("Waiting for edited name of blog post...");
-                        this.wait(waitInMilliSeconds);
+                        this.wait(waitInSeconds);
                     }
                     catch (InterruptedException ex)
                     {
                     }
                 }
                 drone.refresh();
-                maxTimeWaitInMilliSeconds = maxTimeWaitInMilliSeconds - waitInMilliSeconds;
+                maxTimeWaitInSeconds = maxTimeWaitInSeconds - waitInSeconds;
             }
 
         }
@@ -626,7 +623,7 @@ public abstract class AbstractWQS implements AlfrescoTests
                 {
                     try
                     {
-                        this.wait(50L);
+                        this.wait(100L);
                     }
                     catch (InterruptedException e)
                     {

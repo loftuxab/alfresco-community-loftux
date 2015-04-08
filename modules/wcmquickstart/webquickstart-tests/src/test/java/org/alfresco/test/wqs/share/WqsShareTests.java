@@ -43,7 +43,6 @@ public class WqsShareTests extends AbstractWQS
 {
     private static final Log logger = LogFactory.getLog(WqsShareTests.class);
     String newsName;
-    String wqsURL;
     String siteName;
     private String ipAddress;
     private String[] loginInfo;
@@ -270,14 +269,14 @@ public class WqsShareTests extends AbstractWQS
         // * Quick Start live folder (empty)
         Assert.assertTrue(documentLibraryPage.isFileVisible(ALFRESCO_QUICK_START), ALFRESCO_QUICK_START + " folder is not displayed.");
 
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
         Assert.assertTrue(documentLibraryPage.isFileVisible(QUICK_START_EDITORIAL), QUICK_START_EDITORIAL + " folder is not displayed.");
         Assert.assertTrue(documentLibraryPage.isFileVisible(QUICK_START_LIVE), QUICK_START_LIVE + " folder is not displayed.");
 
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
         Assert.assertTrue(documentLibraryPage.isFileVisible(ROOT), "Folder " + ROOT + " is not displayed.");
 
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(ROOT).render();
         Assert.assertTrue(documentLibraryPage.isFileVisible("blog"), "Folder blog is not displayed.");
         Assert.assertTrue(documentLibraryPage.isFileVisible("collections"), "Folder collections is not displayed.");
         Assert.assertTrue(documentLibraryPage.isFileVisible("contact"), "Folder contact is not displayed.");
@@ -289,8 +288,8 @@ public class WqsShareTests extends AbstractWQS
         documentLibraryPage = documentLibraryPage.getNavigation().clickCrumbsParentLinkName().render();
         Assert.assertTrue(documentLibraryPage.isFileVisible(ALFRESCO_QUICK_START), ALFRESCO_QUICK_START + " folder is not displayed.");
 
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_LIVE).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(QUICK_START_LIVE).render();
         Assert.assertTrue(documentLibraryPage.isFileUploadInstructionDisplayed(), "File upload instruction is displayed thus there are no files or folder on the page");
 
         ShareUtil.logout(drone);
@@ -302,7 +301,7 @@ public class WqsShareTests extends AbstractWQS
      * AONE-5600:Editing Site's Data
      */
     @AlfrescoTest(testlink="AONE-5600")
-    @Test(groups = "WQS")
+    @Test(groups = "WQS", dependsOnMethods = "createWebSiteShare")
     public void editingSiteData() throws Exception
     {
         String testName = getTestName();
@@ -349,9 +348,6 @@ public class WqsShareTests extends AbstractWQS
         WcmqsHomePage wqsPage = new WcmqsHomePage(drone).render();
 
         WcmqsNewsArticleDetails wcmqsNewsArticle = wqsPage.selectFirstArticleFromLeftPanel().render();
-//        WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone).render();
-//        wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
-
         WcmqsEditPage wcmqsEditPage = wcmqsNewsArticle.clickEditButton();
         WcmqsArticleDetails wcmqsArticleDetails = wcmqsEditPage.getArticleDetails();
         newsArticleName = wcmqsArticleDetails.getName();
@@ -449,6 +445,7 @@ public class WqsShareTests extends AbstractWQS
         Assert.assertTrue(tinyMceEditor2.getContent().contains("<a href=\"http://www.alfresco.com/\" data-mce-href=\"http://www.alfresco.com/\">" + randomText + "</a>"), "tinyMceEditor.getContent() is: " + tinyMceEditor2.getContent());
 
         ShareUtil.logout(drone);
+        waitForWcmqsToLoad();
     }
 
     /**
@@ -596,16 +593,7 @@ public class WqsShareTests extends AbstractWQS
         String modifiedTitle = testName + "_newTitle";
         String newsArticle = "article4.html";
 
-        // On the Quick Start website, navigate to the Global Economy page.
-        drone.navigateTo(wqsURL);
-
-        WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        homePage.render();
-
-        drone.refresh();
-        drone.refresh();
-
-        // User login.
+            // User login.
         loginActions.loginToShare(drone, loginInfo, shareUrl);
 
         // ---- Step 1 ----
@@ -633,6 +621,8 @@ public class WqsShareTests extends AbstractWQS
         // Navigate to the sample editorial wcmqs site at http://localhost:8080/wcmqs/en/news/global/
         // Expected Result
         // The title of the article has changed.
+        navigateTo(wqsURL);
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
         WcmqsNewsPage newsPage = homePage.openNewsPageFolder("global").render();
         Assert.assertTrue(newsPage.getNewsTitle(newsArticle).equals(modifiedTitle));
 
@@ -673,24 +663,23 @@ public class WqsShareTests extends AbstractWQS
         // and'Submenu1-Item3'.
         // Expected Result
         // Folders are created.
-        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        DocumentLibraryPage documentLibraryPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
 
-        String blogFolder = ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + File.separator + "blog";
+        String blogFolder = DOCLIB + SLASH +  ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + File.separator + "blog";
         siteActions.navigateToFolder(drone, blogFolder).render();
         siteActions.createFolder(drone, folder1, folder1, "").render();
-        siteActions.navigateToFolder(drone, blogFolder).render();
-        siteActions.createFolder(drone, folder2, folder1, "").render();
-        siteActions.navigateToFolder(drone, blogFolder).render();
-        siteActions.createFolder(drone, folder3, folder1, "").render();
+        siteActions.createFolder(drone, folder2, folder2, "").render();
+        siteActions.createFolder(drone, folder3, folder3, "").render();
 
         // ---- Step 2 ----
         // ---- Step Action -----
         // Navigate to Documents> Alfresco Quick Start> Quick Start Editorial> root> blog> Submenu1-Item1 and create new folder 'Submenu2'.
         // Expected Result
         // Folders are created.
-        blogFolder = blogFolder + File.separator + folder1;
-        siteActions.navigateToFolder(drone, blogFolder).render();
+
+        siteActions.navigateToFolder(drone, folder3).render();
         siteActions.createFolder(drone, folder11, folder11, "").render();
+
 
         // ---- Step 3 ----
         // ---- Step Action -----
@@ -698,13 +687,12 @@ public class WqsShareTests extends AbstractWQS
         // 'Submenu3-Item2'.
         // Expected Result
         // Folders are created.
-        blogFolder = blogFolder + File.separator + folder11;
-        siteActions.navigateToFolder(drone, blogFolder).render();
+
+        siteActions.navigateToFolder(drone, folder11).render();
         siteActions.createFolder(drone, folder111, folder111, "").render();
-        siteActions.navigateToFolder(drone, blogFolder).render();
         siteActions.createFolder(drone, folder112, folder112, "").render();
 
-        drone.navigateTo(wqsURL);
+        waitForWcmqsToLoad();
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
         homePage.render();
@@ -714,15 +702,10 @@ public class WqsShareTests extends AbstractWQS
         // In the Quick Start website, navigate to the Home page and open the Blog menu down to Submenu2.
         // Expected Result
         // Folders are created.
-        drone.refresh();
+
         homePage.selectMenu("home");
-        drone.refresh();
 
         List<ShareLink> allFolders = homePage.getAllFoldersFromMenu("blog");
-        // String lastFolder = allFolders.get(2).getDescription();
-        // Assert.assertTrue(lastFolder.contains(folder3));
-        // String urlLast = allFolders.get(6).getHref();
-        // Assert.assertTrue(urlLast.contains(folder112));
         Assert.assertTrue(allFolders.size() > 5);
 
     }

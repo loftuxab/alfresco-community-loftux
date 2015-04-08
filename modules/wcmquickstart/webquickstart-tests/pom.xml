@@ -155,6 +155,8 @@
                             <alfresco.rmi.services.retryInterval>2000</alfresco.rmi.services.retryInterval>
                             <!-- Enables Lucene in continuous integration -->
                             <index.subsystem.name>${index.subsystem.name}</index.subsystem.name>
+                            <webdrone.max.waitTime>${webdrone.max.waitTime}</webdrone.max.waitTime>
+                            <webdrone.element.wait.time>${webdrone.element.wait.time}</webdrone.element.wait.time>
                         </systemPropertyVariables>
                         <enableAssertions>false</enableAssertions>
                     </configuration>
