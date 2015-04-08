@@ -153,15 +153,17 @@ public abstract class AbstractWQS implements AlfrescoTests
         return ipAddress;
     }
 
-    @BeforeClass(alwaysRun = true)
+    /*@BeforeClass(alwaysRun = true)
     public void getWebDrone() throws Exception
     {
         drone = (WebDrone) ctx.getBean("webDrone");
         drone.maximize();
-    }
+    }*/
 
     public void setup() throws Exception
     {
+        drone = (WebDrone) ctx.getBean("webDrone");
+        drone.maximize();
         siteService = (SiteService) ctx.getBean("siteService");
         userService = (UserService) ctx.getBean("userService");
         dataPrepProperties = (BasicAuthPublicApiFactory) ctx.getBean("basicAuthPublicApiFactory");
