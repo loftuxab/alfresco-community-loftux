@@ -8,14 +8,14 @@
       <span class="incomplete-warning"><img src="${url.context}/res/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
       </#if>
       <span class="viewmode-label">${field.label?html}:</span>
+         <#assign tmpFieldValue=field.value?html?replace("\n", "<br>")>
+         <#if field.control.params.saveLineBreaks?? && field.control.params.saveLineBreaks == "false">
+            <#assign tmpFieldValue=field.value?html>
+         </#if>
       <#if field.control.params.activateLinks?? && field.control.params.activateLinks == "true">
-         <#assign fieldValue=field.value?html?replace("((http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?\\^=%&:\\/~\\+#]*[\\w\\-\\@?\\^=%&\\/~\\+#])?)", "<a href=\"$1\" target=\"_blank\">$1</a>", "r")>
+            <#assign fieldValue=tmpFieldValue?replace("((http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?\\^=%&:\\/~\\+#]*[\\w\\-\\@?\\^=%&\\/~\\+#])?)", "<a href=\"$1\" target=\"_blank\">$1</a>", "r")>
       <#else>
-            <#if field.control.params.saveLineBreaks?? && field.control.params.saveLineBreaks == "true">
-               <#assign fieldValue=field.value?html?replace("\n", "<br>")>
-            <#else>
-            <#assign fieldValue=field.value?html>
-            </#if>
+            <#assign fieldValue=tmpFieldValue>
       </#if>
       <span class="viewmode-value"><#if fieldValue == "">${msg("form.control.novalue")}<#else>${fieldValue}</#if></span>
    </div>
