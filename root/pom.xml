@@ -137,7 +137,7 @@
     <!-- Maven specific build properties -->
     <maven.build.sourceVersion>1.7</maven.build.sourceVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
+    <argLine>-Xmx2G -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
 
     <!-- Community build specific properties -->
     <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD</maven.scm.connection>
