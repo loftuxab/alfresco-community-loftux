@@ -134,6 +134,11 @@ public class FileTransferReceiver implements TransferReceiver
     private DescriptorDAO descriptorDAO;
     private String sourceRepoId;
     
+    /**
+      * Runnables that will be invoked after commit.
+      */
+    private List<FSRRunnable> postCommit;
+    
 
     public void cancel(String transferId) throws TransferException
     {
@@ -235,6 +240,23 @@ public class FileTransferReceiver implements TransferReceiver
             {
                 log.error("Failed to clean up transfer. Lock may still be in place: " + transferId, ex);
             }
+            
+            // let's run postCommit
+            if (postCommit != null && postCommit.size() > 0)
+            {
+                for (FSRScriptRunnable runnable : postCommit)
+                {
+                    try
+                    {
+                        runnable.setTransferId(transferId);
+                        runnable.run();
+                    }
+                    catch (Throwable t)
+                    {
+                       	log.error("Error from postCommit event t:" + t.toString(), t);
+                    }
+                }
+            } 
         }
 
     }
@@ -1059,4 +1081,12 @@ public class FileTransferReceiver implements TransferReceiver
     {
         return new DbHelperImpl(fileTransferInfoDAO, transactionService, sourceRepoId);
     }
+        
+   	public void setPostCommit(List<FSRRunnable> postCommit) {
+   		this.postCommit = postCommit;
+   	}
+   
+   	public List<FSRRunnable> getPostCommit() {
+   		return postCommit;
+   	}
 }
