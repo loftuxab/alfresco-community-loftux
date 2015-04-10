@@ -132,8 +132,11 @@ public class SearchTests extends AbstractWQS
         documentLibPage.render();
         documentLibPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         createArticles5710();
+        waitForDocumentsToIndex();
         createArticles5711();
+        waitForDocumentsToIndex();
         createArticles5712();
+        waitForDocumentsToIndex();
         createArticlesSameContent();
         waitForDocumentsToIndex();
 
