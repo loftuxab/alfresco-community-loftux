@@ -284,6 +284,65 @@ public class NewsComponent extends AbstractWQS
 
 
     /*
+   * AONE-5689 Opening components from News page (links in articles)
+   */
+    @AlfrescoTest(testlink="AONE-5689")
+    @Test(groups = {"WQS", "EnterpriseOnly"})
+    public void openArticlesNewsPageLinks() throws Exception
+    {
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Navigate to http://host:8080/wcmqs
+        // ---- Expected results ----
+        // Sample site is opened;
+
+        drone.navigateTo(wqsURL);
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Click News link;
+        // ---- Expected results ----
+        // News page is opened;
+
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsNewsPage wcmqsNewsPage = homePage.selectMenu("News").render();
+        Assert.assertTrue(wcmqsNewsPage instanceof WcmqsNewsPage);
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // For "Europe dept concerns ease but bank fears remain" click "Global economy" link;
+        // ---- Expected results ----
+        //  Component is opened successfully;
+
+        wcmqsNewsPage = wcmqsNewsPage.clickCategoryLinkByTitle(WcmqsNewsPage.FTSE_1000).render();
+        Assert.assertEquals(wcmqsNewsPage.getCategoryTitle(), "Global economy");
+        wcmqsNewsPage.selectMenu("News").render();
+
+        // ---- Step 4 ----
+        // ---- Step action ----
+        // Return to News page and click "Global economy" link for  "Media Consult new site coming out in September";
+        // ---- Expected results ----
+        //   Component is opened successfully;
+
+        wcmqsNewsPage = wcmqsNewsPage.clickCategoryLinkByTitle(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY).render();
+        Assert.assertEquals(wcmqsNewsPage.getCategoryTitle(), "Companies");
+        wcmqsNewsPage.selectMenu("News").render();
+
+        wcmqsNewsPage = wcmqsNewsPage.clickCategoryLinkByTitle(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS).render();
+        Assert.assertEquals(wcmqsNewsPage.getCategoryTitle(), "Companies");
+        wcmqsNewsPage.selectMenu("News").render();
+
+        wcmqsNewsPage = wcmqsNewsPage.clickCategoryLinkByTitle(WcmqsNewsPage.INVESTORS_FEAR).render();
+        Assert.assertEquals(wcmqsNewsPage.getCategoryTitle(), "Markets");
+        wcmqsNewsPage.selectMenu("News").render();
+
+        wcmqsNewsPage = wcmqsNewsPage.clickCategoryLinkByTitle(WcmqsNewsPage.HOUSE_PRICES).render();
+        Assert.assertEquals(wcmqsNewsPage.getCategoryTitle(), "Markets");
+        wcmqsNewsPage.selectMenu("News").render();
+    }
+
+    /*
      * AONE-5702 News - Markets
      */
     @AlfrescoTest(testlink="AONE-5702")

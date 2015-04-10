@@ -91,7 +91,6 @@ public abstract class AbstractWQS implements AlfrescoTests
     protected static AlfrescoVersion alfrescoVersion;
     protected static String ADMIN_USERNAME;
     protected static String ADMIN_PASSWORD;
-    protected static Map<WebDrone, ShareTestProperty> dronePropertiesMap = new HashMap<WebDrone, ShareTestProperty>();
     protected static ShareTestProperty testProperties;
     protected static BasicAuthPublicApiFactory dataPrepProperties;
     protected static String UNIQUE_TESTDATA_STRING = "newdata";
@@ -320,26 +319,23 @@ public abstract class AbstractWQS implements AlfrescoTests
         }
     }
 
-    protected DocumentLibraryPage navigateToFolderAndCreateContent(DocumentLibraryPage documentLibPage, String folderName, String fileName, String fileContent, String fileTitle)
+    protected DocumentLibraryPage navigateToFolderAndCreateContent(String folderName, String fileName, String fileContent, String fileTitle)
             throws Exception
     {
-        documentLibPage = navigateToWqsFolder(documentLibPage, folderName);
+        String root_folder_path = ALFRESCO_QUICK_START + File.separator + QUICK_START_EDITORIAL + File.separator + ROOT + File.separator + folderName;
+
         ContentDetails contentDetails1 = new ContentDetails();
         contentDetails1.setName(fileName);
         contentDetails1.setTitle(fileTitle);
         contentDetails1.setContent(fileContent);
-        documentLibPage = siteActions.createContent(drone, contentDetails1, ContentType.HTML);
+
+        DocumentLibraryPage documentLibPage = siteActions.navigateToFolder(drone, root_folder_path).render();
+        documentLibPage = siteActions.createContent(drone, contentDetails1, ContentType.HTML).render();
+
         return documentLibPage;
     }
 
-    protected DocumentLibraryPage navigateToWqsFolder(DocumentLibraryPage documentLibPage, String folderName)
-    {
-        documentLibPage = documentLibPage.selectFolder(ALFRESCO_QUICK_START).render();
-        documentLibPage = documentLibPage.selectFolder(QUICK_START_EDITORIAL).render();
-        documentLibPage = documentLibPage.selectFolder(ROOT).render();
-        documentLibPage = documentLibPage.selectFolder(folderName).render();
-        return documentLibPage;
-    }
+
 
     protected String generateRandomStringOfLength(int length)
     {

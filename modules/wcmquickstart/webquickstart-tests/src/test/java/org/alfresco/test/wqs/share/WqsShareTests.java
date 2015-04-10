@@ -639,6 +639,7 @@ public class WqsShareTests extends AbstractWQS
         EditHtmlDocumentPage editDocPage = (EditHtmlDocumentPage) inlineEditPage.getInlineEditDocumentPage(MimeType.HTML);
         editDocPage.setTitle(modifiedTitle);
         editDocPage.saveText();
+        waitForDocumentsToIndex();
 
         // ---- Step 2 ----
         // ---- Step Action -----
@@ -668,7 +669,7 @@ public class WqsShareTests extends AbstractWQS
      * AONE-5605:All WQS submenu items are displayed with normal zoom.
      */
     @AlfrescoTest(testlink="AONE-5605")
-    @Test(groups = "WQS")
+    @Test(groups = {"WQS", "ProductBug"})
     public void allWqsItemsDisplayed() throws Exception
     {
         String folder1 = "Folder 1";
@@ -715,9 +716,9 @@ public class WqsShareTests extends AbstractWQS
         siteActions.navigateToFolder(drone, folder11).render();
         siteActions.createFolder(drone, folder111, folder111, "").render();
         siteActions.createFolder(drone, folder112, folder112, "").render();
+        waitForDocumentsToIndex();
 
-        waitForWcmqsToLoad();
-
+        navigateTo(wqsURL);
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
         homePage.render();
 
@@ -726,8 +727,6 @@ public class WqsShareTests extends AbstractWQS
         // In the Quick Start website, navigate to the Home page and open the Blog menu down to Submenu2.
         // Expected Result
         // Folders are created.
-
-        homePage.selectMenu("home");
 
         List<ShareLink> allFolders = homePage.getAllFoldersFromMenu("blog");
         Assert.assertTrue(allFolders.size() > 1);
@@ -744,7 +743,6 @@ public class WqsShareTests extends AbstractWQS
         String folder1 = "Folder5606";
         String fileName = "AONE-5606.docx";
         String rendConfig = "application/vnd.openxmlformats-officedocument.wordprocessingml.document=ws:swfPreview";
-
         File file = new File(DATA_FOLDER + SLASH + fileName);
 
         // User login.
@@ -754,7 +752,6 @@ public class WqsShareTests extends AbstractWQS
         // ---- Step Action -----
         // Already created in data prep
         DocumentLibraryPage docLib = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-
         String blogFolder = "Alfresco Quick Start" + File.separator + "Quick Start Editorial" + File.separator + "root";
         siteActions.navigateToFolder(drone, blogFolder).render();
         docLib = siteActions.createFolder(drone, folder1, folder1, "").render();
@@ -764,10 +761,11 @@ public class WqsShareTests extends AbstractWQS
         editPage.selectSave().render();
 
         docLib.selectFolder(folder1).render();
-
+        logger.info("Access file from " + file.getCanonicalPath());
         siteActions.uploadFile(drone, file).render();
-
+        drone.refresh();
         Assert.assertTrue(docLib.isFileVisible(fileName));
+
         ShareUtil.logout(drone);
 
     }

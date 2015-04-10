@@ -136,6 +136,7 @@ public class WqsDLIntegrationTests extends AbstractWQS
         blogPostPage.setVisitorComment(visitorComment);
         blogPostPage.clickPostButton();
         Assert.assertTrue(blogPostPage.isAddCommentMessageDisplay(), "Comment was not posted.");
+        waitForDocumentsToIndex();
 
         // --- Step 2 ---
         // --- Step action ---
@@ -217,6 +218,7 @@ public class WqsDLIntegrationTests extends AbstractWQS
         blogPostPage.setVisitorComment(visitorComment);
         blogPostPage.clickPostButton();
         Assert.assertTrue(blogPostPage.isAddCommentMessageDisplay(), "Comment was not posted.");
+        waitForDocumentsToIndex();
 
         // --- Step 2 ---
         // --- Step action ---
