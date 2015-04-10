@@ -1,6 +1,7 @@
 package org.alfresco.po.wqs;
 
 import org.alfresco.po.share.ShareLink;
+import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
@@ -54,6 +55,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     private final By NEWS_MENU = By.cssSelector("a[href$='news/']");
 
+    private final By CATEGORY = By.xpath(".//*[@id='left']/div[@class='interior-header']/h2");
     private final By RSS_LINK = By.xpath("//a[text()='Subscribe to RSS']");
 
     @RenderWebElement
@@ -346,6 +348,38 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
             return false;
         }
     }
+
+    /**
+     * Method to click on company link for a given news title
+     * @param title
+     * @return
+     */
+
+    public HtmlPage clickCategoryLinkByTitle(String title)
+    {
+        try
+        {
+            drone.find(By.xpath(String.format("//div[@id='left']//li/div[h3/a=\"%s\"]/span/a", title))).click();
+           return FactoryWqsPage.resolveWqsPage(drone);
+        }
+        catch (NoSuchElementException e)
+        {
+            throw new PageOperationException("The category link was not found. " + e.toString());
+        }
+    }
+
+    public String getCategoryTitle()
+    {
+        try
+        {
+            return drone.find(CATEGORY).getText();
+        }
+        catch (NoSuchElementException e)
+        {
+            throw new PageOperationException("The category links was not found. " + e.toString());
+        }
+    }
+
 }
 
 

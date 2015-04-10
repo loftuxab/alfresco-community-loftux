@@ -25,6 +25,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.io.File;
+
 /**
  * Created by Cristina Axinte on 12/22/2014.
  */
@@ -63,7 +65,6 @@ public class SearchTests extends AbstractWQS
 
     @Override
     @BeforeClass(alwaysRun = true)
-    @Test(groups = {"WQS", "EnterpriseOnly"})
     public void setup() throws Exception
     {
         super.setup();
@@ -130,10 +131,11 @@ public class SearchTests extends AbstractWQS
 
         documentLibPage.render();
         documentLibPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        createArticles5710(documentLibPage);
-        createArticles5711(documentLibPage);
-        createArticles5712(documentLibPage);
-        createArticlesSameContent(documentLibPage);
+        createArticles5710();
+        createArticles5711();
+        createArticles5712();
+        createArticlesSameContent();
+        waitForDocumentsToIndex();
 
         ShareUtil.logout(drone);
         waitForWcmqsToLoad();
@@ -793,107 +795,122 @@ public class SearchTests extends AbstractWQS
     }
 
 
-    private void createArticles5710(DocumentLibraryPage documentLibPage) throws Exception
+    private void createArticles5710() throws Exception
     {
         // ---- Step 4 ----
         // ---- Step action ----
         // Several articles are created in News, Publications, Blogs components:
         // * blogs: house, techno, trance with any content
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogH5710.html", "content blog h1", blogHouse5710);
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTe5710.html", "content blog te1", blogTechno5710);
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTr5710.html", "content blog tr1", blogTrance5710);
+        navigateToFolderAndCreateContent("blog", "BlogH5710.html", "content blog h1", blogHouse5710).render();
+        navigateToFolderAndCreateContent("blog", "BlogTe5710.html", "content blog te1", blogTechno5710).render();
+        navigateToFolderAndCreateContent("blog", "BlogTr5710.html", "content blog tr1", blogTrance5710).render();
 
         // * news: house, techno, trance
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsH5710.html", "content news h1", newsHouse5710);
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTr5710.html", "content news te1", newsTechno5710);
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTe5710.html", "content news tr1", newsTrance5710);
+        navigateToFolderAndCreateContent("news", "NewsH5710.html", "content news h1", newsHouse5710).render();
+        navigateToFolderAndCreateContent("news", "NewsTr5710.html", "content news te1", newsTechno5710).render();
+        navigateToFolderAndCreateContent("news", "NewsTe5710.html", "content news tr1", newsTrance5710).render();
 
         // * publications (e.g. rename custom files via Share): house, techno, house techno
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublicationH5710.html", "content publication h1",
-                publicationHouse5710);
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublicationTe5710.html", "content publication te1",
-                publicationTechno5710);
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublicationTr5710.html", "content publication tr1",
-                publicationTrance5710);
+        navigateToFolderAndCreateContent("publications", "PublicationH5710.html", "content publication h1",
+                publicationHouse5710).render();
+        navigateToFolderAndCreateContent("publications", "PublicationTe5710.html", "content publication te1",
+                publicationTechno5710).render();
+        navigateToFolderAndCreateContent("publications", "PublicationTr5710.html", "content publication tr1",
+                publicationTrance5710).render();
     }
 
-    private void createArticles5711(DocumentLibraryPage documentLibPage) throws Exception
+    private void createArticles5711() throws Exception
     {
         // ---- Step 4 ----
         // ---- Step action ----
         // Several articles are created in News, Publications, Blogs components:
         // * blogs with content: blog1 with content "house", blog2 with content "techno", blog3 with content "trance"
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogH5711.html", blogHouse5711, "Blog H5711");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTe5711.html", blogTechno5711, "Blog Te5711");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTr5711.html", blogTrance5711, "Blog Tr5711");
+        navigateToFolderAndCreateContent("blog", "BlogH5711.html", blogHouse5711, "Blog H5711").render();
+        navigateToFolderAndCreateContent("blog", "BlogTe5711.html", blogTechno5711, "Blog Te5711").render();
+        navigateToFolderAndCreateContent("blog", "BlogTr5711.html", blogTrance5711, "Blog Tr5711").render();
 
         // * news articles with content: article1 with content "house", article2 with content "techno", article3 with content "trance"
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsH5711.html", newsHouse5711, "News H5711");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTe5711.html", newsTechno5711, "News Te5711");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTr5711.html", newsTrance5711, "News Tr5711");
+        navigateToFolderAndCreateContent("news", "NewsH5711.html", newsHouse5711, "News H5711").render();
+        navigateToFolderAndCreateContent("news", "NewsTe5711.html", newsTechno5711, "News Te5711").render();
+        navigateToFolderAndCreateContent("news", "NewsTr5711.html", newsTrance5711, "News Tr5711").render();
 
         // * publication articles with content: publication1 with content "house", publication2 with content "techno", publication3 with content "trance"
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublH5711.html", publicationHouse5711, "Publ H5711");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublTe5711.html", publicationTechno5711, "Publ Te5711");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublTr5711.html", publicationTrance5711, "Publ Tr5711");
+        navigateToFolderAndCreateContent("publications", "PublH5711.html", publicationHouse5711, "Publ H5711").render();
+        navigateToFolderAndCreateContent("publications", "PublTe5711.html", publicationTechno5711, "Publ Te5711").render();
+        navigateToFolderAndCreateContent("publications", "PublTr5711.html", publicationTrance5711, "Publ Tr5711").render();
 
     }
 
-    private void createArticles5712(DocumentLibraryPage documentLibPage) throws Exception
+    private void createArticles5712() throws Exception
     {
         // ---- Step 4 ----
         // ---- Step action ----
         // Several articles are created in News, Publications, Blogs components:
         // * blogs with tags: post1 with tag "house", post2 with tag "techno",post3 with tag "trance"
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogH5712.html", "blog content H5712", "Blog H5712");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTe5712.html", "blog content Te5712", "Blog Te5712");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", "BlogTr5712.html", "blog content Tr5712", "Blog Tr5712");
-        navigateToWqsFolder(documentLibPage, "blog").render();
+        navigateToFolderAndCreateContent("blog", "BlogH5712.html", "blog content H5712", "Blog H5712").render();
+        navigateToFolderAndCreateContent("blog", "BlogTe5712.html", "blog content Te5712", "Blog Te5712").render();
+        DocumentLibraryPage documentLibPage = navigateToFolderAndCreateContent("blog", "BlogTr5712.html", "blog content Tr5712", "Blog Tr5712").render();
+
+        String blog_folder_path = ALFRESCO_QUICK_START + File.separator + QUICK_START_EDITORIAL + File.separator + ROOT + File.separator + "blog";
+        documentLibPage = siteActions.navigateToFolder(drone, blog_folder_path).render();
         documentLibPage.getFileDirectoryInfo("BlogH5712.html").addTag(tagHouse);
+        drone.refresh();
         documentLibPage.getFileDirectoryInfo("BlogTe5712.html").addTag(tagTechno);
+        drone.refresh();
         documentLibPage.getFileDirectoryInfo("BlogTr5712.html").addTag(tagTrance);
+        drone.refresh();
 
         // * news articles with tags: news1 with tag "house", news2 with tag "techno", news3 with tag "trance"
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsH5712.html", "news content H5712", "News H5712");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTe5712.html", "news content Te5712", "News Te5712");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", "NewsTr5712.html", "news content Tr5712", "News Tr5712");
-        navigateToWqsFolder(documentLibPage, "news").render();
+        navigateToFolderAndCreateContent("news", "NewsH5712.html", "news content H5712", "News H5712").render();
+        navigateToFolderAndCreateContent("news", "NewsTe5712.html", "news content Te5712", "News Te5712").render();
+        documentLibPage = navigateToFolderAndCreateContent("news", "NewsTr5712.html", "news content Tr5712", "News Tr5712").render();
+
+        String news_folder_path = ALFRESCO_QUICK_START + File.separator + QUICK_START_EDITORIAL + File.separator + ROOT + File.separator + "news";
+        documentLibPage = siteActions.navigateToFolder(drone, news_folder_path).render();
         documentLibPage.getFileDirectoryInfo("NewsH5712.html").addTag(tagHouse);
+        drone.refresh();
         documentLibPage.getFileDirectoryInfo("NewsTe5712.html").addTag(tagTechno);
+        drone.refresh();
         documentLibPage.getFileDirectoryInfo("NewsTr5712.html").addTag(tagTrance);
+        drone.refresh();
 
         // * publication articles with tag: paper1 with tag "house", paper2 with tag "techno", paper3 with tag "trance"
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublH5712.html", "publ content H5712", "Publ H5712");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublTe5712.html", "publ content Te5712", "Publ Te5712");
-        documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "publications", "PublTr5712.html", "publ content Tr5712", "Publ Tr5712");
-        documentLibPage = navigateToWqsFolder(documentLibPage, "publications").render();
+        navigateToFolderAndCreateContent("publications", "PublH5712.html", "publ content H5712", "Publ H5712").render();
+        navigateToFolderAndCreateContent("publications", "PublTe5712.html", "publ content Te5712", "Publ Te5712").render();
+        documentLibPage = navigateToFolderAndCreateContent("publications", "PublTr5712.html", "publ content Tr5712", "Publ Tr5712").render();
+
+        String publications_folder_path = ALFRESCO_QUICK_START + File.separator + QUICK_START_EDITORIAL + File.separator + ROOT + File.separator + "publications";
+        documentLibPage = siteActions.navigateToFolder(drone, publications_folder_path).render();
         documentLibPage.getFileDirectoryInfo("PublH5712.html").addTag(tagHouse);
+        drone.refresh();
         documentLibPage.getFileDirectoryInfo("PublTe5712.html").addTag(tagTechno);
+        drone.refresh();
         documentLibPage.getFileDirectoryInfo("PublTr5712.html").addTag(tagTrance);
+        drone.refresh();
     }
 
-    private void createArticlesSameContent(DocumentLibraryPage documentLibPage) throws Exception
+    private void createArticlesSameContent() throws Exception
     {
         // ---- Step 4 ----
         // ---- Step action ----
         // More than 20 article items with content "test" are created in 'news' and 'blogs' folders;
 
-        documentLibPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String name;
         // create 10 blogs in "news" folder
         for (int i = 0; i < 10; i++)
         {
             name = "News" + i;
-            documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "news", name + "T5713.html", name + " content", name + "test 5713");
+            navigateToFolderAndCreateContent("news", name + "T5713.html", name + " content", name + "test 5713").render();
         }
 
         // create 10 blogs in "blog" folder
         for (int i = 0; i < 10; i++)
         {
             name = "Blog" + i;
-            documentLibPage = navigateToFolderAndCreateContent(documentLibPage, "blog", name + "T5713.html", name + " content", name + "test 5713");
+            navigateToFolderAndCreateContent("blog", name + "T5713.html", name + " content", name + "test 5713").render();
         }
 
     }
