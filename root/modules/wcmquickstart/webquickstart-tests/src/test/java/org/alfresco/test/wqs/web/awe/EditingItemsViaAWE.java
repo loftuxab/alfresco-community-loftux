@@ -24,6 +24,8 @@ import org.alfresco.po.wqs.WcmqsEditPage;
 import org.alfresco.po.wqs.WcmqsHomePage;
 import org.alfresco.po.wqs.WcmqsNewsArticleDetails;
 import org.alfresco.po.wqs.WcmqsNewsPage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Keys;
 import org.springframework.social.alfresco.api.entities.Site;
@@ -36,7 +38,7 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class EditingItemsViaAWE extends AbstractWQS
 {
-    private static final Logger logger = Logger.getLogger(EditingItemsViaAWE.class);
+    private static final Log logger = LogFactory.getLog(EditingItemsViaAWE.class);
     private String testName;
     private String siteName;
     private String ipAddress;

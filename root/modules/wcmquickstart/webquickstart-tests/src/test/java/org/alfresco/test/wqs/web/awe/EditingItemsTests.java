@@ -23,6 +23,8 @@ import org.alfresco.po.wqs.WcmqsEditPage;
 import org.alfresco.po.wqs.WcmqsHomePage;
 import org.alfresco.po.wqs.WcmqsNewsArticleDetails;
 import org.alfresco.po.wqs.WcmqsNewsPage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.springframework.social.alfresco.api.entities.Site;
 import org.testng.Assert;
@@ -43,7 +45,7 @@ public class EditingItemsTests extends AbstractWQS
     public static final String SLIDE_FILE1 = "slide1.html";
     public static final String SLIDE_FILE2 = "slide2.html";
     public static final String SLIDE_FILE3 = "slide3.html";
-    private static final Logger logger = Logger.getLogger(EditingItemsViaAWE.class);
+    private static final Log logger = LogFactory.getLog(EditingItemsTests.class);
     private String testName;
     private String ipAddress;
     private String siteName;

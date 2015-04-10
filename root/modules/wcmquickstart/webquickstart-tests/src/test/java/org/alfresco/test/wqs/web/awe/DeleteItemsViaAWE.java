@@ -17,6 +17,8 @@ import org.alfresco.po.wqs.WcmqsBlogPostPage;
 import org.alfresco.po.wqs.WcmqsNewsArticleDetails;
 import org.alfresco.po.wqs.WcmqsNewsPage;
 import org.alfresco.test.wqs.web.news.NewsComponent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.springframework.social.alfresco.api.entities.Site;
 import org.testng.Assert;
@@ -32,7 +34,7 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class DeleteItemsViaAWE extends AbstractWQS
 {
-    private static final Logger logger = Logger.getLogger(DeleteItemsViaAWE.class);
+    private static final Log logger = LogFactory.getLog(DeleteItemsViaAWE.class);
     private String testName;
     private String siteName;
     private String ipAddress;

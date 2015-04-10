@@ -20,7 +20,7 @@ import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 /**
  * The news page that is opened for a folder (Global Economy, Companies, Markets .... )
- * 
+ *
  * @author bogdan.bocancea
  */
 
@@ -49,17 +49,19 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
     public static final String ARTICLE_5 = "article5.html";
     protected static String TITLES_NEWS = "ul.newslist-wrapper>li>h4>a";
     protected static By RIGHT_TITLES_NEWS = By.cssSelector("div[id='right'] ul");
+    protected static By RIGHT_TITLES = By.cssSelector("div[class='services-box'] h3");
+    protected static By FATURED_TITLES = By.cssSelector("div[class='featured-news'] h2");
+
     private final By NEWS_MENU = By.cssSelector("a[href$='news/']");
 
     private final By RSS_LINK = By.xpath("//a[text()='Subscribe to RSS']");
 
     @RenderWebElement
-    private final By RIGHT_PANEL=By.cssSelector("div[id='right'] div.services-box");
-//    private final By FROM_NEWS = By.cssSelector("span.newslist-date");
+    private final By RIGHT_PANEL = By.cssSelector("div[id='right'] div.services-box");
 
     /**
      * Constructor.
-     * 
+     *
      * @param drone WebDriver to access page
      */
     public WcmqsNewsPage(WebDrone drone)
@@ -92,7 +94,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     /**
      * Method to get the headline titles from news Page
-     * 
+     *
      * @return List<ShareLink>
      */
     public List<ShareLink> getHeadlineTitleNews()
@@ -116,7 +118,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     /**
      * Method to get the date and time for a news
-     * 
+     *
      * @param newsName - the of the news declared in share!
      * @return String news Date and Time
      */
@@ -135,7 +137,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     /**
      * Method to get the date and time for a news
-     * 
+     *
      * @param newsName - the of the news declared in share!
      * @return String news Date and Time
      */
@@ -159,7 +161,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     /**
      * Method to get the description for a news
-     * 
+     *
      * @param newsName - the of the news declared in share!
      * @return String news description
      */
@@ -178,7 +180,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     /**
      * Method title the title for a news
-     * 
+     *
      * @param newsName - the of the news declared in share!
      * @return
      */
@@ -197,15 +199,16 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     /**
      * Method to click a news title
-     * 
+     *
      * @param newsName - the title of the news declared in share!
      * @return
      */
-    public void clickNewsByName(String newsName)
+    public WcmqsNewsArticleDetails clickNewsByName(String newsName)
     {
         try
         {
             drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]", newsName))).click();
+            return new WcmqsNewsArticleDetails(drone);
         }
         catch (TimeoutException e)
         {
@@ -216,7 +219,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     /**
      * Method to navigate to news folders
-     * 
+     *
      * @param folderName - the Name of the folder from SHARE
      * @return WcmqsNewsPage
      */
@@ -273,7 +276,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     /**
      * Method to get the headline titles from right side of news Page
-     * 
+     *
      * @return List<ShareLink>
      */
     public List<ShareLink> getRightHeadlineTitleNews()
@@ -314,4 +317,35 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     }
 
+    public boolean isRightTitlesDisplayed()
+    {
+        try
+        {
+            return drone.find(RIGHT_TITLES).isDisplayed();
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * The method return true if feature titles are displayed
+     *
+     * @return
+     */
+
+    public boolean isFeatureTitleDisplayed()
+    {
+        try
+        {
+            return drone.find(FATURED_TITLES).isDisplayed();
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
+    }
 }
+
+

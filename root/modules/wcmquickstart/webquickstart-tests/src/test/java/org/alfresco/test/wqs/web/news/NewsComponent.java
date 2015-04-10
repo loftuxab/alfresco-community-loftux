@@ -20,6 +20,9 @@ import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
 import org.alfresco.po.wqs.*;
+import org.alfresco.test.wqs.web.blog.BlogComponent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.springframework.social.alfresco.api.entities.Site;
 import org.testng.Assert;
@@ -43,7 +46,7 @@ import static org.hamcrest.Matchers.hasItem;
 @Listeners(FailedTestListener.class)
 public class NewsComponent extends AbstractWQS
 {
-    private static final Logger logger = Logger.getLogger(NewsComponent.class);
+    private static final Log logger = LogFactory.getLog(NewsComponent.class);
     private String siteName;
     private String ipAddress;
     private String tag1;
@@ -191,6 +194,94 @@ public class NewsComponent extends AbstractWQS
         assertThat("Reached page is markets", homePage.getTitle(), containsString("Markets"));
 
     }
+
+    /*
+    * AONE-5687 News page
+    */
+    @AlfrescoTest(testlink="AONE-5687")
+    @Test(groups = {"WQS", "EnterpriseOnly"})
+    public void verifyNewsPage() throws Exception
+    {
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Navigate to http://host:8080/wcmqs
+        // ---- Expected results ----
+        // Sample site is opened;
+
+        drone.navigateTo(wqsURL);
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Click News link;
+        // ---- Expected results ----
+        // News page is opened;
+
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsNewsPage wcmqsNewsPage = homePage.selectMenu("News").render();
+        Assert.assertTrue(wcmqsNewsPage instanceof WcmqsNewsPage);
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Verify News page;
+        // ---- Expected results ----
+        //  The following items are displayed:
+        // * Articles (Article name link, From <component name> link, Created date, 1 paragraph, Article picture preview)
+        // * More News (Articles names links)
+
+        Assert.assertTrue(wcmqsNewsPage.isRightTitlesDisplayed());
+        Assert.assertTrue(wcmqsNewsPage.isFeatureTitleDisplayed());
+    }
+
+
+    /*
+    * AONE-5688 Opening articles from News page
+    */
+    @AlfrescoTest(testlink="AONE-5688")
+    @Test(groups = {"WQS", "EnterpriseOnly"})
+    public void openArticlesNewsPage() throws Exception
+    {
+
+        // ---- Step 1 ----
+        // ---- Step action ----
+        // Navigate to http://host:8080/wcmqs
+        // ---- Expected results ----
+        // Sample site is opened;
+
+        drone.navigateTo(wqsURL);
+
+        // ---- Step 2 ----
+        // ---- Step action ----
+        // Click News link;
+        // ---- Expected results ----
+        // News page is opened;
+
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsNewsPage wcmqsNewsPage = homePage.selectMenu("News").render();
+        Assert.assertTrue(wcmqsNewsPage instanceof WcmqsNewsPage);
+
+        // ---- Step 3 ----
+        // ---- Step action ----
+        // Click "Europe dept concerns ease but bank fears remain" link;
+        // ---- Expected results ----
+        //   Article is opened successfully;
+
+        // TODO update test from TestLink. Sample articles no longer match
+
+        WcmqsNewsArticleDetails wcmqsNewsArticleDetails = wcmqsNewsPage.clickLinkByTitle(WcmqsNewsPage.EUROPE_DEPT_CONCERNS).render();
+        Assert.assertTrue(wcmqsNewsArticleDetails.isNewsArticleImageDisplayed());
+        wcmqsNewsPage = wcmqsNewsArticleDetails.selectMenu("News").render();
+
+        List<ShareLink>  articles = wcmqsNewsPage.getHeadlineTitleNews();
+        for(ShareLink article: articles)
+        {
+            wcmqsNewsArticleDetails = article.click().render();
+            Assert.assertTrue(wcmqsNewsArticleDetails.isNewsArticleImageDisplayed());
+            wcmqsNewsArticleDetails.selectMenu("News").render();
+        }
+
+    }
+
 
     /*
      * AONE-5702 News - Markets
@@ -492,6 +583,7 @@ public class NewsComponent extends AbstractWQS
         documentLibPage.selectFolder("news");
         documentLibPage.selectFolder("markets");
         documentLibPage.getFileDirectoryInfo("article5.html").addTag(tag1);
+        drone.refresh();
         documentLibPage.getFileDirectoryInfo("article5.html").addTag(tag2);
 
         // * test1 to article6.html (Alfresco Quick Start/Quick Start Editorial/root/news/markets)
