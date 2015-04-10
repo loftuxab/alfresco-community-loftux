@@ -43,6 +43,7 @@ public class WqsShareTests extends AbstractWQS
 {
     private static final Log logger = LogFactory.getLog(WqsShareTests.class);
     String newsName;
+    String newsTitle;
     String siteName;
     private String ipAddress;
     private String[] loginInfo;
@@ -54,6 +55,7 @@ public class WqsShareTests extends AbstractWQS
         super.setup();
         testName = this.getClass().getSimpleName();
         newsName = "cont2" + getFileName(testName) + ".html";
+        newsTitle = "cont2" + getFileName(testName);
         siteName = testName + System.currentTimeMillis();
         loginInfo = new String[] { ADMIN_USERNAME, ADMIN_PASSWORD };
         ipAddress =getIpAddress();
@@ -402,11 +404,19 @@ public class WqsShareTests extends AbstractWQS
         // --- Expected results ---
         // Folder is opened;
         DocumentLibraryPage documentLibraryPage = siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        documentLibraryPage.selectFolder("Alfresco Quick Start");
+        EditDocumentPropertiesPage documentPropertiesPage = documentLibraryPage.getFileDirectoryInfo("Quick Start Editorial").selectEditProperties().render();
+        documentPropertiesPage.setSiteHostname(ipAddress);
+        documentPropertiesPage.clickSave();
 
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ALFRESCO_QUICK_START).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(ROOT).render();
-        documentLibraryPage = (DocumentLibraryPage) documentLibraryPage.selectFolder(NEWS).render();
+        // Change property for quick start live to ip address
+        documentLibraryPage.getFileDirectoryInfo("Quick Start Live").selectEditProperties().render();
+        documentPropertiesPage.setSiteHostname("localhost");
+        documentPropertiesPage.clickSave();
+
+        documentLibraryPage = documentLibraryPage.selectFolder(QUICK_START_EDITORIAL).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(ROOT).render();
+        documentLibraryPage = documentLibraryPage.selectFolder(NEWS).render();
 
         // --- Step 2 ---
         // --- Step action ---
@@ -465,7 +475,7 @@ public class WqsShareTests extends AbstractWQS
      * AONE-5602:Verifying correct work of date/time function
      */
     @AlfrescoTest(testlink="AONE-5602")
-    @Test(groups = "WQS")
+    @Test(groups = {"WQS", "ProductBug"})
     public void verifyDateTimeFunction() throws Exception
     {
         // User login.
@@ -488,7 +498,8 @@ public class WqsShareTests extends AbstractWQS
         contentDetails.setTitle(newsName);
         contentDetails.setDescription(newsName);
         contentDetails.setContent(newsName);
-        siteActions.createContent(drone, contentDetails, ContentType.HTML);
+        siteActions.createContent(drone, contentDetails, ContentType.HTML).render();
+        waitForDocumentsToIndex();
 
         ShareUtil.logout(drone);
         // ---- Step 2 ----
@@ -523,7 +534,7 @@ public class WqsShareTests extends AbstractWQS
      * AONE-5603:Edit offline a web quick start publication
      */
     @AlfrescoTest(testlink="AONE-5603")
-    @Test(groups = "WQS")
+    @Test(groups = {"WQS", "Bug"})
     public void editOfflineWqsPublication() throws Exception
     {
         String fileName1 = "Content_Platform.pdf";
@@ -719,7 +730,7 @@ public class WqsShareTests extends AbstractWQS
         homePage.selectMenu("home");
 
         List<ShareLink> allFolders = homePage.getAllFoldersFromMenu("blog");
-        Assert.assertTrue(allFolders.size() > 5);
+        Assert.assertTrue(allFolders.size() > 1);
 
     }
 

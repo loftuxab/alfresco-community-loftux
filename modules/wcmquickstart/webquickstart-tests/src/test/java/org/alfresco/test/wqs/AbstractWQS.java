@@ -83,7 +83,7 @@ public abstract class AbstractWQS implements AlfrescoTests
     protected static final String ACCOUNTING_DATA = "Accounting";
     protected static final String DEFAULT_PASSWORD = "password";
     private static final String SRC_ROOT = System.getProperty("user.dir") + SLASH;
-    protected static final String DATA_FOLDER = SRC_ROOT + "testdata" + SLASH;
+    protected static final String DATA_FOLDER = SRC_ROOT + "webquickstart-tests" + SLASH + "testdata" + SLASH;
     public static long maxWaitTime;
     protected static ApplicationContext ctx;
     protected static String shareUrl;
@@ -219,7 +219,7 @@ public abstract class AbstractWQS implements AlfrescoTests
         return fileName;
     }
 
-    @AfterClass(alwaysRun = true)
+
     public void tearDown()
     {
         if (logger.isTraceEnabled())
@@ -229,6 +229,7 @@ public abstract class AbstractWQS implements AlfrescoTests
         // Close the browser
         if (drone != null)
         {
+            drone.deleteCookies();
             drone.quit();
             drone = null;
         }
@@ -298,14 +299,23 @@ public abstract class AbstractWQS implements AlfrescoTests
         return testProperties.getShareUrl();
     }
 
-    protected void waitForCommentPresent(MyTasksPage myTasksPage, String taskName) throws InterruptedException
+    protected void waitForCommentPresent(MyTasksPage myTasksPage, String taskName)
     {
         int count = 1;
         while (!myTasksPage.isTaskPresent(taskName) && count <= 10)
         {
             siteActions.getSharePage(drone).getNav().selectMyDashBoard().render();
             siteActions.getSharePage(drone).getNav().selectWorkFlowsIHaveStarted().render();
-            wait(5000);
+            synchronized (this)
+            {
+                try
+                {
+                    this.wait(maxWaitTime);
+                }
+                catch (InterruptedException ex)
+                {
+                }
+            }
             count++;
         }
     }

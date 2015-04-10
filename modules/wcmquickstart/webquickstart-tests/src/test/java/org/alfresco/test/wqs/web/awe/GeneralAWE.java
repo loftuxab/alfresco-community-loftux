@@ -15,6 +15,8 @@ import org.alfresco.po.wqs.WcmqsHomePage;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.springframework.social.alfresco.api.entities.Site;
 import org.testng.Assert;
@@ -30,7 +32,7 @@ import org.testng.annotations.Test;
 @Listeners(FailedTestListener.class)
 public class GeneralAWE extends AbstractWQS
 {
-    private static final Logger logger = Logger.getLogger(GeneralAWE.class);
+    private static final Log logger = LogFactory.getLog(GeneralAWE.class);
 
     private String testName;
     private String siteName;
