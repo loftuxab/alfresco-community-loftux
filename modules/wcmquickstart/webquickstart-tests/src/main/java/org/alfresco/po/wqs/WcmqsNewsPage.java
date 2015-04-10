@@ -1,12 +1,15 @@
 package org.alfresco.po.wqs;
 
 import org.alfresco.po.share.ShareLink;
+import org.alfresco.po.thirdparty.firefox.RssFeedPage;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.RenderTime;
 import org.alfresco.webdrone.RenderWebElement;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
 import org.alfresco.webdrone.exception.PageOperationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -27,6 +30,8 @@ import static org.alfresco.webdrone.RenderElement.getVisibleRenderElement;
 
 public class WcmqsNewsPage extends WcmqsAbstractPage
 {
+    private static final Log logger = LogFactory.getLog(WcmqsNewsPage.class);
+
     public static final String FTSE_1000 = "FTSE 100 rallies from seven-week low";
     public static final String GLOBAL_CAR_INDUSTRY = "Global car industry";
     public static final String FRESH_FLIGHT_TO_SWISS = "Fresh flight to Swiss franc as Europe's bond strains return";
@@ -49,7 +54,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
     public static final String ARTICLE_6 = "article6.html";
     public static final String ARTICLE_5 = "article5.html";
     protected static String TITLES_NEWS = "ul.newslist-wrapper>li>h4>a";
-    protected static By RIGHT_TITLES_NEWS = By.cssSelector("div[id='right'] ul");
+    protected static By RIGHT_TITLES_NEWS = By.cssSelector("div[id='right'] li a");
     protected static By RIGHT_TITLES = By.cssSelector("div[class='services-box'] h3");
     protected static By FATURED_TITLES = By.cssSelector("div[class='featured-news'] h2");
 
@@ -57,6 +62,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     private final By CATEGORY = By.xpath(".//*[@id='left']/div[@class='interior-header']/h2");
     private final By RSS_LINK = By.xpath("//a[text()='Subscribe to RSS']");
+    private final By SECTION_TAGS_CATEGORY = By.cssSelector("div.blog-categ");
 
     @RenderWebElement
     private final By RIGHT_PANEL = By.cssSelector("div[id='right'] div.services-box");
@@ -149,7 +155,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
         try
         {
-            present = drone.findAndWait(By.xpath(String.format("//a[contains(@href,'%s')]//.././/./.././span[@class='newslist-date']", newsName)))
+            present = drone.find(By.xpath(String.format("//a[contains(@href,'%s')]//.././/./.././span[@class='newslist-date']", newsName)))
                     .isDisplayed();
         }
         catch (TimeoutException e)
@@ -319,6 +325,11 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
 
     }
 
+    /**
+     * Return true if news titles from right side of News page are displayed
+     * @return
+     */
+
     public boolean isRightTitlesDisplayed()
     {
         try
@@ -332,7 +343,7 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
     }
 
     /**
-     * The method return true if feature titles are displayed
+     * The method return true if feature titles are displayed from News page
      *
      * @return
      */
@@ -380,6 +391,52 @@ public class WcmqsNewsPage extends WcmqsAbstractPage
         }
     }
 
+    /**
+     * Method to solve the stale of the title news from the right side of the News page
+     * @param title
+     * @return
+     */
+    public WebElement resolveRightTitleNewsStale(String title)
+    {
+        try
+        {
+            return drone.find(By.xpath(String.format(".//*[@id='right']/div//li/a[contains(text(), \"%s\")]", title)));
+        }
+        catch (NoSuchElementException e)
+        {
+            logger.error("The title news from the right section was not found", e);
+        }
+        return null;
+    }
+
+    /**
+     * Method return true if section tags is displayed
+     * @return
+     */
+    public boolean isSectionTagsDisplayed()
+    {
+        try
+        {
+            return drone.find(SECTION_TAGS_CATEGORY).isDisplayed();
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
+    }
+
+    public RssFeedPage clickRssLink()
+    {
+        try
+        {
+            drone.find(RSS_LINK).click();
+            return new RssFeedPage(drone);
+        }
+        catch (NoSuchElementException e)
+        {
+            return null;
+        }
+    }
 }
 
 
