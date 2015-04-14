@@ -66,6 +66,8 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdDefiniti
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIntegerDefinitionImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringDefinitionImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyUriDefinitionImpl;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for type definition wrappers.
@@ -75,7 +77,8 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyUriDefinit
 public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWrapper, Serializable
 {
     private static final long serialVersionUID = 1L;
-
+    private Log logger = LogFactory.getLog(AbstractTypeDefinitionWrapper.class);
+    
     protected AbstractTypeDefinition typeDef;
     protected AbstractTypeDefinition typeDefInclProperties;
 
@@ -573,29 +576,38 @@ public abstract class AbstractTypeDefinitionWrapper implements TypeDefinitionWra
             return null;
         }
 
-        switch (datatype)
+        try
         {
-        case BOOLEAN:
-            return (T) Boolean.valueOf(value);
-        case DATETIME:
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTime(ISO8601DateFormat.parse(value));
-            return (T) cal;
-        case DECIMAL:
-            return (T) new BigDecimal(value);
-        case HTML:
-            return (T) value;
-        case ID:
-            return (T) value;
-        case INTEGER:
-            return (T) new BigInteger(value);
-        case STRING:
-            return (T) value;
-        case URI:
-            return (T) value;
-        default:
-            throw new RuntimeException("Unknown datatype! Spec change?");
+            switch (datatype)
+            {
+            case BOOLEAN:
+                return (T) Boolean.valueOf(value);
+            case DATETIME:
+                GregorianCalendar cal = new GregorianCalendar();
+                cal.setTime(ISO8601DateFormat.parse(value));
+                return (T) cal;
+            case DECIMAL:
+                return (T) new BigDecimal(value);
+            case HTML:
+                return (T) value;
+            case ID:
+                return (T) value;
+            case INTEGER:
+                return (T) new BigInteger(value);
+            case STRING:
+                return (T) value;
+            case URI:
+                return (T) value;
+            default: ;
+            }
         }
+        catch (Exception e)
+        {
+            logger.error("Failed to convert value " + value + " to " + datatype, e);
+            return null;
+        }
+        
+        throw new RuntimeException("Unknown datatype! Spec change?");
     }
 
     /**
