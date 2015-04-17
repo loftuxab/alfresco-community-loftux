@@ -139,7 +139,7 @@ public class ContactWorkflowTests extends AbstractWQS
         Assert.assertTrue(contactPage.isAddCommentMessageDisplay(), "Comment was not posted.");
         String expectedMessage = "Your message has been sent!";
         Assert.assertTrue(contactPage.getAddCommentSuccessfulMessage().contains(expectedMessage), "Message: " + expectedMessage + " is not present.");
-
+        waitForDocumentsToIndex();
         // ---- Step 3 ----
         // ---- Step action ----
         // Log in Alfresco Share as admin;
@@ -156,7 +156,6 @@ public class ContactWorkflowTests extends AbstractWQS
 
         String taskName = "Contact request from " + visitorName;
         MyTasksPage myTasksPage = siteActions.getSharePage(drone).getNav().selectMyTasks().render();
-        waitForDocumentsToIndex();
         Assert.assertTrue(myTasksPage.isTaskPresent(taskName), "Task: " + taskName + " is not present.");
 
         ShareUtil.logout(drone);
@@ -185,6 +184,8 @@ public class ContactWorkflowTests extends AbstractWQS
         contactPage.setVisitorComment(visitorComment);
         contactPage.clickPostButton().render();
         Assert.assertTrue(contactPage.isAddCommentMessageDisplay(), "Comment was not posted.");
+        waitForDocumentsToIndex();
+
 
         // ---- Step 1 ----
         // ---- Step action ----

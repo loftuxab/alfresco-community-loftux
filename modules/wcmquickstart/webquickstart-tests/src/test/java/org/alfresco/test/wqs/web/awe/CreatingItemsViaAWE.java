@@ -14,15 +14,10 @@ import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
-import org.alfresco.po.wqs.WcmqsHomePage;
+import org.alfresco.po.wqs.*;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
-import org.alfresco.po.wqs.WcmqsBlogPage;
-import org.alfresco.po.wqs.WcmqsBlogPostPage;
-import org.alfresco.po.wqs.WcmqsEditPage;
-import org.alfresco.po.wqs.WcmqsNewsArticleDetails;
-import org.alfresco.po.wqs.WcmqsNewsPage;
 import org.alfresco.test.wqs.share.WqsShareTests;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,13 +113,13 @@ public class CreatingItemsViaAWE extends AbstractWQS
 
         navigateTo(wqsURL);
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsBlogPostPage blogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
         WcmqsEditPage editPage = blogPostPage.createArticle().render();
 
         Assert.assertNotNull(editPage.getArticleDetails());
 
-        blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
+        WcmqsBlogPage blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
         blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle);
         Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
         Assert.assertEquals(blogPostContent, blogPostPage.getContent());
@@ -152,13 +147,13 @@ public class CreatingItemsViaAWE extends AbstractWQS
         navigateTo(wqsURL);
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
+        WcmqsBlogPostPage blogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
         WcmqsEditPage editPage = blogPostPage.createArticle().render();
 
         Assert.assertNotNull(editPage.getArticleDetails());
 
-        blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
+        WcmqsBlogPage blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
         blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle);
         Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
         Assert.assertEquals(blogPostContent, blogPostPage.getContent());
@@ -185,13 +180,13 @@ public class CreatingItemsViaAWE extends AbstractWQS
 
         navigateTo(wqsURL);
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
+        WcmqsBlogPostPage blogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
         WcmqsEditPage editPage = blogPostPage.createArticle().render();
 
         Assert.assertNotNull(editPage.getArticleDetails());
 
-        blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
+        WcmqsBlogPage blogPage = fillWqsCreateForm(blogPostName, blogPostTitle, blogPostContent).render();
         blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle);
         Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
         Assert.assertEquals(blogPostContent, blogPostPage.getContent());

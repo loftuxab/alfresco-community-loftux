@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
  */
 
 @Listeners(FailedTestListener.class)
-public class DeleteItemsViaAWE extends AbstractWQS
+public class    DeleteItemsViaAWE extends AbstractWQS
 {
     private static final Log logger = LogFactory.getLog(DeleteItemsViaAWE.class);
     private String testName;

@@ -8,10 +8,7 @@ import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.SiteDashboardPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
-import org.alfresco.po.wqs.WcmqsBlogPage;
-import org.alfresco.po.wqs.WcmqsBlogPostPage;
-import org.alfresco.po.wqs.WcmqsEditPage;
-import org.alfresco.po.wqs.WcmqsHomePage;
+import org.alfresco.po.wqs.*;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
@@ -124,8 +121,8 @@ public class GeneralAWE extends AbstractWQS
         // Blog post is opened;
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsBlogPostPage blogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
         Assert.assertNotNull(blogPostPage);
 
         // ---- Step 3 ----
@@ -151,7 +148,7 @@ public class GeneralAWE extends AbstractWQS
      * AONE-5651 Orientation
      */
     @AlfrescoTest(testlink = "AONE-5651")
-    @Test(groups = {"WQS"})
+    @Test(groups = {"WQS", "ProductBug"})
     public void orientation() throws Exception
     {
 
@@ -170,8 +167,8 @@ public class GeneralAWE extends AbstractWQS
         // Blog post is opened;
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsBlogPostPage blogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
         Assert.assertNotNull(blogPostPage);
 
         // ---- Step 3 ----
@@ -225,8 +222,8 @@ public class GeneralAWE extends AbstractWQS
         // Article is opened;
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsBlogPostPage blogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
 
         // ---- Step 3 ----
         // ---- Step action ----
@@ -260,7 +257,7 @@ public class GeneralAWE extends AbstractWQS
         editPage.editTitle(articleTitle);
         editPage.editDescription(articleDescription);
         editPage.insertTextInContent(articleContent);
-        blogPage = editPage.clickSubmitButton().render();
+        WcmqsBlogPage blogPage = editPage.clickSubmitButton().render();
 
         WcmqsBlogPostPage newBlogPostPage = waitAndOpenBlogPost(blogPage, articleTitle);
 
