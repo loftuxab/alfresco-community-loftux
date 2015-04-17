@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,6 +18,7 @@
  */
 package org.alfresco.error;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -164,8 +165,12 @@ public class AlfrescoRuntimeException extends RuntimeException
         String message = I18NUtil.getMessage(messageId, params);
         if (message == null)
         {
-            // If a localised string cannot be found then return the messageId
+            // If a localized string cannot be found then return the messageId and the params
             message = messageId;
+            if (params != null)
+            {
+                message += " - " + Arrays.toString(params);
+            }
         }
         return buildErrorLogNumber(message);
     }
