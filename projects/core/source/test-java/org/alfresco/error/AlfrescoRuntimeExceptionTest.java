@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -42,6 +42,7 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
     private static final String VALUE_PARAMS = "What no " + PARAM_VALUE + "?";
     private static final String VALUE_FR_PARAMS = "Que non " + PARAM_VALUE + "?";
     private static final String NON_I18NED_MSG = "This is a non i18ned error message.";
+    private static final String NON_EXISTING_MSG = "non.existing.msgId";
    
     @Override
     protected void setUp() throws Exception
@@ -89,6 +90,17 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
         
         AlfrescoRuntimeException exception5 = new AlfrescoRuntimeException(NON_I18NED_MSG);
         assertTrue(exception5.getMessage().contains(NON_I18NED_MSG));
+        
+        // MNT-13028
+        String param1 = PARAM_VALUE + "_1";
+        String param2 = PARAM_VALUE + "_2";
+        String param3 = PARAM_VALUE + "_3";
+        AlfrescoRuntimeException exception6 = new AlfrescoRuntimeException(NON_EXISTING_MSG, new Object[]{param1, param2, param3});
+        String message6 = exception6.getMessage();
+        assertTrue(message6.contains(NON_EXISTING_MSG));
+        assertTrue(message6.contains(param1));
+        assertTrue(message6.contains(param2));
+        assertTrue(message6.contains(param3));
     }
     
     public void testMakeRuntimeException()
