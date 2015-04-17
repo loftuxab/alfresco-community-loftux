@@ -66,7 +66,7 @@ public class WcmqsBlogPage extends WcmqsAbstractPage
     @Override
     public WcmqsBlogPage render(RenderTime timer)
     {
-        elementRender(timer, getVisibleRenderElement(BLOG_ENTRIES));
+        elementRender(timer, getVisibleRenderElement(BLOG_HEADER));
         return this;
 
     }

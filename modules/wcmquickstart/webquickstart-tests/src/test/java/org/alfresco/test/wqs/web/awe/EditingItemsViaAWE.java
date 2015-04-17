@@ -329,7 +329,7 @@ public class EditingItemsViaAWE extends AbstractWQS
      * AONE-5612:Editing Content field
      */
     @AlfrescoTest(testlink="AONE-5612")
-    @Test(groups = "WQS", enabled = true)
+    @Test(groups = {"WQS", "ProductBug"}, enabled = true)
     public void editingContentField() throws Exception
     {
         String textBold = "Bold Text";
