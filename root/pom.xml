@@ -169,9 +169,10 @@
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
 
     <!-- Versions of binaries packaged in the installer -->
+    <installer.common.version>5.0-20150414</installer.common.version>
     <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
     <installer.java.version>1.8.0_31</installer.java.version>
-    <installer.postgresql.version>9.3.6</installer.postgresql.version>
+    <installer.postgresql.version>9.3.6-openssl101</installer.postgresql.version>
     <installer.libreoffice.version>4.2.5-alfresco</installer.libreoffice.version>
   </properties>
   
