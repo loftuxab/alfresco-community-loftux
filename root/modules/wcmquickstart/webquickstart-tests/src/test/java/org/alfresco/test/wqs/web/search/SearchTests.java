@@ -26,6 +26,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Created by Cristina Axinte on 12/22/2014.
@@ -157,12 +158,12 @@ public class SearchTests extends AbstractWQS
     /*
      * AONE-5708: Search
      */
-    @AlfrescoTest(testlink="AONE-5708")
+    @AlfrescoTest(testlink = "AONE-5708")
     @Test(groups = {"WQS", "EnterpriseOnly"})
     public void verifySearch() throws Exception
     {
         String searchedText = "company";
-        int expectedNumberOfSearchedItems = 9;
+        int expectedNumberOfSearchedItems = 11;
         // ---- Step 1 ----
         // ---- Step action ----
         // Navigate to http://host:8080/wcmqs
@@ -182,20 +183,21 @@ public class SearchTests extends AbstractWQS
         wcmqsHomePage.render();
         WcmqsSearchPage wcmqsSearchPage = wcmqsHomePage.searchText(searchedText).render();
 
-        Assert.assertTrue(wcmqsSearchPage.verifyNumberOfSearchResultsHeader(expectedNumberOfSearchedItems, searchedText), "The header is not: Showing "
-                + expectedNumberOfSearchedItems + " of " + expectedNumberOfSearchedItems + " results for \"" + searchedText + "\" within the website...");
+        Assert.assertTrue(wcmqsSearchPage.verifyNumberOfSearchResultsHeader(10, expectedNumberOfSearchedItems, searchedText), "The header is not: Showing "
+                + "10" + " of " + expectedNumberOfSearchedItems + " results for \"" + searchedText + "\" within the website...");
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty.");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
-        Assert.assertEquals(wcmqsSearchPage.getWcmqsSearchPagePagination(), "Page 1 of 1", "The pagination form is not (Page 1 of 1)");
+        Assert.assertEquals(wcmqsSearchPage.getWcmqsSearchPagePagination(), "Page 1 of 2", "The pagination form is not (Page 1 of 2)");
     }
 
     /*
      * AONE-5709 Opening blog posts from Search page
      */
-    @AlfrescoTest(testlink="AONE-5709")
-    @Test(groups = {"WQS", "EnterpriseOnly"})
+    @AlfrescoTest(testlink = "AONE-5709")
+    @Test(groups = {"WQS", "EnterpriseOnly", "ProductBug"})
     public void openBlogPostFromSearch() throws Exception
     {
+        //The left side of search page does not display Latest Blog Articles - bug or expected functionality
+
         String searchedText = "company";
 
         // ---- Step 1 ----
@@ -203,7 +205,6 @@ public class SearchTests extends AbstractWQS
         // Navigate to http://host:8080/wcmqs
         // ---- Expected results ----
         // Sample site is opened;
-
         drone.navigateTo(wqsURL);
 
         // ---- Step 2 ----
@@ -262,7 +263,7 @@ public class SearchTests extends AbstractWQS
     /*
      * AONE-5710 Searching items by name
      */
-    @AlfrescoTest(testlink="AONE-5710")
+    @AlfrescoTest(testlink = "AONE-5710")
     @Test(groups = {"WQS", "EnterpriseOnly"})
     public void searchItemsByName() throws Exception
     {
@@ -333,7 +334,6 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(blogTechno5710), "Search Results list does not contain title: "
                 + blogTechno5710);
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains(blogHouse5710), "Search Results list contains title: " + blogHouse5710);
@@ -365,7 +365,6 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(blogTrance5710), "Search Results list does not contain title: "
                 + blogTrance5710);
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains(blogHouse5710), "Search Results list contains title: " + blogHouse5710);
@@ -382,13 +381,16 @@ public class SearchTests extends AbstractWQS
     /*
      * AONE-5711 Searching items by content
      */
-    @AlfrescoTest(testlink="AONE-5711")
+    @AlfrescoTest(testlink = "AONE-5711")
     @Test(groups = {"WQS", "EnterpriseOnly"})
     public void searchItemsByContent() throws Exception
     {
         String searchedText = "House1";
         String searchedText2 = "techno1";
         String searchedText3 = "trance1";
+        ShareUtil.loginAs(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
+        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
+        createArticles5711();
 
         // ---- Step 1 ----
         // ---- Step action ----
@@ -420,7 +422,6 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results list does not contain title: "
                 + "Blog H5711");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5711"), "Search Results list contains title: " + "Blog Te5711");
@@ -451,7 +452,6 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5711"), "Search Results list does not contain title: "
                 + "Blog Te5711");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results list contains title: " + "Blog H5711");
@@ -498,7 +498,7 @@ public class SearchTests extends AbstractWQS
     /*
      * AONE-5713 Pagination on Search page
      */
-    @AlfrescoTest(testlink="AONE-5713")
+    @AlfrescoTest(testlink = "AONE-5713")
     @Test(groups = {"WQS", "EnterpriseOnly"})
     public void paginationSearchPage() throws Exception
     {
@@ -520,15 +520,11 @@ public class SearchTests extends AbstractWQS
 
         WcmqsHomePage wcmqsHomePage = new WcmqsHomePage(drone);
         wcmqsHomePage.render();
-        wcmqsHomePage.searchText(searchedText);
-        WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
-        wcmqsSearchPage.render();
-        Assert.assertNotEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.BlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News9test 5713"), "Search Results list does not contain title: "
+        WcmqsSearchPage wcmqsSearchPage = wcmqsHomePage.searchText(searchedText).render();
+        ArrayList<String> searchResults = wcmqsSearchPage.getTagSearchResults();
+        Assert.assertNotEquals(searchResults.size(), 0, "The Search Results list is empty");
+        Assert.assertTrue(searchResults.contains("News9test 5713"), "Search Results list does not contain title: "
                 + "News9test 5713");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog3test 5713"), "Search Results list contains title: "
-                + "Blog3test 5713");
 
         // ---- Step 3 ----
         // ---- Step action ----
@@ -536,11 +532,8 @@ public class SearchTests extends AbstractWQS
         // ---- Expected results ----
         // Next page is opened;
 
-        wcmqsSearchPage.clickNextPage();
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog3test 5713"), "Search Results list does not contain title: "
-                + "Blog3test 5713");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("News9test 5713"), "Search Results list contains title: "
-                + "News9test 5713");
+        wcmqsSearchPage = wcmqsSearchPage.clickNextPage().render();
+        Assert.assertTrue(wcmqsSearchPage.isPreviousButtonDisplayed());
 
         // ---- Step 4 ----
         // ---- Step action ----
@@ -548,18 +541,15 @@ public class SearchTests extends AbstractWQS
         // ---- Expected results ----
         // Previous page is opened;
 
-        wcmqsSearchPage.clickPrevPage();
-        Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("News9test 5713"), "Search Results list does not contain title: "
-                + "News9test 5713");
-        Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog3test 5713"), "Search Results list contains title: "
-                + "Blog3test 5713");
+        wcmqsSearchPage = wcmqsSearchPage.clickPrevPage().render();
+        Assert.assertTrue(wcmqsSearchPage.isNextButtonDisplayed());
 
     }
 
     /*
      * AONE-5712 Searching items by tags
      */
-    @AlfrescoTest(testlink="AONE-5712")
+    @AlfrescoTest(testlink = "AONE-5712")
     @Test(groups = {"WQS", "EnterpriseOnly"})
     public void searchItemsByTags() throws Exception
     {
@@ -675,7 +665,7 @@ public class SearchTests extends AbstractWQS
     /*
      * AONE-5714 Empty search
      */
-    @AlfrescoTest(testlink="AONE-5714")
+    @AlfrescoTest(testlink = "AONE-5714")
     @Test(groups = {"WQS", "EnterpriseOnly"})
     public void emptySearch() throws Exception
     {
@@ -715,7 +705,7 @@ public class SearchTests extends AbstractWQS
      * AONE-5715 Wildcard search
      * Jira issue #MNT-13143
      */
-    @AlfrescoTest(testlink="AONE-5715")
+    @AlfrescoTest(testlink = "AONE-5715")
     @Test(groups = {"WQS", "EnterpriseOnly", "ProductBug"})
     public void wildcardSearch() throws Exception
     {
@@ -757,7 +747,7 @@ public class SearchTests extends AbstractWQS
     /*
      * AONE-5716 Too long data search
      */
-    @AlfrescoTest(testlink="AONE-5716")
+    @AlfrescoTest(testlink = "AONE-5716")
     @Test(groups = {"WQS", "EnterpriseOnly"})
     public void longDataSearch() throws Exception
     {
@@ -805,6 +795,7 @@ public class SearchTests extends AbstractWQS
         // Several articles are created in News, Publications, Blogs components:
         // * blogs: house, techno, trance with any content
         navigateToFolderAndCreateContent("blog", "BlogH5710.html", "content blog h1", blogHouse5710).render();
+
         navigateToFolderAndCreateContent("blog", "BlogTe5710.html", "content blog te1", blogTechno5710).render();
         navigateToFolderAndCreateContent("blog", "BlogTr5710.html", "content blog tr1", blogTrance5710).render();
 

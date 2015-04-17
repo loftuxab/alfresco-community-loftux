@@ -14,15 +14,10 @@ import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
+import org.alfresco.po.wqs.*;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
-import org.alfresco.po.wqs.WcmqsBlogPage;
-import org.alfresco.po.wqs.WcmqsBlogPostPage;
-import org.alfresco.po.wqs.WcmqsEditPage;
-import org.alfresco.po.wqs.WcmqsHomePage;
-import org.alfresco.po.wqs.WcmqsNewsArticleDetails;
-import org.alfresco.po.wqs.WcmqsNewsPage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
@@ -130,8 +125,8 @@ public class EditingItemsTests extends AbstractWQS
         // Blog post is opened;
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage blogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsBlogPostPage blogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
         Assert.assertTrue(blogPostPage.getTitle().contains(blogName), "Blog :" + blogName + " was not found.");
 
         // ---- Step 3 ----
@@ -254,6 +249,7 @@ public class EditingItemsTests extends AbstractWQS
         // wcmqsEditPage.editTemplateName(newTemplateName);
         WcmqsBlogPage blogsPage2 = wcmqsEditPage.clickSubmitButton().render();
         Assert.assertTrue(blogsPage2.isBlogDisplayed(newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -340,6 +336,7 @@ public class EditingItemsTests extends AbstractWQS
         // wcmqsEditPage.editTemplateName(newTemplateName);
         WcmqsBlogPage blogsPage2 = wcmqsEditPage.clickSubmitButton().render();
         Assert.assertTrue(blogsPage2.isBlogDisplayed(newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -423,6 +420,7 @@ public class EditingItemsTests extends AbstractWQS
         // wcmqsEditPage.editTemplateName(newTemplateName);
         WcmqsNewsPage newsPage2 = wcmqsEditPage.clickSubmitButton().render();
         Assert.assertTrue(newsPage2.checkIfNewsExists(newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -508,6 +506,7 @@ public class EditingItemsTests extends AbstractWQS
         // wcmqsEditPage.editTemplateName(newTemplateName);
         WcmqsNewsPage newsPage2 = wcmqsEditPage.clickSubmitButton().render();
         Assert.assertTrue(newsPage2.checkIfNewsExists(newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -593,6 +592,7 @@ public class EditingItemsTests extends AbstractWQS
         // wcmqsEditPage.editTemplateName(newTemplateName);
         WcmqsNewsPage newsPage2 = wcmqsEditPage.clickSubmitButton().render();
         Assert.assertTrue(newsPage2.checkIfNewsExists(newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -683,6 +683,7 @@ public class EditingItemsTests extends AbstractWQS
         WcmqsNewsPage newsPage2 = new WcmqsNewsPage(drone);
         newsPage2.render();
         Assert.assertTrue(newsPage2.checkIfNewsExists(newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -768,6 +769,7 @@ public class EditingItemsTests extends AbstractWQS
         // wcmqsEditPage.editTemplateName(newTemplateName);
         WcmqsNewsPage newsPage2 = wcmqsEditPage.clickSubmitButton().render();
         Assert.assertTrue(newsPage2.checkIfNewsExists(newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -853,6 +855,7 @@ public class EditingItemsTests extends AbstractWQS
         // wcmqsEditPage.editTemplateName(newTemplateName);
         WcmqsNewsPage newsPage2 = wcmqsEditPage.clickSubmitButton().render();
         Assert.assertTrue(newsPage2.checkIfNewsExists(newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -944,6 +947,7 @@ public class EditingItemsTests extends AbstractWQS
         List<ShareLink> rightTitles = newsPage2.getRightHeadlineTitleNews();
         String titles = rightTitles.toString();
         Assert.assertTrue(titles.contains(newsName + newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -1034,6 +1038,7 @@ public class EditingItemsTests extends AbstractWQS
         List<ShareLink> rightTitles = newsPage2.getRightHeadlineTitleNews();
         String titles = rightTitles.toString();
         Assert.assertTrue(titles.contains(newsName + newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -1125,6 +1130,7 @@ public class EditingItemsTests extends AbstractWQS
         List<ShareLink> rightTitles = newsPage2.getRightHeadlineTitleNews();
         String titles = rightTitles.toString();
         Assert.assertTrue(titles.contains(newsName + newTitle), "Title of blog is not edited.");
+        waitForDocumentsToIndex();
 
         // ---- Step 6 ----
         // ---- Step action ---

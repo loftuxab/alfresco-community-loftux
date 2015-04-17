@@ -737,7 +737,7 @@ public class WqsShareTests extends AbstractWQS
      * AONE-5606:Verify uploading a file when transformation fails in a folder inside a WQS site
      */
     @AlfrescoTest(testlink="AONE-5606")
-    @Test(groups = "WQS")
+    @Test(groups = {"WQS", "Bug"})
     public void verifyFileUploadInWqsFolder() throws Exception
     {
         String folder1 = "Folder5606";

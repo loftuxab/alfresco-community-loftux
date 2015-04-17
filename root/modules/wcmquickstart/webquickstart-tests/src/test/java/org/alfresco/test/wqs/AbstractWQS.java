@@ -16,9 +16,7 @@ package org.alfresco.test.wqs;
 
 import org.alfresco.po.share.AlfrescoVersion;
 import org.alfresco.po.share.MyTasksPage;
-import org.alfresco.po.share.site.document.ContentDetails;
-import org.alfresco.po.share.site.document.ContentType;
-import org.alfresco.po.share.site.document.DocumentLibraryPage;
+import org.alfresco.po.share.site.document.*;
 import org.alfresco.po.share.steps.LoginActions;
 import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.util.ShareTestProperty;
@@ -328,11 +326,16 @@ public abstract class AbstractWQS implements AlfrescoTests
         contentDetails1.setName(fileName);
         contentDetails1.setTitle(fileTitle);
         contentDetails1.setContent(fileContent);
-
         DocumentLibraryPage documentLibPage = siteActions.navigateToFolder(drone, root_folder_path).render();
         documentLibPage = siteActions.createContent(drone, contentDetails1, ContentType.HTML).render();
 
-        return documentLibPage;
+        documentLibPage = siteActions.navigateToFolder(drone, root_folder_path).render();
+        InlineEditPage inlineEditPage = documentLibPage.getFileDirectoryInfo(fileName).selectInlineEdit().render();
+        inlineEditPage.insertTextInContent(fileContent);
+        EditHtmlDocumentPage editDocPage = (EditHtmlDocumentPage) inlineEditPage.getInlineEditDocumentPage(MimeType.HTML);
+        documentLibPage = editDocPage.saveText().render();
+
+        return  documentLibPage.getSiteNav().selectSiteDocumentLibrary().render();
     }
 
 
