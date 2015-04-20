@@ -640,8 +640,8 @@ public class RemoteClient extends AbstractClient implements Cloneable
         }
         catch (Throwable e)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("Error status " + status.getCode() + " " + status.getMessage(), e);
+            if (logger.isErrorEnabled())
+                logger.error("Error status " + status.getCode() + " " + status.getMessage(), e);
             
             // error information already applied to Status object during service() call
             result = new Response(status);
@@ -709,8 +709,8 @@ public class RemoteClient extends AbstractClient implements Cloneable
         }
         catch (Throwable e)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("Error status " + status.getCode() + " " + status.getMessage(), e);
+            if (logger.isErrorEnabled())
+                logger.error("Error status " + status.getCode() + " " + status.getMessage(), e);
             
             // error information already applied to Status object during service() call
             result = new Response(status);
@@ -760,8 +760,8 @@ public class RemoteClient extends AbstractClient implements Cloneable
         }
         catch (Throwable e)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("Error status " + status.getCode() + " " + status.getMessage(), e);
+            if (logger.isErrorEnabled())
+                logger.error("Error status " + status.getCode() + " " + status.getMessage(), e);
             
             // error information already applied to Status object during service() call
             result = new Response(status);
