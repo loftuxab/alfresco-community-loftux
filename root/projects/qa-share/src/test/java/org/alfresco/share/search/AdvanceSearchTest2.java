@@ -308,7 +308,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13909() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String testUser = getUserNameFreeDomain(testName);
         String[] testUserInfo = new String[] { testUser };
         String siteName = getSiteName(testName);
@@ -341,7 +341,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13909() throws Exception
     {
         /** Start Test */
-        testName = getTestName();
+        testName = getTestName() + "R1";
 
         /** Test Data Setup */
 
@@ -466,14 +466,14 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13911() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R3";
         String testUser = getUserNameFreeDomain(testName);
         String[] testUserInfo = new String[] { testUser };
         String siteName = getSiteName(testName).replace("-", "");
 
         String[] folders = { siteName + "_House", siteName + "_Techno", siteName + "_House Techno", siteName + "_House Techno Trance" };
         String[] filesWithNoContent = { siteName + "_House my", siteName + "_Techno my", siteName + "_House Techno my", siteName + "_House Techno Trance my" };
-        String[] filesWithContent = { siteName + "_My 1", siteName + "_My 2", siteName + "_My 3", siteName + "_My 4" };
+        String[] filesWithContent = { siteName + "_My 1.txt", siteName + "_My 2.txt", siteName + "_My 3.txt", siteName + "_My 4.txt" };
         String[] fileContents = { siteName + "_House", siteName + "_Techno", siteName + "_House Techno", siteName + "_House Techno Trance" };
         String[] fileInfo = new String[1];
 
@@ -538,7 +538,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13911() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R3";
         String siteName = getSiteName(testName).replace("-", "");
         /** Test Data Setup */
 
@@ -598,7 +598,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13912() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String testUser = getUserNameFreeDomain(testName);
         String[] testUserInfo = new String[] { testUser };
         String siteName = getSiteName(testName).replace("-", "");
@@ -670,7 +670,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13912() throws Exception
     {
         /** Start Test */
-        testName = getTestName();
+        testName = getTestName() + "R1";
         String siteName = getSiteName(testName).replace("-", "");
         /** Test Data Setup */
 
@@ -846,7 +846,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13914() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R2";
         String testUser = getUserNameFreeDomain(testName);
         String[] testUserInfo = new String[] { testUser };
         String siteName = getSiteName(testName).replace("-", "");
@@ -918,7 +918,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13914() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R2";
         String siteName = getSiteName(testName).replace("-", "");
         /** Test Data Setup */
         String testUser = getUserNameFreeDomain(testName);
@@ -1056,7 +1056,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13916() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String testUser = getUserNameFreeDomain(testName);
         String[] testUserInfo = new String[] { testUser };
         String siteName = getSiteName(testName);
@@ -1128,7 +1128,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13916() throws Exception
     {
         /** Start Test */
-        testName = getTestName();
+        testName = getTestName() + "R1";;
 
         /** Test Data Setup */
         String testUser = getUserNameFreeDomain(testName);
@@ -1256,7 +1256,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13918() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String testUser = getUserNameFreeDomain(testName);
         String[] testUserInfo = new String[] { testUser };
         String siteName = getSiteName(testName);
@@ -1328,7 +1328,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13918() throws Exception
     {
         /** Start Test */
-        testName = getTestName();
+        testName = getTestName() + "R1";;
 
         /** Test Data Setup */
         String testUser = getUserNameFreeDomain(testName);
@@ -1611,7 +1611,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13903() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R3";
         String siteName = getSiteName(testName).replace("-", "");
         String mainUser = getUserNameFreeDomain(testName);
         String[] mainUserInfo = new String[] { mainUser };
@@ -1619,7 +1619,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         String[] testUserInfo = new String[] { testUser };
         String[] folders = { siteName + "_House", siteName + "_Techno", siteName + "_House Techno", siteName + "_House Techno Trance" };
         String[] files = { siteName + "_House my", siteName + "_Techno my", siteName + "_House Techno my", siteName + "_House Techno Trance my" };
-        String[] filesWithContent = { siteName + "_My 1", siteName + "_My 2", siteName + "_My 3", siteName + "_My 4" };
+        String[] filesWithContent = { siteName + "_My 1.txt", siteName + "_My 2.txt", siteName + "_My 3.txt", siteName + "_My 4.txt" };
 
         // User
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, mainUserInfo);
@@ -1692,7 +1692,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13903() throws Exception
     {
         /** Start Test */
-        testName = getTestName();
+        testName = getTestName() + "R3";
         String testUser = getUserNameFreeDomain(testName + "1");
         String siteName = getSiteName(testName).replace("-", "");
 
@@ -1710,6 +1710,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House Techno my", true));
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House Techno Trance my",
                 true));
+        
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 1", true));
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 3", true));
         Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 4", true));
@@ -1732,19 +1733,15 @@ public class AdvanceSearchTest2 extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AdvSearch_AONE_13904() throws Exception
     {
-
-        String testName = getTestName();
-
+        String testName = getTestName() + "R3";
         String siteName = getSiteName(testName).replace("-", "");
-
         String mainUser = getUserNameFreeDomain(testName);
         String[] mainUserInfo = new String[] { mainUser };
         String testUser = getUserNameFreeDomain(testName + "1");
         String[] testUserInfo = new String[] { testUser };
-
         String[] folders = { siteName + "_House", siteName + "_Techno", siteName + "_House Techno", siteName + "_House Techno Trance" };
         String[] files = { siteName + "_House my", siteName + "_Techno my", siteName + "_House Techno my", siteName + "_House Techno Trance my" };
-        String[] filesWithContent = { siteName + "_My 1", siteName + "_My 2", siteName + "_My 3", siteName + "_My 4" };
+        String[] filesWithContent = { siteName + "_My 1.txt", siteName + "_My 2.txt", siteName + "_My 3.txt", siteName + "_My 4.txt" };
 
         // User
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, mainUserInfo);
@@ -1792,7 +1789,6 @@ public class AdvanceSearchTest2 extends AbstractUtils
         contentDetails.setName(filesWithContent[3]);
         contentDetails.setContent(folders[3]);
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
-
         ShareUser.logout(drone);
     }
 
@@ -1809,7 +1805,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13904() throws Exception
     {
         /** Start Test */
-        testName = getTestName();
+        testName = getTestName() + "R3";
         String testUser = getUserNameFreeDomain(testName + "1");
         String siteName = getSiteName(testName).replace("-", "");
 
@@ -1831,7 +1827,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
                     .checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_House Techno my", true));
             Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName
                     + "_House Techno Trance my", true));
-            Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 1", true));
+            Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, siteName, siteName + "_My 1", true));
             Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 3", true));
             Assert.assertTrue(ShareUserSearchPage.checkFacetedSearchResultsWithRetry(drone, ADV_CONTENT_SEARCH, searchTerm, siteName + "_My 4", true));
 
@@ -1948,7 +1944,7 @@ public class AdvanceSearchTest2 extends AbstractUtils
     public void AONE_13933() throws Exception
     {
         /** Start Test */
-        testName = getTestName();
+        testName = getTestName() + "R1";
         String siteName = getSiteName(testName) + System.currentTimeMillis();
         String testUser = getUserNameFreeDomain(testName);
         String[] testUserInfo = new String[] { testUser };

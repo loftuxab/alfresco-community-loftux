@@ -190,7 +190,7 @@ public class ShareUserMembers extends AbstractUtils
         {
             if (isAlfrescoVersionCloud(driver))
             {
-                retVal = CreateUserAPI.inviteUserToSiteWithRoleAndAccept(driver, invitingUser, userJoiningSite, siteActions.getSiteShortname(siteName), role.getRoleName(),
+                retVal = CreateUserAPI.inviteUserToSiteWithRoleAndAccept(driver, invitingUser, userJoiningSite, siteActions.getSiteShortname(siteName).toLowerCase(), role.getRoleName(),
                         "");
             }
             else

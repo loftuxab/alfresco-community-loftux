@@ -181,7 +181,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
 
         String workFlowName1 = testName + System.currentTimeMillis() + "-1-WF";
         String dueDate = getDueDateString();
-
+        dataPrep(testName);
         try
         {
             // Login as User1 (Cloud)
@@ -233,7 +233,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
 
             assertTrue(myTasksPage.isTaskPresent(workFlowName1));
 
-            myTasksPage = ShareUserWorkFlow.cancelTaskFromMyTasksPage(hybridDrone, workFlowName1);
+            myTasksPage = ShareUserWorkFlow.cancelTaskFromMyTasksPage(hybridDrone, workFlowName1).render();
 
             assertFalse(myTasksPage.isTaskPresent(workFlowName1));
 
@@ -330,7 +330,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
         String workFlowName1 = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
         int requiredApprovalPercentage = 100;
-
+        dataPrep(testName);
         try
         {
             // Login as User1 (Cloud)
@@ -470,7 +470,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
         String workFlowName1 = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
         int requiredApprovalPercentage = 100;
-
+        dataPrep(testName);
         try
         {
             // CLOUD: User1 creates Site
