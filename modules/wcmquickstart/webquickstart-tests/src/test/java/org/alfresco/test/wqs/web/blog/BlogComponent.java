@@ -218,8 +218,6 @@ public class BlogComponent extends AbstractWQS
         // Blog post is opened successfully and displayed correctly;
 
         blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS);
-//        WcmqsLoginPage wcmqsLoginPage = new WcmqsLoginPage(drone);
-//        wcmqsLoginPage.login(ADMIN_USERNAME, ADMIN_PASSWORD);
         assertThat("Verify if the correct page opened ", blogPage.getTitle(), containsString(WcmqsBlogPage.ETHICAL_FUNDS));
 
         // ---- Step 4 ----
@@ -349,9 +347,9 @@ public class BlogComponent extends AbstractWQS
         // Blog post is opened;
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage wcmqsBlogPostPage = blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
-        assertThat("Verify if the correct page opened ", blogPage.getTitle(), containsString(WcmqsBlogPage.ETHICAL_FUNDS));
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsBlogPostPage wcmqsBlogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        assertThat("Verify if the correct page opened ", wcmqsBlogPostPage.getTitle(), containsString(WcmqsBlogPage.ETHICAL_FUNDS));
 
         // ---- Step 3 ----
         // ---- Step action ----
@@ -368,9 +366,9 @@ public class BlogComponent extends AbstractWQS
 
         assertThat("Posting was succesfull", wcmqsBlogPostPage.isAddCommentMessageDisplay());
 
-        wcmqsBlogPostPage.clickWebQuickStartLogo().render();
-        wcmqsBlogPostPage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        wcmqsBlogPostPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        homePage = wcmqsBlogPostPage.clickWebQuickStartLogo().render();
+        homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        wcmqsBlogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
         WcmqsComment wcmqsComment = new WcmqsComment(drone);
         assertThat(wcmqsComment.getNameFromContent(), is(equalTo(visitorName)));
         assertThat(wcmqsComment.getCommentFromContent(), is(equalTo(visitorComment)));
@@ -484,6 +482,7 @@ public class BlogComponent extends AbstractWQS
         // Blog1 is opened;
 
         navigateTo(wqsURL);
+        waitForWcmqsToLoad();
         homePage = new WcmqsHomePage(drone);
         blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
         blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
@@ -1021,9 +1020,10 @@ public class BlogComponent extends AbstractWQS
         // Blog post page is opened;
 
         navigateTo(wqsURL);
+        waitForWcmqsToLoad();
         homePage = new WcmqsHomePage(drone);
-        blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        wcmqsBlogPostPage = blogPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        wcmqsBlogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
         assertThat("Verify if the correct page opened ", blogPage.getTitle(), containsString(WcmqsBlogPage.ETHICAL_FUNDS));
 
         // ---- Step 9 ----
