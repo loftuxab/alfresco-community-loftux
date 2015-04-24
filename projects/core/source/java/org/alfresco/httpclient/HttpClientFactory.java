@@ -159,9 +159,19 @@ public class HttpClientFactory
         this.host = host;
     }
 
+    public String getHost()
+    {
+        return host;
+    }
+    
     public void setPort(int port)
     {
         this.port = port;
+    }
+    
+    public int getPort()
+    {
+        return port;
     }
 
     public void setSslPort(int sslPort)
