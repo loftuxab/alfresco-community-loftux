@@ -65,4 +65,15 @@ public class SetProcessedDeniesComponent extends SearchComponent
     {
         return "1.0";
     }
+    
+    @Override
+    public void finishStage(ResponseBuilder rb) {
+      if (rb.stage != ResponseBuilder.STAGE_GET_FIELDS) {
+        return;
+      }
+      
+      Boolean processedDenies = (Boolean) rb.req.getContext().get(PROCESSED_DENIES);
+      processedDenies = (processedDenies == null) ? false : processedDenies;
+      rb.rsp.add(PROCESSED_DENIES, processedDenies);
+    }
 }

@@ -838,8 +838,25 @@ public class AclTracker extends AbstractTracker
         @Override
         protected void doWork() throws IOException, AuthenticationException, JSONException
         {
-            List<AclReaders> readers = client.getAclReaders(acls);
-            indexAcl(readers, true);
+            List<Acl> filteredAcls = filterAcls(acls);
+            if(filteredAcls.size() > 0)
+            {
+                List<AclReaders> readers = client.getAclReaders(filteredAcls);
+                indexAcl(readers, true);
+            }
+        }
+        
+        private List<Acl> filterAcls(List<Acl> acls)
+        {
+            ArrayList<Acl> filteredList = new ArrayList<Acl>(acls.size());
+            for(Acl acl : acls)
+            {
+                if(isInAclShard(acl.getId()))
+                {
+                    filteredList.add(acl);
+                }
+            }
+            return filteredList;
         }
     }
 

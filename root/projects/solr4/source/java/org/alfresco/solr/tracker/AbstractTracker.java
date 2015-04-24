@@ -27,6 +27,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.solr.IndexTrackingShutdownException;
 import org.alfresco.solr.InformationServer;
 import org.alfresco.solr.TrackerState;
+import org.alfresco.solr.client.Node;
 import org.alfresco.solr.client.SOLRAPIClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,11 +59,14 @@ public abstract class AbstractTracker implements Tracker
     private volatile boolean shutdown = false;
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private volatile TrackerState state;
+    private int shardCount;
+    private int shardInstance;
     
     /*
      * A thread handler can be used by subclasses, but they have to intentionally instantiate it.
      */
     protected ThreadHandler threadHandler;
+   
 
     /**
      * Default constructor, strictly for testing.
@@ -83,12 +87,33 @@ public abstract class AbstractTracker implements Tracker
         maxLiveSearchers =  Integer.parseInt(p.getProperty("alfresco.maxLiveSearchers", "2"));
         isSlave =  Boolean.parseBoolean(p.getProperty("enable.slave", "false"));
         isMaster =  Boolean.parseBoolean(p.getProperty("enable.master", "true"));
+        
+        shardCount =  Integer.parseInt(p.getProperty("acl.shard.count", "0"));
+        shardInstance =  Integer.parseInt(p.getProperty("acl.shard.instance", "0"));
 
         this.trackerStats = this.infoSrv.getTrackerStats();
 
         alfrescoVersion = p.getProperty("alfresco.version", "5.0.0");
         log.info("Solr built for Alfresco version: " + alfrescoVersion);
     }
+    
+    /**
+     * @param node
+     * @return
+     */
+    protected boolean isInAclShard(long aclId)
+    {
+        if(shardCount > 1)
+        {
+            return (aclId % shardCount) == shardInstance;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+
     
     /**
      * Subclasses must implement behaviour that completes the following steps, in order:

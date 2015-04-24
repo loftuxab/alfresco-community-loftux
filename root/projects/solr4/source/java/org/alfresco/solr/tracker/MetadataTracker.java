@@ -707,7 +707,6 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         return nodeCount;
     }
 
-
     class NodeIndexWorkerRunnable extends AbstractWorkerRunnable
     {
         InformationServer infoServer;
@@ -722,10 +721,28 @@ public class MetadataTracker extends AbstractTracker implements Tracker
 
         @Override
         protected void doWork() throws IOException, AuthenticationException, JSONException
+        { 
+            List<Node> filteredNodes = filterNodes(nodes);
+            if(filteredNodes.size() > 0)
+            {
+                this.infoServer.indexNodes(filteredNodes, true);
+            }
+        }
+        
+        private List<Node> filterNodes(List<Node> nodes)
         {
-            this.infoServer.indexNodes(nodes, true);
+            ArrayList<Node> filteredList = new ArrayList<Node>(nodes.size());
+            for(Node node : nodes)
+            {
+                if(isInAclShard(node.getAclId()))
+                {
+                    filteredList.add(node);
+                }
+            }
+            return filteredList;
         }
     }
+    
     
     public NodeReport checkNode(Long dbid)
     {
