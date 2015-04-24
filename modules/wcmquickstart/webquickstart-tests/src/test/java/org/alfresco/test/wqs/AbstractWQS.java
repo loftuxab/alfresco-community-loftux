@@ -108,7 +108,7 @@ public abstract class AbstractWQS implements AlfrescoTests
     protected WebDrone drone;
     protected LoginActions loginActions = new LoginActions();
     protected SiteActions siteActions = new SiteActions();
-    protected long MAX_WAIT_TIME_MINUTES = 120000;
+    protected long MAX_WAIT_TIME_MINUTES = 160000;
     protected long MAX_WAIT_TIME_WQS_LOAD = 280000;
     //Map<String, WebDrone> droneMap = new HashMap<String, WebDrone>();
 
@@ -341,12 +341,6 @@ public abstract class AbstractWQS implements AlfrescoTests
         DocumentLibraryPage documentLibPage = siteActions.navigateToFolder(drone, root_folder_path).render();
         documentLibPage = siteActions.createContent(drone, contentDetails1, ContentType.HTML).render();
 
-//        documentLibPage = siteActions.navigateToFolder(drone, root_folder_path).render();
-//        InlineEditPage inlineEditPage = documentLibPage.getFileDirectoryInfo(fileName).selectInlineEdit().render();
-//        EditHtmlDocumentPage editDocPage = inlineEditPage.getInlineEditDocumentPage(MimeType.HTML).render();
-//        editDocPage.editText(fileContent);
-//        documentLibPage = editDocPage.saveText().render();
-
         return documentLibPage.getSiteNav().selectSiteDocumentLibrary().render();
     }
 
@@ -454,8 +448,8 @@ public abstract class AbstractWQS implements AlfrescoTests
         {
             try
             {
-                blogPage.openBlogPost(blogPostTitle);
                 blogPost = FactoryWqsPage.resolveWqsPage(drone).render();
+                blogPage.openBlogPost(blogPostTitle);
                 blogPost.render();
                 newsArticleFound = true;
             }
