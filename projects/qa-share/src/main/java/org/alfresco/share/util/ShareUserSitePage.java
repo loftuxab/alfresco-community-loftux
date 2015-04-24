@@ -36,6 +36,7 @@ import org.alfresco.po.share.site.document.TreeMenuNavigation.TreeMenu;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -279,7 +280,17 @@ public class ShareUserSitePage extends AbstractUtils
 
         if (isCopy)
         {
-            copyOrMoveContentPage = contentRow.selectCopyTo().render();
+            try
+            {
+                copyOrMoveContentPage = contentRow.selectCopyTo().render();
+            }
+            catch(PageOperationException po)
+            {
+                drone.refresh();
+                docLibPage = (DocumentLibraryPage) ShareUser.getSharePage(drone);
+                contentRow = docLibPage.getFileDirectoryInfo(sourceFolder);
+                copyOrMoveContentPage = contentRow.selectCopyToOnFolderCloud().render();
+            }
         }
         else
         {

@@ -110,7 +110,7 @@ public class ShareRefreshCopyToSites extends AbstractUtils
         {
             // cloud
             Assert.assertTrue(destinations.contains("Recent Sites"));
-            Assert.assertTrue(destinations.contains("Favourite Sites"));
+            Assert.assertTrue(destinations.contains("Favorite Sites"));
             Assert.assertTrue(destinations.contains("All Sites"));
         }
         else

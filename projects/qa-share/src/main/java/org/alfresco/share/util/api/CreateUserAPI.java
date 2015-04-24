@@ -477,7 +477,7 @@ public class CreateUserAPI extends AlfrescoHttpClient
         {
             throw new UnsupportedOperationException("Method not suitable for use for Enterprise");
         }
-
+        role.replace(" ", "");
         if (StringUtils.isEmpty(role))
         {
             throw new UnsupportedOperationException("Role should not be empty or null.");
