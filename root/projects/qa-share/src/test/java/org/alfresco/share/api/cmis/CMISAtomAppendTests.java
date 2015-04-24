@@ -79,7 +79,7 @@ public class CMISAtomAppendTests extends CMISAppendTest
     @Test(groups = {"IntermittentBugs"})
     public void AONE_14609() throws Exception
     {
-        appendSeveralChunksTest(drone, getFileName(getTestName()));
+        appendSeveralChunksTest(drone, getFileName(getTestName() + ".txt"));
     }
 
     @Test(groups = {"IntermittentBugs"})

@@ -1120,7 +1120,7 @@ public class GalleryViewTest extends AbstractUtils
         String testName = getTestName();
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
-        String fileName1 = getFileName(testName) + System.currentTimeMillis();
+        String fileName1 = getFileName(testName) + System.currentTimeMillis() + ".txt";
         String fileInfo1[] = { fileName1 };
 
         // User login.
@@ -1133,17 +1133,16 @@ public class GalleryViewTest extends AbstractUtils
         ShareUser.uploadFileInFolder(customDrone, fileInfo1);
 
         // Open the documentlibrary in Gallery view.
-        DocumentLibraryPage docLibPage = ShareUser.openDocumentLibraryInGalleryView(customDrone, siteName);
+        DocumentLibraryPage docLibPage = ShareUser.openDocumentLibraryInGalleryView(customDrone, siteName).render();
         FileDirectoryInfo thisRow = docLibPage.getFileDirectoryInfo(fileName1);
 
         // Click on view in browser from gallery view.
         thisRow.selectViewInBrowser();
 
         // Check the document is correctly displayed
-        String content = "this is a sample test upload file";
+        String content = "New File being created via newFile:" + fileName1;
         String htmlSource = ((WebDroneImpl) customDrone).getDriver().getPageSource();
-        // TODO Add explanation assert
-        Assert.assertTrue(htmlSource.contains(content));
+        Assert.assertTrue(htmlSource.contains(content), "Content is not found");
     }
 
     @Test(groups = "DataPrepAlfrescoOne")
@@ -1259,7 +1258,7 @@ public class GalleryViewTest extends AbstractUtils
     @Test(groups = "DataPrepAlfrescoOne")
     public void dataprep_AONE_14021() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R3";
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String copyFolderName = getFolderName("copy" + testName);
@@ -1301,7 +1300,7 @@ public class GalleryViewTest extends AbstractUtils
     public void AONE_14021() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R3";
 
         testUser = getUserNameFreeDomain(testName);
 
@@ -1582,7 +1581,7 @@ public class GalleryViewTest extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne", "NonGrid" })
     public void dataprep_AONE_15058() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
 
@@ -1616,7 +1615,7 @@ public class GalleryViewTest extends AbstractUtils
     public void AONE_15058() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String folderName = getFolderName(testName) + System.currentTimeMillis();
@@ -1650,7 +1649,7 @@ public class GalleryViewTest extends AbstractUtils
     @Test(groups = "DataPrepAlfrescoOne")
     public void dataprep_AONE_14026() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
 
@@ -1681,9 +1680,9 @@ public class GalleryViewTest extends AbstractUtils
     public void AONE_14026() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         testUser = getUserNameFreeDomain(testName);
-        String accessUser = getUserNameFreeDomain(testName + "accessUser") + getRandomStringWithNumders(5);
+        String accessUser = getUserNameFreeDomain(testName + "accessUser");
         String siteName = getSiteName(testName);
         String folderName = getFolderName(testName) + getRandomStringWithNumders(3);
         // User
@@ -1720,7 +1719,7 @@ public class GalleryViewTest extends AbstractUtils
     @Test(groups = "DataPrepAlfrescoOne")
     public void dataprep_AONE_14027() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
 
@@ -1752,7 +1751,7 @@ public class GalleryViewTest extends AbstractUtils
     public void AONE_14027() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String folderName1 = getFolderName(testName + 1) + System.currentTimeMillis();
@@ -1783,7 +1782,8 @@ public class GalleryViewTest extends AbstractUtils
         createRulePage.fillDescriptionField(testName);
 
         // Select 'Copy' value in the 'Perform Action' section.
-        ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
+        //ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
+        ActionSelectorEnterpImpl actionSelectorEnterpImpl = new ActionSelectorEnterpImpl(customDrone);
         actionSelectorEnterpImpl.selectCopy(siteName, folderName2);
 
         // Click "Create" button
@@ -2185,7 +2185,7 @@ public class GalleryViewTest extends AbstractUtils
     @Test(groups = "DataPrepAlfrescoOne")
     public void dataprep_AONE_14006() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName()  + "R1";;
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName);
@@ -2217,7 +2217,7 @@ public class GalleryViewTest extends AbstractUtils
     public void AONE_14006() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName);

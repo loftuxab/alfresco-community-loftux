@@ -249,7 +249,14 @@ public abstract class CMISSelectorParameter extends CmisUtils
     {
         PublicApiClient.CmisSession cmisSession = getCmisSession(binding, testUser, DOMAIN);
         CmisObject objectByPath = cmisSession.getObject(folderRef);
-        assertEquals(objectByPath.getLastModifiedBy(), testUser);
+        if(alfrescoVersion.isCloud())
+        {
+            assertEquals(objectByPath.getLastModifiedBy(), testUser.toLowerCase());
+        }
+        else
+        {
+            assertEquals(objectByPath.getLastModifiedBy(), testUser);
+        }
         assertEquals(objectByPath.getName(), folderName);
     }
 
@@ -342,7 +349,7 @@ public abstract class CMISSelectorParameter extends CmisUtils
         Document doc = (Document) cmisSession.getObject(fileName1Ref);
         List<Rendition> renditions = doc.getRenditions();
         assertNotNull(doc);
-        assertNull(renditions);
+        Assert.assertTrue(renditions.isEmpty());
     }
 
     protected void selectorContent(String thisTestName) throws Exception

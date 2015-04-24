@@ -5,7 +5,6 @@ import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.BULLE
 import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.ITALIC;
 import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.NUMBER;
 import static org.alfresco.po.share.site.document.TinyMceEditor.FormatType.UNDERLINED;
-import static org.testng.Assert.assertEquals;
 
 import org.alfresco.po.share.enums.TinyMceColourCode;
 import org.alfresco.po.share.site.document.AddCommentForm;
@@ -18,6 +17,7 @@ import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.test.FailedTestListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -48,7 +48,7 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
     public void dataPrep_AONE_12352() throws Exception
     {
 
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String fileName = getFileName(testName) + ".txt";
         String siteName = getSiteName(testName);
 
@@ -74,7 +74,7 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
     public void AONE_12352()
     {
         DocumentLibraryPage documentLibraryPage;
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
         String siteName = getSiteName(testName);
         String fileName = getFileName(testName) + ".txt";
         String testUser = getUserNameFreeDomain(testName);
@@ -85,6 +85,7 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         String textNumber = "Number Text";
         String colorText = "Color Text";
         String allFormats = "All in one";
+        String tinyMceStr;
 
         // Login
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
@@ -106,10 +107,11 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         TinyMceEditor tinyMceEditor = addCommentForm.getTinyMceEditor();
         tinyMceEditor.setText(textBold);
         tinyMceEditor.clickTextFormatter(BOLD);
-        assertEquals(tinyMceEditor.getContent(), String.format("<p><strong>%s</strong></p>", textBold), "The text didn't mark as bold.");
+        tinyMceStr = tinyMceEditor.getContent();
+        Assert.assertTrue(tinyMceStr.contains("<strong>") && tinyMceStr.contains(textBold));
         addCommentForm.clickAddCommentButton().render();
         String boldHTML = detailsPage.getCommentHTML(textBold);
-        assertEquals(boldHTML, String.format("<p><strong>%s</strong></p>", textBold), "The text didn't mark as bold.");
+        Assert.assertTrue(boldHTML.contains("<strong>") && boldHTML.contains(textBold));
 
         // ---- Step 2 ----
         // ---- Step action ---
@@ -119,9 +121,11 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         addCommentForm = detailsPage.clickAddCommentButton();
         tinyMceEditor.setText(textItalic);
         tinyMceEditor.clickTextFormatter(ITALIC);
-        assertEquals(tinyMceEditor.getContent(), String.format("<p><em>%s</em></p>", textItalic), "The text didn't italic.");
+        tinyMceStr = tinyMceEditor.getContent();
+        Assert.assertTrue(tinyMceStr.contains("<em>") && tinyMceStr.contains(textItalic));
         addCommentForm.clickAddCommentButton().render();
-        assertEquals(detailsPage.getCommentHTML(textItalic), String.format("<p><em>%s</em></p>", textItalic), "The text didn't mark as italic.");
+        String italicHtml = detailsPage.getCommentHTML(textItalic);
+        Assert.assertTrue(italicHtml.contains("<em>") && italicHtml.contains(textItalic));
 
         // ---- Step 3 ----
         // ---- Step action ---
@@ -131,11 +135,11 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         addCommentForm = detailsPage.clickAddCommentButton();
         tinyMceEditor.setText(textUnderline);
         tinyMceEditor.clickTextFormatter(UNDERLINED);
-        assertEquals(tinyMceEditor.getContent(), String.format("<p><span style=\"text-decoration: underline;\">%s</span></p>", textUnderline),
-                "The text didn't underlined.");
+        tinyMceStr = tinyMceEditor.getContent();
+        Assert.assertTrue(tinyMceStr.contains("text-decoration: underline;") && tinyMceStr.contains(textUnderline));
         addCommentForm.clickAddCommentButton().render();
-        assertEquals(detailsPage.getCommentHTML(textUnderline), String.format("<p><span style=\"text-decoration: underline;\">%s</span></p>", textUnderline),
-                "The text didn't mark as underlined.");
+        String underlineHtml = detailsPage.getCommentHTML(textUnderline);
+        Assert.assertTrue(underlineHtml.contains("text-decoration: underline;") && underlineHtml.contains(textUnderline));
 
         // ---- Step 4 ----
         // ---- Step action ---
@@ -145,9 +149,11 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         addCommentForm = detailsPage.clickAddCommentButton();
         tinyMceEditor.setText(textBullet);
         tinyMceEditor.clickTextFormatter(BULLET);
-        assertEquals(tinyMceEditor.getContent(), String.format("<ul style=\"\"><li>%s</li></ul>", textBullet), "List didn't display.");
+        tinyMceStr = tinyMceEditor.getContent();
+        Assert.assertTrue(tinyMceStr.contains("ul") && tinyMceStr.contains("<li>") && tinyMceStr.contains(textBullet));
         addCommentForm.clickAddCommentButton().render();
-        assertEquals(detailsPage.getCommentHTML(textBullet), String.format("<ul>\n<li>%s</li>\n</ul>", textBullet), "The text didn't mark as list.");
+        String bulletStr = detailsPage.getCommentHTML(textBullet);
+        Assert.assertTrue(bulletStr.contains("ul") && bulletStr.contains(textBullet) && bulletStr.contains("<li>"));
 
         // ---- Step 5 ----
         // ---- Step action ---
@@ -157,9 +163,11 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         addCommentForm = detailsPage.clickAddCommentButton();
         tinyMceEditor.setText(textNumber);
         tinyMceEditor.clickTextFormatter(NUMBER);
-        assertEquals(tinyMceEditor.getContent(), String.format("<ol style=\"\"><li>%s</li></ol>", textNumber), "Numbered list didn't display.");
+        tinyMceStr = tinyMceEditor.getContent();
+        Assert.assertTrue(tinyMceStr.contains("ol") && tinyMceStr.contains("<li>") && tinyMceStr.contains(textNumber));
         addCommentForm.clickAddCommentButton().render();
-        assertEquals(detailsPage.getCommentHTML(textNumber), String.format("<ol>\n<li>%s</li>\n</ol>", textNumber), "The text didn't mark as list.");
+        String numberStr = detailsPage.getCommentHTML(textNumber);
+        Assert.assertTrue(numberStr.contains("ol") && numberStr.contains(textNumber) && numberStr.contains("<li>"));
 
         // ---- Step 6 ----
         // ---- Step action ---
@@ -169,11 +177,11 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         addCommentForm = detailsPage.clickAddCommentButton();
         tinyMceEditor.setText(colorText);
         tinyMceEditor.clickColorCode(TinyMceColourCode.BLUE);
-        assertEquals(tinyMceEditor.getContent(), String.format("<p><span style=\"color: rgb(0, 0, 255);\">%s</span></p>", colorText),
-                "Text didn't get colored.");
+        tinyMceStr = tinyMceEditor.getContent();
+        Assert.assertTrue(tinyMceStr.contains("color: rgb(0, 0, 255)") && tinyMceStr.contains(colorText));
         addCommentForm.clickAddCommentButton().render();
-        assertEquals(detailsPage.getCommentHTML(colorText), String.format("<p><span style=\"color: #0000ff;\">%s</span></p>", colorText),
-                "Text didn't get colored.");
+        String colorHtml = detailsPage.getCommentHTML(colorText);
+        Assert.assertTrue(colorHtml.contains("color: #0000ff") && colorHtml.contains(colorText));
 
         // ---- Step 7 ----
         // ---- Step action ---
@@ -197,8 +205,8 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         tinyMceEditor.clickTextFormatter(NUMBER);
         tinyMceEditor.clickColorCode(TinyMceColourCode.BLUE);
         addCommentForm.clickAddCommentButton().render();
-        assertEquals(detailsPage.getCommentHTML(allFormats), String.format(
-                "<ol>\n<li><span style=\"text-decoration: underline; color: #0000ff;\"><em><strong>%s</strong></em></span></li>\n</ol>", allFormats));
-
+        String allFormatsHtml = detailsPage.getCommentHTML(allFormats);
+        Assert.assertTrue(allFormatsHtml.contains("text-decoration: underline") && allFormatsHtml.contains(" color: #0000ff")
+                && allFormatsHtml.contains("<em>") && allFormatsHtml.contains("<strong>") && allFormatsHtml.contains("<ol>"));
     }
 }

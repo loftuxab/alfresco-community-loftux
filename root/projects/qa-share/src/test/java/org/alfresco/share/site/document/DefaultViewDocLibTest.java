@@ -73,7 +73,7 @@ public class DefaultViewDocLibTest extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AONE_14099() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
 
         createSiteData(testName, true);
     }
@@ -85,7 +85,7 @@ public class DefaultViewDocLibTest extends AbstractUtils
     public void AONE_14099() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
 
         // Login as User1 (Manager)
         runTestForUser(testName, UserRole.MANAGER);
@@ -197,7 +197,7 @@ public class DefaultViewDocLibTest extends AbstractUtils
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AONE_14103() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "R1";
 
         createSiteData(testName, false);
     }
@@ -209,23 +209,18 @@ public class DefaultViewDocLibTest extends AbstractUtils
     public void AONE_14103() throws Exception
     {
         /** Start Test */
-        String testName = getTestName();
-
+        String testName = getTestName() + "R1";
         String siteName = getSiteName(testName);
-
         String testUserManager = getUserNameFreeDomain(testName + UserRole.MANAGER);
         String testUserCollab = getUserNameFreeDomain(testName + UserRole.COLLABORATOR);
-        String testUserContri = getUserNameFreeDomain(testName + UserRole.CONTRIBUTOR);
-
+        String testUserContri = getUserNameFreeDomain(testName + UserRole.CONTRIBUTOR);  
         String folderName = getFolderName(testName);
         String subFolderNameCollab = getFolderName("collab" + testName);
         String subFolderNameContri = getFolderName("contri" + testName);
 
         // Login as User1 (Manager)
         ShareUser.login(drone, testUserManager);
-
         ShareUser.openSiteDashboard(drone, siteName);
-
         ShareUserSitePage.createFolder(drone, folderName, folderName);
 
         // Expand the "Options" menu, click the any view (e.g. "Gallery View")
@@ -234,6 +229,7 @@ public class DefaultViewDocLibTest extends AbstractUtils
 
         // "Set "ANY View" as default for this folder " ("Gallery View")
         docLibPage = docLibPage.getNavigation().selectSetCurrentViewToDefault().render();
+        waitInSeconds(1);
         assertTrue(docLibPage.getNavigation().isRemoveDefaultViewVisible());
 
         // Login as User2 (Collaborator)
@@ -250,6 +246,7 @@ public class DefaultViewDocLibTest extends AbstractUtils
 
         // "Set "ANY View" as default for this folder " ("Table View")
         docLibPage = docLibPage.getNavigation().selectSetCurrentViewToDefault().render();
+        waitInSeconds(1);
         assertTrue(docLibPage.getNavigation().isRemoveDefaultViewVisible());
 
         // Login as User3 (Contributor)
@@ -265,6 +262,7 @@ public class DefaultViewDocLibTest extends AbstractUtils
 
         // "Set "ANY View" as default for this folder " ("Table View")
         docLibPage = docLibPage.getNavigation().selectSetCurrentViewToDefault().render();
+        waitInSeconds(1);
         assertTrue(docLibPage.getNavigation().isRemoveDefaultViewVisible());
     }
 
@@ -363,6 +361,7 @@ public class DefaultViewDocLibTest extends AbstractUtils
         {
             // "Set "ANY View" as default for this folder " ("Simple View")
             docLibPage = docLibPage.getNavigation().selectSetCurrentViewToDefault().render();
+            waitInSeconds(1);
             assertTrue(docLibPage.getNavigation().isRemoveDefaultViewVisible());
         }
         else
@@ -410,6 +409,7 @@ public class DefaultViewDocLibTest extends AbstractUtils
         {
             // "Set "OTHER View" as default for this folder " ("Detailed View")
             docLibPage = docLibPage.getNavigation().selectSetCurrentViewToDefault().render();
+            waitInSeconds(1);
             assertTrue(docLibPage.getNavigation().isRemoveDefaultViewVisible());
         }
 

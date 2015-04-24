@@ -17,6 +17,7 @@ package org.alfresco.share.user.trashcan;
 import static org.testng.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.exception.ShareException;
@@ -24,7 +25,6 @@ import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FolderDetailsPage;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
-import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.SelectActions;
 import org.alfresco.po.share.user.TrashCanItem;
 import org.alfresco.po.share.user.TrashCanPage;
@@ -51,12 +51,12 @@ import org.testng.annotations.Test;
 public class TrashcanTest3 extends AbstractUtils
 {
     private static final Logger logger = Logger.getLogger(TrashcanTest3.class);
-    private SiteActions siteActions = new SiteActions();
+    //private SiteActions siteActions = new SiteActions();
 
-    private String getCustomRoleName(String siteName, UserRole role)
+   /* private String getCustomRoleName(String siteName, UserRole role)
     {
-        return String.format("site_%s_%s", siteActions.getSiteShortname(siteName), StringUtils.replace(role.getRoleName().trim(), " ", ""));
-    }
+        return String.format("site_%s_%s", siteActions.getSiteShortname(siteName), role.getRoleName());
+    }*/
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -660,26 +660,22 @@ public class TrashcanTest3 extends AbstractUtils
 
         // The user has original access level to all the recovered content items, i.e. manager permissions
         ManagePermissionsPage managePermissionPage = ShareUserSitePage.manageContentPermissions(drone, fileName1);
-
-        String role = managePermissionPage.getInheritedPermissions().get(getCustomRoleName(siteName1, UserRole.SITEMANAGER));
-        Assert.assertEquals(role, UserRole.SITEMANAGER.getRoleName(),
+        Map<String, String> usersAndPermissions = managePermissionPage.getInheritedPermissions();
+        Assert.assertTrue(usersAndPermissions.containsValue(UserRole.SITEMANAGER.getRoleName()),
                 "The user hasn't original access level to the recovered content item (i.e. manager permissions)");
         managePermissionPage.selectCancel().render();
         ShareUser.openDocumentLibrary(drone);
-
         managePermissionPage = ShareUserSitePage.manageContentPermissions(drone, folderName1);
 
-        role = managePermissionPage.getInheritedPermissions().get(getCustomRoleName(siteName1, UserRole.SITEMANAGER));
-        Assert.assertEquals(role, UserRole.SITEMANAGER.getRoleName(),
+        usersAndPermissions = managePermissionPage.getInheritedPermissions();
+        Assert.assertTrue(usersAndPermissions.containsValue(UserRole.SITEMANAGER.getRoleName()),
                 "The user hasn't original access level to the recovered content item (i.e. manager permissions)");
         managePermissionPage.selectCancel().render();
 
         // The content items are absent in the trashcan
         ShareUserProfile.navigateToTrashCan(drone);
-
         Assert.assertFalse(ShareUserProfile.isTrashCanItemPresent(drone, fileName1), "The content item (file) are present in the trashcan");
         Assert.assertFalse(ShareUserProfile.isTrashCanItemPresent(drone, folderName1), "The content item (folder) are present in the trashcan");
-
         ShareUser.logout(drone);
 
     }
@@ -708,10 +704,8 @@ public class TrashcanTest3 extends AbstractUtils
     {
         String testName = getTestName();
         String siteName1 = getSiteName(testName) + System.currentTimeMillis();
-
         String trashcanUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
         String trashcanUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
-
         String fileName1 = "fi1-" + getFileName(testName) + System.currentTimeMillis() + ".txt";
         String folderName1 = "fo3-" + getFolderName(testName) + System.currentTimeMillis();
         String commentForFile = "Whats up " + fileName1 + ", How you doing?";

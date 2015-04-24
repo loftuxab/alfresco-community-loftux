@@ -29,7 +29,6 @@ public class ShareRefreshInheritRules extends AbstractUtils
 {
 
     private static final Logger logger = Logger.getLogger(ShareRefreshInheritRules.class);
-
     private String testUser;
     private String testUser1;
 
@@ -48,7 +47,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
         try
         {
             // create users
-        	CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, testUserInfo);
+            CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, testUserInfo);
             logger.info("ShareRefresh users created. " + testUser);
 
             CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUser1Info);
@@ -75,7 +74,6 @@ public class ShareRefreshInheritRules extends AbstractUtils
         {
             reportError(drone, testName, e);
         }
-
     }
 
     @AfterMethod(groups = { "AlfrescoOne" })
@@ -91,7 +89,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
         {
             reportError(drone, testName, e);
         }
-           
+
     }
 
     /**
@@ -103,7 +101,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
     @Test(groups = { "AlfrescoOne" })
     public void AONE_13990() throws Exception
     {
-    	// create site
+        // create site
         String testName = getTestName();
         String siteName = testName + System.currentTimeMillis();
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
@@ -132,7 +130,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
 
         if (isAlfrescoVersionCloud(drone))
         {
-        	ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
+            ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
             actionSelectorCloudImpl.selectCopy(siteName, "Documents");
         }
         else
@@ -183,7 +181,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
     @Test(groups = { "AlfrescoOne" })
     public void AONE_13991() throws Exception
     {
-    	// create site
+        // create site
         String testName = getTestName();
         String siteName = testName + System.currentTimeMillis();
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
@@ -211,7 +209,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
 
         if (isAlfrescoVersionCloud(drone))
         {
-        	ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
+            ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
             actionSelectorCloudImpl.selectCopy(siteName, "Documents");
         }
         else
@@ -289,7 +287,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
     @Test(groups = { "AlfrescoOne" })
     public void AONE_13992() throws Exception
     {
-    	// create site
+        // create site
         String testName = getTestName();
         String siteName = testName + System.currentTimeMillis();
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
@@ -317,7 +315,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
 
         if (isAlfrescoVersionCloud(drone))
         {
-        	ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
+            ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
             actionSelectorCloudImpl.selectCopy(siteName, "Documents");
         }
         else
@@ -394,11 +392,10 @@ public class ShareRefreshInheritRules extends AbstractUtils
     @Test(groups = { "AlfrescoOne" })
     public void AONE_13993() throws Exception
     {
-    	// create site
+        // create site
         String testName = getTestName();
         String siteName = testName + System.currentTimeMillis();
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
-
         String parentFolderName = getFolderName(testName) + System.currentTimeMillis() + "-Parent";
         String subFolderName = getFolderName(testName) + System.currentTimeMillis() + "-Subfolder";
 
@@ -438,12 +435,12 @@ public class ShareRefreshInheritRules extends AbstractUtils
 
         if (isAlfrescoVersionCloud(drone))
         {
-        	ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
+            ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
             actionSelectorCloudImpl.selectCopy(siteName, "Documents");
         }
         else
         {
-        	ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
+            ActionSelectorEnterpImpl actionSelectorEnterpImpl = createRulePage.getActionOptionsObj();
             actionSelectorEnterpImpl.selectCopy(siteName, "Documents");
         }
 
@@ -491,10 +488,8 @@ public class ShareRefreshInheritRules extends AbstractUtils
         // click on "Don't Inherit Rules"
         docPage = ShareUser.openDocumentLibrary(drone);
         docPage.selectFolder(parentFolderName).render();
-
         subFolderRulesPage = docPage.getFileDirectoryInfo(subFolderName).selectManageRules().render();
         Assert.assertTrue(subFolderRulesPage.isPageCorrect(subFolderName));
-
         Assert.assertTrue(subFolderRulesPage.isInheritRuleToggleAvailable());
 
         // toggle
@@ -523,7 +518,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
     @Test(groups = { "AlfrescoOne" })
     public void AONE_13994() throws Exception
     {
-    	// create site
+        // create site
         String testName = getTestName();
         String siteName = testName + System.currentTimeMillis();
         ShareUser.createSite(drone, siteName, SITE_VISIBILITY_PUBLIC);
@@ -544,7 +539,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
 
         // Invited User logs in
         ShareUser.login(drone, testUser1, DEFAULT_PASSWORD);
-            
+
         // create subfolder in parent folder as invited user
         docPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
         docPage.selectFolder(parentFolderName).render();
@@ -568,7 +563,7 @@ public class ShareRefreshInheritRules extends AbstractUtils
 
         if (isAlfrescoVersionCloud(drone))
         {
-        	ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
+            ActionSelectorCloudImpl actionSelectorCloudImpl = createRulePage.getActionOptionsObj();
             actionSelectorCloudImpl.selectCopy(siteName, "Documents", parentFolderName, subFolderName);
         }
         else
@@ -622,12 +617,12 @@ public class ShareRefreshInheritRules extends AbstractUtils
         Assert.assertFalse(docPage.isFileVisible("Copy of " + sampleFile.getName()));
 
         // click on "Don't Inherit Rules"
-        docPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
+        ShareUser.openSiteDashboard(drone, siteName);
+        docPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
         docPage.selectFolder(parentFolderName).render();
 
         subFolderRulesPage = docPage.getFileDirectoryInfo(subFolderName).selectManageRules().render();
         Assert.assertTrue(subFolderRulesPage.isPageCorrect(subFolderName));
-
         Assert.assertTrue(subFolderRulesPage.isInheritRuleToggleAvailable());
 
         // toggle
@@ -642,6 +637,10 @@ public class ShareRefreshInheritRules extends AbstractUtils
         ShareUserSitePage.uploadFile(drone, anotherFile);
 
         // verify the rule is applied to subfolder
+        ShareUser.openSiteDashboard(drone, siteName);
+        docPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        docPage.selectFolder(parentFolderName).render();
+        docPage.selectFolder(subFolderName).render();
         Assert.assertTrue(docPage.isFileVisible("Copy of " + anotherFile.getName()));
     }
 

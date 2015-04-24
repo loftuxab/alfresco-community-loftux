@@ -18,13 +18,33 @@
  */
 package org.alfresco.share.api.cmis;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.alfresco.po.share.enums.UserRole;
 import org.alfresco.po.share.site.document.DocumentDetailsPage;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.site.document.ManagePermissionsPage;
 import org.alfresco.po.share.site.document.VersionDetails;
-import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.rest.api.tests.client.PublicApiClient.CmisSession;
 import org.alfresco.rest.api.tests.client.data.CMISNode;
@@ -53,22 +73,6 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlEntry
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlPrincipalDataImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.testng.Assert.*;
 
 /**
  * @author abharade
@@ -544,7 +548,14 @@ public abstract class CMISActionValuesTest extends CmisUtils
         Date modifiedDate = simpleDateFormat.parse((String) documentDetailsPage.getProperties().get("ModifiedDate"));
         assertTrue(documentSize.contains("(None)"));
         assertTrue(modifiedDate.after(createdDate), "Created date :" + createdDate + " modified date: " + modifiedDate);
-        assertEquals(documentDetailsPage.getProperties().get("Modifier"), testUser);
+        if(alfrescoVersion.isCloud())
+        {
+            assertEquals(documentDetailsPage.getProperties().get("Modifier"), testUser.toLowerCase());
+        }
+        else
+        {
+            assertEquals(documentDetailsPage.getProperties().get("Modifier"), testUser);
+        }
     }
 
     /**
@@ -678,7 +689,15 @@ public abstract class CMISActionValuesTest extends CmisUtils
         {
             assertTrue(size == oldDocSize);
         }
-        assertEquals(props.get("Modifier"), testUser);
+        
+        if(alfrescoVersion.isCloud())
+        {
+            assertEquals(props.get("Modifier"), testUser.toLowerCase());
+        }
+        else
+        {
+            assertEquals(props.get("Modifier"), testUser);
+        }
         assertFalse(createdDate.after(modifiedDate), "Created date :" + createdDate + " cannot be after modified date: " + modifiedDate);
     }
 
@@ -708,8 +727,15 @@ public abstract class CMISActionValuesTest extends CmisUtils
         double size = getNumericalSize((String) props.get("Size"));
 
         assertTrue(size == oldDocSize);
-
-        assertEquals(props.get("Modifier"), testUser);
+        
+        if(alfrescoVersion.isCloud())
+        {
+            assertEquals(props.get("Modifier"), testUser.toLowerCase());
+        }
+        else
+        {
+            assertEquals(props.get("Modifier"), testUser);
+        }
         assertFalse(modifiedDate.after(createdDate), "Created date :" + createdDate + " cannot be after modified date: " + modifiedDate);
     }
 
