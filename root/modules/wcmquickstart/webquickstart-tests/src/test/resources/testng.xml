@@ -49,11 +49,11 @@
             <package name="org.alfresco.test.wqs.web.search"/>
         </packages>
     </test>
-    <test name="AweWQS">
+    <!--<test name="AweWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web.awe"/>
         </packages>
-    </test>
+    </test>-->
     <test name="MainWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web"/>
