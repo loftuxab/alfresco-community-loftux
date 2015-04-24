@@ -172,12 +172,12 @@ public class CreatingItemsViaAWE extends AbstractWQS
         blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle);
         Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
         Assert.assertEquals(blogPostContent, blogPostPage.getContent());
+        waitForDocumentsToIndex();
 
         loginActions.loginToShare(drone, loginInfo, shareUrl);
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + WcmqsBlogPage.BLOG;
         DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
-        waitForDocumentsToIndex();
         DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(blogPostName).render();
 
         Assert.assertEquals(blogPostName, blogPostDetailsPage.getDocumentTitle());
@@ -205,12 +205,12 @@ public class CreatingItemsViaAWE extends AbstractWQS
         blogPostPage = waitAndOpenBlogPost(blogPage, blogPostTitle);
         Assert.assertEquals(blogPostTitle, blogPostPage.getTitle());
         Assert.assertEquals(blogPostContent, blogPostPage.getContent());
+        waitForDocumentsToIndex();
 
         loginActions.loginToShare(drone, loginInfo, shareUrl);
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + WcmqsBlogPage.BLOG;
         DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
-        waitForDocumentsToIndex();
         DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(blogPostName).render();
 
         Assert.assertEquals(blogPostName, blogPostDetailsPage.getDocumentTitle());
@@ -236,12 +236,12 @@ public class CreatingItemsViaAWE extends AbstractWQS
         newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+        waitForDocumentsToIndex();
 
         loginActions.loginToShare(drone, loginInfo, shareUrl);
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.GLOBAL;
         DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
-        waitForDocumentsToIndex();
         DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
 
         Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
@@ -267,12 +267,12 @@ public class CreatingItemsViaAWE extends AbstractWQS
         newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+        waitForDocumentsToIndex();
 
         loginActions.loginToShare(drone, loginInfo, shareUrl);
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.GLOBAL;
         DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
-        waitForDocumentsToIndex();
         DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
 
         Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
@@ -298,12 +298,12 @@ public class CreatingItemsViaAWE extends AbstractWQS
         newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
-        loginActions.loginToShare(drone, loginInfo, shareUrl);
+        waitForDocumentsToIndex();
 
+        loginActions.loginToShare(drone, loginInfo, shareUrl);
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.COMPANIES;
         DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
-        waitForDocumentsToIndex();
         DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
 
         Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
@@ -329,12 +329,12 @@ public class CreatingItemsViaAWE extends AbstractWQS
         newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+        waitForDocumentsToIndex();
 
         loginActions.loginToShare(drone, loginInfo, shareUrl);
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.COMPANIES;
         DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
-        waitForDocumentsToIndex();
         DocumentDetailsPage postDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
 
         Assert.assertEquals(newsArticleName, postDetailsPage.getDocumentTitle());
@@ -360,12 +360,12 @@ public class CreatingItemsViaAWE extends AbstractWQS
         newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+        waitForDocumentsToIndex();
 
         loginActions.loginToShare(drone, loginInfo, shareUrl);
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.MARKETS;
         DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
-        waitForDocumentsToIndex();
         DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
 
         Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());
@@ -391,12 +391,12 @@ public class CreatingItemsViaAWE extends AbstractWQS
         newsArticleDetails = waitAndOpenNewsArticle(newNewsPage, newsArticleTitle);
         Assert.assertEquals(newsArticleTitle, newsArticleDetails.getTitleOfNewsArticle());
         Assert.assertEquals(newsArticleContent, newsArticleDetails.getBodyOfNewsArticle());
+        waitForDocumentsToIndex();
 
         loginActions.loginToShare(drone, loginInfo, shareUrl);
         siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
         String folderPath = DOCLIB + SLASH + ALFRESCO_QUICK_START + SLASH + QUICK_START_EDITORIAL + SLASH + ROOT + SLASH + NEWS + SLASH + WcmqsNewsPage.MARKETS;
         DocumentLibraryPage documentLibraryPage = siteActions.navigateToFolder(drone, folderPath).render();
-        waitForDocumentsToIndex();
         DocumentDetailsPage blogPostDetailsPage = documentLibraryPage.selectFile(newsArticleName).render();
 
         Assert.assertEquals(newsArticleName, blogPostDetailsPage.getDocumentTitle());

@@ -28,6 +28,7 @@ import org.alfresco.po.wqs.WcmqsBlogPostPage;
 import org.alfresco.po.wqs.WcmqsHomePage;
 import org.alfresco.po.wqs.WcmqsNewsArticleDetails;
 import org.alfresco.po.wqs.WcmqsNewsPage;
+import org.alfresco.po.wqs.WcmqsSearchPage;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.wqs.AbstractWQS;
@@ -140,8 +141,8 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // 2. Blog post is opened;
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage wcmqsBlogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ETHICAL_FUNDS).render();
+        WcmqsBlogPostPage wcmqsBlogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ETHICAL_FUNDS).render();
         Assert.assertNotNull(wcmqsBlogPostPage, "Blog Post " + WcmqsBlogPage.ETHICAL_FUNDS + " is not opened");
 
         // ---- Step 3 ----
@@ -176,7 +177,7 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // Click OK button;
         // ---- Expected results ----
         // File is deleted and no more dislpayed in the list of articles;
-        wcmqsBlogPostPage.confirmArticleDelete().render();
+        WcmqsBlogPage blogPage = wcmqsBlogPostPage.confirmArticleDelete().render();
         Assert.assertTrue(blogPage.isBlogDeleted(WcmqsBlogPage.ETHICAL_FUNDS), "Deleting Blog Post " + WcmqsBlogPage.ETHICAL_FUNDS
                 + " failed. The blog is displayed.");
         waitForDocumentsToIndex();
@@ -221,8 +222,8 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // 2. Blog post is opened;
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage wcmqsBlogPostPage = blogPage.openBlogPost(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
+        WcmqsBlogPostPage wcmqsBlogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP).render();
         Assert.assertNotNull(wcmqsBlogPostPage, "Blog Post " + WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP + " is not opened");
 
         // ---- Step 3 ----
@@ -259,7 +260,8 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // File is deleted and no more dislpayed in the list of articles;
 
-        wcmqsBlogPostPage.confirmArticleDelete().render();
+        wcmqsBlogPostPage.confirmArticleDelete();
+        WcmqsBlogPage blogPage = homePage.selectMenu("blog").render();
         Assert.assertTrue(blogPage.isBlogDeleted(WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP), "Deleting Blog Post "
                 + WcmqsBlogPage.COMPANY_ORGANISES_WORKSHOP + " failed. The blog is displayed.");
         waitForDocumentsToIndex();
@@ -302,8 +304,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // 2. Blog post is opened;
 
         WcmqsHomePage homePage = new WcmqsHomePage(drone);
-        WcmqsBlogPage blogPage = homePage.selectMenu(WcmqsBlogPage.BLOG_MENU_STR).render();
-        WcmqsBlogPostPage wcmqsBlogPostPage = blogPage.openBlogPost(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
+        WcmqsBlogPostPage wcmqsBlogPostPage = wcmqsSearchPage.clickLinkByTitle(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS).render();
+
         Assert.assertNotNull(wcmqsBlogPostPage, "Blog Post " + WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS + " is not opened");
 
         // ---- Step 3 ----
@@ -340,7 +343,8 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // File is deleted and no more dislpayed in the list of articles;
 
-         wcmqsBlogPostPage.confirmArticleDelete().render();
+        wcmqsBlogPostPage.confirmArticleDelete();
+        WcmqsBlogPage blogPage = homePage.selectMenu("blog").render();
         Assert.assertTrue(blogPage.isBlogDeleted(WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS), "Deleting Blog Post " + WcmqsBlogPage.ANALYSTS_LATEST_THOUGHTS
                 + " failed. The blog is displayed.");
         waitForDocumentsToIndex();
@@ -384,7 +388,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.GLOBAL, WcmqsNewsPage.EUROPE_DEPT_CONCERNS).render();
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsNewsPage.EUROPE_DEPT_CONCERNS).render();
+        WcmqsNewsArticleDetails newsArticleDetails = wcmqsSearchPage.clickLinkByTitle(WcmqsNewsPage.EUROPE_DEPT_CONCERNS).render();
         Assert.assertNotNull(newsArticleDetails);
 
         // ---- Step 3 ----
@@ -421,7 +427,8 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // File is deleted and no more dislpayed in the list of articles;
 
-        WcmqsNewsPage newsPage = newsArticleDetails.confirmArticleDelete().render();
+        newsArticleDetails.confirmArticleDelete();
+        WcmqsNewsPage newsPage = homePage.selectMenu("news").render();
         Assert.assertTrue(newsPage.checkIfBlogIsDeleted(WcmqsNewsPage.EUROPE_DEPT_CONCERNS), "Deleting Blog Post " + WcmqsNewsPage.EUROPE_DEPT_CONCERNS
                 + " failed. The blog is displayed.");
         waitForDocumentsToIndex();
@@ -465,7 +472,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.GLOBAL, WcmqsNewsPage.FTSE_1000).render();
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsNewsPage.FTSE_1000).render();
+        WcmqsNewsArticleDetails newsArticleDetails = wcmqsSearchPage.clickLinkByTitle(WcmqsNewsPage.FTSE_1000).render();
         Assert.assertNotNull(newsArticleDetails);
 
         // ---- Step 3 ----
@@ -502,7 +511,8 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // File is deleted and no more dislpayed in the list of articles;
 
-        WcmqsNewsPage newsPage = newsArticleDetails.confirmArticleDelete().render();
+        newsArticleDetails.confirmArticleDelete();
+        WcmqsNewsPage newsPage = homePage.selectMenu("news").render();
         Assert.assertTrue(newsPage.checkIfBlogIsDeleted(WcmqsNewsPage.FTSE_1000), "Deleting Blog Post " + WcmqsNewsPage.FTSE_1000
                 + " failed. The blog is displayed.");
         waitForDocumentsToIndex();
@@ -547,7 +557,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.COMPANIES, WcmqsNewsPage.GLOBAL_CAR_INDUSTRY).render();
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY).render();
+        WcmqsNewsArticleDetails newsArticleDetails = wcmqsSearchPage.clickLinkByTitle(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY).render();
         Assert.assertNotNull(newsArticleDetails);
 
         // ---- Step 3 ----
@@ -584,7 +596,7 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // File is deleted and no more dislpayed in the list of articles;
 
         newsArticleDetails.confirmArticleDelete().render();
-        WcmqsHomePage homePage = returnToHomePage().render();
+        homePage = returnToHomePage().render();
         WcmqsNewsPage newsPage = homePage.selectMenu("news").render();
         Assert.assertTrue(newsPage.checkIfBlogIsDeleted(WcmqsNewsPage.GLOBAL_CAR_INDUSTRY), "Deleting Blog Post " + WcmqsNewsPage.GLOBAL_CAR_INDUSTRY
                 + " failed. The blog is displayed.");
@@ -627,7 +639,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.COMPANIES, WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS).render();
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS).render();
+        WcmqsNewsArticleDetails newsArticleDetails = wcmqsSearchPage.clickLinkByTitle(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS).render();
         Assert.assertNotNull(newsArticleDetails);
 
         // ---- Step 3 ----
@@ -664,7 +678,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // File is deleted and no more dislpayed in the list of articles;
 
-        WcmqsNewsPage newsPage = newsArticleDetails.confirmArticleDelete().render();
+        newsArticleDetails.confirmArticleDelete();
+        homePage = returnToHomePage().render();
+        WcmqsNewsPage newsPage = homePage.selectMenu("news").render();
         Assert.assertTrue(newsPage.checkIfBlogIsDeleted(WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS), "Deleting Blog Post " + WcmqsNewsPage.FRESH_FLIGHT_TO_SWISS
                 + " failed. The blog is displayed.");
         waitForDocumentsToIndex();
@@ -708,7 +724,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.MARKETS, WcmqsNewsPage.INVESTORS_FEAR).render();
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsNewsPage.INVESTORS_FEAR).render();
+        WcmqsNewsArticleDetails newsArticleDetails = wcmqsSearchPage.clickLinkByTitle(WcmqsNewsPage.INVESTORS_FEAR).render();
         Assert.assertNotNull(newsArticleDetails);
 
         // ---- Step 3 ----
@@ -789,7 +807,9 @@ public class DeleteItemsViaAWE extends AbstractWQS
         // ---- Expected results ----
         // 2. Blog post is opened;
 
-        WcmqsNewsArticleDetails newsArticleDetails = openNewsFromCategory(WcmqsNewsPage.MARKETS, WcmqsNewsPage.HOUSE_PRICES).render();
+        WcmqsHomePage homePage = new WcmqsHomePage(drone);
+        WcmqsSearchPage wcmqsSearchPage = homePage.searchText(WcmqsNewsPage.HOUSE_PRICES).render();
+        WcmqsNewsArticleDetails newsArticleDetails = wcmqsSearchPage.clickLinkByTitle(WcmqsNewsPage.HOUSE_PRICES).render();
         Assert.assertNotNull(newsArticleDetails);
 
         // ---- Step 3 ----
