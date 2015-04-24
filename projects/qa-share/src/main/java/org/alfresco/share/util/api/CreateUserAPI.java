@@ -503,7 +503,7 @@ public class CreateUserAPI extends AlfrescoHttpClient
         }
 
         // Invite User
-        String[] regInfo = inviteUserToSite(drone, invitingUsername, email, siteShortname, role, message);
+        String[] regInfo = inviteUserToSite(drone, invitingUsername, email, siteShortname.toLowerCase(), role, message);
 
         // Accept invitation
         result = userAcceptsSiteInvite(drone, email, domainName, regInfo);
