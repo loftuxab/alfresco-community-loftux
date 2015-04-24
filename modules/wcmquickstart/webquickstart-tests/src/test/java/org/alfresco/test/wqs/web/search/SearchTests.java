@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
+ * This file is part of Alfresco
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.alfresco.test.wqs.web.search;
 
 import org.alfresco.po.share.ShareUtil;
@@ -301,7 +316,6 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains(blogHouse5710), "Search Results list does not contain title: "
                 + blogHouse5710);
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains(blogTechno5710), "Search Results list contains title: " + blogTechno5710);
@@ -382,15 +396,12 @@ public class SearchTests extends AbstractWQS
      * AONE-5711 Searching items by content
      */
     @AlfrescoTest(testlink = "AONE-5711")
-    @Test(groups = {"WQS", "EnterpriseOnly"})
+    @Test(groups = {"WQS", "EnterpriseOnly", "Bug"})
     public void searchItemsByContent() throws Exception
     {
         String searchedText = "House1";
         String searchedText2 = "techno1";
         String searchedText3 = "trance1";
-        ShareUtil.loginAs(drone, shareUrl, ADMIN_USERNAME, ADMIN_PASSWORD);
-        siteActions.openSiteDashboard(drone, siteName).getSiteNav().selectSiteDocumentLibrary().render();
-        createArticles5711();
 
         // ---- Step 1 ----
         // ---- Step action ----
@@ -482,7 +493,6 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Tr5711"), "Search Results list does not contain title: "
                 + "Blog Tr5711");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5711"), "Search Results list contains title: " + "Blog H5711");
@@ -587,7 +597,6 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.BlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results list does not contain title: "
                 + "Blog H5712");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5712"), "Search Results list contains title: " + "Blog Te5712");
@@ -618,7 +627,6 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Te5712"), "Search Results list does not contain title: "
                 + "Blog Te5712");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results list contains title: " + "Blog H5712");
@@ -649,7 +657,6 @@ public class SearchTests extends AbstractWQS
         wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotNull(wcmqsSearchPage.getTagSearchResults(), "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog Tr5712"), "Search Results list does not contain title: "
                 + "Blog Tr5712");
         Assert.assertFalse(wcmqsSearchPage.getTagSearchResults().toString().contains("Blog H5712"), "Search Results list contains title: " + "Blog H5712");
@@ -739,7 +746,6 @@ public class SearchTests extends AbstractWQS
         WcmqsSearchPage wcmqsSearchPage = new WcmqsSearchPage(drone);
         wcmqsSearchPage.render();
         Assert.assertNotEquals(wcmqsSearchPage.getTagSearchResults().size(), 0, "The Search Results list is empty");
-//        Assert.assertTrue(wcmqsSearchPage.isLatestBlogArticlesDisplayed(), "The Latest Blog Articles list is not displayed.");
         Assert.assertTrue(wcmqsSearchPage.getTagSearchResults().toString().contains("Global car industry"), "Search Results list does not contain title: "
                 + "Global car industry");
     }
@@ -795,8 +801,8 @@ public class SearchTests extends AbstractWQS
         // Several articles are created in News, Publications, Blogs components:
         // * blogs: house, techno, trance with any content
         navigateToFolderAndCreateContent("blog", "BlogH5710.html", "content blog h1", blogHouse5710).render();
-
         navigateToFolderAndCreateContent("blog", "BlogTe5710.html", "content blog te1", blogTechno5710).render();
+        drone.refresh();
         navigateToFolderAndCreateContent("blog", "BlogTr5710.html", "content blog tr1", blogTrance5710).render();
 
         // * news: house, techno, trance

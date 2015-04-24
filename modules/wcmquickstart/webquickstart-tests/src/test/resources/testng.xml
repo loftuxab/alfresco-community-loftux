@@ -14,12 +14,17 @@
         </run>
     </groups>
 
+    <listeners>
+        <listener class-name="org.alfresco.test.FailedTestListener"/>
+    </listeners>
+
+
    <test name="BlogWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web.blog"/>
         </packages>
     </test>
-    <test name="ContactWQS">
+   <test name="ContactWQS">
         <packages>
             <package name="org.alfresco.test.wqs.web.contact"/>
         </packages>
