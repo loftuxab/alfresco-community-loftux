@@ -462,6 +462,7 @@
                                         <solr.solr.model.dir>${solr.config.folder}/alfrescoModels</solr.solr.model.dir>
                                         <solr.solr.content.dir>@@ALFRESCO_SOLR4_CONTENT_DIR@@</solr.solr.content.dir>
                                     </systemProperties>
+                                    <tomcatUsers>${highest.basedir}/packaging/installer/src/main/resources/bitrock/bitrock/alfresco/shared/tomcat-users.xml</tomcatUsers>
                                 </configuration>
                             </execution>
                         </executions>

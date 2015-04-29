@@ -110,7 +110,7 @@
     <tomcat.default.alfresco.port>8080</tomcat.default.alfresco.port>
     <tomcat.default.alfresco.ssl.port>8443</tomcat.default.alfresco.ssl.port>
     <tomcat.default.share.port>8081</tomcat.default.share.port>
-    <tomcat.default.share.ssl.port>8444</tomcat.default.share.ssl.port>
+    <tomcat.default.share.ssl.port>0</tomcat.default.share.ssl.port>
     <tomcat.default.solr.port>8082</tomcat.default.solr.port>
     <tomcat.default.solr.ssl.port>8445</tomcat.default.solr.ssl.port>
     <tomcat.default.solr4.port>8083</tomcat.default.solr4.port>
@@ -741,7 +741,6 @@
                     <truststoreFile>${highest.basedir}/projects/system-build-test/keystore/ssl.truststore</truststoreFile>
                     <truststorePass>kT9X6oe68t</truststorePass>
                     <truststoreType>JCEKS</truststoreType>
-                    <tomcatUsers>${highest.basedir}/packaging/installer/src/main/resources/bitrock/bitrock/alfresco/shared/tomcat-users.xml</tomcatUsers>
                 </configuration>
             </plugin>
             <plugin>
