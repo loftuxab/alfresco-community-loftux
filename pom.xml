@@ -1048,7 +1048,7 @@
 					<configuration>
 						<systemProperties>
 							<db.driver>com.mysql.jdbc.Driver</db.driver>
-							<db.url>${db.master.url}</db.url>
+							<db.url>${db.url}</db.url>
 						</systemProperties>
 					</configuration>
 					<dependencies>
