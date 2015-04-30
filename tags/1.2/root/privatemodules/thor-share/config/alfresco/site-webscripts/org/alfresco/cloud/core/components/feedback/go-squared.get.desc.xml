@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>GoSquared Feedback Script</shortname>
+   <description>Adds a JavaScript for GoSquared service</description>
+   <url>/cloud/core/components/feedback/go-squared</url>
+</webscript>

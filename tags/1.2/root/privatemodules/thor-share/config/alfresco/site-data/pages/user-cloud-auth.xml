@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Change Cloud Authentication Settings for a User</title>
+   <title-id>page.userCloudAuth.title</title-id>
+   <description>Change Cloud Authentication Settings section on Profile page for a User</description>
+   <description-id>page.userCloudAuth.description</description-id>
+   <template-instance>user-cloud-auth</template-instance>
+   <authentication>admin</authentication>
+   <!--
+      This page does not make sense to show in the cloud,
+      therefor only admin may access this page in the cloud
+   -->
+</page>

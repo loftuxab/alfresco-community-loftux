@@ -1,0 +1,19 @@
+<webscript>
+   <shortname>GET an invalid email domain</shortname>
+   <description><![CDATA[
+   Response body will be of the form:
+   <pre>
+   {
+      "domain": "hello.test",
+      "type": "BLACKLISTED",
+      "notes": "blacklisted due to some reason."
+   }
+   </pre>
+   ]]>
+   </description>
+   <url>/internal/cloud/emailaddresses/invaliddomains/{domain}</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

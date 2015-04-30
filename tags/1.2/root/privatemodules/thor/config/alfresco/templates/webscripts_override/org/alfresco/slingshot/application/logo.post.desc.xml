@@ -1,0 +1,9 @@
+<webscript kind="org.alfresco.module.org_alfresco_module_cloud.webscripts.networkadmin">
+  <shortname>Logo Upload</shortname>
+  <description>Upload logo file content</description>
+  <format default="json" />
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <url>/slingshot/application/uploadlogo</url>
+  <lifecycle>internal</lifecycle>
+</webscript>

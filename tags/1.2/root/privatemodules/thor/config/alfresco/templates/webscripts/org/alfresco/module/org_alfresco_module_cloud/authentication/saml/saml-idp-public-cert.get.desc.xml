@@ -1,0 +1,21 @@
+<webscript>
+	<shortname>GET SAML IdP public certificate (in PEM format)</shortname>
+	<description>
+   <![CDATA[
+   http://<host>:<port>/alfresco/a/{network}/saml/idp/pubcert
+   
+      Example response from this web script:
+   
+-----BEGIN CERTIFICATE-----
+.....base 64 encoding goes here.....
+-----END CERTIFICATE-----
+
+   Notes:
+   - user must be a NetworkAdmin for given network/tenant
+   ]]>
+	</description>
+	<url>/saml/idp/pubcert</url>
+	<format default="text">argument</format>
+	<authentication>user</authentication>
+	<transaction>required</transaction>
+</webscript>

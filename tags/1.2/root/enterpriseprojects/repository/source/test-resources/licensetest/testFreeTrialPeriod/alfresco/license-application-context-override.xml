@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN"
+	"http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+<!--
+
+Override the schemaVersion to be the same as the current build's.
+This should mean that issued trial license is valid for the build
+(unlike the unit test license that will have a capped schema number)
+
+-->
+   <bean id="serverDescriptorDAO" class="org.alfresco.enterprise.license.LicenseComponentTest$MockDescriptorDAO">
+      <property name="repositoryName">
+         <value>${repository.name}</value>
+      </property>
+      <property name="resource">
+         <value>classpath:alfresco/serverVersion.properties</value>
+      </property>
+      <property name="schemaVersion">
+         <value>${version.schema}</value>
+      </property>
+   </bean>
+</beans>

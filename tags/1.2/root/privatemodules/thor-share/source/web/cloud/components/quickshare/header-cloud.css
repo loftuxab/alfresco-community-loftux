@@ -1,0 +1,63 @@
+.quickshare-header-right
+{
+   width:75%;
+}
+
+.quickshare-header-right .signup-label
+{
+   font-size: 180%;
+}
+
+.sticky-wrapper .quickshare-header-signup
+{
+   padding: 0.5em 1.5em;
+   margin: 0 0.5em;
+   color: #ffffff;
+   box-shadow: 1px 1px 3px 1px #ccc, #B6D66F 0px 1px 1px inset;
+   border-radius: 2px;
+   white-space: nowrap;
+   font-size: 150%;
+   border: 1px solid #6BB624;
+   background: #94ca21; /* Old browsers */
+   background: -moz-linear-gradient(top, #94ca21 0%, #94ca21 66%, #81bb22 100%); /* FF3.6+ */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#94ca21), color-stop(66%,#94ca21), color-stop(100%,#81bb22)); /* Chrome,Safari4+ */
+   background: -webkit-linear-gradient(top, #94ca21 0%,#94ca21 66%,#81bb22 100%); /* Chrome10+,Safari5.1+ */
+   background: -o-linear-gradient(top, #94ca21 0%,#94ca21 66%,#81bb22 100%); /* Opera 11.10+ */
+   background: -ms-linear-gradient(top, #94ca21 0%,#94ca21 66%,#81bb22 100%); /* IE10+ */
+   background: linear-gradient(to bottom, #94ca21 0%,#94ca21 66%,#81bb22 100%); /* W3C */
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#94ca21', endColorstr='#81bb22',GradientType=0 ); /* IE6-9 */
+}
+
+.sticky-wrapper .quickshare-header-signup:hover
+{
+   color: #ffffff;
+   text-decoration: none;
+   box-shadow: 1px 1px 3px 1px #ccc, #AFCD6B 0px 1px 1px inset;
+   background: #6eaf29; /* Old browsers */
+   background: -moz-linear-gradient(top,  #6eaf29 0%, #6eaf29 66%, #629a22 100%); /* FF3.6+ */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#6eaf29), color-stop(66%,#6eaf29), color-stop(100%,#629a22)); /* Chrome,Safari4+ */
+   background: -webkit-linear-gradient(top,  #6eaf29 0%,#6eaf29 66%,#629a22 100%); /* Chrome10+,Safari5.1+ */
+   background: -o-linear-gradient(top,  #6eaf29 0%,#6eaf29 66%,#629a22 100%); /* Opera 11.10+ */
+   background: -ms-linear-gradient(top,  #6eaf29 0%,#6eaf29 66%,#629a22 100%); /* IE10+ */
+   background: linear-gradient(to bottom,  #6eaf29 0%,#6eaf29 66%,#629a22 100%); /* W3C */
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6eaf29', endColorstr='#629a22',GradientType=0 ); /* IE6-9 */
+
+}
+
+.quickshare-header-right .signup-label
+{
+   color: #949494
+}
+
+.sticky-wrapper .quickshare-header-right a.quickshare-header-login-link
+{
+   font-size: 150%;
+   text-decoration: underline;
+   color: #949494;
+}
+
+.quickshare-header-brand-colors,
+.quickshare-header-brand-colors div
+{
+   height:6px;
+}

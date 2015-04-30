@@ -1,0 +1,8 @@
+<webscript>
+   <shortname>Admin Console - User Synchronization Test</shortname>
+   <description><![CDATA[Admin Console WebScript that display a Form to collect user data to test a User Synchronization.]]></description>
+   <url>/enterprise/admin/admin-user-sync-test?authenticatorName={authenticator}</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>

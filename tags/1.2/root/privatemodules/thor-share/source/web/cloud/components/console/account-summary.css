@@ -1,0 +1,70 @@
+.cloud-account-summary .form-fields .form-field
+{
+   padding-left: 17em;
+   padding-right: 17em;
+}
+
+.cloud-account-summary .quota
+{
+   padding-left: 10em;
+   padding-right: 10em;
+   margin-bottom: 1em;
+}
+
+.cloud-account-summary .quota .quota-bar
+{
+   position: relative;
+   height: 1.5em;
+   margin-bottom: 1em;
+   overflow: hidden;
+}
+
+.cloud-account-summary .quota .quota-bar .quota-bar-used
+{
+   position: absolute;
+   border-left-style: none !important;
+   border-top-style: none !important;
+   border-bottom-style: none !important;
+   height: 1.5em;
+   width: 100%;
+}
+
+.cloud-account-summary .quota .quota-bar div.quota-bar-25,
+.cloud-account-summary .quota .quota-bar div.quota-bar-50,
+.cloud-account-summary .quota .quota-bar div.quota-bar-75
+{
+   position: absolute;
+   height: 0.5em;
+   width: 1px;
+   border-left-style: none !important;
+   border-top-style: none !important;
+   border-bottom-style: none !important;
+   bottom: 0;
+}
+
+.cloud-account-summary .quota .quota-bar .quota-bar-25
+{
+   left: 25%;
+}
+
+.cloud-account-summary .quota .quota-bar .quota-bar-50
+{
+   left: 50%;
+}
+
+.cloud-account-summary .quota .quota-bar .quota-bar-75
+{
+   left: 75%;
+}
+
+.cloud-account-summary .quota-legend
+{
+   line-height: 1.5em;
+}
+
+.cloud-account-summary .quota .quota-box
+{
+   display: inline-block;
+   width: 1.5em;
+   height: 1.5em;
+}

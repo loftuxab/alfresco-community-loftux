@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>Cloud Credentials Test Real WebScript</shortname>
+  <url>/test/real/person</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+</webscript>

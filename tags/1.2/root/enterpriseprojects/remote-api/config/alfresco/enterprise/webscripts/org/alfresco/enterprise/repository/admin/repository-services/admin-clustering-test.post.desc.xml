@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - Repository Server Clustering - Validate Cluster</shortname>
+   <description><![CDATA[Admin Console WebScript to test cluster nodes.]]></description>
+   <url>/enterprise/admin/admin-clustering-test</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

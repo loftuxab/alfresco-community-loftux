@@ -1,0 +1,10 @@
+<webscript>
+   <shortname>Admin Console - IMAP Service</shortname>
+   <description><![CDATA[Admin Console WebScript to administer the IMAP service.]]></description>
+   <url>/enterprise/admin/admin-imap</url>
+   <family>AdminConsole</family>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

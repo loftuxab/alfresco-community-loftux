@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <!-- The Account Admin Service -->
+    <bean id="AccountAdminService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_cloud.accounts.AccountAdminService</value>
+        </property>
+        <property name="target">
+            <ref bean="accountAdminService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="AccountAdminService_transaction"/>
+                <idref bean="AuditMethodInterceptor" />
+                <idref bean="exceptionTranslator" />
+                <idref local="AccountAdminService_security"/>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Account Admin Service transaction bean -->
+    <bean id="AccountAdminService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <!-- Account Admin Service security bean -->
+    <bean id="AccountAdminService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
+    <bean id="accountAdminService" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountAdminServiceImpl">
+       <property name="accountDAO" ref="accountDAO"/>
+       <property name="accountService" ref="accountService"/>
+       <property name="cloudPersonService" ref="cloudPersonService"/>
+       <property name="directoryService" ref="directoryService"/>
+       <property name="invalidDomainDAO" ref="invalidDomainDAO"/>
+       <property name="nodeService" ref="nodeService"/>
+       <property name="registrationService" ref="registrationService"/>
+       <property name="tenantAdminService" ref="tenantAdminService"/>
+    </bean>
+</beans>

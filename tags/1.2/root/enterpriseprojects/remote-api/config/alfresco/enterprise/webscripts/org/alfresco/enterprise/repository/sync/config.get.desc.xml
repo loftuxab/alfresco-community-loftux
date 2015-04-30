@@ -1,0 +1,19 @@
+<webscript>
+  <shortname>Get Sync Config</shortname>
+  <description><![CDATA[Web Script that returns a Sync Configuration.
+   <p/>
+   The response body will be of the form:
+   <pre>
+   {
+      "syncMode":"CLOUD"
+   }
+   </pre>
+   Sync Mode [CLOUD|ON_PREMISE|OFF]
+   ]]>
+  </description>
+  <url>/enterprise/sync/config</url>
+  <format default="json">argument</format>
+  <authentication>none</authentication>
+  <lifecycle>internal</lifecycle>
+  <transaction allow="readonly">required</transaction>
+</webscript>

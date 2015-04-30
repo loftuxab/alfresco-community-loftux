@@ -1,0 +1,21 @@
+<webscript>
+   <shortname>POST invalid email domain</shortname>
+   <description><![CDATA[
+   Creates a new invalid email domain entry.
+   The JSON body should be of the form:
+   <pre>
+{
+  "domain": "d6e1adfa6cea38ae32c75e2984dfefa9.test",
+  "notes": "nasty spammer domain",
+  "type": "ANTISPAM"
+}
+   </pre>
+   Returns a 403 if there is already an entry for this domain name.
+   ]]>
+   </description>
+   <url>/internal/cloud/emailaddresses/invaliddomains</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

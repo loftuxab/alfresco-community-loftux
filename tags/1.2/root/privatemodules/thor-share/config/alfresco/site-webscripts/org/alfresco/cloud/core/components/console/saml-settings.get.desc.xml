@@ -1,0 +1,6 @@
+<webscript>
+   <shortname>SAML Settings</shortname>
+   <description>Account Settings - SAML Settings</description>
+   <url>/cloud/core/components/console/saml-settings</url>
+   <family>cloud-console</family>
+</webscript>

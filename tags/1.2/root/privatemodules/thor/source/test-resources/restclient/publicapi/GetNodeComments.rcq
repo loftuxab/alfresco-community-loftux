@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rest-client version="2.3"><request><http-version>1.1</http-version><URL>http://localhost:8080/alfresco/a/alfresco.com/public/alfresco/versions/1/nodes/4f97edeb-f758-4c00-be05-22b013aec1f8/comments?skipCount=0&amp;maxItems=5</URL><method>GET</method><auth-methods>BASIC</auth-methods><auth-preemptive>true</auth-preemptive><auth-username>david.bowie@alfresco.com</auth-username><auth-password>rO0ABXQACHBhc3N3b3Jk</auth-password></request></rest-client>

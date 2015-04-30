@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+
+<beans>
+   
+    <!-- Beans relating to Solr indexes -->
+   
+   <bean id="search.solrIndexCheckService" class="org.alfresco.enterprise.repo.admin.indexcheck.SOLRIndexCheckServiceImpl">
+      <property name="solrAdminClient" ref="solrAdminClient"/>
+   </bean>
+   
+   <bean id="search.solrIndexExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.SOLRIndexExporter" init-method="init">
+        <property name="solrIndexCheckService" ref="search.solrIndexCheckService" />
+   </bean>
+    
+</beans>

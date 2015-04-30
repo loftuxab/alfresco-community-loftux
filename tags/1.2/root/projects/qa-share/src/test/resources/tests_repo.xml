@@ -1,0 +1,7 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Repository Tests" preserve-order="true">
+    <suite-files>
+        <suite-file path="tests_repo_Repository.xml"/>
+        <suite-file path="tests_repo_multiTenancy.xml"/>
+    </suite-files>
+</suite>

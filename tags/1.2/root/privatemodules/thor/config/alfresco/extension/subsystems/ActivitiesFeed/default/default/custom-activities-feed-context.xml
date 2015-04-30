@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <!-- Thor override -->
+   <bean id="feedTaskProcessor" class="org.alfresco.module.org_alfresco_module_cloud.activities.CloudFeedTaskProcessor">
+      <property name="postDAO" ref="postDAO"/>
+      <property name="feedDAO" ref="feedDAO"/>
+      <property name="feedControlDAO" ref="feedControlDAO"/>
+      
+      <property name="useRemoteCallbacks">
+          <value>false</value>
+      </property>
+      
+      <property name="siteService" ref="SiteService"/>
+      <property name="nodeService" ref="NodeService"/>
+      <property name="contentService" ref="ContentService"/>
+      <property name="permissionService" ref="PermissionService"/>
+      <property name="subscriptionService" ref="SubscriptionService"/>
+      <property name="tenantService" ref="tenantService"/>
+      
+      <property name="templateSearchPaths">
+          <list>
+              <value>alfresco/extension/templates/activities</value>
+              <value>alfresco/templates/activities</value>
+          </list>
+      </property>
+      
+   </bean>
+   
+   <bean id="feedModelBuilderPrototype" class="org.alfresco.module.org_alfresco_module_cloud.activities.feed.CloudActivitiesFeedModelBuilder" scope="prototype">
+      <constructor-arg>
+         <map>
+            <entry key="new">
+               <set>
+                  <value>org.alfresco.documentlibrary.file-added</value>
+                  <value>org.alfresco.documentlibrary.files-added</value>
+                  <value>org.alfresco.documentlibrary.folder-added</value>
+                  <value>org.alfresco.documentlibrary.folders-added</value>
+                  <value>org.alfresco.documentlibrary.file-created</value>
+                  <value>org.alfresco.wiki.page-created</value>
+                  <value>org.alfresco.datalists.list-created</value>
+                  <value>org.alfresco.links.link-created</value>
+                  <value>org.alfresco.calendar.event-created</value>
+                  <value>org.alfresco.blog.post-created</value>
+                  <value>org.alfresco.discussions.post-created</value>
+                  <value>org.alfresco.discussions.reply-created</value>
+               </set>
+            </entry>
+            <entry key="updates">
+               <set>
+                  <value>org.alfresco.documentlibrary.file-updated</value>
+                  <value>org.alfresco.documentlibrary.files-updated</value>
+                  <value>org.alfresco.documentlibrary.inline-edit</value>
+                  <value>org.alfresco.wiki.page-edited</value>
+                  <value>org.alfresco.wiki.page-renamed</value>
+                  <value>org.alfresco.discussions.reply-updated</value>
+                  <value>org.alfresco.discussions.post-updated</value>
+                  <value>org.alfresco.blog.post-updated</value>
+                  <value>org.alfresco.calendar.event-updated</value>
+                  <value>org.alfresco.links.link-updated</value>
+                  <value>org.alfresco.datalists.list-updated</value>
+                  <value>org.alfresco.documentlibrary.google-docs-checkout</value>
+                  <value>org.alfresco.documentlibrary.google-docs-checkin</value>
+                  <value>org.alfresco.documentlibrary.files-deleted</value>
+                  <value>org.alfresco.documentlibrary.folder-deleted</value>
+                  <value>org.alfresco.documentlibrary.file-deleted</value>
+                  <value>org.alfresco.documentlibrary.folders-deleted</value>
+                  <value>org.alfresco.wiki.page-deleted</value>
+                  <value>org.alfresco.calendar.event-deleted</value>
+                  <value>org.alfresco.links.link-deleted</value>
+                  <value>org.alfresco.datalists.list-deleted</value>
+                  <value>org.alfresco.blog.post-deleted</value>
+                  <value>org.alfresco.discussions.post-deleted</value>
+               </set>
+            </entry>
+            <entry key="comments">
+               <set>
+                  <value>org.alfresco.comments.comment-created</value>
+                  <value>org.alfresco.comments.comment-updated</value>
+                  <value>org.alfresco.comments.comment-deleted</value>
+                  <value>org.alfresco.discussions.reply-created</value>
+               </set>
+            </entry>
+            <entry key="likes">
+               <set>
+                  <value>org.alfresco.documentlibrary.file-liked</value>
+                  <value>org.alfresco.documentlibrary.folder-liked</value>
+               </set>
+            </entry>
+            <entry key="joins">
+               <set>
+                  <value>org.alfresco.site.user-joined</value>
+               </set>
+            </entry>
+         </map>
+      </constructor-arg>
+      <property name="ignoredActivityTypes">
+         <set>
+            <value>org.alfresco.subscriptions.followed</value>
+            <value>org.alfresco.subscriptions.subscribed</value>
+            <value>org.alfresco.profile.status-changed</value>
+            <value>org.alfresco.documentlibrary.file-previewed</value>
+            <value>org.alfresco.documentlibrary.file-downloaded</value>
+         </set>
+      </property>
+   </bean>
+   
+</beans>

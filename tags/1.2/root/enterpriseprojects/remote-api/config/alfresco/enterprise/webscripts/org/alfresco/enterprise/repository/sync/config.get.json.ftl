@@ -1,0 +1,3 @@
+{
+   "syncMode": "${syncMode}"
+}

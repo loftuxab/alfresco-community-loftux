@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                           http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+   <!-- Cloud Connector Service -->
+   <bean id="CloudConnectorService" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.enterprise.repo.sync.connector.CloudConnectorService</value>
+      </property>
+      <property name="target">
+         <ref bean="cloudConnectorService" />
+      </property>
+      <property name="interceptorNames">
+         <list>
+            <idref bean="cloudConnectorServiceReadTxnAdvisor" />
+            <idref bean="cloudConnectorServiceWriteTxnAdvisor" />
+            <idref bean="AuditMethodInterceptor" />
+            <idref bean="exceptionTranslator" />
+            <idref bean="cloudConnectorService_security" />
+         </list>
+      </property>
+   </bean>
+
+   <!-- Transaction Interceptors for the Cloud Connector Service -->
+   <bean id="cloudConnectorServiceReadTxnAdvisor" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+        <property name="advice">
+            <ref bean="retryingReadTxnAdvice"/>
+        </property>
+        <property name="mappedNames">
+            <list>
+                <value>buildCloudRequest</value>
+                <value>getCloudCredentials</value>
+                <value>executeCloudRequest</value>
+                <value>executeJSONCloudRequest</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="cloudConnectorServiceWriteTxnAdvisor" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+        <property name="advice">
+            <ref bean="retryingWriteTxnAdvice"/>
+        </property>
+        <property name="mappedNames">
+            <list>
+                <value>storeCloudCredentials</value>
+                <value>deleteCloudCredentials</value>
+            </list>
+        </property>
+   </bean>
+
+   <!-- Cloud Connector Service Security -->
+   <bean id="cloudConnectorService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+        <property name="accessDecisionManager"><ref bean="accessDecisionManager"/></property>
+        <property name="afterInvocationManager"><ref bean="afterInvocationManager"/></property>
+        <property name="objectDefinitionSource">
+            <value>
+               org.alfresco.enterprise.repo.sync.connector.CloudConnectorService.buildCloudRequest=ACL_ALLOW
+               org.alfresco.enterprise.repo.sync.connector.CloudConnectorService.executeCloudRequest=ACL_ALLOW
+               org.alfresco.enterprise.repo.sync.connector.CloudConnectorService.deleteCloudCredentials=ACL_ALLOW
+               org.alfresco.enterprise.repo.sync.connector.CloudConnectorService.storeCloudCredentials=ACL_ALLOW
+               org.alfresco.enterprise.repo.sync.connector.CloudConnectorService.getCloudCredentials=ACL_ALLOW
+               org.alfresco.enterprise.repo.sync.connector.CloudConnectorService.*=ACL_DENY
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="KeyProviderLicense" class="org.alfresco.enterprise.repo.sync.connector.impl.KeyProviderLicense"
+       init-method="init">
+       <property name="descriptorService" ref="DescriptorService" />
+    </bean>
+    
+    <!-- Cloud Connector Service base bean -->
+    <bean id="cloudConnectorService" class="org.alfresco.enterprise.repo.sync.connector.impl.CloudConnectorServiceImpl" 
+        init-method="init">
+      
+      <property name="remoteConnectorService" ref="RemoteConnectorService" />
+      <property name="remoteAlfrescoTicketService" ref="RemoteAlfrescoTicketService" />
+            
+      <!-- Where to find the Cloud -->
+      <property name="cloudBaseUrl">
+         <value>${sync.cloud.url}</value>
+      </property>
+      
+      <!--  Get the cloud key from the license -->
+      <property name="keyProvider" ref="KeyProviderLicense" />
+      
+    </bean>
+    
+</beans>

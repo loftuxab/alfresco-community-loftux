@@ -1,0 +1,1 @@
+<html><body><p>Welcome to Alfresco!</p><p>This is the /_vti_bin application.</p><p>This application does not provide a web interface in the browser.</p></body></html>

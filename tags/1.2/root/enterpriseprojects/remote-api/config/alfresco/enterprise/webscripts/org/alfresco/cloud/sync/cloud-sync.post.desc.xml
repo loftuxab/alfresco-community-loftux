@@ -1,0 +1,10 @@
+<webscript>
+  <shortname>cloud-sync</shortname>
+  <description>Document List Action - Apply Cloud Sync Pending Aspect</description>
+  <url>/slingshot/doclib/action/cloud-sync/node/{store_type}/{store_id}/{id}/{path}</url>
+  <url>/slingshot/doclib/action/cloud-sync/node/{store_type}/{store_id}/{id}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <lifecycle>sample</lifecycle>
+</webscript>

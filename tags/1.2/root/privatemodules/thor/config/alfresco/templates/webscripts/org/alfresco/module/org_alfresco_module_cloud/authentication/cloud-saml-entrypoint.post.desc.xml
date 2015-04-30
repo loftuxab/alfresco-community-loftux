@@ -1,0 +1,14 @@
+<webscript>
+   <shortname>POST Cloud SAML - EntryPoint</shortname>
+   <description>
+   <![CDATA[
+   For example, Share will need to proxy through to: 
+   
+   http://<host>:<port>/alfresco/service/saml/entrypoint/{network_domain}
+   ]]>
+   </description>
+   <url>/saml/entrypoint/{network_domain}</url>
+   <format default="json">argument</format>
+   <authentication>none</authentication>
+   <transaction>required</transaction>
+</webscript>

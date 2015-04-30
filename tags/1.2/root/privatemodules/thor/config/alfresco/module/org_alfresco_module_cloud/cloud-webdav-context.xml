@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <bean id="webDAVHelper" parent="baseWebDAVHelper" class="org.alfresco.module.org_alfresco_module_cloud.webdav.CloudWebDAVHelper">
+        <property name="directoryService" ref="directoryService"/>
+        <property name="accountService" ref="accountService"/>
+        <property name="premiumAccountsOnly" value="true"/>
+    </bean>
+    
+    <bean id="commonRequestHandling" class="org.alfresco.module.org_alfresco_module_cloud.webdav.CommonRequestHandling">
+        <property name="davHelper" ref="webDAVHelper"/>
+    </bean>
+</beans>

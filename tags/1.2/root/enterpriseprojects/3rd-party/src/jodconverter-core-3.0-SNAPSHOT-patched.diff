@@ -1,0 +1,461 @@
+Index: pom.xml
+===================================================================
+--- pom.xml	(revision 220)
++++ pom.xml	(working copy)
+@@ -90,8 +90,14 @@
+       <groupId>org.hyperic</groupId>
+       <artifactId>sigar</artifactId>
+       <version>1.6.5.132</version>
+-      <optional>true</optional>
++      <!-- <optional>true</optional> -->
+     </dependency>
++   <dependency>
++     <groupId>org.hyperic</groupId>
++     <artifactId>sigar-dist</artifactId>
++     <version>1.6.5.132</version>
++     <type>zip</type>
++   </dependency>
+     <dependency>
+       <!-- for JSON configuration -->
+       <groupId>org.json</groupId>
+@@ -115,6 +121,29 @@
+     <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-dependency-plugin</artifactId>
++        <version>2.2</version>
++        <executions>
++          <execution>
++            <id>unpack-dependencies</id>
++            <phase>compile</phase>
++            <goals>
++              <goal>unpack-dependencies</goal>
++            </goals>
++            <configuration>
++              <includes>**/sigar-bin/lib/*</includes>
++              <excludes>**/sigar-bin/lib/*jar</excludes>
++              <includeGroupIds>org.hyperic</includeGroupIds>
++              <includeArtifactIds>sigar-dist</includeArtifactIds>
++              <outputDirectory>
++                ${project.build.directory}/depends
++              </outputDirectory>
++              </configuration>
++          </execution>
++        </executions>
++      </plugin>
++      <plugin>
++        <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-compiler-plugin</artifactId>
+         <version>2.3.2</version>
+         <configuration>
+@@ -131,6 +160,12 @@
+           <!-- don't run tests in parallel -->
+           <perCoreThreadCount>false</perCoreThreadCount>
+           <threadCount>1</threadCount>
++          <systemProperties>
++            <property>
++              <name>java.library.path</name>
++              <value>${project.build.directory}/depends/hyperic-sigar-1.6.5/sigar-bin/lib</value>
++            </property>
++          </systemProperties> 
+         </configuration>
+       </plugin>
+       <plugin>
+Index: src/main/java/org/artofsolving/jodconverter/office/DefaultOfficeManagerConfiguration.java
+===================================================================
+--- src/main/java/org/artofsolving/jodconverter/office/DefaultOfficeManagerConfiguration.java	(revision 220)
++++ src/main/java/org/artofsolving/jodconverter/office/DefaultOfficeManagerConfiguration.java	(working copy)
+@@ -16,6 +16,9 @@
+ // Public License along with JODConverter.  If not, see
+ // <http://www.gnu.org/licenses/>.
+ //
++// 2013 - Alfresco Software, Ltd.
++// Alfresco Software has modified source of this file
++// The details of changes as svn diff can be found in svn at location root/enterpriseprojects/3rd-party/src
+ package org.artofsolving.jodconverter.office;
+ 
+ import java.io.File;
+@@ -29,6 +32,7 @@
+ public class DefaultOfficeManagerConfiguration {
+ 
+     public static final long DEFAULT_RETRY_TIMEOUT = 120000L;
++    public static final long DEFAULT_CONNECT_TIMEOUT = 10000L; // 10 seconds
+ 
+     private File officeHome = OfficeUtils.getDefaultOfficeHome();
+     private OfficeConnectionProtocol connectionProtocol = OfficeConnectionProtocol.SOCKET;
+@@ -41,6 +45,7 @@
+     private long taskExecutionTimeout = 120000L;  // 2 minutes
+     private int maxTasksPerProcess = 200;
+     private long retryTimeout = DEFAULT_RETRY_TIMEOUT;
++    private long connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+ 
+     private ProcessManager processManager = null;  // lazily initialised
+ 
+@@ -158,6 +163,18 @@
+         return this;
+     }
+ 
++    /**
++     * Connect timeout set in milliseconds. Used for connect office process calls.
++     * If not set, it defaults to 10 seconds
++     *
++     * @param connectTimeout in milliseconds
++     * @return
++     */
++    public DefaultOfficeManagerConfiguration setConnectTimeout(long connectTimeout) {
++        this.connectTimeout = connectTimeout;
++        return this;
++    }
++
+     public OfficeManager buildOfficeManager() throws IllegalStateException {
+         if (officeHome == null) {
+             throw new IllegalStateException("officeHome not set and could not be auto-detected");
+@@ -182,7 +199,7 @@
+         for (int i = 0; i < numInstances; i++) {
+             unoUrls[i] = (connectionProtocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(pipeNames[i]) : UnoUrl.socket(portNumbers[i]);
+         }
+-        return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, workDir, retryTimeout, taskQueueTimeout, taskExecutionTimeout, maxTasksPerProcess, processManager);
++        return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, workDir, retryTimeout, taskQueueTimeout, taskExecutionTimeout, connectTimeout, maxTasksPerProcess, processManager);
+     }
+ 
+     private ProcessManager findBestProcessManager() {
+Index: src/main/java/org/artofsolving/jodconverter/office/ManagedOfficeProcess.java
+===================================================================
+--- src/main/java/org/artofsolving/jodconverter/office/ManagedOfficeProcess.java	(revision 220)
++++ src/main/java/org/artofsolving/jodconverter/office/ManagedOfficeProcess.java	(working copy)
+@@ -16,12 +16,16 @@
+ // Public License along with JODConverter.  If not, see
+ // <http://www.gnu.org/licenses/>.
+ //
++// 2013 - Alfresco Software, Ltd.
++// Alfresco Software has modified source of this file
++// The details of changes as svn diff can be found in svn at location root/enterpriseprojects/3rd-party/src 
+ package org.artofsolving.jodconverter.office;
+ 
+ import java.net.ConnectException;
+ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.Executors;
+ import java.util.concurrent.Future;
++import java.util.concurrent.TimeUnit;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+ 
+@@ -59,7 +63,7 @@
+ 			}
+ 		});
+ 		try {
+-			future.get();
++			future.get(settings.getConnectTimeout(), TimeUnit.MILLISECONDS);
+ 		} catch (Exception exception) {
+ 			throw new OfficeException("failed to start and connect", exception);
+ 		}
+@@ -72,10 +76,11 @@
+ 			}
+ 		});
+ 		try {
+-			future.get();
++			future.get(settings.getConnectTimeout(), TimeUnit.MILLISECONDS);
+ 		} catch (Exception exception) {
+ 			throw new OfficeException("failed to start and connect", exception);
+ 		}
++		executor.shutdown();
+ 	}
+ 
+ 	public void restartAndWait() {
+@@ -86,7 +91,7 @@
+ 			}
+ 		});
+ 		try {
+-			future.get();
++			future.get(settings.getConnectTimeout(), TimeUnit.MILLISECONDS);
+ 		} catch (Exception exception) {
+ 			throw new OfficeException("failed to restart", exception);
+ 		}
+Index: src/main/java/org/artofsolving/jodconverter/office/ManagedOfficeProcessSettings.java
+===================================================================
+--- src/main/java/org/artofsolving/jodconverter/office/ManagedOfficeProcessSettings.java	(revision 220)
++++ src/main/java/org/artofsolving/jodconverter/office/ManagedOfficeProcessSettings.java	(working copy)
+@@ -16,6 +16,9 @@
+ // Public License along with JODConverter.  If not, see
+ // <http://www.gnu.org/licenses/>.
+ //
++// 2013 - Alfresco Software, Ltd.
++// Alfresco Software has modified source of this file
++// The details of changes as svn diff can be found in svn at location root/enterpriseprojects/3rd-party/src
+ package org.artofsolving.jodconverter.office;
+ 
+ import java.io.File;
+@@ -35,6 +38,8 @@
+     private ProcessManager processManager = new PureJavaProcessManager();
+     private long retryTimeout = DefaultOfficeManagerConfiguration.DEFAULT_RETRY_TIMEOUT;
+     private long retryInterval = DEFAULT_RETRY_INTERVAL;
++    /** the timeout for connecting to an OO instance */
++    private long connectTimeout = DefaultOfficeManagerConfiguration.DEFAULT_CONNECT_TIMEOUT;
+ 
+     public ManagedOfficeProcessSettings(UnoUrl unoUrl) {
+         this.unoUrl = unoUrl;
+@@ -100,4 +105,19 @@
+         this.retryInterval = retryInterval;
+     }
+ 
++    /**
++     * Timeout to connect to a running OO instance.
++     * @return timeout
++     */
++    public long getConnectTimeout() {
++        return connectTimeout;
++    }
++
++    /**
++     * Set the timeout to connect to a running OO instance in milliseconds.
++     * @param connectTimeout
++     */
++    public void setConnectTimeout(long connectTimeout) {
++        this.connectTimeout = connectTimeout;
++    }
+ }
+Index: src/main/java/org/artofsolving/jodconverter/office/OfficeProcess.java
+===================================================================
+--- src/main/java/org/artofsolving/jodconverter/office/OfficeProcess.java	(revision 220)
++++ src/main/java/org/artofsolving/jodconverter/office/OfficeProcess.java	(working copy)
+@@ -16,6 +16,13 @@
+ // Public License along with JODConverter.  If not, see
+ // <http://www.gnu.org/licenses/>.
+ //
++// Included changes from OfficeProcess.patch from
++// http://code.google.com/p/jodconverter/issues/detail?id=103
++//
++// 2012 - Alfresco Software, Ltd.
++// Alfresco Software has modified source of this file
++// The details of changes as svn diff can be found in svn at location root/enterpriseprojects/3rd-party/src 
++
+ package org.artofsolving.jodconverter.office;
+ 
+ import static org.artofsolving.jodconverter.process.ProcessManager.PID_NOT_FOUND;
+@@ -44,6 +52,9 @@
+ 
+     private Process process;
+     private long pid = PID_UNKNOWN;
++    private final int searchIterations = 10;
++    // Sleep time between retries in ms
++    private final int searchSleep = 50;
+ 
+     private final Logger logger = Logger.getLogger(getClass().getName());
+ 
+@@ -56,11 +67,11 @@
+         this.processManager = processManager;
+     }
+ 
+-    public void start() throws IOException {
++    public void start() throws IOException, InterruptedException {
+         start(false);
+     }
+ 
+-    public void start(boolean restart) throws IOException {
++    public void start(boolean restart) throws IOException, InterruptedException {
+         ProcessQuery processQuery = new ProcessQuery("soffice.bin", unoUrl.getAcceptString());
+         long existingPid = processManager.findPid(processQuery);
+     	if (!(existingPid == PID_NOT_FOUND || existingPid == PID_UNKNOWN)) {
+@@ -76,22 +87,64 @@
+         	command.addAll(Arrays.asList(runAsArgs));
+         }
+         command.add(executable.getAbsolutePath());
+-        command.add("-accept=" + unoUrl.getAcceptString() + ";urp;");
+-        command.add("-env:UserInstallation=" + OfficeUtils.toUrl(instanceProfileDir));
+-        command.add("-headless");
+-        command.add("-nocrashreport");
+-        command.add("-nodefault");
+-        command.add("-nofirststartwizard");
+-        command.add("-nolockcheck");
+-        command.add("-nologo");
+-        command.add("-norestore");
++        boolean libreOffice3Dot5 = isLibreOffice3Dot5();
++        if (libreOffice3Dot5)
++        {
++            command.add("--accept=" + unoUrl.getAcceptString() + ";urp;");
++            if (PlatformUtils.isMac() && !isLibreOffice3Dot6())
++            {
++                command.add("--env:UserInstallation=" + OfficeUtils.toUrl(instanceProfileDir));
++            }
++            else
++            {
++                command.add("-env:UserInstallation=" + OfficeUtils.toUrl(instanceProfileDir));
++            }
++            command.add("--headless");
++            command.add("--nocrashreport");
++            command.add("--nodefault");
++            command.add("--nofirststartwizard");
++            command.add("--nolockcheck");
++            command.add("--nologo");
++            command.add("--norestore");
++            logger.info("Using GNU based LibreOffice command"+(PlatformUtils.isMac() ? " on Mac" : "")+": "+command);
++            logger.info("Using GNU based LibreOffice "+
++                    (isLibreOffice3Dot6() ? "3.6" : "3.5")+" command"+
++                    (PlatformUtils.isMac() ? " on Mac" : "")+": "+command);
++        }
++        else
++        {
++            command.add("-accept=" + unoUrl.getAcceptString() + ";urp;");
++            command.add("-env:UserInstallation=" + OfficeUtils.toUrl(instanceProfileDir));
++            command.add("-headless");
++            command.add("-nocrashreport");
++            command.add("-nodefault");
++            command.add("-nofirststartwizard");
++            command.add("-nolockcheck");
++            command.add("-nologo");
++            command.add("-norestore");
++            logger.info("Using original OpenOffice command: "+command);
++        }
+         ProcessBuilder processBuilder = new ProcessBuilder(command);
+         if (PlatformUtils.isWindows()) {
+             addBasisAndUrePaths(processBuilder);
+         }
++        if (PlatformUtils.isMac())
++        {
++            Map<String, String> env = processBuilder.environment();
++            env.remove("DYLD_LIBRARY_PATH");
++            logger.info("Removing $DYLD_LIBRARY_PATH from the environment so that LibreOffice/OpenOffice will start on Mac.");
++        }
+         logger.info(String.format("starting process with acceptString '%s' and profileDir '%s'", unoUrl, instanceProfileDir));
+         process = processBuilder.start();
+-        pid = processManager.findPid(processQuery);
++        for(int i = 0; i < searchIterations; i++)
++        {
++            pid = processManager.findPid(processQuery);
++            if (pid != PID_NOT_FOUND && pid != PID_UNKNOWN)
++            {
++                break;
++            }
++            Thread.sleep(searchSleep);
++        }
+         if (pid == PID_NOT_FOUND) {
+             throw new IllegalStateException(String.format("process with acceptString '%s' started but its pid could not be found",
+                     unoUrl.getAcceptString()));
+@@ -132,21 +185,43 @@
+             }
+         }
+     }
++    
++    private boolean isLibreOffice3Dot5()
++    {
++        return
++            !new File(officeHome, "basis-link").isFile() &&
++            (new File(officeHome, "ure-link").isFile() || new File(officeHome, "ure-link").isDirectory());
++    }
+ 
++    private boolean isLibreOffice3Dot6()
++    {
++        return isLibreOffice3Dot5() && new File(officeHome, "NOTICE").isFile();
++    }
++
+     private void addBasisAndUrePaths(ProcessBuilder processBuilder) throws IOException {
++        File ureBin = null;
++        File basisProgram = null;
++
+         // see http://wiki.services.openoffice.org/wiki/ODF_Toolkit/Efforts/Three-Layer_OOo
+         File basisLink = new File(officeHome, "basis-link");
+         if (!basisLink.isFile()) {
+-            logger.fine("no %OFFICE_HOME%/basis-link found; assuming it's OOo 2.x and we don't need to append URE and Basic paths");
+-            return;
++            // check the case with LibreOffice 3.5 home
++            File ureLink = new File(officeHome, "ure-link");
++            if (!ureLink.isFile()) {
++                logger.fine("no %OFFICE_HOME%/basis-link found; assuming it's OOo 2.x and we don't need to append URE and Basic paths");
++                return;
++            }
++            ureBin = new File(new File(officeHome, FileUtils.readFileToString(ureLink).trim()), "bin");
++        } else {
++            String basisLinkText = FileUtils.readFileToString(basisLink).trim();
++            File basisHome = new File(officeHome, basisLinkText);
++            basisProgram = new File(basisHome, "program");
++            File ureLink = new File(basisHome, "ure-link");
++            String ureLinkText = FileUtils.readFileToString(ureLink).trim();
++            File ureHome = new File(basisHome, ureLinkText);
++            ureBin = new File(ureHome, "bin");
+         }
+-        String basisLinkText = FileUtils.readFileToString(basisLink).trim();
+-        File basisHome = new File(officeHome, basisLinkText);
+-        File basisProgram = new File(basisHome, "program");
+-        File ureLink = new File(basisHome, "ure-link");
+-        String ureLinkText = FileUtils.readFileToString(ureLink).trim();
+-        File ureHome = new File(basisHome, ureLinkText);
+-        File ureBin = new File(ureHome, "bin");
++        
+         Map<String,String> environment = processBuilder.environment();
+         // Windows environment variables are case insensitive but Java maps are not :-/
+         // so let's make sure we modify the existing key
+@@ -156,7 +231,11 @@
+                 pathKey = key;
+             }
+         }
+-        String path = environment.get(pathKey) + ";" + ureBin.getAbsolutePath() + ";" + basisProgram.getAbsolutePath();
++        String path = environment.get(pathKey) + ";" + ureBin.getAbsolutePath();
++        if (basisProgram != null) {
++            path += ";" + basisProgram.getAbsolutePath();
++        }
++        
+         logger.fine(String.format("setting %s to \"%s\"", pathKey, path));
+         environment.put(pathKey, path);
+     }
+Index: src/main/java/org/artofsolving/jodconverter/office/OfficeUtils.java
+===================================================================
+--- src/main/java/org/artofsolving/jodconverter/office/OfficeUtils.java	(revision 220)
++++ src/main/java/org/artofsolving/jodconverter/office/OfficeUtils.java	(working copy)
+@@ -108,7 +108,8 @@
+ 
+     public static File getOfficeExecutable(File officeHome) {
+         if (PlatformUtils.isMac()) {
+-            return new File(officeHome, "MacOS/soffice.bin");
++            File binFile = new File(officeHome, "MacOS/soffice.bin");
++            return binFile.isFile() ? binFile : new File(officeHome, "MacOS/soffice");
+         } else {
+             return new File(officeHome, "program/soffice.bin");
+         }
+Index: src/main/java/org/artofsolving/jodconverter/office/ProcessPoolOfficeManager.java
+===================================================================
+--- src/main/java/org/artofsolving/jodconverter/office/ProcessPoolOfficeManager.java	(revision 220)
++++ src/main/java/org/artofsolving/jodconverter/office/ProcessPoolOfficeManager.java	(working copy)
+@@ -16,6 +16,9 @@
+ // Public License along with JODConverter.  If not, see
+ // <http://www.gnu.org/licenses/>.
+ //
++// 2013 - Alfresco Software, Ltd.
++// Alfresco Software has modified source of this file
++// The details of changes as svn diff can be found in svn at location root/enterpriseprojects/3rd-party/src
+ package org.artofsolving.jodconverter.office;
+ 
+ import java.io.File;
+@@ -37,9 +40,9 @@
+     private final Logger logger = Logger.getLogger(ProcessPoolOfficeManager.class.getName());
+ 
+     public ProcessPoolOfficeManager(File officeHome, UnoUrl[] unoUrls, String[] runAsArgs, File templateProfileDir, File workDir,
+-            long retryTimeout, long taskQueueTimeout, long taskExecutionTimeout, int maxTasksPerProcess,
+-            ProcessManager processManager) {
+-		this.taskQueueTimeout = taskQueueTimeout;
++                                    long retryTimeout, long taskQueueTimeout, long taskExecutionTimeout, long connectTimeout, int maxTasksPerProcess,
++                                    ProcessManager processManager) {
++        this.taskQueueTimeout = taskQueueTimeout;
+         pool = new ArrayBlockingQueue<PooledOfficeManager>(unoUrls.length);
+         pooledManagers = new PooledOfficeManager[unoUrls.length];
+         for (int i = 0; i < unoUrls.length; i++) {
+@@ -50,6 +53,7 @@
+             settings.setOfficeHome(officeHome);
+             settings.setRetryTimeout(retryTimeout);
+             settings.setTaskExecutionTimeout(taskExecutionTimeout);
++            settings.setConnectTimeout(connectTimeout);
+             settings.setMaxTasksPerProcess(maxTasksPerProcess);
+             settings.setProcessManager(processManager);
+             pooledManagers[i] = new PooledOfficeManager(settings);
+Index: src/main/java/org/artofsolving/jodconverter/process/LinuxProcessManager.java
+===================================================================
+--- src/main/java/org/artofsolving/jodconverter/process/LinuxProcessManager.java	(revision 220)
++++ src/main/java/org/artofsolving/jodconverter/process/LinuxProcessManager.java	(working copy)
+@@ -44,7 +44,7 @@
+ 	}
+ 
+     protected String[] psCommand() {
+-        return new String[] { "/bin/ps", "-e", "-o", "pid,args" };
++        return new String[] { "/bin/ps", "-e", "-ww", "-o", "pid,args" };
+     }
+ 
+     public long findPid(ProcessQuery query) throws IOException {

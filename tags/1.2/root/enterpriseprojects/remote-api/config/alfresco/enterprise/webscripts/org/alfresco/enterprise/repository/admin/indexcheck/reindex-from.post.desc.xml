@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>ADM Reindex - from a point in time or from a given ADM txn id</shortname>
+  <description>WARNING this may take a long time ... reindex ADM txn ids from a given time (ISO 8601 format) or from a given txn id - to ensure they are in-sync with the index (on this server)</description>
+  <url>/enterprise/admin/reindex/adm/from?fromTime={fromTime}</url>
+  <url>/enterprise/admin/reindex/adm/from?fromTxnId={fromTxnId}</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

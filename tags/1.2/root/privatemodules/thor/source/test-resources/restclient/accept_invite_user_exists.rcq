@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rest-client version="2.3.3"><request><http-version>1.1</http-version><URL>http://localhost:8080/alfresco/service/internal/cloud/site-invitations/activiti$366/responses</URL><method>POST</method><auth-methods>BASIC</auth-methods><auth-preemptive>false</auth-preemptive><auth-username>admin</auth-username><auth-password>rO0ABXQABWFkbWlu</auth-password><body content-type="application/json" charset="UTF-8">   {
+      "response": "accept",
+      "key": "239ad243-f904-48f9-b59e-0a9cb99ae597"
+   }
+</body></request></rest-client>

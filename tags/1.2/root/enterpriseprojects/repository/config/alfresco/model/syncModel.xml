@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- xsi:schemaLocation="http://www.alfresco.org/model/dictionary/1.0 modelSchema.xsd" -->
+<model name="sync:syncmodel" 
+       xmlns="http://www.alfresco.org/model/dictionary/1.0" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+   <description>Alfresco Sync Domain Model</description>
+   <author>Alfresco</author>
+   <published>2012-05-23</published>
+   <version>1.0</version>
+
+   <imports>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/model/sync/1.0" prefix="sync"/>
+   </namespaces>
+   
+   <types>
+      <type name="sync:syncSetDefinition">
+         <parent>cm:cmobject</parent>
+         <archive>false</archive>
+         
+         <properties>
+            
+            <!-- A GUID for this Sync Set Definition - used to link the same SSD in the two Alfresco instances -->
+            <property name="sync:syncGuid">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            
+            <!-- Source Repository Id (note: each source repo instance must have a globally unique repo id (if the target repo instance is the public cloud) -->
+            <property name="sync:sourceRepoId">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            
+            <!-- Deprecated. This property will be removed, to be replaced by the username variant. -->
+            <!-- The cm:person who created the sync set. Note that this is only required On Premise-->
+            <property name="sync:syncCreatorPerson">
+               <type>d:noderef</type>
+               <mandatory>false</mandatory>
+            </property>
+            
+            <!-- The cm:person who created the sync set. Note that this is only required On Premise-->
+            <property name="sync:syncCreatorUsername">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            
+            <!-- TODO The Cloud alternative to the above is the username of the Cloud user -->
+            
+            <!-- The network id containing the receiving folder in the Cloud -->
+            <property name="sync:targetNetworkId">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            
+            <!-- The noderef (as a string) of the originally selected target root folder. Cannot be a d:noderef -->
+            <property name="sync:targetRootFolder">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            
+            <!-- Is this syncSet locked on premise? -->
+            <property name="sync:syncSetIsLockedOnPremise">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>false</default>
+            </property>
+            
+            <!-- If this syncSet is for a folder sync, should it recursively include sub-folders-->
+            <property name="sync:includeSubFolders">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>false</default>
+            </property>
+            
+            <!-- 5.0 Are deletes allowed on cloud, if false then deletes are prevented -->
+            <property name="sync:isDeleteOnCloud">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>true</default>
+            </property>
+            
+            <!-- 5.0 If a node is deleted on cloud does it get deleted on prem? -->
+            <property name="sync:isDeleteOnPrem">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>true</default>
+            </property>
+            
+         </properties>
+         <associations>
+            <!-- This association points to each noderef which is a member of the sync set -->
+            <association name="sync:members">
+               <source>
+                  <mandatory>false</mandatory>
+                  <many>false</many>
+               </source>
+               <target>
+                  <class>sync:syncSetMemberNode</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </association>
+         </associations>
+      </type>
+   </types>
+   
+   <aspects>
+      <aspect name="sync:syncSetMemberNode">
+         <properties>
+            <property name="sync:otherNodeRefString">
+               <type>d:text</type>
+               <!-- During creation of a syncset and prior to the initial sync, the otherNodeRefString is not known. -->
+               <mandatory>false</mandatory>
+            </property>
+            <property name="sync:remoteModified">
+               <title>Remote Modified</title>
+               <type>d:datetime</type>
+               <protected>true</protected>
+               <mandatory>false</mandatory>
+               <index enabled="true">
+                  <atomic>true</atomic>
+                  <stored>false</stored> 
+                  <tokenised>both</tokenised>
+               </index>
+            </property>
+            <property name="sync:remoteModifier">
+               <title>Remote Modifier</title>
+               <type>d:text</type>
+               <protected>true</protected>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="sync:syncRequested">
+               <title>Has a sync been requested </title>
+               <type>d:boolean</type>
+               <default>false</default>
+            </property>
+            <property name="sync:directSync">
+               <title>Direct/Indirect Sync </title>
+               <type>d:boolean</type>
+               <default>false</default>
+            </property>
+            <property name="sync:syncOwner">
+               <title>Username (on Source Repo) of Sync Set Owner</title>
+               <type>d:text</type>
+            </property>
+            <!-- The datetime of the most recent successful sync. -->
+            <property name="sync:syncTime">
+               <type>d:datetime</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="sync:syncLock">
+               <title>Was this node locked by sync?</title>
+               <type>d:boolean</type>
+               <mandatory>false</mandatory>
+               <default>false</default>
+            </property>
+         </properties>
+      </aspect>
+      
+      
+      <!-- The node has been successfully sync'd -->
+      <aspect name="sync:synced">
+         <properties>
+            <property name="sync:thisVersionLabel">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="sync:remoteVersionLabel">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>
+      
+      <!-- The node has failed to sync-->
+      <aspect name="sync:failed">
+         <properties>
+            <!--  When was the node successfully sync'd -->
+            <property name="sync:errorCode">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="sync:errorDetails">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="sync:errorTime">
+               <type>d:datetime</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>
+      
+      <aspect name="sync:transientError">
+         <properties>
+            <property name="sync:transientErrorCode">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>
+      
+      <!-- applied to a node that may be deleted on prem -->
+      <aspect name="sync:deleteOnPrem">
+      </aspect>
+        
+   </aspects>
+</model>

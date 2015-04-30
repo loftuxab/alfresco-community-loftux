@@ -1,0 +1,1 @@
+<#include "account-completion.lib.head.ftl">

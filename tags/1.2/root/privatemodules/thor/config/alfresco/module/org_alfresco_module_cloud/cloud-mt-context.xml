@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <!-- Cloud MT overrides -->
+
+   <bean id="customModelsRepositoryLocation" class="org.alfresco.repo.dictionary.DynamicCreateRepositoryLocation">
+        <!-- other properties will be defaulted, but can be overriden here -->
+        <property name="path">
+            <value>/app:company_home/app:dictionary/app:models</value>
+        </property>
+        <property name="queryLanguage">
+            <value>path</value>
+        </property>
+        <property name="namespaceService" ref="NamespaceService"/>
+        <property name="searchService" ref="SearchService"/>
+        <property name="importerService" ref="ImporterService" />
+        <property name="contentViewLocation" value="${dictionary.customModelsContentViewLocation}"/>
+        <property name="bundleName" value="alfresco/messages/bootstrap-spaces" />
+        <property name="transactionService" ref="transactionService" />
+   </bean>
+
+    <bean id="spacesBootstrap-base" parent="spacesStoreImporter" abstract="true" >
+        <property name="bootstrapViews">
+            <list>
+                <!-- THOR-327 (replaces spaces.xml) -->
+                <props>
+                    <prop key="path">/</prop>
+                    <prop key="location">alfresco/module/org_alfresco_module_cloud/bootstrap/spacesNoGuest.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <!-- THOR-293 / THOR-327 (replaces system.xml) -->
+                <props>
+                    <prop key="path">/</prop>
+                    <prop key="location">alfresco/module/org_alfresco_module_cloud/bootstrap/systemHiddenAdmin.xml</prop>
+                </props>
+                <!-- (replaces categories.xml) -->
+                <props>
+                    <prop key="path">/</prop>
+                    <prop key="location">alfresco/module/org_alfresco_module_cloud/bootstrap/categoriesEmptyRoot.xml</prop>
+                </props>
+                <props>
+                    <prop key="path">/</prop>
+                    <prop key="location">alfresco/bootstrap/multilingualRoot.xml</prop>
+                </props>
+                <!--
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.childname}</prop>
+                    <prop key="location">alfresco/templates/software_engineering_project.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-templates</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.content.childname}</prop>
+                    <prop key="location">alfresco/templates/content_template_examples.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-content-template-examples</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.content.childname}</prop>
+                    <prop key="location">alfresco/templates/readme_template.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-readme-template</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
+                    <prop key="location">alfresco/templates/email_templates.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                -->
+                <!-- THOR-428 - refer to 'CloudEmailsBootstrap.xml' below
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
+                    <prop key="location">alfresco/templates/activities-email-templates/activities-email-templates.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                -->
+                <!-- THOR-461 - refer to 'CloudEmailsBootstrap.xml' below
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
+                    <prop key="location">alfresco/templates/following-email-templates.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                -->
+                <!-- THOR-417 - refer to 'CloudEmailsBootstrap.xml' below
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/notification/workflow-email-notification.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                -->
+                <!--
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.rss.childname}</prop>
+                    <prop key="location">alfresco/templates/rss_templates.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-content-template-examples</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.scripts.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/example_javascripts.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-example-javascripts</prop>
+                </props>
+                -->
+                <!-- see webScriptsNoSamples.xml
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/webScripts.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-webScripts</prop>
+                </props>
+                -->
+                <!-- note: currently required by RepoStore searchPath -->
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/module/org_alfresco_module_cloud/bootstrap/webScriptsNoSamples.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-webScripts</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/module/org_alfresco_module_cloud/bootstrap/webScriptsExtensions.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-webScriptsExtensions</prop>
+                </props>
+                <!--
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/webScriptsReadme.xml</prop>
+                </props>
+                -->
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/module/org_alfresco_module_cloud/bootstrap/cloudCustomModelsSpace.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <!-- 
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/customMessagesSpace.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/customWebClientExtensionSpace.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/customWorkflowDefsSpace.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                -->
+                <props>
+                    <prop key="path">/cm:categoryRoot</prop>
+                    <prop key="location">alfresco/bootstrap/tagRootCategory.xml</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/sitesSpace.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <props>
+                    <prop key="path">/${system.system_container.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/alfrescoAuthorityStore.xml</prop>
+                </props>
+                <!-- (replaces alfrescoAuthorityStoreDefaultMembers.xml) -->
+                <props>
+                    <prop key="path">/${system.system_container.childname}</prop>
+                    <prop key="location">alfresco/module/org_alfresco_module_cloud/bootstrap/alfrescoAuthorityStoreDefaultMembersNoGuest.xml</prop>
+                </props>
+                <!--
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/imapSpaces.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/transferSpaces.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                -->
+                <!-- note: currently required by RenditionService -->
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/renderingActionSpace.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <!--
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/replicationActionSpace.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <props>
+                    <prop key="path">/app:company_home/app:dictionary/app:transfers/app:transfer_groups/cm:default</prop>
+                    <prop key="location">alfresco/bootstrap/transferTargetRuleFolder.xml</prop>
+                </props>
+                <props>
+                    <prop key="path">/app:company_home/app:dictionary/app:transfers/app:transfer_groups/cm:default/rule:ruleFolder</prop>
+                    <prop key="location">alfresco/bootstrap/transferTargetRule.xml</prop>
+                </props>
+                -->
+                <!-- note: currently required by ScheduledPersistedActionService -->
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/scheduledActionsFolder.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <!--
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}/${spaces.templates.email.invite.childname}</prop>
+                    <prop key="location">alfresco/templates/new-user-templates.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}/${spaces.templates.email.invite.childname}</prop>
+                    <prop key="location">alfresco/templates/invite-email-templates.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.email.childname}/${spaces.templates.email.notify.childname}</prop>
+                    <prop key="location">alfresco/templates/email_templates2.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.imapConfig.childname}/${spaces.imap_templates.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/imapSpacesTemplates.acp</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
+                </props>
+                -->
+                <props>
+                    <prop key="path">/${system.system_container.childname}</prop>
+                    <prop key="location">alfresco/module/org_alfresco_module_cloud/bootstrap/alfrescoAuthorityTenant.xml</prop>
+                </props>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Override MT service to allow for users in multiple tenants -->
+    <bean id="tenantService" class="org.alfresco.module.org_alfresco_module_cloud.tenant.MultiTCrossDomainServiceImpl">
+        <property name="tenantAdminDAO" ref="tenantAdminDAO"/>
+    </bean>
+
+   <!-- Override -->
+    <bean id="networksService" class="org.alfresco.module.org_alfresco_module_cloud.tenant.CloudNetworksServiceImpl">
+       <property name="tenantAdminService" ref="tenantAdminService" />
+       <property name="directoryService" ref="directoryService" />
+       <property name="accountService" ref="accountService" />
+    </bean>
+
+    <!-- Override MT admin service to allow for tenant usages / quotas -->
+    <bean id="tenantAdminService" parent="baseMultiTAdminService" class="org.alfresco.module.org_alfresco_module_cloud.tenant.CloudTenantAdminServiceImpl">
+        <property name="tenantQuotaService" ref="tenantQuotaService" />
+        <property name="emailAddressService" ref="emailAddressService" />
+    </bean>
+    
+    <!-- Override MT File Content Store (for local development boxes) -->
+    <bean id="fileContentStore" class="org.alfresco.repo.content.filestore.TenantFileContentStore">
+        <constructor-arg>
+            <value>${dir.contentstore}</value>
+        </constructor-arg>
+      
+        <property name="contentLimitProvider" ref="defaultContentLimitProvider"/>
+        <property name="tenantAdminDAO" ref="tenantAdminDAO"/>
+    </bean>
+    
+    <!-- 
+       Overrides for current CMIS (v4.x impl - based on OpenCMIS/Chemistry)
+       note: override opencmis-context.xml 
+    -->
+
+    <bean id="OpenCMISMapping" class="org.alfresco.opencmis.mapping.CMISMapping" >
+        <property name="cmisVersion"            value="CMIS_1_0" />
+        <property name="dictionaryService"      ref="dictionaryService" />
+        <property name="namespaceService"       ref="namespaceService" />
+        <property name="filter" >
+          <bean class="org.alfresco.opencmis.dictionary.QNameFilterImpl" init-method="initFilter">  
+          </bean>
+        </property>
+    </bean>
+
+    <bean id="OpenCMISMapping1.1" class="org.alfresco.opencmis.mapping.CMISMapping" >
+        <property name="cmisVersion"            value="CMIS_1_1" />
+        <property name="dictionaryService"      ref="dictionaryService" />
+        <property name="namespaceService"       ref="namespaceService" />
+        <property name="filter" >
+          <bean class="org.alfresco.opencmis.dictionary.QNameFilterImpl" init-method="initFilter">  
+          </bean>
+        </property>
+    </bean>
+    
+    <bean id="objectFilter" class="org.alfresco.opencmis.PathObjectFilter">
+        <property name="rootPath"               value="${opencmis.connector.default.rootPath}" />
+        <property name="nodeService"            ref="NodeService" />
+        <property name="namespaceService"       ref="namespaceService" />
+        <property name="excludedPaths">
+            <list>
+                <value>/app:user_homes</value>
+                <value>/cm:Imap_x0020_Home</value>
+                <value>/cm:Imap_x0020_Attachments</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- override rootPath (see also ALF-7333 - consistent with OOTB install) -->
+    <bean id="CMISConnector" class="org.alfresco.opencmis.CMISConnector" init-method="setup">
+        <property name="hiddenAspect"           ref="hiddenAspect" />
+        <property name="store"                  value="${spaces.store}" />
+        <property name="rootPath"               value="${protocols.opencmis.rootPath}" />
+        <property name="typesDefaultMaxItems"   value="500" />
+        <property name="typesDefaultDepth"      value="-1" />
+        <property name="objectsDefaultMaxItems" value="10000" />
+        <property name="objectsDefaultDepth"    value="100" />
+        <property name="renditionKindMapping">
+            <map>
+                <entry key="cmis:thumbnail">
+                    <list>
+                        <value>doclib</value>
+                    </list>
+                </entry>
+                <entry key="alf:webpreview">
+                    <list>
+                        <value>webpreview</value>
+                        <value>imgpreview</value>
+                    </list>
+                </entry>
+            </map>
+        </property>
+
+        <property name="ignoreChildren">
+            <set>
+                <value>cm:checkedOut</value>
+            </set>
+        </property>
+
+        <property name="OpenCMISDictionaryService"   ref="OpenCMISDictionaryService" />
+        <property name="OpenCMISQueryService"        ref="OpenCMISQueryService" />     
+        <property name="OpenCMISDictionaryService11" ref="OpenCMISDictionaryService1.1" />
+        <property name="OpenCMISQueryService11"      ref="OpenCMISQueryService1.1" />
+
+        <property name="activityPoster"         ref="cmisActivityPoster" />
+        <property name="objectFilter"           ref="objectFilter" />
+        <property name="descriptorService"      ref="DescriptorService" />
+        <property name="siteService"            ref="SiteService" />
+        <property name="actionService"          ref="ActionService" />
+        <property name="nodeService"            ref="NodeService" />
+        <property name="thumbnailService"       ref="ThumbnailService" />
+        <property name="serviceRegistry"        ref="ServiceRegistry" />
+        <property name="fileFolderService"      ref="FileFolderService" />
+        <property name="versionService"         ref="VersionService" />
+        <property name="checkOutCheckInService" ref="CheckoutCheckinService" />
+        <property name="lockService"            ref="LockService" />
+        <property name="contentService"         ref="ContentService" />
+        <property name="renditionService"       ref="RenditionService" />
+        <property name="tenantAdminService"     ref="tenantAdminService" />
+        <property name="singletonCache"         ref="immutableSingletonCache" />
+        <property name="transactionService"     ref="transactionService"/>
+        <property name="authenticationService"  ref="authenticationService" />
+        <property name="permissionService"      ref="PermissionService" />
+        <property name="permissionModelDao"     ref="permissionsModelDAO" />
+        <property name="mimetypeService"        ref="MimetypeService" />
+        <property name="auditService"           ref="auditService" />
+        <property name="namespaceService"       ref="namespaceService" />
+        <property name="searchService"          ref="SearchService" />
+        <property name="dictionaryService"      ref="DictionaryService" />
+        <property name="behaviourFilter"        ref="policyBehaviourFilter" />
+        <property name="eventPublisher"         ref="eventPublisher" />
+        <property name="dictionaryDAO"          ref="dictionaryDAO" />
+    </bean>
+
+    <!-- THOR-370 -->
+    <bean id="CMISServiceFactory" class="org.alfresco.opencmis.CloudAlfrescoCmisServiceFactory">
+        <property name="cmisConnector"          ref="CMISConnector" />
+        <property name="cmisTransactions"       ref="CMISService_Transactions" />
+        <property name="cmisExceptions"         ref="CMISService_Exceptions" />
+        <property name="cmisControl"            ref="CMISService_Control" />
+        <property name="cmisStreams"            ref="CMISService_Streams" />
+        <property name="authorityService"       ref="AuthorityService" />
+        <!-- extended -->
+        <property name="tenantAdminService"     ref="tenantAdminService"/>
+        <property name="networksService"        ref="networksService"/>
+    </bean>
+
+    <!-- note: also used 'cloud-authentication.xml' -->
+    <bean id="runAsDefaultTenantInterceptor" class="org.alfresco.repo.tenant.RunAsTenantInterceptor">
+        <constructor-arg index="0"><value>Default</value></constructor-arg>
+    </bean>
+    
+    <!-- THOR-475: improve create tenant time by sharing the rendition defs from super tenant - avoids thumbnail registry init for each tenant
+                   (pending future refactor of registries, including thumbnail registry) -->
+    
+    <!-- Thumbnail Register -->
+    <bean id="thumbnailRegistry" parent="baseThumbnailRegistry" class="org.alfresco.module.org_alfresco_module_cloud.repo.thumbnail.CloudThumbnailRegistry" />
+    
+    <bean id="renditionDefinitionPersister" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.repo.rendition.RenditionDefinitionPersister</value>
+            </list>
+        </property>
+        <property name="target">
+            <ref bean="renditionDefinitionPersister_raw"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="runAsDefaultTenantInterceptor"/>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="renditionDefinitionPersister_raw" class="org.alfresco.repo.rendition.RenditionDefinitionPersisterImpl" >
+        <property name="runtimeActionService" ref="actionService" />
+        <property name="nodeService" ref="NodeService" />
+        <property name="behaviourFilter" ref="policyBehaviourFilter" />
+    </bean>
+    
+</beans>

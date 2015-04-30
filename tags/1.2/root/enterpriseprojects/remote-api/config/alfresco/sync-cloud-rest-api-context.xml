@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+   
+   <!--                              -->
+   <!--  Web Scripts for Cloud Sync  -->
+   <!--                              -->
+
+   <!-- Sync Set Definition management -->
+   <bean id="webscript.org.alfresco.enterprise.repository.sync.cloudonly.remotesyncsetdefinition.post"
+         class="org.alfresco.enterprise.repo.web.scripts.sync.cloudonly.RemoteSyncSetDefinitionPost"
+         parent="abstractCloudSyncWebScript">
+   </bean>
+   
+   <!-- Sync Set Definition management -->
+   <bean id="webscript.org.alfresco.enterprise.repository.sync.cloudonly.remotesyncsetdefinition.delete"
+         class="org.alfresco.enterprise.repo.web.scripts.sync.cloudonly.RemoteSyncSetDefinitionDelete"
+         parent="abstractCloudSyncWebScript">
+   </bean>
+   
+</beans>

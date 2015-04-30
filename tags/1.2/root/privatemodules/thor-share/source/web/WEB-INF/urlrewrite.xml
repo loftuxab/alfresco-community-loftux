@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.0//EN" "http://tuckey.org/res/dtds/urlrewrite3.0.dtd">
+<urlrewrite use-query-string="true">
+
+   <!--  The URLRewrite Filter will only match a single rule, therefore we need to check for
+         tenant data before defaulting to standard Surf matches. We're working on the assumption
+         that if tenant data is provided it will be provided *after* the application context,
+         but *before* the servlet context ("page"). However, the original Share URL re-writing was provided
+         to insert the servlet context if not provided. -->
+
+   <!-- SAML -->
+
+   <!-- Short networks SAML login url -->
+   <rule>
+      <from>^/([^/^\?]+)\/?$</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/saml-sp-authnrequest</to>
+   </rule>
+   <rule>
+      <from>^/([^/^\?]+)\?page=(.*)$</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/saml-sp-authnrequest</to>
+   </rule>
+   <!-- Incoming AuthnResponse from IDP -->
+   <rule>
+      <from>^/([^/^\?]+)/saml/authnresponse$</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/saml-authnresponse</to>
+   </rule>
+   <!-- Incoming LogoutResponse from IDP (after an SP initiated LogoutRequest) -->
+   <rule>
+      <from>^/([^/^\?]+)/saml/logoutresponse$</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/saml-logoutresponse</to>
+   </rule>
+   <!-- Incoming LogoutRequest from IDP (after and IDP initiated logout) -->
+   <rule>
+      <from>^/([^/^\?]+)/saml/logoutrequest$</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/cloud/core/components/saml/logoutrequest</to>
+   </rule>
+
+   <!-- Quick share short url mapping  -->
+   <rule>
+      <from>^/s/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">-default-</set>
+      <to>/page/quickshare?id=$1</to>
+   </rule>
+
+   <!--  We need to have explicit rules that check for the existence of the "page" servlet
+         mapping. These rules must be placed before the basic tenant re-writing to ensure
+         that we never set "page" as the current tenant name -->
+   <rule>
+      <from>^/([^/]+)/page/proxy/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/proxy/$2</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/page/res/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/resource/$2</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/page/service/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/$2</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/page/feedservice/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/feed/$2</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/page/system/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/system/$2</to>
+   </rule>
+
+   <!-- This rule handles page requests where the "@" symbol in the users id has not been encoded correctly
+        to "%40". This is vital so that when a session timeout occurs the URL redirection post login is not
+        broken. The rule re-encodes the matches around the "@" in the element to ensure they are escaped. -->
+   <rule>
+      <from>^/([^/]+)/page/(.*)/([^@]+)@([^@]+)/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/$2/${escape:$3@$4}/$5</to>
+   </rule>
+
+   <!-- This rule captures tenant information from standard Surf URLs. The tenant information will be
+        stored as a request attribute and used to generate the JavaScript application constants used throughout
+        the application to use make proxy requests... -->
+   <rule>
+      <from>^/([^/]+)/page/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/$2</to>
+   </rule>
+
+   <!--  The following set of rules are the ones that we typically expect to be invoked. They
+         map a request to include the servlet context ("page") but remove any tenant provided
+         and set it as a request attribute. -->
+   <rule>
+      <from>^/([^/]+)/proxy/(.*)\?(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/proxy/${escapePath:$2}?$3</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/proxy/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/proxy/${escapePath:$2}</to>
+   </rule>
+
+   <!-- NOTE: At this stage it is not clear if we'd expect tenant information on
+              any URLs other than proxy requests. For example, why would a user want
+              to request a resource from the repository? However, these have been
+              included for the time being to cover all eventualities -->
+   <rule>
+      <from>^/([^/]+)/res/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/resource/$2</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/service/(.*)\?(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/${escapePath:$2}?$3</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/service/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/${escapePath:$2}</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/feedservice/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/feed/$2</to>
+   </rule>
+   <rule>
+      <from>^/([^/]+)/system/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/system/$2</to>
+   </rule>
+
+   <!--  The following are the original Share rules that we should include for instances
+         when no tenant information is provided (e.g. initial login)
+   <rule>
+      <from>/proxy/(.*)</from>
+      <to>/page/proxy/$1</to>
+   </rule>
+   -->
+   <rule>
+      <from>^/res/(.*)</from>
+      <to>/page/resource/$1</to>
+   </rule>
+   <rule>
+      <from>^/service/(.*)</from>
+      <to>/page/$1</to>
+   </rule>
+   <rule>
+      <from>^/feedservice/(.*)</from>
+      <to>/page/feed/$1</to>
+   </rule>
+   <rule>
+      <from>^/system/(.*)</from>
+      <to>/page/system/$1</to>
+   </rule>
+
+   <!-- The following rules are special case filters that ensure that user activation
+        and site invitation URLs provided do not require tenants. This is partly because
+        they are achieved through the use of the "-default-" tenant which we do not wish
+        to expose in a URL. -->
+   <rule>
+      <from>/page/activation?(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">-default-</set>
+      <to>/page/activation?$1</to>
+   </rule>
+   <rule>
+      <from>/page/invitation?(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">-default-</set>
+      <to>/page/invitation?$1</to>
+   </rule>
+   <rule>
+      <from>/page/forgot-password?(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">-default-</set>
+      <to>/page/forgot-password?$1</to>
+   </rule>
+   <rule>
+      <from>/page/reset-password?(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">-default-</set>
+      <to>/page/reset-password?$1</to>
+   </rule>
+
+   <!--  This rule has been provided to cover the sign-up completion scenario. No-one should
+         explicitly requesting "/-system-" but this is the request made upon successful signup
+         completion. This will cause a redirect to the site-index authenticated against the
+         -default- tenant.  -->
+   <rule>
+      <from>/-system-</from>
+      <set name="org.alfresco.cloud.tenant.name">-default-</set>
+      <to>/page/site-index</to>
+   </rule>
+
+   <!-- This rule is a catch all condition for all other requests to ensure that at least the tenant name is set correctly -->
+   <rule>
+      <from>/([^/]+)(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/site-index</to>
+   </rule>
+
+   <!--  This rule is needed to cope with pure application context requests (e.g. all tenant information generated from the
+         authentication. Both this AND the previous rule are required despite looking the same. -->
+   <rule>
+      <from>/(.*)</from>
+      <set name="org.alfresco.cloud.tenant.name">$1</set>
+      <to>/page/site-index</to>
+   </rule>
+
+</urlrewrite>

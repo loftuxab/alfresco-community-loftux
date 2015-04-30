@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <!-- TODO - currently uses default cache settings -->
+   
+   <!-- ===================================== -->
+   <!-- ID lookup for Account entities    -->
+   <!-- ===================================== -->
+
+   <!-- The cross-transaction shared cache for Account -->
+   
+   <bean name="accountEntitySharedCache" factory-bean="cacheFactory" factory-method="createCache">
+      <constructor-arg value="cache.accountEntityCache"/>
+   </bean>
+   
+   <!-- The transactional cache for Account -->
+   
+   <bean name="accountEntityCache" class="org.alfresco.repo.cache.TransactionalCache">
+      <property name="sharedCache">
+         <ref bean="accountEntitySharedCache" />
+      </property>
+      <property name="name">
+         <value>org.alfresco.cache.accountEntityTransactionalCache</value>
+      </property>
+      <property name="maxCacheSize" value="1000" />
+      <property name="mutable" value="true" />
+      <property name="disableSharedCache" value="${system.cache.disableMutableSharedCaches}" />
+      <property name="tenantAware" value="false" />
+   </bean>
+   
+</beans>

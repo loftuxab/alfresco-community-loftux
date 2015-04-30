@@ -1,0 +1,22 @@
+<webscript>
+  <shortname>Gets the status of an ongoing reset-password request</shortname>
+  <description><![CDATA[
+  This webscript retrieves the status of a specific 'reset password' process.
+  <p/>
+  The response will look like:
+<pre>
+{
+  "username" : "joe.bloggs@acme-1317661051429.example"
+}
+</pre>
+The username response parameter is the user whose password is being reset as part of this workflow.
+If the id or key within the GET call are not recognised this webscript will return a 404.
+  
+  ]]></description>
+  <url>/internal/cloud/users/passwords/resetrequests/{id}?key={key}</url>
+  <format default="json"/>
+  <lifecycle>internal</lifecycle>
+  
+  <authentication runas="admin">none</authentication>
+  <transaction>required</transaction>
+</webscript>

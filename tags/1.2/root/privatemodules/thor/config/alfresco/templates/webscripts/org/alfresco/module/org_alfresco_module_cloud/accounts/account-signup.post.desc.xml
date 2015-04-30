@@ -1,0 +1,56 @@
+<webscript>
+   <shortname>POST account</shortname>
+   <description><![CDATA[
+   POSTing an email address to this webscript is an implicit request to create an account for that user e.g. joe.bloggs@eng.acme.com
+   The user "joe.bloggs" will be added to the account associated with the domain "eng.acme.com". If such an account does not
+   exist, it may be created (subject to validation of the domain).<br/>
+   The Content-Body should have the form:
+<pre>
+    {
+       "email":           "joe.bloggs@eng.acme.com",
+       "firstName":       "Joe",
+       "lastName":        "Bloggs",
+       "password":        "mypassword",
+       "source":          "website",
+       "sourceUrl":       "http://www.alfresco.com/products/cloud",
+       
+       "ipAddress":       "100.100.100.100",
+       "landingTime":     1321010076,
+       "landingReferrer": "format TBD",
+       "landingPage":     "format TBD",
+       "landingKeywords": ["key1", "key2", "key3"],
+       "utmSource":       "format TBD",
+       "utmMedium":       "format TBD",
+       "utmTerm":         "format TBD",
+       "utmContent":      "format TBD",
+       "utmCampaign":     "format TBD"
+    }
+</pre>
+<ul>
+<li>email: The email address of the user signing up. Mandatory.</li>
+<li>firstName: The last name of the user signing up. Optional.</li>
+<li>lastName: The first name of the user signing up. Optional.</li>
+<li>password: The password of the user signing up. Optional.</li>
+<li>source: The source of the signup e.g. mobile app, website etc. Mandatory.</li>
+<li>sourceUrl: For the case where source is website, the URL of that website can be specified here. e.g. http://www.alfresco.com/products/cloud. Optional.</li>
+<li>ipAddress: The IP address from which the user signed up. Optional.</li>
+<li>landingTime: The UNIX time (in seconds) the user originally landed on the website. Optional.</li>
+<li>landingReferrer: The landing referral URL where the user came from. Optional.</li>
+<li>landingPage: The landing page the user first arrived on the website. Optional.</li>
+<li>landingKeywords: The landing keywords if the user arrived from a search engine. Optional.</li>
+<li>utmSource: Google 'source' identifier. Optional.</li>
+<li>utmMedium: Google 'medium' identifier. Optional.</li>
+<li>utmTerm: Google 'term' identifier. Optional.</li>
+<li>utmContent: Google 'content' identifier. Optional.</li>
+<li>utmCampaign: Google 'campaign' identifier. Optional.</li>
+</ul>
+The source along with any optional properties whose values are given will be used for signup metrics. The presence of firstName,
+lastName and password implictly imply that the registration is "preRegistered". 
+   ]]>
+   </description>
+   <url>/internal/cloud/accounts/signupqueue</url>
+   <format default="json">argument</format>
+   <authentication runas="admin">none</authentication>
+   <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

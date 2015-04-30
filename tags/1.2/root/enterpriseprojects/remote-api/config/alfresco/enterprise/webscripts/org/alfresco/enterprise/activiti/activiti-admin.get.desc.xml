@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>activiti-admin</shortname>
+  <description>Activiti Admin Console Redirect Web Script</description>
+  <url>/activiti-admin</url>
+  <format default="html">extension</format>
+  <authentication>user</authentication>
+</webscript>

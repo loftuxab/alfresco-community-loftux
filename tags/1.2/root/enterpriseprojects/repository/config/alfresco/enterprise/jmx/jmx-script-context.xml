@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+   <!-- This is the bean which is registered with Alfresco's ScriptService as a JavaScript root object  -->
+   <bean id="jmxScriptExtension" parent="baseJavaScriptExtension" class="org.alfresco.enterprise.repo.management.script.JmxScriptProcessorExtension">
+      <property name="extensionName" value="jmx"/>
+      <!-- The API which is exposed in JavaScript is all delegated to another bean -->
+      <property name="jmxScript" ref="JmxScript" /> <!-- Big 'J' as we want the secure version -->
+   </bean>
+   
+   <!-- This bean implements the jmxScript JavaScript API -->
+   <bean id="jmxScript" class="org.alfresco.enterprise.repo.management.script.JmxScriptImpl">
+      <property name="MBeanServer" ref="alfrescoMBeanServer" />
+      <property name="valueConverter" ref="jmxValueConverter"/>
+   </bean>
+   
+   <!-- This bean is responsible for the conversion of JMX values to JavaScript-friendly wrapper
+        objects and vice versa. It relies on, amongst other things, the normal Rhino conversion. -->
+   <bean id="jmxValueConverter"
+         class="org.alfresco.enterprise.repo.management.script.JmxValueConversionChain">
+      <property name="valueConverters">
+         <list>
+            <!-- Simplify our lives by filtering out nulls immediately. -->
+            <bean class="org.alfresco.enterprise.repo.management.script.JmxValueConverter$NullJmxValueConverter"/>
+            
+            <bean class="org.alfresco.enterprise.repo.management.script.CompositeDataJmxValueConverter">
+               <property name="conversionChain" ref="jmxValueConverter" />
+            </bean>
+            <bean class="org.alfresco.enterprise.repo.management.script.CompositeDataArrayJmxValueConverter">
+               <property name="conversionChain" ref="jmxValueConverter" />
+            </bean>
+            <bean class="org.alfresco.enterprise.repo.management.script.TabularDataJmxValueConverter">
+               <property name="conversionChain" ref="jmxValueConverter" />
+            </bean>
+            <bean class="org.alfresco.enterprise.repo.management.script.SerializableJmxValueConverter"/>
+            
+            <!-- Final catch-all converter which returns unconverted values. -->
+            <bean class="org.alfresco.enterprise.repo.management.script.JmxValueConverter$IdentityJmxValueConverter"/>
+         </list>
+      </property>
+   </bean>
+   
+   <!-- This bean adds security interceptors for the jmxScript implementation -->
+   <bean id="JmxScript" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.enterprise.repo.management.script.JmxScript</value>
+      </property>
+      <property name="target">
+         <ref bean="jmxScript" />
+      </property>
+      <property name="interceptorNames">
+         <list>
+            <idref local="JmxScript_security" />
+         </list>
+      </property>
+   </bean>
+   
+   <!-- This bean ensures that only users with an ADMIN role can call methods on the jmx JavaScript root object
+        This approach ensures that, while all users will be able to see the "jmx" root object, non-admin users
+        will get a security exception when they try to use it. -->
+   <bean id="JmxScript_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+        <property name="accessDecisionManager"><ref bean="accessDecisionManager"/></property>
+        <property name="afterInvocationManager"><ref bean="afterInvocationManager"/></property>
+        <property name="objectDefinitionSource">
+            <value>
+               org.alfresco.enterprise.repo.management.script.JmxScript.queryMBeans=ACL_METHOD.ROLE_ADMINISTRATOR
+               org.alfresco.enterprise.repo.management.script.JmxScript.save=ACL_METHOD.ROLE_ADMINISTRATOR
+               org.alfresco.enterprise.repo.management.script.JmxScript.setScope=ACL_ALLOW
+               org.alfresco.enterprise.repo.management.script.JmxScript.*=ACL_DENY
+            </value>
+        </property>
+    </bean>
+    
+    <!-- This prototype bean represents the JavaScript-friendly view of an MBean.
+         It has been made a spring bean in order to manage dependencies via IoC and also to potentially add security interception. -->
+    <bean id="scriptMBean"
+          scope="prototype"
+          class="org.alfresco.enterprise.repo.management.script.ScriptMBean"
+          factory-method="create">
+      <property name="MBeanServer" ref="alfrescoMBeanServer" />
+      <property name="jmxValueConversionChain" ref="jmxValueConverter"/>
+    </bean>
+    
+    <!-- This prototype bean represents the JavaScript-friendly view of a set of MBean JMX operations.
+         It has been made a spring bean in order to manage dependencies via IoC and also to potentially add security interception. -->
+    <bean id="scriptableMBeanOperations"
+          scope="prototype"
+          class="org.alfresco.enterprise.repo.management.script.ScriptableMBeanOperations"
+          factory-method="create"
+          init-method="initJmxOperations">
+      <property name="MBeanServer" ref="alfrescoMBeanServer" />
+      <property name="conversionChain" ref="jmxValueConverter" />
+    </bean>
+</beans>

@@ -1,0 +1,15 @@
+<webscript>
+  <shortname>cloud-sync-push</shortname>
+  <description>Accepts the push of the sync changes to a node</description>
+  <url>/enterprise/sync/push</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <lifecycle>internal</lifecycle>
+
+  <!-- The services we call handle the transaction stuff carefully. -->
+  <!-- We need to disable transactions, so we can get the raw request -->
+  <transaction>none</transaction>
+
+  <!-- We do special multi-part handling -->
+  <formdata multipart-processing="false" />
+</webscript>

@@ -1,0 +1,22 @@
+<webscript>
+   <shortname>POST user as Network Admin (promotion)</shortname>
+   <description><![CDATA[
+   Promotes a user to a NetworkAdmin on a Tenant.
+   <p/>
+   The body content should have the form:
+   <pre>
+   {
+      "username" : "person@company.com"
+   }
+   </pre>
+   The username must already exist or a 400 will be returned.
+   The username must refer to a user who has the account as their home account, or a 403 will be returned.
+   External users cannot be NetworkAdmins.
+   ]]>
+   </description>
+   <url>/internal/cloud/accounts/{id}/networkadmins</url>
+   <url>/internal/cloud/domains/{domainName}/account/networkadmins</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>

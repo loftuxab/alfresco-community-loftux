@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  Account self sign-up Workflow Model -->
+
+<model name="suwf:account-self-signup-workflow-model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+    <imports>
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+        <import uri="http://www.alfresco.org/model/bpm/1.0" prefix="bpm" />
+    </imports>
+    
+    <namespaces>
+        <namespace uri="http://www.alfresco.org/model/workflow/signup/selfsignup/1.0" prefix="suwf" />
+    </namespaces>
+    
+    <types>
+        
+      <!--  Custom Tasks -->
+      <type name="suwf:requestSelfSignupTask">
+         <parent>bpm:startTask</parent>
+         <mandatory-aspects>
+             <aspect>suwf:selfSignupInitialProperties</aspect>
+         </mandatory-aspects>
+      </type>
+      
+      <type name="suwf:sendSignupRequestedEmailTask">
+         <parent>bpm:workflowTask</parent>
+         <mandatory-aspects>
+             <aspect>suwf:selfSignupInitialProperties</aspect>
+         </mandatory-aspects>
+      </type>
+      
+      <type name="suwf:accountActivationPendingTask">
+         <parent>bpm:workflowTask</parent>
+         <mandatory-aspects>
+             <aspect>suwf:selfSignupInitialProperties</aspect>
+             <aspect>suwf:selfSignupActivationProperties</aspect>
+         </mandatory-aspects>
+      </type>
+
+      <type name="suwf:activateAccountTask">
+         <parent>bpm:workflowTask</parent>
+         <mandatory-aspects>
+             <aspect>suwf:selfSignupInitialProperties</aspect>
+             <aspect>suwf:selfSignupActivationProperties</aspect>
+         </mandatory-aspects>
+      </type>
+   </types>
+
+   <aspects>
+      <aspect name="suwf:selfSignupInitialProperties">
+         <properties>
+            <property name="suwf:emailAddress">
+               <type>d:text</type>
+            </property>
+            <property name="suwf:key">
+               <type>d:text</type>
+            </property>
+            <property name="suwf:initiatorEmailAddress">
+               <type>d:text</type>
+            </property>
+            <property name="suwf:initiatorFirstName">
+               <type>d:text</type>
+            </property>
+            <property name="suwf:initiatorLastName">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </aspect>
+      <aspect name="suwf:selfSignupActivationProperties">
+         <properties>
+            <property name="suwf:firstName">
+               <type>d:text</type>
+            </property>
+            <property name="suwf:lastName">
+               <type>d:text</type>
+            </property>
+            <!-- We intentionally do not store passwords in the workflow process -->
+         </properties>
+      </aspect>
+   </aspects>
+</model>

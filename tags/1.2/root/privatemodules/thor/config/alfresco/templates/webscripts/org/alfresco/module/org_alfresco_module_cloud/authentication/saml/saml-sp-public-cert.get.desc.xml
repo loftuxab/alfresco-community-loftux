@@ -1,0 +1,21 @@
+<webscript>
+   <shortname>GET SAML SP public certificate (in Base64 encoding)</shortname>
+   <description>
+   <![CDATA[
+   http://<host>:<port>/alfresco/a/{network}/saml/sp/pubcert
+   
+   Example response from this web script:
+   
+-----BEGIN CERTIFICATE-----
+.....base 64 encoding goes here.....
+-----END CERTIFICATE-----
+   
+   Notes:
+   - user must be a NetworkAdmin for given network/tenant
+   ]]>
+   </description>
+   <url>/saml/sp/pubcert</url>
+   <format default="text">argument</format>
+   <authentication>user</authentication>
+   <transaction>required</transaction>
+</webscript>

@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>ADM Index Check - check given txn id or last txn (if txn id not specified)</shortname>
+  <description>Check ADM txn id to ensure it is in-sync with the index (on this server)</description>
+  <url>/enterprise/admin/indexcheck/adm/checktxn?txnId={txnId}</url>
+  <url>/enterprise/admin/indexcheck/adm/checktxn</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

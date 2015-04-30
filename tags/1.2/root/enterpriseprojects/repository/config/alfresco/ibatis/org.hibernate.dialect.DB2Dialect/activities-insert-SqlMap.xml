@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alfresco.activities.insert">
+
+   <insert id="insert_activity_feedcontrol" parameterType="FeedControl">
+      
+      <include refid="alfresco.activities.insert_ActivityFeedControl_AutoIncrement"/>
+      
+      <selectKey resultType="long" keyProperty="id" order="AFTER">
+         VALUES IDENTITY_VAL_LOCAL()
+      </selectKey>
+      
+   </insert>
+   
+   <insert id="insert_activity_feed" parameterType="ActivityFeed">
+      
+      <include refid="alfresco.activities.insert_ActivityFeed_AutoIncrement"/>
+      
+      <selectKey resultType="long" keyProperty="id" order="AFTER">
+         VALUES IDENTITY_VAL_LOCAL()
+      </selectKey>
+      
+   </insert>
+   
+   <insert id="insert_activity_post" parameterType="ActivityPost">
+      
+      <include refid="alfresco.activities.insert_ActivityPost_AutoIncrement"/>
+      
+      <selectKey resultType="long" keyProperty="id" order="AFTER">
+         VALUES IDENTITY_VAL_LOCAL()
+      </selectKey>
+      
+   </insert>
+   
+</mapper>

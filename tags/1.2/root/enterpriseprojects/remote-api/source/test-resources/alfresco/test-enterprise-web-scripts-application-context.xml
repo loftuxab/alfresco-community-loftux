@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <!-- Pull in the main Enterprise Remote API Context -->
+    <import resource="classpath:alfresco/enterprise-web-scripts-application-context.xml" />
+
+    <!-- Now define any testing WebScripts below -->
+
+    <!-- Test cloud proxy pass-through -->    
+    <bean id="webscript.test.proxy.testing"
+         parent="abstractCloudPassThroughWebScript">
+        <property name="mapping">
+           <map>
+              <entry key="/test/proxy" value="/test/real" />
+           </map>
+        </property>
+   </bean>
+</beans>

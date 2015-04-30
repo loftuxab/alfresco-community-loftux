@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN"
+	"http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+   <bean id="serverDescriptorDAO" class="org.alfresco.enterprise.license.LicenseComponentTest$MockDescriptorDAO">
+      <property name="repositoryName">
+         <value>${repository.name}</value>
+      </property>
+      <property name="resource">
+         <value>classpath:alfresco/serverVersion.properties</value>
+      </property>
+   </bean>
+
+   <bean id="currentRepoDescriptorDAO" class="org.alfresco.enterprise.license.LicenseComponentTest$MockDescriptorDAO">
+      <property name="repositoryName">
+         <value>${repository.name}</value>
+      </property>
+      <property name="resource">
+         <value>classpath:alfresco/currentRepoVersion.properties</value>
+      </property>
+   </bean>
+
+   <bean id="installedRepoDescriptorDAO" class="org.alfresco.enterprise.license.LicenseComponentTest$MockDescriptorDAO">
+      <property name="repositoryName">
+         <value>${repository.name}</value>
+      </property>
+      <property name="resource">
+         <value>classpath:alfresco/installedRepoVersion.properties</value>
+      </property>
+   </bean>
+   
+   <!-- Override the license load locations to avoid hitting embedded real licenses -->
+   <bean id="licenseResourceComponent" class="org.alfresco.repo.descriptor.LicenseResourceComponent">
+      <property name="externalLicenseLocation">
+         <value>${location.license.external}</value>
+      </property>
+      <property name="sharedLicenseLocation"> 
+         <value>${location.license.shared}</value>
+      </property>
+      <property name="embeddedLicenseLocation">
+         <value>/WEB-INF-test/alfresco/license/*.lic</value>
+      </property>
+   </bean>
+
+   <!--  Override the shutdownBackstop for the purposes of this test -->
+   <bean id="shutdownBackstop" class="java.lang.String" />
+
+</beans>

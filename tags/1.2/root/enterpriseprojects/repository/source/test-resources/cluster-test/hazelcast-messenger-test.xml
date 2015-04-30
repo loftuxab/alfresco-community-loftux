@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <bean id="messengerFactory" class="org.alfresco.enterprise.repo.cluster.messenger.HazelcastMessengerFactory">
+        <property name="hazelcastInstanceFactory" ref="hazelcastInstanceFactory"/>
+        <property name="clusterService" ref="ClusterService"/>
+    </bean>
+    
+    <bean id="hazelcastConfig" class="org.alfresco.enterprise.repo.cluster.core.HazelcastConfigFactoryBean">
+        <property name="configFile" value="classpath:cluster-test/hazelcast-messenger-test-conf.xml"/>
+        <property name="properties">
+            <props>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="testMembershipListener" class="org.alfresco.enterprise.repo.cluster.core.TestMembershipListener"/>
+    
+    <bean id="hazelcastInstanceFactory" class="org.alfresco.enterprise.repo.cluster.core.HazelcastInstanceFactory">
+        <property name="configFactory" ref="hazelcastConfig"/>
+        <property name="clusteringEnabled" value="true"/>
+        <property name="membershipListeners">
+            <list>
+                <ref bean="testMembershipListener"/>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="tcpIpConfig" class="com.hazelcast.config.TcpIpConfig">
+        <property name="enabled" value="false"/>
+    </bean>
+    
+    <bean id="ClusterService" class="org.alfresco.enterprise.repo.cluster.core.HazelcastTest.TestClusterService"/>
+</beans>

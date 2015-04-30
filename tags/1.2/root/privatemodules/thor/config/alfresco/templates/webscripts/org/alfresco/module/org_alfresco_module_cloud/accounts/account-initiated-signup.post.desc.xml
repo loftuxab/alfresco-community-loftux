@@ -1,0 +1,35 @@
+<webscript>
+   <shortname>Signup Users</shortname>
+   <description><![CDATA[
+   Used when an already logged in user initiates the sign up.
+
+   The body of the POST call should be something like:
+   <pre>
+      {
+          "emails":    [ "emailId@company1.com", "email2d@company2.com", ... ]
+          "message":   "Custom welcome message."
+
+          "source":          "website"
+      }
+   </pre>
+   The response will look like:
+   <pre>
+   {
+      "invalidEmails":
+      [
+         {
+            "email": "emailId@company2.com",
+            "failureReason": "USER_EXISTS"
+         },
+         ...
+      ]
+   }
+   </pre>
+
+  ]]>>
+   </description>
+   <url>/internal/cloud/accounts/initiatedsignupqueue</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction>required</transaction>
+</webscript>

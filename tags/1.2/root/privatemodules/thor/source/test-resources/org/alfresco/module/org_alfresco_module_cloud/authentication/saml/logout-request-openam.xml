@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<samlp:LogoutRequest Destination="http://localhost:8081/share/openam.test/saml/logoutrequest" ID="s2a0ef4b28d5a28661fae2c16148079deb2841b229" IssueInstant="2013-01-27T19:50:37Z" NotOnOrAfter="2013-01-27T20:00:37Z" Version="2.0" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://www.myopenam.com:9080/opensso</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#s2a0ef4b28d5a28661fae2c16148079deb2841b229">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>71gCGDe9Kf6cDjThkv3uHEUjuXo=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+kUxzs8cDGEoVOXODI/otPJAA2bZngVrXXky91QSxw9unAWe3b2X1l5L0sTQlY2J3s8MpU1cO0JWQ
+zUrKGjsWla0vid+HF4j7U05u388e94oRDLM3GGzRmZ7h7vvaOd0JemQgRqvA8pfKS/5qyNOkw+lw
++nNqZcE+BzfXEgBU7Ac=
+</ds:SignatureValue>
+</ds:Signature><saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="http://www.myopenam.com:9080/opensso" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">xoVxpCIKrPZfyQvQRwMJkBSJ8CPu</saml:NameID><samlp:SessionIndex>s2584c93524014b85bf535bd202b33a8d6a34d9f01</samlp:SessionIndex></samlp:LogoutRequest>

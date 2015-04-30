@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - Search Service</shortname>
+   <description><![CDATA[Admin Console WebScript that persists POSTed mbean attribute values for the Search Service page.]]></description>
+   <url>/enterprise/admin/admin-searchservice</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction>required</transaction>
+</webscript>

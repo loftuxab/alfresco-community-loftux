@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<samlp:LogoutResponse
+	Destination="http://localhost:8081/share/openam.test/saml/logoutresponse"
+	ID="s94249893aa31fe8112996cafb88e5bb0936755c8" InResponseTo="_19d989d-c7f8-4eac-b27e-e9bc2ec4ab28"
+	IssueInstant="2013-01-27T19:52:20Z" Version="2.0"
+	xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+	<saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://www.myopenam.com:9080/opensso
+	</saml:Issuer>
+	<samlp:Status>
+		<samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+		</samlp:StatusCode>
+	</samlp:Status>
+</samlp:LogoutResponse>

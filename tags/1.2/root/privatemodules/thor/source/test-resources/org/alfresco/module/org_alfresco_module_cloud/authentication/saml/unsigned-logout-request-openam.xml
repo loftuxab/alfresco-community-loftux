@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<samlp:LogoutRequest
+	Destination="http://localhost:8081/share/openam.test/saml/logoutrequest"
+	ID="s2a0ef4b28d5a28661fae2c16148079deb2841b229" IssueInstant="2013-01-27T19:50:37Z"
+	NotOnOrAfter="2013-01-27T20:00:37Z" Version="2.0"
+	xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+	<saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://www.myopenam.com:9080/opensso
+	</saml:Issuer>
+	<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+		NameQualifier="http://www.myopenam.com:9080/opensso" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">xoVxpCIKrPZfyQvQRwMJkBSJ8CPu
+	</saml:NameID>
+	<samlp:SessionIndex>s2584c93524014b85bf535bd202b33a8d6a34d9f01
+	</samlp:SessionIndex>
+</samlp:LogoutRequest>

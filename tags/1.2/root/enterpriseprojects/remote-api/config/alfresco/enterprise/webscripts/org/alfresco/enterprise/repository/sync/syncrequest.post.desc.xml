@@ -1,0 +1,19 @@
+<webscript>
+   <shortname>POST SyncRequest</shortname>
+   <description><![CDATA[Web Script to request sync
+   <p/>
+   The request body should be of the form:
+   <pre>
+   {
+      "memberNodeRefs": ["workspace://SpacesStore/82ae718e-5ef3-46e1-99f8-c401bf678fb0"], ...
+   }
+   </pre>
+   ]]>
+   </description>
+  <url>/enterprise/sync/syncrequest</url>
+  <authentication>user</authentication>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="barsync:model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+    <description>Sync Test Dynamic Custom Model</description>
+    <author>mrogers</author>
+    <version>1.0</version>
+    <imports>
+        <import prefix="d" uri="http://www.alfresco.org/model/dictionary/1.0"/>
+        <import prefix="cm" uri="http://www.alfresco.org/model/content/1.0"/>
+    </imports>
+    <namespaces>
+        <namespace prefix="barsync" uri="http://www.alfresco.org/syncTest/barsync/1.0"/>
+    </namespaces>
+    <aspects>
+        <aspect name="barsync:testPass" />
+    </aspects>
+</model>

@@ -1,0 +1,19 @@
+<webscript>
+   <shortname>GET SyncSetDefinition</shortname>
+   <description><![CDATA[Web Script that returns a SyncSetDefinition for the specified id, if one exists.
+   <p/>
+   The response body will be of the form:
+   <pre>
+   {
+      TODO
+   }
+   </pre>
+   If there is no syncSetDefinition matching the specified id, a 404 will be returned.
+   ]]>
+   </description>
+   <url>/enterprise/sync/syncsetdefinitions/{id}</url>
+   <authentication>user</authentication>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>

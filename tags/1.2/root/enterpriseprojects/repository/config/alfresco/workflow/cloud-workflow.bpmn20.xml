@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
+   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+   xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+   expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://alfresco.org">
+
+    <process id="cloudWorkflow" name="Cloud task or review">
+
+        <extensionElements>
+            <activiti:executionListener delegateExpression="${HybridWorkflowCleanupListener}" event="end" />
+        </extensionElements>
+        
+        <startEvent id="start"
+            activiti:formKey="hwf:submitCloudWorkflow" />
+            
+        <sequenceFlow sourceRef="start" targetRef="setupSyncTask" id="flow1"/>
+        
+        <serviceTask id="setupSyncTask" activiti:delegateExpression="${HybridWorkflowSetupSyncDelegate}" name="Setup Sync" />
+
+        <sequenceFlow sourceRef="setupSyncTask" targetRef="receiveCloudSignal" id="flow2" />
+        
+        <receiveTask id="receiveCloudSignal" name="Recieve signal" />
+        
+        <sequenceFlow sourceRef="receiveCloudSignal" targetRef="statusCheck" id="flow3"/>
+        
+        <exclusiveGateway id="statusCheck" name="Status Gateway" />
+        
+        <sequenceFlow id="cancelledFlow" sourceRef="statusCheck" targetRef="cancelledTask">
+            <conditionExpression xsi:type="tFormalExpression">${hwf_workflowStatus == "cancelledOnCloud"}</conditionExpression>
+        </sequenceFlow>
+        
+        <sequenceFlow id="finishedFlow" sourceRef="statusCheck" targetRef="finishedGateway" />
+        
+        <!-- Cancelled on-cloud path -->
+        <userTask id="cancelledTask" name="Worklflow cancelled on the cloud"
+            activiti:formKey="hwf:cancelledCloudTask" >
+            <extensionElements>
+               <activiti:taskListener event="create" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
+                  <activiti:field name="script">
+                     <activiti:string>
+                     	if (typeof bpm_workflowDescription != 'undefined') task.description = bpm_workflowDescription;
+                        if (typeof bpm_workflowDueDate != "undefined") task.dueDate = bpm_workflowDueDate
+                        if (typeof bpm_workflowPriority != "undefined") task.priority = bpm_workflowPriority;
+                     </activiti:string>
+                  </activiti:field>
+               </activiti:taskListener>
+            </extensionElements>
+            <humanPerformer>
+                <resourceAssignmentExpression>
+                    <formalExpression>${initiator.exists() ? initiator.properties.userName : "admin"}</formalExpression>
+                </resourceAssignmentExpression>
+            </humanPerformer>
+        </userTask>
+        
+        <sequenceFlow id="cancelledEndFlow" sourceRef="cancelledTask" targetRef="cancelledEnd" />
+        <endEvent id="cancelledEnd" />
+        
+        
+        <!-- Finished on-cloud path -->
+        <exclusiveGateway id="finishedGateway" name="Finished Gateway" />
+        
+        <sequenceFlow id="simpleTaskCompletedFlow" sourceRef="finishedGateway" targetRef="completedTask">
+            <conditionExpression xsi:type="tFormalExpression">${hwf_cloudWorkflowType == "task"}</conditionExpression>
+        </sequenceFlow>
+        
+        <sequenceFlow id="reviewTaskApprovedFlow" sourceRef="finishedGateway" targetRef="approvedTask">
+            <conditionExpression xsi:type="tFormalExpression">${hwf_cloudWorkflowType == "review" &amp;&amp; wf_reviewOutcome == "Approve"}</conditionExpression>
+        </sequenceFlow>
+        
+        <sequenceFlow id="reviewTaskRejectedFlow" sourceRef="finishedGateway" targetRef="rejectedTask" />
+        
+        <userTask id="completedTask" name="Verify task was completed on the cloud"
+            activiti:formKey="hwf:finishedCloudTask" >
+            <extensionElements>
+               <activiti:taskListener event="create" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
+                  <activiti:field name="script">
+                     <activiti:string>
+                        if (typeof bpm_workflowDescription != 'undefined') task.description = bpm_workflowDescription;
+                        if (typeof bpm_workflowDueDate != 'undefined') task.dueDate = bpm_workflowDueDate
+                        if (typeof bpm_workflowPriority != 'undefined') task.priority = bpm_workflowPriority;
+                     </activiti:string>
+                  </activiti:field>
+               </activiti:taskListener>
+           </extensionElements>
+            <humanPerformer>
+                <resourceAssignmentExpression>
+                    <formalExpression>${initiator.exists() ? initiator.properties.userName : 'admin'}</formalExpression>
+                </resourceAssignmentExpression>
+            </humanPerformer>
+        </userTask>
+        
+        <userTask id="approvedTask" name="Document was approved on the cloud"
+            activiti:formKey="hwf:approvedCloudTask" >
+            <extensionElements>
+               <activiti:taskListener event="create" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
+                  <activiti:field name="script">
+                     <activiti:string>
+                     	if (typeof bpm_workflowDescription != 'undefined') task.description = bpm_workflowDescription;
+                        if (typeof bpm_workflowDueDate != "undefined") task.dueDate = bpm_workflowDueDate
+                        if (typeof bpm_workflowPriority != "undefined") task.priority = bpm_workflowPriority;
+                        
+                        task.setVariableLocal('hwf_requiredApprovalPercentage', hwf_requiredApprovalPercentage);
+                     </activiti:string>
+                  </activiti:field>
+               </activiti:taskListener>
+            </extensionElements>
+            <humanPerformer>
+                <resourceAssignmentExpression>
+                    <formalExpression>${initiator.exists() ? initiator.properties.userName : "admin"}</formalExpression>
+                </resourceAssignmentExpression>
+            </humanPerformer>
+        </userTask>
+        
+        <userTask id="rejectedTask" name="Document was rejected on the cloud"
+            activiti:formKey="hwf:rejectedCloudTask" >
+            <extensionElements>
+               <activiti:taskListener event="create" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
+                  <activiti:field name="script">
+                     <activiti:string>
+                     	if (typeof bpm_workflowDescription != 'undefined') task.description = bpm_workflowDescription;
+                        if (typeof bpm_workflowDueDate != "undefined") task.dueDate = bpm_workflowDueDate
+                        if (typeof bpm_workflowPriority != "undefined") task.priority = bpm_workflowPriority;
+                        
+                        task.setVariableLocal('hwf_requiredApprovalPercentage', hwf_requiredApprovalPercentage);
+                     </activiti:string>
+                  </activiti:field>
+               </activiti:taskListener>
+            </extensionElements>
+            <humanPerformer>
+                <resourceAssignmentExpression>
+                    <formalExpression>${initiator.exists() ? initiator.properties.userName : "admin"}</formalExpression>
+                </resourceAssignmentExpression>
+            </humanPerformer>
+        </userTask>
+        
+        <sequenceFlow id="approvedEnd" sourceRef="approvedTask" targetRef="end" />
+        <sequenceFlow id="rejectedEnd" sourceRef="rejectedTask" targetRef="end" />
+        <sequenceFlow id="adhocEnd" sourceRef="completedTask" targetRef="end" />
+        
+        <endEvent id="end" />
+   </process><bpmndi:BPMNDiagram id="BPMNDiagram_cloudWorkflow">
+    <bpmndi:BPMNPlane bpmnElement="cloudWorkflow" id="BPMNPlane_cloudWorkflow">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="30.0" width="30.0" x="15.0" y="278.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="setupSyncTask" id="BPMNShape_setupSyncTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="263.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="receiveCloudSignal" id="BPMNShape_receiveCloudSignal">
+        <omgdc:Bounds height="60.0" width="100.0" x="230.0" y="263.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="statusCheck" id="BPMNShape_statusCheck">
+        <omgdc:Bounds height="40.0" width="40.0" x="380.0" y="273.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cancelledTask" id="BPMNShape_cancelledTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="470.0" y="405.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cancelledEnd" id="BPMNShape_cancelledEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="656.0" y="421.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="finishedGateway" id="BPMNShape_finishedGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="500.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="completedTask" id="BPMNShape_completedTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="620.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approvedTask" id="BPMNShape_approvedTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="620.0" y="45.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectedTask" id="BPMNShape_rejectedTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="620.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="28.0" width="28.0" x="855.0" y="203.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="reviewTaskApprovedFlow" id="BPMNEdge_reviewTaskApprovedFlow">
+        <omgdi:waypoint x="520.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="75.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="330.0" y="293.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="293.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="adhocEnd" id="BPMNEdge_adhocEnd">
+        <omgdi:waypoint x="720.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="855.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="cancelledEndFlow" id="BPMNEdge_cancelledEndFlow">
+        <omgdi:waypoint x="570.0" y="435.0"></omgdi:waypoint>
+        <omgdi:waypoint x="656.0" y="435.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="180.0" y="293.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="293.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="finishedFlow" id="BPMNEdge_finishedFlow">
+        <omgdi:waypoint x="420.0" y="293.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="293.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="45.0" y="293.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="293.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="simpleTaskCompletedFlow" id="BPMNEdge_simpleTaskCompletedFlow">
+        <omgdi:waypoint x="540.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="approvedEnd" id="BPMNEdge_approvedEnd">
+        <omgdi:waypoint x="720.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="869.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="869.0" y="203.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="reviewTaskRejectedFlow" id="BPMNEdge_reviewTaskRejectedFlow">
+        <omgdi:waypoint x="520.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="350.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="rejectedEnd" id="BPMNEdge_rejectedEnd">
+        <omgdi:waypoint x="720.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="869.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="869.0" y="231.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="cancelledFlow" id="BPMNEdge_cancelledFlow">
+        <omgdi:waypoint x="420.0" y="293.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="293.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="435.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="435.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

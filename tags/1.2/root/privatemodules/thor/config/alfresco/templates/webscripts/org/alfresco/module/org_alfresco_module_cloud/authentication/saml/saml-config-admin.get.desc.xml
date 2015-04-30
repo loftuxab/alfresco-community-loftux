@@ -1,0 +1,35 @@
+<webscript>
+   <shortname>GET SAML Config</shortname>
+   <description>
+   <![CDATA[
+   Get SAML config for given network/tenant, if configured
+   
+   http://<host>:<port>/alfresco/a/{network}/saml/config
+   
+   Example response from this web script:
+   
+   {
+       "ssoEnabled" : true,
+       "idpSsoURL" : "https://localhost:9031/idp/SSO.saml2",
+       "idpSloRequestURL" : "https://localhost:9031/idp/SLO.saml2",
+       "idpSloResponseURL" : "https://localhost:9031/idp/SLO.saml2",
+       "autoProvisionEnabled" : false,
+       "alfrescoLoginCredentialEnabled" : false,
+       "entityID" : "my.alfresco.com-ping.com",
+       "certificate" : {
+    					"status" : "valid",
+    					"expiryDate" : {
+      									"iso8601" : "2111-06-05T15:17:32.000+02:00"
+    								   }
+  						}
+   }
+   
+   Notes:
+   - user must be a Network Admin for given network/tenant
+   ]]>
+   </description>
+   <url>/saml/config</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction>required</transaction>
+</webscript>

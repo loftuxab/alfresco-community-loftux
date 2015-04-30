@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alfresco.query.tenant_usages">
+
+    <!--                -->
+    <!-- Result Maps    -->
+    <!--                -->
+    
+    <resultMap id="result_storeUsage" type="StoreUsage">
+        <result property="storeId" column="storeId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="storeSize" column="storeSize" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </resultMap>
+    
+    <!--                -->
+    <!-- Selects        -->
+    <!--                -->
+    
+    <!-- Query for the 'new' style content properties stored in the 'content_url' table (note: parameter is via "IdsEntity") -->
+    <select id="select_GetStoresContentSize" parameterType="Ids" resultMap="result_storeUsage">
+        select
+            s.id         id,
+            s.protocol   protocol,
+            s.identifier identifier,
+            sum(cu.content_size) as storeSize
+        from
+            alf_store s
+            left join alf_node n on (s.id = n.store_id and n.type_qname_id = #{idOne})
+            left join alf_node_properties np on (np.node_id = n.id and np.qname_id = #{idOne})
+            left join alf_content_data cd on (np.long_value = cd.id)
+            left join alf_content_url cu on (cd.content_url_id = cu.id)
+        where
+            s.id in 
+                <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+        group by
+            s.id,
+            s.protocol,
+            s.identifier
+    </select>
+    
+    <!-- Query for count of all nodes of a give type (within tenant) -->
+    <select id="select_CountType" parameterType="Ids" resultType="Long">
+        select count(*)
+        from
+            alf_node n
+            <if test="idThree != null">left join alf_node_aspects na1 on (na1.node_id = n.id and na1.qname_id = #{idThree})</if>
+            <if test="idFour != null">left join alf_node_aspects na2 on (na2.node_id = n.id and na2.qname_id = #{idFour})</if>
+        where
+            n.store_id = #{idOne}
+            and n.type_qname_id = #{idTwo}
+            <if test="idThree != null">and na1.qname_id is null</if>
+            <if test="idFour != null">and na2.qname_id is null</if>
+    </select>
+    
+    <!-- Query for count of all nodes of a give type (within tenant) that also have an aspects applied -->
+    <select id="select_CountTypeWithAspect" parameterType="Ids" resultType="Long">
+        select count(*)
+        from
+            alf_node n
+            <if test="idThree != null">left join alf_node_aspects na1 on (na1.node_id = n.id and na1.qname_id = #{idThree})</if>
+            <if test="idFour != null">left join alf_node_aspects na2 on (na2.node_id = n.id and na2.qname_id = #{idFour})</if>
+        where
+            n.store_id = #{idOne}
+            and n.type_qname_id = #{idTwo}
+            <if test="idThree != null">and na1.qname_id is not null</if>
+            <if test="idFour != null">and na2.qname_id is null</if>
+    </select>
+</mapper>

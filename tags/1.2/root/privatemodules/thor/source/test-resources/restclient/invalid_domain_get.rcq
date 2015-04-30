@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rest-client version="2.3"><request><http-version>1.1</http-version><URL>http://localhost:8080/alfresco/service/internal/cloud/emailaddresses/invaliddomains/gmail.com</URL><method>GET</method><auth-methods>BASIC</auth-methods><auth-preemptive>false</auth-preemptive><auth-username>admin</auth-username><auth-password>rO0ABXQABWFkbWlu</auth-password></request></rest-client>

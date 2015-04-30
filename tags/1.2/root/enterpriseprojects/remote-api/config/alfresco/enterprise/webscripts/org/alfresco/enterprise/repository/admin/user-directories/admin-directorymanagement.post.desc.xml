@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - User and Group Directory Management POST webscript</shortname>
+   <description><![CDATA[Admin Console WebScript that persists POSTed mbean attribute values for the User and Group Directory Management page.]]></description>
+   <url>/enterprise/admin/admin-directorymanagement</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction>required</transaction>
+</webscript>

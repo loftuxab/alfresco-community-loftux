@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>List invitations</shortname>
+  <description><![CDATA[
+  Gets a collection of pending cloud site invitations for the specified invitee.<br/>
+  ]]></description>
+  <url>/internal/cloud/invitations?inviteeUserName={inviteeUserName}&amp;pageSize={pageSize?}</url>
+  <format default="json"/>
+  <lifecycle>internal</lifecycle>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+</webscript>

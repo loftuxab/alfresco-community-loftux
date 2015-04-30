@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Change Language</shortname>
+  <description>Change user language</description>
+  <url>/components/profile/change-locale</url>
+</webscript>

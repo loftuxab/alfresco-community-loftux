@@ -1,0 +1,26 @@
+.login .cloud-core-login-separator
+{
+   margin-left: 1em;
+   margin-right: 1em;
+}
+
+.no-wrap
+{
+   white-space: nowrap;
+}
+
+/*
+ * Set the login button to match the cloud branding colours 
+ */
+.form-fields.login.CLOUD .form-field > span.yui-button {
+  border-color: #0181c5;
+}
+
+.form-fields.login.CLOUD .form-field > span.yui-button > .first-child {
+  background-color: #0181c5;
+  border-color: #0181c5;
+}
+
+.theme-company-logo {
+   background: transparent url("../images/logo.png") no-repeat;
+}

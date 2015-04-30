@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>Cloud SAML IDP LogoutRequest</shortname>
+   <description>SAML - IDP - LogoutRequest</description>
+   <url>/cloud/core/components/saml/logoutrequest</url>
+</webscript>

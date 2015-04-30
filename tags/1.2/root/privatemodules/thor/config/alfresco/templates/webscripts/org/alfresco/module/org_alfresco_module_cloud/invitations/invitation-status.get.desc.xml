@@ -1,0 +1,33 @@
+<webscript>
+  <shortname>Gets the status of a site invtation</shortname>
+  <description><![CDATA[
+  This webscript retrieves the status of a specific site invitation along with various
+  contextual information.
+  
+  The response will look like:
+<pre>
+{
+   "id": "activiti$2352",
+   "key": "6799e2c3-92b5-47a9-87f0-6fc817504782",
+   "siteShortName": "testsite",
+   "siteTitle": "Test Site",
+   "siteTenantId": "alfresco.com",
+   "siteTenantTitle": "alfresco.com",
+   "inviterEmail": "name.surname@domain.com",
+   "inviterFirstName": "Name",
+   "inviterLastName": "Surname",
+   "inviteeEmail": "inv.itee@domain.com",
+   "inviteeIsActivated": false,
+   "response": ""
+}
+</pre>
+If the key or the invite_id are not valid a 404 is returned.
+  
+  ]]></description>
+  <url>/internal/cloud/site-invitations/{invite_id}?key={key}</url>
+  <format default="json"/>
+  <lifecycle>internal</lifecycle>
+  
+  <authentication runas="admin">none</authentication>
+  <transaction>required</transaction>
+</webscript>

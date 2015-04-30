@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                           http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+   
+   <bean id="SyncAuditService" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.enterprise.repo.sync.audit.SyncAuditService</value>
+      </property>
+      <property name="target">
+         <ref bean="syncAuditService" />
+      </property>
+      <property name="interceptorNames">
+         <list>
+            <idref local="SyncAuditService_transaction" />
+            <idref bean="AuditMethodInterceptor" />
+            <idref bean="exceptionTranslator" />
+            <idref local="SyncAuditService_security" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="SyncAuditService_transaction"
+      class="org.springframework.transaction.interceptor.TransactionInterceptor">
+      <property name="transactionManager">
+         <ref bean="transactionManager" />
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">${server.transaction.mode.default}</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <bean id="SyncAuditService_security"
+      class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+   
+   <bean id="syncAuditService" class="org.alfresco.enterprise.repo.sync.audit.SyncAuditServiceImpl" >
+      <property name="auditService" ref="auditService"/>
+      <property name="descriptorService" ref="DescriptorService"/>
+      <property name="syncEventHandler" ref="syncEventHandler" />
+   </bean>
+   
+   
+   
+   <bean id="syncEventHandler" class="org.alfresco.enterprise.repo.sync.audit.SyncEventHandler" >
+      <property name="auditComponent"    ref="auditComponent"/>
+      <property name="dictionaryService" ref="dictionaryService"/>
+      <property name="namespaceService"  ref="namespaceService"/>
+      <property name="nodeService"       ref="nodeService"/>
+      <property name="syncAdminService"  ref="syncAdminService"/>
+   </bean>
+</beans>

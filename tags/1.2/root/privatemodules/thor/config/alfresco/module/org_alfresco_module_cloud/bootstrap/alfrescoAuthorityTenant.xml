@@ -1,0 +1,80 @@
+<view:view xmlns:view="http://www.alfresco.org/view/repository/1.0" xmlns:cm="http://www.alfresco.org/model/content/1.0"
+   xmlns:sys="http://www.alfresco.org/model/system/1.0" xmlns:usr="http://www.alfresco.org/model/user/1.0" xmlns:app="http://www.alfresco.org/model/application/1.0">
+
+    <view:reference view:pathref="${system.authorities_container.childname}">
+        <view:associations>
+            <sys:children>
+            
+                <!-- GROUP_INTERNAL_USERS is a group authority holding all those user authorities which are internal users of a tenant.
+                     There is one such group per tenant. -->
+                <cm:authorityContainer view:childName="cm:GROUP_INTERNAL_USERS">
+                    <view:aspects>
+                        <sys:referenceable />
+                    </view:aspects>
+                    <view:properties>
+                        <cm:name>GROUP_INTERNAL_USERS</cm:name>
+                        <sys:node-uuid>GROUP_INTERNAL_USERS</sys:node-uuid>
+                        <cm:authorityName>GROUP_INTERNAL_USERS</cm:authorityName>
+                    </view:properties>
+                </cm:authorityContainer>
+                
+                <!-- GROUP_NETWORK_ADMINS is a group authority holding all those user authorities which are 'network admins' a.k.a. 'tenant admins'.
+                     There is one such group per tenant.-->
+                <cm:authorityContainer view:childName="cm:GROUP_NETWORK_ADMINS">
+                    <view:aspects>
+                        <sys:referenceable />
+                    </view:aspects>
+                    <view:properties>
+                        <cm:name>GROUP_NETWORK_ADMINS</cm:name>
+                        <sys:node-uuid>GROUP_NETWORK_ADMINS</sys:node-uuid>
+                        <cm:authorityName>GROUP_NETWORK_ADMINS</cm:authorityName>
+                    </view:properties>
+                </cm:authorityContainer>
+            </sys:children>
+        </view:associations>
+    </view:reference>
+    
+    
+    <view:reference view:pathref="${system.zones_container.childname}/cm:AUTH.ALF">
+        <view:associations>
+            <cm:inZone>
+                <view:reference
+                    view:pathref="${system.authorities_container.childname}/cm:GROUP_INTERNAL_USERS"
+                    view:childName="cm:GROUP_INTERNAL_USERS" />
+            </cm:inZone>
+            <cm:inZone>
+                <view:reference
+                    view:pathref="${system.authorities_container.childname}/cm:GROUP_NETWORK_ADMINS"
+                    view:childName="cm:GROUP_NETWORK_ADMINS" />
+            </cm:inZone>
+        </view:associations>
+    </view:reference>
+    
+    <view:reference view:pathref="${system.zones_container.childname}">
+         <view:associations>
+            <sys:children>
+                <cm:zone view:childName="cm:APP.SHARE">
+                    <view:aspects>
+                        <sys:referenceable />
+                    </view:aspects>
+                    <view:properties>
+                        <sys:node-uuid>APP.SHARE</sys:node-uuid>
+                        <cm:name>APP.SHARE</cm:name>
+                    </view:properties>
+                    <view:associations>
+                        <cm:inZone>
+                            <view:reference
+                                view:pathref="${system.authorities_container.childname}/cm:GROUP_INTERNAL_USERS"
+                                view:childName="cm:GROUP_INTERNAL_USERS" />
+                        </cm:inZone>
+                        <cm:inZone>
+                            <view:reference
+                                view:pathref="${system.authorities_container.childname}/cm:GROUP_NETWORK_ADMINS"
+                                view:childName="cm:GROUP_NETWORK_ADMINS" />
+                        </cm:inZone>
+                    </view:associations>
+                </cm:zone>
+            </sys:children>
+        </view:associations>
+    </view:reference>
+</view:view>

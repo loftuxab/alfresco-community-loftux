@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>ADM Index Check - get progress</shortname>
+  <description>Get summary progress of index check (on this server)</description>
+  <url>/enterprise/admin/indexcheck/adm/progress</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

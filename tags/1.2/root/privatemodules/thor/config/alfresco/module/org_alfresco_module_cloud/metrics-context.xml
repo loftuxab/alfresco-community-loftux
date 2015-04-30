@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <bean id="abstractConcurrewntUserMonitor" class="org.alfresco.module.org_alfresco_module_cloud.metrics.ConcurrentUserMonitor" abstract="true"/>
+    
+    <!-- WebScript authentications -->
+    <bean id="webScriptConcurrentUserMonitor" parent="abstractConcurrewntUserMonitor">
+        <property name="localStores">
+            <map>
+	            <entry key="org.alfresco.repo.web.auth.BasicAuthCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.webscripts.BasicAuthCredentials"/>
+                    </bean>
+	            </entry>
+                <entry key="org.alfresco.module.org_alfresco_module_cloud.webscripts.PublicApiCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.webscripts.PublicApiCredentials"/>
+                    </bean>
+                </entry>
+	            <entry key="org.alfresco.repo.web.auth.TicketCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.webscripts.TicketCredentials"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="clusterStores">
+            <map>
+	            <entry key="org.alfresco.repo.web.auth.BasicAuthCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.webscripts.BasicAuthCredentials"/>
+                    </bean>
+	            </entry>
+                <entry key="org.alfresco.module.org_alfresco_module_cloud.webscripts.PublicApiCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.webscripts.PublicApiCredentials"/>
+                    </bean>
+                </entry>
+	            <entry key="org.alfresco.repo.web.auth.TicketCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.webscripts.TicketCredentials"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="WebScriptConcurrentUsersResource" parent="managedResource">
+        <property name="resource" ref="webScriptConcurrentUserMonitor"/>
+        <property name="objectName" value="Alfresco:Name=ConncurrentUsers,Type=WebScript"/>
+    </bean>
+
+    <alias name="webScriptConcurrentUserMonitor" alias="webScriptAuthenticationListener"/>
+
+   <!-- Global (Explorer) authentication -->
+    <bean id="globalConcurrentUserMonitor" parent="abstractConcurrewntUserMonitor">
+        <property name="localStores">
+            <map>
+                <entry key="org.alfresco.repo.web.auth.BasicAuthCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.global.BasicAuthCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.module.org_alfresco_module_cloud.webscripts.PublicApiCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.global.PublicApiCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.repo.web.auth.TicketCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.global.TicketCredentials"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="clusterStores">
+            <map>
+                <entry key="org.alfresco.repo.web.auth.BasicAuthCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.global.BasicAuthCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.module.org_alfresco_module_cloud.webscripts.PublicApiCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.global.PublicApiCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.repo.web.auth.TicketCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.global.TicketCredentials"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="BlobalConcurrentUsersResource" parent="managedResource">
+        <property name="resource" ref="globalConcurrentUserMonitor"/>
+        <property name="objectName" value="Alfresco:Name=ConncurrentUsers,Type=Global"/>
+    </bean>
+
+    <alias name="globalConcurrentUserMonitor" alias="globalAuthenticationListener"/>
+
+
+    <!-- WebDav authentications -->
+    <bean id="webDavConcurrentUserMonitor" parent="abstractConcurrewntUserMonitor">
+        <property name="localStores">
+            <map>
+                <entry key="org.alfresco.repo.web.auth.BasicAuthCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.webdav.BasicAuthCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.module.org_alfresco_module_cloud.webscripts.PublicApiCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.webdav.PublicApiCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.repo.web.auth.TicketCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.webdav.TicketCredentials"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="clusterStores">
+            <map>
+                <entry key="org.alfresco.repo.web.auth.BasicAuthCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.webdav.BasicAuthCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.module.org_alfresco_module_cloud.webscripts.PublicApiCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.webdav.PublicApiCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.repo.web.auth.TicketCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.webdav.TicketCredentials"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="WebDavConcurrentUsersResource" parent="managedResource">
+        <property name="resource" ref="webDavConcurrentUserMonitor"/>
+        <property name="objectName" value="Alfresco:Name=ConncurrentUsers,Type=WebDav"/>
+    </bean>
+
+    <alias name="webDavConcurrentUserMonitor" alias="webDavAuthenticationListener"/>
+    
+
+    <!-- SharePoint authentications -->
+    <bean id="sharepointConcurrentUserMonitor" parent="abstractConcurrewntUserMonitor">
+        <property name="localStores">
+            <map>
+                <entry key="org.alfresco.repo.web.auth.BasicAuthCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.sharepoint.BasicAuthCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.module.org_alfresco_module_cloud.webscripts.PublicApiCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.sharepoint.PublicApiCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.repo.web.auth.TicketCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.local.concurrentssers.sharepoint.TicketCredentials"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="clusterStores">
+            <map>
+                <entry key="org.alfresco.repo.web.auth.BasicAuthCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.sharepoint.BasicAuthCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.module.org_alfresco_module_cloud.webscripts.PublicApiCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.sharepoint.PublicApiCredentials"/>
+                    </bean>
+                </entry>
+                <entry key="org.alfresco.repo.web.auth.TicketCredentials">
+                    <bean factory-bean="cacheFactory" factory-method="createCache">
+                      <constructor-arg value="cache.concurrentssers.sharepoint.TicketCredentials"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <!-- Replace the default Noop webDavAuthenticationListener with concurrentUserMonitor -->
+    <alias name="sharepointConcurrentUserMonitor" alias="sharepointAuthenticationListener"/>
+    
+    <bean id="SharepointConcurrentUsersResource" parent="managedResource">
+        <property name="resource" ref="sharepointConcurrentUserMonitor"/>
+        <property name="objectName" value="Alfresco:Name=ConncurrentUsers,Type=Sharepoint"/>
+    </bean>
+</beans>

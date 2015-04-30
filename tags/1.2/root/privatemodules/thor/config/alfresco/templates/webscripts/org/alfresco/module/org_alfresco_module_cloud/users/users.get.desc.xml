@@ -1,0 +1,29 @@
+<webscript>
+   <shortname>Get People</shortname>
+   <description><![CDATA[
+      Get a collection of people in the current network stored in the repository. This can optionally be
+      filtered according to a given filter query string.
+      <p/>
+      Sample query parameters and their meanings
+      <ul>
+        <li>skipCount the number of people to skip</li>
+        <li>maxItems the number of people to return in the page</li>
+        <li>filter=fred = people whose first names, last names or usernames start with 'fred'.</li>
+        <li>sortBy : 'lastName' or 'firstName' </li>
+        <li>internal not specified = all people visible on this tenant.</li>
+        <li>internal = true (case-sensitive) = all people who are internal on this tenant.</li>
+        <li>internal = false = all people who are external on this tenant.</li>
+        <li>networkAdmin = true (case-sensitive) = all people who are network admins on this tenant.</li>
+      </ul>
+      <p/>
+      The query params can be used together.
+      
+      Note: the results are post filtered, which means that the pages may be truncated. Until we get aspect support in the
+      canned queries, there isn't much we can do about that.
+   ]]>
+   </description>
+   <url>/internal/cloud/people?skipCount={skipCount?}&amp;maxItems={maxItems?}&amp;filter={filterQuery?}&amp;sortBy={sortBy?}&amp;internal={internal?}&amp;networkAdmin={networkAdmin?}</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction allow="readonly">required</transaction>
+</webscript>

@@ -1,0 +1,25 @@
+<webscript>
+   <shortname>POST account activation details</shortname>
+   <description><![CDATA[
+The body of the POST call should be something like:
+<pre>
+   {
+      "email": "emailId@company.com",
+      "firstName": "name",
+      "lastName": "NAME",
+      "password": "password",
+      "key": "239ad243-f904-48f9-b59e-0a9cb99ae597",
+      "id": "activiti$101"
+   }
+</pre>
+If the id and/or the key do not match an in-flight registration workflow, the script will return 404. firstName and lastName are mandatory only for non-pre-registered registrations
+i.e. those for which the firstName, lastName and password were not provided at registration time. password is mandatory.
+   
+   ]]>
+   </description>
+   <url>/internal/cloud/account-activations</url>
+   <format default="json">argument</format>
+   <authentication runas="admin">none</authentication>
+   <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

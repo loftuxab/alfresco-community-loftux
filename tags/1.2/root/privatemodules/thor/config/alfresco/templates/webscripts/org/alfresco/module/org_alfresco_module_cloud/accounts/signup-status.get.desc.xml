@@ -1,0 +1,31 @@
+<webscript>
+  <shortname>Gets the status of a signup request</shortname>
+  <description><![CDATA[
+  This webscript retrieves the status of a specific signup process along with various
+  contextual information.
+  <p/>
+  The response will look like:
+<pre>
+{
+  "id" : "activiti$1404",
+  "key" : "58b8995e-922f-4db4-b46e-7ed407d58efb"},
+  "email" : "joe.bloggs@acme-1317661051429.example",
+  "isRegistered" : false,
+  "isActivated" : true,
+  "initiatorFirstName": "Bill",
+  "initiatorLastName": "Andersson"
+}
+</pre>
+id and key identify the workflow and reflect the values passed in the URL.
+email is the email address being or to be signed up as part of this workflow.
+Note that if the email is activated, then it is NOT considered to be registered.
+If the id or key within the GET call are not recognised, this webscript will return a 404.
+  
+  ]]></description>
+  <url>/internal/cloud/accounts/signupqueue/{id}?key={key}</url>
+  <format default="json"/>
+  <lifecycle>internal</lifecycle>
+  
+  <authentication runas="admin">none</authentication>
+  <transaction>required</transaction>
+</webscript>

@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>ADM Index Check - check node status for a nodeRef or node changes for a txnId</shortname>
+  <description>Check ADM nodes against the index (on this server)</description>
+  <url>/enterprise/admin/indexcheck/adm/checknodes?nodeRef={nodRef}</url>
+  <url>/enterprise/admin/indexcheck/adm/checknodes?txnId={txnId}</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>Invite Completion</shortname>
+   <description>UI for completing invite process.</description>
+   <url>/cloud/core/components/account/invite-completion</url>
+</webscript>

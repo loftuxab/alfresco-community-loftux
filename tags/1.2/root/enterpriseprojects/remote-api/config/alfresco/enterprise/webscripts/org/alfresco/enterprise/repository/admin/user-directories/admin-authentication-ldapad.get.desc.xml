@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - Authentication Subsystem LDAP-AD</shortname>
+   <description><![CDATA[Admin Console WebScript that displays an LDAP-AD Authentication subsystem page.]]></description>
+   <url>/enterprise/admin/admin-authentication-ldapad?id={id}</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

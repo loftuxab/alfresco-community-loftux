@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - CONTROL TEST PAGE</shortname>
+   <description><![CDATA[Admin Console WebScript that displays the CONTROL TEST PAGE.]]></description>
+   <url>/enterprise/admin/admin-test</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

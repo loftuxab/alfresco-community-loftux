@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <bean id="storeSelectorContentStoreBase"
+           class="org.alfresco.enterprise.repo.content.routing.StoreSelectorAspectContentStore"
+           abstract="true"
+           init-method="init">
+       <property name="nodeService">
+           <ref bean="nodeService"/>
+       </property>
+       <property name="policyComponent">
+           <ref bean="policyComponent" />
+       </property>
+       <property name="dictionaryService">
+           <ref bean="dictionaryService" />
+       </property>
+       <property name="storesCache">
+           <ref bean="routingContentStoreCache"/>
+       </property>
+       <property name="policyFilter">
+            <ref bean="policyBehaviourFilter"/>
+       </property>
+   </bean>
+   <!--
+       A ContentStore that can direct content based on the cm:storeName property.
+       The 'storeSelectorContentStore.constraint' ensures that values are mapped to keys in the
+       'storesByName' map.
+   -->
+   <bean id="storeSelectorContentStore" parent="storeSelectorContentStoreBase">
+       <property name="defaultStoreName">
+            <value>default</value>
+       </property>
+       <property name="storesByName" ref="contentStoresByName" />
+   </bean>
+   
+   <bean id="contentStoresByName" class="java.util.TreeMap">
+        <constructor-arg>
+            <map>
+                <entry key="default">
+                    <ref bean="fileContentStore"/>
+                </entry>
+            </map>
+        </constructor-arg>
+   </bean>
+      
+   <bean id="storeSelectorContentStore.constraint"
+           class="org.alfresco.enterprise.repo.content.routing.StoreSelectorAspectContentStore$StoreSelectorConstraint"
+           init-method="initialize" >
+       <property name="shortName">
+           <value>defaultStoreSelector</value>
+       </property>
+       <property name="store">
+           <ref bean="storeSelectorContentStore" />
+       </property>
+       <property name="registry">
+           <ref bean="cm:constraintRegistry" />
+       </property>
+   </bean>
+
+</beans>

@@ -1,0 +1,23 @@
+<webscript>
+   <shortname>Get People</shortname>
+   <description><![CDATA[
+      Get a collection of people stored in the repository. This can optionally be
+      filtered according to a given filter query string.
+      <p/>
+      Sample query parameters and their meanings
+      <ul>
+        <li>filter=fred = people whose first names, last names or usernames start with 'fred'.</li>
+        <li>internal not specified = all people visible on this tenant.</li>
+        <li>internal = true (case-sensitive) = all people who are internal on this tenant.</li>
+        <li>internal = false = all people who are external on this tenant.</li>
+        <li>networkAdmin = true (case-sensitive) = all people who are network admins on this tenant.</li>
+      </ul>
+      <p/>
+      The query params can be used together.
+   ]]>
+   </description>
+   <url>/api/people?filter={filterQuery?}&amp;internal={internal?}&amp;networkAdmin={networkAdmin?}</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction allow="readonly">required</transaction>
+</webscript>

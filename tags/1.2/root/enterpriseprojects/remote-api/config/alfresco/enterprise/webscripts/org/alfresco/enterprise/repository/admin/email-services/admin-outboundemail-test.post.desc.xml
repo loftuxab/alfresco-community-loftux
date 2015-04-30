@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - Test Outbound Email</shortname>
+   <description><![CDATA[Admin Console WebScript that tests the Outbound Email.]]></description>
+   <url>/enterprise/admin/admin-outboundemail-test</url>
+   <format default="json" />
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

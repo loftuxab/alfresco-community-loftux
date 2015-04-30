@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 4.0//EN"
+        "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
+
+<urlrewrite use-query-string="true">
+
+    <rule>
+        <note>Map alfresco/a to network/tenant root of new API (CLOUD-2110)</note> 
+        <from>^/publicapi/alfresco/a$</from>
+        <to type="forward" last="true">/api/</to>
+    </rule>
+    
+    <rule>
+        <note>Map alfresco/a/ to network/tenant root of new API (CLOUD-2110)</note> 
+        <from>^/publicapi/alfresco/a/$</from>
+        <to type="forward" last="true">/api/</to>
+    </rule>
+    
+    <rule>
+        <note>Map only alfresco/a/networkId/ (no slashes other than trailing) to network/tenant root of new API (CLOUD-2110)</note> 
+        <from>^/publicapi/alfresco/a/([^/]+)/$</from>
+        <to type="forward" last="true">/api/$1</to>
+    </rule>
+    
+    <rule>
+        <note>Map only alfresco/a/networkId (no slashes) to network/tenant root of new API (CLOUD-2110)</note> 
+        <from>^/publicapi/alfresco/a/([^/]+)$</from>
+        <to type="forward" last="true">/api/$1</to>
+    </rule>
+    
+    <rule>
+        <note>Pass through all other old-style /alfresco/* public API URLs</note>
+        <from>^/publicapi/alfresco/(.*)$</from>
+        <to type="forward" last="true">/$1</to>
+    </rule>
+
+    <rule>
+        <note>Map CMIS service document to -default- network</note>
+        <from>^/publicapi/cmis/versions/(.*)$/(.*)$</from>
+        <to type="forward" last="true">/api/-default-/cmis/versions/$1/$2</to>
+    </rule>
+    
+    <rule>
+        <note>Map new-style Public APIs to network/tenant root</note>
+        <from>^/publicapi/(.*)$</from>
+        <to type="forward" last="true">/api/$1</to>
+    </rule>
+    
+    <rule>
+        <note>Map Public APIs root to network/tenant root</note>
+        <from>^/publicapi$</from>
+        <to type="forward" last="true">/api/</to>
+    </rule>
+    
+</urlrewrite>

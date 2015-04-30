@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                           http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+   
+    <!-- Bootstrap the Sync model -->
+    <bean id="syncDictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+        <property name="models">
+            <list>
+                <value>alfresco/model/syncModel.xml</value>
+            </list>
+        </property>
+    </bean>
+    
+   <bean id="SyncAdminService" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.enterprise.repo.sync.SyncAdminService</value>
+      </property>
+      <property name="target">
+         <ref bean="syncAdminService" />
+      </property>
+      <property name="interceptorNames">
+         <list>
+            <idref local="SyncAdminService_transaction" />
+            <idref bean="AuditMethodInterceptor" />
+            <idref bean="exceptionTranslator" />
+            <idref local="SyncAdminService_security" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="SyncAdminService_transaction"
+      class="org.springframework.transaction.interceptor.TransactionInterceptor">
+      <property name="transactionManager">
+         <ref bean="transactionManager" />
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">${server.transaction.mode.default}</prop>
+         </props>
+      </property>
+   </bean>
+   
+   <bean id="SyncAdminService_security"
+      class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+      
+   <bean id="syncAdminService" parent="baseSyncAdminService"/>
+   
+   <bean id="baseSyncAdminService" class="org.alfresco.enterprise.repo.sync.SyncAdminServiceImpl" abstract="true" init-method="init">
+      <property name="cloudConnectorService" ref="CloudConnectorService"/>
+      <property name="cloudSyncSetDefinitionTransport" ref="CloudSyncSetDefinitionTransport"/>
+      <property name="ssdIdMappingStrategy">
+          <!-- For loopback-based testing, the SSD IDs cannot be the same On Premise and in Cloud as it's the same
+               Alfresco instance. In this scenario, change the mapping bean here. -->
+          <bean class="org.alfresco.enterprise.repo.sync.SsdIdMappingStrategy$IdentitySsdIdMapping"/>
+          <!--
+          <bean class="org.alfresco.enterprise.repo.sync.SyncAdminServiceImplTest$DevelopmentTestSsdIdMapping"/>
+          -->
+      </property>
+      <property name="syncSetDefinitionStorage" ref="syncSetDefinitionStorage"/>
+      <property name="syncChangeMonitor" ref="syncChangeMonitor"/>
+      <property name="descriptorService" ref="DescriptorService"/>
+      <property name="fileFolderService" ref="FileFolderService"/>
+      <property name="nodeService" ref="NodeService"/>
+      <property name="permissionService" ref="PermissionService"/>
+      <property name="lockService" ref="lockService"/>
+      <property name="modeString"><value>${sync.mode}</value></property>
+      <property name="checkLicenseForSyncMode"><value>${sync.checkLicenseForSyncMode}</value></property>
+      <property name="serverModeProvider">
+           <ref bean="serverMode"/>
+      </property>
+   </bean>
+   
+   <!-- Bean to handle the persistence of SyncSetDefinitions to/from the Node/ContentService -->
+   <bean id="syncSetDefinitionStorage" class="org.alfresco.enterprise.repo.sync.SyncSetDefinitionStorage" >
+      <property name="importerBootstrap" ref="spacesBootstrap"/>
+      <property name="repositoryHelper" ref="repositoryHelper"/>
+      <property name="nodeService" ref="nodeService"/>
+      <property name="permissionService" ref="permissionService"/>
+      <property name="namespaceService" ref="namespaceService"/>
+      <property name="checkOutCheckInService" ref="CheckOutCheckInService"/>
+   </bean>
+   
+   
+   <bean id="syncPropertyInterceptor" class="org.alfresco.enterprise.repo.sync.SyncPropertyInterceptor" 
+        init-method="init">
+      <property name="nodeService">
+         <ref bean="mlAwareNodeService" />
+      </property>
+      <property name="attributeService">
+         <ref bean="attributeService" />
+      </property>
+      <property name="namespaceService">
+         <ref bean="namespaceService" />
+      </property>
+      <property name="enabled">
+         <value>true</value>
+      </property>
+      <property name="injectName">
+         <value>sync:transientErrorCode</value>
+      </property>
+      <property name="aspectName">
+         <value>sync:syncSetMemberNode</value>
+      </property>
+      
+   </bean>
+    
+    <!-- sync adds a new interceptor to "spoof" the transient error aspect -->
+    <bean id="_nodeService" class="org.springframework.aop.framework.ProxyFactoryBean" >
+      <property name="targetName">
+         <value>mlAwareNodeService</value>
+      </property>
+      <property name="proxyInterfaces">
+         <list>
+            <value>org.alfresco.service.cmr.repository.NodeService</value>
+         </list>
+      </property>
+      <property name="interceptorNames">
+         <list>
+            <value>nodeRefPropertyInterceptor</value>
+            <value>syncPropertyInterceptor</value>
+            <value>mlPropertyInterceptor</value>
+            <value>tagscopeSummaryPropertyInterceptor</value> 
+         </list>
+      </property>
+   </bean>
+    
+   <!-- Additional definitions and models deployed for Hybrid Workflow -->
+    <bean id="hybridWorkflowModelBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+        <property name="models">
+            <list>
+                 <value>alfresco/workflow/hybridWorkflowModel.xml</value>
+            </list>
+        </property>
+    </bean>
+     
+    <bean id="hybridWorkflowBootstrap" class="org.alfresco.enterprise.workflow.activiti.HybridWorkflowDeployer" parent="workflowDeployer" depends-on="syncAdminService">
+        <property name="enableHybridWorkflow" value="${hybridworkflow.enabled}" />
+        <property name="syncAdminService" ref="syncAdminService" />
+        <property name="workflowDefinitions">
+            <list>
+                <props>
+                    <prop key="engineId">activiti</prop>
+                    <prop key="location">alfresco/workflow/cloud-workflow.bpmn20.xml</prop>
+                    <prop key="mimetype">text/xml</prop>
+                    <prop key="redeploy">false</prop>
+                </props>
+            </list>
+        </property>
+        <property name="labels">
+            <list>
+               <value>alfresco/workflow/hybrid-workflow-model-messages</value>
+            </list>
+        </property>
+    </bean>
+    
+   <bean id="hybridWorkflowSetupSyncDelegate" class="org.alfresco.enterprise.workflow.activiti.HybridWorkflowSetupSyncDelegate" parent="baseJavaDelegate">
+        <property name="syncAdminService" ref="SyncAdminService"/>
+        <property name="messageService" ref="messageService" />
+        <property name="hybridWorkflowHelper" ref="hybridWorkflowHelper" />
+        <property name="enableHybridWorkflow" value="${hybridworkflow.enabled}" />
+   </bean>
+   
+   <bean id="hybridWorkflowHelper" class="org.alfresco.enterprise.workflow.activiti.HybridWorkflowHelper">
+        <property name="cloudConnectorService" ref="CloudConnectorService"/>
+   </bean>
+   
+   <bean id="hybridWorkflowCleanupListener" class="org.alfresco.enterprise.workflow.activiti.HybridWorkflowCleanupListener" parent="baseExecutionListener">
+        <property name="syncAdminService" ref="SyncAdminService"/>
+   </bean>
+   
+   <bean id="hybridWorkflowMessages" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.enterprise.messages.hybrid-workflow-messages</value>
+            </list>
+        </property>
+   </bean>
+   
+   <bean id="hybridWorkflowAspect" class="org.alfresco.enterprise.workflow.activiti.HybridWorkflowOnPremiseAspect" init-method="init" depends-on="hybridWorkflowModelBootstrap">
+      <property name="namespaceService" ref="namespaceService" />
+      <property name="activitiProcessEngine" ref="activitiProcessEngine" />
+      <property name="policyComponent" ref="policyComponent" />
+      <property name="nodeService" ref="nodeService" />
+      <property name="messageService" ref="messageService" />
+   </bean>
+   
+   <!-- Form-service extension for multi-valued comment property -->
+   <bean id="extendedPropertyFieldConfigurer" class="org.alfresco.enterprise.repo.forms.workflow.ExtendedPropertyFieldConfigurer" depends-on="extendedPropertyFieldProcessor, hybridWorkflowAspect">
+      <property name="extendedPropertyFieldProcessor" ref="extendedPropertyFieldProcessor" />
+      <property name="namespaceService" ref="namespaceService" />
+      <property name="escapedProperties">
+         <list>
+            <value>hwf:comments</value>
+         </list>
+      </property>
+   </bean>
+   
+</beans>

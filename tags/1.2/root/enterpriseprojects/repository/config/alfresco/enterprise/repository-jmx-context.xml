@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<beans>
+    <!--  Enterprise Configuration Extensions for Management and Monitoring via JMX -->
+    <bean id="managedResource" class="org.alfresco.enterprise.repo.management.ManagedResource" abstract="true">
+        <property name="jmxExporter" ref="dynamicExporter" />
+    </bean>
+
+    <bean id="FileServerConfigResource" parent="managedResource">
+        <property name="resource" ref="fileServerConfiguration" />
+        <property name="managedInterfaces">
+            <value>org.alfresco.filesys.FileServerConfigMBean</value>
+        </property>
+    </bean>
+
+    <bean id="RepoServerMgmtResource" parent="managedResource">
+        <property name="resource" ref="RepoServerMgmt" />
+    </bean>
+
+    <!-- Export the Global Properties --> 
+    <bean id="GlobalPropertiesResource" parent="managedResource"> 
+        <property name="resource"> 
+            <bean class="org.alfresco.enterprise.repo.management.PropertiesDynamicMBean" > 
+                <constructor-arg ref="global-properties" /> 
+            </bean> 
+        </property> 
+    </bean>
+    
+    <!-- Export the System Properties -->
+    <bean id="SystemPropertiesResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.PropertiesDynamicMBean" />
+        </property>
+    </bean>
+
+    <!-- Export the Database Metadata-->
+    <bean id="DatabaseInformationResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.Database">
+                <constructor-arg ref="dataSource" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="PatchServiceResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.PatchService">
+                <property name="patchService" ref="patchComponent" />
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="MetadataQueryIndexesCheckResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.PatchCheck">
+                <property name="optionalPatchApplicationCheckBootstrapBean" ref="metadataQueryIndexesCheck" />
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="WebDavResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.WebDav">
+                <property name="webDavService" ref="webdavService" />
+            </bean>
+        </property>
+        <!-- Make webdav look like a subsystem -->
+        <property name="objectName">
+            <value>Alfresco:Type=Configuration,Category=WebDav,id1=default</value>
+        </property>
+    </bean>
+
+    <bean id="ModuleServiceResource" parent="managedResource"> 
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.ModuleService">
+                <property name="moduleService" ref="ModuleService" />
+                <property name="transactionService" ref="transactionService" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="AuthorityResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.Authority">
+                <property name="authorityService" ref="AuthorityService" />
+                <property name="transactionService" ref="transactionService" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="RuntimeResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.Runtime" />
+        </property>
+    </bean>
+
+    <bean id="ConnectionPoolResource" parent="managedResource">
+        <property name="resource" ref="dataSource" />
+        <property name="managedInterfaces">
+            <value>org.alfresco.enterprise.repo.management.ConnectionPoolMBean</value>
+        </property>
+    </bean>
+
+    <bean id="TransformerConfigResource" parent="managedResource">
+        <property name="resource" ref="transformerConfigMBean" />
+        <property name="objectName">
+            <value>Alfresco:Name=ContentTransformer,Type=Configuration</value>
+        </property>
+        <property name="managedInterfaces">
+            <value>org.alfresco.repo.content.transform.TransformerConfigMBean</value>
+        </property>
+    </bean>
+    
+    <bean id="Pdf2swfResource" parent="managedResource">
+        <property name="resource" ref="transformer.worker.Pdf2swf" />
+        <property name="objectName">
+            <value>Alfresco:Name=ContentTransformer,Type=pdf2swf</value>
+        </property>
+        <property name="managedInterfaces">
+            <value>org.alfresco.enterprise.repo.management.ContentTransformerMBean</value>
+        </property>
+    </bean>
+
+    <bean id="ImageMagickResource" parent="managedResource">
+        <property name="resource" ref="transformer.worker.ImageMagick" />
+        <property name="objectName">
+            <value>Alfresco:Name=ContentTransformer,Type=ImageMagick</value>
+        </property>
+        <property name="managedInterfaces">
+            <value>org.alfresco.enterprise.repo.management.ContentTransformerMBean</value>
+        </property>
+    </bean>
+    
+    <!-- Export the Workflow Metadata-->
+    <bean id="WorkflowInformationResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.Workflow">
+                <property name="workflowService" ref="WorkflowService" />
+                <property name="workflowAdminService" ref="workflowAdminService" />
+                <property name="workflowDeployer" ref="workflowBootstrap"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="managedResourceExporter" class="org.alfresco.enterprise.repo.management.AbstractManagedResourceExporter"
+        abstract="true">
+        <property name="jmxExporter" ref="dynamicExporter" />
+    </bean>
+
+    <!--  Expose all property backed beans in the registry -->
+    <bean id="propertyBackedBeanExporter" class="org.alfresco.enterprise.repo.management.subsystems.PropertyBackedBeanExporter">
+        <property name="jmxExporter" ref="dynamicExporter" />
+        <property name="registry">
+            <ref bean="propertyBackedBeanRegistry" />
+        </property>
+        <property name="transactionService" ref="transactionService" />
+        <property name="attributeService" ref="AttributeService" />
+        <property name="messengerFactory" ref="messengerFactory"/>
+    </bean>
+
+    <bean id="log4jExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.Log4jHierarchyExporter"/>
+        
+    <bean id="syncMonitorExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.SyncMonitorExporter" />
+    
+    <bean id="synchronizationUnExporter" class="org.alfresco.enterprise.repo.management.SynchronizationUnExporter">
+        <property name="jmxExporter" ref="dynamicExporter" />
+    </bean>
+    
+    <bean id="synchronizationBridge" class="org.alfresco.enterprise.repo.management.SynchronizationBridge" init-method="init">
+        <property name="registry" ref="propertyBackedBeanRegistry" />
+    </bean>
+    
+    <bean id="cachingContentStoreExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.CachingContentStoreExporter" />
+
+    <bean id="contentStoreExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.ContentStoreExporter" />
+
+    <bean id="repositoryDescriptorExporter" parent="managedResourceExporter"
+        class="org.alfresco.enterprise.repo.management.RepositoryDescriptorExporter">
+        <property name="repoAdminService" ref="RepoAdminService"/>
+    </bean>
+
+    <bean id="luceneIndexExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.LuceneIndexExporter" />
+
+    <bean id="openOfficeExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.OpenOfficeMetadataExporter" />
+
+    <bean id="batchMonitorExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.BatchMonitorExporter" />
+
+    <bean id="encryptionAdminExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.encryption.management.EncryptionAdminExporter" init-method="init">
+        <property name="reEncryptor" ref="reEncryptor" />
+        <property name="mainKeyStore" ref="keyStore"/>
+        <property name="sslKeyStore" ref="ssl.keyStore"/>
+        <property name="sslTrustStore" ref="ssl.trustStore"/>
+    </bean>
+
+    <bean id="schemaBootstrapExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.SchemaBootstrapExporter" />
+
+    <bean id="clusterInfoExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.ClusterInfoExporter" init-method="init">
+        <property name="clusterChecker" ref="clusterChecker"/>
+    </bean>
+        
+    <bean id="RunningActionsResource" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.ActionsImpl">
+               <property name="monitor" ref="actionServiceMonitor"/>
+            </bean>
+        </property>
+    </bean>
+    
+    <!-- Export the cluster admin/reporting management -->
+    <bean id="clusterAdminExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.ClusterAdminExporter">
+        <property name="transactionService" ref="transactionService"/>
+    </bean>
+    
+    <!-- Export the transactional cache statistics management -->
+    <bean id="cacheStatsExporter" parent="managedResourceExporter" class="org.alfresco.enterprise.repo.management.CacheStatisticsExporter"/>
+
+</beans>

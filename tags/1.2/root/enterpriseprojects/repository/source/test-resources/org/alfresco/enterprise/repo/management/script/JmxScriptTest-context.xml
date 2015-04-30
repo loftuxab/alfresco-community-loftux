@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <bean id="TestJmx" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.script.JmxScriptTest$TestJmx" />
+        </property>
+    </bean>
+    
+    <bean id="TestOverloadedJmx" parent="managedResource">
+        <property name="resource">
+            <bean class="org.alfresco.enterprise.repo.management.script.JmxScriptTest$TestOverloadedJmx" />
+        </property>
+    </bean>
+</beans>

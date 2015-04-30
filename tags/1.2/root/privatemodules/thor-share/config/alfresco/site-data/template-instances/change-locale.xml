@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>org/alfresco/change-locale</template-type>
+   <components>
+
+      <!-- Toolbar -->
+      <component>
+         <region-id>toolbar</region-id>
+         <url>/components/profile/userprofile-toolbar</url>
+      </component>
+
+      <!-- Change Locale -->
+      <component>
+         <region-id>change-locale</region-id>
+         <url>/components/profile/change-locale</url>
+      </component>
+   </components>
+</template-instance>

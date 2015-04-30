@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <bean id="cloudAosWebDAVHelper" parent="baseWebDAVHelper" class="org.alfresco.module.org_alfresco_module_cloud.aos.CloudAosWebDAVHelper">
+        <property name="directoryService" ref="directoryService"/>
+        <property name="accountService" ref="accountService"/>
+        <property name="premiumAccountsOnly" value="true"/>
+    </bean>
+    
+    <bean id="AosVirtualFileSystem" class="org.alfresco.module.org_alfresco_module_cloud.aos.AlfrescoCloudVirtualFileSystem">
+        <property name="authenticationService">
+            <ref bean="authenticationService" />
+        </property>
+        <property name="nodeService">
+            <ref bean="NodeService" />
+        </property>
+        <property name="fileFolderService">
+            <ref bean="FileFolderService" />
+        </property>
+        <property name="checkOutCheckInService">
+            <ref bean="CheckOutCheckInService" />
+        </property>
+        <property name="lockService">
+            <ref bean="LockService" />
+        </property>
+        <property name="versionService">
+         <ref bean="VersionService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="DictionaryService" />
+        </property>
+        <property name="namespaceService">
+            <ref bean="NamespaceService" />
+        </property>
+        <property name="mimetypeService">
+            <ref bean="MimetypeService" />
+        </property>
+        <property name="searchService">
+            <ref bean="SearchService" />
+        </property>
+        <property name="policyBehaviourFilter">
+            <ref bean="policyBehaviourFilter" />
+        </property>
+        <property name="transactionService">
+            <ref bean="TransactionService" />
+        </property>
+        <property name="tenantService">
+            <ref bean="tenantService" />
+        </property>
+        <property name="siteService">
+            <ref bean="SiteService" />
+        </property>
+        <property name="webDavHelper">
+            <ref bean="cloudAosWebDAVHelper" />
+        </property>
+        <property name="webDavInitParams">
+            <ref bean="webdav.initParams" />
+        </property>
+        <property name="authenticationContext">
+            <ref bean="authenticationContext" />
+        </property>
+        <property name="activityPoster">
+            <ref bean="aosActivityPoster" />
+        </property>
+        <property name="dataModelMappingConfiguration">
+            <ref bean="aosDataModelMappingConfiguration" />
+        </property>
+        <property name="ioContentFilterRegistry">
+            <null />
+        </property>
+        <property name="singletonCache">
+            <ref bean="immutableSingletonCache" />
+        </property>
+        <property name="baseUrlOverwrite">
+            <value>${aos.baseUrlOverwrite}</value>
+        </property>
+        <property name="sitePathOverwrite">
+            <value>${aos.sitePathOverwrite}</value>
+        </property>
+        <property name="tempDirectoryName">
+            <value>${aos.tempDirectoryName}</value>
+        </property>
+        <property name="encryptTempFiles">
+            <value>${aos.encryptTempFiles}</value>
+        </property>
+        <property name="tempFileThreshold">
+            <value>${aos.tempFileThreshold}</value>
+        </property>
+        <property name="tempFileMaxContentSize">
+            <value>${aos.tempFileMaxContentSize}</value>
+        </property>
+    </bean>
+    
+    <bean id="aosDataModelMappingConfiguration" class="org.alfresco.enterprise.repo.officeservices.metadata.StandardDataModelMappingConfiguration">
+        <property name="dictionaryService">
+            <ref bean="DictionaryService" />
+        </property>
+        <property name="documentRootType">
+            <value>{http://www.alfresco.org/model/content/1.0}content</value>
+        </property>
+        <property name="folderRootType">
+            <value>{http://www.alfresco.org/model/content/1.0}folder</value>
+        </property>
+        <property name="includedTypesPatterns">
+            <list>
+            </list>
+        </property>
+        <property name="excludedTypesPatterns">
+            <list>
+                <value>.*</value>
+            </list>
+        </property>
+        <property name="includedAspectsPatterns">
+            <list>
+            </list>
+        </property>
+        <property name="excludedAspectsPatterns">
+            <list>
+                <value>.*</value>
+            </list>
+        </property>
+        <property name="includedPropertiesPatterns">
+            <list>
+            </list>
+        </property>
+        <property name="excludedPropertiesPatterns">
+            <list>
+                <value>.*</value>
+            </list>
+        </property>
+        <property name="includedInstantiableTypesPatterns">
+            <list>
+            </list>
+        </property>
+        <property name="excludedInstantiableTypesPatterns">
+            <list>
+                <value>.*</value>
+            </list>
+        </property>
+    </bean>
+
+</beans>

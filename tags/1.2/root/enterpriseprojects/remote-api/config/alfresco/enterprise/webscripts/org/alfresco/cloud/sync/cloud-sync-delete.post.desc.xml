@@ -1,0 +1,15 @@
+<webscript>
+  <shortname>cloud-sync-delete</shortname>
+  <description>Requests the un-syncing, and possible deletion of a sync node</description>
+  <url>/enterprise/sync/delete?deleteOnUnSync={deleteOnUnSync}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <lifecycle>internal</lifecycle>
+
+  <!-- The services we call handle the transaction stuff carefully. -->
+  <!-- We need to disable transactions, so we can get the raw request -->
+  <transaction>none</transaction>
+
+  <!-- We may do special multi-part handling -->
+  <formdata multipart-processing="false" />
+</webscript>

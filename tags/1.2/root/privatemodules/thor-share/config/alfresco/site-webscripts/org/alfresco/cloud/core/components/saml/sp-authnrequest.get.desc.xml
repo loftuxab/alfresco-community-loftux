@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>Cloud SAML SP AuthnRequest</shortname>
+   <description>SAML - SP - AuthnRequest</description>
+   <url>/cloud/core/components/saml/sp-authnrequest</url>
+</webscript>

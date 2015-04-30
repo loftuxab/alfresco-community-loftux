@@ -1,0 +1,3538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.alfresco.org/repo/db-schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.alfresco.org/repo/db-schema db-schema.xsd" name="ALFUSER" dbprefix="alf_" version="5026">
+  <validators>
+    <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+      <properties>
+        <property name="pattern">.*</property>
+      </properties>
+    </validator>
+    <validator class="org.alfresco.util.schemacomp.validator.SchemaVersionValidator"/>
+  </validators>
+  <objects>
+    <table name="ALF_ACCESS_CONTROL_ENTRY">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="PERMISSION_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUTHORITY_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ALLOWED" order="5">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="APPLIES" order="6">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTEXT_ID" order="7">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153558900">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_ACE_CTX">
+          <localcolumn>CONTEXT_ID</localcolumn>
+          <targettable>ALF_ACE_CONTEXT</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_ACE_AUTH">
+          <localcolumn>AUTHORITY_ID</localcolumn>
+          <targettable>ALF_AUTHORITY</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_ACE_PERM">
+          <localcolumn>PERMISSION_ID</localcolumn>
+          <targettable>ALF_PERMISSION</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="PERMISSION_ID" unique="true">
+          <columnnames>
+            <columnname>PERMISSION_ID</columnname>
+            <columnname>AUTHORITY_ID</columnname>
+            <columnname>ALLOWED</columnname>
+            <columnname>APPLIES</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153558430" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_ACE_AUTH" unique="false">
+          <columnnames>
+            <columnname>AUTHORITY_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_ACE_CTX" unique="false">
+          <columnnames>
+            <columnname>CONTEXT_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_ACE_PERM" unique="false">
+          <columnnames>
+            <columnname>PERMISSION_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_ACCESS_CONTROL_LIST">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACL_ID" order="3">
+          <type>varchar(144)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LATEST" order="4">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACL_VERSION" order="5">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="INHERITS" order="6">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="INHERITS_FROM" order="7">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TYPE" order="8">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="INHERITED_ACL" order="9">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="IS_VERSIONED" order="10">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="REQUIRES_VERSION" order="11">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACL_CHANGE_SET" order="12">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153600470">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_ACL_ACS">
+          <localcolumn>ACL_CHANGE_SET</localcolumn>
+          <targettable>ALF_ACL_CHANGE_SET</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="ACL_ID" unique="true">
+          <columnnames>
+            <columnname>ACL_ID</columnname>
+            <columnname>LATEST</columnname>
+            <columnname>ACL_VERSION</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153600020" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_ACL_ACS" unique="false">
+          <columnnames>
+            <columnname>ACL_CHANGE_SET</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_ACL_INH" unique="false">
+          <columnnames>
+            <columnname>INHERITS</columnname>
+            <columnname>INHERITS_FROM</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_ACE_CONTEXT">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CLASS_CONTEXT" order="3">
+          <type>varchar(4096)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="PROPERTY_CONTEXT" order="4">
+          <type>varchar(4096)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="KVP_CONTEXT" order="5">
+          <type>varchar(4096)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153556710">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153556360" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_ACL_CHANGE_SET">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="COMMIT_TIME_MS" order="2">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153559700">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153559440" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_ACS_CTMS" unique="false">
+          <columnnames>
+            <columnname>COMMIT_TIME_MS</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_ACL_MEMBER">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACL_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACE_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="POS" order="5">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153601300">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_ACLM_ACE">
+          <localcolumn>ACE_ID</localcolumn>
+          <targettable>ALF_ACCESS_CONTROL_ENTRY</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_ACLM_ACL">
+          <localcolumn>ACL_ID</localcolumn>
+          <targettable>ALF_ACCESS_CONTROL_LIST</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="ACLM_ACL_ID" unique="true">
+          <columnnames>
+            <columnname>ACL_ID</columnname>
+            <columnname>ACE_ID</columnname>
+            <columnname>POS</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153600950" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_ACLM_ACE" unique="false">
+          <columnnames>
+            <columnname>ACE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_ACLM_ACL" unique="false">
+          <columnnames>
+            <columnname>ACL_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_ACTIVITY_FEED">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="POST_ID" order="2">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="POST_DATE" order="3">
+          <type>timestamp</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACTIVITY_SUMMARY" order="4">
+          <type>varchar(4096)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="FEED_USER_ID" order="5">
+          <type>varchar(1020)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACTIVITY_TYPE" order="6">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="SITE_NETWORK" order="7">
+          <type>varchar(1020)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="APP_TOOL" order="8">
+          <type>varchar(144)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="POST_USER_ID" order="9">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="FEED_DATE" order="10">
+          <type>timestamp</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153634350">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153634090" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FEED_FEEDUSERID_IDX" unique="false">
+          <columnnames>
+            <columnname>FEED_USER_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FEED_POSTDATE_IDX" unique="false">
+          <columnnames>
+            <columnname>POST_DATE</columnname>
+          </columnnames>
+        </index>
+        <index name="FEED_POSTUSERID_IDX" unique="false">
+          <columnnames>
+            <columnname>POST_USER_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FEED_SITENETWORK_IDX" unique="false">
+          <columnnames>
+            <columnname>SITE_NETWORK</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_ACTIVITY_FEED_CONTROL">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="FEED_USER_ID" order="2">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="SITE_NETWORK" order="3">
+          <type>varchar(1020)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="APP_TOOL" order="4">
+          <type>varchar(144)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LAST_MODIFIED" order="5">
+          <type>timestamp</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153635150">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153634890" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FEEDCTRL_FEEDUSERID_IDX" unique="false">
+          <columnnames>
+            <columnname>FEED_USER_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_ACTIVITY_POST">
+      <columns>
+        <column name="SEQUENCE_ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="POST_DATE" order="2">
+          <type>timestamp</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="STATUS" order="3">
+          <type>varchar(40)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACTIVITY_DATA" order="4">
+          <type>varchar(4096)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="POST_USER_ID" order="5">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="JOB_TASK_NODE" order="6">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="SITE_NETWORK" order="7">
+          <type>varchar(1020)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="APP_TOOL" order="8">
+          <type>varchar(144)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACTIVITY_TYPE" order="9">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LAST_MODIFIED" order="10">
+          <type>timestamp</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153635840">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">SEQUENCE_ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153635530" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>SEQUENCE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="POST_JOBTASKNODE_IDX" unique="false">
+          <columnnames>
+            <columnname>JOB_TASK_NODE</columnname>
+          </columnnames>
+        </index>
+        <index name="POST_STATUS_IDX" unique="false">
+          <columnnames>
+            <columnname>STATUS</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_APPLIED_PATCH">
+      <columns>
+        <column name="ID" order="1">
+          <type>varchar(256)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="DESCRIPTION" order="2">
+          <type>varchar(4096)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="FIXES_FROM_SCHEMA" order="3">
+          <type>integer</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="FIXES_TO_SCHEMA" order="4">
+          <type>integer</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="APPLIED_TO_SCHEMA" order="5">
+          <type>integer</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TARGET_SCHEMA" order="6">
+          <type>integer</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="APPLIED_ON_DATE" order="7">
+          <type>timestamp</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="APPLIED_TO_SERVER" order="8">
+          <type>varchar(256)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="WAS_EXECUTED" order="9">
+          <type>smallint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="SUCCEEDED" order="10">
+          <type>smallint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="REPORT" order="11">
+          <type>varchar(4096)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153553310">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153552950" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_AUDIT_APP">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="APP_NAME_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_MODEL_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="DISABLED_PATHS_ID" order="5">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153622500">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_AUD_APP_MOD">
+          <localcolumn>AUDIT_MODEL_ID</localcolumn>
+          <targettable>ALF_AUDIT_MODEL</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_AUD_APP_DIS">
+          <localcolumn>DISABLED_PATHS_ID</localcolumn>
+          <targettable>ALF_PROP_ROOT</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_AUD_APP_AN">
+          <localcolumn>APP_NAME_ID</localcolumn>
+          <targettable>ALF_PROP_VALUE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="IDX_ALF_AUD_APP_AN" unique="true">
+          <columnnames>
+            <columnname>APP_NAME_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153622230" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_AUD_APP_DIS" unique="false">
+          <columnnames>
+            <columnname>DISABLED_PATHS_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_AUD_APP_MOD" unique="false">
+          <columnnames>
+            <columnname>AUDIT_MODEL_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_AUDIT_ENTRY">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="AUDIT_APP_ID" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_TIME" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_USER_ID" order="4">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_VALUES_ID" order="5">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153623260">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_AUD_ENT_APP">
+          <localcolumn>AUDIT_APP_ID</localcolumn>
+          <targettable>ALF_AUDIT_APP</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_AUD_ENT_PRO">
+          <localcolumn>AUDIT_VALUES_ID</localcolumn>
+          <targettable>ALF_PROP_ROOT</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_AUD_ENT_USE">
+          <localcolumn>AUDIT_USER_ID</localcolumn>
+          <targettable>ALF_PROP_VALUE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL120116153622970" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_AUD_ENT_APP" unique="false">
+          <columnnames>
+            <columnname>AUDIT_APP_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_AUD_ENT_PRO" unique="false">
+          <columnnames>
+            <columnname>AUDIT_VALUES_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_AUD_ENT_USE" unique="false">
+          <columnnames>
+            <columnname>AUDIT_USER_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_AUD_ENT_TM" unique="false">
+          <columnnames>
+            <columnname>AUDIT_TIME</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_AUDIT_MODEL">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="CONTENT_DATA_ID" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_CRC" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153621830">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_AUD_MOD_CD">
+          <localcolumn>CONTENT_DATA_ID</localcolumn>
+          <targettable>ALF_CONTENT_DATA</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="IDX_ALF_AUD_MOD_CR" unique="true">
+          <columnnames>
+            <columnname>CONTENT_CRC</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153621560" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_AUD_MOD_CD" unique="false">
+          <columnnames>
+            <columnname>CONTENT_DATA_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_AUTHORITY">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUTHORITY" order="3">
+          <type>varchar(400)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CRC" order="4">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153557930">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="AUTHORITY" unique="true">
+          <columnnames>
+            <columnname>AUTHORITY</columnname>
+            <columnname>CRC</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153556990" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_AUTH_AUT" unique="false">
+          <columnnames>
+            <columnname>AUTHORITY</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_AUTHORITY_ALIAS">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUTH_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ALIAS_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153602120">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_AUTHA_AUT">
+          <localcolumn>AUTH_ID</localcolumn>
+          <targettable>ALF_AUTHORITY</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_AUTHA_ALI">
+          <localcolumn>ALIAS_ID</localcolumn>
+          <targettable>ALF_AUTHORITY</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="AUTH_ID" unique="true">
+          <columnnames>
+            <columnname>AUTH_ID</columnname>
+            <columnname>ALIAS_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153601770" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_AUTHA_ALI" unique="false">
+          <columnnames>
+            <columnname>ALIAS_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_AUTHA_AUT" unique="false">
+          <columnnames>
+            <columnname>AUTH_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_CHILD_ASSOC">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="PARENT_NODE_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TYPE_QNAME_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CHILD_NODE_NAME_CRC" order="5">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CHILD_NODE_NAME" order="6">
+          <type>varchar(200)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CHILD_NODE_ID" order="7">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="QNAME_NS_ID" order="8">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="QNAME_LOCALNAME" order="9">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="QNAME_CRC" order="10">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="IS_PRIMARY" order="11">
+          <type>smallint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ASSOC_INDEX" order="12">
+          <type>integer</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153606200">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_CASS_QNNS">
+          <localcolumn>QNAME_NS_ID</localcolumn>
+          <targettable>ALF_NAMESPACE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_CASS_CNODE">
+          <localcolumn>CHILD_NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_CASS_PNODE">
+          <localcolumn>PARENT_NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_CASS_TQN">
+          <localcolumn>TYPE_QNAME_ID</localcolumn>
+          <targettable>ALF_QNAME</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="PARENT_NODE_ID" unique="true">
+          <columnnames>
+            <columnname>PARENT_NODE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>CHILD_NODE_NAME_CRC</columnname>
+            <columnname>CHILD_NODE_NAME</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153605850" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_CASS_CNODE" unique="false">
+          <columnnames>
+            <columnname>CHILD_NODE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_CASS_PNODE" unique="false">
+          <columnnames>
+            <columnname>PARENT_NODE_ID</columnname>
+            <columnname>ASSOC_INDEX</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_CASS_QNNS" unique="false">
+          <columnnames>
+            <columnname>QNAME_NS_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_CASS_TQN" unique="false">
+          <columnnames>
+            <columnname>TYPE_QNAME_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_CASS_PRI" unique="false">
+          <columnnames>
+            <columnname>PARENT_NODE_ID</columnname>
+            <columnname>IS_PRIMARY</columnname>
+            <columnname>CHILD_NODE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_CASS_QNCRC" unique="false">
+          <columnnames>
+            <columnname>QNAME_CRC</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>PARENT_NODE_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_CONTENT_DATA">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_URL_ID" order="3">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_MIMETYPE_ID" order="4">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_ENCODING_ID" order="5">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_LOCALE_ID" order="6">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153614060">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_CONT_URL">
+          <localcolumn>CONTENT_URL_ID</localcolumn>
+          <targettable>ALF_CONTENT_URL</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_CONT_ENC">
+          <localcolumn>CONTENT_ENCODING_ID</localcolumn>
+          <targettable>ALF_ENCODING</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_CONT_LOC">
+          <localcolumn>CONTENT_LOCALE_ID</localcolumn>
+          <targettable>ALF_LOCALE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_CONT_MIM">
+          <localcolumn>CONTENT_MIMETYPE_ID</localcolumn>
+          <targettable>ALF_MIMETYPE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL120116153613570" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_CONT_ENC" unique="false">
+          <columnnames>
+            <columnname>CONTENT_ENCODING_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_CONT_LOC" unique="false">
+          <columnnames>
+            <columnname>CONTENT_LOCALE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_CONT_MIM" unique="false">
+          <columnnames>
+            <columnname>CONTENT_MIMETYPE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_CONT_URL" unique="false">
+          <columnnames>
+            <columnname>CONTENT_URL_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_CONTENT_URL">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="CONTENT_URL" order="2">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_URL_SHORT" order="3">
+          <type>varchar(48)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_URL_CRC" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_SIZE" order="5">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ORPHAN_TIME" order="6">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153613180">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="IDX_ALF_CONTURL_CR" unique="true">
+          <columnnames>
+            <columnname>CONTENT_URL_SHORT</columnname>
+            <columnname>CONTENT_URL_CRC</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153612910" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_CONTURL_OT" unique="false">
+          <columnnames>
+            <columnname>ORPHAN_TIME</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_CONTURL_SZ" unique="false">
+          <columnnames>
+            <columnname>CONTENT_SIZE</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_CONTENT_URL_ENCRYPTION">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="CONTENT_URL_ID" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ALGORITHM" order="3">
+          <type>varchar(10)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="KEY_SIZE" order="4">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ENCRYPTED_KEY" order="5">
+          <type>blob(1048576)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="MASTER_KEYSTORE_ID" order="6">
+          <type>varchar(20)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="MASTER_KEY_ALIAS" order="7">
+          <type>varchar(15)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="UNENCRYPTED_FILE_SIZE" order="8">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL141202162028990">
+         <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_CONT_ENC_URL">
+          <localcolumn>CONTENT_URL_ID</localcolumn>
+          <targettable>ALF_CONTENT_URL</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL141202162028790" unique="true">
+         <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_CONT_ENC_URL" unique="true">
+          <columnnames>
+            <columnname>CONTENT_URL_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_CONT_ENC_MKA" unique="false">
+          <columnnames>
+            <columnname>MASTER_KEY_ALIAS</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_ENCODING">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ENCODING_STR" order="3">
+          <type>varchar(400)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153612550">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153612250" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120120145948920" unique="true">
+          <!-- This index is a consequence of an anonymous UNIQUE constraint and should be ignored. -->
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.IgnoreObjectValidator"/>
+          </validators>
+          <columnnames>
+            <columnname>ENCODING_STR</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_LOCALE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LOCALE_STR" order="3">
+          <type>varchar(80)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153554040">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="LOCALE_STR" unique="true">
+          <columnnames>
+            <columnname>LOCALE_STR</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153553690" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_LOCK">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="SHARED_RESOURCE_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="EXCL_RESOURCE_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LOCK_TOKEN" order="5">
+          <type>varchar(144)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="START_TIME" order="6">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="EXPIRY_TIME" order="7">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153611310">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_LOCK_SHARED">
+          <localcolumn>SHARED_RESOURCE_ID</localcolumn>
+          <targettable>ALF_LOCK_RESOURCE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_LOCK_EXCL">
+          <localcolumn>EXCL_RESOURCE_ID</localcolumn>
+          <targettable>ALF_LOCK_RESOURCE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="IDX_ALF_LOCK_KEY" unique="true">
+          <columnnames>
+            <columnname>SHARED_RESOURCE_ID</columnname>
+            <columnname>EXCL_RESOURCE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153610910" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_LOCK_EXCL" unique="false">
+          <columnnames>
+            <columnname>EXCL_RESOURCE_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_LOCK_RESOURCE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="QNAME_NS_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="QNAME_LOCALNAME" order="4">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153610600">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_LOCKR_NS">
+          <localcolumn>QNAME_NS_ID</localcolumn>
+          <targettable>ALF_NAMESPACE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="IDX_ALF_LOCKR_KEY" unique="true">
+          <columnnames>
+            <columnname>QNAME_NS_ID</columnname>
+            <columnname>QNAME_LOCALNAME</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153610260" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_MIMETYPE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="MIMETYPE_STR" order="3">
+          <type>varchar(400)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153611920">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153611660" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120126114232660" unique="true">
+          <!-- This index is a consequence of an anonymous UNIQUE constraint and should be ignored. -->
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.IgnoreObjectValidator"/>
+          </validators>
+          <columnnames>
+            <columnname>MIMETYPE_STR</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_NAMESPACE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="URI" order="3">
+          <type>varchar(400)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153554570">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="URI" unique="true">
+          <columnnames>
+            <columnname>URI</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153554310" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_NODE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="STORE_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="UUID" order="4">
+          <type>varchar(144)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TRANSACTION_ID" order="5">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TYPE_QNAME_ID" order="6">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LOCALE_ID" order="7">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACL_ID" order="8">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_CREATOR" order="9">
+          <type>varchar(1020)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_CREATED" order="10">
+          <type>varchar(120)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_MODIFIER" order="11">
+          <type>varchar(1020)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_MODIFIED" order="12">
+          <type>varchar(120)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="AUDIT_ACCESSED" order="13">
+          <type>varchar(120)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153604800">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_NODE_ACL">
+          <localcolumn>ACL_ID</localcolumn>
+          <targettable>ALF_ACCESS_CONTROL_LIST</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NODE_LOC">
+          <localcolumn>LOCALE_ID</localcolumn>
+          <targettable>ALF_LOCALE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NODE_TQN">
+          <localcolumn>TYPE_QNAME_ID</localcolumn>
+          <targettable>ALF_QNAME</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NODE_STORE">
+          <localcolumn>STORE_ID</localcolumn>
+          <targettable>ALF_STORE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NODE_TXN">
+          <localcolumn>TRANSACTION_ID</localcolumn>
+          <targettable>ALF_TRANSACTION</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="STORE_ID" unique="true">
+          <columnnames>
+            <columnname>STORE_ID</columnname>
+            <columnname>UUID</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153604540" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NODE_ACL" unique="false">
+          <columnnames>
+            <columnname>ACL_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NODE_LOC" unique="false">
+          <columnnames>
+            <columnname>LOCALE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NODE_STORE" unique="false">
+          <columnnames>
+            <columnname>STORE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NODE_TQN" unique="false">
+          <columnnames>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>STORE_ID</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NODE_TXN_TYPE" unique="false">
+          <columnnames>
+            <columnname>TRANSACTION_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NODE_MDQ" unique="false">
+          <columnnames>
+            <columnname>STORE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NODE_COR" unique="false">
+          <columnnames>
+            <columnname>AUDIT_CREATOR</columnname>
+            <columnname>STORE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NODE_CRD" unique="false">
+          <columnnames>
+            <columnname>AUDIT_CREATED</columnname>
+            <columnname>STORE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NODE_MOR" unique="false">
+          <columnnames>
+            <columnname>AUDIT_MODIFIER</columnname>
+            <columnname>STORE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NODE_MOD" unique="false">
+          <columnnames>
+            <columnname>AUDIT_MODIFIED</columnname>
+            <columnname>STORE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_NODE_ASPECTS">
+      <columns>
+        <column name="NODE_ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="QNAME_ID" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153607160">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">NODE_ID</columnname>
+          <columnname order="2">QNAME_ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_NASP_N">
+          <localcolumn>NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NASP_QN">
+          <localcolumn>QNAME_ID</localcolumn>
+          <targettable>ALF_QNAME</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL120116153606910" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>NODE_ID</columnname>
+            <columnname>QNAME_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NASP_N" unique="false">
+          <columnnames>
+            <columnname>NODE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NASP_QN" unique="false">
+          <columnnames>
+            <columnname>QNAME_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_NODE_ASSOC">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="SOURCE_NODE_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TARGET_NODE_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TYPE_QNAME_ID" order="5">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ASSOC_INDEX" order="6">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153607830">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_NASS_SNODE">
+          <localcolumn>SOURCE_NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NASS_TNODE">
+          <localcolumn>TARGET_NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NASS_TQN">
+          <localcolumn>TYPE_QNAME_ID</localcolumn>
+          <targettable>ALF_QNAME</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SOURCE_NODE_ID" unique="true">
+          <columnnames>
+            <columnname>SOURCE_NODE_ID</columnname>
+            <columnname>TARGET_NODE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153607570" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NASS_SNODE" unique="false">
+          <columnnames>
+            <columnname>SOURCE_NODE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>ASSOC_INDEX</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NASS_TNODE" unique="false">
+          <columnnames>
+            <columnname>TARGET_NODE_ID</columnname>
+            <columnname>TYPE_QNAME_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NASS_TQN" unique="false">
+          <columnnames>
+            <columnname>TYPE_QNAME_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_NODE_PROPERTIES">
+      <columns>
+        <column name="NODE_ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ACTUAL_TYPE_N" order="2">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="PERSISTED_TYPE_N" order="3">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="BOOLEAN_VALUE" order="4">
+          <type>smallint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LONG_VALUE" order="5">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="FLOAT_VALUE" order="6">
+          <type>double</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="DOUBLE_VALUE" order="7">
+          <type>double</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="STRING_VALUE" order="8">
+          <type>varchar(4096)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="SERIALIZABLE_VALUE" order="9">
+          <type>blob(1048576)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="QNAME_ID" order="10">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LIST_INDEX" order="11">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LOCALE_ID" order="12">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153609810">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">NODE_ID</columnname>
+          <columnname order="2">QNAME_ID</columnname>
+          <columnname order="3">LIST_INDEX</columnname>
+          <columnname order="4">LOCALE_ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_NPROP_LOC">
+          <localcolumn>LOCALE_ID</localcolumn>
+          <targettable>ALF_LOCALE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NPROP_N">
+          <localcolumn>NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_NPROP_QN">
+          <localcolumn>QNAME_ID</localcolumn>
+          <targettable>ALF_QNAME</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL120116153609540" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>NODE_ID</columnname>
+            <columnname>QNAME_ID</columnname>
+            <columnname>LIST_INDEX</columnname>
+            <columnname>LOCALE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NPROP_LOC" unique="false">
+          <columnnames>
+            <columnname>LOCALE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NPROP_N" unique="false">
+          <columnnames>
+            <columnname>NODE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_NPROP_QN" unique="false">
+          <columnnames>
+            <columnname>QNAME_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NPROP_S" unique="false">
+          <columnnames>
+            <columnname>QNAME_ID</columnname>
+            <columnname>STRING_VALUE</columnname>
+            <columnname>NODE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_NPROP_L" unique="false">
+          <columnnames>
+            <columnname>QNAME_ID</columnname>
+            <columnname>LONG_VALUE</columnname>
+            <columnname>NODE_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PERMISSION">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TYPE_QNAME_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="NAME" order="4">
+          <type>varchar(400)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153555990">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_PERM_TQN">
+          <localcolumn>TYPE_QNAME_ID</localcolumn>
+          <targettable>ALF_QNAME</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="TYPE_QNAME_ID" unique="true">
+          <columnnames>
+            <columnname>TYPE_QNAME_ID</columnname>
+            <columnname>NAME</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153555640" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_PERM_TQN" unique="false">
+          <columnnames>
+            <columnname>TYPE_QNAME_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_CLASS">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="JAVA_CLASS_NAME" order="2">
+          <type>varchar(1020)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="JAVA_CLASS_NAME_SHORT" order="3">
+          <type>varchar(128)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="JAVA_CLASS_NAME_CRC" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153614830">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="IDX_ALF_PROPC_CRC" unique="true">
+          <columnnames>
+            <columnname>JAVA_CLASS_NAME_CRC</columnname>
+            <columnname>JAVA_CLASS_NAME_SHORT</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153614580" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_PROPC_CLAS" unique="false">
+          <columnnames>
+            <columnname>JAVA_CLASS_NAME</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_DATE_VALUE">
+      <columns>
+        <column name="DATE_VALUE" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="FULL_YEAR" order="2">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="HALF_OF_YEAR" order="3">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="QUARTER_OF_YEAR" order="4">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="MONTH_OF_YEAR" order="5">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="WEEK_OF_YEAR" order="6">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="WEEK_OF_MONTH" order="7">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="DAY_OF_YEAR" order="8">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="DAY_OF_MONTH" order="9">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="DAY_OF_WEEK" order="10">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153615480">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">DATE_VALUE</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153615210" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>DATE_VALUE</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_PROPDT_DT" unique="false">
+          <columnnames>
+            <columnname>FULL_YEAR</columnname>
+            <columnname>MONTH_OF_YEAR</columnname>
+            <columnname>DAY_OF_MONTH</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_DOUBLE_VALUE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="DOUBLE_VALUE" order="2">
+          <type>double</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153616150">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="IDX_ALF_PROPD_VAL" unique="true">
+          <columnnames>
+            <columnname>DOUBLE_VALUE</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153615800" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_LINK">
+      <columns>
+        <column name="ROOT_PROP_ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="PROP_INDEX" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTAINED_IN" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="KEY_PROP_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="VALUE_PROP_ID" order="5">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153620290">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ROOT_PROP_ID</columnname>
+          <columnname order="2">CONTAINED_IN</columnname>
+          <columnname order="3">PROP_INDEX</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_PROPLN_ROOT">
+          <localcolumn>ROOT_PROP_ID</localcolumn>
+          <targettable>ALF_PROP_ROOT</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_PROPLN_KEY">
+          <localcolumn>KEY_PROP_ID</localcolumn>
+          <targettable>ALF_PROP_VALUE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_PROPLN_VAL">
+          <localcolumn>VALUE_PROP_ID</localcolumn>
+          <targettable>ALF_PROP_VALUE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL120116153620020" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ROOT_PROP_ID</columnname>
+            <columnname>CONTAINED_IN</columnname>
+            <columnname>PROP_INDEX</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_PROPLN_KEY" unique="false">
+          <columnnames>
+            <columnname>KEY_PROP_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_PROPLN_VAL" unique="false">
+          <columnnames>
+            <columnname>VALUE_PROP_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_PROPLN_FOR" unique="false">
+          <columnnames>
+            <columnname>ROOT_PROP_ID</columnname>
+            <columnname>KEY_PROP_ID</columnname>
+            <columnname>VALUE_PROP_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_ROOT">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153619700">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153619430" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_SERIALIZABLE_VALUE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="SERIALIZABLE_VALUE" order="2">
+          <type>blob(1048576)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153618530">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="SQL120116153618270" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_STRING_VALUE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="STRING_VALUE" order="2">
+          <type>varchar(4096)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="STRING_END_LOWER" order="3">
+          <type>varchar(128)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="STRING_CRC" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153616730">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="IDX_ALF_PROPS_CRC" unique="true">
+          <columnnames>
+            <columnname>STRING_END_LOWER</columnname>
+            <columnname>STRING_CRC</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153616440" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_PROPS_STR" unique="false">
+          <columnnames>
+            <columnname>STRING_VALUE</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_UNIQUE_CTX">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>integer</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="VALUE1_PROP_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="VALUE2_PROP_ID" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="VALUE3_PROP_ID" order="5">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="PROP1_ID" order="6">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153620970">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_PROPUCTX_P1">
+          <localcolumn>PROP1_ID</localcolumn>
+          <targettable>ALF_PROP_ROOT</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_PROPUCTX_V1">
+          <localcolumn>VALUE1_PROP_ID</localcolumn>
+          <targettable>ALF_PROP_VALUE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_PROPUCTX_V2">
+          <localcolumn>VALUE2_PROP_ID</localcolumn>
+          <targettable>ALF_PROP_VALUE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_PROPUCTX_V3">
+          <localcolumn>VALUE3_PROP_ID</localcolumn>
+          <targettable>ALF_PROP_VALUE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="IDX_ALF_PROPUCTX" unique="true">
+          <columnnames>
+            <columnname>VALUE1_PROP_ID</columnname>
+            <columnname>VALUE2_PROP_ID</columnname>
+            <columnname>VALUE3_PROP_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153620740" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_PROPUCTX_P1" unique="false">
+          <columnnames>
+            <columnname>PROP1_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_PROPUCTX_V2" unique="false">
+          <columnnames>
+            <columnname>VALUE2_PROP_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_PROPUCTX_V3" unique="false">
+          <columnnames>
+            <columnname>VALUE3_PROP_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_PROP_VALUE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="ACTUAL_TYPE_ID" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="PERSISTED_TYPE" order="3">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LONG_VALUE" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153619070">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="IDX_ALF_PROPV_ACT" unique="true">
+          <columnnames>
+            <columnname>ACTUAL_TYPE_ID</columnname>
+            <columnname>LONG_VALUE</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153618800" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_PROPV_PER" unique="false">
+          <columnnames>
+            <columnname>PERSISTED_TYPE</columnname>
+            <columnname>LONG_VALUE</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_QNAME">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="NS_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="LOCAL_NAME" order="4">
+          <type>varchar(800)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153555160">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_QNAME_NS">
+          <localcolumn>NS_ID</localcolumn>
+          <targettable>ALF_NAMESPACE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="NS_ID" unique="true">
+          <columnnames>
+            <columnname>NS_ID</columnname>
+            <columnname>LOCAL_NAME</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153554900" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        </indexes>
+    </table>
+    <table name="ALF_SERVER">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="IP_ADDRESS" order="3">
+          <type>varchar(156)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153602860">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+      <indexes>
+        <index name="IP_ADDRESS" unique="true">
+          <columnnames>
+            <columnname>IP_ADDRESS</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153602590" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_STORE">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="PROTOCOL" order="3">
+          <type>varchar(200)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="IDENTIFIER" order="4">
+          <type>varchar(400)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ROOT_NODE_ID" order="5">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153604190">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_STORE_ROOT">
+          <localcolumn>ROOT_NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="PROTOCOL" unique="true">
+          <columnnames>
+            <columnname>PROTOCOL</columnname>
+            <columnname>IDENTIFIER</columnname>
+          </columnnames>
+        </index>
+        <index name="SQL120116153603810" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_STORE_ROOT" unique="false">
+          <columnnames>
+            <columnname>ROOT_NODE_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_SUBSCRIPTIONS">
+      <columns>
+        <column name="USER_NODE_ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="NODE_ID" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153637330">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">USER_NODE_ID</columnname>
+          <columnname order="2">NODE_ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_SUB_USER">
+          <localcolumn>USER_NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+        <foreignkey name="FK_ALF_SUB_NODE">
+          <localcolumn>NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL120116153636980" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>USER_NODE_ID</columnname>
+            <columnname>NODE_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_SUB_NODE" unique="false">
+          <columnnames>
+            <columnname>NODE_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_TENANT">
+      <columns>
+        <column name="TENANT_DOMAIN" order="1">
+          <type>varchar(75)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="ENABLED" order="3">
+          <type>smallint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="TENANT_NAME" order="4">
+          <type>varchar(75)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CONTENT_ROOT" order="5">
+          <type>varchar(255)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="DB_URL" order="6">
+          <type>varchar(255)</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120503170625590">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">TENANT_DOMAIN</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys/>
+	  <indexes>
+	    <index name="SQL120525162428480" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>TENANT_DOMAIN</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_TRANSACTION">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="SERVER_ID" order="3">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="CHANGE_TXN_ID" order="4">
+          <type>varchar(224)</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="COMMIT_TIME_MS" order="5">
+          <type>bigint</type>
+          <nullable>true</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153603440">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_TXN_SVR">
+          <localcolumn>SERVER_ID</localcolumn>
+          <targettable>ALF_SERVER</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL120116153603170" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_TXN_SVR" unique="false">
+          <columnnames>
+            <columnname>SERVER_ID</columnname>
+          </columnnames>
+        </index>
+        <index name="IDX_ALF_TXN_CTMS" unique="false">
+          <columnnames>
+            <columnname>COMMIT_TIME_MS</columnname>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+    <table name="ALF_USAGE_DELTA">
+      <columns>
+        <column name="ID" order="1">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>true</autoincrement>
+        </column>
+        <column name="VERSION" order="2">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="NODE_ID" order="3">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+        <column name="DELTA_SIZE" order="4">
+          <type>bigint</type>
+          <nullable>false</nullable>
+          <autoincrement>false</autoincrement>
+        </column>
+      </columns>
+      <primarykey name="SQL120116153636580">
+        <validators>
+          <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+            <properties>
+              <property name="pattern">SQL[0-9]+</property>
+            </properties>
+          </validator>
+        </validators>
+        <columnnames>
+          <columnname order="1">ID</columnname>
+        </columnnames>
+      </primarykey>
+      <foreignkeys>
+        <foreignkey name="FK_ALF_USAGED_N">
+          <localcolumn>NODE_ID</localcolumn>
+          <targettable>ALF_NODE</targettable>
+          <targetcolumn>ID</targetcolumn>
+        </foreignkey>
+      </foreignkeys>
+      <indexes>
+        <index name="SQL120116153636200" unique="true">
+          <validators>
+            <validator class="org.alfresco.util.schemacomp.validator.NameValidator">
+              <properties>
+                <property name="pattern">SQL[0-9]+</property>
+              </properties>
+            </validator>
+          </validators>
+          <columnnames>
+            <columnname>ID</columnname>
+          </columnnames>
+        </index>
+        <index name="FK_ALF_USAGED_N" unique="false">
+          <columnnames>
+            <columnname>NODE_ID</columnname>
+          </columnnames>
+        </index>
+      </indexes>
+    </table>
+  </objects>
+</schema>

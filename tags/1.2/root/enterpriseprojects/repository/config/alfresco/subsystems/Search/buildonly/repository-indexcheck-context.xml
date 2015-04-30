@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <!-- Index Check service (note: also implements script API) -->
+   <bean id="search.admIndexCheckService" class="org.alfresco.enterprise.repo.admin.indexcheck.ADMIndexCheckServiceImpl" parent="baseJavaScriptExtension">
+      <property name="nodeDAO" ref="nodeDAO"/>
+      <property name="indexTransactionTracker" ref="search.admIndexTrackerComponent"/>
+      <property name="searcher" ref="SearchService"/>
+      
+      <property name="extensionName">
+         <value>admIndexCheckService</value>
+      </property>
+   </bean>
+   
+</beans>

@@ -1,0 +1,29 @@
+<webscript>
+   <shortname>GET SyncSet Manifest (SyncSetDef IDs)</shortname>
+   <description>
+   <![CDATA[
+   Web Script that returns a SyncSet Manifest (list of SSD ids) for the specified sourceRepoId ... 
+   for any SSD that have outstanding sync changes (in the sync audit change log).
+   <p/>
+   The request body will be of the form:
+   <pre>
+   GET .../sync/syncsetmanifest?srcRepoId=9319d5a3-03c1-4f86-8b44-f8516ff91820&maxItems=1024
+   </pre>
+   <p/>
+   The response body will be of the form:
+   <pre>
+   [
+      "bd9c79fd-dcac-4af9-a1a5-8d3e490ab7c9",
+      "b171e2f7-fb9d-46a9-822b-b6599886101f",
+      "235a3817-76a7-4417-8953-1b7d206f4579",
+      "b23edfe8-be7b-4413-87df-3557290fe3d6"
+   ]
+   </pre>
+   ]]>
+   </description>
+   <url>/enterprise/sync/syncsetmanifest?srcRepoId={srcRepoId}&amp;maxItems={maxItems?}</url>
+   <format default="json">argument</format>
+   <authentication>none</authentication>
+   <transaction allow="readonly">required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

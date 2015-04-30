@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>Cloud SAML SP LogoutRequest</shortname>
+   <description>SAML - SP - LogoutRequest</description>
+   <url>/cloud/core/components/saml/sp-logoutrequest</url>
+</webscript>

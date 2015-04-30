@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<samlp:Response Destination="http://localhost:8081/share/openam.test/saml/authnresponse" ID="s2fa01349d0d6f3ff8cdcac29eb386b28c9c2bccf5" IssueInstant="2013-01-23T16:54:24Z" Version="2.0" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://www.myopenam.com:9080/opensso</saml:Issuer>
+<samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"></samlp:StatusCode>
+</samlp:Status>
+<saml:Assertion ID="s261bfb1eec470fa0d50d02e6701c54d8a19d8cc8e" IssueInstant="2013-01-23T16:54:24Z" Version="2.0" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+<saml:Issuer>http://www.myopenam.com:9080/opensso</saml:Issuer>
+<saml:Subject>
+<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="http://www.myopenam.com:9080/opensso">xoVxpCIKrPZfyQvQRwMJkBSJ8CPu</saml:NameID>
+<saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+<saml:SubjectConfirmationData NotOnOrAfter="2013-01-23T17:04:24Z" Recipient="http://localhost:8081/share/openam.test/saml/authnresponse"/>
+</saml:SubjectConfirmation>
+</saml:Subject>
+<saml:Conditions NotBefore="2013-01-22T16:44:24Z" NotOnOrAfter="2013-01-23T17:04:24Z">
+<saml:AudienceRestriction>
+<saml:Audience>my.alfresco.com-openam.test</saml:Audience>
+</saml:AudienceRestriction>
+</saml:Conditions>
+<saml:AuthnStatement AuthnInstant="2013-01-23T16:54:24Z" SessionIndex="s2a8886a3ff01eb5c2fc8705291d99a28fdaffbc01">
+<saml:AuthnContext>
+<saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef>
+</saml:AuthnContext>
+</saml:AuthnStatement>
+</saml:Assertion>
+</samlp:Response>

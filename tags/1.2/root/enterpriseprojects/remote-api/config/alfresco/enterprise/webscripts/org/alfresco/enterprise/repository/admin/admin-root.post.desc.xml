@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - root POST webscript</shortname>
+   <description><![CDATA[Admin Console WebScript that persists POSTed mbean attribute values.]]></description>
+   <url>/enterprise/admin?t={tool?}&amp;debug={debug?}</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction>required</transaction>
+</webscript>

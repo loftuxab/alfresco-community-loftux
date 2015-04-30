@@ -1,0 +1,16 @@
+<webscript>
+   <shortname>DELETE user as Network Admin (demotion)</shortname>
+   <description><![CDATA[
+   Demotes a user as a NetworkAdmin on a Tenant.
+   <p/>
+   The username must already exist or a 404 will be returned.
+   If the user is not a NetworkAdmin, nothing will happen and a 200 will be returned.
+   The user cannot be the last remaining NetworkAdmin on that tenant or a 403 will be returned.
+   ]]>
+   </description>
+   <url>/internal/cloud/accounts/{id}/networkadmins/{username}</url>
+   <url>/internal/cloud/domains/{domainName}/account/networkadmins/{username}</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>

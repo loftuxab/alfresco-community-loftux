@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>ADM Index Check</shortname>
+  <description>Check index txn ids and (optionally) reindex (on this server)</description>
+  <url>/enterprise/admin/indexcheck</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

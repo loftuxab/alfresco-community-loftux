@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - Edit Directory: Passthru</shortname>
+   <description><![CDATA[Admin Console WebScript that displays the Passthru authentication page.]]></description>
+   <url>/enterprise/admin/admin-authentication-passthru?id={id}</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

@@ -1,0 +1,10 @@
+<webscript>
+   <shortname>Admin Console - Repository Server Clustering</shortname>
+   <description><![CDATA[Admin Console WebScript to Administer and test cluster nodes.]]></description>
+   <url>/enterprise/admin/admin-clustering</url>
+   <family>AdminConsole</family>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Admin Console - Apply New License POST method</shortname>
+   <description><![CDATA[Admin Console POST WebScript that applies a new license.]]></description>
+   <url>/enterprise/admin/admin-license-apply</url>
+   <format default="json" />
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

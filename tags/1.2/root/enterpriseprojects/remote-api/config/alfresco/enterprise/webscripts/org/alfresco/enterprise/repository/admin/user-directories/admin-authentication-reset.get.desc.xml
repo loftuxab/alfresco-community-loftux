@@ -1,0 +1,8 @@
+<webscript>
+   <shortname>Admin Console - Authentication Reset</shortname>
+   <description><![CDATA[Admin Console WebScript that display a Form to reset an Authentication Subsystem.]]></description>
+   <url>/enterprise/admin/admin-authentication-reset?authenticatorName={authenticator}</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>

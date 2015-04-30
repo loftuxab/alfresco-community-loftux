@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <!-- Parent bean for all account type beans -->
+    <bean id="baseAccountType" abstract="true" init-method="init">
+        <property name="accountRegistry" ref="accountRegistry"/>
+    </bean>
+    
+    
+    <!-- Free Account Definition - public email domain e.g. gmail.com-->
+    <bean id="publicEmailDomainType" parent="baseAccountType" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountType">
+        <property name="accountClass" ref="publicEmailDomainClass" />
+        <property name="id" value="-1"/>
+        <!-- Public users should be unable to upload content or create sites in their home accounts -->
+        <property name="fileQuota" value="0" />
+        <property name="siteCountQuota" value="0" />
+        <property name="personCountQuota" value="-1" />
+        <property name="personIntOnlyCountQuota" value="-1" />
+        <property name="personNetworkAdminCountQuota" value="0" />
+        <property name="subscriptionLevel" value="Free" />
+    </bean>
+    
+    
+    <!-- Free Account Definition - private email domain e.g. alfresco.com-->
+    <bean id="privateEmailDomainType" parent="baseAccountType" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountType">
+        <property name="accountClass" ref="privateEmailDomainClass" />
+        <property name="id" value="0"/>
+        <property name="fileUploadQuota" value="52428800" />        <!-- 50 Mb -->
+        <property name="fileQuota" value="10737418240" />           <!-- 10 Gb = 10 * 1073741824 bytes -->
+        <property name="siteCountQuota" value="-1" />
+        <property name="personCountQuota" value="-1" />
+        <property name="personIntOnlyCountQuota" value="-1" />
+        <property name="personNetworkAdminCountQuota" value="0" />
+        <property name="subscriptionLevel" value="Free" />
+    </bean>
+    
+    
+    <!--                                    -->
+    <!-- On-premise subscriber Accounts     -->
+    <!--                                    -->
+    
+    <bean id="standardCustomerNetworkBusinessDomainType" parent="baseAccountType" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountType">
+        <property name="accountClass" ref="businessClass" />
+        <property name="id" value="102"/>
+        <property name="fileUploadQuota" value="2147483648" />      <!-- 2 Gb = 2 * 1073741824 bytes -->
+        <property name="fileQuota" value="26843545600" />           <!-- 25 Gb = 10 * 1073741824 bytes -->
+        <property name="siteCountQuota" value="-1" />
+        <property name="personCountQuota" value="-1" />
+        <property name="personIntOnlyCountQuota" value="-1" />
+        <property name="personNetworkAdminCountQuota" value="-1" />
+        <property name="subscriptionLevel" value="Standard" />
+    </bean>
+
+    <bean id="enterpriseCustomerNetworkBusinessDomainType" parent="baseAccountType" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountType">
+        <property name="accountClass" ref="businessClass" />
+        <property name="id" value="103"/>
+        <property name="fileUploadQuota" value="2147483648" />      <!-- 2 Gb = 2 * 1073741824 bytes -->
+        <property name="fileQuota" value="26843545600" />           <!-- 25 Gb = 10 * 1073741824 bytes -->
+        <property name="siteCountQuota" value="-1" />
+        <property name="personCountQuota" value="-1" />
+        <property name="personIntOnlyCountQuota" value="-1" />
+        <property name="personNetworkAdminCountQuota" value="-1" />
+        <property name="subscriptionLevel" value="Standard" />
+    </bean>
+    
+    <!--                          -->
+    <!-- Standard Cloud Accounts  -->
+    <!--                          -->
+    
+    <bean id="standardNetworkBusinessDomainType" parent="baseAccountType" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountType">
+        <property name="accountClass" ref="businessClass" />
+        <property name="id" value="100"/>
+        <property name="fileUploadQuota" value="2147483648" />      <!-- 2 Gb = 2 * 1073741824 bytes -->
+        <property name="fileQuota" value="26843545600" />           <!-- 25 Gb = 10 * 1073741824 bytes -->
+        <property name="siteCountQuota" value="-1" />
+        <property name="personCountQuota" value="-1" />
+        <property name="personIntOnlyCountQuota" value="-1" />
+        <property name="personNetworkAdminCountQuota" value="-1" />
+        <property name="subscriptionLevel" value="Standard" />
+    </bean>
+
+    <bean id="partnerNetworkBusinessDomainType" parent="baseAccountType" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountType">
+        <property name="accountClass" ref="businessClass" />
+        <property name="id" value="101"/>
+        <property name="fileUploadQuota" value="2147483648" />      <!-- 2 Gb = 2 * 1073741824 bytes -->
+        <property name="fileQuota" value="26843545600" />           <!-- 25 Gb = 10 * 1073741824 bytes -->
+        <property name="siteCountQuota" value="-1" />
+        <property name="personCountQuota" value="-1" />
+        <property name="personIntOnlyCountQuota" value="-1" />
+        <property name="personNetworkAdminCountQuota" value="-1" />
+        <property name="subscriptionLevel" value="Standard" />
+    </bean>
+
+    <!--                             -->
+    <!-- Enterprise Cloud Accounts   -->
+    <!--                             -->
+    
+    <bean id="enterpriseNetworkBusinessDomainType" parent="baseAccountType" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountType">
+        <property name="accountClass" ref="businessClass" />
+        <property name="id" value="1000"/>
+        <property name="fileUploadQuota" value="2147483648" />      <!-- 2 Gb = 2 * 1073741824 bytes -->
+        <property name="fileQuota" value="1073741824000" />         <!-- 1 Tb = 1000 * 1073741824 bytes -->
+        <property name="siteCountQuota" value="-1" />
+        <property name="personCountQuota" value="-1" />
+        <property name="personIntOnlyCountQuota" value="-1" />
+        <property name="personNetworkAdminCountQuota" value="-1" />
+        <property name="subscriptionLevel" value="Enterprise" />
+    </bean>
+    
+    <bean id="trialEnterpriseNetworkBusinessDomainType" parent="baseAccountType" class="org.alfresco.module.org_alfresco_module_cloud.accounts.AccountType">
+        <property name="accountClass" ref="businessClass" />
+        <property name="id" value="1001"/>
+        <property name="fileUploadQuota" value="2147483648" />      <!-- 2 Gb = 2 * 1073741824 bytes -->
+        <property name="fileQuota" value="10737418240" />           <!-- 10 Gb = 10 * 1073741824 bytes -->
+        <property name="siteCountQuota" value="-1" />
+        <property name="personCountQuota" value="-1" />
+        <property name="personIntOnlyCountQuota" value="-1" />
+        <property name="personNetworkAdminCountQuota" value="-1" />
+        <property name="subscriptionLevel" value="Enterprise" />
+    </bean>
+
+</beans>

@@ -1,0 +1,10 @@
+<webscript>
+   <shortname>Admin Console - Activities Feed</shortname>
+   <description><![CDATA[Admin Console WebScript that displays the Activities Feed page.]]></description>
+   <url>/enterprise/admin/admin-activitiesfeed</url>
+   <family>AdminConsole</family>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

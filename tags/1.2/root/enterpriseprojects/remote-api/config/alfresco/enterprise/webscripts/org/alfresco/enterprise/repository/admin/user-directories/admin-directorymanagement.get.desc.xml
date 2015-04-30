@@ -1,0 +1,12 @@
+<webscript>
+   <shortname>Admin Console - User and Group Directory Management</shortname>
+   <description><![CDATA[Admin Console WebScript that displays the User and Group Directory Management page.]]></description>
+   <url>/enterprise/admin/admin-directorymanagement</url>
+   <family>AdminConsole</family>
+   <format default="html" />
+   <negotiate accept="text/html">html</negotiate>
+   <negotiate accept="application/json">json</negotiate>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

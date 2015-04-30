@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>alfresco-enterprise-parent</artifactId>
+        <groupId>org.alfresco</groupId>
+        <version>5.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>alfresco-enterprise-vti-bin</artifactId>
+    <name>Alfresco Enterprise _vti_bin Web Application</name>
+
+    <packaging>war</packaging>
+
+    <url>http://www.alfresco.org/</url>
+    <inceptionYear>2013</inceptionYear>
+    <organization>
+        <name>Alfresco Software</name>
+        <url>http://www.alfresco.org/</url>
+    </organization>
+
+    <properties>
+        <m2eclipse.wtp.contextRoot>/_vti_bin</m2eclipse.wtp.contextRoot>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <!-- aoservices -->
+        <dependency>
+            <groupId>org.alfresco.officeservices</groupId>
+            <artifactId>aoservices</artifactId>
+            <version>2.12.5</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <warName>_vti_bin</warName>
+                    <attachClasses>true</attachClasses>
+                    <archiveClasses>true</archiveClasses>
+                </configuration>
+            </plugin>
+        </plugins>
+        <finalName>_vti_bin</finalName>
+    </build>
+
+</project>

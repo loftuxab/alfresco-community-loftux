@@ -1,0 +1,12 @@
+<webscript>
+   <!-- Example tool - Remove these comments and change the text for your tool shortname, description and url -->
+   <shortname>Admin Console - Example</shortname>
+   <description><![CDATA[Admin Console WebScript that displays the Example page.]]></description>
+   <url>/enterprise/admin/admin-example</url>
+   <!-- Example tool - Uncomment this family element and remove this comment -->
+   <!--<family>AdminConsole</family>-->
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

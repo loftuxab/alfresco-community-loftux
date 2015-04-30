@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You MUST NOT modify or format this document otherwise, the tests will fail -->
+<samlp:Response Destination="http://localhost:8081/share/ping.test/saml/authnresponse" ID="OeFbDHbFaIEIFy3-c4ZW2_w7e3o" IssueInstant="2013-01-25T17:16:51.311Z" Version="2.0" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">PF-DEMO</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#OeFbDHbFaIEIFy3-c4ZW2_w7e3o">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>IoQ1AWUcmPPg2pvt4/5+vBEMICI=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+s3JxYIW4tnVEBqqVfGAUIRsMNTGlLRvfR/wwcf/T5f5kGxzmj1fe5QyRPgEHigeGtR5U4C7/q8Vw
+7Sp3lv2Fltdqq+Ns8DQeAcFVxC02k5UcjH1UhZlfljEogt+8WrmkfTqtOnWmvOLz8exVEu5TRN0q
++dSyBQwp2cRbCY9xWqU=
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIICXTCCAcagAwIBAgIGATDbjCWrMA0GCSqGSIb3DQEBBQUAMHExCzAJBgNVBAYTAlVTMQswCQYD
+VQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRUwEwYDVQQKEwxQaW5nRmVkZXJhdGUxFTATBgNVBAsT
+DFBpbmdJZGVudGl0eTEWMBQGA1UEAxMNZGVtbyBkc2lnIG5ldzAgFw0xMTA2MjkxMzE3MzJaGA8y
+MTExMDYwNTEzMTczMlowcTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNPMQ8wDQYDVQQHEwZEZW52
+ZXIxFTATBgNVBAoTDFBpbmdGZWRlcmF0ZTEVMBMGA1UECxMMUGluZ0lkZW50aXR5MRYwFAYDVQQD
+Ew1kZW1vIGRzaWcgbmV3MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6foDB+shyY0XG2HqM
+MpFbRUH+bmivje2I0Zb3DtLNVJo5WksW6BnQ4e5bFLb1Q69+knrVLGaEi/+FE1dhLez4fEFIFrFb
+8vqDpMvv5FRhQ6YZ2MWy7Y8Ep/juCN0GezuFhILdTbf2DDx07Fq1rvxZhtU7UjyUxvzELGPQPu+9
+BQIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACrjAN5EM6+e4XSvpSZOWGypcgKLLrEnt7nVYcwB/koF
+PfGlHKJL6Ec345DDwxrCzUEKpQXYsiNL0+occGEsp+a4NPu5rib/jb/bRErbRIkfuIzDZHuqwyF5
+CrGzL0sEVQuS44fHeL7Fy3Hfx9YTgFNUMdg+ACCoriS5kcc+K71c
+</ds:X509Certificate>
+</ds:X509Data>
+<ds:KeyValue>
+<ds:RSAKeyValue>
+<ds:Modulus>
+un6AwfrIcmNFxth6jDKRW0VB/m5or43tiNGW9w7SzVSaOVpLFugZ0OHuWxS29UOvfpJ61SxmhIv/
+hRNXYS3s+HxBSBaxW/L6g6TL7+RUYUOmGdjFsu2PBKf47gjdBns7hYSC3U239gw8dOxata78WYbV
+O1I8lMb8xCxj0D7vvQU=
+</ds:Modulus>
+<ds:Exponent>AQAB</ds:Exponent>
+</ds:RSAKeyValue>
+</ds:KeyValue>
+</ds:KeyInfo>
+</ds:Signature><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status><saml:Assertion ID="S8sjfvMcn8LKLzOtD_rIBboO3vd" IssueInstant="2013-01-25T17:16:51.314Z" Version="2.0" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Issuer>PF-DEMO</saml:Issuer><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">user1@ping.test</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><saml:SubjectConfirmationData NotOnOrAfter="2013-01-25T18:16:51.315Z" Recipient="http://localhost:8081/share/ping.test/saml/authnresponse"/></saml:SubjectConfirmation></saml:Subject><saml:Conditions NotBefore="2013-01-25T17:11:51.315Z" NotOnOrAfter="2013-01-25T18:16:51.315Z"><saml:AudienceRestriction><saml:Audience>my.alfresco.com-ping.test</saml:Audience></saml:AudienceRestriction></saml:Conditions><saml:AuthnStatement AuthnInstant="2013-01-25T17:16:43.000Z" SessionIndex="S8sjfvMcn8LKLzOtD_rIBboO3vd"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement xmlns:xs="http://www.w3.org/2001/XMLSchema"><saml:Attribute Name="Email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"><saml:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">user1@ping.test</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion></samlp:Response>

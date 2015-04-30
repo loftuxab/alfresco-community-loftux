@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<beans>
+
+   <bean id="authenticationComponent" class="org.alfresco.repo.security.authentication.AuthenticationComponentImpl"
+      parent="authenticationComponentBase">
+      <property name="authenticationDao">
+         <ref bean="authenticationDao" />
+      </property>
+      <property name="authenticationManager">
+         <ref bean="authenticationManager" />
+      </property>
+      <property name="allowGuestLogin">
+         <value>${alfresco.authentication.allowGuestLogin}</value>
+      </property>
+      <property name="nodeService">
+         <ref bean="nodeService" />
+      </property>
+      <property name="personService">
+         <ref bean="personService" />
+      </property>
+      <property name="transactionService">
+         <ref bean="transactionService" />
+      </property>
+      <!--                                                                  -->
+      <!-- A list of default users with admin rights.                       -->
+      <!--                                                                  -->
+      <!-- If the security framework is case sensitive these values should  -->
+      <!-- be case sensitive user names. If the security framework is not   -->
+      <!-- case sensitive these values should be the lower-case user names. -->
+      <!--                                                                  -->
+      <!-- By default this includes:                                        -->
+      <!--    admin (the user name of default alfresco admin user)          -->
+      <!--    administrator (the windows default admin user)                -->
+      <!--                                                                  -->
+      <!-- This assumes that user names are not case sensitive.             -->
+      <!--                                                                  -->
+      <property name="defaultAdministratorUserNames">
+         <set>
+            <value>${alfresco_user_store.adminusername}</value>
+         </set>
+      </property>
+      <!--                                                                  -->
+      <!-- A list of default users acting as guests.                        -->
+      <!--                                                                  -->
+      <!-- By default this includes:                                        -->
+      <!--    guest (the user name of default alfresco guest user)          -->
+      <!--                                                                  -->
+      <!-- This assumes that user names are not case sensitive.             -->
+      <!--                                                                  -->
+      <property name="defaultGuestUserNames">
+         <set>
+            <!-- THOR-327
+            <value>${alfresco_user_store.guestusername}</value>
+            -->
+         </set>
+      </property>
+   </bean>
+
+   <!-- Wrapped version to be used within subsystem -->
+   <bean id="AuthenticationComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <list>
+            <value>org.alfresco.repo.security.authentication.AuthenticationComponent</value>
+            <value>org.alfresco.repo.security.authentication.ntlm.NLTMAuthenticator</value>
+         </list>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager" />
+      </property>
+      <property name="target">
+         <ref bean="authenticationComponent" />
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">${server.transaction.mode.default}</prop>
+         </props>
+      </property>
+   </bean>
+
+    <bean id="authenticationDaoTenantService" class="org.alfresco.repo.tenant.SingleTServiceImpl" />
+
+    <bean id="authenticationDao" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.repo.security.authentication.MutableAuthenticationDao</value>
+                <value>org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy</value>
+                <value>org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy</value>
+            </list>
+        </property>
+        <property name="target">
+            <ref bean="authenticationDao_raw"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="runAsDefaultTenantInterceptor"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="runAsRealUserTenantInterceptor" class="org.alfresco.repo.tenant.RunAsTenantInterceptor">
+        <constructor-arg index="0"><value>RealUser</value></constructor-arg>
+    </bean>
+
+    <bean id="authorityService_tenant" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.service.cmr.security.AuthorityService</value>
+            </list>
+        </property>
+        <property name="target">
+            <ref bean="authorityService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="runAsRealUserTenantInterceptor"/>
+            </list>
+        </property>
+    </bean>
+
+   <!-- Authentication service for chaining -->
+   <bean id="localAuthenticationService" class="org.alfresco.module.org_alfresco_module_cloud.authentication.CloudMutableAuthenticationServiceImpl">
+      <property name="authenticationDao">
+         <ref bean="authenticationDao" />
+      </property>
+      <property name="ticketComponent">
+         <ref bean="ticketComponent" />
+      </property>
+      <property name="authenticationComponent">
+         <ref bean="authenticationComponent" />
+      </property>
+      <property name="sysAdminParams">
+         <ref bean="sysAdminParams" />
+      </property>
+   </bean>
+   
+   <!--                                                                    -->
+   <!-- The Acegi authentication manager.                                  -->
+   <!--                                                                    -->
+   <!-- Provders are asked to authenticate in order.                       -->
+   <!-- First, is a provider that checks if an acegi authentication object -->
+   <!-- is already bound to the executing thread. If it is, and it is set  -->
+   <!-- as authenticated then no further authentication is required. If    -->
+   <!-- this is absent, Acegi validates the password for every method      -->
+   <!-- invocation, which is too CPU expensive. If we set an               -->
+   <!-- authentication based on a ticket etc .... or we want to set the    -->
+   <!-- the system user as the current user ... we do not have the         -->
+   <!-- password. So if we have set an authentication and set it as        -->
+   <!-- authenticated that is sufficient to validate the user.             -->
+   <!--                                                                    -->
+   <!-- If the authentication bound to the current thread is not set as    -->
+   <!-- authenticated the standard Acegi DAO Authentication provider       -->
+   <!-- is used to authenticate.                                           -->
+   <!--                                                                    -->
+
+
+   <!-- MD4 DAO and Authentication Provider -->
+
+   <!--  
+   <bean id="authenticationDao_raw" class="org.alfresco.module.org_alfresco_module_cloud.authentication.CloudAuthenticationDao">
+      <property name="nodeService" ref="nodeService" />
+      <property name="authorityService" ref="authorityService_tenant" />
+      <property name="namespaceService" ref="namespaceService" />
+      <property name="passwordEncoder" ref="passwordEncoder" />
+      <property name="sha256PasswordEncoder" ref="sha256PasswordEncoder" />
+      <property name="policyComponent" ref="policyComponent" />
+      <property name="authenticationCache" ref="authenticationCache" />
+      <property name="tenantService" ref="authenticationDaoTenantService" />
+      <property name="MTTenantService" ref="tenantService"/>
+      <property name="singletonCache" ref="immutableSingletonCache"/>
+      <property name="transactionService" ref="transactionService" />
+   </bean>
+
+   <bean id="daoAuthenticationProvider" class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
+      <property name="authenticationDao">
+         <ref bean="authenticationDao" />
+      </property>
+      <property name="saltSource">
+         <ref bean="saltSource" />
+      </property>
+      <property name="passwordEncoder">
+         <ref bean="passwordEncoder" />
+      </property>
+   </bean>
+   -->
+   
+   <!-- END MD4 -->
+
+   <!-- SHA256 DAO and Authentication Provider -->
+ 
+   <bean id="authenticationDao_raw" class="org.alfresco.module.org_alfresco_module_cloud.authentication.CloudAuthenticationPassword2Dao">
+      <property name="nodeService" ref="nodeService" />
+      <property name="authorityService" ref="authorityService_tenant" />
+      <property name="namespaceService" ref="namespaceService" />
+      <property name="passwordEncoder" ref="noOpPasswordEncoder" />
+      <property name="sha256PasswordEncoder" ref="sha256PasswordEncoder" />
+      <property name="policyComponent" ref="policyComponent" />
+      <property name="authenticationCache" ref="authenticationCache" />
+      <property name="tenantService" ref="authenticationDaoTenantService" />
+      <property name="MTTenantService" ref="tenantService"/>
+      <property name="singletonCache" ref="immutableSingletonCache"/>
+      <property name="transactionService" ref="transactionService" />
+   </bean>
+
+   <bean id="daoAuthenticationProvider" class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
+      <property name="authenticationDao">
+         <ref bean="authenticationDao" />
+      </property>
+      <property name="saltSource">
+         <ref bean="saltSource" />
+      </property>
+      <property name="passwordEncoder">
+         <ref bean="sha256PasswordEncoder" />
+      </property>
+   </bean>
+   
+   <!-- END SHA256 -->
+
+   <bean id="authenticationManager" class="net.sf.acegisecurity.providers.ProviderManager">
+      <property name="providers">
+         <list>
+            <ref bean="authenticatedAuthenticationPassthroughProvider" />
+            <ref bean="daoAuthenticationProvider" />
+         </list>
+      </property>
+   </bean>
+
+   <alias alias="saltSource" name="authenticationDao" />
+   
+   <!-- User Directory Service -->
+   
+   <bean id="localDirectoryService_raw" class="org.alfresco.module.org_alfresco_module_cloud.directory.DirectoryServiceImpl">
+       <property name="emailAddressService" ref="emailAddressService"/>
+       <property name="mutableAuthenticationService" ref="localAuthenticationService"/>
+       <property name="repositoryAuthenticationDao" ref="authenticationDao_raw"/>
+       <property name="nodeService" ref="nodeService"/>
+       <property name="userNamesAreCaseSensitive" value="${user.name.caseSensitive}"/>
+       <property name="transactionService" ref="transactionService" />
+   </bean>
+
+    <bean id="localDirectoryService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.module.org_alfresco_module_cloud.directory.DirectoryService</value>
+            </list>
+        </property>
+        <property name="target">
+            <ref bean="localDirectoryService_raw"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="runAsDefaultTenantInterceptor"/>
+            </list>
+        </property>
+    </bean>
+
+   <!-- Enable control over mapping between request and user ID -->
+   <bean id="remoteUserMapper" class="org.alfresco.repo.security.authentication.external.DefaultRemoteUserMapper">
+      <property name="active">
+         <value>${alfresco.authentication.cloud.enabled}</value>
+      </property>
+      <property name="proxyUserName">
+         <value>${alfresco.authentication.cloud.proxyUserName}</value>
+      </property>
+      <property name="personService">
+         <ref bean="PersonService" />
+      </property>
+   </bean>
+
+</beans>

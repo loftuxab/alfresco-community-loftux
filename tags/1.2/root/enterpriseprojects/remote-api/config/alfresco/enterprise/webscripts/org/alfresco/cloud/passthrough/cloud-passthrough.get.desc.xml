@@ -1,0 +1,37 @@
+<webscript>
+  <shortname>Passes select URLs on to the Cloud - GET version</shortname>
+  <description>Passes URLs to the Cloud as the current user, based on spring config</description>
+
+  <!-- List local URLs here -->
+  <!-- Then in spring, list the mapping -->
+
+  <url>/cloud/people/{userid}/sites</url>
+
+  <url>/cloud/sites</url>
+  <url>/cloud/sites/shareUrl</url>
+
+  <url>/cloud/doclib/treenode/site/{site}/{container}/{path}</url>
+  <url>/cloud/doclib/treenode/site/{site}/{container}</url>
+
+  <url>/cloud/doclib/containers/{site}</url>
+
+  <url>/cloud/content/metadata</url>
+  <url>/cloud/tenant/information</url>
+
+  <url>/cloud/doclib2/node/{store_type}/{store_id}/{id}</url>
+
+   <!-- Network list -->
+   <url>/cloud/tenant/information</url>
+   
+   <!-- Cloud-user picker -->
+   <url>/cloud/forms/picker/authority/children</url>
+
+  <!-- Default is JSON, but we pass back directly -->
+  <format default="json">argument</format>
+
+  <!-- The cloud may need more, but we need this as a minimum -->
+  <authentication>user</authentication>
+
+  <!-- We don't touch the local repo -->
+  <transaction allow="readonly">required</transaction>
+</webscript>

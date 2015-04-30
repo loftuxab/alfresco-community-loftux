@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alfresco.node.insert">
+
+    <insert id="insert_Server" parameterType="Server" >
+        <include refid="alfresco.node.insert_Server_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+
+    <insert id="insert_Store" parameterType="Store" >
+        <include refid="alfresco.node.insert_Store_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+
+    <insert id="insert_Node" parameterType="Node" >
+        <include refid="alfresco.node.insert_Node_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+
+    <insert id="insert_Transaction" parameterType="Transaction" >
+        <include refid="alfresco.node.insert_Transaction_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+
+    <insert id="insert_NodeAssoc" parameterType="NodeAssoc" >
+        <include refid="alfresco.node.insert_NodeAssoc_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+
+    <insert id="insert_ChildAssoc" parameterType="ChildAssoc" >
+        <include refid="alfresco.node.insert_ChildAssoc_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+
+</mapper>

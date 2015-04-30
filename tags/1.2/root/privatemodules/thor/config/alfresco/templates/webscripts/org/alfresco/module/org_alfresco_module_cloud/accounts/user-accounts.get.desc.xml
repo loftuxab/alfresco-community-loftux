@@ -1,0 +1,10 @@
+<webscript>
+   <shortname>Gets all accounts associated with specified user</shortname>
+   <description>
+   </description>
+   <url>/internal/cloud/user/{userId}/accounts</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction allow="readonly">required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

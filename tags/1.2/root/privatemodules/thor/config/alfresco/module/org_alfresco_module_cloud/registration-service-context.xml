@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <bean id="RegistrationService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_cloud.registration.RegistrationService</value>
+        </property>
+        <property name="target">
+            <ref bean="registrationService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="RegistrationService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref bean="RegistrationService_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="RegistrationService_transaction" class="org.alfresco.repo.transaction.RetryingTransactionInterceptor">
+        <property name="transactionService" ref="TransactionService"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="get*">${server.transaction.mode.readOnly}</prop>
+                <prop key="is*">${server.transaction.mode.readOnly}</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+    
+   <bean id="RegistrationService_security"
+      class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
+    <bean id="registrationService" class="org.alfresco.module.org_alfresco_module_cloud.registration.RegistrationServiceImpl" init-method="init">
+        <property name="directoryService" ref="directoryService"/>
+        <property name="emailAddressService" ref="emailAddressService"/>
+        <property name="accountService" ref="accountService"/>
+        <property name="cloudPersonService" ref="cloudPersonService"/>
+        <property name="authorityService" ref="authorityService"/>
+        <property name="workflowService" ref="WorkflowService"/>
+        <property name="personReplicationComponent" ref="personReplicationComponent"/>
+        <property name="siteService" ref="SiteService"/>
+        <property name="namespaceService" ref="NamespaceService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="importerService" ref="importerComponent"/>
+        <property name="policyComponent" ref="policyComponent" />
+        <property name="actionService" ref="actionService" />
+        <property name="passwordEncoder" ref="sha256PasswordEncoder" />
+        <property name="homeSiteSurfConfig" ref="registrationHomeSiteSurfConfig" />
+        <property name="timerRemind3" value="${cloud.signup.remindTimer3}" />
+        <property name="timerRemind7" value="${cloud.signup.remindTimer7}" />
+        <property name="timerEnd" value="${cloud.signup.endTimer}" />
+        <property name="samlConfigAdminService" ref="samlConfigAdminService"/>
+        <property name="ticketComponent" ref="ticketComponent"/>
+    </bean>
+    
+    <bean id="registrationHomeSiteSurfConfig" class="org.alfresco.module.org_alfresco_module_cloud.registration.HomeSiteSurfConfig">
+        <property name="configPath" value="alfresco/module/org_alfresco_module_cloud/bootstrap/homesite"/>
+    </bean>
+    
+    <bean id="home-site-content-import" class="org.alfresco.module.org_alfresco_module_cloud.registration.HomeSiteContentImportActionExecutor" parent="action-executer">
+        <property name="publicAction">
+            <value>false</value>
+        </property>
+        <property name="importerService" ref="importerComponent"/>
+        <property name="nodeService" ref="nodeService" />
+        <property name="contentService" ref="contentService" />
+        <property name="emailAddressService" ref="emailAddressService"/>
+        <property name="accountService" ref="accountService"/>
+    </bean>
+    
+    <bean id="registrationResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.messages.registration-service</value>
+            </list>
+        </property>
+   </bean>
+    
+    
+    
+    <!-- Activiti Delegate beans for signup workflow -->
+    <bean id="baseRegistrationDelegate" parent="baseJavaDelegate" abstract="true">
+        <property name="registrationService" ref="RegistrationService"/>
+        <property name="sysAdminParams" ref="sysAdminParams"/>
+    </bean>
+    
+    <bean id="RegistrationPathDelegate" parent="baseRegistrationDelegate"
+         class="org.alfresco.module.org_alfresco_module_cloud.registration.RegistrationPathDelegate">
+        <property name="emailAddressService" ref="emailAddressService"/>
+    </bean>
+    
+    <bean id="SendEmailDelegate" parent="baseRegistrationDelegate"
+         class="org.alfresco.module.org_alfresco_module_cloud.registration.SendEmailDelegate">
+         <property name="emailSender" value="noreply@alfresco.com"/> <!-- TODO Externalise -->
+         <property name="emailHelper" ref="cloudEmailHelper"/>
+         <property name="emailAddressService" ref="emailAddressService"/>
+         <property name="samlConfigAdminService" ref="samlConfigAdminService"/>
+    </bean>
+         
+    <bean id="ActivateAccountDelegate" parent="baseRegistrationDelegate"
+         class="org.alfresco.module.org_alfresco_module_cloud.registration.ActivateAccountDelegate" >
+         <property name="taskService" ref="activitiTaskService"/>
+    </bean>
+    
+    
+    
+    <bean id="directoryService" class="org.alfresco.repo.management.subsystems.ChainingSubsystemProxyFactory">
+      <property name="applicationContextManager">
+         <ref bean="Authentication" />
+      </property>
+      <property name="sourceBeanName">
+         <value>localDirectoryService</value>
+      </property>
+        <property name="interfaces">
+            <list>
+                <value>org.alfresco.module.org_alfresco_module_cloud.directory.DirectoryService</value>
+           </list>
+        </property>
+    </bean>
+    
+    <!-- Behaviours and policies -->
+    <bean id="personReplicationComponent" class="org.alfresco.module.org_alfresco_module_cloud.person.PersonReplicationComponent" init-method="init">
+        <property name="personService" ref="personService"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="contentService" ref="contentService"/>
+        <property name="preferenceService" ref="preferenceService"/>
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="registrationService" ref="registrationService"/>
+    </bean>
+    
+   <bean id="networkAdminAspectBehaviours" class="org.alfresco.module.org_alfresco_module_cloud.person.NetworkAdminAspectBehaviours" init-method="init">
+       <property name="policyComponent" ref="policyComponent"/>
+   </bean>
+    
+    
+    <!-- used by "webframework/content/metadata" script that has been overridden (js + ftl) by cloud module  -->
+    <bean id="userTenant" parent="baseJavaScriptExtension" class="org.alfresco.module.org_alfresco_module_cloud.tenant.jscript.UserTenant">
+        <property name="extensionName">
+            <value>userTenant</value>
+        </property>
+        <property name="accountService" ref="accountService"/>
+        <property name="directoryService" ref="directoryService"/>
+    </bean>
+    
+</beans>

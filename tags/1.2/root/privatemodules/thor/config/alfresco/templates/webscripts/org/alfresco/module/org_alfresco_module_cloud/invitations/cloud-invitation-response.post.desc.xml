@@ -1,0 +1,52 @@
+<webscript>
+  <shortname>Create a response to a cloud site invitation</shortname>
+  <description><![CDATA[
+  There are a number of acceptable forms for the body of this call and each must send back the 'key' string
+  which was embedded in the invitation email link. The first is a rejection of the invitation:
+<pre>
+   {
+      "response": "reject",
+      "key": "239ad243-f904-48f9-b59e-0a9cb99ae597"
+   }
+</pre>
+It is also possible to accept an invitation like so:
+<pre>
+   {
+      "response": "accept",
+      "key": "239ad243-f904-48f9-b59e-0a9cb99ae597"
+   }
+</pre>
+In the above case, the accepting user must already be a registered user within the Cloud system. If an invitation has been sent to
+an email address which does NOT currently represent a registered user, then that user must provide profile information with their
+acceptance call, like so:
+<pre>
+   {
+      "response": "accept",
+      "key": "239ad243-f904-48f9-b59e-0a9cb99ae597",
+      "firstName": "name",
+      "lastName": "NAME",
+      "password": "password"
+   }
+</pre>
+Finally, a user may accept an invitation on another account to that on which they were invited - provided that other account
+is an activated account in the system and the invitee has the password for that account.
+<pre>
+   {
+      "response": "accept-alt-email",
+      "key": "239ad243-f904-48f9-b59e-0a9cb99ae597",
+      "alt-email": invitees.other@account.test",
+      "password": "password"
+   }
+</pre>
+If the key or the invite_id are not valid a 404 is returned.
+In the case of an "accept-alt-email" response type, if there is no user with a user id equal to alt-email, or if there is but the password
+is incorrect for that user, a 403 is returned.
+  
+  ]]></description>
+  <url>/internal/cloud/site-invitations/{invite_id}/responses</url>
+  <format default="json"/>
+  <lifecycle>internal</lifecycle>
+  
+  <authentication runas="admin">none</authentication>
+  <transaction>required</transaction>
+</webscript>

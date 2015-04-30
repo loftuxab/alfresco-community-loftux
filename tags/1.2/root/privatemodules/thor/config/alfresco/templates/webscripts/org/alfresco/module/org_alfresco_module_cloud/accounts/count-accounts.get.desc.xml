@@ -1,0 +1,9 @@
+<webscript>
+   <shortname>Count the number of accounts</shortname>
+   <description/>
+   <url>/internal/cloud/accounts/count</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <transaction allow="readonly">required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

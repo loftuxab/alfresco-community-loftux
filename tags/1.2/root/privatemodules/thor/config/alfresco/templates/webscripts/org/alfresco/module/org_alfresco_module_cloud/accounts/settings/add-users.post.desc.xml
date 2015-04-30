@@ -1,0 +1,18 @@
+<webscript>
+   <shortname>Add users to an account</shortname>
+   <description><![CDATA[
+   Add users to an account
+   <p/>
+   The body content should have the form:
+   <pre>
+   {
+      emails: [<email>, <email>, ...]
+   }
+   </pre>
+   ]]>
+   </description>
+   <url>/internal/cloud/account/settings/addusers/{id}</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>

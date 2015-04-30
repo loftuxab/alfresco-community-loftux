@@ -1,0 +1,26 @@
+<webscript>
+   <shortname>PUT account</shortname>
+   <description><![CDATA[
+   Update metadata for an Account - eg. file quota
+   <p/>
+   The body content should have the form:
+   <pre>
+   {
+      "fileQuota" : "quota",
+      "siteCountQuota" : "siteCountQuota",
+      "personCountQuota" : "personCountQuota",
+      "personIntOnlyCountQuota" : "personIntOnlyCountQuota",
+      "accountTypeId" : 42,
+      "enabled" : false
+   }
+   </pre>
+   where all of these data values are optional.
+   The accountTypeId must correspond to a recognised account type id, or a 400 response will be given.
+   ]]>
+   </description>
+   <url>/internal/cloud/accounts/{id}</url>
+   <url>/internal/cloud/domains/{domainName}/account</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>

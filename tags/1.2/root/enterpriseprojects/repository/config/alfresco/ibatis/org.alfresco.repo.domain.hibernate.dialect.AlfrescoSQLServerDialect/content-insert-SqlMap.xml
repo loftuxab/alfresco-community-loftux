@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alfresco.content.insert">
+
+    <insert id="insert_Mimetype" parameterType="Mimetype" >
+        <include refid="alfresco.content.insert_Mimetype_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            select @@IDENTITY as value
+        </selectKey>
+    </insert>
+
+    <insert id="insert_Encoding" parameterType="Encoding" >
+        <include refid="alfresco.content.insert_Encoding_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            select @@IDENTITY as value
+        </selectKey>
+    </insert>
+
+    <insert id="insert_ContentUrl" parameterMap="alfresco.content.parameter_ContentUrl" >
+        <include refid="alfresco.content.insert_ContentUrl_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            select @@IDENTITY as value
+        </selectKey>
+    </insert>
+
+    <insert id="insert_ContentData" parameterMap="alfresco.content.parameter_ContentData" >
+        <include refid="alfresco.content.insert_ContentData_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            select @@IDENTITY as value
+        </selectKey>
+    </insert>
+
+    <insert id="insert_KeyData" parameterMap="alfresco.content.parameter_ContentUrlKey">
+        <include refid="alfresco.content.insert_KeyData_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER" >
+            select @@IDENTITY as value
+        </selectKey>
+    </insert>
+</mapper>

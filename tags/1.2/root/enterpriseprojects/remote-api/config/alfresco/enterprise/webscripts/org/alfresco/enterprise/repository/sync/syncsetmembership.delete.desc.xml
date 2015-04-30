@@ -1,0 +1,26 @@
+<webscript>
+   <shortname>DELETE SyncSet Membership</shortname>
+   <description><![CDATA[Web Script that removes a given NodeRef from a syncSet (Unsync) with option to request delete of remote node(s). 
+   Notes:
+   - unsync of folder will cause unsync of children (recursive if the syncSet was setup with includeSubFolders)
+   - requested delete of remote node(s) => target, if the unsync is performed on the source
+   <p/>
+   The request will be of the form:
+   <pre>
+   DELETE .../sync/syncsetmembers/workspace/SpacesStore/9319d5a3-03c1-4f86-8b44-f8516ff91820?deleteRemote=true
+   <p/>
+   The response body will be of the form:
+   <pre>
+   {
+      "success" : true
+   }
+   </pre>
+   If there is no nodeRef matching the specified id or if the nodeRef is not a member of a SyncSet, a 404 will be returned.
+   ]]>
+   </description>
+   <url>/enterprise/sync/syncsetmembers/{store_type}/{store_id}/{id}?requestDeleteRemote={requestDeleteRemote?}</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

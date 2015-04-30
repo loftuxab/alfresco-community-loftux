@@ -1,0 +1,70 @@
+<#assign body="font-family: 'Helvetica Neue LT', Helvetica, sans-serif;font-size: 14px;color: #444444;background-color: #e8e8e8;text-align:left;">
+<#assign outer_table="width: 100%;text-align:left;">
+<#assign inner_table="width: 600px;padding: 0;">
+<#assign banner_colour_row="height: 5px;">
+<#assign banner_color_cell="font-size: 5px;width: 100px;">
+<#assign banner_colour_1="background-color: #0C82C5;">
+<#assign banner_colour_2="background-color: #075EAA;">
+<#assign banner_colour_3="background-color: #0DC540;">
+<#assign banner_colour_4="background-color: #47A947;">
+<#assign banner_colour_5="background-color: #FEDF00;">
+<#assign banner_colour_6="background-color: #F8982A;">
+<#assign banner_body_row="background-color: #444444;height: 85px;">
+<#assign banner_body_cell="">
+<#assign banner_rounding_row="font-size: 5px; height: 5px;background-color: #444444;">
+<#assign banner_bottom_left_corner="background-color: #444444;">
+<#assign banner_bottom_corner_fill="font-size: 5px;background-color: #444444;">
+<#assign banner_bottom_right_corner="background-color: #444444;">
+<#assign banner_logo="padding-top:10px;padding-bottom:3px;padding-left: 20px;width: 208px;">
+<#assign banner_logo_img="width:187px; height:53px; color:#ffffff;" >
+<#assign banner_text="width: 392px;text-align: right;padding-right: 25px;font-size: 22pt;color: #f0f0f0;">
+<#assign banner_subtext="color: #bbbbbb;font-size: 13pt;text-align: right;padding-right: 25px;">
+<#assign spacing_row="height: 10px;">
+<#assign spacing_cell="font-size:5px;">
+<#assign body_row="background-color: #ffffff;">
+<#assign body_top_corners_row="font-size:5px;height: 5px;background-color: #ffffff;">
+<#assign banner_bottom_left_corner="font-size:5px;background-color: #444444;">
+<#assign banner_bottom_corner_fill="font-size:5px;">
+<#assign banner_bottom_right_corner="font-size:5px;background-color: #444444;">
+<#assign bottom_corner_image="background-color: #e8e8e8;vertical-align: bottom;">
+<#assign top_corner_image="background-color: #e8e8e8;vertical-align: top;">
+<#assign body_main_row="background-color: #ffffff;">
+<#assign body_main_cell="padding-left: 25px;padding-right: 25px;">
+<#assign body_main_table="width: 100%;padding-top: 30px;padding-bottom: 30px;">
+<#assign body_footer_row="background-color: #ffffff;color: #cccccc;border-top: 1px dashed #cccccc;padding-bottom:24px;">
+<#assign body_footer_row_nodash="background-color: #ffffff;color: #cccccc;padding-bottom:24px;">
+<#assign body_footer_row_bottom="padding-top:25px;">
+<#assign body_footer_cell="padding-left: 25px;padding-right: 25px;">
+<#assign body_footer_item="background-color: #ffffff;color: #cccccc;font-size: 10px">
+<#assign body_footer_table="width: 100%;border-top: 1px dashed #cccccc;padding-top: 25px;padding-bottom: 25px;">
+<#assign body_bottom_corners_row="font-size:5px;height: 5px;background-color: #ffffff;">
+<#assign body_bottom_left_corner="">
+<#assign body_bottom_corner_fill="font-size:5px;">
+<#assign body_bottom_right_corner="">
+<#assign body_nesting_cell="padding-left:25px;padding-right:25px;background-color:#ffffff;text-align:left;">
+
+<#assign button_top_left_corner="font-size:5px;background-color: #80ba00;">
+<#assign button_top_corner_fill="font-size:5px;background-color: #80ba00;">
+<#assign button_top_right_corner="font-size:5px;background-color: #80ba00;">
+<#assign button_bottom_left_corner="font-size:5px;background-color: #80ba00;">
+<#assign button_bottom_corner_fill="font-size:5px;background-color: #80ba00;">
+<#assign button_bottom_right_corner="font-size:5px;background-color: #80ba00;">
+<#assign button_center="font-size:18px;color:#ffffff;background-color: #80ba00;padding-right:20px;padding-left:20px;padding-top:10px;padding-bottom:10px">
+<#assign button_bottom_corner_image="background-color: #ffffff;vertical-align: bottom;border:0;">
+<#assign button_top_corner_image="background-color: #ffffff;vertical-align: top;border:0;">
+
+<#assign standard_text="font-size: 14px; margin: 12px 0px 24px 0px; padding-top: 10px;">
+
+<#assign activities_table="width:528px;text-align:center;">
+<#assign activities_numbers_row="font-size: 36px; font-weight: bold; color: #666666;">
+<#assign activities_number_cell="width: 88px;">
+<#assign activities_total_cell="color: #95C62C;">
+<#assign activities_labels_row="font-size: 14px; font-weight: bold; color: #666666;">
+
+<#assign site_link="font-size: 18px;font-weight: bolder;">
+
+<#assign th="text-align: left; font-weight: normal; color: #A8A8A8;">
+<#assign dashed_bottom_border="border-bottom: 1px dashed #cccccc; padding-bottom: 5px;">
+
+<#assign follow_label="font-size: 12px; padding-right: 10px;">
+<#assign follow_count_cell="padding: 0 15px; border-left: 1px solid #aaaaaa; text-align: left;">

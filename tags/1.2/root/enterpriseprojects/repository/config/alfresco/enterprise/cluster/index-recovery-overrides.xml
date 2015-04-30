@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--
+        Adds enterprise clustering configuration to reindexers.
+        
+        Note: file name does not end with "-context.xml" as it must not be imported automatically,
+        but is imported specifically at the end of the index-recovery-context.xml file.
+    -->
+    <!-- Index recovery bean augmentation -->
+    <bean id="search.admIndexJobDetail" parent="search.baseAdmIndexJobDetail">
+        <property name="jobClass">
+            <value>org.alfresco.enterprise.repo.cluster.index.IndexRecoveryJob</value>
+        </property>
+        <property name="jobDataAsMap">
+            <map merge="true">
+                <entry key="clusterService">
+                    <ref bean="ClusterService"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="search.missingFullTextReindexJobDetail" parent="search.baseMissingFullTextReindexJobDetail">
+        <property name="jobClass">
+            <value>org.alfresco.enterprise.repo.cluster.index.IndexRecoveryJob</value>
+        </property>
+        <property name="jobDataAsMap">
+            <map merge="true">
+                <entry key="clusterService">
+                    <ref bean="ClusterService"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+</beans>

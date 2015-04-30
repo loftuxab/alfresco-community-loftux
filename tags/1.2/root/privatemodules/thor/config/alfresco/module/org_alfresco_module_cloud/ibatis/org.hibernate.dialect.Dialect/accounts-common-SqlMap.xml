@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alfresco.accounts">
+
+    <!--                -->
+    <!-- Result Maps    -->
+    <!--                -->
+    
+    <resultMap id="result_Account" type="Account">
+        <result property="id" column="id"/>
+        <result property="domain" column="domain"/>
+        <result property="type" column="type_id"/>
+        <result property="creationDate" column="creation_date"/>
+        <result property="name" column="name" jdbcType="VARCHAR" javaType="string"/>
+    </resultMap>
+    
+    <!--                -->
+    <!-- SQL Snippets   -->
+    <!--                -->
+    
+    <insert id="insert_Account" parameterType="Account" useGeneratedKeys="true" keyProperty="id">
+        insert into alf_account (id, domain, type_id, creation_date, name)
+        values (#{id}, #{domain}, #{type}, #{creationDate}, #{name})
+    </insert>
+    
+    <delete id="delete_Account" parameterType="Account">
+        delete from alf_account where id = #{id}
+    </delete>
+    
+    <select id="select_AccountById" resultMap="result_Account">
+        select
+            id,
+            domain,
+            type_id,
+            creation_date,
+            name
+        from
+            alf_account
+        where
+            id = #{id}
+    </select>
+    
+    <select id="select_AccountByDomain" resultMap="result_Account">
+        select
+            id,
+            domain,
+            type_id,
+            creation_date,
+            name
+        from
+            alf_account
+        where
+            domain = #{domain}
+    </select>
+    
+    <select id="select_Accounts" parameterType="AccountCannedQueryParams" resultMap="result_Account">
+        select
+            id,
+            domain,
+            type_id,
+            creation_date,
+            name
+        from
+            alf_account
+        <where>
+        <if test="filterByAccountTypeId != null">
+            type_id = #{filterByAccountTypeId}
+        </if>
+        </where>
+        <if test="sortByAccountTypeId != null">
+            <if test="sortByAccountTypeId == ascTrue">
+            order by
+                type_id asc
+            </if>
+            <if test="sortByAccountTypeId != ascTrue">
+            order by
+                type_id desc
+            </if>
+        </if>
+    </select>
+    
+    <!-- note: CQ - currently assumes single schema (hence "joins" account to tenant attributes) -->
+    <select id="select_AccountsSortByTotalUserCount" parameterType="AccountCannedQueryParams" resultMap="result_Account">
+        select
+            a.id,
+            a.domain,
+            a.type_id,
+            a.creation_date,
+            a.name
+        from alf_prop_unique_ctx puc
+        join alf_prop_value pv1 on (pv1.id = puc.value1_prop_id)
+        join alf_prop_string_value psv1 on (psv1.id = pv1.long_value and pv1.persisted_type = 3 and psv1.string_value = '.tenantUsages')
+        join alf_prop_value pv2 on (pv2.id = puc.value2_prop_id)
+        join alf_prop_string_value psv2 on (psv2.id = pv2.long_value)
+        join alf_account a on (a.domain = psv2.string_value)
+        join alf_prop_value pv3 on (pv3.id = puc.value3_prop_id)
+        join alf_prop_string_value psv3 on (psv3.id = pv3.long_value and pv3.persisted_type = 3 and psv3.string_value = 'typeCountUsage-personTotalCount')
+        join alf_prop_link pl on (pl.root_prop_id = puc.prop1_id)
+        left join alf_prop_value pval on (pval.id = pl.value_prop_id)
+        <where>
+        <if test="filterByAccountTypeId != null">
+            a.type_id = #{filterByAccountTypeId}
+        </if>
+        </where>
+        <if test="sortByTotalUserCount == ascTrue">
+        order by
+            pval.long_value asc
+        </if>
+        <if test="sortByTotalUserCount != ascTrue">
+        order by
+            pval.long_value desc
+        </if>
+    </select>
+    
+    <!-- note: CQ - currently assumes single schema (hence "joins" account to tenant attributes) -->
+    <select id="select_AccountsSortByTotalUsageSize" parameterType="AccountCannedQueryParams" resultMap="result_Account">
+        select
+            a.id,
+            a.domain,
+            a.type_id,
+            a.creation_date,
+            a.name
+        from alf_prop_unique_ctx puc
+        join alf_prop_value pv1 on (pv1.id = puc.value1_prop_id)
+        join alf_prop_string_value psv1 on (psv1.id = pv1.long_value and pv1.persisted_type = 3 and psv1.string_value = '.tenantUsages')
+        join alf_prop_value pv2 on (pv2.id = puc.value2_prop_id)
+        join alf_prop_string_value psv2 on (psv2.id = pv2.long_value)
+        join alf_account a on (a.domain = psv2.string_value)
+        join alf_prop_value pv3 on (pv3.id = puc.value3_prop_id)
+        join alf_prop_string_value psv3 on (psv3.id = pv3.long_value and pv3.persisted_type = 3 and psv3.string_value = 'fileUsage')
+        join alf_prop_link pl on (pl.root_prop_id = puc.prop1_id)
+        left join alf_prop_value pval on (pval.id = pl.value_prop_id)
+        <where>
+        <if test="filterByAccountTypeId != null">
+            a.type_id = #{filterByAccountTypeId}
+        </if>
+        </where>
+        <if test="sortByTotalUsageSize == ascTrue">
+        order by
+            pval.long_value asc
+        </if>
+        <if test="sortByTotalUsageSize != ascTrue">
+        order by
+            pval.long_value desc
+        </if>
+    </select>
+    
+    <select id="count_AllAccounts" resultType="long">
+        select count(1)
+        from
+            alf_account
+    </select>
+
+    <update id="update_Account" parameterType="Account">
+        update
+            alf_account
+        set
+            type_id = #{type}
+        where
+            id = #{id}
+    </update>
+    
+</mapper>

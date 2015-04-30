@@ -1,0 +1,41 @@
+.cloud-invite
+{
+   width: 32em;
+}
+
+.cloud-invite .bd .form-fields
+{
+   padding-top: 1em;
+}
+
+.cloud-invite .bd .form-field
+{
+   padding-left: 1em;
+   padding-right: 1em;
+}
+
+.cloud-invite .bd .form-field textarea
+{
+   min-height: 7em;
+}
+
+.cloud-invite .user-suggestion
+{
+   padding: 0.5em;
+}
+.cloud-invite .user-suggestion img
+{
+   float: left;
+   width: 2em;
+   padding-right: 1em;
+}
+
+.cloud-invite .inlineItemEditAutoCompleteWrapper
+{
+   width: 12em !important;
+}
+
+.cloud-invite .inlineItemEditAutoComplete .yui-ac-content
+{
+   width: 20em !important;
+}

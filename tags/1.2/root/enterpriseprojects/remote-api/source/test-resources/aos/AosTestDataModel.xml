@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model name="aostest:AosTestDataModel" xmlns="http://www.alfresco.org/model/dictionary/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.alfresco.org/model/dictionary/1.0/modelSchema.xsd">
+
+    <description>Data Model for AOS Test Cases</description>
+    <author>Alfresco Software, Inc.</author>
+    <version>1.0</version>
+
+    <imports>
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+    </imports>
+
+    <namespaces>
+        <namespace uri="http://www.alfresco.org/model/aostest/1.0" prefix="aostest" />
+    </namespaces>
+
+    <constraints>
+        <constraint name="aostest:testchoice" type="LIST">
+            <parameter name="allowedValues">
+                <list>
+                    <value>Value1</value>
+                    <value>Value2</value>
+                    <value>Value3</value>
+                    <value>Value4</value>
+                    <value>Value5</value>
+                </list>
+            </parameter>
+        </constraint>
+    </constraints>
+
+    <types>
+
+        <type name="aostest:TestType">
+
+            <title>AOS Test Type</title>
+            <parent>cm:content</parent>
+
+            <properties>
+
+                <property name="aostest:TestString">
+                    <description>A Test String</description>
+                    <type>d:text</type>
+                </property>
+
+                <property name="aostest:TestMultiline">
+                    <description>A Test Multiline</description>
+                    <type>d:mltext</type>
+                </property>
+            
+                <property name="aostest:TestInt">
+                    <description>A Test Integer</description>
+                    <type>d:int</type>
+                </property>
+            
+                <property name="aostest:TestLong">
+                    <description>A Test Long</description>
+                    <type>d:long</type>
+                </property>
+            
+                <property name="aostest:TestFloat">
+                    <description>A Test Float</description>
+                    <type>d:float</type>
+                </property>
+            
+                <property name="aostest:TestDouble">
+                    <description>A Test Double</description>
+                    <type>d:double</type>
+                </property>
+            
+                <property name="aostest:TestDate">
+                    <description>A Test Date</description>
+                    <type>d:date</type>
+                </property>
+            
+                <property name="aostest:TestDateTime">
+                    <description>A Test DateTime</description>
+                    <type>d:datetime</type>
+                </property>
+            
+                <property name="aostest:TestBoolean">
+                    <description>A Test Boolean</description>
+                    <type>d:boolean</type>
+                </property>
+            
+                <property name="aostest:TestChoice">
+                    <description>A Test Choice</description>
+                    <type>d:text</type>
+                    <constraints>
+                        <constraint ref="aostest:testchoice" />
+                    </constraints>
+                </property>
+                
+            </properties>
+
+        </type>
+
+        <type name="aostest:MandatoryTestType">
+
+            <title>AOS Mandatory Test Type</title>
+            <parent>cm:content</parent>
+
+            <properties>
+
+                <property name="aostest:MandatoryTestString">
+                    <description>A Mandatory Test String</description>
+                    <type>d:text</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+
+                <property name="aostest:MandatoryTestMultiline">
+                    <description>A Mandatory Test Multiline</description>
+                    <type>d:mltext</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+            
+                <property name="aostest:MandatoryTestInt">
+                    <description>A Mandatory Test Integer</description>
+                    <type>d:int</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+            
+                <property name="aostest:MandatoryTestLong">
+                    <description>A Mandatory Test Long</description>
+                    <type>d:long</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+            
+                <property name="aostest:MandatoryTestFloat">
+                    <description>A Mandatory Test Float</description>
+                    <type>d:float</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+            
+                <property name="aostest:MandatoryTestDouble">
+                    <description>A Mandatory Test Double</description>
+                    <type>d:double</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+            
+                <property name="aostest:MandatoryTestDate">
+                    <description>A Mandatory Test Date</description>
+                    <type>d:date</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+            
+                <property name="aostest:MandatoryTestDateTime">
+                    <description>A Mandatory Test DateTime</description>
+                    <type>d:datetime</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+            
+                <property name="aostest:MandatoryTestBoolean">
+                    <description>A Mandatory Test Boolean</description>
+                    <type>d:boolean</type>
+                    <mandatory enforced='true'>true</mandatory>
+                </property>
+            
+                <property name="aostest:MandatoryTestChoice">
+                    <description>A Mandatory Test Choice</description>
+                    <type>d:text</type>
+                    <mandatory enforced='true'>true</mandatory>
+                    <constraints>
+                        <constraint ref="aostest:testchoice" />
+                    </constraints>
+                </property>
+                
+            </properties>
+
+        </type>
+
+        <type name="aostest:ConstraintsTestType">
+
+            <title>AOS Constraints Test Type</title>
+            <parent>cm:content</parent>
+
+            <properties>
+
+                <property name="aostest:ConstraintsTestString1">
+                    <description>String 0-10chars</description>
+                    <type>d:text</type>
+                    <constraints>
+                        <constraint type="LENGTH">
+                            <parameter name="minLength"><value>0</value></parameter>
+                            <parameter name="maxLength"><value>10</value></parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+
+                <property name="aostest:ConstraintsTestString2">
+                    <description>String 10-20chars</description>
+                    <type>d:text</type>
+                    <constraints>
+                        <constraint type="LENGTH">
+                            <parameter name="minLength"><value>10</value></parameter>
+                            <parameter name="maxLength"><value>20</value></parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+            
+                <property name="aostest:ConstraintsTestInt">
+                    <description>Integer 5-15</description>
+                    <type>d:int</type>
+                    <constraints>
+                        <constraint type="MINMAX">
+                            <parameter name="minValue"><value>5</value></parameter>
+                            <parameter name="maxValue"><value>15</value></parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+            
+                <property name="aostest:ConstraintsTestLong">
+                    <description>Long 5-15</description>
+                    <type>d:long</type>
+                    <constraints>
+                        <constraint type="MINMAX">
+                            <parameter name="minValue"><value>5</value></parameter>
+                            <parameter name="maxValue"><value>15</value></parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+            
+                <property name="aostest:ConstraintsTestFloat">
+                    <description>Float 5-15</description>
+                    <type>d:float</type>
+                    <constraints>
+                        <constraint type="MINMAX">
+                            <parameter name="minValue"><value>5</value></parameter>
+                            <parameter name="maxValue"><value>15</value></parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+            
+                <property name="aostest:ConstraintsTestDouble">
+                    <description>Double 5-15</description>
+                    <type>d:double</type>
+                    <constraints>
+                        <constraint type="MINMAX">
+                            <parameter name="minValue"><value>5</value></parameter>
+                            <parameter name="maxValue"><value>15</value></parameter>
+                        </constraint>
+                    </constraints>
+                </property>
+                
+            </properties>
+
+        </type>
+<!--        
+        <type name="aostest:AspectTestType">
+            <title>SimpleECM jUnit Aspect Test Type</title>
+            <parent>cm:content</parent>
+            <properties>
+            </properties>
+            <mandatory-aspects>
+                <aspect>aostest:TestAspect</aspect>
+            </mandatory-aspects>
+        </type>
+        
+        <type name="aostest:InheritanceAspectTestType">
+            <title>SimpleECM jUnit Child Aspect Test Type</title>
+            <parent>cm:content</parent>
+            <properties>
+            </properties>
+            <mandatory-aspects>
+                <aspect>aostest:TestInheritanceAspect</aspect>
+            </mandatory-aspects>
+        </type>
+        
+        <type name="aostest:OverridesChildAspectTestType">
+            <title>SimpleECM jUnit Overrides Child Aspect Test Type</title>
+            <parent>cm:content</parent>
+            <properties>
+            </properties>
+            <mandatory-aspects>
+                <aspect>aostest:TestOverridesChildAspect</aspect>
+            </mandatory-aspects>
+        </type>
+-->
+    </types>
+    
+    <aspects>
+<!--
+        <aspect name="aostest:TestParentAspect">
+
+            <title>SimpleECM jUnit Test Parent Aspect</title>
+            
+            <properties>
+
+                <property name="aostest:ParentAspectTestString">
+                    <description>A Test String inherited from the parent</description>
+                    <type>d:text</type>
+                </property>
+
+            </properties>
+
+        </aspect>
+
+        <aspect name="aostest:TestAspect">
+
+            <title>SimpleECM jUnit Test Aspect</title>
+            
+            <properties>
+
+                <property name="aostest:AspectTestString">
+                    <description>A Test String</description>
+                    <type>d:text</type>
+                </property>
+            
+                <property name="aostest:AspectTestInt">
+                    <description>A Test Integer</description>
+                    <type>d:int</type>
+                </property>
+            
+                <property name="aostest:AspectTestLong">
+                    <description>A Test Long</description>
+                    <type>d:long</type>
+                </property>
+            
+                <property name="aostest:AspectTestFloat">
+                    <description>A Test Float</description>
+                    <type>d:float</type>
+                </property>
+            
+                <property name="aostest:AspectTestDouble">
+                    <description>A Test Double</description>
+                    <type>d:double</type>
+                </property>
+            
+                <property name="aostest:AspectTestDate">
+                    <description>A Test Date</description>
+                    <type>d:date</type>
+                </property>
+            
+                <property name="aostest:AspectTestDateTime">
+                    <description>A Test DateTime</description>
+                    <type>d:datetime</type>
+                </property>
+            
+                <property name="aostest:AspectTestBoolean">
+                    <description>A Test Boolean</description>
+                    <type>d:boolean</type>
+                </property>
+            
+                <property name="aostest:AspectTestChoice">
+                    <description>A Test Choice</description>
+                    <type>d:text</type>
+                    <constraints>
+                        <constraint ref="aostest:testchoice" />
+                    </constraints>
+                </property>
+                
+            </properties>
+
+        </aspect>
+
+        <aspect name="aostest:TestInheritanceAspect">
+
+            <title>SimpleECM jUnit Child Test Aspect</title>
+            <parent>aostest:TestAspect</parent>
+            
+            <properties>
+
+                <property name="aostest:ChildAspectTestString">
+                    <description>A Test String inherited from the parent</description>
+                    <type>d:text</type>
+                </property>
+
+            </properties>
+
+        </aspect>
+
+        <aspect name="aostest:TestOverridesChildAspect">
+
+            <title>SimpleECM jUnit Overrides Child Test Aspect</title>
+            <parent>aostest:TestAspect</parent>
+            
+            <overrides>
+
+                <property name="aostest:AspectTestString">
+                    <default>aspect-test-string-default</default>
+                </property>
+
+            </overrides>
+
+        </aspect>
+-->
+    </aspects>
+
+</model>

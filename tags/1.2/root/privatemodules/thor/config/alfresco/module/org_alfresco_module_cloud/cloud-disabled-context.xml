@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <!-- THOR-859: disable rules -->
+    <bean id="ruleService" class="org.alfresco.repo.rule.RuleServiceImpl" init-method="init">
+        <property name="nodeService" ref="NodeService"/>
+        <property name="runtimeNodeService" ref="nodeService"/>
+        <property name="copyService" ref="copyService"/>
+        <property name="actionService" ref="ActionService"/>
+        <property name="runtimeActionService" ref="actionService"/>
+        <property name="dictionaryService" ref="dictionaryService"/>
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="permissionService" ref="permissionService"/>
+        <property name="nodeRulesCache" ref="nodeRulesCache"/>
+        <property name="rulesDisabled">
+            <value>${system.rules.disabled}</value>
+        </property>
+    </bean>
+    
+    <!-- THOR-505: Disable (turn-off autoStart) of unused subsystems -->
+    
+    <!-- also means that NodeMonitor(s) are not init'ed -->
+    <bean id="fileServers" class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory" parent="abstractPropertyBackedBean">
+        <property name="autoStart">
+            <value>false</value>
+        </property>
+        <property name="compositePropertyTypes">
+            <map>
+                <entry key="nfs.user.mappings">
+                    <value>org.alfresco.filesys.auth.nfs.UserMapping</value>
+                </entry>
+                <entry key="filesystem.acl.global.domainAccessControls">
+                    <value>org.alfresco.filesys.config.acl.DomainAccessControlBean</value>
+                </entry>
+                <entry key="filesystem.acl.global.protocolAccessControls">
+                    <value>org.alfresco.filesys.config.acl.ProtocolAccessControlBean</value>
+                </entry>
+                <entry key="filesystem.acl.global.userAccessControls">
+                    <value>org.alfresco.filesys.config.acl.UserAccessControlBean</value>
+                </entry>
+                <entry key="filesystem.domainMappings">
+                    <value>org.alfresco.filesys.config.DomainMappingConfigBean</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <!-- Disable autoStart of IMAP subsystem -->
+    <bean id="imap" class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory" parent="abstractPropertyBackedBean">
+        <property name="autoStart">
+            <value>false</value>
+        </property>
+        <property name="compositePropertyTypes">
+            <map>
+               <entry key="imap.config.server.mountPoints">
+                   <value>org.alfresco.repo.imap.config.ImapConfigMountPointsBean</value>
+               </entry>
+               <entry key="imap.config.ignore.extraction">
+                   <value>org.alfresco.util.config.RepositoryFolderConfigBean</value>
+               </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="InboundSMTP" class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory" parent="abstractPropertyBackedBean">
+        <property name="category">
+            <value>email</value>
+        </property>
+        <property name="typeName">
+            <value>InboundSMTP</value>
+        </property>
+        <property name="instancePath">
+            <list>
+                <value>inbound</value>
+            </list>
+        </property>
+        <property name="autoStart">
+            <value>false</value>
+        </property>
+    </bean>
+    
+    <!-- note: currently still starts (after startup) due to userRegistrySynchronizer -->
+    <bean id="Synchronization" class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory" parent="abstractPropertyBackedBean">
+        <property name="autoStart">
+            <value>false</value>
+        </property>
+    </bean>
+    
+    <bean id="Replication" class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory" parent="abstractPropertyBackedBean">
+        <property name="autoStart">
+            <value>false</value>
+        </property>
+   </bean>
+    
+    <!-- THOR-404: disable JBPM AlfrescoJobExecutor (pending ALF-11452) -->
+    <bean id="jbpm_configuration" class="org.alfresco.repo.workflow.jbpm.AlfrescoJbpmConfigurationFactoryBean">
+      <property name="sessionFactory" ref="sessionFactory"/>
+      <property name="configuration" value="classpath:alfresco/module/org_alfresco_module_cloud/custom-jbpm.cfg.xml"/>
+    </bean>
+    
+    <!-- Disable some of the default jobs (by commenting-out "scheduler" property) that are not used/required by THOR -->
+    
+    <bean id="userUsageCollapseJob" class="org.alfresco.util.TriggerBean">
+        <property name="jobDetail">
+            <bean id="userUsageTrackingJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+                <property name="jobClass">
+                    <value>org.alfresco.repo.usage.UserUsageCollapseJob</value>
+                </property>
+               <property name="jobDataAsMap">
+                   <map>
+                        <entry key="userUsageTrackingComponent">
+                            <ref bean="userUsageTrackingComponent" />
+                        </entry>
+                   </map>
+               </property>
+            </bean>
+        </property>
+        <!--
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        -->
+        <property name="startDelayMinutes">
+            <value>5</value>
+        </property>
+        <property name="repeatIntervalMinutes">
+            <value>5</value>
+        </property>
+    </bean>
+    
+    <!-- THOR-1200 -->
+    <!-- The following beans are being replaced as "no-ops" by instantiating ArrayLists in their place. This has
+         been done to prevent errors occurring when using the re-instated FolderRules.-->
+   <bean id="ac-email-templates" class="java.util.ArrayList"/>
+   <bean id="ac-publishing-channels" class="java.util.ArrayList"/>
+   <bean id="ac-status-update-channels" class="java.util.ArrayList"/>
+   
+   <!-- CLOUD-2011 -->
+   <bean id="downloadCleanerTrigger" class="org.alfresco.util.TriggerBean">
+      <property name="jobDetail">
+         <ref bean="downloadCleanerJobDetail" />
+      </property>
+      <!--
+      <property name="scheduler">
+         <ref bean="schedulerFactory" />
+      </property>
+      -->
+      <property name="startDelayMinutes">
+         <value>${download.cleaner.startDelayMins}</value>
+      </property>
+      <property name="repeatIntervalMinutes">
+         <value>${download.cleaner.repeatIntervalMins}</value>
+      </property>
+   </bean> 
+</beans>

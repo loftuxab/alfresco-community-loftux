@@ -1,0 +1,900 @@
+<alfresco-config>
+
+   <!-- Cloud -->
+   <config evaluator="string-compare" condition="Cloud">
+      <signup>
+         <url>http://cloud.alfresco.com</url>
+         <email>sales@alfresco.com</email>
+      </signup>
+      <learn>
+         <url>http://www.alfresco.com/products/cloud/</url>
+      </learn>
+      <legal>
+         <terms>http://www.alfresco.com/legal/agreements/cloud/</terms>
+         <privacy>http://www.alfresco.com/privacy/</privacy>
+      </legal>
+      <cancelledSignup>
+         <url>http://www.alfresco.com/signup/canceled</url>
+      </cancelledSignup>
+      <x-robots-tag>
+      	<value>noindex,nofollow,noarchive</value>
+      </x-robots-tag>
+      <!--
+      Uncommenting the following configuration will ensure that the Google Analytics tracking script
+      is inserted into all pages uses the tracking code defined. 
+      <google-analytics>
+         <tracking-code>UA-1936916-37</tracking-code>
+      </google-analytics>
+      -->
+      
+      <!--
+      Uncommenting the following configuration will ensure that the Mix-panel tracking script
+      is inserted into all pages and uses the defined id. 
+      <mix-panel>
+         <mix-panel-id>XXXXXXXXXXXXX</mix-panel-id>
+      </mix-panel>
+      -->
+      
+      <!--
+      Uncommenting the following configuration will ensure that the AppDynamics tracking script
+      is inserted into all pages and uses the defined key.
+      <app-dynamics>
+         <app-dynamics-key>XXXXXXXXXXXXX</app-dynamics-key>
+      </app-dynamics>
+      -->
+   </config>
+
+   <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+      <create-content-by-template>false</create-content-by-template>
+      <hidden-picker-view-modes>
+         <mode>VIEW_MODE_USERHOME</mode>
+         <mode>VIEW_MODE_SHARED</mode>
+      </hidden-picker-view-modes>
+      <google-docs>
+         <enabled>false</enabled>
+         <creatable-types></creatable-types>
+      </google-docs>
+      <file-upload>
+         <adobe-flash-enabled>false</adobe-flash-enabled>
+         <in-memory-limit>262144000</in-memory-limit>
+         <!-- Don't allow a file to be larger than 25 MB -->
+         <maximum-file-size-limit>26214400</maximum-file-size-limit>
+      </file-upload>
+   </config>
+
+   <config evaluator="string-compare" condition="DocumentLibrary">
+      <indicators>
+         <!-- Override some icons that indicate where a file came from so they show the on-premise image instead of the cloud -->
+         <indicator id="cloud-synced" index="70" action="onCloudSyncIndicatorAction" icon="../../../cloud/components/documentlibrary/indicators/cloud-synced-cloud-16.png">
+            <evaluator>evaluator.doclib.indicator.isSynced</evaluator>
+         </indicator>
+         <indicator id="cloud-indirect-sync" index="90" action="onCloudIndirectSyncIndicatorAction" icon="../../../cloud/components/documentlibrary/indicators/cloud-indirect-sync-cloud-16.png">
+            <evaluator>evaluator.doclib.indicator.isIndirectSync</evaluator>
+            <override>cloud-synced</override>
+         </indicator>
+      </indicators>
+   </config>
+   
+   <config evaluator="string-compare" condition="DocumentLibrary" replace="true">
+      <multi-select>
+         <!-- Remove the Download action from multi-select action: CLOUD-1588 -->
+         <action type="action-link" id="onActionCopyTo" label="menu.selected-items.copy" />
+         <action type="action-link" id="onActionMoveTo" permission="Delete" label="menu.selected-items.move"/>
+         <action type="action-link" id="onActionAssignWorkflow" asset="document" label="menu.selected-items.assign-workflow"/>
+         <action type="action-link" id="onActionDelete" permission="Delete" label="menu.selected-items.delete" notAspect="hwf:hybridWorkflow,sys:undeletable" />
+         <action type="action-link" id="onActionCloudSync" asset="document"  permission="CreateChildren" label="menu.selected-items.cloudSync" notAspect="sync:syncSetMemberNode" syncMode="ON_PREMISE" />
+         <action type="action-link" id="onActionCloudSyncRequest" label="menu.selected-items.cloudRequestSync" hasAspect="sync:syncSetMemberNode" syncMode="ON_PREMISE" />
+      </multi-select>
+   </config>
+
+   <config evaluator="string-compare" condition="DocLibActions">
+      <actions>
+         <!-- Hide certain actions in the cloud -->
+         <action id="document-publish">
+            <evaluator>evaluator.doclib.action.disableAction</evaluator>
+         </action>
+         <action id="document-manage-aspects">
+            <evaluator>evaluator.doclib.action.disableAction</evaluator>
+         </action>
+         <action id="document-change-type">
+            <evaluator>evaluator.doclib.action.disableAction</evaluator>
+         </action>
+         <action id="folder-download">
+            <evaluator>evaluator.doclib.action.disableAction</evaluator>
+         </action>
+      </actions>
+   </config>
+
+   <!-- Workflow config section -->
+   <config evaluator="string-compare" condition="Workflow">
+      <!-- A list of workflow definitions that are NOT displayed in Share -->
+      <hidden-workflows>
+         <!-- Hide some of the standard Share workflows -->
+         <workflow name="activiti$activitiParallelGroupReview"/>
+         <workflow name="activiti$activitiReviewPooled"/>
+         <workflow name="activiti$activitiReview"/>
+         <!-- Hide all Cloud workflows -->
+         <workflow name="activiti$accountSelfSignup"/>
+         <workflow name="activiti$siteInvitationCloud"/>
+         <workflow name="activiti$resetPassword"/>
+         <!-- Hide hybrid workflows -->
+         <workflow name="activiti$hybridAdhoc"/>
+         <workflow name="activiti$hybridReview"/>
+      </hidden-workflows>
+   </config>
+
+   <config evaluator="string-compare" condition="RepositoryLibrary" replace="true">
+      <!-- Stop non site browsing from being available in the ui -->
+      <root-node />
+   </config>
+
+   <config evaluator="string-compare" condition="Search" replace="true">
+      <search>
+         <min-search-term-length>1</min-search-term-length>
+         <max-search-results>250</max-search-results>
+         <repository-search>none</repository-search>
+      </search>
+   </config>
+
+   <config evaluator="string-compare" condition="Users">
+      <!-- Default username and password criteria for all users -->
+      <users>
+         <!-- minimum length for username and password -->
+         <username-min-length>2</username-min-length>
+         <password-min-length>8</password-min-length>
+         <!-- Minimum requirements on the content of the password. A zero value means not enforced. -->
+         <password-contains>
+            <min-uppercase>0</min-uppercase>
+            <min-lowercase>0</min-lowercase>
+            <min-numeric>0</min-numeric>
+            <min-symbols>0</min-symbols>
+         </password-contains>
+      </users>
+      <!-- Override the default password length and content restrictions for selected networks -->
+      <network-users>
+         <network id="aetna.com">
+            <password-min-length>8</password-min-length>
+            <password-contains>
+               <min-uppercase>1</min-uppercase>
+               <min-lowercase>1</min-lowercase>
+               <min-numeric>1</min-numeric>
+               <min-symbols>0</min-symbols>
+            </password-contains>
+         </network>
+      </network-users>
+   </config>
+
+   <!--
+      Overridden form-config.xml entries to:
+         - ensure package items can only be chosen from Sites.
+   -->
+   <config>
+      <forms>
+         <default-controls>
+             <type name="association:packageItems" template="/org/alfresco/components/form/controls/workflow/packageitems.ftl">
+               <control-param name="rootNode">{siteshome}</control-param>
+            </type>
+         </default-controls>
+      </forms>
+   </config>
+
+   <!-- dl:todoList type -->
+   <config evaluator="model-type" condition="dl:todoList">
+      <forms>
+         <!-- Create item form -->
+         <form>
+            <field-visibility>
+               <show id="dl:todoTitle" />
+               <show id="dl:todoDueDate" />
+               <show id="dl:todoPriority" />
+               <show id="dl:todoStatus" />
+               <show id="dl:todoNotes" />
+               <show id="dl:assignee" />
+               <show id="dl:attachments" />
+            </field-visibility>
+            <create-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="dl:todoNotes">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="dl:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+
+         <!-- Data Grid view -->
+         <!-- An example of an optional "datagrid" form-id to show a different set of fields to the new/edit forms -->
+         <form id="datagrid">
+            <field-visibility>
+               <show id="dl:todoTitle" />
+               <show id="dl:todoDueDate" />
+               <show id="dl:todoPriority" />
+               <show id="dl:todoStatus" />
+               <show id="dl:assignee" />
+               <show id="dl:attachments" />
+            </field-visibility>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl_todoList type (existing nodes) -->
+   <config evaluator="node-type" condition="dl:todoList">
+      <forms>
+         <!-- Data List pop-up edit form -->
+         <form>
+            <field-visibility>
+               <show id="dl:todoTitle" />
+               <show id="dl:todoDueDate" />
+               <show id="dl:todoPriority" />
+               <show id="dl:todoStatus" />
+               <show id="dl:todoNotes" />
+               <show id="dl:assignee" />
+               <show id="dl:attachments" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="dl:todoNotes">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="dl:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:task (advanced) type create form config-->
+   <!-- An example of an optional custom new/edit item template (see dl_task.ftl) -->
+   <config evaluator="model-type" condition="dl:task">
+      <forms>
+         <!-- Create item form -->
+         <form>
+            <field-visibility>
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <!-- dl:gantt aspect -->
+               <show id="dl:ganttStartDate" />
+               <show id="dl:ganttEndDate" />
+               <!-- dl:task type-->
+               <show id="dl:taskAssignee" />
+               <show id="dl:taskPriority" />
+               <show id="dl:taskStatus" />
+               <!-- dl:gantt aspect -->
+               <show id="dl:ganttPercentComplete" />
+               <!-- dl:task type -->
+               <show id="dl:taskComments" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+            </field-visibility>
+            <create-form template="../data-lists/forms/dl_task.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="dl:taskComments">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:task (advanced) type edit form config-->
+   <config evaluator="node-type" condition="dl:task">
+      <forms>
+         <!-- Data List pop-up edit form -->
+         <form>
+            <field-visibility>
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <!-- dl:gantt aspect -->
+               <show id="dl:ganttStartDate" />
+               <show id="dl:ganttEndDate" />
+               <!-- dl:task type-->
+               <show id="dl:taskAssignee" />
+               <show id="dl:taskPriority" />
+               <show id="dl:taskStatus" />
+               <!-- dl:gantt aspect -->
+               <show id="dl:ganttPercentComplete" />
+               <!-- dl:task type -->
+               <show id="dl:taskComments" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/dl_task.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="dl:taskComments">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:simpletask (simple) type create form config-->
+   <config evaluator="model-type" condition="dl:issue">
+      <forms>
+         <!-- Create item form -->
+         <form>
+            <field-visibility>
+               <!-- dl:issue type -->
+               <show id="dl:issueID" />
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <!-- dl:issue type -->
+               <show id="dl:issueAssignedTo" />
+               <show id="dl:issueStatus" />
+               <show id="dl:issuePriority" />
+               <!-- cm:titled aspect -->
+               <show id="cm:description" />
+               <!-- dl:issue type -->
+               <show id="dl:issueDueDate" />
+               <show id="dl:issueComments" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+             </field-visibility>
+            <create-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="dl:issueComments">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:task type edit form config-->
+   <config evaluator="node-type" condition="dl:issue">
+      <forms>
+         <!-- Data List pop-up edit form -->
+         <form>
+            <field-visibility>
+               <!-- dl:issue type -->
+               <show id="dl:issueID" />
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <!-- dl:issue type -->
+               <show id="dl:issueAssignedTo" />
+               <show id="dl:issueStatus" />
+               <show id="dl:issuePriority" />
+               <!-- cm:titled aspect -->
+               <show id="cm:description" />
+               <!-- dl:issue type -->
+               <show id="dl:issueDueDate" />
+               <show id="dl:issueComments" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="dl:issueComments">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:event type create form config-->
+   <config evaluator="model-type" condition="dl:event">
+      <forms>
+         <!-- Create item form -->
+         <form>
+            <field-visibility>
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <!-- dl:event type -->
+               <show id="dl:eventLocation" />
+               <show id="dl:eventStartDate" />
+               <show id="dl:eventEndDate" />
+               <show id="dl:eventRegistrations" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+               <!-- dl:event type -->
+               <show id="dl:eventNote" />
+             </field-visibility>
+            <create-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="dl:eventNote">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:task type edit form config-->
+   <config evaluator="node-type" condition="dl:event">
+      <forms>
+         <!-- Data List pop-up edit form -->
+         <form>
+            <field-visibility>
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <!-- dl:event type -->
+               <show id="dl:eventLocation" />
+               <show id="dl:eventStartDate" />
+               <show id="dl:eventEndDate" />
+               <show id="dl:eventRegistrations" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+               <!-- dl:event type -->
+               <show id="dl:eventNote" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="dl:eventNote">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:location type create form config-->
+   <config evaluator="model-type" condition="dl:location">
+      <forms>
+         <!-- Create item form -->
+         <form>
+            <field-visibility>
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <!-- dl:location type -->
+               <show id="dl:locationAddress1" />
+               <show id="dl:locationAddress2" />
+               <show id="dl:locationAddress3" />
+               <show id="dl:locationZip" />
+               <show id="dl:locationState" />
+               <show id="dl:locationCountry" />
+               <!-- cm:titled aspect -->
+               <show id="cm:description" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+             </field-visibility>
+            <create-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:task type edit form config-->
+   <config evaluator="node-type" condition="dl:location">
+      <forms>
+         <!-- Data List pop-up edit form -->
+         <form>
+            <field-visibility>
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <!-- dl:location type -->
+               <show id="dl:locationAddress1" />
+               <show id="dl:locationAddress2" />
+               <show id="dl:locationAddress3" />
+               <show id="dl:locationZip" />
+               <show id="dl:locationState" />
+               <show id="dl:locationCountry" />
+               <!-- cm:titled aspect -->
+               <show id="cm:description" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:meetingAgenda type create form config-->
+   <config evaluator="model-type" condition="dl:meetingAgenda">
+      <forms>
+         <!-- Create item form -->
+         <form>
+            <field-visibility>
+               <!-- dl:meetingAgenda type -->
+               <show id="dl:meetingAgendaRef" />
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <!-- dl:meetingAgenda type -->
+               <show id="dl:meetingAgendaTime" />
+               <show id="dl:meetingAgendaOwner" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+            </field-visibility>
+            <create-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:meetingAgenda type edit form config-->
+   <config evaluator="node-type" condition="dl:meetingAgenda">
+      <forms>
+         <!-- Data List pop-up edit form -->
+         <form>
+            <field-visibility>
+               <!-- dl:meetingAgenda type -->
+               <show id="dl:meetingAgendaRef" />
+               <!-- cm:titled aspect -->
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <!-- dl:meetingAgenda type -->
+               <show id="dl:meetingAgendaTime" />
+               <show id="dl:meetingAgendaOwner" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:eventAgenda type create form config-->
+   <config evaluator="model-type" condition="dl:eventAgenda">
+      <forms>
+         <!-- Create item form -->
+         <form>
+            <field-visibility>
+               <!-- dl:meetingAgenda type -->
+               <show id="dl:eventAgendaRef" />
+               <show id="dl:eventAgendaStartTime" />
+               <show id="dl:eventAgendaEndTime" />
+               <show id="dl:eventAgendaSessionName" />
+               <show id="dl:eventAgendaPresenter" />
+               <show id="dl:eventAgendaAudience" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+               <!-- d:meetingAgenda type -->
+               <show id="dl:eventAgendaNotes" />
+            </field-visibility>
+            <create-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="dl:eventAgendaNotes">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <!-- dl:eventAgenda type edit form config-->
+   <config evaluator="node-type" condition="dl:eventAgenda">
+      <forms>
+         <!-- Data List pop-up edit form -->
+         <form>
+            <field-visibility>
+               <!-- dl:meetingAgenda type -->
+               <show id="dl:eventAgendaRef" />
+               <show id="dl:eventAgendaStartTime" />
+               <show id="dl:eventAgendaEndTime" />
+               <show id="dl:eventAgendaSessionName" />
+               <show id="dl:eventAgendaPresenter" />
+               <show id="dl:eventAgendaAudience" />
+               <!-- cm:attachable aspect -->
+               <show id="cm:attachments" />
+               <!-- d:meetingAgenda type -->
+               <show id="dl:eventAgendaNotes" />
+            </field-visibility>
+            <edit-form template="../data-lists/forms/dataitem.ftl" />
+            <appearance>
+               <field id="dl:eventAgendaNotes">
+                  <control template="/org/alfresco/components/form/controls/textarea.ftl" />
+               </field>
+               <field id="cm:attachments">
+                  <control>
+                     <control-param name="startLocation">{siteshome}</control-param>
+                     <control-param name="rootNode">{siteshome}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
+   <config evaluator="string-compare" condition="HelpPages" replace="true">
+      <help-pages>
+         <share-help>http://docs.alfresco.com/cloud/topic/com.alfresco.cloud.doc/topics/cloud-welcome.html</share-help>
+         <share-tutorial>http://docs.alfresco.com/cloud/topic/com.alfresco.cloud.doc/topics/cloud-tutorial.html</share-tutorial>
+      </help-pages>
+   </config>
+
+   <!-- Overriding CSRFPolicy filter config, make sure to update this if it changes on HEAD -->
+   <config evaluator="string-compare" condition="CSRFPolicy" replace="true">
+      <filter>
+
+         <!-- CLOUD SPECIFIC CONFIG -  START -->
+
+         <!--
+            Since we have added the CSRF filter with filter-mapping of "/*" we will catch all public GET's to avoid them
+            having to pass through the remaining rules.
+         -->
+         <rule>
+            <request>
+               <method>GET</method>
+               <path>/res/.*</path>
+            </request>
+         </rule>
+
+         <!-- Incoming posts from IDPs do not require a token -->
+         <rule>
+            <request>
+               <method>POST</method>
+               <path>/saml/authnresponse|/saml/logoutresponse|/saml/logoutrequest</path>
+            </request>
+         </rule>
+
+         <!-- CLOUD SPECIFIC CONFIG -  STOP -->
+
+         <!-- EVERYTHING BELOW FROM HERE IS COPIED FROM share-security-config.xml -->
+
+         <!--
+            Certain webscripts shall not be allowed to be accessed directly form the browser.
+            Make sure to throw an error if they are used.
+         -->
+         <rule>
+            <request>
+               <path>/proxy/alfresco/remoteadm/.*</path>
+            </request>
+            <action name="throwError">
+               <param name="message">It is not allowed to access this url from your browser</param>
+            </action>
+         </rule>
+
+         <!--
+            Certain Repo webscripts should be allowed to pass without a token since they have no Share knowledge.
+         -->
+         <rule>
+            <request>
+               <method>POST</method>
+               <path>/proxy/alfresco/api/publishing/channels/.+</path>
+            </request>
+            <action name="assertReferer">
+               <param name="referer">{referer}</param>
+            </action>
+            <action name="assertOrigin">
+               <param name="origin">{origin}</param>
+            </action>
+         </rule>
+
+         <!--
+            Certain Surf POST requests from the WebScript console must be allowed to pass without a token since
+            the Surf WebScript console code can't be dependent on a Share specific filter.
+         -->
+         <rule>
+            <request>
+               <method>POST</method>
+               <path>/page/caches/dependency/clear|/page/index|/page/surfBugStatus|/page/modules/deploy|/page/modules/module|/page/api/javascript/debugger</path>
+            </request>
+            <action name="assertReferer">
+               <param name="referer">{referer}</param>
+            </action>
+            <action name="assertOrigin">
+               <param name="origin">{origin}</param>
+            </action>
+         </rule>
+
+         <!-- Certain Share POST requests does NOT require a token -->
+         <rule>
+            <request>
+               <method>POST</method>
+               <path>/page/dologin(\?.+)?|/page/site/[^/]+/start-workflow|/page/start-workflow</path>
+            </request>
+            <action name="assertReferer">
+               <param name="referer">{referer}</param>
+            </action>
+            <action name="assertOrigin">
+               <param name="origin">{origin}</param>
+            </action>
+         </rule>
+
+         <!-- Assert logout is done from a valid domain, if so clear the token when logging out -->
+         <rule>
+            <request>
+               <method>GET</method>
+               <path>/page/dologout(\?.+)?</path>
+            </request>
+            <action name="assertReferer">
+               <param name="referer">{referer}</param>
+            </action>
+            <action name="assertOrigin">
+               <param name="origin">{origin}</param>
+            </action>
+            <action name="clearToken">
+               <param name="session">{token}</param>
+               <param name="cookie">{token}</param>
+            </action>
+         </rule>
+
+         <!-- Make sure the first token is generated -->
+         <rule>
+            <request>
+               <session>
+                  <attribute name="_alf_USER_ID">.+</attribute>
+                  <attribute name="{token}"/>
+                  <!-- empty attribute element indicates null, meaning the token has not yet been set -->
+               </session>
+            </request>
+            <action name="generateToken">
+               <param name="session">{token}</param>
+               <param name="cookie">{token}</param>
+            </action>
+         </rule>
+
+         <!-- Refresh token on new "page" visit when a user is logged in -->
+         <rule>
+            <request>
+               <method>GET</method>
+               <path>/page/.*</path>
+               <session>
+                  <attribute name="_alf_USER_ID">.+</attribute>
+                  <attribute name="{token}">.+</attribute>
+               </session>
+            </request>
+            <action name="generateToken">
+               <param name="session">{token}</param>
+               <param name="cookie">{token}</param>
+            </action>
+         </rule>
+
+         <!--
+            Verify multipart requests from logged in users contain the token as a parameter
+            and also correct referer & origin header if available
+         -->
+         <rule>
+            <request>
+               <method>POST</method>
+               <header name="Content-Type">multipart/.+</header>
+               <session>
+                  <attribute name="_alf_USER_ID">.+</attribute>
+               </session>
+            </request>
+            <action name="assertToken">
+               <param name="session">{token}</param>
+               <param name="parameter">{token}</param>
+            </action>
+            <action name="assertReferer">
+               <param name="referer">{referer}</param>
+            </action>
+            <action name="assertOrigin">
+               <param name="origin">{origin}</param>
+            </action>
+         </rule>
+
+         <!--
+            Verify that all remaining state changing requests from logged in users' requests contains a token in the
+            header and correct referer & origin headers if available. We "catch" all content types since just setting it to
+            "application/json.*" since a webscript that doesn't require a json request body otherwise would be
+            successfully executed using i.e."text/plain".
+         -->
+         <rule>
+            <request>
+               <method>POST|PUT|DELETE</method>
+               <session>
+                  <attribute name="_alf_USER_ID">.+</attribute>
+               </session>
+            </request>
+            <action name="assertToken">
+               <param name="session">{token}</param>
+               <param name="header">{token}</param>
+            </action>
+            <action name="assertReferer">
+               <param name="referer">{referer}</param>
+            </action>
+            <action name="assertOrigin">
+               <param name="origin">{origin}</param>
+            </action>
+         </rule>
+
+      </filter>
+   </config>
+
+</alfresco-config>

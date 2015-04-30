@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>Upgrade</shortname>
+   <description>Account Settings - Upgrade</description>
+   <url>/cloud/core/components/console/upgrade</url>
+</webscript>

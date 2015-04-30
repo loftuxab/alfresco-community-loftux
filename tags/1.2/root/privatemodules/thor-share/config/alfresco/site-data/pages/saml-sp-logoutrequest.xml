@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page>
+   <title>SAML Alfresco Logout</title>
+   <title-id>page.saml-sp-logoutrequest.title</title-id>
+   <template-instance>redirect</template-instance>
+   <authentication>none</authentication>
+   <components>
+
+      <!-- Will redirect user to the network's IDP -->
+      <component>
+         <region-id>components</region-id>
+         <url>/cloud/core/components/saml/sp-logoutrequest</url>
+         <properties>
+            <idpSessionIndex>{idpSessionIndex}</idpSessionIndex>
+         </properties>
+      </component>
+
+   </components>
+</page>

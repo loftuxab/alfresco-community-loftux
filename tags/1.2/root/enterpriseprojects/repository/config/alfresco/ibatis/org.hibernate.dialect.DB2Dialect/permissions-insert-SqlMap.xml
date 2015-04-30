@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alfresco.permissions.insert">
+
+	<parameterMap id="parameter_Acl" type="Acl">
+        <parameter property="aclId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+		<parameter property="latest" jdbcType="BIT" javaType="java.lang.Boolean"/>
+		<parameter property="aclVersion" jdbcType="BIGINT" javaType="java.lang.Long"/>
+		<parameter property="inherits" jdbcType="BIT" javaType="java.lang.Boolean"/>
+		<parameter property="inheritsFrom" jdbcType="BIGINT" javaType="java.lang.Long"/>
+		<parameter property="type" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+		<parameter property="inheritedAcl" jdbcType="BIGINT" javaType="java.lang.Long"/>
+		<parameter property="isVersioned" jdbcType="BIT" javaType="java.lang.Boolean"/>
+		<parameter property="requiresVersion" jdbcType="BIT" javaType="java.lang.Boolean"/>
+		<parameter property="aclChangeSet" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+	
+	<parameterMap id="parameter_Ace" type="Ace">
+        <parameter property="permissionId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+		<parameter property="authorityId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+		<parameter property="allowed" jdbcType="BIT" javaType="java.lang.Boolean"/>
+		<parameter property="applies" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+		<parameter property="contextId" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </parameterMap>
+	
+    <insert id="insert_Acl" parameterMap="parameter_Acl">
+	
+        insert into alf_access_control_list
+            (version, acl_id, latest, acl_version, inherits, inherits_from,
+             type, inherited_acl, is_versioned, requires_version, acl_change_set)
+        values
+            (0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			 
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+    
+    <insert id="insert_AclMember" parameterType="AclMember">
+        <include refid="alfresco.permissions.insert_AclMember_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+    
+    <insert id="insert_AclChangeSet" parameterType="AclChangeSet">
+        <include refid="alfresco.permissions.insert_AclChangeSet_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL() 
+        </selectKey>
+    </insert>
+    
+    <insert id="insert_Ace" parameterMap="parameter_Ace">
+	
+        insert into alf_access_control_entry
+            (version, permission_id, authority_id, allowed, applies, context_id)
+        values
+            (0, ?, ?, ?, ?, ?)
+			
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+    
+    <insert id="insert_AceContext" parameterType="AceContext">
+        <include refid="alfresco.permissions.insert_AceContext_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+    
+    <insert id="insert_Permission" parameterType="Permission">
+        <include refid="alfresco.permissions.insert_Permission_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+    
+    <insert id="insert_Authority" parameterType="Authority">
+        <include refid="alfresco.permissions.insert_Authority_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+    
+    <insert id="insert_AuthorityAlias" parameterType="AuthorityAlias">
+        <include refid="alfresco.permissions.insert_AuthorityAlias_AutoIncrement"/>
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            VALUES IDENTITY_VAL_LOCAL()
+        </selectKey>
+    </insert>
+    
+</mapper>

@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>cloud-sync-pull</shortname>
+  <description>Builds the sync changes to a node for a pull</description>
+  <url>/enterprise/sync/pull</url>
+  <authentication>user</authentication>
+  <lifecycle>internal</lifecycle>
+
+  <!-- The services we call handle the transaction stuff carefully. -->
+  <!-- We need to disable transactions, so we can get the raw request -->
+  <transaction>none</transaction>
+</webscript>

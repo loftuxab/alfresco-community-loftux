@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <bean id="tenantQuotaService" class="org.alfresco.module.org_alfresco_module_cloud.usage.CloudTenantQuotaServiceImpl">
+        <property name="attributeService" ref="attributeService" /> 
+        <property name="accountRegistry" ref="accountRegistry" />
+        <property name="accountDAO" ref="accountDAO" />
+    </bean>
+
+    <!-- THOR-184: disabled via NOOP impl -->
+    <bean id="userUsageTrackingComponent" class="org.alfresco.module.org_alfresco_module_cloud.usage.CloudNOOPUserUsageTrackingComponent" />
+    
+    <bean id="baseTypeCountUsageImpl" abstract="true" class="org.alfresco.module.org_alfresco_module_cloud.usage.TypeCountUsageImpl">
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="attributeService" ref="attributeService"/>
+        <property name="jobLockService" ref="jobLockService"/>
+        <property name="cannedQueryDAO" ref="cloudCannedQueryDAO"/>
+        <property name="qnameDAO" ref="qnameDAO"/>
+        <property name="nodeDAO" ref="nodeDAO"/>
+        <property name="tenantService" ref="tenantService"/>
+        <property name="tenantQuotaService" ref="tenantQuotaService"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="transactionService" ref="transactionService"/>
+    </bean>
+    
+    <!--  Cloud Tenant Site Count usage & quota -->
+    
+    <bean id="siteCountUsageImpl" parent="baseTypeCountUsageImpl">
+        <!-- for site count -->
+        <property name="typeQName" value="{http://www.alfresco.org/model/site/1.0}site"/>
+        <property name="quotaName" value="siteCount"/>
+    </bean>
+    
+    <!--  Cloud Tenant People Count usage & quota -->
+    
+    <!-- all people (internal and external, not disabled)-->
+    <bean id="personTotalCountUsageImpl" parent="baseTypeCountUsageImpl">
+        <!-- for person count -->
+        <property name="typeQName" value="{http://www.alfresco.org/model/content/1.0}person"/>
+        <property name="quotaName" value="personTotalCount"/>
+        
+        <property name="fixedUsageAdjustment" value="-1"/> <!-- exclude implicit/hidden people (ie. admin@<tenant>) -->
+        
+        <!-- not disabled -->
+        <property name="excludeAspectQNames">
+            <list>
+                <value>{http://www.alfresco.org/model/content/1.0}personDisabled</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!--  internal people only (not external, not disabled) -->
+    <bean id="personInternalOnlyCountUsageImpl" parent="baseTypeCountUsageImpl">
+        <!-- for person count -->
+        <property name="typeQName" value="{http://www.alfresco.org/model/content/1.0}person"/>
+        <property name="quotaName" value="personInternalOnlyCount"/>
+        
+        <property name="fixedUsageAdjustment" value="-1"/> <!-- exclude implicit/hidden people (ie. admin@<tenant>)  -->
+        
+        <!-- not external, not disabled -->
+        <property name="excludeAspectQNames">
+            <list>
+                <value>{http://www.alfresco.org/model/content/1.0}personDisabled</value>
+                <value>{http://www.alfresco.org/model/cloud/1.0}personExternal</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--  network admins people only (not disabled) -->
+    <bean id="personNetworkAdminCountUsageImpl" parent="baseTypeCountUsageImpl">
+        <!-- for person count -->
+        <property name="typeQName" value="{http://www.alfresco.org/model/content/1.0}person"/>
+        <property name="quotaName" value="personNetworkAdminCount"/>
+        
+        <property name="fixedUsageAdjustment" value="0"/> <!-- admin@<tenant> can't be a network admin  -->
+
+        <!-- network admin -->
+        <property name="includeAspectQNames">
+            <list>
+                <value>{http://www.alfresco.org/model/cloud/1.0}networkAdmin</value>
+            </list>
+        </property>
+
+        <!-- not disabled -->
+        <property name="excludeAspectQNames">
+            <list>
+                <value>{http://www.alfresco.org/model/content/1.0}personDisabled</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Cloud Tenant File usage & quota (based on Version Store) -->
+    
+    <bean id="tenantContentUsageImpl" class="org.alfresco.module.org_alfresco_module_cloud.usage.TenantContentUsageImpl" init-method="init">
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="tenantService" ref="tenantService"/>
+        <property name="tenantQuotaService" ref="tenantQuotaService"/>
+        <property name="attributeService" ref="attributeService"/>
+        <property name="jobLockService" ref="jobLockService"/>
+        <property name="transactionService" ref="transactionService"/>
+        <property name="nodeDAO" ref="nodeDAO"/>
+        <property name="qnameDAO" ref="qnameDAO"/>
+        <property name="cannedQueryDAO" ref="cloudCannedQueryDAO"/>
+        <property name="enabled" value="true"/>
+    </bean>
+   
+    <!-- note: comment-out scheduler property to de-activate trigger bean -->
+    <bean id="tenantContentUsageUpdateJob" class="org.alfresco.util.TriggerBean">
+        <property name="jobDetail">
+            <bean id="storeUsageTrackingJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+                <property name="jobClass">
+                    <value>org.alfresco.module.org_alfresco_module_cloud.usage.TenantContentUsageUpdateJob</value>
+                </property>
+               <property name="jobDataAsMap">
+                   <map>
+                        <entry key="tenantContentUsageImpl">
+                            <ref bean="tenantContentUsageImpl" />
+                        </entry>
+                   </map>
+               </property>
+            </bean>
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="startDelayMinutes">
+            <value>${tenantContentUsage.updateJob.startDelayMinutes}</value>
+        </property>
+        <property name="repeatIntervalMinutes">
+            <value>${tenantContentUsage.updateJob.repeatIntervalMinutes}</value>
+        </property>
+    </bean>
+    
+    <!-- overridden: commented out version store (to enable policy firing) -->
+    <bean id="dbNodeService" class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init" >
+        <property name="dictionaryService" ref="dictionaryService" />
+        <property name="transactionService" ref="transactionService" />
+        <property name="qnameDAO" ref="qnameDAO" />
+        <property name="nodeDAO" ref="nodeDAO" />
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="storeArchiveMap" ref="storeArchiveMap"/>
+        <property name="nodeIndexer" ref="nodeIndexer"/>
+        <property name="policyBehaviourFilter" ref="policyBehaviourFilter" />
+        <property name="tenantService" ref="tenantService"/>
+        <property name="permissionService" ref="permissionServiceImpl" />
+        <property name="storesToIgnorePolicies">
+            <list>
+                <value>${spaces.archive.store}</value>
+                <!-- <value>${version.store.version2Store}</value> -->
+            </list>
+        </property>
+    </bean>
+    
+     <bean id="defaultContentLimitProvider" class="org.alfresco.module.org_alfresco_module_cloud.usage.AccountContentLimitProvider" >
+         <property name="tenantQuotaService" ref="tenantQuotaService" />
+     </bean>
+    
+</beans>

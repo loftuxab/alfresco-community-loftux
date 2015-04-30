@@ -1,0 +1,10 @@
+<webscript>
+   <shortname>Admin Console - Process Engines</shortname>
+   <description><![CDATA[Admin Console WebScript that displays the Process Engines page.]]></description>
+   <url>/enterprise/admin/admin-processengines</url>
+   <family>AdminConsole</family>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

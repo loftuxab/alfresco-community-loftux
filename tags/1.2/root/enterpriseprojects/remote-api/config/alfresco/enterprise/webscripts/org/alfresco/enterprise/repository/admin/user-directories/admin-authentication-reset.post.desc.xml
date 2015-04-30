@@ -1,0 +1,18 @@
+<webscript>
+   <shortname>Admin Console - Authentication Reset</shortname>
+   <description><![CDATA[
+Admin Console WebScript that resets an Authentication Subsystem.
+<p>
+The request is specified in json of the form:
+<pre>
+{ 
+   "authenticatorName": "ldap1"
+}
+</pre>
+   ]]></description>
+   <url>/enterprise/admin/admin-authentication-reset</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

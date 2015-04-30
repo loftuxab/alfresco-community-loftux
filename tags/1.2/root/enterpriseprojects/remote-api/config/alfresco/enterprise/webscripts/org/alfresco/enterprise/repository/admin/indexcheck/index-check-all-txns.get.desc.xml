@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>ADM Index Check - check all txn ids</shortname>
+  <description>WARNING this may take a long time ... check all ADM txn ids to ensure they are in-sync with the index (on this server)</description>
+  <url>/enterprise/admin/indexcheck/adm/checktxns/all</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

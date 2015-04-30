@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <bean id="webscripts.networkadmin" class="org.alfresco.module.org_alfresco_module_cloud.networkadmin.NetworkAdmin">
+      <property name="nodeService" ref="nodeService" />
+      <property name="personService" ref="personService" />
+    </bean>
+
+</beans>

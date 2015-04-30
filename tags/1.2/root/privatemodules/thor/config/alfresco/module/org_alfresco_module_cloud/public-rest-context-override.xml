@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <bean id="networks" class="org.alfresco.rest.api.impl.NetworksImpl">
+        <property name="people" ref="People" />
+        <property name="networksService" ref="networksService" />
+    </bean>
+
+    <bean id="Networks" class="org.springframework.aop.framework.ProxyFactoryBean">
+       <property name="proxyInterfaces">
+          <value>org.alfresco.rest.api.Networks</value>
+       </property>
+       <property name="target">
+          <ref bean="networks" />
+       </property>
+       <property name="interceptorNames">
+          <list>
+             <idref bean="legacyExceptionInterceptor" />
+          </list>
+       </property>
+    </bean>
+    
+    <!-- Note: overrides to people services for Cloud  -->
+    <bean id="cloudPeople" class="org.alfresco.rest.api.impl.CloudPeopleImpl">
+        <property name="nodes" ref="Nodes" />
+        <property name="sites" ref="Sites" />
+        <property name="siteService" ref="SiteService" />
+        <property name="nodeService" ref="NodeService" />
+        <property name="personService" ref="PersonService" />
+        <property name="authenticationService" ref="AuthenticationService" />
+        <property name="contentUsageService" ref="contentUsageImpl" />
+        <property name="contentService" ref="ContentService" />
+        <property name="thumbnailService" ref="ThumbnailService" />
+        <property name="cloudSiteService" ref="siteService" />
+        <property name="cloudPersonService" ref="cloudPersonService" />
+    </bean>
+
+    <bean id="CloudPeople" class="org.springframework.aop.framework.ProxyFactoryBean">
+       <property name="proxyInterfaces">
+          <value>org.alfresco.rest.api.People</value>
+       </property>
+       <property name="target">
+          <ref bean="cloudPeople" />
+       </property>
+       <property name="interceptorNames">
+          <list>
+             <idref bean="legacyExceptionInterceptor" />
+          </list>
+       </property>
+    </bean>
+    
+   <bean id="publicapi.authenticator" class="org.alfresco.rest.api.PublicApiAuthenticatorFactory">
+      <property name="authenticationService" ref="AuthenticationService" />
+      <property name="authenticationListener" ref="webScriptAuthenticationListener"/>
+      <property name="authenticationComponent" ref="authenticationComponent" />
+      <property name="transactionHelper" ref="web.retryingTransactionHelper" />
+      <!-- Note: override to tenantAuthentication for Cloud  -->
+      <property name="tenantAuthentication" ref="webscripts.authenticator.tenantauthentication"/>
+      <property name="validAuthentictorKeys">
+         <bean class="org.springframework.util.StringUtils" factory-method="commaDelimitedListToSet">
+            <constructor-arg type="java.lang.String" value="${alfresco.authentication.validAuthenticatorKeys}"/>
+         </bean>   
+      </property>
+      <property name="outboundHeaders">
+         <bean class="org.springframework.util.StringUtils" factory-method="commaDelimitedListToSet">
+            <constructor-arg type="java.lang.String" value="${alfresco.authentication.gateway.outboundHeaders}"/>
+         </bean>
+      </property>
+      <property name="remoteUserMapper">
+         <ref bean="RemoteUserMapper" />
+      </property>
+   </bean>
+
+   <alias name="webscripts.authenticator.tenantauthentication" alias="publicapi.tenantAuthenticator"/>   
+   
+   <!-- Override for Cloud -->
+   <bean class="org.alfresco.rest.api.people.PeopleEntityResource">
+      <property name="people" ref="CloudPeople" />
+   </bean>
+
+    <bean   id="cmisAtomPubDispatcher1" class="org.alfresco.opencmis.PublicApiAtomPubCMISDispatcher" init-method="init">
+        <property name="descriptorService"  ref="DescriptorService"/>
+        <property name="cmisServiceFactory" ref="publicApiCMISServiceFactory"/>
+        <property name="registry"           ref="cmisDispatcherRegistry" />
+        <property name="serviceName"        value="cmis" />
+        <property name="baseUrlGenerator"   ref="baseUrlGenerator" />
+        <property name="version"            value="1"/>
+        <property name="cmisVersion"        value="1.0"/>
+    </bean>
+</beans>

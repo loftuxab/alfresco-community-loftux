@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="cm:title">a.txt title</entry>
+<entry key="type">cm:content</entry>
+<entry key="cm:description">head migration tag</entry>
+<entry key="cm:name">a.txt</entry>
+<entry key="aspects">cm:versionable,cm:auditable</entry>
+</properties>

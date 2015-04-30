@@ -1,0 +1,164 @@
+<!-- ****************************************************** -->
+<!-- ** Experimental Maven build - use at your own risk! ** -->
+<!-- ****************************************************** -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>alfresco-enterprise-crypto</artifactId>
+    <name>Alfresco Enterprise Repository Encryption At Rest</name>
+    <parent>
+        <artifactId>alfresco-enterprise-parent</artifactId>
+        <groupId>org.alfresco</groupId>
+        <version>5.1-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-enterprise-repository</artifactId>
+            <version>${project.version}</version>
+			<exclusions>
+		        <exclusion>  <!-- declare the exclusion here -->
+		          <groupId>ch.qos.logback</groupId>
+		          <artifactId>logback-classic</artifactId>
+		        </exclusion>
+         </exclusions> 
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-repository</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+          <plugin>
+               <artifactId>maven-surefire-plugin</artifactId>
+               <executions>
+                  <execution>
+                     <id>default-test</id>
+                     <!-- There's also surefire configuration in the integration-tests profile -->
+                     <configuration>
+                          <excludes>
+                              <exclude>**/*IntegrationTest.java</exclude>
+                          </excludes>
+                     </configuration>
+                  </execution>
+               </executions>
+            </plugin>
+
+            <!-- Extract test resources, because they need to be seen as files, not in a jar -->
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>extract-quick-resource-files</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.alfresco</groupId>
+                                    <artifactId>alfresco-repository</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>tests</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                            <includes>quick/*</includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+   <profiles>
+        <profile>
+            <id>integration-tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Wipe the database before starting tests -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>sql-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>wipe-database</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <sqlCommand>${db.drop.command}</sqlCommand>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>create-database</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <sqlCommand>${db.create.command}</sqlCommand>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <executions>
+                           <execution>
+                              <id>integration-tests</id>
+                              <goals>
+                                 <goal>test</goal>
+                              </goals>
+                              <configuration>
+                                <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+                                <forkMode>always</forkMode>
+                                <includes>
+                                    <include>**/*IntegrationTest.java</include>
+                                </includes>
+                              </configuration>
+                           </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+   </profiles>
+</project>

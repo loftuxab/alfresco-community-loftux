@@ -1,0 +1,20 @@
+<webscript>
+   <shortname>Remove a user from an account</shortname>
+   <description>
+   This webscript can be used to remove an internal or an external user from an account/network. The meaning of 'remove' depends on
+   the user's relationship to the network. If the user is an external user in the specified network (i.e. it is a secondary account
+   for that user) then the user will be removed from the network and will still be able to access any of their other networks.
+   <p/>
+   However if the user is an internal member (i.e. it is their home network) then they will be removed from all networks (secondary and
+   home networks) and their authentication details will be removed from the system. The user will no longer be able to use the system at all.
+   <p/>
+   Note that only NetworkAdmins can call this webscript. Also note that if the user to be removed is the last network admin in a network,
+   then the remove will not succeed and a 403 will be returned.
+   </description>
+   <url>/internal/cloud/account/{id}/users/{userId}</url>
+   <url>/internal/cloud/domains/{domainName}/account/users/{userId}</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

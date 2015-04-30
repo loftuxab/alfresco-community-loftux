@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You MUST NOT modify or format this document otherwise, the tests will fail -->
+
+<samlp:Response Destination="http://localhost:8081/share/openam.test/saml/authnresponse" ID="s23cb3ca7deb47cf983e958bc8a964e4bd2faac993" IssueInstant="2013-01-25T12:40:57Z" Version="2.0" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://www.myopenam.com:9080/opensso</saml:Issuer><samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+<samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+</samlp:StatusCode>
+</samlp:Status><saml:Assertion ID="s25453f9daf8f997c9b286d1bac1557fbaf98c1252" IssueInstant="2013-01-25T12:40:57Z" Version="2.0" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+<saml:Issuer>http://www.myopenam.com:9080/opensso</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#s25453f9daf8f997c9b286d1bac1557fbaf98c1252">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>Eq75a/zVkIJpgxQwK1febXdbQ68=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+Q2PoKSggeF8Llt90lDm9hEcnNjpSlV5BdBx1py34w/C6bz6QWosUfz99cd4lj8tHgAytcCwflgKX
+4qHsIFG9UjgtcAG5pX1Fhk7O6GfpV9kOx242HGf8y6jN4uP+3gpoobZsgCm13iXskhnSS66MimOm
+ksv4z8APpsDPern12gs=
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIIDLjCCApegAwIBAgIEO6EPWTANBgkqhkiG9w0BAQsFADBvMQswCQYDVQQGEwJVSzETMBEGA1UE
+CBMKU29tZS1TdGF0ZTEPMA0GA1UEBxMGTG9uZG9uMRowGAYDVQQKExFBbGZyZXNjbyBTb2Z0d2Fy
+ZTERMA8GA1UECxMIQ2xvdWQtU1AxCzAJBgNVBAMTAnNwMCAXDTEyMTIxOTEyMDk1NVoYDzIxMTIx
+MTI1MTIwOTU1WjBvMQswCQYDVQQGEwJVSzETMBEGA1UECBMKU29tZS1TdGF0ZTEPMA0GA1UEBxMG
+TG9uZG9uMRowGAYDVQQKExFBbGZyZXNjbyBTb2Z0d2FyZTERMA8GA1UECxMIQ2xvdWQtU1AxCzAJ
+BgNVBAMTAnNwMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDFUlMJHqqGV/kw4T9x0MXCmrRT
+MlglGdmJxYY1Ri6bDx9pCwK5X76pwTfmDKHmbZvH9k/OSO0Wc04ywkmByEN94odhrR3Aoisi/fv7
+y4QXFmekC37x5GRr/Ntm4Lhdc6vITczLY8bN+ScEv1N2q18Cl3/eXNnwBiCMW+ZUiCOKHwIDAQAB
+o4HUMIHRMB0GA1UdDgQWBBQAmb+R4D+ISoms5S0ejw8XsvXC3DCBoQYDVR0jBIGZMIGWgBQAmb+R
+4D+ISoms5S0ejw8XsvXC3KFzpHEwbzELMAkGA1UEBhMCVUsxEzARBgNVBAgTClNvbWUtU3RhdGUx
+DzANBgNVBAcTBkxvbmRvbjEaMBgGA1UEChMRQWxmcmVzY28gU29mdHdhcmUxETAPBgNVBAsTCENs
+b3VkLVNQMQswCQYDVQQDEwJzcIIJAKBHynOqbt0kMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEL
+BQADgYEAPC9nkslkzYmgVGI87HjUCRGCSGiRzTZMvSxoFwj8ngoxyHF7VH95ZJcjcGnPuoUcsWTG
+GiHYLTIkYgI+jV9ems0fuTY22lWPPBBwpcEnKX9RG8fN42pzf1SvqDZIZsORnbYn7neq80vbJMtX
+6SteyFAV0zg0nrKk5/EagCU6uO0=
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</ds:Signature><saml:Subject>
+<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="http://www.myopenam.com:9080/opensso">xoVxpCIKrPZfyQvQRwMJkBSJ8CPu</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+<saml:SubjectConfirmationData NotOnOrAfter="2013-01-25T12:50:57Z" Recipient="http://localhost:8081/share/openam.test/saml/authnresponse"/></saml:SubjectConfirmation>
+</saml:Subject><saml:Conditions NotBefore="2013-01-25T12:30:57Z" NotOnOrAfter="2013-01-25T12:50:57Z">
+<saml:AudienceRestriction>
+<saml:Audience>my.alfresco.com-openam.test</saml:Audience>
+</saml:AudienceRestriction>
+</saml:Conditions>
+<saml:AuthnStatement AuthnInstant="2013-01-25T12:40:57Z" SessionIndex="s20155a0976087a7bed74c3c649536b71cdb285e01"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement><saml:Attribute Name="Email"><saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">user2@openam.test</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion></samlp:Response>

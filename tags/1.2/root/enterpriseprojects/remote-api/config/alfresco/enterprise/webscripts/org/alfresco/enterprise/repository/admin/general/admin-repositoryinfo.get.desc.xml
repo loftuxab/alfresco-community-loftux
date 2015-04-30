@@ -1,0 +1,10 @@
+<webscript>
+   <shortname>Admin Console - Repository Information</shortname>
+   <description><![CDATA[Admin Console WebScript that displays the Repository Information page.]]></description>
+   <url>/enterprise/admin/admin-repositoryinfo</url>
+   <family>AdminConsole</family>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>

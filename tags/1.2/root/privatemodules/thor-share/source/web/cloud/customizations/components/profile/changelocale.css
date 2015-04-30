@@ -1,0 +1,18 @@
+.locale
+{
+   display: none;
+}
+
+.locale .label
+{
+   display: inline;
+   float: none;
+   margin-left: 2em;
+}
+
+.locale .buttons
+{
+   padding-bottom: 1em;
+   padding-top: 0.5em;
+   text-align: center;
+}

@@ -1,0 +1,11 @@
+<webscript>
+   <shortname>DELETE invalid email domain</shortname>
+   <description><![CDATA[
+   ]]>
+   </description>
+   <url>/internal/cloud/emailaddresses/invaliddomains/{domain}</url>
+   <format default="json">argument</format>
+   <authentication>admin</authentication>
+   <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

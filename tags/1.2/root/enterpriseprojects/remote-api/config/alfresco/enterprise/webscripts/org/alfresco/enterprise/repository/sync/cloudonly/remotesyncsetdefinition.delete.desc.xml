@@ -1,0 +1,19 @@
+<webscript>
+   <shortname>DELETE SyncSetDefinition</shortname>
+   <description><![CDATA[Web Script that deletes a Target SyncSetDefinition on the Cloud.
+   <p/>
+   The request body should be of the form:
+   <pre>
+   {
+      "ssdId": "12345678-1234-abcd-wxyz-123456789012"
+   }
+   </pre>
+   ]]>
+   </description>
+   <url>/enterprise/sync/remotesyncsetdefinitions</url>
+   <authentication>user</authentication>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

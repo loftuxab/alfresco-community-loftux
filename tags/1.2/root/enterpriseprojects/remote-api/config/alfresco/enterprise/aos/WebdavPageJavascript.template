@@ -1,0 +1,113 @@
+var ua = navigator.userAgent.toLowerCase();
+var isWin32 = (ua.indexOf('win32') > -1) || (ua.indexOf('32bit') > -1) || ((parseInt(navigator.appVersion) >= 4) && (navigator.platform=="Win32")); 
+var isIE = (ua.indexOf("msie") > -1);
+var isIE5OrLater = false;
+if(isIE)
+{
+    var ieVer = parseInt(ua.substring(ua.indexOf("msie ")+5));
+    isIE5OrLater = ieVer >= 5;
+}
+
+function exportDatabase(siteUrl,listId,viewId)
+{
+    if(!isIE5OrLater)
+    {
+        alert("The feature \"Open with Access\" is only available in MS Internet Explorer 5.0 or later.");
+        return;
+    }
+    if(!isWin32)
+    {
+        alert("The feature \"Open with Access\" is only  available on the 32-bit platform.");
+        return;
+    }
+    try
+    {
+        var exportDatabase;
+        exportDatabase = new ActiveXObject("SharePoint.ExportDatabase");
+        if(!exportDatabase)
+        {
+            alert("Error creating Active-X object: SharePoint.ExportDatabase");
+            return;
+        }
+        exportDatabase.SiteUrl = siteUrl;
+        exportDatabase.ListID = listId;
+        exportDatabase.ViewID = viewId;
+        exportDatabase.DoExport(false);
+        exportDatabase = null;
+    }
+    catch(e)
+    {
+        alert("Error exporting list to Access Database:\n" + e.name + "\n" + e.message);
+    }
+}
+function subscribePublishedLinksService(siteName,siteUrl,portalUrl)
+{
+    try
+    {
+        var portalConnect;
+        try
+        {
+            portalConnect = new ActiveXObject("PortalConnect14.PersonalSite.1");
+        }
+        catch(ee)
+        {
+            portalConnect = null;
+        }
+        if(!portalConnect)
+        {
+            alert("Error creating Active-X object: PortalConnect14.PersonalSite.1");
+            return;
+        }
+        portalConnect.EnsurePersonalSiteOrPortal(siteName,siteUrl,portalUrl);
+        portalConnect = null;
+    }
+    catch(e)
+    {
+        alert("Error subscribing to published links service:\n" + e.name + "\n" + e.message);
+    }
+}
+var httpFolderInvokationDIV = null;
+var httpFolderInvokationTarget = null;
+function openInWindowsExplorer(url)
+{
+    if(!isIE5OrLater)
+    {
+        alert("The feature \"Open in windows Explorer\" is only available in MS Internet Explorer 5.0 or later.");
+        return;
+    }
+    if(!isWin32)
+    {
+        alert("The feature \"Open in windows Explorer\" is only  available on the 32-bit platform.");
+        return;
+    }
+    httpFolderInvokationTarget = url;
+    httpFolderInvokeNavigate();
+}
+function httpFolderInvokeNavigate()
+{
+    // create a new DIV element and add the #default#httpFolder behavior
+    if(httpFolderInvokationDIV == null)
+    {
+        httpFolderInvokationDIV = document.createElement("DIV");
+        document.body.appendChild(httpFolderInvokationDIV);
+        httpFolderInvokationDIV.addBehavior("#default#httpFolder");
+        httpFolderInvokationDIV.onReadyStateChange = httpFolderInvokeNavigate;
+    }
+    // check if DIV is ready
+    if(httpFolderInvokationDIV.readyState == "complete")
+    {
+        httpFolderInvokationDIV.onReadyStateChange = null;
+        try
+        {
+            var result = httpFolderInvokationDIV.navigateFrame(httpFolderInvokationTarget,"_blank");
+            if(result != "OK")
+            {
+                alert("Error Opening in Windows Explorer. Error code:\n" + result);
+            }
+        }
+        catch(e)
+        {
+            alert("Error Opening in Windows Explorer. Exception:\n" + e.name + "\n" + e.message);
+        }
+    }
+}

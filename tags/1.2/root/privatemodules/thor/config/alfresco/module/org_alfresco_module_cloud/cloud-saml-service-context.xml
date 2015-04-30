@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="samlInitializer" class="org.opensaml.DefaultBootstrap"
+        init-method="bootstrap" />
+        
+    <!-- SAML Config Admin Service -->
+
+	<bean id="samlConfigAdminService"
+		class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.SAMLConfigAdminServiceImpl" init-method="init">
+		<property name="attributeService" ref="AttributeService" />
+		<property name="importerBootstrap" ref="spacesBootstrap" />
+		<property name="repositoryHelper" ref="repositoryHelper" />
+		<property name="nodeService" ref="nodeService" />
+		<property name="namespaceService" ref="namespaceService" />
+		<property name="contentService" ref="contentService" />
+		<property name="samlTrustEngineCache" ref="samlTrustEngineCache"/>
+	</bean>
+	
+    <bean id="samlTrustEngineStore"
+        class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.core.SAMLTrustEngineStoreImpl" init-method="init">
+       <property name="samlConfigAdminService" ref="samlConfigAdminService" />
+    </bean>
+    
+    <bean id="samlXMLSignatureSecurityPolicyRule"
+        class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.core.SAMLXMLSignatureSecurityPolicyRule"
+        init-method="init">
+        <property name="samlTrustEngineStore" ref="samlTrustEngineStore" />
+    </bean>
+
+    <bean id="samlHttpPostBodyDataGenerator"
+        class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.core.SAMLHttpPostBodyDataGenerator" />
+
+    <bean id="samlHttpPostSimpleSignDecoder"
+        class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.core.SAMLHttpPostSimpleSignDecoder" />
+
+    <bean id="securityPolicyResolver"
+        class="org.opensaml.ws.security.provider.StaticSecurityPolicyResolver">
+        <constructor-arg ref="samlSecurityPolicyDelegate" />
+    </bean>
+
+    <bean id="samlMapBasedStorageService" class="org.opensaml.util.storage.MapBasedStorageService" />
+
+    <bean id="samlReplayCache" class="org.opensaml.util.storage.ReplayCache">
+        <constructor-arg ref="samlMapBasedStorageService" />
+        <constructor-arg value="${message.state.duration.in.millis}" />
+    </bean>
+
+    <bean id="samlMessageReplayRule" class="org.opensaml.common.binding.security.MessageReplayRule">
+        <constructor-arg ref="samlReplayCache" />
+    </bean>
+
+    <bean id="samlIssueInstantRule" class="org.opensaml.common.binding.security.IssueInstantRule">
+        <constructor-arg index="0"
+            value="${issueInstantRule.check.clock.skew.in.seconds}" />
+        <constructor-arg index="1"
+            value="${issueInstantRule.check.expiration.in.seconds}" />
+    </bean>
+    
+    <bean id="samlSecurityPolicyDelegate"
+        class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.core.SecurityPolicyDelegate">
+        <constructor-arg>
+            <list>
+                <ref bean="samlXMLSignatureSecurityPolicyRule" />
+                <ref bean="samlIssueInstantRule" />
+                <ref bean="samlMessageReplayRule" />
+            </list>
+        </constructor-arg>
+    </bean>
+    
+    <bean id="samlBinding" class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.core.SAML2PostBindingImpl" init-method="init">
+        <property name="httpPostBodyDataGenerator" ref="samlHttpPostBodyDataGenerator" />
+        <property name="samlDecoder" ref="samlHttpPostSimpleSignDecoder" />
+        <property name="resolver" ref="securityPolicyResolver" />
+    </bean>
+
+	<bean id="samlKeyStoreParameters" class="org.alfresco.encryption.KeyStoreParameters" init-method="init">
+		<property name="name" value="SAML Key Store" />
+		<property name="location" value="${saml.keystore.location}" />
+		<property name="type" value="${saml.keystore.type}" />
+		<property name="provider" value="${saml.keystore.provider}" />
+		<property name="keyMetaDataFileLocation" value="${saml.keystore.keyMetaData.location}" />
+	</bean>
+
+	<bean id="samlCredentialResolverDelegate" class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.core.SAMLCredentialResolverDelegate">
+		<property name="keyStoreParameters" ref="samlKeyStoreParameters" />
+		<property name="keyResourceLoader" ref="springKeyResourceLoader" />
+		<property name="validateKeyChanges" value="false" />
+		<property name="encryptionKeysRegistry" ref="encryptionKeysRegistry" />
+	</bean>
+
+	<bean id="samlAssertionConsumer" class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.SAMLAssertionConsumerImpl">
+		<property name="emailAddressService" ref="emailAddressService" />
+	</bean>
+
+    <bean id="samlRequestMessageGenerator" class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.SAMLMessageGeneratorImpl" init-method="init">
+        <property name="credentialResolver" ref="samlCredentialResolverDelegate" />
+        <property name="samlBinding" ref="samlBinding" />
+    </bean>
+    
+    <!-- SAML Authentication Service -->
+    
+    <bean id="samlAuthenticationService" class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.SAMLAuthenticationServiceImpl">
+        <property name="smalRequestMessageGenerator" ref="samlRequestMessageGenerator" />
+        <property name="samlAssertionConsumer" ref="samlAssertionConsumer" />
+        <property name="samlBinding" ref="samlBinding" />
+        <property name="sysAdminParams" ref="sysAdminParams" />
+        <property name="spIssuerNamePrefix" value="${sp.issuer.namePrefix}" />
+        <property name="spSsoURLSuffix" value="${saml.share.spSsoURLSuffix}" />
+        <property name="spSloRequestURLSuffix" value="${saml.share.spSloRequestURLSuffix}" />
+        <property name="spSloResponseURLSuffix" value="${saml.share.spSloResponseURLSuffix}" />
+        <property name="samlConfigAdminService" ref="samlConfigAdminService" />
+    </bean>    
+</beans>

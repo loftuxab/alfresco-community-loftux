@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+                           http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+    
+   <!--Activiti admin UI Authentication -->    
+  	<bean id="activitiLoginHandler" class="org.alfresco.enterprise.workflow.activiti.AlfrescoLoginHandler">
+      <property name="nodeService" ref="NodeService" />
+      <property name="personService" ref="PersonService" />
+      <property name="authorityService" ref="AuthorityService" />
+      <property name="authenticationService" ref="AuthenticationService" />
+   </bean>
+    
+   <!-- Import activiti UI context -->
+   <import resource="classpath*:activiti-ui-context.xml" />
+   
+   <bean id="registerScriptNodeRenderer" class="org.activiti.explorer.ui.variable.VariableRendererConfigurer">
+   		<property name="variableRendererManager" ref="variableRendererManager" />
+   		<property name="renderer">
+		   <bean id="activitiScriptNodeRenderer" class="org.alfresco.enterprise.workflow.activiti.ActivitiScriptNodeRenderer" />
+   		</property>
+   </bean>
+   
+   <bean id="registerScriptNodeListRenderer" class="org.activiti.explorer.ui.variable.VariableRendererConfigurer">
+   		<property name="variableRendererManager" ref="variableRendererManager" />
+   		<property name="renderer">
+		   <bean id="activitiScriptNodeListRenderer" class="org.alfresco.enterprise.workflow.activiti.ActivitiScriptNodeListRenderer" />
+   		</property>
+   </bean>
+   
+   <bean id="multiTenantProcessDefinitionFilter" class="org.alfresco.enterprise.workflow.activiti.MultiTenantProcessDefinitionFilter">
+         <property name="tenantService" ref="tenantService" />
+         <property name="processDefinitionFilterFactory" ref="processDefinitionFilterFactory" />
+   </bean>
+  
+   <bean id="multiTenantDeploymentFilter" class="org.alfresco.enterprise.workflow.activiti.MultiTenantDeploymentFilter">
+         <property name="tenantService" ref="tenantService" />
+         <property name="deploymentFilterFactory" ref="deploymentFilterFactory" />
+   </bean>
+</beans>

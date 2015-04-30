@@ -1,0 +1,51 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Tests for WAT1" verbose="1" preserve-order="true">
+    <groups>
+        <run>
+            <exclude name="DataPrep.*" />
+            <exclude name="CloudOnly" />
+            <exclude name="Hybrid.*" />
+        </run>
+    </groups>
+    
+    <listeners>
+        <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter" />
+    </listeners>
+        
+    <test name="SiteAdminGroupTests" verbose="1" parallel="classes" thread-count="1">
+        <classes>
+            <class name="org.alfresco.share.admin.SiteAdminGroupTests"></class>
+        </classes>
+    </test>
+    <test name="BecomeSiteManagerTest" verbose="1" parallel="classes" thread-count="1">
+        <classes>
+            <class name="org.alfresco.share.admin.BecomeSiteManagerTest"></class>
+        </classes>
+    </test>
+    <test name="DeleteSiteTests" verbose="1" parallel="classes" thread-count="1">
+        <classes>
+            <class name="org.alfresco.share.admin.DeleteSiteTests"></class>
+        </classes>
+    </test>
+    <test name="ManageSitesPageTest" verbose="1" parallel="classes" thread-count="1">
+        <classes>
+            <class name="org.alfresco.share.admin.ManageSitesPageTest"></class>
+        </classes>
+    </test>
+    <test name="SiteAdminChangeVisibilityTest" verbose="1" parallel="classes" thread-count="1">
+        <classes>
+            <class name="org.alfresco.share.admin.SiteAdminChangeVisibilityTest"></class>
+        </classes>
+    </test>    
+    <test name="FacetedSearchPageTest" verbose="1" parallel="classes" thread-count="1">
+        <classes>
+            <class name="org.alfresco.share.search.FacetedSearchPageTest"></class>
+        </classes>
+    </test>
+    <test name="FacetedSearchPageTest1" verbose="1" parallel="classes" thread-count="1">
+        <classes>
+            <class name="org.alfresco.share.search.FacetedSearchPageTest1"></class>
+        </classes>
+    </test>        
+    
+</suite>

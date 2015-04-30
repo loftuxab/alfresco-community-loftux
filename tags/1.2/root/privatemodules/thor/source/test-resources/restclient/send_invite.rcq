@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rest-client version="2.3.3"><request><http-version>1.1</http-version><URL>http://ec2-50-19-20-233.compute-1.amazonaws.com:8080/alfresco/service/internal/cloud/sites/david-caruana-alfresco-com/invitations</URL><method>POST</method><auth-methods>BASIC</auth-methods><auth-preemptive>false</auth-preemptive><auth-username>david.caruana@alfresco.com</auth-username><auth-password>rO0ABXQACHBhc3N3b3Jk</auth-password><body content-type="application/json" charset="UTF-8">   {
+      "inviterEmail": "david.caruana@alfresco.com",
+      "inviteeEmails": ["bob@ibm.example"],
+      "role": "SiteContributor",
+      "inviterMessage": "Optional personal message..."
+   }
+</body></request></rest-client>

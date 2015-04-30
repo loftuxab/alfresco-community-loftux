@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                           http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+   <bean id="syncServiceResourceBundle" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+      <property name="resourceBundles">
+         <list>
+            <value>alfresco.enterprise.messages.sync-messages</value>
+         </list>
+      </property>
+   </bean>
+
+   <bean id="SyncService" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.enterprise.repo.sync.SyncService</value>
+      </property>
+      <property name="target">
+         <ref bean="syncService" />
+      </property>
+      <property name="interceptorNames">
+         <list>
+            <idref local="SyncService_transaction" />
+            <idref bean="AuditMethodInterceptor" />
+            <idref bean="exceptionTranslator" />
+            <idref local="SyncService_security" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="SyncService_transaction"
+      class="org.springframework.transaction.interceptor.TransactionInterceptor">
+      <property name="transactionManager">
+         <ref bean="transactionManager" />
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">${server.transaction.mode.default}</prop>
+         </props>
+      </property>
+   </bean>
+
+   <bean id="SyncService_security"
+      class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+   
+   <bean id="syncService" class="org.alfresco.enterprise.repo.sync.SyncServiceImpl" init-method="init">
+      <property name="nodeService" ref="nodeService" />
+      <property name="fileFolderService" ref="FileFolderService" />
+      <property name="checkOutCheckInService" ref="CheckOutCheckInService" />
+      <property name="behaviourFilter" ref="policyBehaviourFilter" />
+      <property name="contentService" ref="contentService" />
+      <property name="syncAdminService" ref="syncAdminService" />
+      <property name="syncAuditService" ref="syncAuditService" />
+      <property name="syncChangeMonitor" ref="syncChangeMonitor" />
+      <property name="ssmnChangeManagement" ref="ssmnChangeManagement" />
+      <property name="versionService" ref="versionService" />
+      <property name="retryingTransactionHelper" ref="retryingTransactionHelper" />
+      <property name="lockService" ref="lockService" />
+   </bean>
+
+   <!-- The Sync Tracker Component Pushes and Pulls content to a remote repo -->
+   <bean id="syncTrackerComponent" class="org.alfresco.enterprise.repo.sync.SyncTrackerComponent" init-method="init">
+      <property name="syncAdminService" ref="syncAdminService" />
+      <property name="syncAuditService" ref="syncAuditService" />
+      <property name="syncService" ref="syncService" />
+      <property name="cloudSyncMemberNodeTransport" ref="cloudSyncMemberNodeTransport" />
+      <property name="cloudSyncSetDefinitionTransport" ref="cloudSyncSetDefinitionTransport" />
+      <property name="jobLockService" ref="jobLockService" />
+      <property name="retryingTransactionHelper" ref="retryingTransactionHelper" />
+      <property name="transactionService" ref="transactionService" />
+      <property name="nodeService" ref="nodeService" />
+      <property name="checkOutCheckInService" ref="CheckOutCheckInService" />
+      <property name="personService" ref="personService" />
+      <property name="ssmnChangeManagement" ref="ssmnChangeManagement" />
+      <property name="lockService" ref="lockService" />
+      <property name="attributeService" ref="attributeService" />
+      <property name="permissionService" ref="permissionService" />
+      <property name="pushThreadCnt" value="3" />
+      <property name="pullThreadCnt" value="3" />
+      <property name="serverModeProvider">
+           <ref bean="serverMode"/>
+      </property>
+      <property name="behaviourFilter" ref="policyBehaviourFilter" />
+   </bean>
+   
+   <!-- This bean is responsible for plugging dynamic custom models into the syncChangeMonitor -->
+   <bean id="syncDynamicClassMonitor" class="org.alfresco.enterprise.repo.sync.DynamicClassMonitor" init-method="init">
+      <property name="policyComponent" ref="policyComponent" />
+      <property name="namespaceService" ref="NamespaceService" />
+      <property name="syncChangeMonitor" ref="syncChangeMonitor" />
+   </bean>
+   
+
+   <!-- This bean is responsible for *detecting* sync changes and passing them to the Sync Audit Service -->
+   <bean id="syncChangeMonitor" class="org.alfresco.enterprise.repo.sync.SyncChangeMonitor" depends-on="syncDictionaryBootstrap, hybridWorkflowModelBootstrap">
+      <property name="transactionService" ref="transactionService" />
+      <property name="behaviourFilter" ref="policyBehaviourFilter" />
+      <property name="dictionaryService" ref="DictionaryService" />
+      <property name="namespaceService" ref="NamespaceService" />
+      <property name="nodeService" ref="NodeService" />
+      <property name="fileFolderService" ref="FileFolderService" />
+      <property name="policyComponent" ref="policyComponent" />
+      <property name="syncAdminService" ref="syncAdminService" />
+      <property name="syncAuditService" ref="syncAuditService" />
+      <property name="qnameDAO" ref="qnameDAO" />
+
+
+      <!-- The QName properties below are used to configure which properties & aspects are to be tracked for syncing purposes. 
+         The bean implementation class has some hard-coded types/aspects which are always tracked. -->
+
+      <!-- These are the Alfresco core properties which are tracked. It is not necessary to include cm:content as that is always 
+         tracked. Each value must either be a property qname or an aspect qname followed by ".*" -->
+      <property name="propertiesToTrack">
+         <list>
+            <value>cm:name</value>
+            <value>sys:locale</value>
+            <value>cm:author.*</value>
+            <value>cm:geographic.*</value>
+            <value>cm:titled.*</value>
+            <value>exif:exif.*</value>
+            <value>sys:hidden.*</value>
+            <value>hwf:hybridWorkflow.*</value>
+         </list>
+      </property>
+
+      <!-- We track the add/remove of these core aspects. -->
+      <property name="aspectsToTrack">
+         <list>
+            <value>cm:titled</value>
+            <value>sys:localized</value>
+            <value>sys:hidden</value>
+            <value>hwf:hybridWorkflow</value>
+         </list>
+      </property>
+   </bean>
+
+   <!-- This bean holds behaviours/policys for SyncSetMemberNodes - apart from any that are specifically linked to the SyncAuditService -->
+   <bean id="syncSetMemberNodeAspectBehaviours" class="org.alfresco.enterprise.repo.sync.SyncSetMemberNodeAspectBehaviours"
+      init-method="init">
+      <property name="policyComponent" ref="policyComponent" />
+      <property name="nodeService" ref="nodeService" />
+      <property name="lockService" ref="lockService" />
+      <property name="nodeArchiveService" ref="nodeArchiveService"/>
+
+   </bean>
+
+   <bean id="ssmnChangeManagement" class="org.alfresco.enterprise.repo.sync.deltas.SsmnChangeManagement"
+      init-method="init">
+      <property name="contentService" ref="contentService" />
+      <property name="nodeService" ref="nodeService" />
+      <property name="syncAdminService" ref="syncAdminService" />
+      <property name="syncChangeMonitor" ref="syncChangeMonitor" />
+      <property name="permissionService" ref="permissionService" />
+   </bean>
+
+   <!-- Cron scheduled sync PULL job -->
+   <!-- TODO Have this such that PULL job can be easily disabled in the Cloud -->
+   <bean id="onPremiseSyncPullTrigger" class="org.alfresco.util.CronTriggerBean">
+
+      <property name="enabled">
+         <value>${sync.pullJob.enabled}</value>
+      </property>
+
+      <property name="jobDetail">
+         <bean id="onPremiseSyncPullJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+            <property name="jobClass">
+               <value>org.alfresco.enterprise.repo.sync.OnPremiseSyncPullJob</value>
+            </property>
+            <property name="jobDataAsMap">
+               <map>
+                  <entry key="syncTrackerComponent">
+                     <ref bean="syncTrackerComponent" />
+                  </entry>
+               </map>
+            </property>
+         </bean>
+      </property>
+      <property name="scheduler">
+         <ref bean="schedulerFactory" />
+      </property>
+      <property name="cronExpression">
+         <!-- FIXME This is every minute - for testing only. Will be a JMX-able property -->
+         <value>0 * * * * ?</value>
+      </property>
+      <property name="startDelayMinutes">
+         <value>${system.cronJob.startDelayMinutes}</value>
+      </property>
+   </bean>
+
+   <!-- Cron scheduled sync PUSH job -->
+   <!-- TODO Have this such that PUSH job can be easily disabled in the Cloud -->
+   <bean id="onPremiseSyncPushCronTrigger" class="org.alfresco.util.CronTriggerBean">
+
+      <property name="enabled">
+         <value>${sync.pushJob.enabled}</value>
+      </property>
+
+      <property name="jobDetail">
+         <bean id="onPremiseSyncPushJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+            <property name="jobClass">
+               <value>org.alfresco.enterprise.repo.sync.OnPremiseSyncPushJob</value>
+            </property>
+            <property name="jobDataAsMap">
+               <map>
+                  <entry key="syncTrackerComponent">
+                     <ref bean="syncTrackerComponent" />
+                  </entry>
+               </map>
+            </property>
+         </bean>
+      </property>
+      <property name="scheduler">
+         <ref bean="schedulerFactory" />
+      </property>
+      <property name="cronExpression">
+         <value>0/15 * * * * ?</value>
+      </property>
+      <property name="startDelayMinutes">
+         <value>${system.cronJob.startDelayMinutes}</value>
+      </property>
+   </bean>
+
+
+</beans>

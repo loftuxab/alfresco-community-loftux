@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>SAML AuthnResponse Help</title>
+   <title-id>page.saml-authnresponse-help.title</title-id>
+   <description>Page for instructing user how to proceed after failing to login</description>
+   <template-instance>simple-guest</template-instance>
+   <authentication>guest</authentication>
+   <components>
+
+      <!-- Signup profile -->
+      <component>
+         <region-id>components</region-id>
+         <url>/cloud/core/components/saml/authnresponse-help</url>
+      </component>
+
+   </components>
+</page>

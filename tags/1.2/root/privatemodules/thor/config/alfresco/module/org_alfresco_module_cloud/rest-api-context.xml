@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!--                                      -->
+    <!--      Account Service REST API        -->
+    <!--                                      -->
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.account.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AccountGet"
+          parent="webscript">
+          <property name="accountService" ref="AccountService"/>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.accounts.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AccountsGet"
+          parent="webscript">
+          <property name="accountService" ref="AccountService"/>
+    </bean>
+
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.count-accounts.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.CountAccountsGet"
+          parent="webscript">
+          <property name="accountService" ref="AccountService"/>
+    </bean>
+
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.account.put"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AccountPut"
+          parent="webscript">
+          <property name="accountService" ref="AccountService"/>
+          <property name="accountAdminService" ref="AccountAdminService"/>
+          <property name="accountRegistry" ref="accountRegistry"/>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.user-accounts.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.UserAccountsGet"
+          parent="webscript">
+          <property name="registrationService" ref="RegistrationService"/>
+          <property name="directoryService" ref="directoryService"/>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.add-external-user.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AddExternalUserPost"
+          parent="webscript">
+          <property name="registrationService" ref="RegistrationService"/>
+          <property name="directoryService" ref="directoryService"/>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.remove-external-user.delete"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.RemoveExternalUserDelete"
+          parent="webscript">
+          <property name="accountService" ref="AccountService"/>
+          <property name="registrationService" ref="RegistrationService"/>
+          <property name="directoryService" ref="directoryService"/>
+          <property name="networkAdmin" ref="webscripts.networkadmin" />
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.account-types.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AccountTypesGet"
+          parent="webscript">
+          <property name="accountRegistry" ref="accountRegistry"/>
+    </bean>
+    
+    
+    <!--                                           -->
+    <!--      Self signup Workflow REST API        -->
+    <!--                                           -->
+    
+    <bean id="baseSelfSignupWebscript" abstract="true" parent="webscript">
+          <property name="emailAddressService" ref="emailAddressService"/>
+          <property name="accountService" ref="AccountService"/>
+          <property name="workflowService" ref="WorkflowService"/>
+          <property name="registrationService" ref="RegistrationService"/>
+          <property name="directoryService" ref="directoryService"/>
+    </bean>
+    
+    <!-- URL to initiate self signup -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.account-signup.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AccountSignupPost"
+          parent="baseSelfSignupWebscript">
+    </bean>
+
+    <!-- URL to activate the account -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.account-activation.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AccountActivationPost"
+          parent="baseSelfSignupWebscript">
+    </bean>
+    
+     <!-- URL to cancel the account signup -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.account-cancellation.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AccountCancellationPost"
+          parent="baseSelfSignupWebscript">
+    </bean>
+    
+    <!-- URL to query a specific signup workflow status -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.signup-status.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.SignupStatusGet"
+          parent="baseSelfSignupWebscript">
+    </bean>
+
+
+   <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.accounts.account-initiated-signup.post"
+         class="org.alfresco.module.org_alfresco_module_cloud.accounts.webscripts.AccountInitiatedSignupPost"
+         parent="webscript">
+      <property name="registrationService" ref="RegistrationService"/>
+   </bean>
+
+
+   <!--                                          -->
+    <!--      Email Address Service REST API      -->
+    <!--                                          -->
+    
+    <!-- URL to request email validation (deprecated) -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.emails.email-validation.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.emailaddress.webscripts.EmailValidationPost"
+          parent="webscript">
+          <property name="emailAddressService" ref="emailAddressService"/>
+    </bean>
+    
+    <!-- URL to request email domains validation - to validate one or more domains in bulk -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.emails.email-domains-validation.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.emailaddress.webscripts.EmailDomainsValidationPost"
+          parent="webscript">
+          <property name="emailAddressService" ref="emailAddressService"/>
+    </bean>
+    
+    <!-- URLs for the CRUD of Invalid Domains (the blacklist) -->
+    <bean id="baseInvalidDomainWebscript" abstract="true" parent="webscript">
+          <property name="emailAddressService" ref="emailAddressService"/>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.emails.invalid-domain.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.emailaddress.webscripts.InvalidDomainGet"
+          parent="baseInvalidDomainWebscript"/>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.emails.invalid-domains.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.emailaddress.webscripts.InvalidDomainsGet"
+          parent="baseInvalidDomainWebscript"/>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.emails.invalid-domain.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.emailaddress.webscripts.InvalidDomainPost"
+          parent="baseInvalidDomainWebscript"/>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.emails.invalid-domain.put"
+          class="org.alfresco.module.org_alfresco_module_cloud.emailaddress.webscripts.InvalidDomainPut"
+          parent="baseInvalidDomainWebscript"/>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.emails.invalid-domain.delete"
+          class="org.alfresco.module.org_alfresco_module_cloud.emailaddress.webscripts.InvalidDomainDelete"
+          parent="baseInvalidDomainWebscript"/>
+    
+    
+    
+    <!--                                                     -->
+    <!--      Cloud Site Invitation  Workflow REST API       -->
+    <!--                                                     -->
+    
+    <bean id="baseCloudSiteInviteWebscript" abstract="true" parent="webscript">
+          <property name="emailAddressService" ref="emailAddressService"/>
+          <property name="cloudInvitationService" ref="CloudInvitationService"/>
+          <property name="workflowService" ref="WorkflowService"/>
+          <property name="registrationService" ref="RegistrationService"/>
+    </bean>
+    
+    <!-- URL to initiate cloud invitation signup -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.invitations.cloud-invitation.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.invitation.webscripts.StartCloudSiteInvitationPost"
+          parent="baseCloudSiteInviteWebscript">
+    </bean>
+    
+    <!-- URL for invitee to send their response -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.invitations.cloud-invitation-response.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.invitation.webscripts.CloudSiteInvitationResponsePost"
+          parent="baseCloudSiteInviteWebscript">
+        <property name="authenticationService" ref="AuthenticationService"/>
+        <property name="directoryService" ref="directoryService"/>
+    </bean>
+    
+    <!-- URL to query a site invitee's invitation status -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.invitations.invitation-status.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.invitation.webscripts.InvitationStatusGet"
+          parent="baseCloudSiteInviteWebscript">
+    </bean>
+    
+    <!-- URL to send a reminder to an invite's invitee -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.invitations.invitation-reminder.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.invitation.webscripts.InvitationReminderPost"
+          parent="baseCloudSiteInviteWebscript">
+    </bean>
+    
+    <!-- URL to query a site's pending invitations -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.invitations.pending-invitations-site.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.invitation.webscripts.PendingInvitationsSiteGet"
+          parent="baseCloudSiteInviteWebscript">
+    </bean>
+    
+    <!-- URL to query an invitee's pending invitations -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.invitations.pending-invitations-invitee.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.invitation.webscripts.PendingInvitationsInviteeGet"
+          parent="baseCloudSiteInviteWebscript">
+    </bean>
+    
+    <!-- URL to cancel an invitation -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.invitations.cloud-invitation.delete"
+          class="org.alfresco.module.org_alfresco_module_cloud.invitation.webscripts.CloudInvitationDelete"
+          parent="baseCloudSiteInviteWebscript">
+    </bean>
+    
+    
+    
+    <!--                                                     -->
+    <!--       Cloud Reset Password  Workflow REST API       -->
+    <!--                                                     -->
+    
+    <!-- URL to initiate a user password change for a cloud user. -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.users.request-reset-password.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.users.webscripts.RequestPasswordResetPost"
+          parent="webscript">
+        <property name="workflowService" ref="WorkflowService"/>
+        <property name="timerEnd" value="${cloud.resetpassword.endTimer}" />
+    </bean>
+    
+    <!-- URL to actually change the user password. -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.users.change-password.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.users.webscripts.ChangePasswordPost"
+          parent="webscript">
+        <property name="historyService" ref="activitiHistoryService"/>
+        <property name="workflowService" ref="WorkflowService"/>
+    </bean>
+    
+    <!-- URL to query a specific reset-password workflow status -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.users.reset-status.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.users.webscripts.ResetPasswordStatusGet"
+          parent="webscript">
+        <property name="workflowService" ref="WorkflowService"/>
+    </bean>
+    
+    
+    <!--                                                        -->
+    <!--       Promotion and demotion of NetworkAdmin users     -->
+    <!--                                                        -->
+    
+    <!-- URL to promote a user to a NetworkAdmin -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.users.network-admin.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.users.webscripts.NetworkAdminPost"
+          parent="webscript">
+        <property name="networkAdmin" ref="webscripts.networkadmin" />
+        <property name="accountService" ref="AccountService"/>
+        <property name="registrationService" ref="RegistrationService"/>
+    </bean>
+    
+    <!-- URL to demote a user from NetworkAdmin -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.users.network-admin.delete"
+          class="org.alfresco.module.org_alfresco_module_cloud.users.webscripts.NetworkAdminDelete"
+          parent="webscript">
+        <property name="networkAdmin" ref="webscripts.networkadmin" />
+        <property name="accountService" ref="AccountService"/>
+        <property name="registrationService" ref="RegistrationService"/>
+    </bean>
+    
+    <!--                                                        -->
+    <!--                   User/Network metadata                -->
+    <!--                                                        -->
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.users.user-network.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.users.webscripts.UserNetworkGet"
+          parent="webscript">
+        <property name="nodeService" ref="NodeService"></property>
+        <property name="personService" ref="PersonService"></property>
+        <property name="accountService" ref="AccountService"></property>
+    </bean>
+    
+    <!--  Network Admin -->
+
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.users.users.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.networkadmin.scripts.ListUsersWebScript"
+          parent="webscript">
+        <property name="cloudPersonService" ref="cloudPersonService" />
+        <property name="networkAdmin" ref="webscripts.networkadmin" />
+    </bean>
+
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.users.users.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.networkadmin.scripts.CreateUsersWebScript"
+          parent="webscript">
+        <property name="networkAdmin" ref="webscripts.networkadmin" />
+        <property name="registrationService" ref="RegistrationService"/>
+    </bean>
+    
+    
+    <!--                                                     -->
+    <!--      Cloud SAML (SSO / SLO) REST API                -->
+    <!--                                                     -->
+    
+     <!-- SAML Enabled ? - is the network/tenant SAML-enabled (or user's primary network) -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-enabled.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLEnabledGet"
+          parent="webscript">
+          <property name="samlConfigAdminService" ref="samlConfigAdminService"/>
+          <property name="networkAdmin" ref="webscripts.networkadmin" />
+          <property name="tenantService" ref="tenantService" />
+    </bean>
+    
+    <!-- Get/Post/Put SAML Config Admin -->
+    
+    <bean id="baseSAMLConfigAdminWebscript" abstract="true" parent="webscript">
+          <property name="samlConfigAdminService" ref="samlConfigAdminService"/>
+          <property name="networkAdmin" ref="webscripts.networkadmin"/>
+          <property name="accountService" ref="AccountService"></property>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-config-admin.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLConfigAdminGet"
+          parent="baseSAMLConfigAdminWebscript">
+          <property name="samlAuthenticationService" ref="samlAuthenticationService" />
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-config-admin.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLConfigAdminPostPut"
+          parent="baseSAMLConfigAdminWebscript">
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-config-admin.put"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLConfigAdminPostPut"
+          parent="baseSAMLConfigAdminWebscript">
+    </bean>
+    
+        <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-config-admin-multipart.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLConfigAdminMultipartPost"
+          parent="baseSAMLConfigAdminWebscript">
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-config-admin.delete"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLConfigAdminDelete"
+          parent="baseSAMLConfigAdminWebscript">     
+    </bean>
+    
+    <bean id="baseSAMLAdminWebscript" abstract="true" parent="webscript">
+          <property name="networkAdmin" ref="webscripts.networkadmin"/>
+          <property name="accountService" ref="AccountService"></property>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-sp-public-cert.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLSpPublicCertGet"
+          parent="baseSAMLAdminWebscript">
+          <property name="samlAuthenticationService" ref="samlAuthenticationService" />
+    </bean>
+    
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-sp-metadata.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLSpMetadataGet"
+          parent="baseSAMLAdminWebscript">
+          <property name="samlAuthenticationService" ref="samlAuthenticationService" />
+    </bean>
+    
+    <!-- note: requests/responses are sent/received to/from the Network-specific iDP (Identity Provider) if configured for a given Enterprise Network -->
+    
+    <bean id="baseSAMLAuthWebscript" abstract="true" parent="webscript">
+          <property name="samlConfigAdminService" ref="samlConfigAdminService"/>
+          <property name="samlAuthenticationService" ref="samlAuthenticationService" />
+    </bean>
+    
+    <!-- SAML SSO (SingleSignOn) Request - to initiate and send the SAML auth request XML -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-sso-request.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SSORequestGet"
+          parent="baseSAMLAuthWebscript">
+    </bean>
+    
+    <!-- SAML SSO (SingleSignOn) Response => ACS (Assertion Consumer Service) - to receive the signed SAML auth response XML -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-sso-response-acs.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SSOResponseACSPost"
+          parent="baseSAMLAuthWebscript">
+          <property name="personService" ref="PersonService"/>
+          <property name="ticketComponent" ref="ticketComponent"/>
+          <property name="registrationService" ref="RegistrationService"/>
+          <property name="cloudInvitationService" ref="CloudInvitationService"/>
+    </bean>
+    
+    <!-- SAML SLO (SingleLogOut) Request - to initiate and send the SAML SLO request XML --> 
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-slo-request.get"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SLORequestGet"
+          parent="baseSAMLAuthWebscript">
+    </bean>
+    
+    <!-- SAML SLO (SingleLogOut) Response - to receive the signed SAML SLO response XML -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-slo-response.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SLOResponsePost"
+          parent="baseSAMLAuthWebscript">
+          <property name="ticketComponent" ref="ticketComponent"/>
+    </bean>
+    
+        <!-- SAML SLO (SingleLogOut) Request - to receive the signed SAML SLO request XML -->
+    <bean id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-slo-request.post"
+          class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SLORequestPost"
+          parent="baseSAMLAuthWebscript">
+          <property name="ticketComponent" ref="ticketComponent"/>
+    </bean>
+
+	<!-- SAML IdP Certificate -->
+	<bean
+		id="webscript.org.alfresco.module.org_alfresco_module_cloud.authentication.saml.saml-idp-public-cert.get"
+		class="org.alfresco.module.org_alfresco_module_cloud.authentication.saml.webscripts.SAMLIdpPublicCertGet"
+		parent="baseSAMLAdminWebscript">
+		<property name="samlConfigAdminService" ref="samlConfigAdminService" />
+	</bean>
+    
+</beans>

@@ -1,0 +1,30 @@
+<webscript>
+   <shortname>GET Remote Synced Node</shortname>
+   <description><![CDATA[Web Script that returns some data about a Synced Node on a sync-target Alfresco instance.
+   <p/>
+   The nodeRef query parameter should refer to a valid NodeRef in the local repository.
+   Normally the response body will be of the form:
+   <pre>
+   {
+      "remoteNetworkId": "alfresco.com",
+      "remoteNodeRef": "workspace://SpacesStore/9bc01309-8112-406b-b614-fd70bf3d83e2",
+      "remoteParentNodeRef": "workspace://SpacesStore/9bc01309-8112-406b-b614-fd70bf3d83e2",
+      "localRootNodeRef": "workspace://SpacesStore/9bc01309-8112-406b-b614-fd70bf3d83e2",
+      "localRootNodeName": "Testfolder",
+      "syncSetOwnerFirstName": "Joe",
+      "syncSetOwnerLastName": "Soap",
+      "syncSetOwnerUserName": "jsoap"
+   }
+   </pre>
+   If the local nodeRef does not exist, the webscript will return a 404.
+   If the local nodeRef is not a member of a SyncSet, the webscript will return a 403.
+   If the local nodeRef is a member of a SyncSet, but does not have a record of its partner NodeRef (e.g. because it has not yet been synced), then the remoteNodeRef value will be the empty string.
+   ]]>
+   </description>
+   <url>/enterprise/sync/remotesyncednode?nodeRef={nodeRef}</url>
+   <authentication>user</authentication>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction allow="readonly">required</transaction>
+   <lifecycle>internal</lifecycle>
+</webscript>

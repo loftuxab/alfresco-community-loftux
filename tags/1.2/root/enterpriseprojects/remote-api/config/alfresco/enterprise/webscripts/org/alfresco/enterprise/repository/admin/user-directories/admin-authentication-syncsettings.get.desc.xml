@@ -1,0 +1,8 @@
+<webscript>
+   <shortname>Admin Console - Authentication Synchronization Settings</shortname>
+   <description><![CDATA[Admin Console WebScript that display a Form to collect common synchronization settings for all LDAP authentication subsystems.]]></description>
+   <url>/enterprise/admin/admin-authentication-syncsettings</url>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+</webscript>

@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>ADM Reindex - get reindex/tracker progress</shortname>
+  <description>Get summary progress of reindex/tracker (on this server)</description>
+  <url>/enterprise/admin/reindex/adm/progress</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

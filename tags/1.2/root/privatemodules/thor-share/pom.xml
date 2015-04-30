@@ -1,0 +1,193 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>alfresco-cloud-share</artifactId>
+    <name>Alfresco Cloud Share</name>
+    <packaging>war</packaging>
+
+    <parent>
+        <artifactId>alfresco-thor-parent</artifactId>
+        <groupId>org.alfresco.cloud</groupId>
+        <version>5.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <maven.tomcat.path>/${project.build.finalName}</maven.tomcat.path>
+        <maven.tomcat.port>8081</maven.tomcat.port>
+        <maven.tomcat.httpsPort>8444</maven.tomcat.httpsPort>
+        <maven.tomcat.url>http://localhost:${maven.tomcat.port}/manager/text</maven.tomcat.url>
+    </properties>
+
+    <dependencies>
+        <!-- Defines WAR to overlay -->
+        <dependency>
+            <groupId>${alfrescoEnterprise.groupId}</groupId>
+            <artifactId>share-enterprise</artifactId>
+            <version>${alfrescoEnterprise.version}</version>
+            <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Alfresco dependencies -->
+        <dependency>
+            <groupId>${alfrescoEnterprise.groupId}</groupId>
+            <artifactId>share</artifactId>
+            <version>${alfrescoEnterprise.version}</version>
+            <classifier>classes</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <!-- alfresco-repository is only used to get version.properties -->
+        <dependency>
+            <groupId>${alfrescoEnterprise.groupId}</groupId>
+            <artifactId>alfresco-repository</artifactId>
+            <version>${alfrescoEnterprise.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- 3rd party cloud-specific dependencies -->
+        <dependency>
+            <groupId>com.newrelic</groupId>
+            <artifactId>newrelic-api</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-cloud</artifactId>
+            <version>2.4</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>share</finalName>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                <!-- Fetch and packages version.properties, so that MMT knows the version of share.war, to apply AMPs -->
+                    <execution>
+                        <id>fetch-version-properties</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.alfresco</groupId>
+                                    <artifactId>alfresco-repository</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <includes>alfresco/version.properties</includes>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                <!-- Fetch amp files -->
+                    <execution>
+                        <id>fetch-amps</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.alfresco.integrations</groupId>
+                                    <artifactId>alfresco-googledocs-share</artifactId>
+                                    <version>${alfresco.googledocs.version}</version>
+                                    <classifier>cloud</classifier>
+                                    <type>amp</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.alfresco.integrations</groupId>
+                                    <artifactId>salesforce-share</artifactId>
+                                    <version>${alfresco.salesforce.version}</version>
+                                    <type>amp</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>target/amps</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Configure war overlay -->
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <overlays>
+                        <overlay>
+                            <groupId>${alfrescoEnterprise.groupId}</groupId>
+                            <artifactId>share-enterprise</artifactId>
+                            <excludes>
+                                <exclude>components\invite\sent-invites-min.js</exclude>
+                            </excludes>
+                        </overlay>
+                    </overlays>
+                </configuration>
+                <!-- This allows overlays to be prepared on the FS for minification and faster run -->
+                <executions>
+                    <execution>
+                        <id>prepare-exploded-war</id>
+                        <goals>
+                            <goal>exploded</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>                
+            </plugin>
+
+            <!-- Apply amp files -->
+            <plugin>
+                <groupId>org.alfresco.maven.plugin</groupId>
+                <artifactId>alfresco-maven-plugin</artifactId>
+                <configuration>
+                    <warLocation>${project.build.directory}/${project.build.finalName}</warLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-amps</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>install</goal>
+                        </goals>
+                        <configuration>
+                            <ampLocation>target/amps</ampLocation>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>run</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>run-exploded-webapp</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run-war-only</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>    
+
+</project>

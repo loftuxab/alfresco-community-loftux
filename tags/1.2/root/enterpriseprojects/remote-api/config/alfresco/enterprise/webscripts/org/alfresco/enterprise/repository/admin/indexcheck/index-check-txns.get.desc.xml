@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>ADM Index Check - check from/to given points in time or from a given ADM txn id</shortname>
+  <description>WARNING this may take a long time ... check ADM txn ids from/to given time (ISO 8601 format) or from a given txn id - to ensure they are in-sync with the index (on this server)</description>
+  <url>/enterprise/admin/indexcheck/adm/checktxns?fromTime={fromTime}</url>
+  <url>/enterprise/admin/indexcheck/adm/checktxns?fromTxnId={fromTxnId}</url>
+  <url>/enterprise/admin/indexcheck/adm/checktxns?fromTime={fromTime}&amp;toTime={toTime}</url>
+  <url>/enterprise/admin/indexcheck/adm/checktxns?fromTxnId={fromTxnId}&amp;toTxnId={toTxnId}</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

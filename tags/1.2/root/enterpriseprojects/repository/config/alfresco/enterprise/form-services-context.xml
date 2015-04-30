@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+   
+    <bean id="jmxFormProcessorResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.enterprise.form-service</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!--  JMX Form Processor Config -->
+
+    <bean id="jmxFormProcessor" class="org.alfresco.enterprise.repo.forms.jmx.JMXFormProcessor"
+          init-method="register">
+        <property name="processorRegistry" ref="formProcessorRegistry" />
+        <property name="filterRegistry" ref="jmxFilterRegistry" />
+        <property name="MBeanServer" ref="alfrescoMBeanServer" />
+        <property name="authorityService" ref="AuthorityService" />
+        <property name="ignoredOperations">
+            <list>
+                <value>revert</value>
+                <value>stop</value>
+            </list>
+        </property>
+        <property name="matchPattern">
+            <value>mbean</value>
+        </property>
+    </bean>
+
+    <bean id="jmxFilterRegistry" class="org.alfresco.repo.forms.processor.FilterRegistry" />
+
+</beans>

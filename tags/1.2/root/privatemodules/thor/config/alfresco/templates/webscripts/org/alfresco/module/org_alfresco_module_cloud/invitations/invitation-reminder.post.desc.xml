@@ -1,0 +1,16 @@
+<webscript>
+  <shortname>Sends a reminder to the invitee</shortname>
+  <description><![CDATA[
+  This webscript sends a reminder to the invitee of the invitation.
+  
+  When successful, a 200 is returned.  
+  If the key or the invite_id are not valid a 404 is returned.
+  
+  ]]></description>
+  <url>/internal/cloud/site-invitations/{invite_id}/reminder?key={key}</url>
+  <format default="json"/>
+  <lifecycle>internal</lifecycle>
+  
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

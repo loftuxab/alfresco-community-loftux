@@ -1,0 +1,10 @@
+<webscript>
+   <shortname>Admin Console - System Settings</shortname>
+   <description><![CDATA[Admin Console WebScript that displays the System Settings page.]]></description>
+   <url>/enterprise/admin/admin-systemsettings</url>
+   <family>AdminConsole</family>
+   <format default="html">argument</format>
+   <authentication>admin</authentication>
+   <lifecycle>internal</lifecycle>
+   <transaction allow="readonly">required</transaction>
+</webscript>
