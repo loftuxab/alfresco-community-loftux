@@ -110,18 +110,8 @@
     <tomcat.default.solr4.port>8083</tomcat.default.solr4.port>
     <tomcat.default.solr4.ssl.port>8446</tomcat.default.solr4.ssl.port>
     
-    <!-- Database properties - default values to be overridden in settings.xml -->
+    <!-- Skip database drop/create by default -->
     <db.skip>true</db.skip>
-    <db.driver>org.postgresql.Driver</db.driver>
-    <db.name>alfresco</db.name>
-    <db.url>jdbc:postgresql:${db.name}</db.url>
-    <db.master.url>jdbc:postgresql:template1</db.master.url>
-    <db.username>alfresco</db.username>
-    <db.password>alfresco</db.password>
-    <db.master.username>alfresco</db.master.username>
-    <db.master.password>alfresco</db.master.password>
-    <db.drop.command>drop database if exists ${db.name}</db.drop.command>
-    <db.create.command>create database ${db.name}</db.create.command>
     <test.working.dir>${project.build.directory}</test.working.dir>
     <dir.root>${test.working.dir}/alf_test_data</dir.root>
     <img.exe>convert</img.exe>
@@ -936,6 +926,63 @@
   </reporting>
 
   <profiles>
+    <!-- Establish default database properties, but only when alfresco-global.properties is not present -->
+    <profile>
+        <id>default-db-properties</id>
+        <activation>
+            <file>
+                <missing>${basedir}/tomcat/shared/classes/alfresco-global.properties</missing>
+            </file>
+        </activation>
+        <properties>
+            <db.driver>org.postgresql.Driver</db.driver>
+            <db.name>alfresco</db.name>
+            <db.url>jdbc:postgresql:${db.name}</db.url>
+
+            <db.master.url>jdbc:postgresql:template1</db.master.url>
+            <db.username>alfresco</db.username>
+            <db.password>alfresco</db.password>
+            <db.master.username>alfresco</db.master.username>
+            <db.master.password>alfresco</db.master.password>
+            <db.drop.command>drop database if exists ${db.name}</db.drop.command>
+            <db.create.command>create database ${db.name}</db.create.command>
+        </properties>
+    </profile>
+
+    <profile>
+        <id>alfresco-global-properties</id>
+        <activation>
+            <file>
+                <exists>${basedir}/tomcat/shared/classes/alfresco-global.properties</exists>
+            </file>
+        </activation>
+        <build>
+            <plugins>
+                <!-- Read alfresco-global.properties if it exists, to use it for cleaning runtime data (e.g. which database?) -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.0-alpha-2</version>
+                    <executions>
+                        <execution>
+                            <id>read-alfresco-global-properties</id>
+                            <phase>pre-clean</phase>
+                            <goals>
+                                <goal>read-project-properties</goal>
+                            </goals>
+                            <configuration>
+                                <files>
+                                    <file>${basedir}/tomcat/shared/classes/alfresco-global.properties</file>
+                                </files>
+                                <quiet>false</quiet>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+
     <!-- Profile to build Community packaging, including installers -->
     <profile>
         <id>packaging</id>
