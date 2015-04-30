@@ -89,18 +89,13 @@
     <module>projects/mbeans</module>
     <module>projects/repository</module>
     <module>projects/remote-api</module>
-    <module>projects/web-framework-commons</module>
     <module>projects/web-client</module>
-    <module>projects/web-editor</module>
-    <module>projects/web-editor-plugin</module>
     <module>projects/solr-client</module>
     <module>projects/solr4</module>
     <module>projects/solr</module>
     <module>projects/file-transfer-receiver</module>
     <module>projects/system-build-test</module>
     <module>modules/sharepoint/amp</module>
-    <module>modules/wcmquickstart</module>
-    <module>projects/web-editor-samples/customer-site</module>
     <module>projects/mmt</module>
     <module>projects/sdk/alfresco-platform-distribution</module>
   </modules>
