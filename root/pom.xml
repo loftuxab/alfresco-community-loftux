@@ -715,11 +715,6 @@
                 <version>2.2</version>
                 <configuration>
                     <systemProperties>
-                        <db.url>${db.url}</db.url>
-                        <db.driver>${db.driver}</db.driver>
-                        <db.name>${db.name}</db.name>
-                        <db.username>${db.username}</db.username>
-                        <db.password>${db.password}</db.password>
                         <dir.root>${dir.root}</dir.root>
                     </systemProperties>
                     <keystoreFile>${highest.basedir}/projects/system-build-test/keystore/ssl.keystore</keystoreFile>
