@@ -13,11 +13,10 @@
     </parent>
 
     <dependencies>
-        <!-- Intra alfresco deps -->
         <dependency>
-            <groupId>org.alfresco</groupId>
-            <artifactId>alfresco-core</artifactId>
-            <version>${project.version}</version>
+          <groupId>org.springframework.extensions.surf</groupId>
+          <artifactId>spring-surf-core-configservice</artifactId>
+          <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
