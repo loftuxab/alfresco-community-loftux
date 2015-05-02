@@ -988,7 +988,6 @@ public abstract class AbstractUtils implements AlfrescoTests
      * @param driver WebDrone Instance
      * @param waitMiliSec Wait duration in milliseconds
      */
-    @SuppressWarnings("deprecation")
     protected static HtmlPage webDriverWait(WebDrone driver, long waitMiliSec)
     {
         if (waitMiliSec <= 0)
@@ -996,12 +995,11 @@ public abstract class AbstractUtils implements AlfrescoTests
             waitMiliSec = maxWaitTime;
         }
         logger.info("Waiting For: " + waitMiliSec / 1000 + " seconds");
-        /*
-         * try { Thread.sleep(waitMiliSec); //driver.refresh(); }
-         * catch(InterruptedException ie) { throw new
-         * RuntimeException("Wait interrupted / timed out"); }
-         */
-        driver.waitFor(waitMiliSec);
+        try
+        {
+            driver.wait(waitMiliSec);
+        }
+        catch (InterruptedException e){ }
         return getSharePage(driver);
     }
 
