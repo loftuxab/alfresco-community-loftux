@@ -157,7 +157,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         File file = new File(DATA_FOLDER + CIFS_LOCATION + SLASH + fileName_6277 + pptxFileType);
         ShareUserSitePage.uploadFile(drone, file).render();
 
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6277 + pptxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6277 + pptxFileType).render().render();
 
         // Click "Edit Properties" in Actions section;
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
@@ -212,7 +212,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // The document's metadata and version history are not broken. They are displayed correctly.
             ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
             documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6277 + pptxFileType);
+            DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6277 + pptxFileType).render();
 
             EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
             Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6277 + pptxFileType));
@@ -257,7 +257,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // Expected Result
             // The document's metadata and version history are not broken. They are displayed correctly.
             documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            detailsPage = documentLibPage.selectFile(fileName_6277 + pptxFileType);
+            detailsPage = documentLibPage.selectFile(fileName_6277 + pptxFileType).render();
 
             editPropertiesPage = detailsPage.selectEditProperties().render();
             Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6277 + pptxFileType));
@@ -303,7 +303,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // Expected Result
             // The document's metadata and version history are not broken. They are displayed correctly.
             documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            detailsPage = documentLibPage.selectFile(fileName_6277 + pptxFileType);
+            detailsPage = documentLibPage.selectFile(fileName_6277 + pptxFileType).render();
 
             editPropertiesPage = detailsPage.selectEditProperties().render();
             Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6277 + pptxFileType));
@@ -342,7 +342,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         File file = new File(DATA_FOLDER + CIFS_LOCATION + SLASH + fileName_6278 + pptxFileType);
         ShareUserSitePage.uploadFile(drone, file).render();
 
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6278 + pptxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6278 + pptxFileType).render();
 
         // Click "Edit Properties" in Actions section;
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
@@ -403,7 +403,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // are displayed correctly.
             ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
             documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6278 + pptxFileType);
+            DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6278 + pptxFileType).render();
 
             EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
             editPropertiesPage.getDocumentTitle();
@@ -456,7 +456,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // The document's metadata and version history are not broken. They
             // are displayed correctly.
             documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            detailsPage = documentLibPage.selectFile(fileName_6278 + pptxFileType);
+            detailsPage = documentLibPage.selectFile(fileName_6278 + pptxFileType).render();
 
             editPropertiesPage = detailsPage.selectEditProperties().render();
             editPropertiesPage.getDocumentTitle();
@@ -511,7 +511,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
             // The document's metadata and version history are not broken. They
             // are displayed correctly.
             documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-            detailsPage = documentLibPage.selectFile(fileName_6278 + pptxFileType);
+            detailsPage = documentLibPage.selectFile(fileName_6278 + pptxFileType).render();
 
             editPropertiesPage = detailsPage.selectEditProperties().render();
             Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6278 + pptxFileType));
@@ -683,7 +683,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6279 + pptxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6279 + pptxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6279 + pptxFileType));
@@ -891,7 +891,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6280 + pptxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6280 + pptxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6280 + pptxFileType));
@@ -1079,7 +1079,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6281 + pptxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6281 + pptxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6281 + pptxFileType));
@@ -1257,7 +1257,7 @@ public class CifsMSPPoint2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6282 + pptxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6282 + pptxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6282 + pptxFileType));

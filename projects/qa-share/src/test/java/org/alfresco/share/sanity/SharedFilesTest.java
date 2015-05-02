@@ -198,7 +198,7 @@ public class SharedFilesTest extends AbstractUtils
         FileDirectoryInfo fileDirectoryInfo = sharedFilesPage.getFileDirectoryInfo(file1);
         assertTrue(!fileDirectoryInfo.getPreViewUrl().isEmpty());
 
-        DocumentDetailsPage detailsPage = sharedFilesPage.selectFile(file1);
+        DocumentDetailsPage detailsPage = sharedFilesPage.selectFile(file1).render();
         assertTrue(detailsPage.isDocumentDetailsPage(), "Failed to open Document Details page");
         verifyPreviewer(detailsPage);
         // assertTrue(detailsPage.getPreviewerClassName().equals("previewer PdfJs"), "Preview isn't correctly displayed on details page");
@@ -1223,7 +1223,7 @@ public class SharedFilesTest extends AbstractUtils
         // verify the actions available for Document2
         sharedFilesPage = ShareUserSharedFilesPage.openSharedFiles(drone);
 
-        DocumentDetailsPage documentDetailsPage = sharedFilesPage.selectFile(fileName2);
+        DocumentDetailsPage documentDetailsPage = sharedFilesPage.selectFile(fileName2).render();
         List<String> documentActionsList = documentDetailsPage.getDocumentActionList();
         actualActionSet.clear();
         actualActionSet = new HashSet<>(documentActionsList);
@@ -1267,7 +1267,7 @@ public class SharedFilesTest extends AbstractUtils
         // verify the actions available for Document1
         sharedFilesPage = ShareUserSharedFilesPage.navigateToFolderInSharedFiles(drone, folderPath).render();
 
-        documentDetailsPage = sharedFilesPage.selectFile(fileName1);
+        documentDetailsPage = sharedFilesPage.selectFile(fileName1).render();
         documentActionsList.clear();
         documentActionsList = documentDetailsPage.getDocumentActionList();
 

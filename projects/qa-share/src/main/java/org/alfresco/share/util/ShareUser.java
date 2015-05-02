@@ -799,8 +799,8 @@ public class ShareUser extends AbstractUtils
         }
 
         DocumentLibraryPage docLibraryPage = getSharePage(driver).render();
-        DocumentDetailsPage docDetailsPage = docLibraryPage.selectFile(contentName);
-        return docDetailsPage.render();
+        DocumentDetailsPage docDetailsPage = docLibraryPage.selectFile(contentName).render();
+        return docDetailsPage;
     }
 
     /**
@@ -1881,7 +1881,7 @@ public class ShareUser extends AbstractUtils
     public static DocumentLibraryPage addComment(WebDrone drone, String fileName, String comment)
     {
         DocumentLibraryPage documentLibraryPage = getSharePage(drone).render();
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         detailsPage = detailsPage.addComment(comment).render();
         return detailsPage.getSiteNav().selectSiteDocumentLibrary().render();
     }
@@ -1897,7 +1897,7 @@ public class ShareUser extends AbstractUtils
     public static DocumentLibraryPage setAuthor(WebDrone drone, String fileName, String author)
     {
         DocumentLibraryPage documentLibraryPage = getSharePage(drone).render();
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         EditDocumentPropertiesPage propertiesPage = detailsPage.selectEditProperties().render();
         propertiesPage.setAuthor(author);
         detailsPage = propertiesPage.selectSave().render();

@@ -81,7 +81,7 @@ public class DocumentDetailsPropertiesTest extends AbstractUtils
 
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-        DetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
         // Click on the Edit Properties icon in the Properties section
         EditDocumentPropertiesPage editDocumentPropertiesPage = detailsPage.selectEditProperties();
@@ -139,7 +139,7 @@ public class DocumentDetailsPropertiesTest extends AbstractUtils
 
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-        DetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
         // Click on the Edit Properties icon in the Properties section
         EditDocumentPropertiesPage editDocumentPropertiesPage = detailsPage.selectEditProperties();

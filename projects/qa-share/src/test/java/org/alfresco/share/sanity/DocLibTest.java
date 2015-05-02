@@ -1150,7 +1150,7 @@ public class DocLibTest extends AbstractUtils
 
             // Open document Details Page
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(customDrone, siteName).render();
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render(maxWaitTime);
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render(maxWaitTime);
 
             // Mark document as favourite
             detailsPage.selectFavourite().render();
@@ -1196,7 +1196,7 @@ public class DocLibTest extends AbstractUtils
             assertTrue(doc.getCommentsCount() == 1);
 
             // Click Download from the document actions
-            detailsPage = documentLibraryPage.selectFile(fileName).render();
+            detailsPage = documentLibraryPage.selectFile(fileName).render().render();
             detailsPage.selectDownloadFromActions(null).render();
 
             detailsPage.waitForFile(downloadDirectory + fileName);
@@ -1223,7 +1223,7 @@ public class DocLibTest extends AbstractUtils
 
             // Edit Properties for folder and add any tag to it
             documentLibraryPage = customDrone.getCurrentPage().render(maxWaitTime);
-            detailsPage = documentLibraryPage.selectFile(fileName).render();
+            detailsPage = documentLibraryPage.selectFile(fileName).render().render();
             EditDocumentPropertiesPage editProperties = detailsPage.selectEditProperties().render();
             editProperties.setName(1 + fileName);
             TagPage tagPage = editProperties.getTag().render();

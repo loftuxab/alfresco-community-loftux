@@ -380,7 +380,7 @@ public class RepositoryWebDavTests extends AbstractUtils
         assertTrue(documentLibraryPage.isItemVisble(fileName), fileName + " file isn't displayed");
 
         // The changes made via WebDav are displayed
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         assertEquals(detailsPage.getDocumentBody().contains(testUser), true, "The changes are not displayed");
     }
 
@@ -445,7 +445,7 @@ public class RepositoryWebDavTests extends AbstractUtils
         assertEquals(ShareUserSitePage.getContentCount(drone), 1, "Incorrect document count: " + ShareUserSitePage.getContentCount(drone));
 
         // The changes, made via WebDav for Working Copy, are displayed
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
         assertEquals(detailsPage.getDocumentBody().contains(testUser), true, "The changes are not displayed");
 
     }

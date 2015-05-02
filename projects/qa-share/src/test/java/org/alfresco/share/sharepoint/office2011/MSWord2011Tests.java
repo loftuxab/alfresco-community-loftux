@@ -361,7 +361,7 @@ public class MSWord2011Tests extends MS2011BaseTest
     {
         openDocumentLibraryForTest();
         String testFile = doc9741TestFile.getName();
-        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(testFile);
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(testFile).render();
         String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
 
         openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);

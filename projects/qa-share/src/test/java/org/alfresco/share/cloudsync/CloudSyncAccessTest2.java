@@ -1106,7 +1106,7 @@ public class CloudSyncAccessTest2 extends AbstractCloudSyncTest
         docLibPage = drone.getCurrentPage().render();
         docLibPage = docLibPage.renderItem(maxWaitTime, fileName1);
         // OP: User 1: Edits content
-        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName1).render();
+        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName1).render().render();
 
         // Select "In line Edit", modify details
         ShareUser.editTextDocument(drone, fileName1, file1Desc, file1Content);
@@ -1148,7 +1148,7 @@ public class CloudSyncAccessTest2 extends AbstractCloudSyncTest
 
         docLibPage = ShareUser.openSitesDocumentLibrary(hybridDrone, siteName);
 
-        documentDetailsPage = docLibPage.selectFile(fileName1).render();
+        documentDetailsPage = docLibPage.selectFile(fileName1).render().render();
 
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         ContentDetails contentDetails = inlineEditPage.getDetails();
@@ -1522,7 +1522,7 @@ public class CloudSyncAccessTest2 extends AbstractCloudSyncTest
 
             DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-            DocumentDetailsPage docDetailPage = docLibPage.selectFile(fileName).render();
+            DocumentDetailsPage docDetailPage = docLibPage.selectFile(fileName).render().render();
             docDetailPage = ShareUser.editTextDocument(drone, fileName, fileDesc, fileContent);
 
             // Open another browser window
@@ -1552,7 +1552,7 @@ public class CloudSyncAccessTest2 extends AbstractCloudSyncTest
 
             docLibPage = ShareUser.openSitesDocumentLibrary(hybridDrone, siteName);
 
-            docDetailPage = docLibPage.selectFile(fileName).render();
+            docDetailPage = docLibPage.selectFile(fileName).render().render();
             EditTextDocumentPage inlineEditPage = docDetailPage.selectInlineEdit().render();
 
             ContentDetails contentDetails = inlineEditPage.getDetails();

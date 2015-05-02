@@ -1290,7 +1290,7 @@ public class HybridSyncPositiveTests3 extends AbstractWorkflow
                 // --- Expected results ---
                 // The content was changed and file will synced back to on-premise version. The version is changed to "1.1"
 
-                DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+                DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
                 ShareUser.editTextDocument(hybridDrone, fileName, "Description", "Content");
 
                 EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();

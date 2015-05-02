@@ -1331,7 +1331,7 @@ public class CloudSyncAccessTest extends AbstractCloudSyncTest
             // Select File to open Document Library page
             DocumentDetailsPage documentDetailsPage = ShareUser.openDocumentDetailPage(drone, fileName);
             // DocumentDetailsPage documentDetailsPage =
-            // documentLibraryPage.selectFile(fileName).render();
+            // documentLibraryPage.selectFile(fileName).render().render();
             // Select "Inline Edit", modify details
             EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
             ContentDetails contentDetails = new ContentDetails();

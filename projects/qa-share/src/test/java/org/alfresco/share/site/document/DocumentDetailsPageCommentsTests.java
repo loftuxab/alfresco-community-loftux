@@ -94,7 +94,7 @@ public class DocumentDetailsPageCommentsTests extends AbstractUtils
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
         // select the file
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
         // click add comment
         AddCommentForm addCommentForm = detailsPage.clickAddCommentButton();

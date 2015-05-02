@@ -72,7 +72,7 @@ public class DocumentDetailsTest extends AbstractUtils
 
                 Assert.assertTrue(documentLibraryPage.isFileVisible(fileCSV), String.format("File %s didn't uploaded", fileCSV));
 
-                DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileCSV);
+                DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileCSV).render();
                 Assert.assertTrue(documentDetailsPage.isFlashPreviewDisplayed(), "Preview for file didn't displayed.");
                 Assert.assertEquals(documentDetailsPage.getDocumentSize(), "45 bytes", "File has the wrong size");
         }
@@ -129,7 +129,7 @@ public class DocumentDetailsTest extends AbstractUtils
 
             DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
             
             if (!isAlfrescoVersionCloud(drone))
             {

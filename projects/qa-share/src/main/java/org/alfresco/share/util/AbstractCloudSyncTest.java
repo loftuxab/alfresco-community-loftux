@@ -317,7 +317,7 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
     public static void unSyncFromCloud(WebDrone driver, String fileName)
     {
         DocumentLibraryPage documentLibraryPage = (DocumentLibraryPage) getSharePage(driver);
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
         if (documentDetailsPage.isFileSyncSetUp())
         {
             documentDetailsPage.selectUnSyncFromCloud().render();

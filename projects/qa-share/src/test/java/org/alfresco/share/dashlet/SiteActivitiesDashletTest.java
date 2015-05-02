@@ -156,7 +156,7 @@ public class SiteActivitiesDashletTest extends AbstractUtils
         documentLibraryPage = drone.getCurrentPage().render();
 
         // select the file
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
         // like document
         detailsPage.selectLike();
@@ -298,7 +298,7 @@ public class SiteActivitiesDashletTest extends AbstractUtils
         documentLibraryPage = drone.getCurrentPage().render();
 
         // select the file
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
         // like document
         detailsPage.selectLike();
@@ -428,7 +428,7 @@ public class SiteActivitiesDashletTest extends AbstractUtils
         documentLibraryPage = drone.getCurrentPage().render();
 
         // select the file
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
         // like document
         detailsPage.selectLike();
@@ -569,7 +569,7 @@ public class SiteActivitiesDashletTest extends AbstractUtils
         documentLibraryPage = drone.getCurrentPage().render();
 
         // select the file
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
         // like document
         detailsPage.selectLike();

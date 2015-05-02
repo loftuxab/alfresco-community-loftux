@@ -263,7 +263,7 @@ public class CompletedWorkflowNotSyncedTests extends AbstractWorkflow
 
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
 
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContentByOnPrem);
@@ -285,7 +285,7 @@ public class CompletedWorkflowNotSyncedTests extends AbstractWorkflow
 
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName);
 
-        documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertFalse(inlineEditPage.getDetails().getContent().contains(modifiedContentByOnPrem), "Content has been changed on Cloud but sync is removed");
         ShareUser.logout(hybridDrone);
@@ -325,7 +325,7 @@ public class CompletedWorkflowNotSyncedTests extends AbstractWorkflow
 
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSiteName);
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
 
         ContentDetails contentDetails = new ContentDetails();
@@ -350,7 +350,7 @@ public class CompletedWorkflowNotSyncedTests extends AbstractWorkflow
         // Changes didn't appear to OP.
 
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
-        documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertFalse(inlineEditPage.getDetails().getContent().contains(modifiedContentByCloud), "Content has been changed on OP but sync is removed");
         ShareUser.logout(drone);

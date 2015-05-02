@@ -227,7 +227,7 @@ public class AdminTools extends AbstractUtils
         // add Classifiable aspect to any document
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
         SelectAspectsPage selectAspectsPage = documentDetailsPage.selectManageAspects();
         selectAspectsPage.add(aspects);
         documentDetailsPage = selectAspectsPage.clickApplyChanges().render();

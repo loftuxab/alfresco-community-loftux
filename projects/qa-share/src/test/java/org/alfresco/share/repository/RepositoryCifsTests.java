@@ -403,7 +403,7 @@ public class RepositoryCifsTests extends AbstractUtils
         assertTrue(documentLibraryPage.isItemVisble(fileName), fileName + " file isn't displayed");
 
         // Changes made via CIFS are displayed correctly
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         assertEquals(detailsPage.getDocumentBody().contains(testUser), true, "The changes are not displayed");
     }
 
@@ -466,7 +466,7 @@ public class RepositoryCifsTests extends AbstractUtils
         assertEquals(ShareUserSitePage.getContentCount(drone), 1, "Incorrect document count: " + ShareUserSitePage.getContentCount(drone));
 
         // The changes, made via CIFS for Working Copy, are displayed
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
         assertEquals(detailsPage.getDocumentBody().contains(testUser), true, "The changes are not displayed");
 
         // Press 'View Original Document'
@@ -990,7 +990,7 @@ public class RepositoryCifsTests extends AbstractUtils
         assertTrue(documentLibraryPage.isFileVisible(fileName), "File isn't visible " + fileName);
 
         // Open Details page of the uploaded document and verify version history
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
 
         assertTrue(detailsPage.getDocumentVersion().equals("1.0"), "Version isn't changed");
         assertTrue(detailsPage.isVersionHistoryPanelPresent(), "Version history panel isn't present, ACE-1628");
@@ -1003,7 +1003,7 @@ public class RepositoryCifsTests extends AbstractUtils
 
             ShareUserSitePage.navigateToFolder(drone, folderName);
 
-            detailsPage = documentLibraryPage.selectFile(fileName).render();
+            detailsPage = documentLibraryPage.selectFile(fileName).render().render();
 
             // Open Details page of the uploaded document and verify version history
             assertTrue(detailsPage.getDocumentVersion().equals("1." + i), "Version isn't changed");

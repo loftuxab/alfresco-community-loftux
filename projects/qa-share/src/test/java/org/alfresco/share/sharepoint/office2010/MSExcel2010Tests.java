@@ -690,7 +690,7 @@ public class MSExcel2010Tests extends AbstractUtils
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
                 // 6. Navigate the document;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9672 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9672 + fileType).render();
 
                 // 6. Changes are not applied to the original file; Version is not
                 // increased to new major one.
@@ -980,7 +980,7 @@ public class MSExcel2010Tests extends AbstractUtils
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render(maxWaitTime);
 
                 // 7. Excel Document is still checked out; Changes are not applied;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9676 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9676 + fileType).render();
                 assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.", "File " + xlsFileName_9676 + " isn't locked");
 
                 String documentContent = detailsPage.getDocumentBody();
