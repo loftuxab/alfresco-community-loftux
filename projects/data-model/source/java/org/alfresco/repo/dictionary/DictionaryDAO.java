@@ -226,6 +226,16 @@ public interface DictionaryDAO extends ModelQuery
     List<M2ModelDiff> diffModelIgnoringConstraints(M2Model model);
 
     /**
+     * Register listener with the Dictionary
+     * <p>
+     *     This method is <b>deprecated</b>, use {@link #registerListener(DictionaryListener dictionaryListener)} instead.
+     * </p>
+     * @param dictionaryListener
+     */
+    @Deprecated
+    void register(DictionaryListener dictionaryListener);
+
+    /**
      * 
      * Register listener with the Dictionary
      * 
