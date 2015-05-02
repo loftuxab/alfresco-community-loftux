@@ -2026,10 +2026,17 @@ public class SolrInformationServer implements InformationServer
 
                 if (childAssocRef.isPrimary())
                 {
-                    doc.addField(FIELD_PRIMARYPARENT, childAssocRef.getParentRef().toString());
-                    doc.addField(FIELD_PRIMARYASSOCTYPEQNAME,
-                                ISO9075.getXPathName(childAssocRef.getTypeQName()));
-                    doc.addField(FIELD_PRIMARYASSOCQNAME, ISO9075.getXPathName(childAssocRef.getQName()));
+                	if(doc.getField(FIELD_PRIMARYPARENT) == null)
+                	{
+                        doc.addField(FIELD_PRIMARYPARENT, childAssocRef.getParentRef().toString());
+                        doc.addField(FIELD_PRIMARYASSOCTYPEQNAME,
+                                    ISO9075.getXPathName(childAssocRef.getTypeQName()));
+                        doc.addField(FIELD_PRIMARYASSOCQNAME, ISO9075.getXPathName(childAssocRef.getQName()));
+                	}
+                	else
+                	{
+                		log.warn("Duplicate primary parent for node id "+nodeMetaData.getId());
+                	}
                 }
             }
             doc.addField(FIELD_ASSOCTYPEQNAME, assocTypeQNameBuffer.toString());
