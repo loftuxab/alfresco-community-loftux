@@ -115,6 +115,20 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
     }
 
     /**
+     * Register listener with the Dictionary
+     * <p>
+     *     This method is <b>deprecated</b>, use {@link #registerListener(DictionaryListener dictionaryListener)} instead.
+     * </p>
+     * @param dictionaryListener
+     */
+    @Override
+    @Deprecated
+    public void register(DictionaryListener dictionaryListener)
+    {
+        registerListener(dictionaryListener);
+    }
+
+    /**
      * Register with the Dictionary
      */
     @Override
