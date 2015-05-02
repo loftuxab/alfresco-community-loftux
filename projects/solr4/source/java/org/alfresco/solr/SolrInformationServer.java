@@ -2587,6 +2587,11 @@ public class SolrInformationServer implements InformationServer
                     log.debug("ML "+field.getField() + " in "+ locale+ " of "+propValue);
                 }
                 
+                if((locale == null) || (propValue == null))
+                {
+                	continue;
+                }    		
+                
                 StringBuilder builder = new StringBuilder(propValue.length() + 16);
                 builder.append("\u0000").append(locale.toString()).append("\u0000").append(propValue);
        
