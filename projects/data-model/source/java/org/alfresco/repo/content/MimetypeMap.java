@@ -76,6 +76,8 @@ public class MimetypeMap implements MimetypeService
 
     public static final String EXTENSION_BINARY = "bin";
 
+    public static final String MIMETYPE_MULTIPART_ALTERNATIVE = "multipart/alternative";
+
     public static final String MIMETYPE_TEXT_PLAIN = "text/plain";
 
     public static final String MIMETYPE_TEXT_MEDIAWIKI = "text/mediawiki";
