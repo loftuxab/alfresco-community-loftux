@@ -196,7 +196,7 @@ public class PerformanceTest extends CmisUtils
             super.setupCustomDrone(DownLoadDrone);
             login(customDrone, testUser, DEFAULT_PASSWORD);
             DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(customDrone, siteName);
-            DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(BIG_DATA_FILE);
+            DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(BIG_DATA_FILE).render();
             documentDetailsPage.clickOnDownloadLinkForUnsupportedDocument();
             webDriverWait(customDrone, 300000);
             assertTrue(downloadedBigDataFile.exists(), "Big data file don't download");
@@ -229,7 +229,7 @@ public class PerformanceTest extends CmisUtils
         contentDetails.setName(fileName);
         contentDetails.setDescription(fileName);
         DocumentLibraryPage documentLibraryPage = createContent(drone, contentDetails, PLAINTEXT);
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
         SelectAspectsPage selectAspectsPage = documentDetailsPage.selectManageAspects().render();
         List<DocumentAspect> documentAspectList = new ArrayList<>();
         documentAspectList.add(CLASSIFIABLE);
@@ -255,7 +255,7 @@ public class PerformanceTest extends CmisUtils
 
         login(drone, testUser, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
         EditDocumentPropertiesPage editDocumentPropertiesPage = documentDetailsPage.selectEditProperties().render();
         CategoryPage categoryPage = editDocumentPropertiesPage.getCategory();
         assertTrue(categoryPage.isCategoryPageVisible(), "Category Page don't open.");
@@ -310,7 +310,7 @@ public class PerformanceTest extends CmisUtils
 
         login(drone, testUser, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
         EditDocumentPropertiesPage editDocumentPropertiesPage = documentDetailsPage.selectEditProperties().render();
         TagPage tagPage = editDocumentPropertiesPage.getTag();
         webDriverWait(drone, 3000);

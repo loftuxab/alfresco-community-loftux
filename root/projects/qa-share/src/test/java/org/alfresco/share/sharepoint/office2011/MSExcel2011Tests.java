@@ -366,7 +366,7 @@ public class MSExcel2011Tests extends MS2011BaseTest
     {
         openDocumentLibraryForTest();
 
-        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9764TestFile.getName());
+        DocumentDetailsPage docDetailsPage = documentLibraryPage.selectFile(xls9764TestFile.getName()).render();
         String oldVersion = docDetailsPage.getCurrentVersionDetails().getVersionNumber();
 
         openCleanMDCtool(testSiteName, testUser, DEFAULT_PASSWORD);

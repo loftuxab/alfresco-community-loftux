@@ -174,7 +174,7 @@ public class GoogleDocsTest2 extends AbstractUtils
         Assert.assertFalse(docLibPage.isFileVisible(filename1), "File " + filename1 + " is visible (format doc.). File isn't upgraded.");
 
         Assert.assertTrue(docLibPage.isFileVisible(filename2), "File " + filename2 + " isn't visible (format doc.).");
-        detailsPage = docLibPage.selectFile(filename2);
+        detailsPage = docLibPage.selectFile(filename2).render();
 
         // Click on the Edit Properties icon in the Properties section
         EditDocumentPropertiesPage editDocumentPropertiesPage = detailsPage.selectEditProperties();

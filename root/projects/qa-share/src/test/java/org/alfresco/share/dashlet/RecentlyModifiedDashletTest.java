@@ -93,7 +93,7 @@ public class RecentlyModifiedDashletTest extends AbstractUtils
         // Upload File
         String[] fileInfo = { fileName, DOCLIB };
         DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         detailsPage.selectFavourite().render();
 
     }

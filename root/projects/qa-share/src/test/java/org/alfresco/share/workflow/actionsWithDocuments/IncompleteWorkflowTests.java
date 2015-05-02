@@ -259,7 +259,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         editDocumentProperties.selectSave().render();
 
         DocumentLibraryPage cldocumentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        cldocumentLibraryPage.selectFile(simpleTaskFile);
+        cldocumentLibraryPage.selectFile(simpleTaskFile).render();
         editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite, simpleTaskFile);
         Assert.assertTrue((modifiedTitle + cloudUser).equals(editDocumentProperties.getDocumentTitle()),
                 "Document Title modified by CL User is not present for Cloud.");
@@ -374,7 +374,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // Cloud Modify the synced document's properties, e.g. change title and description.
         // ---- Expected results ----
         // The content is changed successfully.
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContent);
         contentDetails.setName(simpleTaskFile);
@@ -403,7 +403,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         while (counter <= retryRefreshCount)
         {
             documentLibraryPageCL = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-            documentDetailsPageCL = documentLibraryPageCL.selectFile(simpleTaskFile);
+            documentDetailsPageCL = documentLibraryPageCL.selectFile(simpleTaskFile).render();
             inlineEditPageCL = documentDetailsPageCL.selectInlineEdit().render();
             if (inlineEditPageCL.getDetails().getContent().contains(modifiedContent))
             {
@@ -497,7 +497,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // The content is changed successfully.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContentOnCloud);
         contentDetails.setName(simpleTaskFile);
@@ -505,7 +505,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         documentDetailsPage = inlineEditPage.save(contentDetails).render();
         ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
-        documentLibraryPage.selectFile(simpleTaskFile);
+        documentLibraryPage.selectFile(simpleTaskFile).render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Content is not updated");
         ShareUser.logout(hybridDrone);
@@ -522,7 +522,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         while (counter <= retryRefreshCount)
         {
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-            documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+            documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
             inlineEditPage = documentDetailsPage.selectInlineEdit().render();
             if (inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud))
             {
@@ -810,7 +810,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         DocumentLibraryNavigation documentLibraryNavigation = new DocumentLibraryNavigation(drone);
         Assert.assertFalse(documentLibraryNavigation.isDeleteActionForIncompleteWorkflowDocumentPresent(), "Delete button is displayed");
         documentLibraryPage.render();
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(simpleTaskFile).render().render();
         Assert.assertFalse(detailsPage.isDeleteDocumentLinkDisplayed(), "Delete button is displayed");
         ShareUser.logout(drone);
 
@@ -907,7 +907,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         DocumentLibraryNavigation documentLibraryNavigation = new DocumentLibraryNavigation(hybridDrone);
         Assert.assertFalse(documentLibraryNavigation.isDeleteActionForIncompleteWorkflowDocumentPresent(), "Delete button is displayed");
         documentLibraryPage.render();
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(simpleTaskFile).render().render();
         Assert.assertFalse(detailsPage.isDeleteDocumentLinkDisplayed(), "Delete button is displayed");
         ShareUser.logout(hybridDrone);
 

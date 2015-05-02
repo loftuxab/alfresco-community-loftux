@@ -1214,7 +1214,7 @@ public class CryptoDocSanityTest extends AbstractUtils
 
         // edit inline
         String newDescription = getTestName() + " description";
-        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName);
+        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName).render();
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setDescription(newDescription);
@@ -1313,7 +1313,7 @@ public class CryptoDocSanityTest extends AbstractUtils
 
         // edit inline
         newDescription = getTestName() + " description";
-        documentDetailsPage = docLibPage.selectFile(plainText + 2);
+        documentDetailsPage = docLibPage.selectFile(plainText + 2).render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         contentDetails = new ContentDetails();
         contentDetails.setDescription(newDescription);

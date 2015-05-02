@@ -154,7 +154,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         File file = new File(DATA_FOLDER + CIFS_LOCATION + SLASH + fileName_6289 + xlsxFileType);
         ShareUserSitePage.uploadFile(drone, file).render();
 
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6289 + xlsxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6289 + xlsxFileType).render();
 
         // Click "Edit Properties" in Actions section;
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
@@ -208,7 +208,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document's metadata and version history are not broken. They are displayed correctly.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6289 + xlsxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6289 + xlsxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
@@ -253,7 +253,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Expected Result
         // The document's metadata and version history are not broken. They are displayed correctly.
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        detailsPage = documentLibPage.selectFile(fileName_6289 + xlsxFileType);
+        detailsPage = documentLibPage.selectFile(fileName_6289 + xlsxFileType).render();
 
         editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
@@ -298,7 +298,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Expected Result
         // The document's metadata and version history are not broken. They are displayed correctly.
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        detailsPage = documentLibPage.selectFile(fileName_6289 + xlsxFileType);
+        detailsPage = documentLibPage.selectFile(fileName_6289 + xlsxFileType).render();
 
         editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
@@ -331,7 +331,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         File file = new File(DATA_FOLDER + CIFS_LOCATION + SLASH + fileName_6290 + xlsxFileType);
         ShareUserSitePage.uploadFile(drone, file).render();
 
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6290 + xlsxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6290 + xlsxFileType).render();
 
         // Click "Edit Properties" in Actions section;
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
@@ -386,7 +386,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // The document's metadata and version history are not broken. They are displayed correctly.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6290 + xlsxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6290 + xlsxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
@@ -433,7 +433,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Expected Result
         // The document's metadata and version history are not broken. They are displayed correctly.
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        detailsPage = documentLibPage.selectFile(fileName_6290 + xlsxFileType);
+        detailsPage = documentLibPage.selectFile(fileName_6290 + xlsxFileType).render();
 
         editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
@@ -480,7 +480,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // Expected Result
         // The document's metadata and version history are not broken. They are displayed correctly.
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        detailsPage = documentLibPage.selectFile(fileName_6290 + xlsxFileType);
+        detailsPage = documentLibPage.selectFile(fileName_6290 + xlsxFileType).render();
 
         editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getDocumentTitle().equals(testName));
@@ -640,7 +640,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6291 + xlsxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6291 + xlsxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6291 + xlsxFileType));
@@ -844,7 +844,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6292 + xlsxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6292 + xlsxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6292 + xlsxFileType));
@@ -1027,7 +1027,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6293 + xlsxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6293 + xlsxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6293 + xlsxFileType));
@@ -1206,7 +1206,7 @@ public class CifsMSExcel2013Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6294 + xlsxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(fileName_6294 + xlsxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(fileName_6294 + xlsxFileType));

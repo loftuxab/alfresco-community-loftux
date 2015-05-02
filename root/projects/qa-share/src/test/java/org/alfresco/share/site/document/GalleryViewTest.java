@@ -245,7 +245,7 @@ public class GalleryViewTest extends AbstractUtils
         // Open Gallery View
         DocumentLibraryPage docLibPage = ShareUser.openDocumentLibraryInGalleryView(customDrone, siteName);
 
-        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1).render();
+        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1).render().render();
 
         String docVersion = detailsPage.getDocumentVersion();
 

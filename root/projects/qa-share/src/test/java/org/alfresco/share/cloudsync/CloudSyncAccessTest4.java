@@ -975,7 +975,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             Assert.assertTrue(AbstractCloudSyncTest.checkIfContentIsSynced(drone, fileName));
             drone.refresh();
             documentLibraryPage = drone.getCurrentPage().render();
-            DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+            DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
             // Verify the document's version is "1.0"
             Assert.assertEquals("1.0", documentDetailsPage.getDocumentVersion());
             ShareUser.logout(drone);
@@ -991,7 +991,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
             // Select the file to open Document Details page and verify the
             // Description property is saved and the version is still "1.0"
-            documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+            documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
 
             Assert.assertEquals(documentDetailsPage.getProperties().get("Description"), docDescription);
             Assert.assertEquals(documentDetailsPage.getDocumentVersion(), "1.0");
@@ -1003,7 +1003,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             // open Document Library page
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
 
-            documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+            documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
 
             // Verify Description property is updated and version changed from
             // "1.0" to "1.1"
@@ -1097,7 +1097,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             Assert.assertTrue(AbstractCloudSyncTest.checkIfContentIsSynced(drone, fileName), "Verify if the document is synced");
             drone.refresh();
             documentLibraryPage = drone.getCurrentPage().render();
-            DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+            DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
             // Verify the document's version is "1.0"
             Assert.assertEquals("1.0", documentDetailsPage.getDocumentVersion());
             ShareUser.logout(drone);
@@ -1122,7 +1122,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
             // open Document Library page
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName);
 
-            documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+            documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
             // Verify version changed from "1.0" to "1.1"
             Assert.assertTrue(checkForNewVersion(drone, "1.1"));
 
@@ -2681,7 +2681,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
 
         syncInfoPage.selectUnsyncRemoveContentFromCloud(false);
         drone.refresh();
-        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName).render();
+        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName).render().render();
         // Select "In line Edit", modify details
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         ContentDetails contentDetails = new ContentDetails();
@@ -2693,7 +2693,7 @@ public class CloudSyncAccessTest4 extends AbstractCloudSyncTest
         ShareUser.login(hybridDrone, testUser, DEFAULT_PASSWORD);
         docLibPage = ShareUser.openSitesDocumentLibrary(hybridDrone, siteName);
         Assert.assertTrue(docLibPage.isFileVisible(fileName));
-        documentDetailsPage = docLibPage.selectFile(fileName).render();
+        documentDetailsPage = docLibPage.selectFile(fileName).render().render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         contentDetails = inlineEditPage.getDetails();
         Assert.assertFalse(fileDesc.equals(contentDetails.getDescription()));

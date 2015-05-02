@@ -262,7 +262,7 @@ public class MSWordTests extends AbstractUtils
                 ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9809 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9809 + fileType).render();
                 Map<String, Object> properties = detailsPage.getProperties();
                 Assert.assertEquals(properties.get("Name"), docFileName_9809 + " (Working Copy)" + fileType);
                 String documentContent = detailsPage.getDocumentBody();
@@ -415,7 +415,7 @@ public class MSWordTests extends AbstractUtils
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
 
                 // 7. Locked document and working copy are present;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9812 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9812 + fileType).render();
                 Assert.assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.");
                 Map<String, Object> properties = detailsPage.getProperties();
                 Assert.assertEquals(properties.get("Name"), docFileName_9812 + " (Working Copy)" + fileType);
@@ -680,7 +680,7 @@ public class MSWordTests extends AbstractUtils
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
                 // 6. Navigate the document;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9816 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9816 + fileType).render();
 
                 // 6. Changes are not applied to the original file; Version is not
                 // increased to new major one.
@@ -947,7 +947,7 @@ public class MSWordTests extends AbstractUtils
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
                 // 7. Excel Document is still checked out; Changes are not applied;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9827 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_9827 + fileType).render();
                 assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.", "File " + docFileName_9827 + " isn't locked");
 
                 String documentContent = detailsPage.getDocumentBody();

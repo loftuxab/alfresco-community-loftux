@@ -330,7 +330,7 @@ public class RepositoryFtpTest extends AbstractUtils
         assertTrue(documentLibraryPage.isItemVisble(fileName), fileName + " file isn't displayed");
 
         //Check that the changes made by FTP are displayed;
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         assertEquals(detailsPage.getDocumentBody().contains(testUser), true, "The changes are not displayed");
     }
 
@@ -381,7 +381,7 @@ public class RepositoryFtpTest extends AbstractUtils
         assertEquals(ShareUserSitePage.getContentCount(drone), 1, "Incorrect document count: " + ShareUserSitePage.getContentCount(drone));
 
         //Check that the changes made by FTP are displayed;
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
         assertEquals(detailsPage.getDocumentBody().contains(testUser), true, "The changes are not displayed");
 
     }
@@ -915,7 +915,7 @@ public class RepositoryFtpTest extends AbstractUtils
 
         //  Open Details page of the uploaded document and verify version history
         DocumentLibraryPage documentLibraryPage = drone.getCurrentPage().render();
-        documentLibraryPage.selectFile(fileName);
+        documentLibraryPage.selectFile(fileName).render();
         DocumentDetailsPage detailsPage = drone.getCurrentPage().render();
         assertTrue(detailsPage.isVersionHistoryPanelPresent(), "Version history panel isn't present");
         assertTrue(detailsPage.getDocumentVersion().equals("1.0"));
@@ -931,7 +931,7 @@ public class RepositoryFtpTest extends AbstractUtils
             ShareUser.openSitesDocumentLibrary(drone, siteName).render();
             ShareUserSitePage.navigateToFolder(drone, folderName);
             documentLibraryPage = drone.getCurrentPage().render();
-            documentLibraryPage.selectFile(fileName);
+            documentLibraryPage.selectFile(fileName).render();
             detailsPage = drone.getCurrentPage().render();
             assertTrue(detailsPage.getDocumentVersion().equals("1." + i));
             ShareUser.logout(drone);
@@ -942,7 +942,7 @@ public class RepositoryFtpTest extends AbstractUtils
         ShareUser.openSitesDocumentLibrary(drone, siteName).render();
         ShareUserSitePage.navigateToFolder(drone, folderName);
         documentLibraryPage = drone.getCurrentPage().render();
-        documentLibraryPage.selectFile(fileName);
+        documentLibraryPage.selectFile(fileName).render();
         detailsPage = drone.getCurrentPage().render();
         List<VersionDetails> olderVersions = detailsPage.getOlderVersionDetails();
         assertEquals(olderVersions.get(0).getVersionNumber(), "1.2");

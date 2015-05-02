@@ -202,7 +202,7 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
         // OP Modify the document's content. The content is changed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
 
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContentByOnPrem);

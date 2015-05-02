@@ -107,7 +107,7 @@ public class AbstractAspectTests extends AbstractUtils
         String[] fileInfo = { fileName, DOCLIB };
         ShareUser.uploadFileInFolder(drone, fileInfo);
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
 
         SelectAspectsPage aspectsPage = documentDetailsPage.selectManageAspects().render();
 
@@ -173,7 +173,7 @@ public class AbstractAspectTests extends AbstractUtils
         String[] fileInfo = { fileName, DOCLIB };
         ShareUser.uploadFileInFolder(drone, fileInfo);
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render().render();
 
         SelectAspectsPage aspectsPage = documentDetailsPage.selectManageAspects().render();
 

@@ -209,7 +209,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // The content is changed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContent);
         contentDetails.setName(simpleTaskFile);
@@ -231,7 +231,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         DocumentDetailsPage documentDetailsPageCL;
         EditTextDocumentPage inlineEditPageCL = new EditTextDocumentPage(hybridDrone);
         documentLibraryPageCL = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        documentDetailsPageCL = documentLibraryPageCL.selectFile(simpleTaskFile);
+        documentDetailsPageCL = documentLibraryPageCL.selectFile(simpleTaskFile).render();
         inlineEditPageCL = documentDetailsPageCL.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPageCL.getDetails().getContent().contains(modifiedContent), "Changes are not displayed on Cloud");
     }
@@ -261,14 +261,14 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // The content is changed successfully.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContentOnCloud);
         contentDetails.setName(simpleTaskFile);
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         documentDetailsPage = inlineEditPage.save(contentDetails).render();
         ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
-        documentLibraryPage.selectFile(simpleTaskFile);
+        documentLibraryPage.selectFile(simpleTaskFile).render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Content is not modified");
         ShareUser.logout(hybridDrone);
@@ -285,7 +285,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
         waitForSync(drone, simpleTaskFile, opSiteName);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Changes are not displayed on OP");
     }

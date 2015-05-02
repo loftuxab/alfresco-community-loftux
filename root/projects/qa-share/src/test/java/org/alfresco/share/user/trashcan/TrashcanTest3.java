@@ -643,7 +643,7 @@ public class TrashcanTest3 extends AbstractUtils
 
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't presented in Doc Lib");
 
-        DocumentDetailsPage docDetailsPage = docLibPage.selectFile(fileName1).render();
+        DocumentDetailsPage docDetailsPage = docLibPage.selectFile(fileName1).render().render();
 
         Assert.assertTrue(docDetailsPage.getComments().contains(commentForFile), "Comment for file " + fileName1 + " isn't presented");
 
@@ -1085,7 +1085,7 @@ public class TrashcanTest3 extends AbstractUtils
         // Verify the content items
         Assert.assertTrue(docLibPage.isFileVisible(fileName), "File " + fileName + " isn't presented in Doc Lib");
 
-        DocumentDetailsPage docDetailsPage = docLibPage.selectFile(fileName).render();
+        DocumentDetailsPage docDetailsPage = docLibPage.selectFile(fileName).render().render();
 
         Assert.assertTrue(docDetailsPage.getComments().contains(commentForFile), "Comment for file " + fileName + " isn't presented");
 
