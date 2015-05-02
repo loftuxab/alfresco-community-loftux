@@ -703,7 +703,7 @@
       <dynamicField name="content@s__mimetype@*"         type="identifier"   indexed="true"  omitNorms="true"  stored="false"  multiValued="false" docValues="true" sortMissingLast="true" />
       <dynamicField name="content@s__encoding@*"         type="identifier"   indexed="true"  omitNorms="true"  stored="false"  multiValued="false" docValues="true" sortMissingLast="true" />
       <dynamicField name="content@s__docid@*"            type="long"         indexed="true"  omitNorms="true"  stored="false"  multiValued="false"  docValues="true" sortMissingLast="false" sortMissingFirst="false" />
-      <dynamicField name="content@s__tr_ex@*"            type="text___"      indexed="true"  omitNorms="true"  stored="false"  multiValued="false" sortMissingLast="true" />
+      <dynamicField name="content@s__tr_ex@*"            type="identifier"      indexed="true"  omitNorms="true"  stored="false"  multiValued="false" sortMissingLast="true" />
       <dynamicField name="content@s__tr_time@*"          type="long"         indexed="true"  omitNorms="true"  stored="false"  multiValued="false" sortMissingLast="true" />
       <dynamicField name="content@s__tr_status@*"        type="lowercase_id" indexed="true"  omitNorms="true"  stored="false"  multiValued="false" sortMissingLast="true" />
 
@@ -719,7 +719,7 @@
       <dynamicField name="content@m__mimetype@*"         type="identifier"   indexed="true"  omitNorms="true"  stored="false"  multiValued="true" docValues="true" />
       <dynamicField name="content@m__encoding@*"         type="identifier"   indexed="true"  omitNorms="true"  stored="false"  multiValued="true" docValues="true" />
       <dynamicField name="content@m__docid@*"            type="long"         indexed="true"  omitNorms="true"  stored="false"  multiValued="true"  docValues="true" />
-      <dynamicField name="content@m__tr_ex@*"            type="text___"      indexed="true"  omitNorms="true"  stored="false"  multiValued="true" />
+      <dynamicField name="content@m__tr_ex@*"            type="identifier"      indexed="true"  omitNorms="true"  stored="false"  multiValued="true" />
       <dynamicField name="content@m__tr_time@*"          type="long"         indexed="true"  omitNorms="true"  stored="false"  multiValued="true" />
       <dynamicField name="content@m__tr_status@*"        type="lowercase_id" indexed="true"  omitNorms="true"  stored="false"  multiValued="true" />
 
@@ -729,11 +729,6 @@
       <dynamicField name="content@m__lt@*"          type="alfrescoFieldType" indexed="true" omitNorms="false"  stored="false"  multiValued="true" />
       <dynamicField name="content@m___t@*"          type="text___"           indexed="true" omitNorms="false"  stored="false"  multiValued="true" />
 
-
-      <!-- Suggestion -->
-      <dynamicField name="suggest_*"               type="text_shingle"    indexed="false"  omitNorms="true"  stored="false"  multiValued="true" />
-
-      <copyField source="suggest_*" dest="suggest" />
 
    </fields>
 
