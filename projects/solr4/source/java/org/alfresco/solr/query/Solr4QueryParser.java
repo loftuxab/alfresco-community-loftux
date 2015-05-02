@@ -1816,6 +1816,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             }
         }
 
+        
+        SchemaField sf = schema.getField(field);
         if (list.size() == 0)
             return null;
         else if (list.size() == 1)
@@ -1855,6 +1857,33 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                         q.add(currentQuery, BooleanClause.Occur.SHOULD);
                     }
                     return q;
+                }
+                // shingle
+                else if(sf.omitPositions() && sf.getType().getTypeName().contains("shingle"))
+                {
+                    
+                    ArrayList<org.apache.lucene.analysis.Token> nonContained = getNonContained(list);
+                    Query currentQuery;
+
+                    BooleanQuery weakPhrase = new BooleanQuery();
+                    for (org.apache.lucene.analysis.Token shingleToken : nonContained)
+                    {
+                        String termText = shingleToken.toString();
+                        Term term = new Term(field, termText);
+
+                        if ((termText != null) && (termText.contains("*") || termText.contains("?")))
+                        {
+                            currentQuery = new org.apache.lucene.search.WildcardQuery(term);
+                        }
+                        else
+                        {
+                            currentQuery = new TermQuery(term);
+                        }
+                        weakPhrase.add(currentQuery, Occur.MUST);             
+                    }
+                    
+                    return weakPhrase;
+
                 }
                 // Consider if we can use a multi-phrase query (e.g for synonym use rather then WordDelimiterFilterFactory)
                 else if(canUseMultiPhraseQuery(fixedTokenSequences))
@@ -2189,6 +2218,36 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 }
             }
         }
+    }
+
+    /**
+     * @param list
+     * @return
+     */
+    private ArrayList<Token> getNonContained(ArrayList<Token> list)
+    {
+        ArrayList<Token> nonContained = new  ArrayList<Token>();
+        NEXT_CANDIDATE : for(Token candidate : list)
+        {
+            NEXT_TEST: for(Token test : list)
+            {
+                if(candidate == test)
+                {
+                    continue NEXT_TEST;
+                }
+                else if((test.startOffset() <= candidate.startOffset()) && (test.endOffset() > candidate.endOffset()))
+                {
+                    continue NEXT_CANDIDATE;
+                }
+                else if((test.startOffset() < candidate.startOffset()) && (test.endOffset() >= candidate.endOffset()))
+                {
+                    continue NEXT_CANDIDATE;
+                }
+                        
+            }
+            nonContained.add(candidate);
+        }
+        return nonContained;
     }
 
     /**
