@@ -1931,9 +1931,28 @@ public class SolrInformationServer implements InformationServer
             doc.addField(FIELD_ASPECT, aspect.toString());
             if(aspect.equals(ContentModel.ASPECT_GEOGRAPHIC))
             {
-                String lat = ((StringPropertyValue)nodeMetaData.getProperties().get(ContentModel.PROP_LATITUDE)).getValue();
+            	String lat = ((StringPropertyValue)nodeMetaData.getProperties().get(ContentModel.PROP_LATITUDE)).getValue();
                 String lon = ((StringPropertyValue)nodeMetaData.getProperties().get(ContentModel.PROP_LONGITUDE)).getValue();
-                doc.addField(FIELD_GEO, lat + ", " + lon);
+                
+                // Only add if the data is valid
+                
+                if((lat != null) && (lon != null))
+                {
+                    try
+                    {
+                        double dLat = Double.parseDouble(lat);
+                        double dLon = Double.parseDouble(lon);
+                
+                        if((-90d <= dLat ) && (dLat <= 90d) && (-180d <= dLon)  && (dLon <= 180d) )
+                        {
+                            doc.addField(FIELD_GEO, lat + ", " + lon);
+                        }
+                    }
+                    catch(NumberFormatException nfe)
+                    {
+                        log.info("Skipping invalid geo data on node "+nodeMetaData.getId()+ " -> (" + lat + ", " + lon+")");
+                    }
+                }
             }
         }
         doc.addField(FIELD_ISNODE, "T");
