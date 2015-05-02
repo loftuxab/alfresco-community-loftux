@@ -2011,7 +2011,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
 
      public Solr4QueryParser getLuceneQueryParser(SearchParameters searchParameters, SolrQueryRequest req)
      {
-         Analyzer analyzer =  req.getSchema().getAnalyzer();
+         Analyzer analyzer =  req.getSchema().getQueryAnalyzer();
          Solr4QueryParser parser = new Solr4QueryParser(req.getSchema(), Version.LUCENE_48, searchParameters.getDefaultFieldName(), analyzer);
 //         Operator defaultOperator;
 //         if (searchParameters.getDefaultOperator() == SearchParameters.AND)
