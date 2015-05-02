@@ -1,1 +1,0 @@
-<#include "account-completion.lib.html.ftl">

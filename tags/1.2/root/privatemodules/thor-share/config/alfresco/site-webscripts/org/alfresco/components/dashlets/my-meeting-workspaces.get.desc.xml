@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>My Meeting Workspaces (Hidden)</shortname>
-   <description>The &lt;family&gt; has been removed and its now accessible by admin only</description>
-   <url>/components/dashlets/my-meeting-workspaces</url>
-   <authentication>admin</authentication>
-</webscript>

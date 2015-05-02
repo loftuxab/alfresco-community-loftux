@@ -1,1 +1,0 @@
-G'Day ${epoch?date?string.medium}

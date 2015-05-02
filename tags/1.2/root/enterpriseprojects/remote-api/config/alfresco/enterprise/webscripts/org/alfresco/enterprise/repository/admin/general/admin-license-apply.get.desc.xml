@@ -1,9 +1,0 @@
-<webscript>
-   <shortname>Admin Console - Apply New License</shortname>
-   <description><![CDATA[Admin Console WebScript apply a new license.]]></description>
-   <url>/enterprise/admin/admin-license-apply</url>
-   <format default="html" />
-   <authentication>admin</authentication>
-   <lifecycle>internal</lifecycle>
-   <transaction allow="readonly">required</transaction>
-</webscript>

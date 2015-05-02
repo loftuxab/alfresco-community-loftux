@@ -1,5 +1,0 @@
-<webscript>
-   <shortname>Test email signup</shortname>
-   <description>Used for development testing email signup without drupal site.</description>
-   <url>/cloud/core/components/account/signup</url>
-</webscript>

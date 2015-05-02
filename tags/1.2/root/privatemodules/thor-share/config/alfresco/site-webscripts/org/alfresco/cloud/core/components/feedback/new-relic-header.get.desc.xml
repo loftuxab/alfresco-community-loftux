@@ -1,5 +1,0 @@
-<webscript>
-   <shortname>New Relic header</shortname>
-   <description>Java backed WebScript that outputs the New Relic header information</description>
-   <url>/cloud/core/components/feedback/header</url>
-</webscript>

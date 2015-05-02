@@ -1,3 +1,0 @@
-{
-    "numberOfAccounts" : ${numberOfAccounts?c}
-}

@@ -1,5 +1,0 @@
-<webscript>
-   <shortname>Restricted Tenant</shortname>
-   <description>Error indicating that a tenant has been requested that they do not have access to.</description>
-   <url>/cloud/core/components/error/restricted-tenant</url>
-</webscript>

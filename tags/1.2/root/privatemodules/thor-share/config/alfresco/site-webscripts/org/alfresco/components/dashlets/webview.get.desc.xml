@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>Web View (Hidden)</shortname>
-   <description>The &lt;family&gt; has been removed and its now accessible by admin only</description>
-   <url>/components/dashlets/webview</url>
-   <authentication>admin</authentication>
-</webscript>

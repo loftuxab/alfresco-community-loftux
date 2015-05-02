@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>Manage Users</shortname>
-   <description>Account Settings - Manage Users</description>
-   <url>/cloud/core/components/console/manage-users</url>
-   <family>cloud-console</family>
-</webscript>

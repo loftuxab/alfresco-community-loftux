@@ -1,1 +1,0 @@
-Hello ${epoch?date?string.medium}

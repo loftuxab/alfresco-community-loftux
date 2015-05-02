@@ -1,5 +1,0 @@
-<webscript>
-   <shortname>Cloud Invite</shortname>
-   <description>Dialog for inviting user</description>
-   <url>/cloud/core/components/account/invite</url>
-</webscript>

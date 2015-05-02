@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rest-client version="2.3"><request><http-version>1.1</http-version><URL>http://localhost:8080/alfresco/a/alfresco.com/public/alfresco/versions/1/tags/0219243e-e376-4ef2-b20b-21dd997541d9</URL><method>PUT</method><auth-methods>BASIC</auth-methods><auth-preemptive>true</auth-preemptive><auth-username>steven.glover@alfresco.com</auth-username><auth-password>rO0ABXQACHBhc3N3b3Jk</auth-password><body content-type="application/json" charset="UTF-8">{
-    "tag": "taggy4"
-}</body></request></rest-client>

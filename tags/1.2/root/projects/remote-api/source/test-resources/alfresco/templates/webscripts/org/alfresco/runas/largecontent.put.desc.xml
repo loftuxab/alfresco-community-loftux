@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Large Request Test</shortname>
-  <description>Large Request Test </description>
-  <url>/test/largecontenttest</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>Signup Completion</shortname>
-   <description>UI for completing signup process.</description>
-   <url>/cloud/core/components/account/signup-completion</url>
-   <!-- Describe arguments -->
-</webscript>

@@ -1,7 +1,0 @@
-<webscript>
-  <shortname>Cloud Credentials Test Proxy WebScript</shortname>
-  <url>/test/proxy/person</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction allow="readonly">required</transaction>
-</webscript>

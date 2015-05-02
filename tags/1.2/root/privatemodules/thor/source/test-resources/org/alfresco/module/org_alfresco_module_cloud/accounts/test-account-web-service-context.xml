@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
-
-<beans>
-    <!--  Override the accountDAO with a simple in-memory storage system
-          Obviously this is for test code only. -->
-    <bean id="accountDAO" class="org.alfresco.module.org_alfresco_module_cloud.accounts.domain.AccountDAOMemoryImpl"/>
-</beans>

@@ -1,3 +1,0 @@
-Sharepoint Protocol Module
---------------------------
-

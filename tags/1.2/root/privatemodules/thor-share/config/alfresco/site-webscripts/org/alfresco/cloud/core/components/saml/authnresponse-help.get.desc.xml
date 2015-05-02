@@ -1,8 +1,0 @@
-<webscript>
-   <shortname>Cloud SAML AuthnResponse Help</shortname>
-   <description>
-      SAML - AuthnResponse Help, displayed when the user doesn't exist in Alfresco in a tenant
-      that does NOT have turned on auto provisioning.
-   </description>
-   <url>/cloud/core/components/saml/authnresponse-help</url>
-</webscript>

@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<page>
-   <title>Change Language Page for a User</title>
-   <title-id>page.changeLocale.title</title-id>
-   <description>Change Language section on Profile page for a User</description>
-   <description-id>page.changeLocale.description</description-id>
-   <template-instance>change-locale</template-instance>
-   <authentication>user</authentication>
-</page>

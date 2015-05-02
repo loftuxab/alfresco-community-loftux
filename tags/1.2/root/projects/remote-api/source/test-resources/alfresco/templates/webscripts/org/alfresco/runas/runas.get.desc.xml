@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Runas Test</shortname>
-  <description>Runas Test</description>
-  <url>/test/runas</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

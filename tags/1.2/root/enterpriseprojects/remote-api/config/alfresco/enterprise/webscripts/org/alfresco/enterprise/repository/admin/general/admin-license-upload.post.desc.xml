@@ -1,9 +1,0 @@
-<webscript>
-   <shortname>Admin Console - Upload New License POST method</shortname>
-   <description><![CDATA[Admin Console POST WebScript that uploads a new license.]]></description>
-   <url>/enterprise/admin/admin-license-upload</url>
-   <format default="html" />
-   <authentication>admin</authentication>
-   <lifecycle>internal</lifecycle>
-   <transaction allow="readonly">required</transaction>
-</webscript>

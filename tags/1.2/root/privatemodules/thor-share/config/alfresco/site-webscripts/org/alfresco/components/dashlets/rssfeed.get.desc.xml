@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>RSS Feed (Hidden)</shortname>
-   <description>The &lt;family&gt; has been removed and its now accessible by admin only</description>
-   <url>/components/dashlets/rssfeed</url>
-   <authentication>admin</authentication>
-</webscript>

@@ -1,9 +1,0 @@
-<webscript>
-  <shortname>Get tenant information</shortname>
-  <description>Fetches Multi Tenancy Information for the current user</description>
-  <url>/api/tenant/information</url>
-  <format default="json">argument</format>
-  <transaction allow="readonly">required</transaction>
-  <authentication>user</authentication>
-  <lifecycle>internal</lifecycle>
-</webscript>

@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>Account Summary</shortname>
-   <description>Account Settings - Account Summary</description>
-   <url>/cloud/core/components/console/account-summary</url>
-   <family>cloud-console</family>
-</webscript>

@@ -1,9 +1,0 @@
-<webscript>
-   <shortname>Admin Console - Dialog and redirect POST webscript</shortname>
-   <description><![CDATA[Admin Console WebScript that persists POSTed mbean attribute values for a generic dialog page. The resulting page will then execute the require JavaScript to close any dialog frames and execute a callback function on the parent window.]]></description>
-   <url>/enterprise/admin/admin-dialog?cb={callback?}</url>
-   <format default="html">argument</format>
-   <authentication>admin</authentication>
-   <lifecycle>internal</lifecycle>
-   <transaction>required</transaction>
-</webscript>

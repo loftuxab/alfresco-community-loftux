@@ -1,5 +1,0 @@
-<webscript>
-   <shortname>GetSatisfaction Feedback Script</shortname>
-   <description>Adds a JavaScript for prompting for feedback through GetSatisfaction service</description>
-   <url>/cloud/core/components/feedback/get-satisfaction</url>
-</webscript>

@@ -1,8 +1,0 @@
-<webscript>
-   <shortname>Admin Console - Run Synchronization</shortname>
-   <description><![CDATA[Admin Console WebScript that displays a form to run user directory synchronization.]]></description>
-   <url>/enterprise/admin/admin-sync</url>
-   <format default="html">argument</format>
-   <authentication>admin</authentication>
-   <lifecycle>internal</lifecycle>
-</webscript>

@@ -1,5 +1,0 @@
-<webscript>
-   <shortname>New Relic footer</shortname>
-   <description>Java backed WebScript that outputs the New Relic footer information</description>
-   <url>/cloud/core/components/feedback/footer</url>
-</webscript>

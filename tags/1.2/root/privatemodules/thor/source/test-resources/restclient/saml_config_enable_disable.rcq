@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rest-client version="2.3.3"><request><http-version>1.1</http-version><URL>http://localhost:8080/alfresco/a/my.network/cloud/saml/config</URL><method>POST</method><auth-methods>BASIC</auth-methods><auth-preemptive>true</auth-preemptive><auth-username>my.user@my.network</auth-username><auth-password>rO0ABXQACm15cGFzc3dvcmQ=</auth-password><body content-type="text/plain" charset="UTF-8">{ "enabled" : true }</body></request></rest-client>
