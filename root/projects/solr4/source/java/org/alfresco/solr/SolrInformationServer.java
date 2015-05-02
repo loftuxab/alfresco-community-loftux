@@ -1931,28 +1931,42 @@ public class SolrInformationServer implements InformationServer
             doc.addField(FIELD_ASPECT, aspect.toString());
             if(aspect.equals(ContentModel.ASPECT_GEOGRAPHIC))
             {
-            	String lat = ((StringPropertyValue)nodeMetaData.getProperties().get(ContentModel.PROP_LATITUDE)).getValue();
-                String lon = ((StringPropertyValue)nodeMetaData.getProperties().get(ContentModel.PROP_LONGITUDE)).getValue();
-                
-                // Only add if the data is valid
-                
-                if((lat != null) && (lon != null))
-                {
-                    try
-                    {
-                        double dLat = Double.parseDouble(lat);
-                        double dLon = Double.parseDouble(lon);
-                
-                        if((-90d <= dLat ) && (dLat <= 90d) && (-180d <= dLon)  && (dLon <= 180d) )
-                        {
-                            doc.addField(FIELD_GEO, lat + ", " + lon);
-                        }
-                    }
-                    catch(NumberFormatException nfe)
-                    {
-                        log.info("Skipping invalid geo data on node "+nodeMetaData.getId()+ " -> (" + lat + ", " + lon+")");
-                    }
-                }
+            	StringPropertyValue latProp = ((StringPropertyValue)nodeMetaData.getProperties().get(ContentModel.PROP_LATITUDE));
+            	StringPropertyValue lonProp = ((StringPropertyValue)nodeMetaData.getProperties().get(ContentModel.PROP_LONGITUDE));
+            	
+            	if((latProp != null) && (lonProp != null))
+            	{
+            		String lat = latProp.getValue();
+            		String lon = lonProp.getValue();
+
+            		// Only add if the data is valid
+
+            		if((lat != null) && (lon != null))
+            		{
+            			try
+            			{
+            				double dLat = Double.parseDouble(lat);
+            				double dLon = Double.parseDouble(lon);
+
+            				if((-90d <= dLat ) && (dLat <= 90d) && (-180d <= dLon)  && (dLon <= 180d) )
+            				{
+            					doc.addField(FIELD_GEO, lat + ", " + lon);
+            				}
+            			}
+            			catch(NumberFormatException nfe)
+            			{
+            				log.info("Skipping invalid geo data on node "+nodeMetaData.getId()+ " -> (" + lat + ", " + lon+")");
+            			}
+            		}
+            		else
+            		{
+            			log.info("Skipping missing geo data on "+nodeMetaData.getId());
+            		}
+            	}
+            	else
+        		{
+        			log.info("Skipping missing geo data on "+nodeMetaData.getId());
+        		}
             }
         }
         doc.addField(FIELD_ISNODE, "T");
