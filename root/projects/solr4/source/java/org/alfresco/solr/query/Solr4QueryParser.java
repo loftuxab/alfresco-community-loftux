@@ -1514,20 +1514,33 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             }
         }
 
+        // Put in real position increments as we treat them correctly
+        
+        int curentIncrement = -1;
+        for (org.apache.lucene.analysis.Token c : list)
+        {
+            if(curentIncrement == -1)
+            {
+                curentIncrement = c.getPositionIncrement();
+            }
+            else if(c.getPositionIncrement() > 0)
+            {
+                curentIncrement = c.getPositionIncrement();
+            }
+            else
+            {
+                c.setPositionIncrement(curentIncrement);
+            }
+        }
+
         Collections.sort(list, new Comparator<org.apache.lucene.analysis.Token>()
                 {
 
             public int compare(Token o1, Token o2)
             {
                 int dif = o1.startOffset() - o2.startOffset();
-                if (dif != 0)
-                {
                     return dif;
-                }
-                else
-                {
-                    return o2.getPositionIncrement() - o1.getPositionIncrement();
-                }
+                
             }
                 });
 
@@ -1537,9 +1550,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
         LinkedList<LinkedList<org.apache.lucene.analysis.Token>> tokensByPosition = new LinkedList<LinkedList<org.apache.lucene.analysis.Token>>();
         LinkedList<org.apache.lucene.analysis.Token> currentList = null;
+        int lastStart = 0;
         for (org.apache.lucene.analysis.Token c : list)
         {    
-            if (c.getPositionIncrement() == 0)
+            if(c.startOffset() == lastStart)
             {
                 if(currentList == null)
                 {
@@ -1554,6 +1568,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 tokensByPosition.add(currentList);
                 currentList.add(c);
             }
+            lastStart = c.startOffset();
         }
 
         // Build all the token sequences and see which ones get strung together
@@ -1561,14 +1576,13 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
         LinkedList<LinkedList<org.apache.lucene.analysis.Token>> allTokenSequences = new LinkedList<LinkedList<org.apache.lucene.analysis.Token>>();
         for(LinkedList<org.apache.lucene.analysis.Token> tokensAtPosition : tokensByPosition)
         {
-            int positionIncrement = tokensAtPosition.get(tokensAtPosition.size() -1 ).getPositionIncrement();
             if(allTokenSequences.size() == 0)
             {
                 for(org.apache.lucene.analysis.Token t : tokensAtPosition)
                 {
                     org.apache.lucene.analysis.Token replace = new org.apache.lucene.analysis.Token(t, t.startOffset(), t.endOffset());
                     replace.setType(t.type());
-                    replace.setPositionIncrement(positionIncrement);
+                    replace.setPositionIncrement(t.getPositionIncrement());
                     
                     LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
                     newEntry.add(replace);
@@ -1583,7 +1597,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                 {
                     org.apache.lucene.analysis.Token replace = new org.apache.lucene.analysis.Token(t, t.startOffset(), t.endOffset());
                     replace.setType(t.type());
-                    replace.setPositionIncrement(positionIncrement);
+                    replace.setPositionIncrement(t.getPositionIncrement());
                     
                     boolean tokenFoundSequence = false;
                     for(LinkedList<org.apache.lucene.analysis.Token> tokenSequence : allTokenSequences)
