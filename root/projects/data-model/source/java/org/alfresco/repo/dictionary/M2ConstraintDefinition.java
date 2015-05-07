@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -62,6 +62,7 @@ import org.springframework.beans.PropertyAccessException;
     public static final String ERR_CONSTRUCT_FAILURE = "d_dictionary.constraint.err.construct_failure";
     public static final String ERR_PROPERTY_MISMATCH = "d_dictionary.constraint.err.property_mismatch";
     public static final String ERR_RESERVED_PROPERTY = "d_dictionary.constraint.err.reserved_property";
+    public static final String ERR_NAMESPACE_NOT_DEFINED = "d_dictionary.constraint.err.namespace_not_defined";
 
     private static int anonPropCount = 0;
 
@@ -104,7 +105,7 @@ import org.springframework.beans.PropertyAccessException;
             this.name = QName.createQName(m2Constraint.getName(), prefixResolver);
             if (!model.isNamespaceDefined(name.getNamespaceURI()))
             {
-                throw new DictionaryException("Cannot define constraint " + name.toPrefixString() + " as namespace " + name.getNamespaceURI() + " is not defined by model " + model.getName().toPrefixString());
+                throw new DictionaryException(ERR_NAMESPACE_NOT_DEFINED, name.toPrefixString(), name.getNamespaceURI(), model.getName().toPrefixString());
             }
         }
     }

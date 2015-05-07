@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -17,6 +17,8 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.alfresco.repo.dictionary;
+
+import static org.alfresco.service.cmr.dictionary.DictionaryException.DuplicateDefinitionException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -50,6 +52,21 @@ import org.alfresco.util.EqualsHelper;
  */
 /*package*/ class M2ClassDefinition implements ClassDefinition
 {
+    private static final String ERR_CLASS_NOT_DEFINED_NAMESPACE = "d_dictionary.class_definition.class.namespace_not_defined";
+    private static final String ERR_PROPERTY_NOT_DEFINED_NAMESPACE = "d_dictionary.class_definition.property.namespace_not_defined";
+    private static final String ERR_DUPLICATE_PROPERTY_DEFINITION = "d_dictionary.class_definition.duplicate.property_definition";
+    private static final String ERR_DUPLICATE_PROPERTY_EXISTING_DEF = "d_dictionary.class_definition.duplicate.property_existing_def";
+    private static final String ERR_ASSOCIATION_NOT_DEFINED_NAMESPACE = "d_dictionary.class_definition.association.namespace_not_defined";
+    private static final String ERR_DUPLICATE_ASSOCIATION_DEFINITION = "d_dictionary.class_definition.duplicate.association_definition";
+    private static final String ERR_DUPLICATE_ASSOCIATION_EXISTING_DEF = "d_dictionary.class_definition.duplicate.association_existing_def";
+    private static final String ERR_DUPLICATE_PROPERTY_AND_PROPERTY_OVERRIDE = "d_dictionary.class_definition.duplicate.property_and_property_override";
+    private static final String ERR_DUPLICATE_PROPERTY_OVERRIDE = "d_dictionary.class_definition.duplicate.property_override_definition";
+    private static final String ERR_PARENT_NOT_FOUND = "d_dictionary.class_definition.class.parent_not_found";
+    private static final String ERR_PROPERTY_NOT_EXIST = "d_dictionary.class_definition.property_not_exist";
+    private static final String ERR_MANDATORY_ASPECT_NOT_FOUND = "d_dictionary.class_definition.mandatory_aspect_not_found";
+    private static final String ERR_DUPLICATE_PROPERTY_IN_CLASS_HIERARCHY = "d_dictionary.class_definition.duplicate.property_in_class_hierarchy";
+    private static final String ERR_DUPLICATE_ASSOCIATION_IN_CLASS_HIERARCHY = "d_dictionary.class_definition.duplicate.association_in_class_hierarchy";
+
     protected ModelDefinition model;
     protected M2Class m2Class;
     protected QName name;
@@ -90,7 +107,7 @@ import org.alfresco.util.EqualsHelper;
         this.name = QName.createQName(m2Class.getName(), resolver);
         if (!model.isNamespaceDefined(name.getNamespaceURI()))
         {
-            throw new DictionaryException("Cannot define class " + name.toPrefixString() + " as namespace " + name.getNamespaceURI() + " is not defined by model " + model.getName().toPrefixString());
+            throw new DictionaryException(ERR_CLASS_NOT_DEFINED_NAMESPACE, name.toPrefixString(), name.getNamespaceURI(), model.getName().toPrefixString());
         }
         this.archive = m2Class.getArchive();
         this.includedInSuperTypeQuery = m2Class.getIncludedInSuperTypeQuery();
@@ -106,11 +123,11 @@ import org.alfresco.util.EqualsHelper;
             if (!model.isNamespaceDefined(def.getName().getNamespaceURI()) &&
                     !model.isNamespaceImported(def.getName().getNamespaceURI()))
             {
-                throw new DictionaryException("Cannot define property " + def.getName().toPrefixString() + " as namespace " + def.getName().getNamespaceURI() + " is not defined by model " + model.getName().toPrefixString());
+                throw new DictionaryException(ERR_PROPERTY_NOT_DEFINED_NAMESPACE, def.getName().toPrefixString(), def.getName().getNamespaceURI(), model.getName().toPrefixString());
             }
             if (properties.containsKey(def.getName()))
             {
-                throw new DictionaryException("Found duplicate property definition " + def.getName().toPrefixString() + " within class " + name.toPrefixString());
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_PROPERTY_DEFINITION, def.getName().toPrefixString(), name.toPrefixString());
             }
             
             // Check for existence of property elsewhere within the model
@@ -118,8 +135,7 @@ import org.alfresco.util.EqualsHelper;
             if (existingDef != null)
             {
                 // TODO: Consider sharing property, if property definitions are equal
-                throw new DictionaryException("Found duplicate property definition " + def.getName().toPrefixString() + " within class " 
-                    + name.toPrefixString() + " and class " + existingDef.getContainerClass().getName().toPrefixString());
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_PROPERTY_EXISTING_DEF, def.getName().toPrefixString(), name.toPrefixString(), existingDef.getContainerClass().getName().toPrefixString());
             }
             
             properties.put(def.getName(), def);
@@ -140,11 +156,11 @@ import org.alfresco.util.EqualsHelper;
             }
             if (!model.isNamespaceDefined(def.getName().getNamespaceURI()))
             {
-                throw new DictionaryException("Cannot define association " + def.getName().toPrefixString() + " as namespace " + def.getName().getNamespaceURI() + " is not defined by model " + model.getName().toPrefixString());
+                throw new DictionaryException(ERR_ASSOCIATION_NOT_DEFINED_NAMESPACE, def.getName().toPrefixString(), def.getName().getNamespaceURI(), model.getName().toPrefixString());
             }
             if (associations.containsKey(def.getName()))
             {
-                throw new DictionaryException("Found duplicate association definition " + def.getName().toPrefixString() + " within class " + name.toPrefixString());
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_ASSOCIATION_DEFINITION, def.getName().toPrefixString(), name.toPrefixString());
             }
             
             // Check for existence of association elsewhere within the model
@@ -152,8 +168,7 @@ import org.alfresco.util.EqualsHelper;
             if (existingDef != null)
             {
                 // TODO: Consider sharing association, if association definitions are equal
-                throw new DictionaryException("Found duplicate association definition " + def.getName().toPrefixString() + " within class " 
-                    + name.toPrefixString() + " and class " + existingDef.getSourceClass().getName().toPrefixString());
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_ASSOCIATION_EXISTING_DEF, def.getName().toPrefixString(), name.toPrefixString(), existingDef.getSourceClass().getName().toPrefixString());
             }
             
             associations.put(def.getName(), def);
@@ -166,11 +181,11 @@ import org.alfresco.util.EqualsHelper;
             QName overrideName = QName.createQName(override.getName(), resolver);
             if (properties.containsKey(overrideName))
             {
-                throw new DictionaryException("Found duplicate property and property override definition " + overrideName.toPrefixString() + " within class " + name.toPrefixString());
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_PROPERTY_AND_PROPERTY_OVERRIDE, overrideName.toPrefixString(), name.toPrefixString());
             }
             if (propertyOverrides.containsKey(overrideName))
             {
-                throw new DictionaryException("Found duplicate property override definition " + overrideName.toPrefixString() + " within class " + name.toPrefixString());
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_PROPERTY_OVERRIDE, overrideName.toPrefixString(), name.toPrefixString());
             }
             propertyOverrides.put(overrideName, override);
         }
@@ -209,7 +224,7 @@ import org.alfresco.util.EqualsHelper;
             ClassDefinition parent = query.getClass(parentName);
             if (parent == null)
             {
-                throw new DictionaryException("Parent class " + parentName.toPrefixString() + " of class " + name.toPrefixString() + " is not found");
+                throw new DictionaryException(ERR_PARENT_NOT_FOUND, parentName.toPrefixString(), name.toPrefixString());
             }
             parentClassDefinition = parent;
         }
@@ -228,7 +243,7 @@ import org.alfresco.util.EqualsHelper;
             PropertyDefinition propDef = query.getProperty(override.getKey());
             if (propDef == null)
             {
-                throw new DictionaryException("Class " + name.toPrefixString() + " attempting to override property " + override.getKey().toPrefixString() + " which does not exist");
+                throw new DictionaryException(ERR_PROPERTY_NOT_EXIST, name.toPrefixString(), override.getKey().toPrefixString());
             }
         }
         
@@ -237,7 +252,7 @@ import org.alfresco.util.EqualsHelper;
             AspectDefinition aspect = query.getAspect(aspectName);
             if (aspect == null)
             {
-                throw new DictionaryException("Mandatory aspect " + aspectName.toPrefixString() + " of class " + name.toPrefixString() + " is not found");
+                throw new DictionaryException(ERR_MANDATORY_ASPECT_NOT_FOUND, aspectName.toPrefixString(), name.toPrefixString());
             }
             defaultAspects.add(aspect);
         }
@@ -276,7 +291,7 @@ import org.alfresco.util.EqualsHelper;
         {
             if (inheritedProperties.containsKey(def.getName()))
             {
-                throw new DictionaryException("Duplicate property definition " + def.getName().toPrefixString() + " found in class hierarchy of " + name.toPrefixString()); 
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_PROPERTY_IN_CLASS_HIERARCHY, def.getName().toPrefixString(), name.toPrefixString()); 
             }
             inheritedProperties.put(def.getName(), def);
         }
@@ -292,7 +307,7 @@ import org.alfresco.util.EqualsHelper;
         {
             if (inheritedAssociations.containsKey(def.getName()))
             {
-                throw new DictionaryException("Duplicate association definition " + def.getName().toPrefixString() + " found in class hierarchy of " + name.toPrefixString()); 
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_ASSOCIATION_IN_CLASS_HIERARCHY, def.getName().toPrefixString(), name.toPrefixString()); 
             }
             inheritedAssociations.put(def.getName(), def);
         }
