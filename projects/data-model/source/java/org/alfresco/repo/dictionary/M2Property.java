@@ -256,8 +256,16 @@ public class M2Property
         constraints.add(constraint);
         return constraint;
     }
-    
-    
+
+    public M2Constraint addConstraint(String name, String type)
+    {
+        M2Constraint constraint = new M2Constraint();
+        constraint.setName(name);
+        constraint.setType(type);
+        constraints.add(constraint);
+        return constraint;
+    }
+
     public void removeConstraintRef(String refName)
     {
         List<M2Constraint> cons = new ArrayList<M2Constraint>(getConstraints());
@@ -270,6 +278,21 @@ public class M2Property
         }
     }
 
+    public void removeConstraint(String name)
+    {
+        if(name == null)
+        {
+            return;
+        }
+        List<M2Constraint> cons = new ArrayList<M2Constraint>(getConstraints());
+        for (M2Constraint con : cons)
+        {
+            if (name.equals(con.getName()))
+            {
+                constraints.remove(con);
+            }
+        }
+    }
 
     /**
      * @return
