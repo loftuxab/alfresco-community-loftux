@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -42,7 +42,10 @@ public class M2ModelDiff
 	public static final String TYPE_PROPERTY = "PROPERTY";
 	public static final String TYPE_ASSOCIATION = "ASSOCIATION";
 	public static final String TYPE_CONSTRAINT = "TYPE_CONSTRAINT";
-	
+
+    private static final String ERR_UNKNOWN_ELEMENT_TYPE = "d_dictionary.model_diff.element_type.unknown";
+    private static final String ERR_UNKNOWN_DIFF_TYPE = "d_dictionary.model_diff.diff_type.unknown";
+
 	private QName elementName;   
 	private String elementType;  
 	private String diffType;
@@ -62,7 +65,7 @@ public class M2ModelDiff
              (!elementType.equals(TYPE_CONSTRAINT))
              )
          {
-             throw new AlfrescoRuntimeException("Unknown element type = " + elementType);
+             throw new AlfrescoRuntimeException(ERR_UNKNOWN_ELEMENT_TYPE, new Object[] { elementType });
          }
         
          if ((! diffType.equals(DIFF_CREATED)) && 
@@ -71,7 +74,7 @@ public class M2ModelDiff
              (! diffType.equals(DIFF_DELETED)) && 
              (! diffType.equals(DIFF_UNCHANGED)))
          {
-             throw new AlfrescoRuntimeException("Unknown diff type = " + diffType);
+             throw new AlfrescoRuntimeException(ERR_UNKNOWN_DIFF_TYPE, new Object[] { diffType });
          }
         
          this.elementName = elementName;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -17,6 +17,8 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.alfresco.repo.dictionary;
+
+import static org.alfresco.service.cmr.dictionary.DictionaryException.DuplicateDefinitionException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,7 +62,13 @@ public class CompiledModel implements ModelQuery
     
     // Logger
     private static final Log logger = LogFactory.getLog(DictionaryDAOImpl.class);
-    
+
+    private static final String ERR_COMPILE_MODEL_FAILURE = "d_dictionary.compiled_model.err.compile.failure";
+    private static final String ERR_DUPLICATE_PROPERTY_TYPE = "d_dictionary.compiled_model.err.duplicate_property_type";
+    private static final String ERR_DUPLICATE_TYPE = "d_dictionary.compiled_model.err.duplicate_type";
+    private static final String ERR_DUPLICATE_ASPECT = "d_dictionary.compiled_model.err.duplicate_aspect";
+    private static final String ERR_DUPLICATE_CONSTRAINT = "d_dictionary.compiled_model.err.duplicate_constraint";
+
     private M2Model model;
     private ModelDefinition modelDefinition;
     private Map<QName, DataTypeDefinition> dataTypes = new HashMap<QName, DataTypeDefinition>();
@@ -105,7 +113,7 @@ public class CompiledModel implements ModelQuery
         }
         catch(Exception e)
         {
-            throw new DictionaryException("Failed to compile model " + model.getName(), e);
+            throw new DictionaryException(ERR_COMPILE_MODEL_FAILURE, e, model.getName());
         }
     }
 
@@ -138,7 +146,7 @@ public class CompiledModel implements ModelQuery
             M2DataTypeDefinition def = new M2DataTypeDefinition(modelDefinition, propType, localPrefixes);
             if (dataTypes.containsKey(def.getName()))
             {
-                throw new DictionaryException("Found duplicate property type definition " + propType.getName());
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_PROPERTY_TYPE, propType.getName());
             }
             dataTypes.put(def.getName(), def);
         }
@@ -149,7 +157,7 @@ public class CompiledModel implements ModelQuery
             M2TypeDefinition def = new M2TypeDefinition(modelDefinition, type, localPrefixes, properties, associations);
             if (classes.containsKey(def.getName()))
             {
-                throw new DictionaryException("Found duplicate class definition " + type.getName() + " (a type)");
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_TYPE, type.getName());
             }
             classes.put(def.getName(), def);
             types.put(def.getName(), def);
@@ -161,7 +169,7 @@ public class CompiledModel implements ModelQuery
             M2AspectDefinition def = new M2AspectDefinition(modelDefinition, aspect, localPrefixes, properties, associations);
             if (classes.containsKey(def.getName()))
             {
-                throw new DictionaryException("Found duplicate class definition " + aspect.getName() + " (an aspect)");
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_ASPECT, aspect.getName());
             }
             classes.put(def.getName(), def);
             aspects.put(def.getName(), def);
@@ -174,7 +182,7 @@ public class CompiledModel implements ModelQuery
             QName qname = def.getName();
             if (constraints.containsKey(qname))
             {
-                throw new DictionaryException("Found duplicate constraint definition " + constraint.getName() + " (an aspect)");
+                throw new DuplicateDefinitionException(ERR_DUPLICATE_CONSTRAINT, constraint.getName());
             }
             constraints.put(qname, def);
         }

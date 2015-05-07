@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -141,7 +141,7 @@ public class DictionaryBootstrap implements DictionaryListener
                 InputStream modelStream = getClass().getClassLoader().getResourceAsStream(bootstrapModel);
                 if (modelStream == null)
                 {
-                    throw new DictionaryException("Could not find bootstrap model " + bootstrapModel);
+                    throw new DictionaryException("d_dictionary.bootstrap.model_not_found", bootstrapModel);
                 }
                 try
                 {
@@ -156,7 +156,7 @@ public class DictionaryBootstrap implements DictionaryListener
                 }
                 catch(DictionaryException e)
                 {
-                    throw new DictionaryException("Could not import bootstrap model " + bootstrapModel, e);
+                    throw new DictionaryException("d_dictionary.bootstrap.model_not_imported", e, bootstrapModel);
                 }
                 finally
                 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -40,6 +40,10 @@ import org.alfresco.service.namespace.QName;
  */
 /*package*/ class M2DataTypeDefinition implements DataTypeDefinition
 {
+    private static final String ERR_NOT_DEFINED_NAMESPACE = "d_dictionary.data_type.namespace_not_defined";
+    private static final String ERR_JAVA_CLASS_NOT_SPECIFIED = "d_dictionary.data_type.java_class_not_specified";
+    private static final String ERR_JAVA_CLASS_INVALID = "d_dictionary.data_type.java_class_invalid";
+
     private ModelDefinition model;
     private QName name;
     private M2DataType dataType;
@@ -53,7 +57,7 @@ import org.alfresco.service.namespace.QName;
         this.name = QName.createQName(propertyType.getName(), resolver);
         if (!model.isNamespaceDefined(name.getNamespaceURI()))
         {
-            throw new DictionaryException("Cannot define data type " + name.toPrefixString() + " as namespace " + name.getNamespaceURI() + " is not defined by model " + model.getName().toPrefixString());
+            throw new DictionaryException(ERR_NOT_DEFINED_NAMESPACE, name.toPrefixString(), name.getNamespaceURI(), model.getName().toPrefixString());
         }
         this.dataType = propertyType;
         this.analyserResourceBundleName = dataType.getAnalyserResourceBundleName();
@@ -66,7 +70,7 @@ import org.alfresco.service.namespace.QName;
         String javaClass = dataType.getJavaClassName();
         if (javaClass == null)
         {
-            throw new DictionaryException("Java class of data type " + name.toPrefixString() + " must be specified");
+            throw new DictionaryException(ERR_JAVA_CLASS_NOT_SPECIFIED, name.toPrefixString());
         }
         
         // Ensure java class is valid and referenceable
@@ -76,7 +80,7 @@ import org.alfresco.service.namespace.QName;
         }
         catch (ClassNotFoundException e)
         {
-            throw new DictionaryException("Java class " + javaClass + " of data type " + name.toPrefixString() + " is invalid", e);
+            throw new DictionaryException(ERR_JAVA_CLASS_INVALID, javaClass, name.toPrefixString(), e);
         }
     }
     
