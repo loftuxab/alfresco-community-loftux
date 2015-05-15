@@ -193,6 +193,9 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_APPLICATION_ILLUSTRATOR = "application/illustrator";
 
     public static final String MIMETYPE_APPLICATION_PHOTOSHOP = "image/vnd.adobe.photoshop";
+    
+    //Encrypted office document
+    public static final String MIMETYPE_ENCRYPTED_OFFICE = "application/x-tika-ooxml-protected";
 
     // Open Document
     public static final String MIMETYPE_OPENDOCUMENT_TEXT = "application/vnd.oasis.opendocument.text";
@@ -795,8 +798,8 @@ public class MimetypeMap implements MimetypeService
         MediaType type = detectType(filename, input);
         String filenameGuess = guessMimetype(filename);
 
-        // If Tika doesn't know what the type is, go with the filename one
-        if (type == null || MediaType.OCTET_STREAM.equals(type)) { return filenameGuess; }
+        // If Tika doesn't know what the type is, or file is password protected, go with the filename one
+        if (type == null || MediaType.OCTET_STREAM.equals(type) || MIMETYPE_ENCRYPTED_OFFICE.equals(type.toString())) { return filenameGuess; }
 
         // If Tika has supplied a very generic type, go with the filename one,
         // as it's probably a custom Text or XML format known only to Alfresco
