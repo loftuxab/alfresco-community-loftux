@@ -39,7 +39,7 @@ public class SolrClientTestSuite extends TestSuite
         suite.addTestSuite(RepoJettyStartTest.class);
         
         // the following tests rely on running repo
-        suite.addTestSuite(EmbeddedSolrTest.class);
+        // suite.addTestSuite(EmbeddedSolrTest.class); Temporarily commented! See MNT-13415
         suite.addTestSuite(SOLRAPIClientTest.class);
         suite.addTestSuite(CMISDataCreatorTest.class);
         // stop (embedded) Jetty
