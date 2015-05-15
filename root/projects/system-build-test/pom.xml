@@ -81,6 +81,9 @@
     </resources>
     <testResources>
       <testResource>
+        <directory>source/test-resources</directory> 
+      </testResource>
+      <testResource>
         <directory>keystore</directory> 
       </testResource>
     </testResources>
@@ -253,10 +256,11 @@
                         <configuration>
                             <includes>
                                 <include>**/MiscSystemTestSuite.*</include>
+                                <include>**/SolrClientTestSuite.*</include>
                             </includes>
                             <systemPropertyVariables>
                                 <solr.solr.home>${solr.config.folder}</solr.solr.home>
-                                <solr.solr.model.dir>${solr.config.folder}/models</solr.solr.model.dir>
+                                <solr.solr.model.dir>${solr.config.folder}/alfrescoModels</solr.solr.model.dir>
                                 <solr.solr.content.dir>${solr.config.folder}/content</solr.solr.content.dir>
                             </systemPropertyVariables>
                         </configuration>
