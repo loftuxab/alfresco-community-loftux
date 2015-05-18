@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -277,18 +277,28 @@ public class HttpClientFactory
     
     protected HttpClient getHttpsClient()
     {
+       return getHttpsClient(host, sslPort);
+    }
+    
+    protected HttpClient getHttpsClient(String httpsHost, int httpsPort)
+    {
         // Configure a custom SSL socket factory that will enforce mutual authentication
         HttpClient httpClient = constructHttpClient();
-        HttpHostFactory hostFactory = new HttpHostFactory(new Protocol("https", sslSocketFactory, sslPort));
+        HttpHostFactory hostFactory = new HttpHostFactory(new Protocol("https", sslSocketFactory, httpsPort));
         httpClient.setHostConfiguration(new HostConfigurationWithHostFactory(hostFactory));
-        httpClient.getHostConfiguration().setHost(host, sslPort, "https");
+        httpClient.getHostConfiguration().setHost(httpsHost, httpsPort, "https");
         return httpClient;
     }
 
     protected HttpClient getDefaultHttpClient()
     {
+        return getDefaultHttpClient(host, port);
+    }
+    
+    protected HttpClient getDefaultHttpClient(String httpHost, int httpPort)
+    {
         HttpClient httpClient = constructHttpClient();
-        httpClient.getHostConfiguration().setHost(host, port);
+        httpClient.getHostConfiguration().setHost(httpHost, httpPort);
         return httpClient;
     }
     
@@ -363,6 +373,26 @@ public class HttpClientFactory
         else if(secureCommsType == SecureCommsType.NONE)
         {
             httpClient = getDefaultHttpClient();
+        }
+        else
+        {
+            throw new AlfrescoRuntimeException("Invalid Solr secure communications type configured in alfresco.secureComms, should be 'ssl'or 'none'");
+        }
+
+        return httpClient;
+    }
+    
+    public HttpClient getHttpClient(String host, int port)
+    {
+        HttpClient httpClient = null;
+
+        if(secureCommsType == SecureCommsType.HTTPS)
+        {
+            httpClient = getHttpsClient(host, port);
+        }
+        else if(secureCommsType == SecureCommsType.NONE)
+        {
+            httpClient = getDefaultHttpClient(host, port);
         }
         else
         {

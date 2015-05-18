@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -50,6 +50,7 @@ import org.alfresco.solr.tracker.SolrTrackerScheduler;
 import org.alfresco.solr.tracker.Tracker;
 import org.alfresco.solr.tracker.TrackerRegistry;
 import org.alfresco.util.CachingDateFormat;
+import org.alfresco.util.shard.ExplicitShardingPolicy;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.apache.solr.common.params.SolrParams;
@@ -348,56 +349,51 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             
             if(numShards > 1 )
             {
-                String collectionName = storeRef.getProtocol() + "-" + storeRef.getIdentifier() + "-shards-"+numShards;
-                String coreBase = storeRef.getProtocol() + "-" + storeRef.getIdentifier() + "-shard-";
-                if (params.get("coreName") != null)
-                {
-                    collectionName = params.get("coreName") + "-shards-"+numShards;
-                    coreBase = params.get("coreName") + "-shard-";
-                }
-              
-                File baseDirectory = new File(solrHome, collectionName);
-                
                 int replicationFactor =  params.getInt("replicationFactor", 1);
                 int nodeInstance =  params.getInt("nodeInstance", -1);
                 int numNodes =  params.getInt("numNodes", 1);
+                
+                String collectionName = templateName + "--" + storeRef.getProtocol() + "-" + storeRef.getIdentifier() + "--shards--"+numShards + "-x-"+replicationFactor+"--node--"+nodeInstance+"-of-"+numNodes;
+                String coreBase = storeRef.getProtocol() + "-" + storeRef.getIdentifier() + "-";
+                if (params.get("coreName") != null)
+                {
+                    collectionName = templateName + "--" + params.get("coreName") + "--shards--"+numShards + "-x-"+replicationFactor+"--node--"+nodeInstance+"-of-"+numNodes;
+                    coreBase = params.get("coreName") + "-";
+                }
+              
+                File baseDirectory = new File(solrHome, collectionName);    
                 
                 if(nodeInstance == -1)
                 {
                     return false;
                 }
                 
-                if( (numShards * replicationFactor) % numNodes != 0)
+                ExplicitShardingPolicy policy = new ExplicitShardingPolicy(numShards, replicationFactor, numNodes);
+                
+                if(!policy.configurationIsValid())
                 {
                     return false;
                 }
                 
-                int shardsPerNode = numShards * replicationFactor / numNodes;
-                if((shardsPerNode > numShards) || (shardsPerNode < 1))
+                for(Integer shard : policy.getShardIdsForNode(nodeInstance))
                 {
-                    return false;
-                }
-                
-                for(int shard = 0; shard < (numShards*replicationFactor); shard++)
-                {
-                    if(shard % numNodes == nodeInstance-1)
+                    String coreName = coreBase+shard;
+                    File newCore = new File(baseDirectory, coreName);
+                    String solrCoreName = coreName;
+                    if (params.get("coreName") == null)
                     {
-						int actualShard = shard % numShards;
-                    
-                        String coreName = coreBase+actualShard;
-                        File newCore = new File(baseDirectory, coreName);
-                        String solrCoreName = coreName;
                         if(storeRef.equals(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE))
                         {
-                            solrCoreName = "alfresco-"+actualShard;
+                            solrCoreName = "alfresco-"+shard;
                         }
                         else if(storeRef.equals(StoreRef.STORE_REF_ARCHIVE_SPACESSTORE))
                         {
-                            solrCoreName = "archive-"+actualShard;
+                            solrCoreName = "archive-"+shard;
                         }
-                        createAndRegisterNewCore(rsp, params, store, template, solrCoreName, newCore, numShards, actualShard);
                     }
+                    createAndRegisterNewCore(rsp, params, store, template, solrCoreName, newCore, numShards, shard);
                 }
+                       
                 return true;
             }
             else
