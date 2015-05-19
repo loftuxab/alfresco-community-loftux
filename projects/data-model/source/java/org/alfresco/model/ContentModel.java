@@ -125,6 +125,11 @@ public interface ContentModel
      * @since 3.5.0
      */
     static final QName ASPECT_UNDELETABLE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "undeletable");
+    
+    /**
+     * Aspect for nodes which are by default not movable.
+     */
+    static final QName ASPECT_UNMOVABLE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "unmovable");
 
     /**
      * Aspects marking nodes that are pending deletion.
