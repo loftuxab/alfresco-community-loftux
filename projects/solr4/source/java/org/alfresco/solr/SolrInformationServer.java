@@ -2163,14 +2163,11 @@ public class SolrInformationServer implements InformationServer
     private void deleteNode(UpdateRequestProcessor processor, SolrQueryRequest request, Node node) throws IOException
     {
         String errorDocId = PREFIX_ERROR + node.getId();
-        String nodeDocId = AlfrescoSolrDataModel.getNodeDocumentId(node.getTenant(), 
-                node.getAclId(), node.getId());
         DeleteUpdateCommand delErrorDocCmd = new DeleteUpdateCommand(request);
         delErrorDocCmd.setId(errorDocId);
         processor.processDelete(delErrorDocCmd);
-        DeleteUpdateCommand delNodeDocCmd = new DeleteUpdateCommand(request);
-        delNodeDocCmd.setId(nodeDocId);
-        processor.processDelete(delNodeDocCmd);
+        // MNT-13767 fix, remove by node DBID.
+        deleteNode(processor, request, node.getId());
     }
 
     private void deleteNode(UpdateRequestProcessor processor, SolrQueryRequest request, long dbid) throws IOException
