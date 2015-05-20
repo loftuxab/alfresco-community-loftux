@@ -61,6 +61,19 @@
       </snapshots>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <!-- Used to download bcel 6.0-RC3 - see ACE-3667 -->
+    <pluginRepository>
+      <id>alfresco-public</id>
+      <url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 
   <distributionManagement>
       <repository>
