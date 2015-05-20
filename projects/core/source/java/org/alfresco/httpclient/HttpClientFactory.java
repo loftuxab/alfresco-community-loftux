@@ -117,7 +117,7 @@ public class HttpClientFactory
 
     private int maxHostConnections = 40;
     
-    private int socketTimeout = 0;
+    private Integer socketTimeout = null;
 
     private int connectionTimeout = 0;
     
@@ -266,7 +266,10 @@ public class HttpClientFactory
         HttpClientParams params = httpClient.getParams();
         params.setBooleanParameter(HttpConnectionParams.TCP_NODELAY, true);
         params.setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK, true);
-        params.setSoTimeout(socketTimeout);
+        if (socketTimeout != null) 
+        {
+            params.setSoTimeout(socketTimeout);
+        }
         HttpConnectionManagerParams connectionManagerParams = httpClient.getHttpConnectionManager().getParams();
         connectionManagerParams.setMaxTotalConnections(maxTotalConnections);
         connectionManagerParams.setDefaultMaxConnectionsPerHost(maxHostConnections);
