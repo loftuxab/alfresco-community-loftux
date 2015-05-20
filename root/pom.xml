@@ -78,7 +78,6 @@
     <module>projects/core</module>
     <module>projects/data-model</module>
     <module>projects/legacy-lucene</module>
-    <module>projects/alfresco-jlan</module>
     <module>projects/mbeans</module>
     <module>projects/repository</module>
     <module>projects/remote-api</module>
