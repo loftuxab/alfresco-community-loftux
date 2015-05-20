@@ -323,28 +323,8 @@ public class HttpClientFactory
         httpClient.getHostConfiguration().setHost(host, port);
         return httpClient;
     }
-    
-    protected AlfrescoHttpClient getAlfrescoMD5HttpClient(String host, int port)
-    {
-        AlfrescoHttpClient repoClient = new SecureHttpClient(getDefaultHttpClient(), keyResourceLoader, host, port,
-                keyStoreParameters, encryptionParameters);
-        return repoClient;
-    }
-    
-    /**
-     * For testing.
-     * 
-     * @param host
-     * @param port
-     * @param encryptionService
-     * @return
-     */
-    protected AlfrescoHttpClient getAlfrescoMD5HttpClient(String host, int port, EncryptionService encryptionService)
-    {
-        AlfrescoHttpClient repoClient = new SecureHttpClient(getDefaultHttpClient(), encryptionService);
-        return repoClient;
-    }
-    
+	
+	
     public AlfrescoHttpClient getRepoClient(String host, int port)
     {
         AlfrescoHttpClient repoClient = null;
@@ -452,84 +432,7 @@ public class HttpClientFactory
         }
     }
     
-    /**
-     * Simple HTTP client to connect to the Alfresco server.
-     * 
-     * @since 4.0
-     */
-    class SecureHttpClient extends AbstractHttpClient
-    {
-        private Encryptor encryptor;
-        private EncryptionUtils encryptionUtils;
-        private EncryptionService encryptionService;
-        
-        /**
-         * For testing purposes.
-         * 
-         * @param httpClient
-         * @param encryptionService
-         */
-        public SecureHttpClient(HttpClient httpClient, EncryptionService encryptionService)
-        {
-            super(httpClient);
-            this.encryptionUtils = encryptionService.getEncryptionUtils();
-            this.encryptor = encryptionService.getEncryptor();
-            this.encryptionService = encryptionService;
-        }
-        
-        public SecureHttpClient(HttpClient httpClient, KeyResourceLoader keyResourceLoader, String host, int port,
-                KeyStoreParameters keyStoreParameters, MD5EncryptionParameters encryptionParameters)
-        {
-            super(httpClient);
-            this.encryptionService = new EncryptionService(host, port, keyResourceLoader, keyStoreParameters, encryptionParameters);
-            this.encryptionUtils = encryptionService.getEncryptionUtils();
-            this.encryptor = encryptionService.getEncryptor();
-        }
-        
-        protected HttpMethod createMethod(Request req) throws IOException
-        {
-            byte[] message = null;
-            HttpMethod method = super.createMethod(req);
 
-            if(req.getMethod().equalsIgnoreCase("POST"))
-            {
-                message = req.getBody();
-                // encrypt body
-                Pair<byte[], AlgorithmParameters> encrypted = encryptor.encrypt(KeyProvider.ALIAS_SOLR, null, message);
-                encryptionUtils.setRequestAlgorithmParameters(method, encrypted.getSecond());
-                
-                ((PostMethod)method).getParams().setBooleanParameter(HttpMethodParams.USE_EXPECT_CONTINUE, encrypted.getFirst().length > DEFAULT_SAVEPOST_BUFFER);
-                ByteArrayRequestEntity requestEntity = new ByteArrayRequestEntity(encrypted.getFirst(), "application/octet-stream");
-                ((PostMethod)method).setRequestEntity(requestEntity);
-            }
-
-            encryptionUtils.setRequestAuthentication(method, message);
-
-            return method;
-        }
-        
-        protected HttpMethod sendRemoteRequest(Request req) throws AuthenticationException, IOException
-        {
-            HttpMethod method = super.sendRemoteRequest(req);
-
-            // check that the request returned with an ok status
-            if(method.getStatusCode() == HttpStatus.SC_UNAUTHORIZED)
-            {
-                throw new AuthenticationException(method);
-            }
-            
-            return method;
-        }
-
-        /**
-         * Send Request to the repository
-         */
-        public Response sendRequest(Request req) throws AuthenticationException, IOException
-        {
-            HttpMethod method = super.sendRemoteRequest(req);
-            return new SecureHttpMethodResponse(method, httpClient.getHostConfiguration(), encryptionUtils);
-        }
-    }
     
     static class SecureHttpMethodResponse extends HttpMethodResponse
     {
