@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 
 import org.alfresco.repo.content.encoding.ContentCharsetFinder;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -417,7 +418,7 @@ public class MimetypeMap implements MimetypeService
         this.mimetypes = new ArrayList<String>(40);
         this.extensionsByMimetype = new HashMap<String, String>(59);
         this.mimetypesByExtension = new HashMap<String, String>(59);
-        this.displaysByMimetype = new HashMap<String, String>(59);
+        this.displaysByMimetype = new TreeMap<String, String>();
         this.displaysByExtension = new HashMap<String, String>(59);
         this.textMimetypes = new HashSet<String>(23);
 
