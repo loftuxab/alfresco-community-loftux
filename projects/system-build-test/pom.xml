@@ -254,6 +254,7 @@
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <forkMode>always</forkMode>
                             <includes>
                                 <include>**/MiscSystemTestSuite.*</include>
                                 <include>**/SolrClientTestSuite.*</include>
