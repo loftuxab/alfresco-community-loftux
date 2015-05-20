@@ -590,6 +590,34 @@
 				</execution>
 			</executions>
 		</plugin>
+
+        <!--
+            Add tomcat's shared/classes as a test source. This is not a nice solution
+            to getting alfresco-global.properties onto the classpath, but since additionalClasspathElements
+            for the surefire plugin does NOT work, we have to do something else.
+            The problem with doing it this way is that the resources are copied to the target folder,
+            rather than being referenced directly.
+        -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>add-shared-classes</id>
+                    <phase>generate-test-sources</phase>
+                    <goals>
+                        <goal>add-test-resource</goal>
+                    </goals>
+                    <configuration>
+                        <resources>
+                            <resource>
+                                <directory>${runtime.tomcat.conf.folder}/shared/classes</directory>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
 
     <!-- Defining version and some configuration of Maven plugins -->
