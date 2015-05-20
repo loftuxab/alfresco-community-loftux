@@ -88,7 +88,6 @@
 
   <modules>
     <module>projects/3rd-party</module>
-    <module>projects/core</module>
     <module>projects/data-model</module>
     <module>projects/legacy-lucene</module>
     <module>projects/mbeans</module>
