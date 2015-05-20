@@ -545,8 +545,8 @@
                             <property name="db.master.url" value="jdbc:postgresql:template1"/>
                             <property name="db.username" value="alfresco"/>
                             <property name="db.password" value="alfresco"/>
-                            <property name="db.master.username" value="postgres"/>
-                            <property name="db.master.password" value=""/>
+                            <property name="db.master.username" value="alfresco"/>
+                            <property name="db.master.password" value="alfresco"/>
                             <property name="db.drop.command" value="drop database if exists ${db.name}"/>
                             <property name="db.create.command" value="create database ${db.name}"/>
                         </target>
@@ -568,8 +568,8 @@
                             <property name="db.master.url" value="jdbc:postgresql:template1"/>
                             <property name="db.username" value="alfresco"/>
                             <property name="db.password" value="alfresco"/>
-                            <property name="db.master.username" value="postgres"/>
-                            <property name="db.master.password" value=""/>
+                            <property name="db.master.username" value="alfresco"/>
+                            <property name="db.master.password" value="alfresco"/>
                             <property name="db.drop.command" value="drop database if exists ${db.name}"/>
                             <property name="db.create.command" value="create database ${db.name}"/>
                         </target>
