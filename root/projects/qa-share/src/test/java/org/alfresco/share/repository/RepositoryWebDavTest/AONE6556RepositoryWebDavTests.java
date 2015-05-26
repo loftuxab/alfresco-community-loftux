@@ -234,7 +234,7 @@ public class AONE6556RepositoryWebDavTests extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // Verify that the taggable aspect is applied
-        Assert.assertTrue(aspectsPage.getSelectedAspects().contains(DocumentAspect.TAGGABLE), "'TAGGABLE'' aspect isn't applied");
+        Assert.assertTrue(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.TAGGABLE), "'TAGGABLE'' aspect isn't applied");
 
         // Click on Apply changes on select aspects page
         aspectsPage.clickApplyChanges().render();

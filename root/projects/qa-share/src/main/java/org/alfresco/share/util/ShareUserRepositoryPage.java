@@ -640,7 +640,7 @@ public class ShareUserRepositoryPage extends AbstractUtils
         selectAspectsPage = selectAspectsPage.add(aspects).render();
 
         // Verify assert added to currently selected right hand side
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(aspect));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(aspect));
 
         // Click on Apply changes on select aspects page
         selectAspectsPage.clickApplyChanges().render();

@@ -685,14 +685,14 @@ public class MyFilesTest extends AbstractUtils
         aspects.add(EMAILED);
         aspectsPage = aspectsPage.add(aspects).render();
 
-        assertTrue(aspectsPage.getSelectedAspects().contains(VERSIONABLE));
-        assertTrue(aspectsPage.getSelectedAspects().contains(EMAILED));
+        assertTrue(aspectsPage.getSelectedSystemAspects().contains(VERSIONABLE));
+        assertTrue(aspectsPage.getSelectedSystemAspects().contains(EMAILED));
 
         aspects.remove(VERSIONABLE);
         aspectsPage.remove(aspects);
 
-        assertTrue(aspectsPage.getSelectedAspects().contains(VERSIONABLE));
-        assertFalse(aspectsPage.getSelectedAspects().contains(EMAILED));
+        assertTrue(aspectsPage.getSelectedSystemAspects().contains(VERSIONABLE));
+        assertFalse(aspectsPage.getSelectedSystemAspects().contains(EMAILED));
 
         myFilesPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
 

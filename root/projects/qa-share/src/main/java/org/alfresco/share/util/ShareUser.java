@@ -2062,7 +2062,7 @@ public class ShareUser extends AbstractUtils
 
         DetailsPage detailsPage = ShareUserSitePage.openDetailsPage(drone, contentName);
         SelectAspectsPage selectAspectsPage = detailsPage.selectManageAspects().render();
-        Set<DocumentAspect> selectedAspects = selectAspectsPage.getSelectedAspects();
+        Set<DocumentAspect> selectedAspects = selectAspectsPage.getSelectedSystemAspects();
         selectAspectsPage.clickCancel().render();
         return selectedAspects;
     }
