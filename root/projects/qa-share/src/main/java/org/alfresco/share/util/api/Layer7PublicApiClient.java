@@ -3,9 +3,12 @@ package org.alfresco.share.util.api;
 import org.alfresco.rest.api.tests.client.*;
 import org.alfresco.share.util.AbstractUtils;
 import org.alfresco.webdrone.WebDrone;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by dmitry.yukhnovets on 13.10.2014.
@@ -35,7 +38,21 @@ public class Layer7PublicApiClient extends PublicApiHttpClient {
                 public HttpResponse onCallSuccess(HttpMethod method) throws Exception
                 {
                     long end = System.currentTimeMillis();
-                    return new HttpResponse(method, rq.getRunAsUser(), method.getResponseBodyAsString(), (end - start));
+                    Map<String, String> headersMap = null;
+                    Header[] headers = method.getResponseHeaders();
+                    if (headers != null)
+                    {
+                        headersMap = new HashMap<String, String>(headers.length);
+                        for (Header header : headers)
+                        {
+                            headersMap.put(header.getName(), header.getValue());
+                        }
+                    }
+                    return new HttpResponse(method,
+                                            rq.getRunAsUser(),
+                                            method.getResponseBodyAsString(),
+                                            headersMap,
+                                            (end - start));
                 }
 
                 @Override
