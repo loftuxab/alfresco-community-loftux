@@ -1844,8 +1844,8 @@ public class GalleryViewTest extends AbstractUtils
 
         // Verify assert added to currently selected right hand side
         // TODO Add explanation assert
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.RESTRICTABLE));
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.RESTRICTABLE));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE));
 
         docLibPage = selectAspectsPage.clickApplyChanges().render();
         DetailsPage detailsPage = ShareUserSitePage.getContentDetailsPage(customDrone, folderName);

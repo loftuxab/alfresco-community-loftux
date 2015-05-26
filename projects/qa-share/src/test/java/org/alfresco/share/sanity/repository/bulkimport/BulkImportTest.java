@@ -422,7 +422,7 @@ public class BulkImportTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // Verify the rule isn't applied
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect is applied");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect is applied");
 
         aspectsPage.clickCancel();
 
@@ -465,7 +465,7 @@ public class BulkImportTest extends AbstractUtils
 
         aspectsPage = detailsPage.selectManageAspects().render();
 
-        Assert.assertTrue(aspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE),
+        Assert.assertTrue(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE),
                 "'Classifiable'' aspect isn't appeared. The rule isn't applied to file");
     }
 

@@ -409,7 +409,7 @@ public class DocLibTest extends AbstractUtils
             SelectAspectsPage aspectsPage = docDetailsPage.selectManageAspects().render();
 
             // Classifiable aspect has been removed
-            assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect hasn't been removed)");
+            assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect hasn't been removed)");
             aspectsPage.clickCancel().render();
             documentLibraryPage = ShareUser.openDocumentLibrary(customDrone).render();
 
@@ -443,8 +443,8 @@ public class DocLibTest extends AbstractUtils
             aspect.add(CLASSIFIABLE);
             aspectsPage = aspectsPage.add(aspect).render();
 
-            assertTrue(aspectsPage.getSelectedAspects().contains(CLASSIFIABLE));
-            assertTrue(aspectsPage.getSelectedAspects().contains(ALIASABLE_EMAIL));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(CLASSIFIABLE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(ALIASABLE_EMAIL));
 
             fDetailsPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
             customDrone.refresh();
@@ -457,8 +457,8 @@ public class DocLibTest extends AbstractUtils
             aspect.remove(ALIASABLE_EMAIL);
             aspectsPage.remove(aspect);
 
-            assertFalse(aspectsPage.getSelectedAspects().contains(CLASSIFIABLE));
-            assertTrue(aspectsPage.getSelectedAspects().contains(ALIASABLE_EMAIL));
+            assertFalse(aspectsPage.getSelectedSystemAspects().contains(CLASSIFIABLE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(ALIASABLE_EMAIL));
 
             fDetailsPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
             customDrone.refresh();
@@ -1363,8 +1363,8 @@ public class DocLibTest extends AbstractUtils
             aspect.add(CLASSIFIABLE);
             aspectsPage = aspectsPage.add(aspect).render();
 
-            assertTrue(aspectsPage.getSelectedAspects().contains(CLASSIFIABLE));
-            assertTrue(aspectsPage.getSelectedAspects().contains(DUBLIN_CORE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(CLASSIFIABLE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(DUBLIN_CORE));
 
             detailsPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
             customDrone.refresh();
@@ -1377,8 +1377,8 @@ public class DocLibTest extends AbstractUtils
             aspect.remove(CLASSIFIABLE);
             aspectsPage.remove(aspect);
 
-            assertFalse(aspectsPage.getSelectedAspects().contains(DUBLIN_CORE));
-            assertTrue(aspectsPage.getSelectedAspects().contains(CLASSIFIABLE));
+            assertFalse(aspectsPage.getSelectedSystemAspects().contains(DUBLIN_CORE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(CLASSIFIABLE));
 
             detailsPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
             customDrone.refresh();
