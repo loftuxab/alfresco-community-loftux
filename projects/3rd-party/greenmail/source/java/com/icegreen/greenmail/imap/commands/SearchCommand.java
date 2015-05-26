@@ -15,6 +15,7 @@ import com.icegreen.greenmail.store.MailFolder;
 
 import javax.mail.Flags;
 import javax.mail.Message;
+import javax.mail.search.AndTerm;
 import javax.mail.search.FlagTerm;
 import javax.mail.search.HeaderTerm;
 import javax.mail.search.MessageIDTerm;
@@ -97,47 +98,191 @@ class SearchCommand extends SelectedStateCommand implements UidEnabledCommand {
          * Not yet implemented - all searches will return everything for now.
          * TODO implement search
          */
-        public SearchTerm searchTerm(ImapRequestLineReader request)
-                throws ProtocolException {
-            // Dummy implementation
-            // Consume to the end of the line.
-            StringBuilder sb = new StringBuilder();
+        public SearchTerm searchTerm(ImapRequestLineReader request) throws ProtocolException
+        {
+            SearchTerm resultTerm = null;
+            SearchTerm searchTerm;
+            trimFirstSpace(request);
             char next = request.nextChar();
-            while (next != '\n') {
-                sb.append(next);
-                request.consume();
-                next = request.nextChar();
-            }
-            String searchCriteria = sb.toString().trim();
-            
-            if (log.isDebugEnabled())
+
+            while (next != '\n')
             {
-                log.debug("Search criteria : " + searchCriteria);
+                searchTerm = extractSearchTerm(request);
+                resultTerm = (resultTerm == null ? searchTerm : new AndTerm(resultTerm, searchTerm));
+                try
+                {
+                    next = request.nextChar();
+                }
+                catch (ProtocolException e)
+                {
+                    //it is end of line
+                    break;
+                }
+                trimFirstSpace(request);
             }
-            
-            // MNT-12585 workaround, handle UID SEARCH DELETED correctly
-            if (FLAG_DELETED.equals(searchCriteria))
+            return resultTerm;
+        }
+
+        private SearchTerm extractSearchTerm(ImapRequestLineReader request) throws ProtocolException
+        {
+            StringBuilder sb = new StringBuilder();
+            trimFirstSpace(request);
+            char next = request.nextChar();
+
+            if (next == '(')
             {
-                Flags flags = new Flags(Flags.Flag.DELETED);
-                return new FlagTerm(flags, true);
-            }
-            else if (searchCriteria.toLowerCase().contains("HEADER Message-ID".toLowerCase()))
-            {
-                String[] headersCriteria = searchCriteria.split("\"");
-                String messageId = headersCriteria[headersCriteria.length - 1];
-                
-                return new MessageIDTerm(messageId);
+                return paren(request);
             }
             else
             {
-                // Return a search term that matches everything.
-                return new SearchTerm() {
-                    public boolean match(Message message) {
-                        return true;
-                    }
-                };
+                while (next != ' ' && next != '\n' && next != ')')
+                {
+                    sb.append(next);
+                    request.consume();
+                    next = request.nextChar();
+                }
+            }
+
+            SearchTermBuilder b = SearchTermBuilder.create(sb.toString());
+            if (b.isExpressionParameter())
+            {
+                extractParameterExpression(request, b);
+            }
+            extractParameters(request, b);
+
+            return b.build();
+        }
+
+        private void extractParameterExpression(ImapRequestLineReader request, SearchTermBuilder builder) throws ProtocolException
+        {
+            while (builder.expectsParameter())
+            {
+                SearchTerm st = extractSearchTerm(request);
+                builder.addParameter(st);
             }
         }
+
+        private void extractParameters(ImapRequestLineReader request, SearchTermBuilder builder) throws ProtocolException
+        {
+            int QUOTE = '"';
+            int SPACE = ' ';
+            int BRACKET = ')';
+            while (builder.expectsParameter())
+            {
+                trimFirstSpace(request);
+                char next = request.nextChar();
+                StringBuilder sb = new StringBuilder();
+                boolean needContinue = true;
+                boolean startsWithQuote = false;
+                if (next == QUOTE)
+                {
+                    startsWithQuote = true;
+                    request.consume();
+                }
+
+                while (needContinue)
+                {
+                    next = request.nextChar();
+
+                    // process "space" char
+                    if (next == SPACE)
+                    {
+                        if (!startsWithQuote)
+                        {
+                            // parameter was ended
+                            needContinue = false;
+                            continue;
+                        }
+                    }
+                    // process "quote" char
+                    if (next == QUOTE)
+                    {
+                        if (sb.length() == 0 || sb.charAt(sb.length()-1) != '\\')
+                        {
+                            // parameter was ended
+                            needContinue = false;
+                            request.consume();
+                            continue;
+                        }
+                    }
+                    //process bracket ")"
+                    if (next == BRACKET)
+                    {
+                        // parameter was ended
+                        needContinue = false;
+                        continue;
+                    }
+
+                    sb.append(next);
+                    request.consume();
+                }
+                builder.addParameter(clearParameter(sb));
+            }
+        }
+
+        private void trimFirstSpace(ImapRequestLineReader request) throws ProtocolException
+        {
+            char next = request.nextChar();
+            if (next == ' ')
+            {
+                request.consume();
+            }
+        }
+
+        /**
+         * IMAP client can include parameter in quotes. Additionally, some characters can be escaped.
+         * E.g.: "body string with \" quote".
+         * <br>
+         * Current method removes quotes at start and at end of string and unescapes characters
+         *
+         * @param dirtyParam parameter from IMAP client
+         * @return parameter that was typed by user
+         */
+        private String clearParameter(StringBuilder dirtyParam)
+        {
+            int fromIndex = dirtyParam.indexOf("\\");
+            while (fromIndex > -1)
+            {
+                if (dirtyParam.length() >= fromIndex +1)
+                {
+                    if (dirtyParam.charAt(fromIndex+1) == '\\')
+                    {
+                        dirtyParam.deleteCharAt(fromIndex);
+                        fromIndex += 1;
+                    }
+                    else
+                    {
+                        dirtyParam.deleteCharAt(fromIndex);
+                    }
+                }
+                fromIndex = dirtyParam.indexOf("\\", fromIndex);
+            }
+            return dirtyParam.toString();
+        }
+
+
+        /**
+         * Some expressions can use brackets for complex parameters
+         * @param request request
+         * @return search term in brackets
+         * @throws ProtocolException
+         */
+        private SearchTerm paren(ImapRequestLineReader request) throws ProtocolException
+        {
+            request.consume();
+            SearchTerm resultTerm = null;
+            char next = request.nextWordChar();
+            while (next != ')')
+            {
+                SearchTerm searchTerm = extractSearchTerm(request);
+                resultTerm = (resultTerm == null ? searchTerm : new AndTerm(resultTerm, searchTerm));
+                next = request.nextWordChar();
+            }
+            request.consume();
+            return resultTerm;
+        }
+
+
 
     }
 }
