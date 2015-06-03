@@ -27,7 +27,7 @@ import org.apache.solr.response.transform.TransformerFactory;
  * @author Andy
  *
  */
-public class CachedDocTransformerFactory extends TransformerFactory
+public class DocValueDocTransformerFactory extends TransformerFactory
 {
 
     /* (non-Javadoc)
@@ -36,7 +36,7 @@ public class CachedDocTransformerFactory extends TransformerFactory
     @Override
     public DocTransformer create(String field, SolrParams params, SolrQueryRequest req)
     {
-        return new CachedDocTransformer();
+        return new DocValueDocTransformer();
     }
 
 }

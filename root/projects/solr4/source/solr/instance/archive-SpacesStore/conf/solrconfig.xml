@@ -1823,6 +1823,9 @@
   <transformer name="cached" class="org.alfresco.solr.transformer.CachedDocTransformerFactory" >
   </transformer>
 
+  <transformer name="dv" class="org.alfresco.solr.transformer.DocValueDocTransformerFactory" >
+  </transformer>
+
 
   <!-- Legacy config for the admin interface -->
   <admin>

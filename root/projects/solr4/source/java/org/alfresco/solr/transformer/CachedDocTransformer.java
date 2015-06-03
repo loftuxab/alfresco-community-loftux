@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -31,9 +31,7 @@ import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
 
 import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.solr.AlfrescoSolrDataModel;
-import org.alfresco.solr.SolrInformationServer;
 import org.alfresco.solr.AlfrescoSolrDataModel.TenantAclIdDbId;
 import org.alfresco.solr.content.SolrContentStore;
 import org.alfresco.solr.content.SolrContentUrlBuilder;
@@ -42,7 +40,7 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.JavaBinCodec;
-import org.apache.solr.core.CoreContainer;
+import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.response.transform.DocTransformer;
 import org.apache.solr.response.transform.TransformContext;
 import org.quartz.JobExecutionException;
@@ -90,7 +88,8 @@ public class CachedDocTransformer extends DocTransformer
         {
             try
             {
-                solrContentStore = getSolrContentStore(context.req.getCore().getResourceLoader().locateSolrHome());
+                context.req.getCore().getResourceLoader();
+                solrContentStore = getSolrContentStore(SolrResourceLoader.locateSolrHome());
             }
             catch (JobExecutionException e)
             {
@@ -146,7 +145,7 @@ public class CachedDocTransformer extends DocTransformer
                     .add(SolrContentUrlBuilder.KEY_TENANT, tenant)
                     .add(SolrContentUrlBuilder.KEY_DB_ID, String.valueOf(dbId))
                     .get();
-        ContentReader reader = this.solrContentStore.getReader(contentUrl);
+        ContentReader reader = CachedDocTransformer.solrContentStore.getReader(contentUrl);
         SolrInputDocument cachedDoc = null;
         if (reader.exists())
         {
