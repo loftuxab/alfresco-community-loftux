@@ -303,6 +303,7 @@ public class AlfrescoCoreAdminTester
             before.add("core", core.getName());
 
             AlfrescoSolrDataModel dataModel = AlfrescoSolrDataModel.getInstance();
+            dataModel.setCMDefaultUri();
 
             this.solrQueryRequest = new SolrServletRequest(core, null);
             this.solrQueryRequest.setParams(req.getParams());
@@ -881,6 +882,7 @@ public class AlfrescoCoreAdminTester
                 rsp.add("core", core.getName());
 
                 dataModel = AlfrescoSolrDataModel.getInstance();
+                dataModel.setCMDefaultUri();
                 
                 this.solrQueryRequest = new SolrServletRequest(core, null);
                 this.solrQueryRequest.setParams(req.getParams());
@@ -1101,6 +1103,7 @@ public class AlfrescoCoreAdminTester
             rsp.add("core", core.getName());
 
             AlfrescoSolrDataModel dataModel = AlfrescoSolrDataModel.getInstance();
+            dataModel.setCMDefaultUri();
             
             this.solrQueryRequest = new SolrServletRequest(core, null);
             this.solrQueryRequest.setParams(req.getParams());
