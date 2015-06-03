@@ -1820,6 +1820,9 @@
      <transformer name="qecBooster" class="org.apache.solr.response.transform.EditorialMarkerFactory" />
     -->
     
+  <transformer name="cached" class="org.alfresco.solr.transformer.CachedDocTransformerFactory" >
+  </transformer>
+
 
   <!-- Legacy config for the admin interface -->
   <admin>
