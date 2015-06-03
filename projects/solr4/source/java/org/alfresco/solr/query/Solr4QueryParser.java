@@ -57,6 +57,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.solr.AlfrescoAnalyzerWrapper;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.AlfrescoSolrDataModel.ContentFieldType;
 import org.alfresco.solr.AlfrescoSolrDataModel.FieldInstance;
@@ -72,10 +73,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.shingle.ShingleFilterFactory;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -96,6 +99,7 @@ import org.apache.lucene.search.spans.SpanTermQuery;
 import org.apache.lucene.search.spans.SpanMultiTermQueryWrapper.TopTermsSpanBooleanQueryRewrite;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Version;
+import org.apache.solr.analysis.TokenizerChain;
 import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.schema.SchemaField;
 import org.jaxen.saxpath.SAXPathException;
@@ -1533,6 +1537,9 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
             }
         }
 
+        // Remove small bits already covered in larger fragments 
+        list = getNonContained(list);
+        
         Collections.sort(list, new Comparator<org.apache.lucene.analysis.Token>()
                 {
 
@@ -1604,7 +1611,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                     {
                         LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
                         newEntry.addAll(tokenSequence);
-                        if(newEntry.getLast().endOffset() <= replace.startOffset())
+                        if((newEntry.getLast().startOffset() < replace.startOffset()) && (newEntry.getLast().endOffset() < replace.endOffset()))
                         {
                             newEntry.add(replace);
                             tokenFoundSequence = true;
@@ -1613,9 +1620,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                     }
                     if(false == tokenFoundSequence)
                     {
-                        LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
-                        newEntry.add(replace);
-                        newAllTokeSequences.add(newEntry);
+                    	throw new IllegalStateException();
                     }
                     // Limit the max number of permutations we consider
                     if(newAllTokeSequences.size() > 64)
@@ -1832,6 +1837,26 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
         
         SchemaField sf = schema.getField(field);
+        TokenizerChain tokenizerChain = (sf.getType().getQueryAnalyzer() instanceof TokenizerChain) ? ((TokenizerChain) sf.getType().getQueryAnalyzer()) : null;
+        boolean isShingled = false;
+        if(tokenizerChain != null)
+        {
+            for(TokenFilterFactory factory : tokenizerChain.getTokenFilterFactories())
+            {
+                if(factory instanceof ShingleFilterFactory)
+                {
+                    isShingled = true;
+                    break;
+                }
+            }
+        }
+        AlfrescoAnalyzerWrapper analyzerWrapper = (sf.getType().getQueryAnalyzer() instanceof AlfrescoAnalyzerWrapper) ? ((AlfrescoAnalyzerWrapper) sf.getType().getQueryAnalyzer()) : null;
+        if(analyzerWrapper != null)
+        {
+            // assume if there are no term positions it is shingled ....
+            isShingled = true;
+        }
+        
         if (list.size() == 0)
             return null;
         else if (list.size() == 1)
@@ -1873,7 +1898,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                     return q;
                 }
                 // shingle
-                else if(sf.omitPositions() && sf.getType().getTypeName().contains("shingle"))
+                else if(sf.omitPositions() && isShingled)
                 {
                     
                     ArrayList<org.apache.lucene.analysis.Token> nonContained = getNonContained(list);
@@ -2305,12 +2330,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
      */
     private boolean canUseMultiPhraseQuery(LinkedList<LinkedList<Token>> fixedTokenSequences)
     {
-        if(fixedTokenSequences.size() <= 1)
-        {
-            return true;
-        }
         LinkedList<Token> first = fixedTokenSequences.get(0);
-        for(int i = 1; i < fixedTokenSequences.size(); i++)
+        for(int i = 0; i < fixedTokenSequences.size(); i++)
         {
             LinkedList<Token> current = fixedTokenSequences.get(i);
             if(first.size() != current.size())
