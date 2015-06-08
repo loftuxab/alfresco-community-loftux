@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -341,6 +342,75 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
     
     
+    public String getAlfrescoPropertyFromSchemaField(String schemaField)
+    {
+        int index = schemaField.lastIndexOf("@{");
+        if(index == -1)
+        {
+            return schemaField;
+        }
+        
+        String alfrescoQueryField = schemaField.substring(index+1);
+        QName qName = QName.createQName(alfrescoQueryField);
+        alfrescoQueryField = qName.toPrefixString(namespaceDAO);
+        
+        PropertyDefinition propertyDefinition = getPropertyDefinition(qName);
+        if((propertyDefinition == null))
+        { 
+            return alfrescoQueryField;
+        }
+        if(!propertyDefinition.isIndexed() && !propertyDefinition.isStoredInIndex())
+        {
+            return alfrescoQueryField;
+        }
+        
+        DataTypeDefinition dataTypeDefinition = propertyDefinition.getDataType();
+        if(dataTypeDefinition.getName().equals(DataTypeDefinition.CONTENT))
+        {
+            if(schemaField.contains("__size@"))
+            {
+                return alfrescoQueryField + ".size";
+            }
+            else if(schemaField.contains("__locale@"))
+            {
+                return alfrescoQueryField + ".locale";
+            }
+            else if(schemaField.contains("__mimetype@"))
+            {
+                return alfrescoQueryField + ".mimetype";
+            }
+            else if(schemaField.contains("__encoding@"))
+            {
+                return alfrescoQueryField + ".encoding";
+            }
+            else if(schemaField.contains("__docid@"))
+            {
+                return alfrescoQueryField + ".docid";
+            }
+            else if(schemaField.contains("__tr_ex@"))
+            {
+                return alfrescoQueryField + ".tr_ex";
+            }
+            else if(schemaField.contains("__tr_time@"))
+            {
+                return alfrescoQueryField + ".tr_time";
+            }
+            else if(schemaField.contains("__tr_status@"))
+            {
+                return alfrescoQueryField + ".tr_status";
+            }
+            else
+            {
+                return alfrescoQueryField;
+            }
+        }
+        else
+        {
+            return alfrescoQueryField;
+        }
+    }
+    
+ 
     public static AlfrescoSolrDataModel getInstance()
     {
         readWriteLock.readLock().lock();

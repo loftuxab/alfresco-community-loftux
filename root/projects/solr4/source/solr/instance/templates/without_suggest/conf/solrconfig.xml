@@ -841,7 +841,35 @@
        of SearchComponents (see below) and supports distributed
        queries across multiple shards
     -->
-  <requestHandler name="/select" class="org.apache.solr.handler.component.AlfrescoSearchHandler">
+
+
+ <requestHandler name="/select" class="org.apache.solr.handler.component.AlfrescoSearchHandler" lazy="true" >
+    <lst name="defaults">
+     <str name="defType">afts</str>
+     <str name="echoParams">explicit</str>
+     <int name="rows">10</int>
+     <str name="df">suggest</str>
+    </lst>
+    <arr name="components">
+      <str>setLocale</str>
+      <str>ensureModels</str>
+      <str>rewriteFacetParameters</str>
+      <str>query</str>
+      <str>facet</str>
+      <str>mlt</str>
+      <str>highlight</str>
+      <str>stats</str>
+      <str>debug</str>
+      <str>clearLocale</str>
+      <str>rewriteFacetCounts</str>
+      <!-- <str>addTxId</str> -->
+      <str>spellcheck</str>
+      <str>setProcessedDenies</str>
+    </arr>
+  </requestHandler>
+
+
+    <requestHandler name="/native" class="org.apache.solr.handler.component.AlfrescoSearchHandler">
     <!-- default values for query parameters can be specified, these
          will be overridden by parameters in the request
       -->
@@ -1127,6 +1155,10 @@
     -->
   <requestHandler name="/admin/" 
                   class="solr.admin.AdminHandlers" />
+
+     <requestHandler name="/admin/luke"       class="org.apache.solr.handler.component.AlfrescoLukeRequestHandler" />
+
+
   <!-- This single handler is equivalent to the following... -->
   <!--
      <requestHandler name="/admin/luke"       class="solr.admin.LukeRequestHandler" />

@@ -46,11 +46,46 @@ public class RewriteFacetParametersComponent extends SearchComponent
     @Override
     public void prepare(ResponseBuilder rb) throws IOException
     {
-        
-       
+
     }
 
     
+    /**
+     * @param fixed
+     * @param params
+     * @param rb
+     */
+    private void fixFilterQueries(ModifiableSolrParams fixed, SolrParams params, ResponseBuilder rb)
+    {
+        for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
+        {
+            String name = it.next();
+            if(name.equals("fq"))
+            {
+                String[] values = params.getParams(name);
+                if(values != null)
+                {
+                    String[] fixedValues = new String[values.length];
+                    for(int i = 0; i < values.length; i++)
+                    {
+                        String value = values[i];
+                        if(value.startsWith("{!"))
+                        {
+                            fixedValues[i] = value;
+                        }
+                        else
+                        {
+                            fixedValues[i] = "{!afts}"+value;
+                        }
+                    }
+                    fixed.add(name, fixedValues);
+                }
+                
+            }
+        }
+    }
+
+
     /**
      * @param params
      * @return
@@ -86,7 +121,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
         //    f.<stats_field>.stats.facet=<new Field> 
         //    would require a more complex rewrite  
         
-        copyNonFacetParams(fixed, params);
+       
         
         rb.rsp.add("_original_parameters_", params);
         rb.rsp.add("_field_mappings_", fieldMappings);
@@ -110,7 +145,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
         for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
         {
             String name = it.next();
-            if(name.startsWith("f.") || name.startsWith("facet.field") || name.startsWith("facet.date") || name.startsWith("facet.range") || name.startsWith("facet.pivot") || name.startsWith("facet.interval")|| name.startsWith("stats."))
+            if(name.equals("fq") || name.startsWith("f.") || name.equals("facet.field") || name.equals("facet.date") || name.equals("facet.range") || name.equals("facet.pivot") || name.equals("facet.interval")|| name.startsWith("stats."))
             {
                 // Already done 
                 continue;
@@ -191,6 +226,8 @@ public class RewriteFacetParametersComponent extends SearchComponent
         
         ModifiableSolrParams fixed = new ModifiableSolrParams();
         fixFacetParams(fixed, params, rb);
+        fixFilterQueries(fixed, params, rb);
+        copyNonFacetParams(fixed, params);
         req.setParams(fixed);
     }
 
