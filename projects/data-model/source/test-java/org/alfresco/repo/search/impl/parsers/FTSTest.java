@@ -79,27 +79,6 @@ public class FTSTest extends TestCase
         assertEquals("Invalids " + result, 0, executer.invalids.size());
     }
 
-    public void testLexerOutput() throws IOException, RecognitionException
-    {
-        CharStream cs = new ANTLRStringStream("cmodified:[* TO *]");
-        FTSLexer lexer = new FTSLexer(cs);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        
-        for(int i = 0; i < 10; i++)
-        {
-           System.out.println(tokens.LA(1));
-           System.out.println(tokens.LT(1));
-           tokens.consume();
-        }
-        FTSParser parser = new FTSParser(tokens);
-        parser.setMode(FTSParser.Mode.DEFAULT_CONJUNCTION);
-        parser.setDefaultFieldConjunction(true);
-        CommonTree ftsNode = (CommonTree) parser.ftsQuery().getTree();
-        System.out.println(ftsNode);
-        System.out.println(tokens.index());
-        System.out.println(tokens.size());
-    }
-
     private GrammarInfo parse(CharStream input) throws RecognitionException
     {
         gUnitLexer lexer = new gUnitLexer(input);

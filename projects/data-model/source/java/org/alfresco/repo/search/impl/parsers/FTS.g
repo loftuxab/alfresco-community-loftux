@@ -661,25 +661,25 @@ ftsFieldGroupTest
         (ftsFieldGroupProximity) => ftsFieldGroupProximity
                 ->
                         ^(FG_PROXIMITY ftsFieldGroupProximity)
-        | ftsFieldGroupTerm ( (fuzzy) => fuzzy)?
+        | (ftsFieldGroupTerm) => ftsFieldGroupTerm ( (fuzzy) => fuzzy)?
                 ->
                         ^(FG_TERM ftsFieldGroupTerm fuzzy?)
-        | ftsFieldGroupExactTerm ( (fuzzy) => fuzzy)?
+        | (ftsFieldGroupExactTerm) => ftsFieldGroupExactTerm ( (fuzzy) => fuzzy)?
                 ->
                         ^(FG_EXACT_TERM ftsFieldGroupExactTerm fuzzy?)
-        | ftsFieldGroupPhrase ( (slop) => slop)?
+        | (ftsFieldGroupPhrase) => ftsFieldGroupPhrase ( (slop) => slop)?
                 ->
                         ^(FG_PHRASE ftsFieldGroupPhrase slop?)
-        | ftsFieldGroupExactPhrase ( (slop) => slop)?
+        | (ftsFieldGroupExactPhrase) => ftsFieldGroupExactPhrase ( (slop) => slop)?
                 ->
                         ^(FG_EXACT_PHRASE ftsFieldGroupExactPhrase slop?)
-        | ftsFieldGroupTokenisedPhrase ( (slop) => slop)?
+        | (ftsFieldGroupTokenisedPhrase) => ftsFieldGroupTokenisedPhrase ( (slop) => slop)?
                 ->
                         ^(FG_PHRASE ftsFieldGroupTokenisedPhrase slop?)
-        | ftsFieldGroupSynonym ( (fuzzy) => fuzzy)?
+        | (ftsFieldGroupSynonym) => ftsFieldGroupSynonym ( (fuzzy) => fuzzy)?
                 ->
                         ^(FG_SYNONYM ftsFieldGroupSynonym fuzzy?)
-        | ftsFieldGroupRange
+        | (ftsFieldGroupRange) => ftsFieldGroupRange
                 ->
                         ^(FG_RANGE ftsFieldGroupRange)
         | LPAREN ftsFieldGroupDisjunction RPAREN
