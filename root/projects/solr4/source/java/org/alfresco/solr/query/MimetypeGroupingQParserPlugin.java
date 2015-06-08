@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.io.IOUtils;
@@ -42,19 +43,20 @@ import org.apache.solr.search.SyntaxError;
  */
 public class MimetypeGroupingQParserPlugin extends QParserPlugin
 {
-    private HashMap<String, String> mappings = new HashMap<>();
+    private static HashMap<String, String> mappings = new HashMap<>();
+    
+    private static  HashMap<String, ArrayList<String>> reverseMappings = new HashMap<>();
 
-    /*
-     * (non-Javadoc)
-     * @see org.apache.solr.util.plugin.NamedListInitializedPlugin#init(org.apache.solr.common.util.NamedList)
-     */
-    @Override
-    public void init(NamedList args)
+    public static synchronized HashMap<String, ArrayList<String>> getReverseMappings()
     {
-        String mappingFile = (String) args.get("mapping");
+        return reverseMappings;
+    }
+    
+    private static synchronized void initMap(String mappingFile)
+    {
         String solrHome = SolrResourceLoader.locateSolrHome();
         File file = new File(solrHome, mappingFile);
-       
+
         CSVParser parser;
         try
         {
@@ -74,6 +76,14 @@ public class MimetypeGroupingQParserPlugin extends QParserPlugin
                     break;
 
                 mappings.put(vals[1], vals[2]);
+                
+                ArrayList<String> grouped = reverseMappings.get(vals[2]);
+                if(grouped == null)
+                {
+                    grouped = new ArrayList<>();
+                    reverseMappings.put(vals[2], grouped);
+                }
+                grouped.add(vals[1]);
             }
         }
         catch (FileNotFoundException e1)
@@ -86,6 +96,17 @@ public class MimetypeGroupingQParserPlugin extends QParserPlugin
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.apache.solr.util.plugin.NamedListInitializedPlugin#init(org.apache.solr.common.util.NamedList)
+     */
+    @Override
+    public void init(NamedList args)
+    {
+        String mappingFile = (String) args.get("mapping");
+        initMap(mappingFile);
 
     }
 
@@ -103,12 +124,19 @@ public class MimetypeGroupingQParserPlugin extends QParserPlugin
 
     public static class MimetypeGroupingQParser extends AbstractQParser
     {
-
         private HashMap<String, String> mappings;
+        
+        private boolean group = true;
 
         public MimetypeGroupingQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, HashMap<String, String> mappings)
         {
             super(qstr, localParams, params, req);
+            Boolean doGroup = localParams.getBool("group");
+            if(doGroup != null)
+            {
+                group = doGroup.booleanValue();
+            }
+               
             this.mappings = mappings;
         }
 
@@ -119,7 +147,7 @@ public class MimetypeGroupingQParserPlugin extends QParserPlugin
         @Override
         public Query parse() throws SyntaxError
         {
-            return new MimetypeGroupingAnalyticsQuery(mappings);
+            return new MimetypeGroupingAnalyticsQuery(mappings, group);
         }
     }
 

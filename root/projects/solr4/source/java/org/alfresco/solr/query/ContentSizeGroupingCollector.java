@@ -19,10 +19,16 @@
 package org.alfresco.solr.query;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.HashMap;
 
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
+import org.alfresco.solr.tracker.TrackerStats.Bucket;
+import org.alfresco.solr.tracker.TrackerStats.IncrementalStats;
+import org.alfresco.solr.tracker.TrackerStats.SimpleStats;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.util.Counter;
 import org.apache.solr.common.util.NamedList;
@@ -34,55 +40,41 @@ import org.apache.solr.search.DelegatingCollector;
  * @author Andy
  *
  */
-public class MimetypeGroupingCollector extends DelegatingCollector
+public class ContentSizeGroupingCollector extends DelegatingCollector
 {
-    HashMap<String, Counter> counters = new HashMap<String, Counter>();
     ResponseBuilder rb;
-    private HashMap<String, String> mappings;
-    private boolean doGroup;
+    private int buckets;
+    private int scale;
+    IncrementalStats stats;
+    
     /**
      * @param rb
-     * @param mappings 
-     * @param group 
+     * @param buckets 
      */
-    public MimetypeGroupingCollector(ResponseBuilder rb, HashMap<String, String> mappings, boolean doGroup)
+    public ContentSizeGroupingCollector(ResponseBuilder rb, int scale, int buckets)
     {
         this.rb = rb;
-        this.mappings = mappings;
-        this.doGroup = doGroup;
+        this.buckets = buckets;
+        stats = new IncrementalStats(scale, buckets, null);
     }
     
     public void collect(int doc) throws IOException 
     {
-        String schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty("content.mimetype", FieldUse.FACET, rb.req);
+        String schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty("content.size", FieldUse.FACET, rb.req);
         SchemaField schemaField = rb.req.getSchema().getFieldOrNull(schemaFieldName);
         if(schemaField != null)
         {
-            SortedDocValues sortedDocValues = context.reader().getSortedDocValues(schemaFieldName);
-            
-            if(sortedDocValues != null)
+            if(schemaField.getType().getNumericType() != null)
             {
-                int ordinal = sortedDocValues.getOrd(doc);
-                if(ordinal > -1)
+                NumericDocValues numericDocValues = context.reader().getNumericDocValues(schemaFieldName);
+                if(numericDocValues != null)
                 {
-                   String value = (String)schemaField.getType().toObject(schemaField, sortedDocValues.lookupOrd(ordinal));
-                   String group = doGroup ? mappings.get(value) : value;
-                   if(group == null)
-                   {
-                       group = value;
-                   }
-                   
-                   Counter counter = counters.get(group);
-                   if(counter == null)
-                   {
-                       counter = Counter.newCounter();
-                       counters.put(group, counter);
-                   }
-                   counter.addAndGet(1);
+                    long value = numericDocValues.get(doc);
+                    stats.add(value);
                 }
             }
         }
-       
+
         delegate.collect(doc);
     }
 
@@ -91,15 +83,24 @@ public class MimetypeGroupingCollector extends DelegatingCollector
         NamedList<Object> analytics = new NamedList<>();
         rb.rsp.add("analytics", analytics);
         NamedList<Object> fieldCounts = new NamedList<>(); 
-        analytics.add("mimetype()", fieldCounts);
-        for(String key : counters.keySet())
+        analytics.add("contentSize()", fieldCounts);
+
+        for(Bucket bucket :stats.getHistogram())
         {
-            Counter counter = counters.get(key);
-            fieldCounts.add(key, counter.get());
+            fieldCounts.add("["+(long)Math.ceil(bucket.leftBoundary)+ " TO "+(long)Math.ceil(bucket.rightBoundary)+">", (long)roundEven(bucket.countLeft + bucket.countRight));
         }
-        
+
+
         if(this.delegate instanceof DelegatingCollector) {
             ((DelegatingCollector)this.delegate).finish();
         }
+    }
+    
+  
+    private long roundEven(double value)
+    {
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.round(MathContext.DECIMAL64);
+        return bd.longValue();
     }
 }
