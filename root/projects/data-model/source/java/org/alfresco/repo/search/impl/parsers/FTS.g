@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -734,6 +734,7 @@ ftsFieldGroupProximityTerm
         | TO
         | DECIMAL_INTEGER_LITERAL
         | FLOATING_POINT_LITERAL
+        | DATETIME
         ;
 
 proximityGroup
@@ -877,6 +878,7 @@ ftsWordBase
         | FLOATING_POINT_LITERAL
         | STAR
         | QUESTION_MARK
+        | DATETIME
         ;
 
 number
@@ -894,6 +896,7 @@ ftsRangeWord
         | FTSPHRASE
         | DECIMAL_INTEGER_LITERAL
         | FLOATING_POINT_LITERAL
+        | DATETIME
         ;
 
 //
@@ -1058,6 +1061,20 @@ F_URI_OTHER
         | ';'
         | '='
         ;
+        
+        
+        
+ /**
+ * DATE literal
+ */
+ 
+DATETIME
+        :
+           DIGIT DIGIT DIGIT DIGIT 
+              ( '-' DIGIT DIGIT ( '-' DIGIT DIGIT ( 'T' (DIGIT DIGIT ( ':' DIGIT DIGIT ( ':' DIGIT DIGIT ( '.' DIGIT DIGIT DIGIT ( 'Z' | (( '+' | '-') DIGIT DIGIT ( ':' DIGIT DIGIT)? ) )? )? )? )? )? )? )? )?
+        ;
+        
+        
 /*
  * Simple tokens, note all are case insensitive
  */
@@ -1268,6 +1285,9 @@ ID
                 | F_ESC
         )*
         ;
+
+
+
 
 // This is handled sa part for FLOATING_POINT_LITERAL to reduce lexer complexity 
 fragment DECIMAL_INTEGER_LITERAL
