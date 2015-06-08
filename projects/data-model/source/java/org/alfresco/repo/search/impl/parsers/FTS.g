@@ -448,17 +448,17 @@ ftsTest
                 ->
                         ^(PROXIMITY ftsFieldGroupProximity)
         |
-           ftsTermOrPhrase
+           (ftsTermOrPhrase) => ftsTermOrPhrase
         |
-           ftsExactTermOrPhrase
+           (ftsExactTermOrPhrase) => ftsExactTermOrPhrase
         | 
-           ftsTokenisedTermOrPhrase
+           (ftsTokenisedTermOrPhrase) => ftsTokenisedTermOrPhrase
         |
-           ftsRange
+           (ftsRange) => ftsRange
                 ->
                         ^(RANGE ftsRange)
         |  
-           ftsFieldGroup
+           (ftsFieldGroup) => ftsFieldGroup
                 -> ftsFieldGroup
         |  LPAREN ftsDisjunction RPAREN
                 -> ftsDisjunction

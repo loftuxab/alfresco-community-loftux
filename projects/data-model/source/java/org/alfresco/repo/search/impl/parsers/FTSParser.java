@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g 2015-06-06 12:06:50
+// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g 2015-06-06 12:12:15
 
 package org.alfresco.repo.search.impl.parsers;
 
@@ -2455,7 +2455,7 @@ public class FTSParser extends Parser {
 
 
 	// $ANTLR start "ftsTest"
-	// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:445:1: ftsTest : ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( PROXIMITY ftsFieldGroupProximity ) | ftsTermOrPhrase | ftsExactTermOrPhrase | ftsTokenisedTermOrPhrase | ftsRange -> ^( RANGE ftsRange ) | ftsFieldGroup -> ftsFieldGroup | LPAREN ftsDisjunction RPAREN -> ftsDisjunction | template -> template );
+	// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:445:1: ftsTest : ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( PROXIMITY ftsFieldGroupProximity ) | ( ftsTermOrPhrase )=> ftsTermOrPhrase | ( ftsExactTermOrPhrase )=> ftsExactTermOrPhrase | ( ftsTokenisedTermOrPhrase )=> ftsTokenisedTermOrPhrase | ( ftsRange )=> ftsRange -> ^( RANGE ftsRange ) | ( ftsFieldGroup )=> ftsFieldGroup -> ftsFieldGroup | LPAREN ftsDisjunction RPAREN -> ftsDisjunction | template -> template );
 	public final FTSParser.ftsTest_return ftsTest() throws RecognitionException {
 		FTSParser.ftsTest_return retval = new FTSParser.ftsTest_return();
 		retval.start = input.LT(1);
@@ -2484,11358 +2484,9 @@ public class FTSParser extends Parser {
 		RewriteRuleSubtreeStream stream_ftsFieldGroupProximity=new RewriteRuleSubtreeStream(adaptor,"rule ftsFieldGroupProximity");
 
 		try {
-			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:446:9: ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( PROXIMITY ftsFieldGroupProximity ) | ftsTermOrPhrase | ftsExactTermOrPhrase | ftsTokenisedTermOrPhrase | ftsRange -> ^( RANGE ftsRange ) | ftsFieldGroup -> ftsFieldGroup | LPAREN ftsDisjunction RPAREN -> ftsDisjunction | template -> template )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:446:9: ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( PROXIMITY ftsFieldGroupProximity ) | ( ftsTermOrPhrase )=> ftsTermOrPhrase | ( ftsExactTermOrPhrase )=> ftsExactTermOrPhrase | ( ftsTokenisedTermOrPhrase )=> ftsTokenisedTermOrPhrase | ( ftsRange )=> ftsRange -> ^( RANGE ftsRange ) | ( ftsFieldGroup )=> ftsFieldGroup -> ftsFieldGroup | LPAREN ftsDisjunction RPAREN -> ftsDisjunction | template -> template )
 			int alt17=8;
-			switch ( input.LA(1) ) {
-			case ID:
-				{
-				switch ( input.LA(2) ) {
-				case DOT:
-					{
-					int LA17_16 = input.LA(3);
-					if ( (LA17_16==EOF||(LA17_16 >= AMP && LA17_16 <= BAR)||LA17_16==CARAT||LA17_16==COMMA||(LA17_16 >= DATETIME && LA17_16 <= DECIMAL_INTEGER_LITERAL)||LA17_16==DOT||LA17_16==EQUALS||LA17_16==EXCLAMATION||LA17_16==FLOATING_POINT_LITERAL||(LA17_16 >= FTSPHRASE && LA17_16 <= FTSWORD)||LA17_16==ID||(LA17_16 >= LPAREN && LA17_16 <= LT)||LA17_16==MINUS||LA17_16==NOT||(LA17_16 >= OR && LA17_16 <= PERCENT)||LA17_16==PLUS||LA17_16==QUESTION_MARK||LA17_16==RPAREN||LA17_16==STAR||(LA17_16 >= TILDA && LA17_16 <= URI)) ) {
-						alt17=2;
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 16, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case STAR:
-					{
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						int LA17_28 = input.LA(4);
-						if ( (LA17_28==DECIMAL_INTEGER_LITERAL) ) {
-							int LA17_42 = input.LA(5);
-							if ( (LA17_42==RPAREN) ) {
-								switch ( input.LA(6) ) {
-								case NOT:
-									{
-									int LA17_49 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case EOF:
-								case AMP:
-								case AND:
-								case AT:
-								case BAR:
-								case CARAT:
-								case COMMA:
-								case DOT:
-								case EQUALS:
-								case EXCLAMATION:
-								case FTSPHRASE:
-								case LPAREN:
-								case LSQUARE:
-								case LT:
-								case MINUS:
-								case OR:
-								case PERCENT:
-								case PLUS:
-								case QUESTION_MARK:
-								case RPAREN:
-								case STAR:
-								case TILDA:
-								case URI:
-									{
-									alt17=2;
-									}
-									break;
-								case ID:
-									{
-									int LA17_50 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case TO:
-									{
-									int LA17_51 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-									{
-									int LA17_52 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 47, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( ((LA17_42 >= AMP && LA17_42 <= BAR)||LA17_42==CARAT||LA17_42==COMMA||(LA17_42 >= DATETIME && LA17_42 <= DECIMAL_INTEGER_LITERAL)||(LA17_42 >= DOT && LA17_42 <= DOTDOT)||LA17_42==EQUALS||LA17_42==EXCLAMATION||LA17_42==FLOATING_POINT_LITERAL||(LA17_42 >= FTSPHRASE && LA17_42 <= FTSWORD)||LA17_42==ID||(LA17_42 >= LPAREN && LA17_42 <= LT)||LA17_42==MINUS||LA17_42==NOT||(LA17_42 >= OR && LA17_42 <= PERCENT)||LA17_42==PLUS||LA17_42==QUESTION_MARK||LA17_42==STAR||(LA17_42 >= TILDA && LA17_42 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 42, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-						}
-						else if ( (LA17_28==RPAREN) && (synpred2_FTS())) {
-							alt17=1;
-						}
-						else if ( ((LA17_28 >= AMP && LA17_28 <= BAR)||LA17_28==COMMA||LA17_28==DATETIME||LA17_28==DOT||LA17_28==EQUALS||LA17_28==EXCLAMATION||LA17_28==FLOATING_POINT_LITERAL||(LA17_28 >= FTSPHRASE && LA17_28 <= FTSWORD)||LA17_28==ID||(LA17_28 >= LPAREN && LA17_28 <= LT)||LA17_28==MINUS||LA17_28==NOT||(LA17_28 >= OR && LA17_28 <= PERCENT)||LA17_28==PLUS||LA17_28==QUESTION_MARK||LA17_28==STAR||(LA17_28 >= TILDA && LA17_28 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 28, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_29 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case EOF:
-					case AMP:
-					case AND:
-					case AT:
-					case BAR:
-					case CARAT:
-					case COMMA:
-					case DOT:
-					case EQUALS:
-					case EXCLAMATION:
-					case FTSPHRASE:
-					case LSQUARE:
-					case LT:
-					case MINUS:
-					case OR:
-					case PERCENT:
-					case PLUS:
-					case QUESTION_MARK:
-					case RPAREN:
-					case STAR:
-					case TILDA:
-					case URI:
-						{
-						alt17=2;
-						}
-						break;
-					case ID:
-						{
-						int LA17_30 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case TO:
-						{
-						int LA17_31 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_32 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 17, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-					}
-					break;
-				case COLON:
-					{
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						alt17=6;
-						}
-						break;
-					case ID:
-						{
-						switch ( input.LA(4) ) {
-						case DOT:
-							{
-							int LA17_44 = input.LA(5);
-							if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 44, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COLON:
-							{
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case EOF:
-						case AMP:
-						case AND:
-						case AT:
-						case BAR:
-						case CARAT:
-						case COMMA:
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case EQUALS:
-						case EXCLAMATION:
-						case FLOATING_POINT_LITERAL:
-						case FTSPHRASE:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-						case LPAREN:
-						case LSQUARE:
-						case LT:
-						case MINUS:
-						case NOT:
-						case OR:
-						case PERCENT:
-						case PLUS:
-						case QUESTION_MARK:
-						case RPAREN:
-						case STAR:
-						case TILDA:
-						case TO:
-						case URI:
-							{
-							alt17=2;
-							}
-							break;
-						case DOTDOT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 34, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-						}
-						break;
-					case TO:
-						{
-						int LA17_35 = input.LA(4);
-						if ( (LA17_35==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 35, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case OR:
-						{
-						int LA17_24 = input.LA(4);
-						if ( (LA17_24==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 24, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case AND:
-						{
-						int LA17_25 = input.LA(4);
-						if ( (LA17_25==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 25, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_36 = input.LA(4);
-						if ( (LA17_36==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 36, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case FTSPHRASE:
-						{
-						int LA17_37 = input.LA(4);
-						if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_37==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 37, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case COMMA:
-					case DOT:
-					case QUESTION_MARK:
-					case STAR:
-						{
-						alt17=2;
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_38 = input.LA(4);
-						if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_38==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 38, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case LSQUARE:
-					case LT:
-						{
-						alt17=5;
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 18, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-					}
-					break;
-				case EOF:
-				case AMP:
-				case AND:
-				case AT:
-				case BAR:
-				case CARAT:
-				case COMMA:
-				case DATETIME:
-				case DECIMAL_INTEGER_LITERAL:
-				case EQUALS:
-				case EXCLAMATION:
-				case FLOATING_POINT_LITERAL:
-				case FTSPHRASE:
-				case FTSPRE:
-				case FTSWILD:
-				case FTSWORD:
-				case ID:
-				case LPAREN:
-				case LSQUARE:
-				case LT:
-				case MINUS:
-				case NOT:
-				case OR:
-				case PERCENT:
-				case PLUS:
-				case QUESTION_MARK:
-				case RPAREN:
-				case TILDA:
-				case TO:
-				case URI:
-					{
-					alt17=2;
-					}
-					break;
-				case DOTDOT:
-					{
-					alt17=5;
-					}
-					break;
-				default:
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 1, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-				}
-				break;
-			case AT:
-				{
-				switch ( input.LA(2) ) {
-				case ID:
-					{
-					int LA17_19 = input.LA(3);
-					if ( (LA17_19==DOT) ) {
-						int LA17_39 = input.LA(4);
-						if ( (LA17_39==ID) ) {
-							int LA17_45 = input.LA(5);
-							if ( (LA17_45==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case ID:
-									{
-									switch ( input.LA(7) ) {
-									case DOT:
-										{
-										int LA17_44 = input.LA(8);
-										if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-											alt17=2;
-										}
-
-										else {
-											if (state.backtracking>0) {state.failed=true; return retval;}
-											int nvaeMark = input.mark();
-											try {
-												for (int nvaeConsume = 0; nvaeConsume < 8 - 1; nvaeConsume++) {
-													input.consume();
-												}
-												NoViableAltException nvae =
-													new NoViableAltException("", 17, 44, input);
-												throw nvae;
-											} finally {
-												input.rewind(nvaeMark);
-											}
-										}
-
-										}
-										break;
-									case COLON:
-										{
-										switch ( input.LA(8) ) {
-										case LPAREN:
-											{
-											alt17=6;
-											}
-											break;
-										case FTSPHRASE:
-											{
-											int LA17_37 = input.LA(9);
-											if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_37==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 37, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case COMMA:
-										case DOT:
-										case NOT:
-										case QUESTION_MARK:
-										case STAR:
-										case TO:
-											{
-											alt17=2;
-											}
-											break;
-										case DATETIME:
-										case DECIMAL_INTEGER_LITERAL:
-										case FLOATING_POINT_LITERAL:
-										case FTSPRE:
-										case FTSWILD:
-										case FTSWORD:
-										case ID:
-											{
-											int LA17_38 = input.LA(9);
-											if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_38==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 38, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case LSQUARE:
-										case LT:
-											{
-											alt17=5;
-											}
-											break;
-										default:
-											if (state.backtracking>0) {state.failed=true; return retval;}
-											int nvaeMark = input.mark();
-											try {
-												for (int nvaeConsume = 0; nvaeConsume < 8 - 1; nvaeConsume++) {
-													input.consume();
-												}
-												NoViableAltException nvae =
-													new NoViableAltException("", 17, 41, input);
-												throw nvae;
-											} finally {
-												input.rewind(nvaeMark);
-											}
-										}
-										}
-										break;
-									case EOF:
-									case AMP:
-									case AND:
-									case AT:
-									case BAR:
-									case CARAT:
-									case COMMA:
-									case DATETIME:
-									case DECIMAL_INTEGER_LITERAL:
-									case EQUALS:
-									case EXCLAMATION:
-									case FLOATING_POINT_LITERAL:
-									case FTSPHRASE:
-									case FTSPRE:
-									case FTSWILD:
-									case FTSWORD:
-									case ID:
-									case LPAREN:
-									case LSQUARE:
-									case LT:
-									case MINUS:
-									case NOT:
-									case OR:
-									case PERCENT:
-									case PLUS:
-									case QUESTION_MARK:
-									case RPAREN:
-									case STAR:
-									case TILDA:
-									case TO:
-									case URI:
-										{
-										alt17=2;
-										}
-										break;
-									case DOTDOT:
-										{
-										alt17=5;
-										}
-										break;
-									default:
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 34, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-									}
-									break;
-								case TO:
-									{
-									int LA17_35 = input.LA(7);
-									if ( (LA17_35==COLON) ) {
-										switch ( input.LA(8) ) {
-										case LPAREN:
-											{
-											alt17=6;
-											}
-											break;
-										case FTSPHRASE:
-											{
-											int LA17_37 = input.LA(9);
-											if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_37==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 37, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case COMMA:
-										case DOT:
-										case NOT:
-										case QUESTION_MARK:
-										case STAR:
-										case TO:
-											{
-											alt17=2;
-											}
-											break;
-										case DATETIME:
-										case DECIMAL_INTEGER_LITERAL:
-										case FLOATING_POINT_LITERAL:
-										case FTSPRE:
-										case FTSWILD:
-										case FTSWORD:
-										case ID:
-											{
-											int LA17_38 = input.LA(9);
-											if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_38==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 38, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case LSQUARE:
-										case LT:
-											{
-											alt17=5;
-											}
-											break;
-										default:
-											if (state.backtracking>0) {state.failed=true; return retval;}
-											int nvaeMark = input.mark();
-											try {
-												for (int nvaeConsume = 0; nvaeConsume < 8 - 1; nvaeConsume++) {
-													input.consume();
-												}
-												NoViableAltException nvae =
-													new NoViableAltException("", 17, 41, input);
-												throw nvae;
-											} finally {
-												input.rewind(nvaeMark);
-											}
-										}
-									}
-									else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-										alt17=2;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 35, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case OR:
-									{
-									int LA17_24 = input.LA(7);
-									if ( (LA17_24==COLON) ) {
-										switch ( input.LA(8) ) {
-										case LPAREN:
-											{
-											alt17=6;
-											}
-											break;
-										case FTSPHRASE:
-											{
-											int LA17_37 = input.LA(9);
-											if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_37==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 37, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case COMMA:
-										case DOT:
-										case NOT:
-										case QUESTION_MARK:
-										case STAR:
-										case TO:
-											{
-											alt17=2;
-											}
-											break;
-										case DATETIME:
-										case DECIMAL_INTEGER_LITERAL:
-										case FLOATING_POINT_LITERAL:
-										case FTSPRE:
-										case FTSWILD:
-										case FTSWORD:
-										case ID:
-											{
-											int LA17_38 = input.LA(9);
-											if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_38==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 38, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case LSQUARE:
-										case LT:
-											{
-											alt17=5;
-											}
-											break;
-										default:
-											if (state.backtracking>0) {state.failed=true; return retval;}
-											int nvaeMark = input.mark();
-											try {
-												for (int nvaeConsume = 0; nvaeConsume < 8 - 1; nvaeConsume++) {
-													input.consume();
-												}
-												NoViableAltException nvae =
-													new NoViableAltException("", 17, 41, input);
-												throw nvae;
-											} finally {
-												input.rewind(nvaeMark);
-											}
-										}
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 24, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case AND:
-									{
-									int LA17_25 = input.LA(7);
-									if ( (LA17_25==COLON) ) {
-										switch ( input.LA(8) ) {
-										case LPAREN:
-											{
-											alt17=6;
-											}
-											break;
-										case FTSPHRASE:
-											{
-											int LA17_37 = input.LA(9);
-											if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_37==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 37, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case COMMA:
-										case DOT:
-										case NOT:
-										case QUESTION_MARK:
-										case STAR:
-										case TO:
-											{
-											alt17=2;
-											}
-											break;
-										case DATETIME:
-										case DECIMAL_INTEGER_LITERAL:
-										case FLOATING_POINT_LITERAL:
-										case FTSPRE:
-										case FTSWILD:
-										case FTSWORD:
-										case ID:
-											{
-											int LA17_38 = input.LA(9);
-											if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_38==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 38, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case LSQUARE:
-										case LT:
-											{
-											alt17=5;
-											}
-											break;
-										default:
-											if (state.backtracking>0) {state.failed=true; return retval;}
-											int nvaeMark = input.mark();
-											try {
-												for (int nvaeConsume = 0; nvaeConsume < 8 - 1; nvaeConsume++) {
-													input.consume();
-												}
-												NoViableAltException nvae =
-													new NoViableAltException("", 17, 41, input);
-												throw nvae;
-											} finally {
-												input.rewind(nvaeMark);
-											}
-										}
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 25, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case NOT:
-									{
-									int LA17_36 = input.LA(7);
-									if ( (LA17_36==COLON) ) {
-										switch ( input.LA(8) ) {
-										case LPAREN:
-											{
-											alt17=6;
-											}
-											break;
-										case FTSPHRASE:
-											{
-											int LA17_37 = input.LA(9);
-											if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_37==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 37, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case COMMA:
-										case DOT:
-										case NOT:
-										case QUESTION_MARK:
-										case STAR:
-										case TO:
-											{
-											alt17=2;
-											}
-											break;
-										case DATETIME:
-										case DECIMAL_INTEGER_LITERAL:
-										case FLOATING_POINT_LITERAL:
-										case FTSPRE:
-										case FTSWILD:
-										case FTSWORD:
-										case ID:
-											{
-											int LA17_38 = input.LA(9);
-											if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-												alt17=2;
-											}
-											else if ( (LA17_38==DOTDOT) ) {
-												alt17=5;
-											}
-
-											else {
-												if (state.backtracking>0) {state.failed=true; return retval;}
-												int nvaeMark = input.mark();
-												try {
-													for (int nvaeConsume = 0; nvaeConsume < 9 - 1; nvaeConsume++) {
-														input.consume();
-													}
-													NoViableAltException nvae =
-														new NoViableAltException("", 17, 38, input);
-													throw nvae;
-												} finally {
-													input.rewind(nvaeMark);
-												}
-											}
-
-											}
-											break;
-										case LSQUARE:
-										case LT:
-											{
-											alt17=5;
-											}
-											break;
-										default:
-											if (state.backtracking>0) {state.failed=true; return retval;}
-											int nvaeMark = input.mark();
-											try {
-												for (int nvaeConsume = 0; nvaeConsume < 8 - 1; nvaeConsume++) {
-													input.consume();
-												}
-												NoViableAltException nvae =
-													new NoViableAltException("", 17, 41, input);
-												throw nvae;
-											} finally {
-												input.rewind(nvaeMark);
-											}
-										}
-									}
-									else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-										alt17=2;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 36, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case QUESTION_MARK:
-								case STAR:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 18, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 45, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 39, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-					}
-					else if ( (LA17_19==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case ID:
-							{
-							switch ( input.LA(5) ) {
-							case DOT:
-								{
-								int LA17_44 = input.LA(6);
-								if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-									alt17=2;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 44, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COLON:
-								{
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-								}
-								break;
-							case EOF:
-							case AMP:
-							case AND:
-							case AT:
-							case BAR:
-							case CARAT:
-							case COMMA:
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case EQUALS:
-							case EXCLAMATION:
-							case FLOATING_POINT_LITERAL:
-							case FTSPHRASE:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-							case LPAREN:
-							case LSQUARE:
-							case LT:
-							case MINUS:
-							case NOT:
-							case OR:
-							case PERCENT:
-							case PLUS:
-							case QUESTION_MARK:
-							case RPAREN:
-							case STAR:
-							case TILDA:
-							case TO:
-							case URI:
-								{
-								alt17=2;
-								}
-								break;
-							case DOTDOT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 34, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case TO:
-							{
-							int LA17_35 = input.LA(5);
-							if ( (LA17_35==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 35, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case OR:
-							{
-							int LA17_24 = input.LA(5);
-							if ( (LA17_24==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 24, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case AND:
-							{
-							int LA17_25 = input.LA(5);
-							if ( (LA17_25==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 25, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case NOT:
-							{
-							int LA17_36 = input.LA(5);
-							if ( (LA17_36==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 36, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case QUESTION_MARK:
-						case STAR:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 18, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 19, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case TO:
-					{
-					int LA17_20 = input.LA(3);
-					if ( (LA17_20==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case ID:
-							{
-							switch ( input.LA(5) ) {
-							case DOT:
-								{
-								int LA17_44 = input.LA(6);
-								if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-									alt17=2;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 44, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COLON:
-								{
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-								}
-								break;
-							case EOF:
-							case AMP:
-							case AND:
-							case AT:
-							case BAR:
-							case CARAT:
-							case COMMA:
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case EQUALS:
-							case EXCLAMATION:
-							case FLOATING_POINT_LITERAL:
-							case FTSPHRASE:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-							case LPAREN:
-							case LSQUARE:
-							case LT:
-							case MINUS:
-							case NOT:
-							case OR:
-							case PERCENT:
-							case PLUS:
-							case QUESTION_MARK:
-							case RPAREN:
-							case STAR:
-							case TILDA:
-							case TO:
-							case URI:
-								{
-								alt17=2;
-								}
-								break;
-							case DOTDOT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 34, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case TO:
-							{
-							int LA17_35 = input.LA(5);
-							if ( (LA17_35==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 35, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case OR:
-							{
-							int LA17_24 = input.LA(5);
-							if ( (LA17_24==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 24, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case AND:
-							{
-							int LA17_25 = input.LA(5);
-							if ( (LA17_25==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 25, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case NOT:
-							{
-							int LA17_36 = input.LA(5);
-							if ( (LA17_36==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 36, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case QUESTION_MARK:
-						case STAR:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 18, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 20, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case OR:
-					{
-					int LA17_5 = input.LA(3);
-					if ( (LA17_5==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case ID:
-							{
-							switch ( input.LA(5) ) {
-							case DOT:
-								{
-								int LA17_44 = input.LA(6);
-								if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-									alt17=2;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 44, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COLON:
-								{
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-								}
-								break;
-							case EOF:
-							case AMP:
-							case AND:
-							case AT:
-							case BAR:
-							case CARAT:
-							case COMMA:
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case EQUALS:
-							case EXCLAMATION:
-							case FLOATING_POINT_LITERAL:
-							case FTSPHRASE:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-							case LPAREN:
-							case LSQUARE:
-							case LT:
-							case MINUS:
-							case NOT:
-							case OR:
-							case PERCENT:
-							case PLUS:
-							case QUESTION_MARK:
-							case RPAREN:
-							case STAR:
-							case TILDA:
-							case TO:
-							case URI:
-								{
-								alt17=2;
-								}
-								break;
-							case DOTDOT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 34, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case TO:
-							{
-							int LA17_35 = input.LA(5);
-							if ( (LA17_35==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 35, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case OR:
-							{
-							int LA17_24 = input.LA(5);
-							if ( (LA17_24==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 24, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case AND:
-							{
-							int LA17_25 = input.LA(5);
-							if ( (LA17_25==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 25, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case NOT:
-							{
-							int LA17_36 = input.LA(5);
-							if ( (LA17_36==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 36, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case QUESTION_MARK:
-						case STAR:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 18, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 5, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case AND:
-					{
-					int LA17_6 = input.LA(3);
-					if ( (LA17_6==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case ID:
-							{
-							switch ( input.LA(5) ) {
-							case DOT:
-								{
-								int LA17_44 = input.LA(6);
-								if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-									alt17=2;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 44, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COLON:
-								{
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-								}
-								break;
-							case EOF:
-							case AMP:
-							case AND:
-							case AT:
-							case BAR:
-							case CARAT:
-							case COMMA:
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case EQUALS:
-							case EXCLAMATION:
-							case FLOATING_POINT_LITERAL:
-							case FTSPHRASE:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-							case LPAREN:
-							case LSQUARE:
-							case LT:
-							case MINUS:
-							case NOT:
-							case OR:
-							case PERCENT:
-							case PLUS:
-							case QUESTION_MARK:
-							case RPAREN:
-							case STAR:
-							case TILDA:
-							case TO:
-							case URI:
-								{
-								alt17=2;
-								}
-								break;
-							case DOTDOT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 34, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case TO:
-							{
-							int LA17_35 = input.LA(5);
-							if ( (LA17_35==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 35, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case OR:
-							{
-							int LA17_24 = input.LA(5);
-							if ( (LA17_24==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 24, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case AND:
-							{
-							int LA17_25 = input.LA(5);
-							if ( (LA17_25==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 25, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case NOT:
-							{
-							int LA17_36 = input.LA(5);
-							if ( (LA17_36==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 36, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case QUESTION_MARK:
-						case STAR:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 18, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 6, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case NOT:
-					{
-					int LA17_21 = input.LA(3);
-					if ( (LA17_21==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case ID:
-							{
-							switch ( input.LA(5) ) {
-							case DOT:
-								{
-								int LA17_44 = input.LA(6);
-								if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-									alt17=2;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 44, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COLON:
-								{
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-								}
-								break;
-							case EOF:
-							case AMP:
-							case AND:
-							case AT:
-							case BAR:
-							case CARAT:
-							case COMMA:
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case EQUALS:
-							case EXCLAMATION:
-							case FLOATING_POINT_LITERAL:
-							case FTSPHRASE:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-							case LPAREN:
-							case LSQUARE:
-							case LT:
-							case MINUS:
-							case NOT:
-							case OR:
-							case PERCENT:
-							case PLUS:
-							case QUESTION_MARK:
-							case RPAREN:
-							case STAR:
-							case TILDA:
-							case TO:
-							case URI:
-								{
-								alt17=2;
-								}
-								break;
-							case DOTDOT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 34, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case TO:
-							{
-							int LA17_35 = input.LA(5);
-							if ( (LA17_35==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 35, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case OR:
-							{
-							int LA17_24 = input.LA(5);
-							if ( (LA17_24==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 24, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case AND:
-							{
-							int LA17_25 = input.LA(5);
-							if ( (LA17_25==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 25, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case NOT:
-							{
-							int LA17_36 = input.LA(5);
-							if ( (LA17_36==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 36, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case QUESTION_MARK:
-						case STAR:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 18, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 21, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case URI:
-					{
-					switch ( input.LA(3) ) {
-					case ID:
-						{
-						int LA17_22 = input.LA(4);
-						if ( (LA17_22==DOT) ) {
-							int LA17_40 = input.LA(5);
-							if ( (LA17_40==ID) ) {
-								int LA17_46 = input.LA(6);
-								if ( (LA17_46==COLON) ) {
-									switch ( input.LA(7) ) {
-									case LPAREN:
-										{
-										alt17=6;
-										}
-										break;
-									case FTSPHRASE:
-										{
-										int LA17_37 = input.LA(8);
-										if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-											alt17=2;
-										}
-										else if ( (LA17_37==DOTDOT) ) {
-											alt17=5;
-										}
-
-										else {
-											if (state.backtracking>0) {state.failed=true; return retval;}
-											int nvaeMark = input.mark();
-											try {
-												for (int nvaeConsume = 0; nvaeConsume < 8 - 1; nvaeConsume++) {
-													input.consume();
-												}
-												NoViableAltException nvae =
-													new NoViableAltException("", 17, 37, input);
-												throw nvae;
-											} finally {
-												input.rewind(nvaeMark);
-											}
-										}
-
-										}
-										break;
-									case COMMA:
-									case DOT:
-									case NOT:
-									case QUESTION_MARK:
-									case STAR:
-									case TO:
-										{
-										alt17=2;
-										}
-										break;
-									case DATETIME:
-									case DECIMAL_INTEGER_LITERAL:
-									case FLOATING_POINT_LITERAL:
-									case FTSPRE:
-									case FTSWILD:
-									case FTSWORD:
-									case ID:
-										{
-										int LA17_38 = input.LA(8);
-										if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-											alt17=2;
-										}
-										else if ( (LA17_38==DOTDOT) ) {
-											alt17=5;
-										}
-
-										else {
-											if (state.backtracking>0) {state.failed=true; return retval;}
-											int nvaeMark = input.mark();
-											try {
-												for (int nvaeConsume = 0; nvaeConsume < 8 - 1; nvaeConsume++) {
-													input.consume();
-												}
-												NoViableAltException nvae =
-													new NoViableAltException("", 17, 38, input);
-												throw nvae;
-											} finally {
-												input.rewind(nvaeMark);
-											}
-										}
-
-										}
-										break;
-									case LSQUARE:
-									case LT:
-										{
-										alt17=5;
-										}
-										break;
-									default:
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 41, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 46, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 40, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-						}
-						else if ( (LA17_22==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 22, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case TO:
-						{
-						int LA17_23 = input.LA(4);
-						if ( (LA17_23==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 23, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case OR:
-						{
-						int LA17_24 = input.LA(4);
-						if ( (LA17_24==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 24, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case AND:
-						{
-						int LA17_25 = input.LA(4);
-						if ( (LA17_25==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 25, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_26 = input.LA(4);
-						if ( (LA17_26==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 26, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 8, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-					}
-					break;
-				default:
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 2, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-				}
-				break;
-			case TO:
-				{
-				switch ( input.LA(2) ) {
-				case STAR:
-					{
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						int LA17_28 = input.LA(4);
-						if ( (LA17_28==DECIMAL_INTEGER_LITERAL) ) {
-							int LA17_42 = input.LA(5);
-							if ( (LA17_42==RPAREN) ) {
-								switch ( input.LA(6) ) {
-								case NOT:
-									{
-									int LA17_49 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case EOF:
-								case AMP:
-								case AND:
-								case AT:
-								case BAR:
-								case CARAT:
-								case COMMA:
-								case DOT:
-								case EQUALS:
-								case EXCLAMATION:
-								case FTSPHRASE:
-								case LPAREN:
-								case LSQUARE:
-								case LT:
-								case MINUS:
-								case OR:
-								case PERCENT:
-								case PLUS:
-								case QUESTION_MARK:
-								case RPAREN:
-								case STAR:
-								case TILDA:
-								case URI:
-									{
-									alt17=2;
-									}
-									break;
-								case ID:
-									{
-									int LA17_50 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case TO:
-									{
-									int LA17_51 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-									{
-									int LA17_52 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 47, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( ((LA17_42 >= AMP && LA17_42 <= BAR)||LA17_42==CARAT||LA17_42==COMMA||(LA17_42 >= DATETIME && LA17_42 <= DECIMAL_INTEGER_LITERAL)||(LA17_42 >= DOT && LA17_42 <= DOTDOT)||LA17_42==EQUALS||LA17_42==EXCLAMATION||LA17_42==FLOATING_POINT_LITERAL||(LA17_42 >= FTSPHRASE && LA17_42 <= FTSWORD)||LA17_42==ID||(LA17_42 >= LPAREN && LA17_42 <= LT)||LA17_42==MINUS||LA17_42==NOT||(LA17_42 >= OR && LA17_42 <= PERCENT)||LA17_42==PLUS||LA17_42==QUESTION_MARK||LA17_42==STAR||(LA17_42 >= TILDA && LA17_42 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 42, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-						}
-						else if ( (LA17_28==RPAREN) && (synpred2_FTS())) {
-							alt17=1;
-						}
-						else if ( ((LA17_28 >= AMP && LA17_28 <= BAR)||LA17_28==COMMA||LA17_28==DATETIME||LA17_28==DOT||LA17_28==EQUALS||LA17_28==EXCLAMATION||LA17_28==FLOATING_POINT_LITERAL||(LA17_28 >= FTSPHRASE && LA17_28 <= FTSWORD)||LA17_28==ID||(LA17_28 >= LPAREN && LA17_28 <= LT)||LA17_28==MINUS||LA17_28==NOT||(LA17_28 >= OR && LA17_28 <= PERCENT)||LA17_28==PLUS||LA17_28==QUESTION_MARK||LA17_28==STAR||(LA17_28 >= TILDA && LA17_28 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 28, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_29 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case EOF:
-					case AMP:
-					case AND:
-					case AT:
-					case BAR:
-					case CARAT:
-					case COMMA:
-					case DOT:
-					case EQUALS:
-					case EXCLAMATION:
-					case FTSPHRASE:
-					case LSQUARE:
-					case LT:
-					case MINUS:
-					case OR:
-					case PERCENT:
-					case PLUS:
-					case QUESTION_MARK:
-					case RPAREN:
-					case STAR:
-					case TILDA:
-					case URI:
-						{
-						alt17=2;
-						}
-						break;
-					case ID:
-						{
-						int LA17_30 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case TO:
-						{
-						int LA17_31 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_32 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 17, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-					}
-					break;
-				case COLON:
-					{
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						alt17=6;
-						}
-						break;
-					case ID:
-						{
-						switch ( input.LA(4) ) {
-						case DOT:
-							{
-							int LA17_44 = input.LA(5);
-							if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 44, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COLON:
-							{
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case EOF:
-						case AMP:
-						case AND:
-						case AT:
-						case BAR:
-						case CARAT:
-						case COMMA:
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case EQUALS:
-						case EXCLAMATION:
-						case FLOATING_POINT_LITERAL:
-						case FTSPHRASE:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-						case LPAREN:
-						case LSQUARE:
-						case LT:
-						case MINUS:
-						case NOT:
-						case OR:
-						case PERCENT:
-						case PLUS:
-						case QUESTION_MARK:
-						case RPAREN:
-						case STAR:
-						case TILDA:
-						case TO:
-						case URI:
-							{
-							alt17=2;
-							}
-							break;
-						case DOTDOT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 34, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-						}
-						break;
-					case TO:
-						{
-						int LA17_35 = input.LA(4);
-						if ( (LA17_35==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 35, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case OR:
-						{
-						int LA17_24 = input.LA(4);
-						if ( (LA17_24==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 24, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case AND:
-						{
-						int LA17_25 = input.LA(4);
-						if ( (LA17_25==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 25, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_36 = input.LA(4);
-						if ( (LA17_36==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 36, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case FTSPHRASE:
-						{
-						int LA17_37 = input.LA(4);
-						if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_37==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 37, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case COMMA:
-					case DOT:
-					case QUESTION_MARK:
-					case STAR:
-						{
-						alt17=2;
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_38 = input.LA(4);
-						if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_38==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 38, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case LSQUARE:
-					case LT:
-						{
-						alt17=5;
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 18, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-					}
-					break;
-				case EOF:
-				case AMP:
-				case AND:
-				case AT:
-				case BAR:
-				case CARAT:
-				case COMMA:
-				case DATETIME:
-				case DECIMAL_INTEGER_LITERAL:
-				case DOT:
-				case EQUALS:
-				case EXCLAMATION:
-				case FLOATING_POINT_LITERAL:
-				case FTSPHRASE:
-				case FTSPRE:
-				case FTSWILD:
-				case FTSWORD:
-				case ID:
-				case LPAREN:
-				case LSQUARE:
-				case LT:
-				case MINUS:
-				case NOT:
-				case OR:
-				case PERCENT:
-				case PLUS:
-				case QUESTION_MARK:
-				case RPAREN:
-				case TILDA:
-				case TO:
-				case URI:
-					{
-					alt17=2;
-					}
-					break;
-				default:
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 3, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-				}
-				break;
-			case NOT:
-				{
-				switch ( input.LA(2) ) {
-				case STAR:
-					{
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						int LA17_28 = input.LA(4);
-						if ( (LA17_28==DECIMAL_INTEGER_LITERAL) ) {
-							int LA17_42 = input.LA(5);
-							if ( (LA17_42==RPAREN) ) {
-								switch ( input.LA(6) ) {
-								case NOT:
-									{
-									int LA17_49 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case EOF:
-								case AMP:
-								case AND:
-								case AT:
-								case BAR:
-								case CARAT:
-								case COMMA:
-								case DOT:
-								case EQUALS:
-								case EXCLAMATION:
-								case FTSPHRASE:
-								case LPAREN:
-								case LSQUARE:
-								case LT:
-								case MINUS:
-								case OR:
-								case PERCENT:
-								case PLUS:
-								case QUESTION_MARK:
-								case RPAREN:
-								case STAR:
-								case TILDA:
-								case URI:
-									{
-									alt17=2;
-									}
-									break;
-								case ID:
-									{
-									int LA17_50 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case TO:
-									{
-									int LA17_51 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-									{
-									int LA17_52 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 47, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( ((LA17_42 >= AMP && LA17_42 <= BAR)||LA17_42==CARAT||LA17_42==COMMA||(LA17_42 >= DATETIME && LA17_42 <= DECIMAL_INTEGER_LITERAL)||(LA17_42 >= DOT && LA17_42 <= DOTDOT)||LA17_42==EQUALS||LA17_42==EXCLAMATION||LA17_42==FLOATING_POINT_LITERAL||(LA17_42 >= FTSPHRASE && LA17_42 <= FTSWORD)||LA17_42==ID||(LA17_42 >= LPAREN && LA17_42 <= LT)||LA17_42==MINUS||LA17_42==NOT||(LA17_42 >= OR && LA17_42 <= PERCENT)||LA17_42==PLUS||LA17_42==QUESTION_MARK||LA17_42==STAR||(LA17_42 >= TILDA && LA17_42 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 42, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-						}
-						else if ( (LA17_28==RPAREN) && (synpred2_FTS())) {
-							alt17=1;
-						}
-						else if ( ((LA17_28 >= AMP && LA17_28 <= BAR)||LA17_28==COMMA||LA17_28==DATETIME||LA17_28==DOT||LA17_28==EQUALS||LA17_28==EXCLAMATION||LA17_28==FLOATING_POINT_LITERAL||(LA17_28 >= FTSPHRASE && LA17_28 <= FTSWORD)||LA17_28==ID||(LA17_28 >= LPAREN && LA17_28 <= LT)||LA17_28==MINUS||LA17_28==NOT||(LA17_28 >= OR && LA17_28 <= PERCENT)||LA17_28==PLUS||LA17_28==QUESTION_MARK||LA17_28==STAR||(LA17_28 >= TILDA && LA17_28 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 28, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_29 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case EOF:
-					case AMP:
-					case AND:
-					case AT:
-					case BAR:
-					case CARAT:
-					case COMMA:
-					case DOT:
-					case EQUALS:
-					case EXCLAMATION:
-					case FTSPHRASE:
-					case LSQUARE:
-					case LT:
-					case MINUS:
-					case OR:
-					case PERCENT:
-					case PLUS:
-					case QUESTION_MARK:
-					case RPAREN:
-					case STAR:
-					case TILDA:
-					case URI:
-						{
-						alt17=2;
-						}
-						break;
-					case ID:
-						{
-						int LA17_30 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case TO:
-						{
-						int LA17_31 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_32 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 17, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-					}
-					break;
-				case COLON:
-					{
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						alt17=6;
-						}
-						break;
-					case ID:
-						{
-						switch ( input.LA(4) ) {
-						case DOT:
-							{
-							int LA17_44 = input.LA(5);
-							if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 44, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COLON:
-							{
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case EOF:
-						case AMP:
-						case AND:
-						case AT:
-						case BAR:
-						case CARAT:
-						case COMMA:
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case EQUALS:
-						case EXCLAMATION:
-						case FLOATING_POINT_LITERAL:
-						case FTSPHRASE:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-						case LPAREN:
-						case LSQUARE:
-						case LT:
-						case MINUS:
-						case NOT:
-						case OR:
-						case PERCENT:
-						case PLUS:
-						case QUESTION_MARK:
-						case RPAREN:
-						case STAR:
-						case TILDA:
-						case TO:
-						case URI:
-							{
-							alt17=2;
-							}
-							break;
-						case DOTDOT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 34, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-						}
-						break;
-					case TO:
-						{
-						int LA17_35 = input.LA(4);
-						if ( (LA17_35==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 35, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case OR:
-						{
-						int LA17_24 = input.LA(4);
-						if ( (LA17_24==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 24, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case AND:
-						{
-						int LA17_25 = input.LA(4);
-						if ( (LA17_25==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 25, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_36 = input.LA(4);
-						if ( (LA17_36==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 36, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case FTSPHRASE:
-						{
-						int LA17_37 = input.LA(4);
-						if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_37==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 37, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case COMMA:
-					case DOT:
-					case QUESTION_MARK:
-					case STAR:
-						{
-						alt17=2;
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_38 = input.LA(4);
-						if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_38==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 38, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case LSQUARE:
-					case LT:
-						{
-						alt17=5;
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 18, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-					}
-					break;
-				case EOF:
-				case AMP:
-				case AND:
-				case AT:
-				case BAR:
-				case CARAT:
-				case COMMA:
-				case DATETIME:
-				case DECIMAL_INTEGER_LITERAL:
-				case DOT:
-				case EQUALS:
-				case EXCLAMATION:
-				case FLOATING_POINT_LITERAL:
-				case FTSPHRASE:
-				case FTSPRE:
-				case FTSWILD:
-				case FTSWORD:
-				case ID:
-				case LPAREN:
-				case LSQUARE:
-				case LT:
-				case MINUS:
-				case NOT:
-				case OR:
-				case PERCENT:
-				case PLUS:
-				case QUESTION_MARK:
-				case RPAREN:
-				case TILDA:
-				case TO:
-				case URI:
-					{
-					alt17=2;
-					}
-					break;
-				default:
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 4, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-				}
-				break;
-			case OR:
-				{
-				int LA17_5 = input.LA(2);
-				if ( (LA17_5==COLON) ) {
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						alt17=6;
-						}
-						break;
-					case ID:
-						{
-						switch ( input.LA(4) ) {
-						case DOT:
-							{
-							int LA17_44 = input.LA(5);
-							if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 44, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COLON:
-							{
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case EOF:
-						case AMP:
-						case AND:
-						case AT:
-						case BAR:
-						case CARAT:
-						case COMMA:
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case EQUALS:
-						case EXCLAMATION:
-						case FLOATING_POINT_LITERAL:
-						case FTSPHRASE:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-						case LPAREN:
-						case LSQUARE:
-						case LT:
-						case MINUS:
-						case NOT:
-						case OR:
-						case PERCENT:
-						case PLUS:
-						case QUESTION_MARK:
-						case RPAREN:
-						case STAR:
-						case TILDA:
-						case TO:
-						case URI:
-							{
-							alt17=2;
-							}
-							break;
-						case DOTDOT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 34, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-						}
-						break;
-					case TO:
-						{
-						int LA17_35 = input.LA(4);
-						if ( (LA17_35==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 35, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case OR:
-						{
-						int LA17_24 = input.LA(4);
-						if ( (LA17_24==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 24, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case AND:
-						{
-						int LA17_25 = input.LA(4);
-						if ( (LA17_25==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 25, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_36 = input.LA(4);
-						if ( (LA17_36==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 36, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case FTSPHRASE:
-						{
-						int LA17_37 = input.LA(4);
-						if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_37==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 37, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case COMMA:
-					case DOT:
-					case QUESTION_MARK:
-					case STAR:
-						{
-						alt17=2;
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_38 = input.LA(4);
-						if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_38==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 38, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case LSQUARE:
-					case LT:
-						{
-						alt17=5;
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 18, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-				}
-
-				else {
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 5, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-
-				}
-				break;
-			case AND:
-				{
-				int LA17_6 = input.LA(2);
-				if ( (LA17_6==COLON) ) {
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						alt17=6;
-						}
-						break;
-					case ID:
-						{
-						switch ( input.LA(4) ) {
-						case DOT:
-							{
-							int LA17_44 = input.LA(5);
-							if ( (LA17_44==EOF||(LA17_44 >= AMP && LA17_44 <= BAR)||LA17_44==CARAT||LA17_44==COMMA||(LA17_44 >= DATETIME && LA17_44 <= DECIMAL_INTEGER_LITERAL)||LA17_44==DOT||LA17_44==EQUALS||LA17_44==EXCLAMATION||LA17_44==FLOATING_POINT_LITERAL||(LA17_44 >= FTSPHRASE && LA17_44 <= FTSWORD)||LA17_44==ID||(LA17_44 >= LPAREN && LA17_44 <= LT)||LA17_44==MINUS||LA17_44==NOT||(LA17_44 >= OR && LA17_44 <= PERCENT)||LA17_44==PLUS||LA17_44==QUESTION_MARK||LA17_44==RPAREN||LA17_44==STAR||(LA17_44 >= TILDA && LA17_44 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 44, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COLON:
-							{
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-							}
-							break;
-						case EOF:
-						case AMP:
-						case AND:
-						case AT:
-						case BAR:
-						case CARAT:
-						case COMMA:
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case EQUALS:
-						case EXCLAMATION:
-						case FLOATING_POINT_LITERAL:
-						case FTSPHRASE:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-						case LPAREN:
-						case LSQUARE:
-						case LT:
-						case MINUS:
-						case NOT:
-						case OR:
-						case PERCENT:
-						case PLUS:
-						case QUESTION_MARK:
-						case RPAREN:
-						case STAR:
-						case TILDA:
-						case TO:
-						case URI:
-							{
-							alt17=2;
-							}
-							break;
-						case DOTDOT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 34, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-						}
-						break;
-					case TO:
-						{
-						int LA17_35 = input.LA(4);
-						if ( (LA17_35==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_35==EOF||(LA17_35 >= AMP && LA17_35 <= BAR)||LA17_35==CARAT||LA17_35==COMMA||(LA17_35 >= DATETIME && LA17_35 <= DECIMAL_INTEGER_LITERAL)||LA17_35==DOT||LA17_35==EQUALS||LA17_35==EXCLAMATION||LA17_35==FLOATING_POINT_LITERAL||(LA17_35 >= FTSPHRASE && LA17_35 <= FTSWORD)||LA17_35==ID||(LA17_35 >= LPAREN && LA17_35 <= LT)||LA17_35==MINUS||LA17_35==NOT||(LA17_35 >= OR && LA17_35 <= PERCENT)||LA17_35==PLUS||LA17_35==QUESTION_MARK||LA17_35==RPAREN||LA17_35==STAR||(LA17_35 >= TILDA && LA17_35 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 35, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case OR:
-						{
-						int LA17_24 = input.LA(4);
-						if ( (LA17_24==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 24, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case AND:
-						{
-						int LA17_25 = input.LA(4);
-						if ( (LA17_25==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 25, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_36 = input.LA(4);
-						if ( (LA17_36==COLON) ) {
-							switch ( input.LA(5) ) {
-							case LPAREN:
-								{
-								alt17=6;
-								}
-								break;
-							case FTSPHRASE:
-								{
-								int LA17_37 = input.LA(6);
-								if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_37==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 37, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case COMMA:
-							case DOT:
-							case NOT:
-							case QUESTION_MARK:
-							case STAR:
-							case TO:
-								{
-								alt17=2;
-								}
-								break;
-							case DATETIME:
-							case DECIMAL_INTEGER_LITERAL:
-							case FLOATING_POINT_LITERAL:
-							case FTSPRE:
-							case FTSWILD:
-							case FTSWORD:
-							case ID:
-								{
-								int LA17_38 = input.LA(6);
-								if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-									alt17=2;
-								}
-								else if ( (LA17_38==DOTDOT) ) {
-									alt17=5;
-								}
-
-								else {
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 38, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-
-								}
-								break;
-							case LSQUARE:
-							case LT:
-								{
-								alt17=5;
-								}
-								break;
-							default:
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 41, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-						}
-						else if ( (LA17_36==EOF||(LA17_36 >= AMP && LA17_36 <= BAR)||LA17_36==CARAT||LA17_36==COMMA||(LA17_36 >= DATETIME && LA17_36 <= DECIMAL_INTEGER_LITERAL)||LA17_36==DOT||LA17_36==EQUALS||LA17_36==EXCLAMATION||LA17_36==FLOATING_POINT_LITERAL||(LA17_36 >= FTSPHRASE && LA17_36 <= FTSWORD)||LA17_36==ID||(LA17_36 >= LPAREN && LA17_36 <= LT)||LA17_36==MINUS||LA17_36==NOT||(LA17_36 >= OR && LA17_36 <= PERCENT)||LA17_36==PLUS||LA17_36==QUESTION_MARK||LA17_36==RPAREN||LA17_36==STAR||(LA17_36 >= TILDA && LA17_36 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 36, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case FTSPHRASE:
-						{
-						int LA17_37 = input.LA(4);
-						if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_37==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 37, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case COMMA:
-					case DOT:
-					case QUESTION_MARK:
-					case STAR:
-						{
-						alt17=2;
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_38 = input.LA(4);
-						if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-							alt17=2;
-						}
-						else if ( (LA17_38==DOTDOT) ) {
-							alt17=5;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 38, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case LSQUARE:
-					case LT:
-						{
-						alt17=5;
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 18, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-				}
-
-				else {
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 6, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-
-				}
-				break;
-			case DATETIME:
-			case DECIMAL_INTEGER_LITERAL:
-			case FLOATING_POINT_LITERAL:
-			case FTSPRE:
-			case FTSWILD:
-			case FTSWORD:
-				{
-				switch ( input.LA(2) ) {
-				case STAR:
-					{
-					switch ( input.LA(3) ) {
-					case LPAREN:
-						{
-						int LA17_28 = input.LA(4);
-						if ( (LA17_28==DECIMAL_INTEGER_LITERAL) ) {
-							int LA17_42 = input.LA(5);
-							if ( (LA17_42==RPAREN) ) {
-								switch ( input.LA(6) ) {
-								case NOT:
-									{
-									int LA17_49 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case EOF:
-								case AMP:
-								case AND:
-								case AT:
-								case BAR:
-								case CARAT:
-								case COMMA:
-								case DOT:
-								case EQUALS:
-								case EXCLAMATION:
-								case FTSPHRASE:
-								case LPAREN:
-								case LSQUARE:
-								case LT:
-								case MINUS:
-								case OR:
-								case PERCENT:
-								case PLUS:
-								case QUESTION_MARK:
-								case RPAREN:
-								case STAR:
-								case TILDA:
-								case URI:
-									{
-									alt17=2;
-									}
-									break;
-								case ID:
-									{
-									int LA17_50 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case TO:
-									{
-									int LA17_51 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-									{
-									int LA17_52 = input.LA(7);
-									if ( (synpred2_FTS()) ) {
-										alt17=1;
-									}
-									else if ( (true) ) {
-										alt17=2;
-									}
-
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 47, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-							else if ( ((LA17_42 >= AMP && LA17_42 <= BAR)||LA17_42==CARAT||LA17_42==COMMA||(LA17_42 >= DATETIME && LA17_42 <= DECIMAL_INTEGER_LITERAL)||(LA17_42 >= DOT && LA17_42 <= DOTDOT)||LA17_42==EQUALS||LA17_42==EXCLAMATION||LA17_42==FLOATING_POINT_LITERAL||(LA17_42 >= FTSPHRASE && LA17_42 <= FTSWORD)||LA17_42==ID||(LA17_42 >= LPAREN && LA17_42 <= LT)||LA17_42==MINUS||LA17_42==NOT||(LA17_42 >= OR && LA17_42 <= PERCENT)||LA17_42==PLUS||LA17_42==QUESTION_MARK||LA17_42==STAR||(LA17_42 >= TILDA && LA17_42 <= URI)) ) {
-								alt17=2;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 42, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-						}
-						else if ( (LA17_28==RPAREN) && (synpred2_FTS())) {
-							alt17=1;
-						}
-						else if ( ((LA17_28 >= AMP && LA17_28 <= BAR)||LA17_28==COMMA||LA17_28==DATETIME||LA17_28==DOT||LA17_28==EQUALS||LA17_28==EXCLAMATION||LA17_28==FLOATING_POINT_LITERAL||(LA17_28 >= FTSPHRASE && LA17_28 <= FTSWORD)||LA17_28==ID||(LA17_28 >= LPAREN && LA17_28 <= LT)||LA17_28==MINUS||LA17_28==NOT||(LA17_28 >= OR && LA17_28 <= PERCENT)||LA17_28==PLUS||LA17_28==QUESTION_MARK||LA17_28==STAR||(LA17_28 >= TILDA && LA17_28 <= URI)) ) {
-							alt17=2;
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 28, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-						}
-						break;
-					case NOT:
-						{
-						int LA17_29 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case EOF:
-					case AMP:
-					case AND:
-					case AT:
-					case BAR:
-					case CARAT:
-					case COMMA:
-					case DOT:
-					case EQUALS:
-					case EXCLAMATION:
-					case FTSPHRASE:
-					case LSQUARE:
-					case LT:
-					case MINUS:
-					case OR:
-					case PERCENT:
-					case PLUS:
-					case QUESTION_MARK:
-					case RPAREN:
-					case STAR:
-					case TILDA:
-					case URI:
-						{
-						alt17=2;
-						}
-						break;
-					case ID:
-						{
-						int LA17_30 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case TO:
-						{
-						int LA17_31 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					case DATETIME:
-					case DECIMAL_INTEGER_LITERAL:
-					case FLOATING_POINT_LITERAL:
-					case FTSPRE:
-					case FTSWILD:
-					case FTSWORD:
-						{
-						int LA17_32 = input.LA(4);
-						if ( (synpred2_FTS()) ) {
-							alt17=1;
-						}
-						else if ( (true) ) {
-							alt17=2;
-						}
-
-						}
-						break;
-					default:
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 17, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-					}
-					break;
-				case EOF:
-				case AMP:
-				case AND:
-				case AT:
-				case BAR:
-				case CARAT:
-				case COMMA:
-				case DATETIME:
-				case DECIMAL_INTEGER_LITERAL:
-				case DOT:
-				case EQUALS:
-				case EXCLAMATION:
-				case FLOATING_POINT_LITERAL:
-				case FTSPHRASE:
-				case FTSPRE:
-				case FTSWILD:
-				case FTSWORD:
-				case ID:
-				case LPAREN:
-				case LSQUARE:
-				case LT:
-				case MINUS:
-				case NOT:
-				case OR:
-				case PERCENT:
-				case PLUS:
-				case QUESTION_MARK:
-				case RPAREN:
-				case TILDA:
-				case TO:
-				case URI:
-					{
-					alt17=2;
-					}
-					break;
-				case DOTDOT:
-					{
-					alt17=5;
-					}
-					break;
-				default:
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 7, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-				}
-				break;
-			case URI:
-				{
-				switch ( input.LA(2) ) {
-				case ID:
-					{
-					int LA17_22 = input.LA(3);
-					if ( (LA17_22==DOT) ) {
-						int LA17_40 = input.LA(4);
-						if ( (LA17_40==ID) ) {
-							int LA17_46 = input.LA(5);
-							if ( (LA17_46==COLON) ) {
-								switch ( input.LA(6) ) {
-								case LPAREN:
-									{
-									alt17=6;
-									}
-									break;
-								case FTSPHRASE:
-									{
-									int LA17_37 = input.LA(7);
-									if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_37==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 37, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case COMMA:
-								case DOT:
-								case NOT:
-								case QUESTION_MARK:
-								case STAR:
-								case TO:
-									{
-									alt17=2;
-									}
-									break;
-								case DATETIME:
-								case DECIMAL_INTEGER_LITERAL:
-								case FLOATING_POINT_LITERAL:
-								case FTSPRE:
-								case FTSWILD:
-								case FTSWORD:
-								case ID:
-									{
-									int LA17_38 = input.LA(7);
-									if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-										alt17=2;
-									}
-									else if ( (LA17_38==DOTDOT) ) {
-										alt17=5;
-									}
-
-									else {
-										if (state.backtracking>0) {state.failed=true; return retval;}
-										int nvaeMark = input.mark();
-										try {
-											for (int nvaeConsume = 0; nvaeConsume < 7 - 1; nvaeConsume++) {
-												input.consume();
-											}
-											NoViableAltException nvae =
-												new NoViableAltException("", 17, 38, input);
-											throw nvae;
-										} finally {
-											input.rewind(nvaeMark);
-										}
-									}
-
-									}
-									break;
-								case LSQUARE:
-								case LT:
-									{
-									alt17=5;
-									}
-									break;
-								default:
-									if (state.backtracking>0) {state.failed=true; return retval;}
-									int nvaeMark = input.mark();
-									try {
-										for (int nvaeConsume = 0; nvaeConsume < 6 - 1; nvaeConsume++) {
-											input.consume();
-										}
-										NoViableAltException nvae =
-											new NoViableAltException("", 17, 41, input);
-										throw nvae;
-									} finally {
-										input.rewind(nvaeMark);
-									}
-								}
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 46, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-						}
-
-						else {
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 40, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-
-					}
-					else if ( (LA17_22==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case NOT:
-						case QUESTION_MARK:
-						case STAR:
-						case TO:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 41, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 22, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case TO:
-					{
-					int LA17_23 = input.LA(3);
-					if ( (LA17_23==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case NOT:
-						case QUESTION_MARK:
-						case STAR:
-						case TO:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 41, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 23, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case OR:
-					{
-					int LA17_24 = input.LA(3);
-					if ( (LA17_24==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case NOT:
-						case QUESTION_MARK:
-						case STAR:
-						case TO:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 41, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 24, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case AND:
-					{
-					int LA17_25 = input.LA(3);
-					if ( (LA17_25==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case NOT:
-						case QUESTION_MARK:
-						case STAR:
-						case TO:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 41, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 25, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				case NOT:
-					{
-					int LA17_26 = input.LA(3);
-					if ( (LA17_26==COLON) ) {
-						switch ( input.LA(4) ) {
-						case LPAREN:
-							{
-							alt17=6;
-							}
-							break;
-						case FTSPHRASE:
-							{
-							int LA17_37 = input.LA(5);
-							if ( (LA17_37==EOF||(LA17_37 >= AMP && LA17_37 <= BAR)||LA17_37==CARAT||LA17_37==COMMA||(LA17_37 >= DATETIME && LA17_37 <= DECIMAL_INTEGER_LITERAL)||LA17_37==DOT||LA17_37==EQUALS||LA17_37==EXCLAMATION||LA17_37==FLOATING_POINT_LITERAL||(LA17_37 >= FTSPHRASE && LA17_37 <= FTSWORD)||LA17_37==ID||(LA17_37 >= LPAREN && LA17_37 <= LT)||LA17_37==MINUS||LA17_37==NOT||(LA17_37 >= OR && LA17_37 <= PERCENT)||LA17_37==PLUS||LA17_37==QUESTION_MARK||LA17_37==RPAREN||LA17_37==STAR||(LA17_37 >= TILDA && LA17_37 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_37==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 37, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case COMMA:
-						case DOT:
-						case NOT:
-						case QUESTION_MARK:
-						case STAR:
-						case TO:
-							{
-							alt17=2;
-							}
-							break;
-						case DATETIME:
-						case DECIMAL_INTEGER_LITERAL:
-						case FLOATING_POINT_LITERAL:
-						case FTSPRE:
-						case FTSWILD:
-						case FTSWORD:
-						case ID:
-							{
-							int LA17_38 = input.LA(5);
-							if ( (LA17_38==EOF||(LA17_38 >= AMP && LA17_38 <= BAR)||LA17_38==CARAT||LA17_38==COMMA||(LA17_38 >= DATETIME && LA17_38 <= DECIMAL_INTEGER_LITERAL)||LA17_38==DOT||LA17_38==EQUALS||LA17_38==EXCLAMATION||LA17_38==FLOATING_POINT_LITERAL||(LA17_38 >= FTSPHRASE && LA17_38 <= FTSWORD)||LA17_38==ID||(LA17_38 >= LPAREN && LA17_38 <= LT)||LA17_38==MINUS||LA17_38==NOT||(LA17_38 >= OR && LA17_38 <= PERCENT)||LA17_38==PLUS||LA17_38==QUESTION_MARK||LA17_38==RPAREN||LA17_38==STAR||(LA17_38 >= TILDA && LA17_38 <= URI)) ) {
-								alt17=2;
-							}
-							else if ( (LA17_38==DOTDOT) ) {
-								alt17=5;
-							}
-
-							else {
-								if (state.backtracking>0) {state.failed=true; return retval;}
-								int nvaeMark = input.mark();
-								try {
-									for (int nvaeConsume = 0; nvaeConsume < 5 - 1; nvaeConsume++) {
-										input.consume();
-									}
-									NoViableAltException nvae =
-										new NoViableAltException("", 17, 38, input);
-									throw nvae;
-								} finally {
-									input.rewind(nvaeMark);
-								}
-							}
-
-							}
-							break;
-						case LSQUARE:
-						case LT:
-							{
-							alt17=5;
-							}
-							break;
-						default:
-							if (state.backtracking>0) {state.failed=true; return retval;}
-							int nvaeMark = input.mark();
-							try {
-								for (int nvaeConsume = 0; nvaeConsume < 4 - 1; nvaeConsume++) {
-									input.consume();
-								}
-								NoViableAltException nvae =
-									new NoViableAltException("", 17, 41, input);
-								throw nvae;
-							} finally {
-								input.rewind(nvaeMark);
-							}
-						}
-					}
-
-					else {
-						if (state.backtracking>0) {state.failed=true; return retval;}
-						int nvaeMark = input.mark();
-						try {
-							for (int nvaeConsume = 0; nvaeConsume < 3 - 1; nvaeConsume++) {
-								input.consume();
-							}
-							NoViableAltException nvae =
-								new NoViableAltException("", 17, 26, input);
-							throw nvae;
-						} finally {
-							input.rewind(nvaeMark);
-						}
-					}
-
-					}
-					break;
-				default:
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 8, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-				}
-				break;
-			case FTSPHRASE:
-				{
-				int LA17_9 = input.LA(2);
-				if ( (LA17_9==EOF||(LA17_9 >= AMP && LA17_9 <= BAR)||LA17_9==CARAT||LA17_9==COMMA||(LA17_9 >= DATETIME && LA17_9 <= DECIMAL_INTEGER_LITERAL)||LA17_9==DOT||LA17_9==EQUALS||LA17_9==EXCLAMATION||LA17_9==FLOATING_POINT_LITERAL||(LA17_9 >= FTSPHRASE && LA17_9 <= FTSWORD)||LA17_9==ID||(LA17_9 >= LPAREN && LA17_9 <= LT)||LA17_9==MINUS||LA17_9==NOT||(LA17_9 >= OR && LA17_9 <= PERCENT)||LA17_9==PLUS||LA17_9==QUESTION_MARK||LA17_9==RPAREN||LA17_9==STAR||(LA17_9 >= TILDA && LA17_9 <= URI)) ) {
-					alt17=2;
-				}
-				else if ( (LA17_9==DOTDOT) ) {
-					alt17=5;
-				}
-
-				else {
-					if (state.backtracking>0) {state.failed=true; return retval;}
-					int nvaeMark = input.mark();
-					try {
-						input.consume();
-						NoViableAltException nvae =
-							new NoViableAltException("", 17, 9, input);
-						throw nvae;
-					} finally {
-						input.rewind(nvaeMark);
-					}
-				}
-
-				}
-				break;
-			case COMMA:
-			case DOT:
-			case QUESTION_MARK:
-			case STAR:
-				{
-				alt17=2;
-				}
-				break;
-			case EQUALS:
-				{
-				alt17=3;
-				}
-				break;
-			case TILDA:
-				{
-				alt17=4;
-				}
-				break;
-			case LSQUARE:
-			case LT:
-				{
-				alt17=5;
-				}
-				break;
-			case LPAREN:
-				{
-				alt17=7;
-				}
-				break;
-			case PERCENT:
-				{
-				alt17=8;
-				}
-				break;
-			default:
-				if (state.backtracking>0) {state.failed=true; return retval;}
-				NoViableAltException nvae =
-					new NoViableAltException("", 17, 0, input);
-				throw nvae;
-			}
+			alt17 = dfa17.predict(input);
 			switch (alt17) {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:447:12: ( ftsFieldGroupProximity )=> ftsFieldGroupProximity
@@ -13876,12 +2527,12 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 2 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:451:12: ftsTermOrPhrase
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:451:12: ( ftsTermOrPhrase )=> ftsTermOrPhrase
 					{
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsTermOrPhrase_in_ftsTest1822);
+					pushFollow(FOLLOW_ftsTermOrPhrase_in_ftsTest1828);
 					ftsTermOrPhrase38=ftsTermOrPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -13890,12 +2541,12 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 3 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:453:12: ftsExactTermOrPhrase
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:453:12: ( ftsExactTermOrPhrase )=> ftsExactTermOrPhrase
 					{
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsExactTermOrPhrase_in_ftsTest1845);
+					pushFollow(FOLLOW_ftsExactTermOrPhrase_in_ftsTest1857);
 					ftsExactTermOrPhrase39=ftsExactTermOrPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -13904,12 +2555,12 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 4 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:455:12: ftsTokenisedTermOrPhrase
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:455:12: ( ftsTokenisedTermOrPhrase )=> ftsTokenisedTermOrPhrase
 					{
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsTokenisedTermOrPhrase_in_ftsTest1869);
+					pushFollow(FOLLOW_ftsTokenisedTermOrPhrase_in_ftsTest1887);
 					ftsTokenisedTermOrPhrase40=ftsTokenisedTermOrPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -13918,9 +2569,9 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 5 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:457:12: ftsRange
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:457:12: ( ftsRange )=> ftsRange
 					{
-					pushFollow(FOLLOW_ftsRange_in_ftsTest1892);
+					pushFollow(FOLLOW_ftsRange_in_ftsTest1916);
 					ftsRange41=ftsRange();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -13956,9 +2607,9 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 6 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:461:12: ftsFieldGroup
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:461:12: ( ftsFieldGroup )=> ftsFieldGroup
 					{
-					pushFollow(FOLLOW_ftsFieldGroup_in_ftsTest1965);
+					pushFollow(FOLLOW_ftsFieldGroup_in_ftsTest1995);
 					ftsFieldGroup42=ftsFieldGroup();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -13989,15 +2640,15 @@ public class FTSParser extends Parser {
 				case 7 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:463:12: LPAREN ftsDisjunction RPAREN
 					{
-					LPAREN43=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_ftsTest1998); if (state.failed) return retval; 
+					LPAREN43=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_ftsTest2028); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN43);
 
-					pushFollow(FOLLOW_ftsDisjunction_in_ftsTest2000);
+					pushFollow(FOLLOW_ftsDisjunction_in_ftsTest2030);
 					ftsDisjunction44=ftsDisjunction();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsDisjunction.add(ftsDisjunction44.getTree());
-					RPAREN45=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_ftsTest2002); if (state.failed) return retval; 
+					RPAREN45=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_ftsTest2032); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN45);
 
 					// AST REWRITE
@@ -14026,7 +2677,7 @@ public class FTSParser extends Parser {
 				case 8 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:465:12: template
 					{
-					pushFollow(FOLLOW_template_in_ftsTest2035);
+					pushFollow(FOLLOW_template_in_ftsTest2065);
 					template46=template();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -14120,7 +2771,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:471:9: cmisTerm
 					{
-					pushFollow(FOLLOW_cmisTerm_in_cmisTest2088);
+					pushFollow(FOLLOW_cmisTerm_in_cmisTest2118);
 					cmisTerm47=cmisTerm();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -14158,7 +2809,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:474:11: cmisPhrase
 					{
-					pushFollow(FOLLOW_cmisPhrase_in_cmisTest2148);
+					pushFollow(FOLLOW_cmisPhrase_in_cmisTest2178);
 					cmisPhrase48=cmisPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -14289,10 +2940,10 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:481:9: PERCENT tempReference
 					{
-					PERCENT49=(Token)match(input,PERCENT,FOLLOW_PERCENT_in_template2229); if (state.failed) return retval; 
+					PERCENT49=(Token)match(input,PERCENT,FOLLOW_PERCENT_in_template2259); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_PERCENT.add(PERCENT49);
 
-					pushFollow(FOLLOW_tempReference_in_template2231);
+					pushFollow(FOLLOW_tempReference_in_template2261);
 					tempReference50=tempReference();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -14330,10 +2981,10 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:484:11: PERCENT LPAREN ( tempReference ( COMMA )? )+ RPAREN
 					{
-					PERCENT51=(Token)match(input,PERCENT,FOLLOW_PERCENT_in_template2291); if (state.failed) return retval; 
+					PERCENT51=(Token)match(input,PERCENT,FOLLOW_PERCENT_in_template2321); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_PERCENT.add(PERCENT51);
 
-					LPAREN52=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_template2293); if (state.failed) return retval; 
+					LPAREN52=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_template2323); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN52);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:484:26: ( tempReference ( COMMA )? )+
@@ -14350,7 +3001,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:484:27: tempReference ( COMMA )?
 							{
-							pushFollow(FOLLOW_tempReference_in_template2296);
+							pushFollow(FOLLOW_tempReference_in_template2326);
 							tempReference53=tempReference();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -14365,7 +3016,7 @@ public class FTSParser extends Parser {
 								case 1 :
 									// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:484:41: COMMA
 									{
-									COMMA54=(Token)match(input,COMMA,FOLLOW_COMMA_in_template2298); if (state.failed) return retval; 
+									COMMA54=(Token)match(input,COMMA,FOLLOW_COMMA_in_template2328); if (state.failed) return retval; 
 									if ( state.backtracking==0 ) stream_COMMA.add(COMMA54);
 
 									}
@@ -14385,7 +3036,7 @@ public class FTSParser extends Parser {
 						cnt20++;
 					}
 
-					RPAREN55=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_template2303); if (state.failed) return retval; 
+					RPAREN55=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_template2333); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN55);
 
 					// AST REWRITE
@@ -14474,10 +3125,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:490:9: ( TILDA number -> ^( FUZZY number ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:491:9: TILDA number
 			{
-			TILDA56=(Token)match(input,TILDA,FOLLOW_TILDA_in_fuzzy2385); if (state.failed) return retval; 
+			TILDA56=(Token)match(input,TILDA,FOLLOW_TILDA_in_fuzzy2415); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_TILDA.add(TILDA56);
 
-			pushFollow(FOLLOW_number_in_fuzzy2387);
+			pushFollow(FOLLOW_number_in_fuzzy2417);
 			number57=number();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -14560,10 +3211,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:497:9: ( TILDA DECIMAL_INTEGER_LITERAL -> ^( FUZZY DECIMAL_INTEGER_LITERAL ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:498:9: TILDA DECIMAL_INTEGER_LITERAL
 			{
-			TILDA58=(Token)match(input,TILDA,FOLLOW_TILDA_in_slop2468); if (state.failed) return retval; 
+			TILDA58=(Token)match(input,TILDA,FOLLOW_TILDA_in_slop2498); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_TILDA.add(TILDA58);
 
-			DECIMAL_INTEGER_LITERAL59=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_slop2470); if (state.failed) return retval; 
+			DECIMAL_INTEGER_LITERAL59=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_slop2500); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_DECIMAL_INTEGER_LITERAL.add(DECIMAL_INTEGER_LITERAL59);
 
 			// AST REWRITE
@@ -14643,10 +3294,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:504:9: ( CARAT number -> ^( BOOST number ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:505:9: CARAT number
 			{
-			CARAT60=(Token)match(input,CARAT,FOLLOW_CARAT_in_boost2551); if (state.failed) return retval; 
+			CARAT60=(Token)match(input,CARAT,FOLLOW_CARAT_in_boost2581); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_CARAT.add(CARAT60);
 
-			pushFollow(FOLLOW_number_in_boost2553);
+			pushFollow(FOLLOW_number_in_boost2583);
 			number61=number();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -14742,7 +3393,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:511:9: ( ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord fieldReference ( fuzzy )? ) ) | FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord ( fuzzy )? ) )
 			int alt27=3;
 			int LA27_0 = input.LA(1);
-			if ( (LA27_0==AT) && (synpred3_FTS())) {
+			if ( (LA27_0==AT) && (synpred8_FTS())) {
 				alt27=1;
 			}
 			else if ( (LA27_0==ID) ) {
@@ -14751,7 +3402,7 @@ public class FTSParser extends Parser {
 					int LA27_10 = input.LA(3);
 					if ( (LA27_10==ID) ) {
 						int LA27_12 = input.LA(4);
-						if ( (synpred3_FTS()) ) {
+						if ( (synpred8_FTS()) ) {
 							alt27=1;
 						}
 						else if ( (true) ) {
@@ -14779,7 +3430,7 @@ public class FTSParser extends Parser {
 					}
 
 				}
-				else if ( (LA27_2==COLON) && (synpred3_FTS())) {
+				else if ( (LA27_2==COLON) && (synpred8_FTS())) {
 					alt27=1;
 				}
 				else if ( (LA27_2==EOF||(LA27_2 >= AMP && LA27_2 <= BAR)||LA27_2==CARAT||LA27_2==COMMA||(LA27_2 >= DATETIME && LA27_2 <= DECIMAL_INTEGER_LITERAL)||LA27_2==EQUALS||LA27_2==EXCLAMATION||LA27_2==FLOATING_POINT_LITERAL||(LA27_2 >= FTSPHRASE && LA27_2 <= FTSWORD)||LA27_2==ID||(LA27_2 >= LPAREN && LA27_2 <= LT)||LA27_2==MINUS||LA27_2==NOT||(LA27_2 >= OR && LA27_2 <= PERCENT)||LA27_2==PLUS||LA27_2==QUESTION_MARK||LA27_2==RPAREN||LA27_2==STAR||(LA27_2 >= TILDA && LA27_2 <= URI)) ) {
@@ -14802,7 +3453,7 @@ public class FTSParser extends Parser {
 			}
 			else if ( (LA27_0==TO) ) {
 				int LA27_3 = input.LA(2);
-				if ( (LA27_3==COLON) && (synpred3_FTS())) {
+				if ( (LA27_3==COLON) && (synpred8_FTS())) {
 					alt27=1;
 				}
 				else if ( (LA27_3==EOF||(LA27_3 >= AMP && LA27_3 <= BAR)||LA27_3==CARAT||LA27_3==COMMA||(LA27_3 >= DATETIME && LA27_3 <= DECIMAL_INTEGER_LITERAL)||LA27_3==DOT||LA27_3==EQUALS||LA27_3==EXCLAMATION||LA27_3==FLOATING_POINT_LITERAL||(LA27_3 >= FTSPHRASE && LA27_3 <= FTSWORD)||LA27_3==ID||(LA27_3 >= LPAREN && LA27_3 <= LT)||LA27_3==MINUS||LA27_3==NOT||(LA27_3 >= OR && LA27_3 <= PERCENT)||LA27_3==PLUS||LA27_3==QUESTION_MARK||LA27_3==RPAREN||LA27_3==STAR||(LA27_3 >= TILDA && LA27_3 <= URI)) ) {
@@ -14823,15 +3474,15 @@ public class FTSParser extends Parser {
 				}
 
 			}
-			else if ( (LA27_0==OR) && (synpred3_FTS())) {
+			else if ( (LA27_0==OR) && (synpred8_FTS())) {
 				alt27=1;
 			}
-			else if ( (LA27_0==AND) && (synpred3_FTS())) {
+			else if ( (LA27_0==AND) && (synpred8_FTS())) {
 				alt27=1;
 			}
 			else if ( (LA27_0==NOT) ) {
 				int LA27_6 = input.LA(2);
-				if ( (LA27_6==COLON) && (synpred3_FTS())) {
+				if ( (LA27_6==COLON) && (synpred8_FTS())) {
 					alt27=1;
 				}
 				else if ( (LA27_6==EOF||(LA27_6 >= AMP && LA27_6 <= BAR)||LA27_6==CARAT||LA27_6==COMMA||(LA27_6 >= DATETIME && LA27_6 <= DECIMAL_INTEGER_LITERAL)||LA27_6==DOT||LA27_6==EQUALS||LA27_6==EXCLAMATION||LA27_6==FLOATING_POINT_LITERAL||(LA27_6 >= FTSPHRASE && LA27_6 <= FTSWORD)||LA27_6==ID||(LA27_6 >= LPAREN && LA27_6 <= LT)||LA27_6==MINUS||LA27_6==NOT||(LA27_6 >= OR && LA27_6 <= PERCENT)||LA27_6==PLUS||LA27_6==QUESTION_MARK||LA27_6==RPAREN||LA27_6==STAR||(LA27_6 >= TILDA && LA27_6 <= URI)) ) {
@@ -14852,7 +3503,7 @@ public class FTSParser extends Parser {
 				}
 
 			}
-			else if ( (LA27_0==URI) && (synpred3_FTS())) {
+			else if ( (LA27_0==URI) && (synpred8_FTS())) {
 				alt27=1;
 			}
 			else if ( (LA27_0==FTSPHRASE) ) {
@@ -14873,12 +3524,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:512:9: ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord fieldReference ( fuzzy )? ) )
 					{
-					pushFollow(FOLLOW_fieldReference_in_ftsTermOrPhrase2642);
+					pushFollow(FOLLOW_fieldReference_in_ftsTermOrPhrase2672);
 					fieldReference62=fieldReference();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_fieldReference.add(fieldReference62.getTree());
-					COLON63=(Token)match(input,COLON,FOLLOW_COLON_in_ftsTermOrPhrase2644); if (state.failed) return retval; 
+					COLON63=(Token)match(input,COLON,FOLLOW_COLON_in_ftsTermOrPhrase2674); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_COLON.add(COLON63);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:513:9: ( FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord fieldReference ( fuzzy )? ) )
@@ -14902,7 +3553,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:514:17: FTSPHRASE ( ( slop )=> slop )?
 							{
-							FTSPHRASE64=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsTermOrPhrase2672); if (state.failed) return retval; 
+							FTSPHRASE64=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsTermOrPhrase2702); if (state.failed) return retval; 
 							if ( state.backtracking==0 ) stream_FTSPHRASE.add(FTSPHRASE64);
 
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:514:27: ( ( slop )=> slop )?
@@ -14912,7 +3563,7 @@ public class FTSParser extends Parser {
 								int LA22_1 = input.LA(2);
 								if ( (LA22_1==DECIMAL_INTEGER_LITERAL) ) {
 									int LA22_3 = input.LA(3);
-									if ( (synpred4_FTS()) ) {
+									if ( (synpred9_FTS()) ) {
 										alt22=1;
 									}
 								}
@@ -14921,7 +3572,7 @@ public class FTSParser extends Parser {
 								case 1 :
 									// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:514:28: ( slop )=> slop
 									{
-									pushFollow(FOLLOW_slop_in_ftsTermOrPhrase2680);
+									pushFollow(FOLLOW_slop_in_ftsTermOrPhrase2710);
 									slop65=slop();
 									state._fsp--;
 									if (state.failed) return retval;
@@ -14971,7 +3622,7 @@ public class FTSParser extends Parser {
 						case 2 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:517:17: ftsWord ( ( fuzzy )=> fuzzy )?
 							{
-							pushFollow(FOLLOW_ftsWord_in_ftsTermOrPhrase2747);
+							pushFollow(FOLLOW_ftsWord_in_ftsTermOrPhrase2777);
 							ftsWord66=ftsWord();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -14983,7 +3634,7 @@ public class FTSParser extends Parser {
 								int LA23_1 = input.LA(2);
 								if ( (LA23_1==DECIMAL_INTEGER_LITERAL||LA23_1==FLOATING_POINT_LITERAL) ) {
 									int LA23_3 = input.LA(3);
-									if ( (synpred5_FTS()) ) {
+									if ( (synpred10_FTS()) ) {
 										alt23=1;
 									}
 								}
@@ -14992,7 +3643,7 @@ public class FTSParser extends Parser {
 								case 1 :
 									// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:517:26: ( fuzzy )=> fuzzy
 									{
-									pushFollow(FOLLOW_fuzzy_in_ftsTermOrPhrase2756);
+									pushFollow(FOLLOW_fuzzy_in_ftsTermOrPhrase2786);
 									fuzzy67=fuzzy();
 									state._fsp--;
 									if (state.failed) return retval;
@@ -15047,7 +3698,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:521:9: FTSPHRASE ( ( slop )=> slop )?
 					{
-					FTSPHRASE68=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsTermOrPhrase2817); if (state.failed) return retval; 
+					FTSPHRASE68=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsTermOrPhrase2847); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_FTSPHRASE.add(FTSPHRASE68);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:521:19: ( ( slop )=> slop )?
@@ -15057,7 +3708,7 @@ public class FTSParser extends Parser {
 						int LA25_1 = input.LA(2);
 						if ( (LA25_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA25_3 = input.LA(3);
-							if ( (synpred6_FTS()) ) {
+							if ( (synpred11_FTS()) ) {
 								alt25=1;
 							}
 						}
@@ -15066,7 +3717,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:521:20: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsTermOrPhrase2825);
+							pushFollow(FOLLOW_slop_in_ftsTermOrPhrase2855);
 							slop69=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -15115,7 +3766,7 @@ public class FTSParser extends Parser {
 				case 3 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:524:9: ftsWord ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsWord_in_ftsTermOrPhrase2875);
+					pushFollow(FOLLOW_ftsWord_in_ftsTermOrPhrase2905);
 					ftsWord70=ftsWord();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -15127,7 +3778,7 @@ public class FTSParser extends Parser {
 						int LA26_1 = input.LA(2);
 						if ( (LA26_1==DECIMAL_INTEGER_LITERAL||LA26_1==FLOATING_POINT_LITERAL) ) {
 							int LA26_3 = input.LA(3);
-							if ( (synpred7_FTS()) ) {
+							if ( (synpred12_FTS()) ) {
 								alt26=1;
 							}
 						}
@@ -15136,7 +3787,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:524:18: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsTermOrPhrase2884);
+							pushFollow(FOLLOW_fuzzy_in_ftsTermOrPhrase2914);
 							fuzzy71=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -15248,13 +3899,13 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:530:9: ( EQUALS ( ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( EXACT_PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( EXACT_TERM ftsWord fieldReference ( fuzzy )? ) ) | FTSPHRASE ( ( slop )=> slop )? -> ^( EXACT_PHRASE FTSPHRASE ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( EXACT_TERM ftsWord ( fuzzy )? ) ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:531:9: EQUALS ( ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( EXACT_PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( EXACT_TERM ftsWord fieldReference ( fuzzy )? ) ) | FTSPHRASE ( ( slop )=> slop )? -> ^( EXACT_PHRASE FTSPHRASE ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( EXACT_TERM ftsWord ( fuzzy )? ) )
 			{
-			EQUALS72=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsExactTermOrPhrase2963); if (state.failed) return retval; 
+			EQUALS72=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsExactTermOrPhrase2993); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_EQUALS.add(EQUALS72);
 
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:532:9: ( ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( EXACT_PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( EXACT_TERM ftsWord fieldReference ( fuzzy )? ) ) | FTSPHRASE ( ( slop )=> slop )? -> ^( EXACT_PHRASE FTSPHRASE ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( EXACT_TERM ftsWord ( fuzzy )? ) )
 			int alt33=3;
 			int LA33_0 = input.LA(1);
-			if ( (LA33_0==AT) && (synpred8_FTS())) {
+			if ( (LA33_0==AT) && (synpred13_FTS())) {
 				alt33=1;
 			}
 			else if ( (LA33_0==ID) ) {
@@ -15278,7 +3929,7 @@ public class FTSParser extends Parser {
 							case ID:
 								{
 								int LA33_14 = input.LA(6);
-								if ( (synpred8_FTS()) ) {
+								if ( (synpred13_FTS()) ) {
 									alt33=1;
 								}
 								else if ( (true) ) {
@@ -15290,7 +3941,7 @@ public class FTSParser extends Parser {
 							case TO:
 								{
 								int LA33_15 = input.LA(6);
-								if ( (synpred8_FTS()) ) {
+								if ( (synpred13_FTS()) ) {
 									alt33=1;
 								}
 								else if ( (true) ) {
@@ -15314,7 +3965,7 @@ public class FTSParser extends Parser {
 									case FTSPHRASE:
 										{
 										int LA33_25 = input.LA(8);
-										if ( (synpred8_FTS()) ) {
+										if ( (synpred13_FTS()) ) {
 											alt33=1;
 										}
 										else if ( (true) ) {
@@ -15329,7 +3980,7 @@ public class FTSParser extends Parser {
 										int LA33_20 = input.LA(8);
 										if ( ((LA33_20 >= DATETIME && LA33_20 <= DECIMAL_INTEGER_LITERAL)||LA33_20==FLOATING_POINT_LITERAL||(LA33_20 >= FTSPRE && LA33_20 <= FTSWORD)||LA33_20==ID||LA33_20==NOT||LA33_20==QUESTION_MARK||LA33_20==STAR||LA33_20==TO) ) {
 											int LA33_24 = input.LA(9);
-											if ( (synpred8_FTS()) ) {
+											if ( (synpred13_FTS()) ) {
 												alt33=1;
 											}
 											else if ( (true) ) {
@@ -15364,7 +4015,7 @@ public class FTSParser extends Parser {
 									case ID:
 										{
 										int LA33_26 = input.LA(8);
-										if ( (synpred8_FTS()) ) {
+										if ( (synpred13_FTS()) ) {
 											alt33=1;
 										}
 										else if ( (true) ) {
@@ -15379,7 +4030,7 @@ public class FTSParser extends Parser {
 									case TO:
 										{
 										int LA33_27 = input.LA(8);
-										if ( (synpred8_FTS()) ) {
+										if ( (synpred13_FTS()) ) {
 											alt33=1;
 										}
 										else if ( (true) ) {
@@ -15436,7 +4087,7 @@ public class FTSParser extends Parser {
 									case FTSPHRASE:
 										{
 										int LA33_25 = input.LA(8);
-										if ( (synpred8_FTS()) ) {
+										if ( (synpred13_FTS()) ) {
 											alt33=1;
 										}
 										else if ( (true) ) {
@@ -15451,7 +4102,7 @@ public class FTSParser extends Parser {
 										int LA33_20 = input.LA(8);
 										if ( ((LA33_20 >= DATETIME && LA33_20 <= DECIMAL_INTEGER_LITERAL)||LA33_20==FLOATING_POINT_LITERAL||(LA33_20 >= FTSPRE && LA33_20 <= FTSWORD)||LA33_20==ID||LA33_20==NOT||LA33_20==QUESTION_MARK||LA33_20==STAR||LA33_20==TO) ) {
 											int LA33_24 = input.LA(9);
-											if ( (synpred8_FTS()) ) {
+											if ( (synpred13_FTS()) ) {
 												alt33=1;
 											}
 											else if ( (true) ) {
@@ -15486,7 +4137,7 @@ public class FTSParser extends Parser {
 									case ID:
 										{
 										int LA33_26 = input.LA(8);
-										if ( (synpred8_FTS()) ) {
+										if ( (synpred13_FTS()) ) {
 											alt33=1;
 										}
 										else if ( (true) ) {
@@ -15501,7 +4152,7 @@ public class FTSParser extends Parser {
 									case TO:
 										{
 										int LA33_27 = input.LA(8);
-										if ( (synpred8_FTS()) ) {
+										if ( (synpred13_FTS()) ) {
 											alt33=1;
 										}
 										else if ( (true) ) {
@@ -15546,7 +4197,7 @@ public class FTSParser extends Parser {
 							case NOT:
 								{
 								int LA33_18 = input.LA(6);
-								if ( (synpred8_FTS()) ) {
+								if ( (synpred13_FTS()) ) {
 									alt33=1;
 								}
 								else if ( (true) ) {
@@ -15558,7 +4209,7 @@ public class FTSParser extends Parser {
 							case FTSPHRASE:
 								{
 								int LA33_19 = input.LA(6);
-								if ( (synpred8_FTS()) ) {
+								if ( (synpred13_FTS()) ) {
 									alt33=1;
 								}
 								else if ( (true) ) {
@@ -15573,7 +4224,7 @@ public class FTSParser extends Parser {
 								int LA33_20 = input.LA(6);
 								if ( ((LA33_20 >= DATETIME && LA33_20 <= DECIMAL_INTEGER_LITERAL)||LA33_20==FLOATING_POINT_LITERAL||(LA33_20 >= FTSPRE && LA33_20 <= FTSWORD)||LA33_20==ID||LA33_20==NOT||LA33_20==QUESTION_MARK||LA33_20==STAR||LA33_20==TO) ) {
 									int LA33_24 = input.LA(7);
-									if ( (synpred8_FTS()) ) {
+									if ( (synpred13_FTS()) ) {
 										alt33=1;
 									}
 									else if ( (true) ) {
@@ -15607,7 +4258,7 @@ public class FTSParser extends Parser {
 							case FTSWORD:
 								{
 								int LA33_21 = input.LA(6);
-								if ( (synpred8_FTS()) ) {
+								if ( (synpred13_FTS()) ) {
 									alt33=1;
 								}
 								else if ( (true) ) {
@@ -15620,7 +4271,7 @@ public class FTSParser extends Parser {
 							case STAR:
 								{
 								int LA33_22 = input.LA(6);
-								if ( (synpred8_FTS()) ) {
+								if ( (synpred13_FTS()) ) {
 									alt33=1;
 								}
 								else if ( (true) ) {
@@ -15681,7 +4332,7 @@ public class FTSParser extends Parser {
 					}
 
 				}
-				else if ( (LA33_2==COLON) && (synpred8_FTS())) {
+				else if ( (LA33_2==COLON) && (synpred13_FTS())) {
 					alt33=1;
 				}
 				else if ( (LA33_2==EOF||(LA33_2 >= AMP && LA33_2 <= BAR)||LA33_2==CARAT||LA33_2==COMMA||(LA33_2 >= DATETIME && LA33_2 <= DECIMAL_INTEGER_LITERAL)||LA33_2==EQUALS||LA33_2==EXCLAMATION||LA33_2==FLOATING_POINT_LITERAL||(LA33_2 >= FTSPHRASE && LA33_2 <= FTSWORD)||LA33_2==ID||(LA33_2 >= LPAREN && LA33_2 <= LT)||LA33_2==MINUS||LA33_2==NOT||(LA33_2 >= OR && LA33_2 <= PERCENT)||LA33_2==PLUS||LA33_2==QUESTION_MARK||LA33_2==RPAREN||LA33_2==STAR||(LA33_2 >= TILDA && LA33_2 <= URI)) ) {
@@ -15704,7 +4355,7 @@ public class FTSParser extends Parser {
 			}
 			else if ( (LA33_0==TO) ) {
 				int LA33_3 = input.LA(2);
-				if ( (LA33_3==COLON) && (synpred8_FTS())) {
+				if ( (LA33_3==COLON) && (synpred13_FTS())) {
 					alt33=1;
 				}
 				else if ( (LA33_3==EOF||(LA33_3 >= AMP && LA33_3 <= BAR)||LA33_3==CARAT||LA33_3==COMMA||(LA33_3 >= DATETIME && LA33_3 <= DECIMAL_INTEGER_LITERAL)||LA33_3==DOT||LA33_3==EQUALS||LA33_3==EXCLAMATION||LA33_3==FLOATING_POINT_LITERAL||(LA33_3 >= FTSPHRASE && LA33_3 <= FTSWORD)||LA33_3==ID||(LA33_3 >= LPAREN && LA33_3 <= LT)||LA33_3==MINUS||LA33_3==NOT||(LA33_3 >= OR && LA33_3 <= PERCENT)||LA33_3==PLUS||LA33_3==QUESTION_MARK||LA33_3==RPAREN||LA33_3==STAR||(LA33_3 >= TILDA && LA33_3 <= URI)) ) {
@@ -15725,15 +4376,15 @@ public class FTSParser extends Parser {
 				}
 
 			}
-			else if ( (LA33_0==OR) && (synpred8_FTS())) {
+			else if ( (LA33_0==OR) && (synpred13_FTS())) {
 				alt33=1;
 			}
-			else if ( (LA33_0==AND) && (synpred8_FTS())) {
+			else if ( (LA33_0==AND) && (synpred13_FTS())) {
 				alt33=1;
 			}
 			else if ( (LA33_0==NOT) ) {
 				int LA33_6 = input.LA(2);
-				if ( (LA33_6==COLON) && (synpred8_FTS())) {
+				if ( (LA33_6==COLON) && (synpred13_FTS())) {
 					alt33=1;
 				}
 				else if ( (LA33_6==EOF||(LA33_6 >= AMP && LA33_6 <= BAR)||LA33_6==CARAT||LA33_6==COMMA||(LA33_6 >= DATETIME && LA33_6 <= DECIMAL_INTEGER_LITERAL)||LA33_6==DOT||LA33_6==EQUALS||LA33_6==EXCLAMATION||LA33_6==FLOATING_POINT_LITERAL||(LA33_6 >= FTSPHRASE && LA33_6 <= FTSWORD)||LA33_6==ID||(LA33_6 >= LPAREN && LA33_6 <= LT)||LA33_6==MINUS||LA33_6==NOT||(LA33_6 >= OR && LA33_6 <= PERCENT)||LA33_6==PLUS||LA33_6==QUESTION_MARK||LA33_6==RPAREN||LA33_6==STAR||(LA33_6 >= TILDA && LA33_6 <= URI)) ) {
@@ -15754,7 +4405,7 @@ public class FTSParser extends Parser {
 				}
 
 			}
-			else if ( (LA33_0==URI) && (synpred8_FTS())) {
+			else if ( (LA33_0==URI) && (synpred13_FTS())) {
 				alt33=1;
 			}
 			else if ( (LA33_0==FTSPHRASE) ) {
@@ -15775,12 +4426,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:533:9: ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( EXACT_PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( EXACT_TERM ftsWord fieldReference ( fuzzy )? ) )
 					{
-					pushFollow(FOLLOW_fieldReference_in_ftsExactTermOrPhrase2991);
+					pushFollow(FOLLOW_fieldReference_in_ftsExactTermOrPhrase3021);
 					fieldReference73=fieldReference();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_fieldReference.add(fieldReference73.getTree());
-					COLON74=(Token)match(input,COLON,FOLLOW_COLON_in_ftsExactTermOrPhrase2993); if (state.failed) return retval; 
+					COLON74=(Token)match(input,COLON,FOLLOW_COLON_in_ftsExactTermOrPhrase3023); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_COLON.add(COLON74);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:534:9: ( FTSPHRASE ( ( slop )=> slop )? -> ^( EXACT_PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( EXACT_TERM ftsWord fieldReference ( fuzzy )? ) )
@@ -15804,7 +4455,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:535:17: FTSPHRASE ( ( slop )=> slop )?
 							{
-							FTSPHRASE75=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsExactTermOrPhrase3021); if (state.failed) return retval; 
+							FTSPHRASE75=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsExactTermOrPhrase3051); if (state.failed) return retval; 
 							if ( state.backtracking==0 ) stream_FTSPHRASE.add(FTSPHRASE75);
 
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:535:27: ( ( slop )=> slop )?
@@ -15814,7 +4465,7 @@ public class FTSParser extends Parser {
 								int LA28_1 = input.LA(2);
 								if ( (LA28_1==DECIMAL_INTEGER_LITERAL) ) {
 									int LA28_3 = input.LA(3);
-									if ( (synpred9_FTS()) ) {
+									if ( (synpred14_FTS()) ) {
 										alt28=1;
 									}
 								}
@@ -15823,7 +4474,7 @@ public class FTSParser extends Parser {
 								case 1 :
 									// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:535:28: ( slop )=> slop
 									{
-									pushFollow(FOLLOW_slop_in_ftsExactTermOrPhrase3029);
+									pushFollow(FOLLOW_slop_in_ftsExactTermOrPhrase3059);
 									slop76=slop();
 									state._fsp--;
 									if (state.failed) return retval;
@@ -15873,7 +4524,7 @@ public class FTSParser extends Parser {
 						case 2 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:538:17: ftsWord ( ( fuzzy )=> fuzzy )?
 							{
-							pushFollow(FOLLOW_ftsWord_in_ftsExactTermOrPhrase3096);
+							pushFollow(FOLLOW_ftsWord_in_ftsExactTermOrPhrase3126);
 							ftsWord77=ftsWord();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -15885,7 +4536,7 @@ public class FTSParser extends Parser {
 								int LA29_1 = input.LA(2);
 								if ( (LA29_1==DECIMAL_INTEGER_LITERAL||LA29_1==FLOATING_POINT_LITERAL) ) {
 									int LA29_3 = input.LA(3);
-									if ( (synpred10_FTS()) ) {
+									if ( (synpred15_FTS()) ) {
 										alt29=1;
 									}
 								}
@@ -15894,7 +4545,7 @@ public class FTSParser extends Parser {
 								case 1 :
 									// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:538:26: ( fuzzy )=> fuzzy
 									{
-									pushFollow(FOLLOW_fuzzy_in_ftsExactTermOrPhrase3105);
+									pushFollow(FOLLOW_fuzzy_in_ftsExactTermOrPhrase3135);
 									fuzzy78=fuzzy();
 									state._fsp--;
 									if (state.failed) return retval;
@@ -15949,7 +4600,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:542:9: FTSPHRASE ( ( slop )=> slop )?
 					{
-					FTSPHRASE79=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsExactTermOrPhrase3166); if (state.failed) return retval; 
+					FTSPHRASE79=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsExactTermOrPhrase3196); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_FTSPHRASE.add(FTSPHRASE79);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:542:19: ( ( slop )=> slop )?
@@ -15959,7 +4610,7 @@ public class FTSParser extends Parser {
 						int LA31_1 = input.LA(2);
 						if ( (LA31_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA31_3 = input.LA(3);
-							if ( (synpred11_FTS()) ) {
+							if ( (synpred16_FTS()) ) {
 								alt31=1;
 							}
 						}
@@ -15968,7 +4619,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:542:20: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsExactTermOrPhrase3174);
+							pushFollow(FOLLOW_slop_in_ftsExactTermOrPhrase3204);
 							slop80=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -16017,7 +4668,7 @@ public class FTSParser extends Parser {
 				case 3 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:545:9: ftsWord ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsWord_in_ftsExactTermOrPhrase3224);
+					pushFollow(FOLLOW_ftsWord_in_ftsExactTermOrPhrase3254);
 					ftsWord81=ftsWord();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -16029,7 +4680,7 @@ public class FTSParser extends Parser {
 						int LA32_1 = input.LA(2);
 						if ( (LA32_1==DECIMAL_INTEGER_LITERAL||LA32_1==FLOATING_POINT_LITERAL) ) {
 							int LA32_3 = input.LA(3);
-							if ( (synpred12_FTS()) ) {
+							if ( (synpred17_FTS()) ) {
 								alt32=1;
 							}
 						}
@@ -16038,7 +4689,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:545:18: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsExactTermOrPhrase3233);
+							pushFollow(FOLLOW_fuzzy_in_ftsExactTermOrPhrase3263);
 							fuzzy82=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -16153,13 +4804,13 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:552:9: ( TILDA ( ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord fieldReference ( fuzzy )? ) ) | FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord ( fuzzy )? ) ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:553:9: TILDA ( ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord fieldReference ( fuzzy )? ) ) | FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord ( fuzzy )? ) )
 			{
-			TILDA83=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsTokenisedTermOrPhrase3314); if (state.failed) return retval; 
+			TILDA83=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsTokenisedTermOrPhrase3344); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_TILDA.add(TILDA83);
 
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:554:9: ( ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord fieldReference ( fuzzy )? ) ) | FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord ( fuzzy )? ) )
 			int alt39=3;
 			int LA39_0 = input.LA(1);
-			if ( (LA39_0==AT) && (synpred13_FTS())) {
+			if ( (LA39_0==AT) && (synpred18_FTS())) {
 				alt39=1;
 			}
 			else if ( (LA39_0==ID) ) {
@@ -16183,7 +4834,7 @@ public class FTSParser extends Parser {
 							case ID:
 								{
 								int LA39_14 = input.LA(6);
-								if ( (synpred13_FTS()) ) {
+								if ( (synpred18_FTS()) ) {
 									alt39=1;
 								}
 								else if ( (true) ) {
@@ -16195,7 +4846,7 @@ public class FTSParser extends Parser {
 							case TO:
 								{
 								int LA39_15 = input.LA(6);
-								if ( (synpred13_FTS()) ) {
+								if ( (synpred18_FTS()) ) {
 									alt39=1;
 								}
 								else if ( (true) ) {
@@ -16219,7 +4870,7 @@ public class FTSParser extends Parser {
 									case FTSPHRASE:
 										{
 										int LA39_25 = input.LA(8);
-										if ( (synpred13_FTS()) ) {
+										if ( (synpred18_FTS()) ) {
 											alt39=1;
 										}
 										else if ( (true) ) {
@@ -16234,7 +4885,7 @@ public class FTSParser extends Parser {
 										int LA39_20 = input.LA(8);
 										if ( ((LA39_20 >= DATETIME && LA39_20 <= DECIMAL_INTEGER_LITERAL)||LA39_20==FLOATING_POINT_LITERAL||(LA39_20 >= FTSPRE && LA39_20 <= FTSWORD)||LA39_20==ID||LA39_20==NOT||LA39_20==QUESTION_MARK||LA39_20==STAR||LA39_20==TO) ) {
 											int LA39_24 = input.LA(9);
-											if ( (synpred13_FTS()) ) {
+											if ( (synpred18_FTS()) ) {
 												alt39=1;
 											}
 											else if ( (true) ) {
@@ -16269,7 +4920,7 @@ public class FTSParser extends Parser {
 									case ID:
 										{
 										int LA39_26 = input.LA(8);
-										if ( (synpred13_FTS()) ) {
+										if ( (synpred18_FTS()) ) {
 											alt39=1;
 										}
 										else if ( (true) ) {
@@ -16284,7 +4935,7 @@ public class FTSParser extends Parser {
 									case TO:
 										{
 										int LA39_27 = input.LA(8);
-										if ( (synpred13_FTS()) ) {
+										if ( (synpred18_FTS()) ) {
 											alt39=1;
 										}
 										else if ( (true) ) {
@@ -16341,7 +4992,7 @@ public class FTSParser extends Parser {
 									case FTSPHRASE:
 										{
 										int LA39_25 = input.LA(8);
-										if ( (synpred13_FTS()) ) {
+										if ( (synpred18_FTS()) ) {
 											alt39=1;
 										}
 										else if ( (true) ) {
@@ -16356,7 +5007,7 @@ public class FTSParser extends Parser {
 										int LA39_20 = input.LA(8);
 										if ( ((LA39_20 >= DATETIME && LA39_20 <= DECIMAL_INTEGER_LITERAL)||LA39_20==FLOATING_POINT_LITERAL||(LA39_20 >= FTSPRE && LA39_20 <= FTSWORD)||LA39_20==ID||LA39_20==NOT||LA39_20==QUESTION_MARK||LA39_20==STAR||LA39_20==TO) ) {
 											int LA39_24 = input.LA(9);
-											if ( (synpred13_FTS()) ) {
+											if ( (synpred18_FTS()) ) {
 												alt39=1;
 											}
 											else if ( (true) ) {
@@ -16391,7 +5042,7 @@ public class FTSParser extends Parser {
 									case ID:
 										{
 										int LA39_26 = input.LA(8);
-										if ( (synpred13_FTS()) ) {
+										if ( (synpred18_FTS()) ) {
 											alt39=1;
 										}
 										else if ( (true) ) {
@@ -16406,7 +5057,7 @@ public class FTSParser extends Parser {
 									case TO:
 										{
 										int LA39_27 = input.LA(8);
-										if ( (synpred13_FTS()) ) {
+										if ( (synpred18_FTS()) ) {
 											alt39=1;
 										}
 										else if ( (true) ) {
@@ -16451,7 +5102,7 @@ public class FTSParser extends Parser {
 							case NOT:
 								{
 								int LA39_18 = input.LA(6);
-								if ( (synpred13_FTS()) ) {
+								if ( (synpred18_FTS()) ) {
 									alt39=1;
 								}
 								else if ( (true) ) {
@@ -16463,7 +5114,7 @@ public class FTSParser extends Parser {
 							case FTSPHRASE:
 								{
 								int LA39_19 = input.LA(6);
-								if ( (synpred13_FTS()) ) {
+								if ( (synpred18_FTS()) ) {
 									alt39=1;
 								}
 								else if ( (true) ) {
@@ -16478,7 +5129,7 @@ public class FTSParser extends Parser {
 								int LA39_20 = input.LA(6);
 								if ( ((LA39_20 >= DATETIME && LA39_20 <= DECIMAL_INTEGER_LITERAL)||LA39_20==FLOATING_POINT_LITERAL||(LA39_20 >= FTSPRE && LA39_20 <= FTSWORD)||LA39_20==ID||LA39_20==NOT||LA39_20==QUESTION_MARK||LA39_20==STAR||LA39_20==TO) ) {
 									int LA39_24 = input.LA(7);
-									if ( (synpred13_FTS()) ) {
+									if ( (synpred18_FTS()) ) {
 										alt39=1;
 									}
 									else if ( (true) ) {
@@ -16512,7 +5163,7 @@ public class FTSParser extends Parser {
 							case FTSWORD:
 								{
 								int LA39_21 = input.LA(6);
-								if ( (synpred13_FTS()) ) {
+								if ( (synpred18_FTS()) ) {
 									alt39=1;
 								}
 								else if ( (true) ) {
@@ -16525,7 +5176,7 @@ public class FTSParser extends Parser {
 							case STAR:
 								{
 								int LA39_22 = input.LA(6);
-								if ( (synpred13_FTS()) ) {
+								if ( (synpred18_FTS()) ) {
 									alt39=1;
 								}
 								else if ( (true) ) {
@@ -16586,7 +5237,7 @@ public class FTSParser extends Parser {
 					}
 
 				}
-				else if ( (LA39_2==COLON) && (synpred13_FTS())) {
+				else if ( (LA39_2==COLON) && (synpred18_FTS())) {
 					alt39=1;
 				}
 				else if ( (LA39_2==EOF||(LA39_2 >= AMP && LA39_2 <= BAR)||LA39_2==CARAT||LA39_2==COMMA||(LA39_2 >= DATETIME && LA39_2 <= DECIMAL_INTEGER_LITERAL)||LA39_2==EQUALS||LA39_2==EXCLAMATION||LA39_2==FLOATING_POINT_LITERAL||(LA39_2 >= FTSPHRASE && LA39_2 <= FTSWORD)||LA39_2==ID||(LA39_2 >= LPAREN && LA39_2 <= LT)||LA39_2==MINUS||LA39_2==NOT||(LA39_2 >= OR && LA39_2 <= PERCENT)||LA39_2==PLUS||LA39_2==QUESTION_MARK||LA39_2==RPAREN||LA39_2==STAR||(LA39_2 >= TILDA && LA39_2 <= URI)) ) {
@@ -16609,7 +5260,7 @@ public class FTSParser extends Parser {
 			}
 			else if ( (LA39_0==TO) ) {
 				int LA39_3 = input.LA(2);
-				if ( (LA39_3==COLON) && (synpred13_FTS())) {
+				if ( (LA39_3==COLON) && (synpred18_FTS())) {
 					alt39=1;
 				}
 				else if ( (LA39_3==EOF||(LA39_3 >= AMP && LA39_3 <= BAR)||LA39_3==CARAT||LA39_3==COMMA||(LA39_3 >= DATETIME && LA39_3 <= DECIMAL_INTEGER_LITERAL)||LA39_3==DOT||LA39_3==EQUALS||LA39_3==EXCLAMATION||LA39_3==FLOATING_POINT_LITERAL||(LA39_3 >= FTSPHRASE && LA39_3 <= FTSWORD)||LA39_3==ID||(LA39_3 >= LPAREN && LA39_3 <= LT)||LA39_3==MINUS||LA39_3==NOT||(LA39_3 >= OR && LA39_3 <= PERCENT)||LA39_3==PLUS||LA39_3==QUESTION_MARK||LA39_3==RPAREN||LA39_3==STAR||(LA39_3 >= TILDA && LA39_3 <= URI)) ) {
@@ -16630,15 +5281,15 @@ public class FTSParser extends Parser {
 				}
 
 			}
-			else if ( (LA39_0==OR) && (synpred13_FTS())) {
+			else if ( (LA39_0==OR) && (synpred18_FTS())) {
 				alt39=1;
 			}
-			else if ( (LA39_0==AND) && (synpred13_FTS())) {
+			else if ( (LA39_0==AND) && (synpred18_FTS())) {
 				alt39=1;
 			}
 			else if ( (LA39_0==NOT) ) {
 				int LA39_6 = input.LA(2);
-				if ( (LA39_6==COLON) && (synpred13_FTS())) {
+				if ( (LA39_6==COLON) && (synpred18_FTS())) {
 					alt39=1;
 				}
 				else if ( (LA39_6==EOF||(LA39_6 >= AMP && LA39_6 <= BAR)||LA39_6==CARAT||LA39_6==COMMA||(LA39_6 >= DATETIME && LA39_6 <= DECIMAL_INTEGER_LITERAL)||LA39_6==DOT||LA39_6==EQUALS||LA39_6==EXCLAMATION||LA39_6==FLOATING_POINT_LITERAL||(LA39_6 >= FTSPHRASE && LA39_6 <= FTSWORD)||LA39_6==ID||(LA39_6 >= LPAREN && LA39_6 <= LT)||LA39_6==MINUS||LA39_6==NOT||(LA39_6 >= OR && LA39_6 <= PERCENT)||LA39_6==PLUS||LA39_6==QUESTION_MARK||LA39_6==RPAREN||LA39_6==STAR||(LA39_6 >= TILDA && LA39_6 <= URI)) ) {
@@ -16659,7 +5310,7 @@ public class FTSParser extends Parser {
 				}
 
 			}
-			else if ( (LA39_0==URI) && (synpred13_FTS())) {
+			else if ( (LA39_0==URI) && (synpred18_FTS())) {
 				alt39=1;
 			}
 			else if ( (LA39_0==FTSPHRASE) ) {
@@ -16680,12 +5331,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:555:9: ( fieldReference COLON )=> fieldReference COLON ( FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord fieldReference ( fuzzy )? ) )
 					{
-					pushFollow(FOLLOW_fieldReference_in_ftsTokenisedTermOrPhrase3342);
+					pushFollow(FOLLOW_fieldReference_in_ftsTokenisedTermOrPhrase3372);
 					fieldReference84=fieldReference();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_fieldReference.add(fieldReference84.getTree());
-					COLON85=(Token)match(input,COLON,FOLLOW_COLON_in_ftsTokenisedTermOrPhrase3344); if (state.failed) return retval; 
+					COLON85=(Token)match(input,COLON,FOLLOW_COLON_in_ftsTokenisedTermOrPhrase3374); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_COLON.add(COLON85);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:556:9: ( FTSPHRASE ( ( slop )=> slop )? -> ^( PHRASE FTSPHRASE fieldReference ( slop )? ) | ftsWord ( ( fuzzy )=> fuzzy )? -> ^( TERM ftsWord fieldReference ( fuzzy )? ) )
@@ -16709,7 +5360,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:557:17: FTSPHRASE ( ( slop )=> slop )?
 							{
-							FTSPHRASE86=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsTokenisedTermOrPhrase3372); if (state.failed) return retval; 
+							FTSPHRASE86=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsTokenisedTermOrPhrase3402); if (state.failed) return retval; 
 							if ( state.backtracking==0 ) stream_FTSPHRASE.add(FTSPHRASE86);
 
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:557:27: ( ( slop )=> slop )?
@@ -16719,7 +5370,7 @@ public class FTSParser extends Parser {
 								int LA34_1 = input.LA(2);
 								if ( (LA34_1==DECIMAL_INTEGER_LITERAL) ) {
 									int LA34_3 = input.LA(3);
-									if ( (synpred14_FTS()) ) {
+									if ( (synpred19_FTS()) ) {
 										alt34=1;
 									}
 								}
@@ -16728,7 +5379,7 @@ public class FTSParser extends Parser {
 								case 1 :
 									// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:557:28: ( slop )=> slop
 									{
-									pushFollow(FOLLOW_slop_in_ftsTokenisedTermOrPhrase3380);
+									pushFollow(FOLLOW_slop_in_ftsTokenisedTermOrPhrase3410);
 									slop87=slop();
 									state._fsp--;
 									if (state.failed) return retval;
@@ -16778,7 +5429,7 @@ public class FTSParser extends Parser {
 						case 2 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:560:17: ftsWord ( ( fuzzy )=> fuzzy )?
 							{
-							pushFollow(FOLLOW_ftsWord_in_ftsTokenisedTermOrPhrase3447);
+							pushFollow(FOLLOW_ftsWord_in_ftsTokenisedTermOrPhrase3477);
 							ftsWord88=ftsWord();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -16790,7 +5441,7 @@ public class FTSParser extends Parser {
 								int LA35_1 = input.LA(2);
 								if ( (LA35_1==DECIMAL_INTEGER_LITERAL||LA35_1==FLOATING_POINT_LITERAL) ) {
 									int LA35_3 = input.LA(3);
-									if ( (synpred15_FTS()) ) {
+									if ( (synpred20_FTS()) ) {
 										alt35=1;
 									}
 								}
@@ -16799,7 +5450,7 @@ public class FTSParser extends Parser {
 								case 1 :
 									// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:560:26: ( fuzzy )=> fuzzy
 									{
-									pushFollow(FOLLOW_fuzzy_in_ftsTokenisedTermOrPhrase3456);
+									pushFollow(FOLLOW_fuzzy_in_ftsTokenisedTermOrPhrase3486);
 									fuzzy89=fuzzy();
 									state._fsp--;
 									if (state.failed) return retval;
@@ -16854,7 +5505,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:564:9: FTSPHRASE ( ( slop )=> slop )?
 					{
-					FTSPHRASE90=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsTokenisedTermOrPhrase3517); if (state.failed) return retval; 
+					FTSPHRASE90=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsTokenisedTermOrPhrase3547); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_FTSPHRASE.add(FTSPHRASE90);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:564:19: ( ( slop )=> slop )?
@@ -16864,7 +5515,7 @@ public class FTSParser extends Parser {
 						int LA37_1 = input.LA(2);
 						if ( (LA37_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA37_3 = input.LA(3);
-							if ( (synpred16_FTS()) ) {
+							if ( (synpred21_FTS()) ) {
 								alt37=1;
 							}
 						}
@@ -16873,7 +5524,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:564:20: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsTokenisedTermOrPhrase3525);
+							pushFollow(FOLLOW_slop_in_ftsTokenisedTermOrPhrase3555);
 							slop91=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -16922,7 +5573,7 @@ public class FTSParser extends Parser {
 				case 3 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:567:9: ftsWord ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsWord_in_ftsTokenisedTermOrPhrase3575);
+					pushFollow(FOLLOW_ftsWord_in_ftsTokenisedTermOrPhrase3605);
 					ftsWord92=ftsWord();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -16934,7 +5585,7 @@ public class FTSParser extends Parser {
 						int LA38_1 = input.LA(2);
 						if ( (LA38_1==DECIMAL_INTEGER_LITERAL||LA38_1==FLOATING_POINT_LITERAL) ) {
 							int LA38_3 = input.LA(3);
-							if ( (synpred17_FTS()) ) {
+							if ( (synpred22_FTS()) ) {
 								alt38=1;
 							}
 						}
@@ -16943,7 +5594,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:567:18: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsTokenisedTermOrPhrase3584);
+							pushFollow(FOLLOW_fuzzy_in_ftsTokenisedTermOrPhrase3614);
 							fuzzy93=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -17038,7 +5689,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:574:9: ( ftsWord -> ftsWord )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:575:9: ftsWord
 			{
-			pushFollow(FOLLOW_ftsWord_in_cmisTerm3657);
+			pushFollow(FOLLOW_ftsWord_in_cmisTerm3687);
 			ftsWord94=ftsWord();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -17111,7 +5762,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:581:9: ( FTSPHRASE -> FTSPHRASE )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:582:9: FTSPHRASE
 			{
-			FTSPHRASE95=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_cmisPhrase3711); if (state.failed) return retval; 
+			FTSPHRASE95=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_cmisPhrase3741); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_FTSPHRASE.add(FTSPHRASE95);
 
 			// AST REWRITE
@@ -17202,12 +5853,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:589:10: fieldReference COLON
 					{
-					pushFollow(FOLLOW_fieldReference_in_ftsRange3766);
+					pushFollow(FOLLOW_fieldReference_in_ftsRange3796);
 					fieldReference96=fieldReference();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_fieldReference.add(fieldReference96.getTree());
-					COLON97=(Token)match(input,COLON,FOLLOW_COLON_in_ftsRange3768); if (state.failed) return retval; 
+					COLON97=(Token)match(input,COLON,FOLLOW_COLON_in_ftsRange3798); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_COLON.add(COLON97);
 
 					}
@@ -17215,7 +5866,7 @@ public class FTSParser extends Parser {
 
 			}
 
-			pushFollow(FOLLOW_ftsFieldGroupRange_in_ftsRange3772);
+			pushFollow(FOLLOW_ftsFieldGroupRange_in_ftsRange3802);
 			ftsFieldGroupRange98=ftsFieldGroupRange();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -17304,23 +5955,23 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:594:9: ( fieldReference COLON LPAREN ftsFieldGroupDisjunction RPAREN -> ^( FIELD_GROUP fieldReference ftsFieldGroupDisjunction ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:595:9: fieldReference COLON LPAREN ftsFieldGroupDisjunction RPAREN
 			{
-			pushFollow(FOLLOW_fieldReference_in_ftsFieldGroup3828);
+			pushFollow(FOLLOW_fieldReference_in_ftsFieldGroup3858);
 			fieldReference99=fieldReference();
 			state._fsp--;
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_fieldReference.add(fieldReference99.getTree());
-			COLON100=(Token)match(input,COLON,FOLLOW_COLON_in_ftsFieldGroup3830); if (state.failed) return retval; 
+			COLON100=(Token)match(input,COLON,FOLLOW_COLON_in_ftsFieldGroup3860); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_COLON.add(COLON100);
 
-			LPAREN101=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_ftsFieldGroup3832); if (state.failed) return retval; 
+			LPAREN101=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_ftsFieldGroup3862); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN101);
 
-			pushFollow(FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroup3834);
+			pushFollow(FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroup3864);
 			ftsFieldGroupDisjunction102=ftsFieldGroupDisjunction();
 			state._fsp--;
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_ftsFieldGroupDisjunction.add(ftsFieldGroupDisjunction102.getTree());
-			RPAREN103=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_ftsFieldGroup3836); if (state.failed) return retval; 
+			RPAREN103=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_ftsFieldGroup3866); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN103);
 
 			// AST REWRITE
@@ -17809,7 +6460,7 @@ public class FTSParser extends Parser {
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						throw new FailedPredicateException(input, "ftsFieldGroupDisjunction", "defaultFieldConjunction() == true");
 					}
-					pushFollow(FOLLOW_ftsFieldGroupExplicitDisjunction_in_ftsFieldGroupDisjunction3921);
+					pushFollow(FOLLOW_ftsFieldGroupExplicitDisjunction_in_ftsFieldGroupDisjunction3951);
 					ftsFieldGroupExplicitDisjunction104=ftsFieldGroupExplicitDisjunction();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -17827,7 +6478,7 @@ public class FTSParser extends Parser {
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						throw new FailedPredicateException(input, "ftsFieldGroupDisjunction", "defaultFieldConjunction() == false");
 					}
-					pushFollow(FOLLOW_ftsFieldGroupImplicitDisjunction_in_ftsFieldGroupDisjunction3935);
+					pushFollow(FOLLOW_ftsFieldGroupImplicitDisjunction_in_ftsFieldGroupDisjunction3965);
 					ftsFieldGroupImplicitDisjunction105=ftsFieldGroupImplicitDisjunction();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -17884,7 +6535,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:607:9: ( ftsFieldGroupImplicitConjunction ( or ftsFieldGroupImplicitConjunction )* -> ^( FIELD_DISJUNCTION ( ftsFieldGroupImplicitConjunction )+ ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:608:9: ftsFieldGroupImplicitConjunction ( or ftsFieldGroupImplicitConjunction )*
 			{
-			pushFollow(FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3968);
+			pushFollow(FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3998);
 			ftsFieldGroupImplicitConjunction106=ftsFieldGroupImplicitConjunction();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -17902,12 +6553,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:608:43: or ftsFieldGroupImplicitConjunction
 					{
-					pushFollow(FOLLOW_or_in_ftsFieldGroupExplicitDisjunction3971);
+					pushFollow(FOLLOW_or_in_ftsFieldGroupExplicitDisjunction4001);
 					or107=or();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_or.add(or107.getTree());
-					pushFollow(FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3973);
+					pushFollow(FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction4003);
 					ftsFieldGroupImplicitConjunction108=ftsFieldGroupImplicitConjunction();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18033,7 +6684,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:615:10: or
 							{
-							pushFollow(FOLLOW_or_in_ftsFieldGroupImplicitDisjunction4058);
+							pushFollow(FOLLOW_or_in_ftsFieldGroupImplicitDisjunction4088);
 							or109=or();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -18043,7 +6694,7 @@ public class FTSParser extends Parser {
 
 					}
 
-					pushFollow(FOLLOW_ftsFieldGroupExplicitConjunction_in_ftsFieldGroupImplicitDisjunction4061);
+					pushFollow(FOLLOW_ftsFieldGroupExplicitConjunction_in_ftsFieldGroupImplicitDisjunction4091);
 					ftsFieldGroupExplicitConjunction110=ftsFieldGroupExplicitConjunction();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18144,7 +6795,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:625:9: ( ftsFieldGroupPrefixed ( and ftsFieldGroupPrefixed )* -> ^( FIELD_CONJUNCTION ( ftsFieldGroupPrefixed )+ ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:626:9: ftsFieldGroupPrefixed ( and ftsFieldGroupPrefixed )*
 			{
-			pushFollow(FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction4148);
+			pushFollow(FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction4178);
 			ftsFieldGroupPrefixed111=ftsFieldGroupPrefixed();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -18162,12 +6813,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:626:32: and ftsFieldGroupPrefixed
 					{
-					pushFollow(FOLLOW_and_in_ftsFieldGroupExplicitConjunction4151);
+					pushFollow(FOLLOW_and_in_ftsFieldGroupExplicitConjunction4181);
 					and112=and();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_and.add(and112.getTree());
-					pushFollow(FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction4153);
+					pushFollow(FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction4183);
 					ftsFieldGroupPrefixed113=ftsFieldGroupPrefixed();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18294,7 +6945,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:633:10: and
 							{
-							pushFollow(FOLLOW_and_in_ftsFieldGroupImplicitConjunction4238);
+							pushFollow(FOLLOW_and_in_ftsFieldGroupImplicitConjunction4268);
 							and114=and();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -18304,7 +6955,7 @@ public class FTSParser extends Parser {
 
 					}
 
-					pushFollow(FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupImplicitConjunction4241);
+					pushFollow(FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupImplicitConjunction4271);
 					ftsFieldGroupPrefixed115=ftsFieldGroupPrefixed();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18425,7 +7076,7 @@ public class FTSParser extends Parser {
 			int LA53_0 = input.LA(1);
 			if ( (LA53_0==NOT) ) {
 				int LA53_1 = input.LA(2);
-				if ( (synpred18_FTS()) ) {
+				if ( (synpred23_FTS()) ) {
 					alt53=1;
 				}
 				else if ( (true) ) {
@@ -18433,7 +7084,7 @@ public class FTSParser extends Parser {
 				}
 
 			}
-			else if ( (LA53_0==EXCLAMATION) && (synpred18_FTS())) {
+			else if ( (LA53_0==EXCLAMATION) && (synpred23_FTS())) {
 				alt53=1;
 			}
 			else if ( (LA53_0==COMMA||(LA53_0 >= DATETIME && LA53_0 <= DECIMAL_INTEGER_LITERAL)||LA53_0==DOT||LA53_0==EQUALS||LA53_0==FLOATING_POINT_LITERAL||(LA53_0 >= FTSPHRASE && LA53_0 <= FTSWORD)||LA53_0==ID||(LA53_0 >= LPAREN && LA53_0 <= LT)||LA53_0==QUESTION_MARK||LA53_0==STAR||(LA53_0 >= TILDA && LA53_0 <= TO)) ) {
@@ -18460,12 +7111,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:640:9: ( not )=> not ftsFieldGroupTest ( boost )?
 					{
-					pushFollow(FOLLOW_not_in_ftsFieldGroupPrefixed4331);
+					pushFollow(FOLLOW_not_in_ftsFieldGroupPrefixed4361);
 					not116=not();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_not.add(not116.getTree());
-					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4333);
+					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4363);
 					ftsFieldGroupTest117=ftsFieldGroupTest();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18480,7 +7131,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:640:40: boost
 							{
-							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4335);
+							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4365);
 							boost118=boost();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -18529,7 +7180,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:643:11: ftsFieldGroupTest ( boost )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4399);
+					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4429);
 					ftsFieldGroupTest119=ftsFieldGroupTest();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18544,7 +7195,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:643:29: boost
 							{
-							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4401);
+							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4431);
 							boost120=boost();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -18593,10 +7244,10 @@ public class FTSParser extends Parser {
 				case 3 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:646:11: PLUS ftsFieldGroupTest ( boost )?
 					{
-					PLUS121=(Token)match(input,PLUS,FOLLOW_PLUS_in_ftsFieldGroupPrefixed4465); if (state.failed) return retval; 
+					PLUS121=(Token)match(input,PLUS,FOLLOW_PLUS_in_ftsFieldGroupPrefixed4495); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_PLUS.add(PLUS121);
 
-					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4467);
+					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4497);
 					ftsFieldGroupTest122=ftsFieldGroupTest();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18611,7 +7262,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:646:34: boost
 							{
-							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4469);
+							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4499);
 							boost123=boost();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -18660,10 +7311,10 @@ public class FTSParser extends Parser {
 				case 4 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:649:11: BAR ftsFieldGroupTest ( boost )?
 					{
-					BAR124=(Token)match(input,BAR,FOLLOW_BAR_in_ftsFieldGroupPrefixed4533); if (state.failed) return retval; 
+					BAR124=(Token)match(input,BAR,FOLLOW_BAR_in_ftsFieldGroupPrefixed4563); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_BAR.add(BAR124);
 
-					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4535);
+					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4565);
 					ftsFieldGroupTest125=ftsFieldGroupTest();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18678,7 +7329,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:649:33: boost
 							{
-							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4537);
+							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4567);
 							boost126=boost();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -18727,10 +7378,10 @@ public class FTSParser extends Parser {
 				case 5 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:652:11: MINUS ftsFieldGroupTest ( boost )?
 					{
-					MINUS127=(Token)match(input,MINUS,FOLLOW_MINUS_in_ftsFieldGroupPrefixed4601); if (state.failed) return retval; 
+					MINUS127=(Token)match(input,MINUS,FOLLOW_MINUS_in_ftsFieldGroupPrefixed4631); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_MINUS.add(MINUS127);
 
-					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4603);
+					pushFollow(FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4633);
 					ftsFieldGroupTest128=ftsFieldGroupTest();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -18745,7 +7396,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:652:35: boost
 							{
-							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4605);
+							pushFollow(FOLLOW_boost_in_ftsFieldGroupPrefixed4635);
 							boost129=boost();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -18889,7 +7540,7 @@ public class FTSParser extends Parser {
 								case NOT:
 									{
 									int LA60_22 = input.LA(7);
-									if ( (synpred19_FTS()) ) {
+									if ( (synpred24_FTS()) ) {
 										alt60=1;
 									}
 									else if ( (true) ) {
@@ -18930,7 +7581,7 @@ public class FTSParser extends Parser {
 								case ID:
 									{
 									int LA60_23 = input.LA(7);
-									if ( (synpred19_FTS()) ) {
+									if ( (synpred24_FTS()) ) {
 										alt60=1;
 									}
 									else if ( (true) ) {
@@ -18942,7 +7593,7 @@ public class FTSParser extends Parser {
 								case TO:
 									{
 									int LA60_24 = input.LA(7);
-									if ( (synpred19_FTS()) ) {
+									if ( (synpred24_FTS()) ) {
 										alt60=1;
 									}
 									else if ( (true) ) {
@@ -18986,7 +7637,7 @@ public class FTSParser extends Parser {
 							}
 
 						}
-						else if ( (LA60_15==RPAREN) && (synpred19_FTS())) {
+						else if ( (LA60_15==RPAREN) && (synpred24_FTS())) {
 							alt60=1;
 						}
 						else if ( ((LA60_15 >= AMP && LA60_15 <= AND)||LA60_15==BAR||LA60_15==COMMA||LA60_15==DATETIME||LA60_15==DOT||LA60_15==EQUALS||LA60_15==EXCLAMATION||LA60_15==FLOATING_POINT_LITERAL||(LA60_15 >= FTSPHRASE && LA60_15 <= FTSWORD)||LA60_15==ID||(LA60_15 >= LPAREN && LA60_15 <= LT)||LA60_15==MINUS||LA60_15==NOT||LA60_15==OR||LA60_15==PLUS||LA60_15==QUESTION_MARK||LA60_15==STAR||(LA60_15 >= TILDA && LA60_15 <= TO)) ) {
@@ -19013,7 +7664,7 @@ public class FTSParser extends Parser {
 					case NOT:
 						{
 						int LA60_16 = input.LA(4);
-						if ( (synpred19_FTS()) ) {
+						if ( (synpred24_FTS()) ) {
 							alt60=1;
 						}
 						else if ( (true) ) {
@@ -19053,7 +7704,7 @@ public class FTSParser extends Parser {
 					case ID:
 						{
 						int LA60_17 = input.LA(4);
-						if ( (synpred19_FTS()) ) {
+						if ( (synpred24_FTS()) ) {
 							alt60=1;
 						}
 						else if ( (true) ) {
@@ -19065,7 +7716,7 @@ public class FTSParser extends Parser {
 					case TO:
 						{
 						int LA60_18 = input.LA(4);
-						if ( (synpred19_FTS()) ) {
+						if ( (synpred24_FTS()) ) {
 							alt60=1;
 						}
 						else if ( (true) ) {
@@ -19239,7 +7890,7 @@ public class FTSParser extends Parser {
 								case NOT:
 									{
 									int LA60_22 = input.LA(7);
-									if ( (synpred19_FTS()) ) {
+									if ( (synpred24_FTS()) ) {
 										alt60=1;
 									}
 									else if ( (true) ) {
@@ -19280,7 +7931,7 @@ public class FTSParser extends Parser {
 								case ID:
 									{
 									int LA60_23 = input.LA(7);
-									if ( (synpred19_FTS()) ) {
+									if ( (synpred24_FTS()) ) {
 										alt60=1;
 									}
 									else if ( (true) ) {
@@ -19292,7 +7943,7 @@ public class FTSParser extends Parser {
 								case TO:
 									{
 									int LA60_24 = input.LA(7);
-									if ( (synpred19_FTS()) ) {
+									if ( (synpred24_FTS()) ) {
 										alt60=1;
 									}
 									else if ( (true) ) {
@@ -19336,7 +7987,7 @@ public class FTSParser extends Parser {
 							}
 
 						}
-						else if ( (LA60_15==RPAREN) && (synpred19_FTS())) {
+						else if ( (LA60_15==RPAREN) && (synpred24_FTS())) {
 							alt60=1;
 						}
 						else if ( ((LA60_15 >= AMP && LA60_15 <= AND)||LA60_15==BAR||LA60_15==COMMA||LA60_15==DATETIME||LA60_15==DOT||LA60_15==EQUALS||LA60_15==EXCLAMATION||LA60_15==FLOATING_POINT_LITERAL||(LA60_15 >= FTSPHRASE && LA60_15 <= FTSWORD)||LA60_15==ID||(LA60_15 >= LPAREN && LA60_15 <= LT)||LA60_15==MINUS||LA60_15==NOT||LA60_15==OR||LA60_15==PLUS||LA60_15==QUESTION_MARK||LA60_15==STAR||(LA60_15 >= TILDA && LA60_15 <= TO)) ) {
@@ -19363,7 +8014,7 @@ public class FTSParser extends Parser {
 					case NOT:
 						{
 						int LA60_16 = input.LA(4);
-						if ( (synpred19_FTS()) ) {
+						if ( (synpred24_FTS()) ) {
 							alt60=1;
 						}
 						else if ( (true) ) {
@@ -19403,7 +8054,7 @@ public class FTSParser extends Parser {
 					case ID:
 						{
 						int LA60_17 = input.LA(4);
-						if ( (synpred19_FTS()) ) {
+						if ( (synpred24_FTS()) ) {
 							alt60=1;
 						}
 						else if ( (true) ) {
@@ -19415,7 +8066,7 @@ public class FTSParser extends Parser {
 					case TO:
 						{
 						int LA60_18 = input.LA(4);
-						if ( (synpred19_FTS()) ) {
+						if ( (synpred24_FTS()) ) {
 							alt60=1;
 						}
 						else if ( (true) ) {
@@ -19479,7 +8130,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:659:9: ( ftsFieldGroupProximity )=> ftsFieldGroupProximity
 					{
-					pushFollow(FOLLOW_ftsFieldGroupProximity_in_ftsFieldGroupTest4696);
+					pushFollow(FOLLOW_ftsFieldGroupProximity_in_ftsFieldGroupTest4726);
 					ftsFieldGroupProximity130=ftsFieldGroupProximity();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -19517,7 +8168,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:662:11: ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupTest4756);
+					pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupTest4786);
 					ftsFieldGroupTerm131=ftsFieldGroupTerm();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -19529,7 +8180,7 @@ public class FTSParser extends Parser {
 						int LA54_1 = input.LA(2);
 						if ( (LA54_1==DECIMAL_INTEGER_LITERAL||LA54_1==FLOATING_POINT_LITERAL) ) {
 							int LA54_3 = input.LA(3);
-							if ( (synpred20_FTS()) ) {
+							if ( (synpred25_FTS()) ) {
 								alt54=1;
 							}
 						}
@@ -19538,7 +8189,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:662:31: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest4766);
+							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest4796);
 							fuzzy132=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -19587,7 +8238,7 @@ public class FTSParser extends Parser {
 				case 3 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:665:11: ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupExactTerm_in_ftsFieldGroupTest4831);
+					pushFollow(FOLLOW_ftsFieldGroupExactTerm_in_ftsFieldGroupTest4861);
 					ftsFieldGroupExactTerm133=ftsFieldGroupExactTerm();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -19599,7 +8250,7 @@ public class FTSParser extends Parser {
 						int LA55_1 = input.LA(2);
 						if ( (LA55_1==DECIMAL_INTEGER_LITERAL||LA55_1==FLOATING_POINT_LITERAL) ) {
 							int LA55_3 = input.LA(3);
-							if ( (synpred21_FTS()) ) {
+							if ( (synpred26_FTS()) ) {
 								alt55=1;
 							}
 						}
@@ -19608,7 +8259,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:665:36: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest4841);
+							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest4871);
 							fuzzy134=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -19657,7 +8308,7 @@ public class FTSParser extends Parser {
 				case 4 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:668:11: ftsFieldGroupPhrase ( ( slop )=> slop )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupPhrase_in_ftsFieldGroupTest4906);
+					pushFollow(FOLLOW_ftsFieldGroupPhrase_in_ftsFieldGroupTest4936);
 					ftsFieldGroupPhrase135=ftsFieldGroupPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -19669,7 +8320,7 @@ public class FTSParser extends Parser {
 						int LA56_1 = input.LA(2);
 						if ( (LA56_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA56_3 = input.LA(3);
-							if ( (synpred22_FTS()) ) {
+							if ( (synpred27_FTS()) ) {
 								alt56=1;
 							}
 						}
@@ -19678,7 +8329,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:668:33: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest4916);
+							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest4946);
 							slop136=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -19727,7 +8378,7 @@ public class FTSParser extends Parser {
 				case 5 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:671:11: ftsFieldGroupExactPhrase ( ( slop )=> slop )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTest4981);
+					pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTest5011);
 					ftsFieldGroupExactPhrase137=ftsFieldGroupExactPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -19739,7 +8390,7 @@ public class FTSParser extends Parser {
 						int LA57_1 = input.LA(2);
 						if ( (LA57_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA57_3 = input.LA(3);
-							if ( (synpred23_FTS()) ) {
+							if ( (synpred28_FTS()) ) {
 								alt57=1;
 							}
 						}
@@ -19748,7 +8399,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:671:38: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest4991);
+							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest5021);
 							slop138=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -19797,7 +8448,7 @@ public class FTSParser extends Parser {
 				case 6 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:674:11: ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupTokenisedPhrase_in_ftsFieldGroupTest5056);
+					pushFollow(FOLLOW_ftsFieldGroupTokenisedPhrase_in_ftsFieldGroupTest5086);
 					ftsFieldGroupTokenisedPhrase139=ftsFieldGroupTokenisedPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -19809,7 +8460,7 @@ public class FTSParser extends Parser {
 						int LA58_1 = input.LA(2);
 						if ( (LA58_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA58_3 = input.LA(3);
-							if ( (synpred24_FTS()) ) {
+							if ( (synpred29_FTS()) ) {
 								alt58=1;
 							}
 						}
@@ -19818,7 +8469,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:674:42: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest5066);
+							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest5096);
 							slop140=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -19867,7 +8518,7 @@ public class FTSParser extends Parser {
 				case 7 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:677:11: ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest5131);
+					pushFollow(FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest5161);
 					ftsFieldGroupSynonym141=ftsFieldGroupSynonym();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -19879,7 +8530,7 @@ public class FTSParser extends Parser {
 						int LA59_1 = input.LA(2);
 						if ( (LA59_1==DECIMAL_INTEGER_LITERAL||LA59_1==FLOATING_POINT_LITERAL) ) {
 							int LA59_3 = input.LA(3);
-							if ( (synpred25_FTS()) ) {
+							if ( (synpred30_FTS()) ) {
 								alt59=1;
 							}
 						}
@@ -19888,7 +8539,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:677:34: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest5141);
+							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest5171);
 							fuzzy142=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -19937,7 +8588,7 @@ public class FTSParser extends Parser {
 				case 8 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:680:11: ftsFieldGroupRange
 					{
-					pushFollow(FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest5206);
+					pushFollow(FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest5236);
 					ftsFieldGroupRange143=ftsFieldGroupRange();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -19975,15 +8626,15 @@ public class FTSParser extends Parser {
 				case 9 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:683:11: LPAREN ftsFieldGroupDisjunction RPAREN
 					{
-					LPAREN144=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_ftsFieldGroupTest5266); if (state.failed) return retval; 
+					LPAREN144=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_ftsFieldGroupTest5296); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN144);
 
-					pushFollow(FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest5268);
+					pushFollow(FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest5298);
 					ftsFieldGroupDisjunction145=ftsFieldGroupDisjunction();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsFieldGroupDisjunction.add(ftsFieldGroupDisjunction145.getTree());
-					RPAREN146=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_ftsFieldGroupTest5270); if (state.failed) return retval; 
+					RPAREN146=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_ftsFieldGroupTest5300); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN146);
 
 					// AST REWRITE
@@ -20057,7 +8708,7 @@ public class FTSParser extends Parser {
 			root_0 = (Object)adaptor.nil();
 
 
-			pushFollow(FOLLOW_ftsWord_in_ftsFieldGroupTerm5323);
+			pushFollow(FOLLOW_ftsWord_in_ftsFieldGroupTerm5353);
 			ftsWord147=ftsWord();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -20112,10 +8763,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:693:9: ( EQUALS ftsFieldGroupTerm -> ftsFieldGroupTerm )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:694:9: EQUALS ftsFieldGroupTerm
 			{
-			EQUALS148=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsFieldGroupExactTerm5356); if (state.failed) return retval; 
+			EQUALS148=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsFieldGroupExactTerm5386); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_EQUALS.add(EQUALS148);
 
-			pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm5358);
+			pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm5388);
 			ftsFieldGroupTerm149=ftsFieldGroupTerm();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -20190,7 +8841,7 @@ public class FTSParser extends Parser {
 			root_0 = (Object)adaptor.nil();
 
 
-			FTSPHRASE150=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase5411); if (state.failed) return retval;
+			FTSPHRASE150=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase5441); if (state.failed) return retval;
 			if ( state.backtracking==0 ) {
 			FTSPHRASE150_tree = (Object)adaptor.create(FTSPHRASE150);
 			adaptor.addChild(root_0, FTSPHRASE150_tree);
@@ -20245,10 +8896,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:704:9: ( EQUALS ftsFieldGroupExactPhrase -> ftsFieldGroupExactPhrase )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:705:9: EQUALS ftsFieldGroupExactPhrase
 			{
-			EQUALS151=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsFieldGroupExactPhrase5452); if (state.failed) return retval; 
+			EQUALS151=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsFieldGroupExactPhrase5482); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_EQUALS.add(EQUALS151);
 
-			pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupExactPhrase5454);
+			pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupExactPhrase5484);
 			ftsFieldGroupExactPhrase152=ftsFieldGroupExactPhrase();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -20323,10 +8974,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:710:9: ( TILDA ftsFieldGroupExactPhrase -> ftsFieldGroupExactPhrase )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:711:9: TILDA ftsFieldGroupExactPhrase
 			{
-			TILDA153=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsFieldGroupTokenisedPhrase5515); if (state.failed) return retval; 
+			TILDA153=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsFieldGroupTokenisedPhrase5545); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_TILDA.add(TILDA153);
 
-			pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTokenisedPhrase5517);
+			pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTokenisedPhrase5547);
 			ftsFieldGroupExactPhrase154=ftsFieldGroupExactPhrase();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -20401,10 +9052,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:716:9: ( TILDA ftsFieldGroupTerm -> ftsFieldGroupTerm )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:717:9: TILDA ftsFieldGroupTerm
 			{
-			TILDA155=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsFieldGroupSynonym5570); if (state.failed) return retval; 
+			TILDA155=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsFieldGroupSynonym5600); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_TILDA.add(TILDA155);
 
-			pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym5572);
+			pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym5602);
 			ftsFieldGroupTerm156=ftsFieldGroupTerm();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -20479,7 +9130,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:722:9: ( ftsFieldGroupProximityTerm ( ( proximityGroup )=> proximityGroup ftsFieldGroupProximityTerm )+ -> ftsFieldGroupProximityTerm ( proximityGroup ftsFieldGroupProximityTerm )+ )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:723:9: ftsFieldGroupProximityTerm ( ( proximityGroup )=> proximityGroup ftsFieldGroupProximityTerm )+
 			{
-			pushFollow(FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5625);
+			pushFollow(FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5655);
 			ftsFieldGroupProximityTerm157=ftsFieldGroupProximityTerm();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -20495,7 +9146,7 @@ public class FTSParser extends Parser {
 					case NOT:
 						{
 						int LA61_3 = input.LA(3);
-						if ( (synpred26_FTS()) ) {
+						if ( (synpred31_FTS()) ) {
 							alt61=1;
 						}
 
@@ -20504,7 +9155,7 @@ public class FTSParser extends Parser {
 					case ID:
 						{
 						int LA61_4 = input.LA(3);
-						if ( (synpred26_FTS()) ) {
+						if ( (synpred31_FTS()) ) {
 							alt61=1;
 						}
 
@@ -20513,7 +9164,7 @@ public class FTSParser extends Parser {
 					case TO:
 						{
 						int LA61_5 = input.LA(3);
-						if ( (synpred26_FTS()) ) {
+						if ( (synpred31_FTS()) ) {
 							alt61=1;
 						}
 
@@ -20527,7 +9178,7 @@ public class FTSParser extends Parser {
 					case FTSWORD:
 						{
 						int LA61_6 = input.LA(3);
-						if ( (synpred26_FTS()) ) {
+						if ( (synpred31_FTS()) ) {
 							alt61=1;
 						}
 
@@ -20543,7 +9194,7 @@ public class FTSParser extends Parser {
 								case NOT:
 									{
 									int LA61_12 = input.LA(6);
-									if ( (synpred26_FTS()) ) {
+									if ( (synpred31_FTS()) ) {
 										alt61=1;
 									}
 
@@ -20552,7 +9203,7 @@ public class FTSParser extends Parser {
 								case ID:
 									{
 									int LA61_13 = input.LA(6);
-									if ( (synpred26_FTS()) ) {
+									if ( (synpred31_FTS()) ) {
 										alt61=1;
 									}
 
@@ -20561,7 +9212,7 @@ public class FTSParser extends Parser {
 								case TO:
 									{
 									int LA61_14 = input.LA(6);
-									if ( (synpred26_FTS()) ) {
+									if ( (synpred31_FTS()) ) {
 										alt61=1;
 									}
 
@@ -20575,7 +9226,7 @@ public class FTSParser extends Parser {
 								case FTSWORD:
 									{
 									int LA61_15 = input.LA(6);
-									if ( (synpred26_FTS()) ) {
+									if ( (synpred31_FTS()) ) {
 										alt61=1;
 									}
 
@@ -20585,7 +9236,7 @@ public class FTSParser extends Parser {
 							}
 
 						}
-						else if ( (LA61_7==RPAREN) && (synpred26_FTS())) {
+						else if ( (LA61_7==RPAREN) && (synpred31_FTS())) {
 							alt61=1;
 						}
 
@@ -20598,12 +9249,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:723:38: ( proximityGroup )=> proximityGroup ftsFieldGroupProximityTerm
 					{
-					pushFollow(FOLLOW_proximityGroup_in_ftsFieldGroupProximity5635);
+					pushFollow(FOLLOW_proximityGroup_in_ftsFieldGroupProximity5665);
 					proximityGroup158=proximityGroup();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_proximityGroup.add(proximityGroup158.getTree());
-					pushFollow(FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5637);
+					pushFollow(FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5667);
 					ftsFieldGroupProximityTerm159=ftsFieldGroupProximityTerm();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -20768,7 +9419,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:741:9: ( STAR ( LPAREN ( DECIMAL_INTEGER_LITERAL )? RPAREN )? -> ^( PROXIMITY ( DECIMAL_INTEGER_LITERAL )? ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:742:9: STAR ( LPAREN ( DECIMAL_INTEGER_LITERAL )? RPAREN )?
 			{
-			STAR161=(Token)match(input,STAR,FOLLOW_STAR_in_proximityGroup5830); if (state.failed) return retval; 
+			STAR161=(Token)match(input,STAR,FOLLOW_STAR_in_proximityGroup5860); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_STAR.add(STAR161);
 
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:742:14: ( LPAREN ( DECIMAL_INTEGER_LITERAL )? RPAREN )?
@@ -20781,7 +9432,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:742:15: LPAREN ( DECIMAL_INTEGER_LITERAL )? RPAREN
 					{
-					LPAREN162=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_proximityGroup5833); if (state.failed) return retval; 
+					LPAREN162=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_proximityGroup5863); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN162);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:742:22: ( DECIMAL_INTEGER_LITERAL )?
@@ -20794,7 +9445,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:742:22: DECIMAL_INTEGER_LITERAL
 							{
-							DECIMAL_INTEGER_LITERAL163=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_proximityGroup5835); if (state.failed) return retval; 
+							DECIMAL_INTEGER_LITERAL163=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_proximityGroup5865); if (state.failed) return retval; 
 							if ( state.backtracking==0 ) stream_DECIMAL_INTEGER_LITERAL.add(DECIMAL_INTEGER_LITERAL163);
 
 							}
@@ -20802,7 +9453,7 @@ public class FTSParser extends Parser {
 
 					}
 
-					RPAREN164=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_proximityGroup5838); if (state.failed) return retval; 
+					RPAREN164=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_proximityGroup5868); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN164);
 
 					}
@@ -20920,15 +9571,15 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:749:9: ftsRangeWord DOTDOT ftsRangeWord
 					{
-					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5922);
+					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5952);
 					ftsRangeWord165=ftsRangeWord();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsRangeWord.add(ftsRangeWord165.getTree());
-					DOTDOT166=(Token)match(input,DOTDOT,FOLLOW_DOTDOT_in_ftsFieldGroupRange5924); if (state.failed) return retval; 
+					DOTDOT166=(Token)match(input,DOTDOT,FOLLOW_DOTDOT_in_ftsFieldGroupRange5954); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_DOTDOT.add(DOTDOT166);
 
-					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5926);
+					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5956);
 					ftsRangeWord167=ftsRangeWord();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -20962,25 +9613,25 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:751:11: range_left ftsRangeWord TO ftsRangeWord range_right
 					{
-					pushFollow(FOLLOW_range_left_in_ftsFieldGroupRange5964);
+					pushFollow(FOLLOW_range_left_in_ftsFieldGroupRange5994);
 					range_left168=range_left();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_range_left.add(range_left168.getTree());
-					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5966);
+					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5996);
 					ftsRangeWord169=ftsRangeWord();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsRangeWord.add(ftsRangeWord169.getTree());
-					TO170=(Token)match(input,TO,FOLLOW_TO_in_ftsFieldGroupRange5968); if (state.failed) return retval; 
+					TO170=(Token)match(input,TO,FOLLOW_TO_in_ftsFieldGroupRange5998); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_TO.add(TO170);
 
-					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5970);
+					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6000);
 					ftsRangeWord171=ftsRangeWord();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsRangeWord.add(ftsRangeWord171.getTree());
-					pushFollow(FOLLOW_range_right_in_ftsFieldGroupRange5972);
+					pushFollow(FOLLOW_range_right_in_ftsFieldGroupRange6002);
 					range_right172=range_right();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -21079,7 +9730,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:757:9: LSQUARE
 					{
-					LSQUARE173=(Token)match(input,LSQUARE,FOLLOW_LSQUARE_in_range_left6031); if (state.failed) return retval; 
+					LSQUARE173=(Token)match(input,LSQUARE,FOLLOW_LSQUARE_in_range_left6061); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LSQUARE.add(LSQUARE173);
 
 					// AST REWRITE
@@ -21108,7 +9759,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:759:11: LT
 					{
-					LT174=(Token)match(input,LT,FOLLOW_LT_in_range_left6063); if (state.failed) return retval; 
+					LT174=(Token)match(input,LT,FOLLOW_LT_in_range_left6093); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LT.add(LT174);
 
 					// AST REWRITE
@@ -21202,7 +9853,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:765:9: RSQUARE
 					{
-					RSQUARE175=(Token)match(input,RSQUARE,FOLLOW_RSQUARE_in_range_right6116); if (state.failed) return retval; 
+					RSQUARE175=(Token)match(input,RSQUARE,FOLLOW_RSQUARE_in_range_right6146); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_RSQUARE.add(RSQUARE175);
 
 					// AST REWRITE
@@ -21231,7 +9882,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:767:11: GT
 					{
-					GT176=(Token)match(input,GT,FOLLOW_GT_in_range_right6148); if (state.failed) return retval; 
+					GT176=(Token)match(input,GT,FOLLOW_GT_in_range_right6178); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_GT.add(GT176);
 
 					// AST REWRITE
@@ -21320,7 +9971,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:775:9: AT
 					{
-					AT177=(Token)match(input,AT,FOLLOW_AT_in_fieldReference6204); if (state.failed) return retval; 
+					AT177=(Token)match(input,AT,FOLLOW_AT_in_fieldReference6234); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_AT.add(AT177);
 
 					}
@@ -21346,30 +9997,30 @@ public class FTSParser extends Parser {
 										int LA68_16 = input.LA(7);
 										if ( (LA68_16==ID) ) {
 											int LA68_18 = input.LA(8);
-											if ( (synpred27_FTS()) ) {
+											if ( (synpred32_FTS()) ) {
 												alt68=1;
 											}
 										}
 									}
-									else if ( (LA68_11==COLON) && (synpred27_FTS())) {
+									else if ( (LA68_11==COLON) && (synpred32_FTS())) {
 										alt68=1;
 									}
 								}
 								else if ( (LA68_8==TO) ) {
 									int LA68_12 = input.LA(6);
-									if ( (LA68_12==COLON) && (synpred27_FTS())) {
+									if ( (LA68_12==COLON) && (synpred32_FTS())) {
 										alt68=1;
 									}
 								}
-								else if ( (LA68_8==OR) && (synpred27_FTS())) {
+								else if ( (LA68_8==OR) && (synpred32_FTS())) {
 									alt68=1;
 								}
-								else if ( (LA68_8==AND) && (synpred27_FTS())) {
+								else if ( (LA68_8==AND) && (synpred32_FTS())) {
 									alt68=1;
 								}
 								else if ( (LA68_8==NOT) ) {
 									int LA68_15 = input.LA(6);
-									if ( (LA68_15==COLON) && (synpred27_FTS())) {
+									if ( (LA68_15==COLON) && (synpred32_FTS())) {
 										alt68=1;
 									}
 								}
@@ -21384,30 +10035,30 @@ public class FTSParser extends Parser {
 								int LA68_16 = input.LA(5);
 								if ( (LA68_16==ID) ) {
 									int LA68_18 = input.LA(6);
-									if ( (synpred27_FTS()) ) {
+									if ( (synpred32_FTS()) ) {
 										alt68=1;
 									}
 								}
 							}
-							else if ( (LA68_11==COLON) && (synpred27_FTS())) {
+							else if ( (LA68_11==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
 						else if ( (LA68_8==TO) ) {
 							int LA68_12 = input.LA(4);
-							if ( (LA68_12==COLON) && (synpred27_FTS())) {
+							if ( (LA68_12==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
-						else if ( (LA68_8==OR) && (synpred27_FTS())) {
+						else if ( (LA68_8==OR) && (synpred32_FTS())) {
 							alt68=1;
 						}
-						else if ( (LA68_8==AND) && (synpred27_FTS())) {
+						else if ( (LA68_8==AND) && (synpred32_FTS())) {
 							alt68=1;
 						}
 						else if ( (LA68_8==NOT) ) {
 							int LA68_15 = input.LA(4);
-							if ( (LA68_15==COLON) && (synpred27_FTS())) {
+							if ( (LA68_15==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
@@ -21425,30 +10076,30 @@ public class FTSParser extends Parser {
 								int LA68_16 = input.LA(5);
 								if ( (LA68_16==ID) ) {
 									int LA68_18 = input.LA(6);
-									if ( (synpred27_FTS()) ) {
+									if ( (synpred32_FTS()) ) {
 										alt68=1;
 									}
 								}
 							}
-							else if ( (LA68_11==COLON) && (synpred27_FTS())) {
+							else if ( (LA68_11==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
 						else if ( (LA68_8==TO) ) {
 							int LA68_12 = input.LA(4);
-							if ( (LA68_12==COLON) && (synpred27_FTS())) {
+							if ( (LA68_12==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
-						else if ( (LA68_8==OR) && (synpred27_FTS())) {
+						else if ( (LA68_8==OR) && (synpred32_FTS())) {
 							alt68=1;
 						}
-						else if ( (LA68_8==AND) && (synpred27_FTS())) {
+						else if ( (LA68_8==AND) && (synpred32_FTS())) {
 							alt68=1;
 						}
 						else if ( (LA68_8==NOT) ) {
 							int LA68_15 = input.LA(4);
-							if ( (LA68_15==COLON) && (synpred27_FTS())) {
+							if ( (LA68_15==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
@@ -21466,30 +10117,30 @@ public class FTSParser extends Parser {
 								int LA68_16 = input.LA(5);
 								if ( (LA68_16==ID) ) {
 									int LA68_18 = input.LA(6);
-									if ( (synpred27_FTS()) ) {
+									if ( (synpred32_FTS()) ) {
 										alt68=1;
 									}
 								}
 							}
-							else if ( (LA68_11==COLON) && (synpred27_FTS())) {
+							else if ( (LA68_11==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
 						else if ( (LA68_8==TO) ) {
 							int LA68_12 = input.LA(4);
-							if ( (LA68_12==COLON) && (synpred27_FTS())) {
+							if ( (LA68_12==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
-						else if ( (LA68_8==OR) && (synpred27_FTS())) {
+						else if ( (LA68_8==OR) && (synpred32_FTS())) {
 							alt68=1;
 						}
-						else if ( (LA68_8==AND) && (synpred27_FTS())) {
+						else if ( (LA68_8==AND) && (synpred32_FTS())) {
 							alt68=1;
 						}
 						else if ( (LA68_8==NOT) ) {
 							int LA68_15 = input.LA(4);
-							if ( (LA68_15==COLON) && (synpred27_FTS())) {
+							if ( (LA68_15==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
@@ -21507,30 +10158,30 @@ public class FTSParser extends Parser {
 								int LA68_16 = input.LA(5);
 								if ( (LA68_16==ID) ) {
 									int LA68_18 = input.LA(6);
-									if ( (synpred27_FTS()) ) {
+									if ( (synpred32_FTS()) ) {
 										alt68=1;
 									}
 								}
 							}
-							else if ( (LA68_11==COLON) && (synpred27_FTS())) {
+							else if ( (LA68_11==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
 						else if ( (LA68_8==TO) ) {
 							int LA68_12 = input.LA(4);
-							if ( (LA68_12==COLON) && (synpred27_FTS())) {
+							if ( (LA68_12==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
-						else if ( (LA68_8==OR) && (synpred27_FTS())) {
+						else if ( (LA68_8==OR) && (synpred32_FTS())) {
 							alt68=1;
 						}
-						else if ( (LA68_8==AND) && (synpred27_FTS())) {
+						else if ( (LA68_8==AND) && (synpred32_FTS())) {
 							alt68=1;
 						}
 						else if ( (LA68_8==NOT) ) {
 							int LA68_15 = input.LA(4);
-							if ( (LA68_15==COLON) && (synpred27_FTS())) {
+							if ( (LA68_15==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
@@ -21548,30 +10199,30 @@ public class FTSParser extends Parser {
 								int LA68_16 = input.LA(5);
 								if ( (LA68_16==ID) ) {
 									int LA68_18 = input.LA(6);
-									if ( (synpred27_FTS()) ) {
+									if ( (synpred32_FTS()) ) {
 										alt68=1;
 									}
 								}
 							}
-							else if ( (LA68_11==COLON) && (synpred27_FTS())) {
+							else if ( (LA68_11==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
 						else if ( (LA68_8==TO) ) {
 							int LA68_12 = input.LA(4);
-							if ( (LA68_12==COLON) && (synpred27_FTS())) {
+							if ( (LA68_12==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
-						else if ( (LA68_8==OR) && (synpred27_FTS())) {
+						else if ( (LA68_8==OR) && (synpred32_FTS())) {
 							alt68=1;
 						}
-						else if ( (LA68_8==AND) && (synpred27_FTS())) {
+						else if ( (LA68_8==AND) && (synpred32_FTS())) {
 							alt68=1;
 						}
 						else if ( (LA68_8==NOT) ) {
 							int LA68_15 = input.LA(4);
-							if ( (LA68_15==COLON) && (synpred27_FTS())) {
+							if ( (LA68_15==COLON) && (synpred32_FTS())) {
 								alt68=1;
 							}
 						}
@@ -21588,7 +10239,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:777:19: ( prefix )=> prefix
 					{
-					pushFollow(FOLLOW_prefix_in_fieldReference6241);
+					pushFollow(FOLLOW_prefix_in_fieldReference6271);
 					prefix178=prefix();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -21598,7 +10249,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:778:19: uri
 					{
-					pushFollow(FOLLOW_uri_in_fieldReference6261);
+					pushFollow(FOLLOW_uri_in_fieldReference6291);
 					uri179=uri();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -21608,7 +10259,7 @@ public class FTSParser extends Parser {
 
 			}
 
-			pushFollow(FOLLOW_identifier_in_fieldReference6282);
+			pushFollow(FOLLOW_identifier_in_fieldReference6312);
 			identifier180=identifier();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -21716,7 +10367,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:787:9: AT
 					{
-					AT181=(Token)match(input,AT,FOLLOW_AT_in_tempReference6369); if (state.failed) return retval; 
+					AT181=(Token)match(input,AT,FOLLOW_AT_in_tempReference6399); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_AT.add(AT181);
 
 					}
@@ -21786,7 +10437,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:789:17: prefix
 					{
-					pushFollow(FOLLOW_prefix_in_tempReference6398);
+					pushFollow(FOLLOW_prefix_in_tempReference6428);
 					prefix182=prefix();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -21796,7 +10447,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:790:19: uri
 					{
-					pushFollow(FOLLOW_uri_in_tempReference6418);
+					pushFollow(FOLLOW_uri_in_tempReference6448);
 					uri183=uri();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -21806,7 +10457,7 @@ public class FTSParser extends Parser {
 
 			}
 
-			pushFollow(FOLLOW_identifier_in_tempReference6439);
+			pushFollow(FOLLOW_identifier_in_tempReference6469);
 			identifier184=identifier();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -21900,12 +10551,12 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:798:9: ( identifier COLON -> ^( PREFIX identifier ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:799:9: identifier COLON
 			{
-			pushFollow(FOLLOW_identifier_in_prefix6526);
+			pushFollow(FOLLOW_identifier_in_prefix6556);
 			identifier185=identifier();
 			state._fsp--;
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_identifier.add(identifier185.getTree());
-			COLON186=(Token)match(input,COLON,FOLLOW_COLON_in_prefix6528); if (state.failed) return retval; 
+			COLON186=(Token)match(input,COLON,FOLLOW_COLON_in_prefix6558); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_COLON.add(COLON186);
 
 			// AST REWRITE
@@ -21983,7 +10634,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:805:9: ( URI -> ^( NAME_SPACE URI ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:806:9: URI
 			{
-			URI187=(Token)match(input,URI,FOLLOW_URI_in_uri6609); if (state.failed) return retval; 
+			URI187=(Token)match(input,URI,FOLLOW_URI_in_uri6639); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_URI.add(URI187);
 
 			// AST REWRITE
@@ -22087,7 +10738,7 @@ public class FTSParser extends Parser {
 					int LA71_6 = input.LA(3);
 					if ( (LA71_6==ID) ) {
 						int LA71_8 = input.LA(4);
-						if ( (synpred28_FTS()) ) {
+						if ( (synpred33_FTS()) ) {
 							alt71=1;
 						}
 						else if ( (true) ) {
@@ -22164,13 +10815,13 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:813:9: ( ID DOT ID )=>id1= ID DOT id2= ID
 					{
-					id1=(Token)match(input,ID,FOLLOW_ID_in_identifier6711); if (state.failed) return retval; 
+					id1=(Token)match(input,ID,FOLLOW_ID_in_identifier6741); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_ID.add(id1);
 
-					DOT188=(Token)match(input,DOT,FOLLOW_DOT_in_identifier6713); if (state.failed) return retval; 
+					DOT188=(Token)match(input,DOT,FOLLOW_DOT_in_identifier6743); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_DOT.add(DOT188);
 
-					id2=(Token)match(input,ID,FOLLOW_ID_in_identifier6717); if (state.failed) return retval; 
+					id2=(Token)match(input,ID,FOLLOW_ID_in_identifier6747); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_ID.add(id2);
 
 					// AST REWRITE
@@ -22199,7 +10850,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:817:12: ID
 					{
-					ID189=(Token)match(input,ID,FOLLOW_ID_in_identifier6766); if (state.failed) return retval; 
+					ID189=(Token)match(input,ID,FOLLOW_ID_in_identifier6796); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_ID.add(ID189);
 
 					// AST REWRITE
@@ -22228,7 +10879,7 @@ public class FTSParser extends Parser {
 				case 3 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:821:12: TO
 					{
-					TO190=(Token)match(input,TO,FOLLOW_TO_in_identifier6833); if (state.failed) return retval; 
+					TO190=(Token)match(input,TO,FOLLOW_TO_in_identifier6863); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_TO.add(TO190);
 
 					// AST REWRITE
@@ -22257,7 +10908,7 @@ public class FTSParser extends Parser {
 				case 4 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:823:12: OR
 					{
-					OR191=(Token)match(input,OR,FOLLOW_OR_in_identifier6871); if (state.failed) return retval; 
+					OR191=(Token)match(input,OR,FOLLOW_OR_in_identifier6901); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_OR.add(OR191);
 
 					// AST REWRITE
@@ -22286,7 +10937,7 @@ public class FTSParser extends Parser {
 				case 5 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:825:12: AND
 					{
-					AND192=(Token)match(input,AND,FOLLOW_AND_in_identifier6909); if (state.failed) return retval; 
+					AND192=(Token)match(input,AND,FOLLOW_AND_in_identifier6939); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_AND.add(AND192);
 
 					// AST REWRITE
@@ -22315,7 +10966,7 @@ public class FTSParser extends Parser {
 				case 6 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:827:12: NOT
 					{
-					NOT193=(Token)match(input,NOT,FOLLOW_NOT_in_identifier6948); if (state.failed) return retval; 
+					NOT193=(Token)match(input,NOT,FOLLOW_NOT_in_identifier6978); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_NOT.add(NOT193);
 
 					// AST REWRITE
@@ -22552,7 +11203,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7072);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7102);
 					ftsWordBase195=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22570,7 +11221,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7080);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7110);
 					ftsWordBase197=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22588,7 +11239,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7088);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7118);
 					ftsWordBase199=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22606,7 +11257,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7096);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7126);
 					ftsWordBase201=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22624,7 +11275,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7104);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7134);
 					ftsWordBase203=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22638,7 +11289,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7164);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7194);
 					ftsWordBase204=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22656,7 +11307,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7172);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7202);
 					ftsWordBase206=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22674,7 +11325,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7180);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7210);
 					ftsWordBase208=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22692,7 +11343,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7188);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7218);
 					ftsWordBase210=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22710,7 +11361,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7196);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7226);
 					ftsWordBase212=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22736,7 +11387,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7269);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7299);
 					ftsWordBase214=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22754,7 +11405,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7277);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7307);
 					ftsWordBase216=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22772,7 +11423,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7285);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7315);
 					ftsWordBase218=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22790,7 +11441,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7293);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7323);
 					ftsWordBase220=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22816,7 +11467,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7359);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7389);
 					ftsWordBase222=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22834,7 +11485,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7367);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7397);
 					ftsWordBase224=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22852,7 +11503,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7375);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7405);
 					ftsWordBase226=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22870,7 +11521,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7383);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7413);
 					ftsWordBase228=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22908,7 +11559,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7456);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7486);
 					ftsWordBase231=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22926,7 +11577,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7464);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7494);
 					ftsWordBase233=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22944,7 +11595,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7472);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7502);
 					ftsWordBase235=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22962,7 +11613,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7480);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7510);
 					ftsWordBase237=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22976,7 +11627,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7534);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7564);
 					ftsWordBase238=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -22994,7 +11645,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7542);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7572);
 					ftsWordBase240=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23012,7 +11663,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7550);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7580);
 					ftsWordBase242=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23030,7 +11681,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7558);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7588);
 					ftsWordBase244=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23056,7 +11707,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7622);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7652);
 					ftsWordBase246=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23074,7 +11725,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7630);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7660);
 					ftsWordBase248=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23092,7 +11743,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7638);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7668);
 					ftsWordBase250=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23118,7 +11769,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7696);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7726);
 					ftsWordBase252=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23136,7 +11787,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7704);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7734);
 					ftsWordBase254=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23154,7 +11805,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7712);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7742);
 					ftsWordBase256=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23192,7 +11843,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7776);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7806);
 					ftsWordBase259=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23210,7 +11861,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7784);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7814);
 					ftsWordBase261=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23228,7 +11879,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7792);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7822);
 					ftsWordBase263=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23242,7 +11893,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7838);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7868);
 					ftsWordBase264=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23260,7 +11911,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7846);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7876);
 					ftsWordBase266=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23278,7 +11929,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7854);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7884);
 					ftsWordBase268=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23304,7 +11955,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7911);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7941);
 					ftsWordBase270=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23322,7 +11973,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7919);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7949);
 					ftsWordBase272=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23348,7 +11999,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7970);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8000);
 					ftsWordBase274=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23366,7 +12017,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7978);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8008);
 					ftsWordBase276=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23404,7 +12055,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8035);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8065);
 					ftsWordBase279=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23422,7 +12073,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8043);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8073);
 					ftsWordBase281=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23436,7 +12087,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8081);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8111);
 					ftsWordBase282=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23454,7 +12105,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8089);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8119);
 					ftsWordBase284=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23480,7 +12131,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8137);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8167);
 					ftsWordBase286=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23506,7 +12157,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8179);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8209);
 					ftsWordBase288=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23544,7 +12195,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8203);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8233);
 					ftsWordBase291=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23558,7 +12209,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8216);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8246);
 					ftsWordBase292=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -23820,7 +12471,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					OR296=(Token)match(input,OR,FOLLOW_OR_in_or8581); if (state.failed) return retval;
+					OR296=(Token)match(input,OR,FOLLOW_OR_in_or8611); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					OR296_tree = (Object)adaptor.create(OR296);
 					adaptor.addChild(root_0, OR296_tree);
@@ -23834,13 +12485,13 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					BAR297=(Token)match(input,BAR,FOLLOW_BAR_in_or8593); if (state.failed) return retval;
+					BAR297=(Token)match(input,BAR,FOLLOW_BAR_in_or8623); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					BAR297_tree = (Object)adaptor.create(BAR297);
 					adaptor.addChild(root_0, BAR297_tree);
 					}
 
-					BAR298=(Token)match(input,BAR,FOLLOW_BAR_in_or8595); if (state.failed) return retval;
+					BAR298=(Token)match(input,BAR,FOLLOW_BAR_in_or8625); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					BAR298_tree = (Object)adaptor.create(BAR298);
 					adaptor.addChild(root_0, BAR298_tree);
@@ -23919,7 +12570,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					AND299=(Token)match(input,AND,FOLLOW_AND_in_and8628); if (state.failed) return retval;
+					AND299=(Token)match(input,AND,FOLLOW_AND_in_and8658); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					AND299_tree = (Object)adaptor.create(AND299);
 					adaptor.addChild(root_0, AND299_tree);
@@ -23933,13 +12584,13 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					AMP300=(Token)match(input,AMP,FOLLOW_AMP_in_and8640); if (state.failed) return retval;
+					AMP300=(Token)match(input,AMP,FOLLOW_AMP_in_and8670); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					AMP300_tree = (Object)adaptor.create(AMP300);
 					adaptor.addChild(root_0, AMP300_tree);
 					}
 
-					AMP301=(Token)match(input,AMP,FOLLOW_AMP_in_and8642); if (state.failed) return retval;
+					AMP301=(Token)match(input,AMP,FOLLOW_AMP_in_and8672); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					AMP301_tree = (Object)adaptor.create(AMP301);
 					adaptor.addChild(root_0, AMP301_tree);
@@ -24062,15 +12713,13 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred3_FTS
 	public final void synpred3_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:512:9: ( fieldReference COLON )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:512:10: fieldReference COLON
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:451:12: ( ftsTermOrPhrase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:451:13: ftsTermOrPhrase
 		{
-		pushFollow(FOLLOW_fieldReference_in_synpred3_FTS2635);
-		fieldReference();
+		pushFollow(FOLLOW_ftsTermOrPhrase_in_synpred3_FTS1823);
+		ftsTermOrPhrase();
 		state._fsp--;
 		if (state.failed) return;
-
-		match(input,COLON,FOLLOW_COLON_in_synpred3_FTS2637); if (state.failed) return;
 
 		}
 
@@ -24079,11 +12728,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred4_FTS
 	public final void synpred4_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:514:28: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:514:29: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:453:12: ( ftsExactTermOrPhrase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:453:13: ftsExactTermOrPhrase
 		{
-		pushFollow(FOLLOW_slop_in_synpred4_FTS2676);
-		slop();
+		pushFollow(FOLLOW_ftsExactTermOrPhrase_in_synpred4_FTS1852);
+		ftsExactTermOrPhrase();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24094,11 +12743,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred5_FTS
 	public final void synpred5_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:517:26: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:517:27: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:455:12: ( ftsTokenisedTermOrPhrase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:455:13: ftsTokenisedTermOrPhrase
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred5_FTS2751);
-		fuzzy();
+		pushFollow(FOLLOW_ftsTokenisedTermOrPhrase_in_synpred5_FTS1882);
+		ftsTokenisedTermOrPhrase();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24109,11 +12758,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred6_FTS
 	public final void synpred6_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:521:20: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:521:21: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:457:12: ( ftsRange )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:457:13: ftsRange
 		{
-		pushFollow(FOLLOW_slop_in_synpred6_FTS2821);
-		slop();
+		pushFollow(FOLLOW_ftsRange_in_synpred6_FTS1911);
+		ftsRange();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24124,11 +12773,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred7_FTS
 	public final void synpred7_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:524:18: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:524:19: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:461:12: ( ftsFieldGroup )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:461:13: ftsFieldGroup
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred7_FTS2879);
-		fuzzy();
+		pushFollow(FOLLOW_ftsFieldGroup_in_synpred7_FTS1990);
+		ftsFieldGroup();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24139,15 +12788,15 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred8_FTS
 	public final void synpred8_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:533:9: ( fieldReference COLON )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:533:10: fieldReference COLON
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:512:9: ( fieldReference COLON )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:512:10: fieldReference COLON
 		{
-		pushFollow(FOLLOW_fieldReference_in_synpred8_FTS2984);
+		pushFollow(FOLLOW_fieldReference_in_synpred8_FTS2665);
 		fieldReference();
 		state._fsp--;
 		if (state.failed) return;
 
-		match(input,COLON,FOLLOW_COLON_in_synpred8_FTS2986); if (state.failed) return;
+		match(input,COLON,FOLLOW_COLON_in_synpred8_FTS2667); if (state.failed) return;
 
 		}
 
@@ -24156,10 +12805,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred9_FTS
 	public final void synpred9_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:535:28: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:535:29: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:514:28: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:514:29: slop
 		{
-		pushFollow(FOLLOW_slop_in_synpred9_FTS3025);
+		pushFollow(FOLLOW_slop_in_synpred9_FTS2706);
 		slop();
 		state._fsp--;
 		if (state.failed) return;
@@ -24171,10 +12820,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred10_FTS
 	public final void synpred10_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:538:26: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:538:27: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:517:26: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:517:27: fuzzy
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred10_FTS3100);
+		pushFollow(FOLLOW_fuzzy_in_synpred10_FTS2781);
 		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
@@ -24186,10 +12835,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred11_FTS
 	public final void synpred11_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:542:20: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:542:21: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:521:20: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:521:21: slop
 		{
-		pushFollow(FOLLOW_slop_in_synpred11_FTS3170);
+		pushFollow(FOLLOW_slop_in_synpred11_FTS2851);
 		slop();
 		state._fsp--;
 		if (state.failed) return;
@@ -24201,10 +12850,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred12_FTS
 	public final void synpred12_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:545:18: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:545:19: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:524:18: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:524:19: fuzzy
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred12_FTS3228);
+		pushFollow(FOLLOW_fuzzy_in_synpred12_FTS2909);
 		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
@@ -24216,15 +12865,15 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred13_FTS
 	public final void synpred13_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:555:9: ( fieldReference COLON )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:555:10: fieldReference COLON
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:533:9: ( fieldReference COLON )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:533:10: fieldReference COLON
 		{
-		pushFollow(FOLLOW_fieldReference_in_synpred13_FTS3335);
+		pushFollow(FOLLOW_fieldReference_in_synpred13_FTS3014);
 		fieldReference();
 		state._fsp--;
 		if (state.failed) return;
 
-		match(input,COLON,FOLLOW_COLON_in_synpred13_FTS3337); if (state.failed) return;
+		match(input,COLON,FOLLOW_COLON_in_synpred13_FTS3016); if (state.failed) return;
 
 		}
 
@@ -24233,10 +12882,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred14_FTS
 	public final void synpred14_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:557:28: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:557:29: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:535:28: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:535:29: slop
 		{
-		pushFollow(FOLLOW_slop_in_synpred14_FTS3376);
+		pushFollow(FOLLOW_slop_in_synpred14_FTS3055);
 		slop();
 		state._fsp--;
 		if (state.failed) return;
@@ -24248,10 +12897,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred15_FTS
 	public final void synpred15_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:560:26: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:560:27: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:538:26: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:538:27: fuzzy
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred15_FTS3451);
+		pushFollow(FOLLOW_fuzzy_in_synpred15_FTS3130);
 		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
@@ -24263,10 +12912,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred16_FTS
 	public final void synpred16_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:564:20: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:564:21: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:542:20: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:542:21: slop
 		{
-		pushFollow(FOLLOW_slop_in_synpred16_FTS3521);
+		pushFollow(FOLLOW_slop_in_synpred16_FTS3200);
 		slop();
 		state._fsp--;
 		if (state.failed) return;
@@ -24278,10 +12927,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred17_FTS
 	public final void synpred17_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:567:18: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:567:19: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:545:18: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:545:19: fuzzy
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred17_FTS3579);
+		pushFollow(FOLLOW_fuzzy_in_synpred17_FTS3258);
 		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
@@ -24293,13 +12942,15 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred18_FTS
 	public final void synpred18_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:640:9: ( not )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:640:10: not
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:555:9: ( fieldReference COLON )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:555:10: fieldReference COLON
 		{
-		pushFollow(FOLLOW_not_in_synpred18_FTS4326);
-		not();
+		pushFollow(FOLLOW_fieldReference_in_synpred18_FTS3365);
+		fieldReference();
 		state._fsp--;
 		if (state.failed) return;
+
+		match(input,COLON,FOLLOW_COLON_in_synpred18_FTS3367); if (state.failed) return;
 
 		}
 
@@ -24308,11 +12959,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred19_FTS
 	public final void synpred19_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:659:9: ( ftsFieldGroupProximity )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:659:10: ftsFieldGroupProximity
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:557:28: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:557:29: slop
 		{
-		pushFollow(FOLLOW_ftsFieldGroupProximity_in_synpred19_FTS4691);
-		ftsFieldGroupProximity();
+		pushFollow(FOLLOW_slop_in_synpred19_FTS3406);
+		slop();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24323,10 +12974,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred20_FTS
 	public final void synpred20_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:662:31: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:662:32: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:560:26: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:560:27: fuzzy
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred20_FTS4761);
+		pushFollow(FOLLOW_fuzzy_in_synpred20_FTS3481);
 		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
@@ -24338,11 +12989,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred21_FTS
 	public final void synpred21_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:665:36: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:665:37: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:564:20: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:564:21: slop
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred21_FTS4836);
-		fuzzy();
+		pushFollow(FOLLOW_slop_in_synpred21_FTS3551);
+		slop();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24353,11 +13004,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred22_FTS
 	public final void synpred22_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:668:33: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:668:34: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:567:18: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:567:19: fuzzy
 		{
-		pushFollow(FOLLOW_slop_in_synpred22_FTS4911);
-		slop();
+		pushFollow(FOLLOW_fuzzy_in_synpred22_FTS3609);
+		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24368,11 +13019,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred23_FTS
 	public final void synpred23_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:671:38: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:671:39: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:640:9: ( not )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:640:10: not
 		{
-		pushFollow(FOLLOW_slop_in_synpred23_FTS4986);
-		slop();
+		pushFollow(FOLLOW_not_in_synpred23_FTS4356);
+		not();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24383,11 +13034,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred24_FTS
 	public final void synpred24_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:674:42: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:674:43: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:659:9: ( ftsFieldGroupProximity )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:659:10: ftsFieldGroupProximity
 		{
-		pushFollow(FOLLOW_slop_in_synpred24_FTS5061);
-		slop();
+		pushFollow(FOLLOW_ftsFieldGroupProximity_in_synpred24_FTS4721);
+		ftsFieldGroupProximity();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24398,10 +13049,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred25_FTS
 	public final void synpred25_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:677:34: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:677:35: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:662:31: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:662:32: fuzzy
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred25_FTS5136);
+		pushFollow(FOLLOW_fuzzy_in_synpred25_FTS4791);
 		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
@@ -24413,11 +13064,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred26_FTS
 	public final void synpred26_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:723:38: ( proximityGroup )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:723:39: proximityGroup
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:665:36: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:665:37: fuzzy
 		{
-		pushFollow(FOLLOW_proximityGroup_in_synpred26_FTS5630);
-		proximityGroup();
+		pushFollow(FOLLOW_fuzzy_in_synpred26_FTS4866);
+		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24428,11 +13079,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred27_FTS
 	public final void synpred27_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:777:19: ( prefix )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:777:20: prefix
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:668:33: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:668:34: slop
 		{
-		pushFollow(FOLLOW_prefix_in_synpred27_FTS6236);
-		prefix();
+		pushFollow(FOLLOW_slop_in_synpred27_FTS4941);
+		slop();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -24443,14 +13094,13 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred28_FTS
 	public final void synpred28_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:813:9: ( ID DOT ID )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:813:10: ID DOT ID
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:671:38: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:671:39: slop
 		{
-		match(input,ID,FOLLOW_ID_in_synpred28_FTS6691); if (state.failed) return;
-
-		match(input,DOT,FOLLOW_DOT_in_synpred28_FTS6693); if (state.failed) return;
-
-		match(input,ID,FOLLOW_ID_in_synpred28_FTS6695); if (state.failed) return;
+		pushFollow(FOLLOW_slop_in_synpred28_FTS5016);
+		slop();
+		state._fsp--;
+		if (state.failed) return;
 
 		}
 
@@ -24459,6 +13109,82 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred29_FTS
 	public final void synpred29_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:674:42: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:674:43: slop
+		{
+		pushFollow(FOLLOW_slop_in_synpred29_FTS5091);
+		slop();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred29_FTS
+
+	// $ANTLR start synpred30_FTS
+	public final void synpred30_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:677:34: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:677:35: fuzzy
+		{
+		pushFollow(FOLLOW_fuzzy_in_synpred30_FTS5166);
+		fuzzy();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred30_FTS
+
+	// $ANTLR start synpred31_FTS
+	public final void synpred31_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:723:38: ( proximityGroup )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:723:39: proximityGroup
+		{
+		pushFollow(FOLLOW_proximityGroup_in_synpred31_FTS5660);
+		proximityGroup();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred31_FTS
+
+	// $ANTLR start synpred32_FTS
+	public final void synpred32_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:777:19: ( prefix )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:777:20: prefix
+		{
+		pushFollow(FOLLOW_prefix_in_synpred32_FTS6266);
+		prefix();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred32_FTS
+
+	// $ANTLR start synpred33_FTS
+	public final void synpred33_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:813:9: ( ID DOT ID )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:813:10: ID DOT ID
+		{
+		match(input,ID,FOLLOW_ID_in_synpred33_FTS6721); if (state.failed) return;
+
+		match(input,DOT,FOLLOW_DOT_in_synpred33_FTS6723); if (state.failed) return;
+
+		match(input,ID,FOLLOW_ID_in_synpred33_FTS6725); if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred33_FTS
+
+	// $ANTLR start synpred34_FTS
+	public final void synpred34_FTS_fragment() throws RecognitionException {
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:833:12: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:833:13: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
@@ -24472,7 +13198,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred29_FTS7017);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7047);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -24487,7 +13213,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred29_FTS7025);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7055);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -24502,7 +13228,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred29_FTS7033);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7063);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -24517,7 +13243,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred29_FTS7041);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7071);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -24532,7 +13258,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred29_FTS7049);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7079);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -24540,10 +13266,10 @@ public class FTSParser extends Parser {
 		}
 
 	}
-	// $ANTLR end synpred29_FTS
+	// $ANTLR end synpred34_FTS
 
-	// $ANTLR start synpred30_FTS
-	public final void synpred30_FTS_fragment() throws RecognitionException {
+	// $ANTLR start synpred35_FTS
+	public final void synpred35_FTS_fragment() throws RecognitionException {
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:835:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase DOT | COMMA ftsWordBase )
 		int alt75=2;
 		int LA75_0 = input.LA(1);
@@ -24565,7 +13291,7 @@ public class FTSParser extends Parser {
 			case 1 :
 				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:835:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase DOT
 				{
-				pushFollow(FOLLOW_ftsWordBase_in_synpred30_FTS7117);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7147);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
@@ -24580,7 +13306,7 @@ public class FTSParser extends Parser {
 					MismatchedSetException mse = new MismatchedSetException(null,input);
 					throw mse;
 				}
-				pushFollow(FOLLOW_ftsWordBase_in_synpred30_FTS7125);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7155);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
@@ -24595,7 +13321,7 @@ public class FTSParser extends Parser {
 					MismatchedSetException mse = new MismatchedSetException(null,input);
 					throw mse;
 				}
-				pushFollow(FOLLOW_ftsWordBase_in_synpred30_FTS7133);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7163);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
@@ -24610,21 +13336,21 @@ public class FTSParser extends Parser {
 					MismatchedSetException mse = new MismatchedSetException(null,input);
 					throw mse;
 				}
-				pushFollow(FOLLOW_ftsWordBase_in_synpred30_FTS7141);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7171);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
 
-				match(input,DOT,FOLLOW_DOT_in_synpred30_FTS7143); if (state.failed) return;
+				match(input,DOT,FOLLOW_DOT_in_synpred35_FTS7173); if (state.failed) return;
 
 				}
 				break;
 			case 2 :
 				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:835:100: COMMA ftsWordBase
 				{
-				match(input,COMMA,FOLLOW_COMMA_in_synpred30_FTS7145); if (state.failed) return;
+				match(input,COMMA,FOLLOW_COMMA_in_synpred35_FTS7175); if (state.failed) return;
 
-				pushFollow(FOLLOW_ftsWordBase_in_synpred30_FTS7147);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7177);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
@@ -24634,10 +13360,10 @@ public class FTSParser extends Parser {
 
 		}
 	}
-	// $ANTLR end synpred30_FTS
+	// $ANTLR end synpred35_FTS
 
-	// $ANTLR start synpred31_FTS
-	public final void synpred31_FTS_fragment() throws RecognitionException {
+	// $ANTLR start synpred36_FTS
+	public final void synpred36_FTS_fragment() throws RecognitionException {
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:837:12: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:837:13: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
@@ -24651,7 +13377,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred31_FTS7216);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7246);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -24666,7 +13392,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred31_FTS7224);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7254);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -24681,7 +13407,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred31_FTS7232);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7262);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -24696,327 +13422,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred31_FTS7240);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		}
-
-	}
-	// $ANTLR end synpred31_FTS
-
-	// $ANTLR start synpred32_FTS
-	public final void synpred32_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:839:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:839:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
-		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred32_FTS7312);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred32_FTS7320);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred32_FTS7328);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred32_FTS7336);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		}
-
-	}
-	// $ANTLR end synpred32_FTS
-
-	// $ANTLR start synpred33_FTS
-	public final void synpred33_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:841:12: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:841:13: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
-		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred33_FTS7409);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred33_FTS7417);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred33_FTS7425);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred33_FTS7433);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		}
-
-	}
-	// $ANTLR end synpred33_FTS
-
-	// $ANTLR start synpred34_FTS
-	public final void synpred34_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:843:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:843:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
-		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7493);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7501);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7509);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7517);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		}
-
-	}
-	// $ANTLR end synpred34_FTS
-
-	// $ANTLR start synpred35_FTS
-	public final void synpred35_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:845:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:845:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
-		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7577);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7585);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7593);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		}
-
-	}
-	// $ANTLR end synpred35_FTS
-
-	// $ANTLR start synpred36_FTS
-	public final void synpred36_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:847:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:847:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
-		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7657);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7665);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7673);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7270);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25038,20 +13444,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred37_FTS
 	public final void synpred37_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:849:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:849:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:839:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:839:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7737);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7342);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25066,7 +13462,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7745);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7350);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25081,11 +13477,36 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7753);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7358);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
 
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7366);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
 		}
 
 	}
@@ -25093,10 +13514,20 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred38_FTS
 	public final void synpred38_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:851:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:851:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:841:12: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:841:13: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7805);
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7439);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25111,7 +13542,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7813);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7447);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25126,7 +13557,22 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7821);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7455);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7463);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25138,20 +13584,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred39_FTS
 	public final void synpred39_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:853:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:853:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:843:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:843:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7874);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7523);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25166,7 +13602,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7882);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7531);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25181,6 +13617,26 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7539);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7547);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
 		}
 
 	}
@@ -25188,10 +13644,20 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred40_FTS
 	public final void synpred40_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:855:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:855:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:845:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:845:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred40_FTS7938);
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred40_FTS7607);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25206,7 +13672,22 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred40_FTS7946);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred40_FTS7615);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred40_FTS7623);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25228,20 +13709,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred41_FTS
 	public final void synpred41_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:857:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:857:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:847:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:847:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS8004);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7687);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25256,11 +13727,36 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS8012);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7695);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
 
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7703);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
 		}
 
 	}
@@ -25268,10 +13764,20 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred42_FTS
 	public final void synpred42_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:859:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:859:12: ftsWordBase ( DOT | COMMA ) ftsWordBase
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:849:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:849:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS8056);
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7767);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25286,7 +13792,22 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS8064);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7775);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7783);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25298,20 +13819,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred43_FTS
 	public final void synpred43_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:861:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:861:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:851:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:851:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS8108);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7835);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25326,6 +13837,26 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7843);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7851);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
 		}
 
 	}
@@ -25333,10 +13864,35 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred44_FTS
 	public final void synpred44_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:863:11: ( ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:863:12: ftsWordBase ( DOT | COMMA )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:853:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:853:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS8156);
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS7904);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS7912);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -25355,6 +13911,176 @@ public class FTSParser extends Parser {
 
 	}
 	// $ANTLR end synpred44_FTS
+
+	// $ANTLR start synpred45_FTS
+	public final void synpred45_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:855:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:855:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		{
+		pushFollow(FOLLOW_ftsWordBase_in_synpred45_FTS7968);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred45_FTS7976);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		}
+
+	}
+	// $ANTLR end synpred45_FTS
+
+	// $ANTLR start synpred46_FTS
+	public final void synpred46_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:857:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:857:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
+		{
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred46_FTS8034);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred46_FTS8042);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred46_FTS
+
+	// $ANTLR start synpred47_FTS
+	public final void synpred47_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:859:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:859:12: ftsWordBase ( DOT | COMMA ) ftsWordBase
+		{
+		pushFollow(FOLLOW_ftsWordBase_in_synpred47_FTS8086);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred47_FTS8094);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred47_FTS
+
+	// $ANTLR start synpred48_FTS
+	public final void synpred48_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:861:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:861:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		{
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred48_FTS8138);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		}
+
+	}
+	// $ANTLR end synpred48_FTS
+
+	// $ANTLR start synpred49_FTS
+	public final void synpred49_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:863:11: ( ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:863:12: ftsWordBase ( DOT | COMMA )
+		{
+		pushFollow(FOLLOW_ftsWordBase_in_synpred49_FTS8186);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		}
+
+	}
+	// $ANTLR end synpred49_FTS
 
 	// Delegated rules
 
@@ -25498,11 +14224,39 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
+	public final boolean synpred45_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred45_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
 	public final boolean synpred8_FTS() {
 		state.backtracking++;
 		int start = input.mark();
 		try {
 			synpred8_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred49_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred49_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -25638,6 +14392,20 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
+	public final boolean synpred48_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred48_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
 	public final boolean synpred3_FTS() {
 		state.backtracking++;
 		int start = input.mark();
@@ -25671,6 +14439,20 @@ public class FTSParser extends Parser {
 		int start = input.mark();
 		try {
 			synpred44_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred46_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred46_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -25755,6 +14537,20 @@ public class FTSParser extends Parser {
 		int start = input.mark();
 		try {
 			synpred42_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred47_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred47_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -25946,20 +14742,6 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred33_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred33_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
 	public final boolean synpred37_FTS() {
 		state.backtracking++;
 		int start = input.mark();
@@ -25974,9 +14756,1038 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
+	public final boolean synpred33_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred33_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
 
 
+	protected DFA17 dfa17 = new DFA17(this);
 	protected DFA72 dfa72 = new DFA72(this);
+	static final String DFA17_eotS =
+		"\u0081\uffff";
+	static final String DFA17_eofS =
+		"\1\uffff\1\32\1\uffff\2\32\2\uffff\1\32\1\uffff\1\32\10\uffff\2\32\65"+
+		"\uffff\4\32\1\uffff\1\32\34\uffff\1\32\5\uffff\1\32\17\uffff";
+	static final String DFA17_minS =
+		"\1\5\1\4\1\5\2\4\2\12\1\4\1\5\1\4\10\uffff\2\4\1\5\32\uffff\10\12\2\uffff"+
+		"\1\0\4\uffff\1\4\1\0\5\uffff\3\0\1\uffff\4\4\1\uffff\1\4\1\uffff\2\74"+
+		"\1\13\1\4\27\uffff\1\4\3\uffff\2\12\1\4\11\uffff\1\0\5\uffff";
+	static final String DFA17_maxS =
+		"\5\136\2\12\1\136\1\135\1\136\10\uffff\2\136\1\135\32\uffff\1\24\2\12"+
+		"\1\24\4\12\2\uffff\1\0\4\uffff\1\136\1\0\5\uffff\3\0\1\uffff\4\136\1\uffff"+
+		"\1\136\1\uffff\2\74\1\135\1\136\27\uffff\1\136\3\uffff\2\12\1\136\11\uffff"+
+		"\1\0\5\uffff";
+	static final String DFA17_acceptS =
+		"\12\uffff\2\2\1\3\1\4\2\5\1\7\1\10\3\uffff\31\2\1\5\10\uffff\2\2\1\uffff"+
+		"\4\2\2\uffff\5\2\3\uffff\1\6\4\uffff\1\2\1\uffff\1\2\4\uffff\1\1\26\2"+
+		"\1\uffff\3\2\3\uffff\11\2\1\uffff\5\2";
+	static final String DFA17_specialS =
+		"\1\23\1\30\1\uffff\1\17\1\20\2\uffff\1\15\1\uffff\1\22\10\uffff\1\5\1"+
+		"\11\1\3\44\uffff\1\12\4\uffff\1\2\1\27\5\uffff\1\24\1\6\1\10\1\uffff\1"+
+		"\0\1\4\1\1\1\13\1\uffff\1\21\3\uffff\1\25\1\16\27\uffff\1\14\5\uffff\1"+
+		"\7\11\uffff\1\26\5\uffff}>";
+	static final String[] DFA17_transitionS = {
+			"\1\6\1\2\4\uffff\1\12\1\uffff\2\7\5\uffff\1\12\2\uffff\1\14\26\uffff"+
+			"\1\7\1\uffff\1\11\3\7\10\uffff\1\1\3\uffff\1\20\1\16\1\17\5\uffff\1\4"+
+			"\1\uffff\1\5\1\21\5\uffff\1\13\5\uffff\1\13\4\uffff\1\15\1\3\1\10",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\24\1\25\1\uffff\2\43\5\uffff\1\22"+
+			"\1\56\1\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43\10\uffff"+
+			"\1\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff\1\34\1"+
+			"\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\23\4\uffff\1\26"+
+			"\1\42\1\44",
+			"\1\6\66\uffff\1\57\13\uffff\1\61\1\uffff\1\5\22\uffff\1\60\1\10",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\24\1\25\1\uffff\2\43\5\uffff\1\25"+
+			"\2\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43\10\uffff\1"+
+			"\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff\1\34\1\53"+
+			"\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\23\4\uffff\1\26\1\42"+
+			"\1\44",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\24\1\25\1\uffff\2\43\5\uffff\1\25"+
+			"\2\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43\10\uffff\1"+
+			"\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff\1\34\1\53"+
+			"\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\23\4\uffff\1\26\1\42"+
+			"\1\44",
+			"\1\24",
+			"\1\24",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\uffff\1\25\1\uffff\2\43\5\uffff"+
+			"\1\25\1\56\1\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43"+
+			"\10\uffff\1\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff"+
+			"\1\34\1\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\23\4\uffff"+
+			"\1\26\1\42\1\44",
+			"\1\65\66\uffff\1\62\13\uffff\1\66\1\uffff\1\64\22\uffff\1\63",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\uffff\1\70\1\uffff\2\43\5\uffff"+
+			"\1\70\1\56\1\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43"+
+			"\10\uffff\1\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff"+
+			"\1\34\1\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\46\4\uffff"+
+			"\1\67\1\42\1\44",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\uffff\1\70\1\uffff\2\75\5\uffff"+
+			"\1\70\2\uffff\1\47\2\uffff\1\37\23\uffff\1\75\1\uffff\1\45\3\75\10\uffff"+
+			"\1\71\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\72\1\uffff\1\34\1"+
+			"\53\1\uffff\1\54\3\uffff\1\74\2\uffff\1\33\2\uffff\1\74\4\uffff\1\26"+
+			"\1\73\1\44",
+			"\1\104\1\103\1\41\1\35\1\uffff\1\102\1\uffff\1\100\1\uffff\2\107\5\uffff"+
+			"\1\100\2\uffff\1\47\2\uffff\1\37\23\uffff\1\107\1\uffff\1\45\3\107\10"+
+			"\uffff\1\105\3\uffff\1\76\1\50\1\51\1\uffff\1\55\3\uffff\1\77\1\uffff"+
+			"\1\34\1\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\46\4\uffff"+
+			"\1\101\1\106\1\44",
+			"\1\65\5\uffff\1\115\1\uffff\2\116\5\uffff\1\115\31\uffff\1\116\1\uffff"+
+			"\1\114\3\116\10\uffff\1\111\3\uffff\1\110\1\16\1\17\5\uffff\1\113\1\uffff"+
+			"\1\64\6\uffff\1\117\5\uffff\1\117\5\uffff\1\112",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\24\11\uffff\1\120",
+			"\1\24",
+			"\1\24",
+			"\1\122\11\uffff\1\121",
+			"\1\122",
+			"\1\122",
+			"\1\122",
+			"\1\122",
+			"",
+			"",
+			"\1\uffff",
+			"",
+			"",
+			"",
+			"",
+			"\1\132\1\131\1\136\1\152\3\uffff\1\125\1\uffff\1\140\1\123\5\uffff\1"+
+			"\125\2\uffff\1\143\2\uffff\1\134\23\uffff\1\140\1\uffff\1\127\3\140\10"+
+			"\uffff\1\133\3\uffff\1\147\1\145\1\146\1\uffff\1\130\3\uffff\1\126\1"+
+			"\uffff\1\141\1\150\1\uffff\1\151\3\uffff\1\135\2\uffff\1\124\2\uffff"+
+			"\1\135\4\uffff\1\144\1\137\1\142",
+			"\1\uffff",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\uffff",
+			"\1\uffff",
+			"\1\uffff",
+			"",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\122\1\154\1\uffff\2\43\5\uffff\1"+
+			"\153\1\56\1\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43\10"+
+			"\uffff\1\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff"+
+			"\1\34\1\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\46\4\uffff"+
+			"\1\155\1\42\1\44",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\122\1\154\1\uffff\2\43\5\uffff\1"+
+			"\154\2\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43\10\uffff"+
+			"\1\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff\1\34\1"+
+			"\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\46\4\uffff\1\155"+
+			"\1\42\1\44",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\122\1\154\1\uffff\2\43\5\uffff\1"+
+			"\154\2\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43\10\uffff"+
+			"\1\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff\1\34\1"+
+			"\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\46\4\uffff\1\155"+
+			"\1\42\1\44",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\uffff\1\70\1\uffff\2\43\5\uffff"+
+			"\1\70\1\56\1\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43"+
+			"\10\uffff\1\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff"+
+			"\1\34\1\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\46\4\uffff"+
+			"\1\156\1\42\1\44",
+			"",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\uffff\1\154\1\uffff\2\43\5\uffff"+
+			"\1\154\1\56\1\uffff\1\47\2\uffff\1\37\23\uffff\1\43\1\uffff\1\45\3\43"+
+			"\10\uffff\1\40\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\36\1\uffff"+
+			"\1\34\1\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\46\4\uffff"+
+			"\1\155\1\42\1\44",
+			"",
+			"\1\157",
+			"\1\160",
+			"\1\115\1\uffff\2\116\5\uffff\1\115\31\uffff\1\116\1\uffff\1\114\3\116"+
+			"\10\uffff\1\116\3\uffff\1\110\1\16\1\17\5\uffff\1\117\10\uffff\1\117"+
+			"\5\uffff\1\117\5\uffff\1\117",
+			"\1\171\1\170\1\136\1\164\1\uffff\1\167\1\uffff\1\162\1\uffff\2\140\5"+
+			"\uffff\1\162\1\172\1\uffff\1\143\2\uffff\1\134\23\uffff\1\140\1\uffff"+
+			"\1\127\3\140\10\uffff\1\133\3\uffff\1\147\1\145\1\146\1\uffff\1\130\3"+
+			"\uffff\1\126\1\uffff\1\163\1\150\1\uffff\1\151\3\uffff\1\135\2\uffff"+
+			"\1\161\2\uffff\1\165\4\uffff\1\166\1\137\1\142",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\31\1\30\1\41\1\35\1\uffff\1\27\1\uffff\1\70\1\uffff\2\177\5\uffff"+
+			"\1\70\2\uffff\1\47\2\uffff\1\37\23\uffff\1\177\1\uffff\1\45\3\177\10"+
+			"\uffff\1\173\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\174\1\uffff"+
+			"\1\34\1\53\1\uffff\1\54\3\uffff\1\176\2\uffff\1\33\2\uffff\1\176\4\uffff"+
+			"\1\155\1\175\1\44",
+			"",
+			"",
+			"",
+			"\1\24",
+			"\1\122",
+			"\1\104\1\103\1\41\1\35\1\uffff\1\102\1\uffff\1\70\1\uffff\2\107\5\uffff"+
+			"\1\70\2\uffff\1\47\2\uffff\1\37\23\uffff\1\107\1\uffff\1\45\3\107\10"+
+			"\uffff\1\105\3\uffff\1\52\1\50\1\51\1\uffff\1\55\3\uffff\1\77\1\uffff"+
+			"\1\34\1\53\1\uffff\1\54\3\uffff\1\46\2\uffff\1\33\2\uffff\1\46\4\uffff"+
+			"\1\u0080\1\106\1\44",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\uffff",
+			"",
+			"",
+			"",
+			"",
+			""
+	};
+
+	static final short[] DFA17_eot = DFA.unpackEncodedString(DFA17_eotS);
+	static final short[] DFA17_eof = DFA.unpackEncodedString(DFA17_eofS);
+	static final char[] DFA17_min = DFA.unpackEncodedStringToUnsignedChars(DFA17_minS);
+	static final char[] DFA17_max = DFA.unpackEncodedStringToUnsignedChars(DFA17_maxS);
+	static final short[] DFA17_accept = DFA.unpackEncodedString(DFA17_acceptS);
+	static final short[] DFA17_special = DFA.unpackEncodedString(DFA17_specialS);
+	static final short[][] DFA17_transition;
+
+	static {
+		int numStates = DFA17_transitionS.length;
+		DFA17_transition = new short[numStates][];
+		for (int i=0; i<numStates; i++) {
+			DFA17_transition[i] = DFA.unpackEncodedString(DFA17_transitionS[i]);
+		}
+	}
+
+	protected class DFA17 extends DFA {
+
+		public DFA17(BaseRecognizer recognizer) {
+			this.recognizer = recognizer;
+			this.decisionNumber = 17;
+			this.eot = DFA17_eot;
+			this.eof = DFA17_eof;
+			this.min = DFA17_min;
+			this.max = DFA17_max;
+			this.accept = DFA17_accept;
+			this.special = DFA17_special;
+			this.transition = DFA17_transition;
+		}
+		@Override
+		public String getDescription() {
+			return "445:1: ftsTest : ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( PROXIMITY ftsFieldGroupProximity ) | ( ftsTermOrPhrase )=> ftsTermOrPhrase | ( ftsExactTermOrPhrase )=> ftsExactTermOrPhrase | ( ftsTokenisedTermOrPhrase )=> ftsTokenisedTermOrPhrase | ( ftsRange )=> ftsRange -> ^( RANGE ftsRange ) | ( ftsFieldGroup )=> ftsFieldGroup -> ftsFieldGroup | LPAREN ftsDisjunction RPAREN -> ftsDisjunction | template -> template );";
+		}
+		@Override
+		public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
+			TokenStream input = (TokenStream)_input;
+			int _s = s;
+			switch ( s ) {
+					case 0 : 
+						int LA17_73 = input.LA(1);
+						 
+						int index17_73 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_73==DOT) ) {s = 107;}
+						else if ( (LA17_73==COLON) ) {s = 82;}
+						else if ( (LA17_73==COMMA) && (synpred3_FTS())) {s = 108;}
+						else if ( (LA17_73==TILDA) && (synpred3_FTS())) {s = 109;}
+						else if ( (LA17_73==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_73==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_73==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_73==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_73==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_73==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_73==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_73==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_73==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_73==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_73==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_73==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_73 >= DATETIME && LA17_73 <= DECIMAL_INTEGER_LITERAL)||LA17_73==FLOATING_POINT_LITERAL||(LA17_73 >= FTSPRE && LA17_73 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_73==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_73==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_73==QUESTION_MARK||LA17_73==STAR) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_73==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_73==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_73==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_73==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_73==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_73==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_73==MINUS) && (synpred3_FTS())) {s = 45;}
+						else if ( (LA17_73==DOTDOT) && (synpred6_FTS())) {s = 46;}
+						 
+						input.seek(index17_73);
+						if ( s>=0 ) return s;
+						break;
+
+					case 1 : 
+						int LA17_75 = input.LA(1);
+						 
+						int index17_75 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_75==COLON) ) {s = 82;}
+						else if ( (LA17_75==COMMA||LA17_75==DOT) && (synpred3_FTS())) {s = 108;}
+						else if ( (LA17_75==TILDA) && (synpred3_FTS())) {s = 109;}
+						else if ( (LA17_75==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_75==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_75==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_75==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_75==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_75==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_75==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_75==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_75==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_75==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_75==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_75==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_75 >= DATETIME && LA17_75 <= DECIMAL_INTEGER_LITERAL)||LA17_75==FLOATING_POINT_LITERAL||(LA17_75 >= FTSPRE && LA17_75 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_75==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_75==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_75==QUESTION_MARK||LA17_75==STAR) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_75==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_75==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_75==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_75==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_75==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_75==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_75==MINUS) && (synpred3_FTS())) {s = 45;}
+						 
+						input.seek(index17_75);
+						if ( s>=0 ) return s;
+						break;
+
+					case 2 : 
+						int LA17_62 = input.LA(1);
+						 
+						int index17_62 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_62==DECIMAL_INTEGER_LITERAL) ) {s = 83;}
+						else if ( (LA17_62==RPAREN) && (synpred2_FTS())) {s = 84;}
+						else if ( (LA17_62==COMMA||LA17_62==DOT) && (synpred3_FTS())) {s = 85;}
+						else if ( (LA17_62==NOT) && (synpred3_FTS())) {s = 86;}
+						else if ( (LA17_62==FTSPHRASE) && (synpred3_FTS())) {s = 87;}
+						else if ( (LA17_62==MINUS) && (synpred3_FTS())) {s = 88;}
+						else if ( (LA17_62==AND) && (synpred3_FTS())) {s = 89;}
+						else if ( (LA17_62==AMP) && (synpred3_FTS())) {s = 90;}
+						else if ( (LA17_62==ID) && (synpred3_FTS())) {s = 91;}
+						else if ( (LA17_62==EXCLAMATION) && (synpred3_FTS())) {s = 92;}
+						else if ( (LA17_62==QUESTION_MARK||LA17_62==STAR) && (synpred3_FTS())) {s = 93;}
+						else if ( (LA17_62==AT) && (synpred3_FTS())) {s = 94;}
+						else if ( (LA17_62==TO) && (synpred3_FTS())) {s = 95;}
+						else if ( (LA17_62==DATETIME||LA17_62==FLOATING_POINT_LITERAL||(LA17_62 >= FTSPRE && LA17_62 <= FTSWORD)) && (synpred3_FTS())) {s = 96;}
+						else if ( (LA17_62==OR) && (synpred3_FTS())) {s = 97;}
+						else if ( (LA17_62==URI) && (synpred3_FTS())) {s = 98;}
+						else if ( (LA17_62==EQUALS) && (synpred3_FTS())) {s = 99;}
+						else if ( (LA17_62==TILDA) && (synpred3_FTS())) {s = 100;}
+						else if ( (LA17_62==LSQUARE) && (synpred3_FTS())) {s = 101;}
+						else if ( (LA17_62==LT) && (synpred3_FTS())) {s = 102;}
+						else if ( (LA17_62==LPAREN) && (synpred3_FTS())) {s = 103;}
+						else if ( (LA17_62==PERCENT) && (synpred3_FTS())) {s = 104;}
+						else if ( (LA17_62==PLUS) && (synpred3_FTS())) {s = 105;}
+						else if ( (LA17_62==BAR) && (synpred3_FTS())) {s = 106;}
+						 
+						input.seek(index17_62);
+						if ( s>=0 ) return s;
+						break;
+
+					case 3 : 
+						int LA17_20 = input.LA(1);
+						 
+						int index17_20 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_20==LPAREN) && (synpred7_FTS())) {s = 72;}
+						else if ( (LA17_20==ID) ) {s = 73;}
+						else if ( (LA17_20==TO) ) {s = 74;}
+						else if ( (LA17_20==OR) ) {s = 52;}
+						else if ( (LA17_20==AND) ) {s = 53;}
+						else if ( (LA17_20==NOT) ) {s = 75;}
+						else if ( (LA17_20==FTSPHRASE) ) {s = 76;}
+						else if ( (LA17_20==COMMA||LA17_20==DOT) && (synpred3_FTS())) {s = 77;}
+						else if ( ((LA17_20 >= DATETIME && LA17_20 <= DECIMAL_INTEGER_LITERAL)||LA17_20==FLOATING_POINT_LITERAL||(LA17_20 >= FTSPRE && LA17_20 <= FTSWORD)) ) {s = 78;}
+						else if ( (LA17_20==QUESTION_MARK||LA17_20==STAR) && (synpred3_FTS())) {s = 79;}
+						else if ( (LA17_20==LSQUARE) && (synpred6_FTS())) {s = 14;}
+						else if ( (LA17_20==LT) && (synpred6_FTS())) {s = 15;}
+						 
+						input.seek(index17_20);
+						if ( s>=0 ) return s;
+						break;
+
+					case 4 : 
+						int LA17_74 = input.LA(1);
+						 
+						int index17_74 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_74==COLON) ) {s = 82;}
+						else if ( (LA17_74==COMMA||LA17_74==DOT) && (synpred3_FTS())) {s = 108;}
+						else if ( (LA17_74==TILDA) && (synpred3_FTS())) {s = 109;}
+						else if ( (LA17_74==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_74==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_74==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_74==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_74==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_74==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_74==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_74==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_74==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_74==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_74==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_74==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_74 >= DATETIME && LA17_74 <= DECIMAL_INTEGER_LITERAL)||LA17_74==FLOATING_POINT_LITERAL||(LA17_74 >= FTSPRE && LA17_74 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_74==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_74==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_74==QUESTION_MARK||LA17_74==STAR) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_74==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_74==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_74==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_74==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_74==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_74==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_74==MINUS) && (synpred3_FTS())) {s = 45;}
+						 
+						input.seek(index17_74);
+						if ( s>=0 ) return s;
+						break;
+
+					case 5 : 
+						int LA17_18 = input.LA(1);
+						 
+						int index17_18 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_18==ID) ) {s = 57;}
+						else if ( (LA17_18==NOT) && (synpred3_FTS())) {s = 58;}
+						else if ( (LA17_18==TILDA) && (synpred3_FTS())) {s = 22;}
+						else if ( (LA17_18==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_18==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_18==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_18==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_18==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_18==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_18==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_18==TO) && (synpred3_FTS())) {s = 59;}
+						else if ( (LA17_18==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_18==QUESTION_MARK||LA17_18==STAR) && (synpred3_FTS())) {s = 60;}
+						else if ( (LA17_18==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( ((LA17_18 >= DATETIME && LA17_18 <= DECIMAL_INTEGER_LITERAL)||LA17_18==FLOATING_POINT_LITERAL||(LA17_18 >= FTSPRE && LA17_18 <= FTSWORD)) && (synpred3_FTS())) {s = 61;}
+						else if ( (LA17_18==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_18==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_18==COMMA||LA17_18==DOT) && (synpred3_FTS())) {s = 56;}
+						else if ( (LA17_18==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_18==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_18==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_18==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_18==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_18==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_18==MINUS) && (synpred3_FTS())) {s = 45;}
+						 
+						input.seek(index17_18);
+						if ( s>=0 ) return s;
+						break;
+
+					case 6 : 
+						int LA17_70 = input.LA(1);
+						 
+						int index17_70 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 84;}
+						else if ( (synpred3_FTS()) ) {s = 106;}
+						 
+						input.seek(index17_70);
+						if ( s>=0 ) return s;
+						break;
+
+					case 7 : 
+						int LA17_113 = input.LA(1);
+						 
+						int index17_113 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_113==NOT) ) {s = 63;}
+						else if ( (LA17_113==CARAT) && (synpred3_FTS())) {s = 66;}
+						else if ( (LA17_113==AND) && (synpred3_FTS())) {s = 67;}
+						else if ( (LA17_113==AMP) && (synpred3_FTS())) {s = 68;}
+						else if ( (LA17_113==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_113==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_113==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_113==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_113==ID) ) {s = 69;}
+						else if ( (LA17_113==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_113==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_113==TO) ) {s = 70;}
+						else if ( ((LA17_113 >= DATETIME && LA17_113 <= DECIMAL_INTEGER_LITERAL)||LA17_113==FLOATING_POINT_LITERAL||(LA17_113 >= FTSPRE && LA17_113 <= FTSWORD)) ) {s = 71;}
+						else if ( (LA17_113==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_113==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_113==COMMA||LA17_113==DOT) && (synpred3_FTS())) {s = 56;}
+						else if ( (LA17_113==QUESTION_MARK||LA17_113==STAR) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_113==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_113==TILDA) && (synpred3_FTS())) {s = 128;}
+						else if ( (LA17_113==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_113==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_113==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_113==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_113==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_113==MINUS) && (synpred3_FTS())) {s = 45;}
+						 
+						input.seek(index17_113);
+						if ( s>=0 ) return s;
+						break;
+
+					case 8 : 
+						int LA17_71 = input.LA(1);
+						 
+						int index17_71 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 84;}
+						else if ( (synpred3_FTS()) ) {s = 106;}
+						 
+						input.seek(index17_71);
+						if ( s>=0 ) return s;
+						break;
+
+					case 9 : 
+						int LA17_19 = input.LA(1);
+						 
+						int index17_19 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_19==LPAREN) ) {s = 62;}
+						else if ( (LA17_19==NOT) ) {s = 63;}
+						else if ( (LA17_19==COMMA||LA17_19==DOT) && (synpred3_FTS())) {s = 64;}
+						else if ( (LA17_19==TILDA) && (synpred3_FTS())) {s = 65;}
+						else if ( (LA17_19==CARAT) && (synpred3_FTS())) {s = 66;}
+						else if ( (LA17_19==AND) && (synpred3_FTS())) {s = 67;}
+						else if ( (LA17_19==AMP) && (synpred3_FTS())) {s = 68;}
+						else if ( (LA17_19==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_19==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_19==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_19==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_19==ID) ) {s = 69;}
+						else if ( (LA17_19==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_19==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_19==TO) ) {s = 70;}
+						else if ( ((LA17_19 >= DATETIME && LA17_19 <= DECIMAL_INTEGER_LITERAL)||LA17_19==FLOATING_POINT_LITERAL||(LA17_19 >= FTSPRE && LA17_19 <= FTSWORD)) ) {s = 71;}
+						else if ( (LA17_19==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_19==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_19==QUESTION_MARK||LA17_19==STAR) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_19==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_19==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_19==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_19==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_19==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_19==MINUS) && (synpred3_FTS())) {s = 45;}
+						 
+						input.seek(index17_19);
+						if ( s>=0 ) return s;
+						break;
+
+					case 10 : 
+						int LA17_57 = input.LA(1);
+						 
+						int index17_57 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred3_FTS()) ) {s = 79;}
+						else if ( (synpred6_FTS()) ) {s = 46;}
+						else if ( (synpred7_FTS()) ) {s = 72;}
+						 
+						input.seek(index17_57);
+						if ( s>=0 ) return s;
+						break;
+
+					case 11 : 
+						int LA17_76 = input.LA(1);
+						 
+						int index17_76 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_76==TILDA) && (synpred3_FTS())) {s = 110;}
+						else if ( (LA17_76==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_76==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_76==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_76==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_76==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_76==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_76==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_76==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_76==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_76==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_76==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_76==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_76 >= DATETIME && LA17_76 <= DECIMAL_INTEGER_LITERAL)||LA17_76==FLOATING_POINT_LITERAL||(LA17_76 >= FTSPRE && LA17_76 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_76==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_76==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_76==COMMA||LA17_76==DOT) && (synpred3_FTS())) {s = 56;}
+						else if ( (LA17_76==QUESTION_MARK||LA17_76==STAR) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_76==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_76==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_76==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_76==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_76==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_76==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_76==MINUS) && (synpred3_FTS())) {s = 45;}
+						else if ( (LA17_76==DOTDOT) && (synpred6_FTS())) {s = 46;}
+						 
+						input.seek(index17_76);
+						if ( s>=0 ) return s;
+						break;
+
+					case 12 : 
+						int LA17_107 = input.LA(1);
+						 
+						int index17_107 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_107==ID) ) {s = 123;}
+						else if ( (LA17_107==NOT) && (synpred3_FTS())) {s = 124;}
+						else if ( (LA17_107==TILDA) && (synpred3_FTS())) {s = 109;}
+						else if ( (LA17_107==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_107==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_107==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_107==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_107==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_107==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_107==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_107==TO) && (synpred3_FTS())) {s = 125;}
+						else if ( (LA17_107==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_107==QUESTION_MARK||LA17_107==STAR) && (synpred3_FTS())) {s = 126;}
+						else if ( (LA17_107==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( ((LA17_107 >= DATETIME && LA17_107 <= DECIMAL_INTEGER_LITERAL)||LA17_107==FLOATING_POINT_LITERAL||(LA17_107 >= FTSPRE && LA17_107 <= FTSWORD)) && (synpred3_FTS())) {s = 127;}
+						else if ( (LA17_107==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_107==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_107==COMMA||LA17_107==DOT) && (synpred3_FTS())) {s = 56;}
+						else if ( (LA17_107==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_107==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_107==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_107==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_107==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_107==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_107==MINUS) && (synpred3_FTS())) {s = 45;}
+						 
+						input.seek(index17_107);
+						if ( s>=0 ) return s;
+						break;
+
+					case 13 : 
+						int LA17_7 = input.LA(1);
+						 
+						int index17_7 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_7==STAR) ) {s = 19;}
+						else if ( (LA17_7==COMMA||LA17_7==DOT) && (synpred3_FTS())) {s = 21;}
+						else if ( (LA17_7==TILDA) && (synpred3_FTS())) {s = 22;}
+						else if ( (LA17_7==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_7==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_7==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_7==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_7==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_7==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_7==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_7==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_7==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_7==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_7==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_7==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_7 >= DATETIME && LA17_7 <= DECIMAL_INTEGER_LITERAL)||LA17_7==FLOATING_POINT_LITERAL||(LA17_7 >= FTSPRE && LA17_7 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_7==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_7==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_7==QUESTION_MARK) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_7==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_7==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_7==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_7==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_7==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_7==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_7==MINUS) && (synpred3_FTS())) {s = 45;}
+						else if ( (LA17_7==DOTDOT) && (synpred6_FTS())) {s = 46;}
+						 
+						input.seek(index17_7);
+						if ( s>=0 ) return s;
+						break;
+
+					case 14 : 
+						int LA17_83 = input.LA(1);
+						 
+						int index17_83 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_83==RPAREN) ) {s = 113;}
+						else if ( (LA17_83==COMMA||LA17_83==DOT) && (synpred3_FTS())) {s = 114;}
+						else if ( (LA17_83==OR) && (synpred3_FTS())) {s = 115;}
+						else if ( (LA17_83==BAR) && (synpred3_FTS())) {s = 116;}
+						else if ( (LA17_83==STAR) && (synpred3_FTS())) {s = 117;}
+						else if ( (LA17_83==FTSPHRASE) && (synpred3_FTS())) {s = 87;}
+						else if ( (LA17_83==MINUS) && (synpred3_FTS())) {s = 88;}
+						else if ( (LA17_83==NOT) && (synpred3_FTS())) {s = 86;}
+						else if ( (LA17_83==TILDA) && (synpred3_FTS())) {s = 118;}
+						else if ( (LA17_83==CARAT) && (synpred3_FTS())) {s = 119;}
+						else if ( (LA17_83==AND) && (synpred3_FTS())) {s = 120;}
+						else if ( (LA17_83==AMP) && (synpred3_FTS())) {s = 121;}
+						else if ( (LA17_83==ID) && (synpred3_FTS())) {s = 91;}
+						else if ( (LA17_83==EXCLAMATION) && (synpred3_FTS())) {s = 92;}
+						else if ( (LA17_83==QUESTION_MARK) && (synpred3_FTS())) {s = 93;}
+						else if ( (LA17_83==AT) && (synpred3_FTS())) {s = 94;}
+						else if ( (LA17_83==TO) && (synpred3_FTS())) {s = 95;}
+						else if ( ((LA17_83 >= DATETIME && LA17_83 <= DECIMAL_INTEGER_LITERAL)||LA17_83==FLOATING_POINT_LITERAL||(LA17_83 >= FTSPRE && LA17_83 <= FTSWORD)) && (synpred3_FTS())) {s = 96;}
+						else if ( (LA17_83==URI) && (synpred3_FTS())) {s = 98;}
+						else if ( (LA17_83==EQUALS) && (synpred3_FTS())) {s = 99;}
+						else if ( (LA17_83==LSQUARE) && (synpred3_FTS())) {s = 101;}
+						else if ( (LA17_83==LT) && (synpred3_FTS())) {s = 102;}
+						else if ( (LA17_83==LPAREN) && (synpred3_FTS())) {s = 103;}
+						else if ( (LA17_83==PERCENT) && (synpred3_FTS())) {s = 104;}
+						else if ( (LA17_83==PLUS) && (synpred3_FTS())) {s = 105;}
+						else if ( (LA17_83==DOTDOT) && (synpred3_FTS())) {s = 122;}
+						 
+						input.seek(index17_83);
+						if ( s>=0 ) return s;
+						break;
+
+					case 15 : 
+						int LA17_3 = input.LA(1);
+						 
+						int index17_3 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_3==STAR) ) {s = 19;}
+						else if ( (LA17_3==COLON) ) {s = 20;}
+						else if ( (LA17_3==COMMA||LA17_3==DOT) && (synpred3_FTS())) {s = 21;}
+						else if ( (LA17_3==TILDA) && (synpred3_FTS())) {s = 22;}
+						else if ( (LA17_3==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_3==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_3==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_3==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_3==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_3==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_3==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_3==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_3==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_3==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_3==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_3==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_3 >= DATETIME && LA17_3 <= DECIMAL_INTEGER_LITERAL)||LA17_3==FLOATING_POINT_LITERAL||(LA17_3 >= FTSPRE && LA17_3 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_3==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_3==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_3==QUESTION_MARK) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_3==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_3==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_3==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_3==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_3==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_3==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_3==MINUS) && (synpred3_FTS())) {s = 45;}
+						 
+						input.seek(index17_3);
+						if ( s>=0 ) return s;
+						break;
+
+					case 16 : 
+						int LA17_4 = input.LA(1);
+						 
+						int index17_4 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_4==STAR) ) {s = 19;}
+						else if ( (LA17_4==COLON) ) {s = 20;}
+						else if ( (LA17_4==COMMA||LA17_4==DOT) && (synpred3_FTS())) {s = 21;}
+						else if ( (LA17_4==TILDA) && (synpred3_FTS())) {s = 22;}
+						else if ( (LA17_4==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_4==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_4==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_4==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_4==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_4==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_4==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_4==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_4==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_4==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_4==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_4==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_4 >= DATETIME && LA17_4 <= DECIMAL_INTEGER_LITERAL)||LA17_4==FLOATING_POINT_LITERAL||(LA17_4 >= FTSPRE && LA17_4 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_4==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_4==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_4==QUESTION_MARK) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_4==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_4==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_4==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_4==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_4==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_4==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_4==MINUS) && (synpred3_FTS())) {s = 45;}
+						 
+						input.seek(index17_4);
+						if ( s>=0 ) return s;
+						break;
+
+					case 17 : 
+						int LA17_78 = input.LA(1);
+						 
+						int index17_78 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_78==COMMA||LA17_78==DOT) && (synpred3_FTS())) {s = 108;}
+						else if ( (LA17_78==TILDA) && (synpred3_FTS())) {s = 109;}
+						else if ( (LA17_78==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_78==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_78==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_78==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_78==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_78==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_78==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_78==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_78==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_78==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_78==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_78==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_78 >= DATETIME && LA17_78 <= DECIMAL_INTEGER_LITERAL)||LA17_78==FLOATING_POINT_LITERAL||(LA17_78 >= FTSPRE && LA17_78 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_78==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_78==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_78==QUESTION_MARK||LA17_78==STAR) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_78==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_78==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_78==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_78==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_78==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_78==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_78==MINUS) && (synpred3_FTS())) {s = 45;}
+						else if ( (LA17_78==DOTDOT) && (synpred6_FTS())) {s = 46;}
+						 
+						input.seek(index17_78);
+						if ( s>=0 ) return s;
+						break;
+
+					case 18 : 
+						int LA17_9 = input.LA(1);
+						 
+						int index17_9 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_9==TILDA) && (synpred3_FTS())) {s = 55;}
+						else if ( (LA17_9==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_9==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_9==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_9==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_9==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_9==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_9==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_9==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_9==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_9==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_9==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_9==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_9 >= DATETIME && LA17_9 <= DECIMAL_INTEGER_LITERAL)||LA17_9==FLOATING_POINT_LITERAL||(LA17_9 >= FTSPRE && LA17_9 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_9==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_9==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_9==COMMA||LA17_9==DOT) && (synpred3_FTS())) {s = 56;}
+						else if ( (LA17_9==QUESTION_MARK||LA17_9==STAR) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_9==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_9==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_9==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_9==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_9==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_9==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_9==MINUS) && (synpred3_FTS())) {s = 45;}
+						else if ( (LA17_9==DOTDOT) && (synpred6_FTS())) {s = 46;}
+						 
+						input.seek(index17_9);
+						if ( s>=0 ) return s;
+						break;
+
+					case 19 : 
+						int LA17_0 = input.LA(1);
+						 
+						int index17_0 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_0==ID) ) {s = 1;}
+						else if ( (LA17_0==AT) ) {s = 2;}
+						else if ( (LA17_0==TO) ) {s = 3;}
+						else if ( (LA17_0==NOT) ) {s = 4;}
+						else if ( (LA17_0==OR) ) {s = 5;}
+						else if ( (LA17_0==AND) ) {s = 6;}
+						else if ( ((LA17_0 >= DATETIME && LA17_0 <= DECIMAL_INTEGER_LITERAL)||LA17_0==FLOATING_POINT_LITERAL||(LA17_0 >= FTSPRE && LA17_0 <= FTSWORD)) ) {s = 7;}
+						else if ( (LA17_0==URI) ) {s = 8;}
+						else if ( (LA17_0==FTSPHRASE) ) {s = 9;}
+						else if ( (LA17_0==COMMA||LA17_0==DOT) && (synpred3_FTS())) {s = 10;}
+						else if ( (LA17_0==QUESTION_MARK||LA17_0==STAR) && (synpred3_FTS())) {s = 11;}
+						else if ( (LA17_0==EQUALS) && (synpred4_FTS())) {s = 12;}
+						else if ( (LA17_0==TILDA) && (synpred5_FTS())) {s = 13;}
+						else if ( (LA17_0==LSQUARE) && (synpred6_FTS())) {s = 14;}
+						else if ( (LA17_0==LT) && (synpred6_FTS())) {s = 15;}
+						else if ( (LA17_0==LPAREN) ) {s = 16;}
+						else if ( (LA17_0==PERCENT) ) {s = 17;}
+						 
+						input.seek(index17_0);
+						if ( s>=0 ) return s;
+						break;
+
+					case 20 : 
+						int LA17_69 = input.LA(1);
+						 
+						int index17_69 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 84;}
+						else if ( (synpred3_FTS()) ) {s = 106;}
+						 
+						input.seek(index17_69);
+						if ( s>=0 ) return s;
+						break;
+
+					case 21 : 
+						int LA17_82 = input.LA(1);
+						 
+						int index17_82 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_82==LPAREN) && (synpred7_FTS())) {s = 72;}
+						else if ( (LA17_82==FTSPHRASE) ) {s = 76;}
+						else if ( (LA17_82==COMMA||LA17_82==DOT) && (synpred3_FTS())) {s = 77;}
+						else if ( ((LA17_82 >= DATETIME && LA17_82 <= DECIMAL_INTEGER_LITERAL)||LA17_82==FLOATING_POINT_LITERAL||(LA17_82 >= FTSPRE && LA17_82 <= FTSWORD)||LA17_82==ID) ) {s = 78;}
+						else if ( (LA17_82==NOT||LA17_82==QUESTION_MARK||LA17_82==STAR||LA17_82==TO) && (synpred3_FTS())) {s = 79;}
+						else if ( (LA17_82==LSQUARE) && (synpred6_FTS())) {s = 14;}
+						else if ( (LA17_82==LT) && (synpred6_FTS())) {s = 15;}
+						 
+						input.seek(index17_82);
+						if ( s>=0 ) return s;
+						break;
+
+					case 22 : 
+						int LA17_123 = input.LA(1);
+						 
+						int index17_123 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred3_FTS()) ) {s = 128;}
+						else if ( (synpred6_FTS()) ) {s = 46;}
+						else if ( (synpred7_FTS()) ) {s = 72;}
+						 
+						input.seek(index17_123);
+						if ( s>=0 ) return s;
+						break;
+
+					case 23 : 
+						int LA17_63 = input.LA(1);
+						 
+						int index17_63 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 84;}
+						else if ( (synpred3_FTS()) ) {s = 106;}
+						 
+						input.seek(index17_63);
+						if ( s>=0 ) return s;
+						break;
+
+					case 24 : 
+						int LA17_1 = input.LA(1);
+						 
+						int index17_1 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_1==DOT) ) {s = 18;}
+						else if ( (LA17_1==STAR) ) {s = 19;}
+						else if ( (LA17_1==COLON) ) {s = 20;}
+						else if ( (LA17_1==COMMA) && (synpred3_FTS())) {s = 21;}
+						else if ( (LA17_1==TILDA) && (synpred3_FTS())) {s = 22;}
+						else if ( (LA17_1==CARAT) && (synpred3_FTS())) {s = 23;}
+						else if ( (LA17_1==AND) && (synpred3_FTS())) {s = 24;}
+						else if ( (LA17_1==AMP) && (synpred3_FTS())) {s = 25;}
+						else if ( (LA17_1==EOF) && (synpred3_FTS())) {s = 26;}
+						else if ( (LA17_1==RPAREN) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_1==OR) && (synpred3_FTS())) {s = 28;}
+						else if ( (LA17_1==BAR) && (synpred3_FTS())) {s = 29;}
+						else if ( (LA17_1==NOT) && (synpred3_FTS())) {s = 30;}
+						else if ( (LA17_1==EXCLAMATION) && (synpred3_FTS())) {s = 31;}
+						else if ( (LA17_1==ID) && (synpred3_FTS())) {s = 32;}
+						else if ( (LA17_1==AT) && (synpred3_FTS())) {s = 33;}
+						else if ( (LA17_1==TO) && (synpred3_FTS())) {s = 34;}
+						else if ( ((LA17_1 >= DATETIME && LA17_1 <= DECIMAL_INTEGER_LITERAL)||LA17_1==FLOATING_POINT_LITERAL||(LA17_1 >= FTSPRE && LA17_1 <= FTSWORD)) && (synpred3_FTS())) {s = 35;}
+						else if ( (LA17_1==URI) && (synpred3_FTS())) {s = 36;}
+						else if ( (LA17_1==FTSPHRASE) && (synpred3_FTS())) {s = 37;}
+						else if ( (LA17_1==QUESTION_MARK) && (synpred3_FTS())) {s = 38;}
+						else if ( (LA17_1==EQUALS) && (synpred3_FTS())) {s = 39;}
+						else if ( (LA17_1==LSQUARE) && (synpred3_FTS())) {s = 40;}
+						else if ( (LA17_1==LT) && (synpred3_FTS())) {s = 41;}
+						else if ( (LA17_1==LPAREN) && (synpred3_FTS())) {s = 42;}
+						else if ( (LA17_1==PERCENT) && (synpred3_FTS())) {s = 43;}
+						else if ( (LA17_1==PLUS) && (synpred3_FTS())) {s = 44;}
+						else if ( (LA17_1==MINUS) && (synpred3_FTS())) {s = 45;}
+						else if ( (LA17_1==DOTDOT) && (synpred6_FTS())) {s = 46;}
+						 
+						input.seek(index17_1);
+						if ( s>=0 ) return s;
+						break;
+			}
+			if (state.backtracking>0) {state.failed=true; return -1;}
+			NoViableAltException nvae =
+				new NoViableAltException(getDescription(), 17, _s, input);
+			error(nvae);
+			throw nvae;
+		}
+	}
+
 	static final String DFA72_eotS =
 		"\u00de\uffff";
 	static final String DFA72_eofS =
@@ -26010,15 +15821,15 @@ public class FTSParser extends Parser {
 		"\10\4\1\uffff\1\4\1\uffff\1\4\2\uffff\12\4\1\uffff\10\3\1\uffff\1\3\1"+
 		"\uffff\1\3\2\uffff\12\3\1\2\1\1";
 	static final String DFA72_specialS =
-		"\4\uffff\1\55\1\uffff\1\2\1\uffff\1\24\10\uffff\1\57\1\uffff\1\35\1\uffff"+
-		"\1\45\1\31\12\uffff\1\47\10\uffff\1\13\1\uffff\1\43\1\uffff\1\20\1\25"+
-		"\12\uffff\1\27\1\uffff\1\36\1\uffff\1\21\10\uffff\1\23\1\uffff\1\22\1"+
-		"\uffff\1\0\1\11\12\uffff\1\16\10\uffff\1\41\1\uffff\1\56\1\uffff\1\37"+
-		"\1\50\12\uffff\1\33\1\uffff\1\26\1\uffff\1\54\10\uffff\1\40\1\uffff\1"+
-		"\32\1\uffff\1\17\1\46\12\uffff\1\53\10\uffff\1\12\1\uffff\1\14\1\uffff"+
-		"\1\52\1\10\12\uffff\1\1\1\uffff\1\5\1\uffff\1\6\10\uffff\1\7\1\uffff\1"+
-		"\51\1\uffff\1\15\1\34\12\uffff\1\44\10\uffff\1\3\1\uffff\1\4\1\uffff\1"+
-		"\30\1\42\14\uffff}>";
+		"\4\uffff\1\0\1\uffff\1\55\1\uffff\1\32\10\uffff\1\27\1\uffff\1\26\1\uffff"+
+		"\1\30\1\57\12\uffff\1\24\10\uffff\1\36\1\uffff\1\21\1\uffff\1\14\1\47"+
+		"\12\uffff\1\23\1\uffff\1\15\1\uffff\1\16\10\uffff\1\6\1\uffff\1\52\1\uffff"+
+		"\1\35\1\13\12\uffff\1\5\10\uffff\1\10\1\uffff\1\33\1\uffff\1\12\1\7\12"+
+		"\uffff\1\3\1\uffff\1\17\1\uffff\1\41\10\uffff\1\34\1\uffff\1\20\1\uffff"+
+		"\1\2\1\31\12\uffff\1\40\10\uffff\1\54\1\uffff\1\25\1\uffff\1\42\1\56\12"+
+		"\uffff\1\37\1\uffff\1\43\1\uffff\1\22\10\uffff\1\45\1\uffff\1\46\1\uffff"+
+		"\1\11\1\53\12\uffff\1\44\10\uffff\1\50\1\uffff\1\51\1\uffff\1\1\1\4\14"+
+		"\uffff}>";
 	static final String[] DFA72_transitionS = {
 			"\1\1\1\uffff\2\2\5\uffff\1\1\31\uffff\1\2\2\uffff\3\2\10\uffff\1\2\13"+
 			"\uffff\1\2\10\uffff\1\2\5\uffff\1\2\5\uffff\1\2",
@@ -26326,659 +16137,664 @@ public class FTSParser extends Parser {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
-						int LA72_75 = input.LA(1);
+						int LA72_4 = input.LA(1);
 						 
-						int index72_75 = input.index();
+						int index72_4 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_75==COMMA||LA72_75==DOT) ) {s = 112;}
-						else if ( (synpred38_FTS()) ) {s = 113;}
-						else if ( (synpred40_FTS()) ) {s = 86;}
+						if ( (LA72_4==NOT) ) {s = 8;}
+						else if ( (LA72_4==TILDA) && (synpred49_FTS())) {s = 9;}
+						else if ( (LA72_4==CARAT) && (synpred49_FTS())) {s = 10;}
+						else if ( (LA72_4==AND) && (synpred49_FTS())) {s = 11;}
+						else if ( (LA72_4==AMP) && (synpred49_FTS())) {s = 12;}
+						else if ( (LA72_4==EOF) && (synpred49_FTS())) {s = 13;}
+						else if ( (LA72_4==RPAREN) && (synpred49_FTS())) {s = 14;}
+						else if ( (LA72_4==OR) && (synpred49_FTS())) {s = 15;}
+						else if ( (LA72_4==BAR) && (synpred49_FTS())) {s = 16;}
+						else if ( (LA72_4==ID) ) {s = 17;}
+						else if ( (LA72_4==EXCLAMATION) && (synpred49_FTS())) {s = 18;}
+						else if ( (LA72_4==QUESTION_MARK||LA72_4==STAR) ) {s = 19;}
+						else if ( (LA72_4==AT) && (synpred49_FTS())) {s = 20;}
+						else if ( (LA72_4==TO) ) {s = 21;}
+						else if ( ((LA72_4 >= DATETIME && LA72_4 <= DECIMAL_INTEGER_LITERAL)||LA72_4==FLOATING_POINT_LITERAL||(LA72_4 >= FTSPRE && LA72_4 <= FTSWORD)) ) {s = 22;}
+						else if ( (LA72_4==URI) && (synpred49_FTS())) {s = 23;}
+						else if ( (LA72_4==FTSPHRASE) && (synpred49_FTS())) {s = 24;}
+						else if ( (LA72_4==COMMA||LA72_4==DOT) && (synpred49_FTS())) {s = 25;}
+						else if ( (LA72_4==EQUALS) && (synpred49_FTS())) {s = 26;}
+						else if ( (LA72_4==LSQUARE) && (synpred49_FTS())) {s = 27;}
+						else if ( (LA72_4==LT) && (synpred49_FTS())) {s = 28;}
+						else if ( (LA72_4==LPAREN) && (synpred49_FTS())) {s = 29;}
+						else if ( (LA72_4==PERCENT) && (synpred49_FTS())) {s = 30;}
+						else if ( (LA72_4==PLUS) && (synpred49_FTS())) {s = 31;}
+						else if ( (LA72_4==MINUS) && (synpred49_FTS())) {s = 32;}
 						 
-						input.seek(index72_75);
+						input.seek(index72_4);
 						if ( s>=0 ) return s;
 						break;
 
 					case 1 : 
-						int LA72_166 = input.LA(1);
+						int LA72_208 = input.LA(1);
 						 
-						int index72_166 = input.index();
+						int index72_208 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_166==NOT) ) {s = 170;}
-						else if ( (LA72_166==TILDA) && (synpred32_FTS())) {s = 171;}
-						else if ( (LA72_166==CARAT) && (synpred32_FTS())) {s = 172;}
-						else if ( (LA72_166==AND) && (synpred32_FTS())) {s = 173;}
-						else if ( (LA72_166==AMP) && (synpred32_FTS())) {s = 174;}
-						else if ( (LA72_166==EOF) && (synpred32_FTS())) {s = 175;}
-						else if ( (LA72_166==RPAREN) && (synpred32_FTS())) {s = 176;}
-						else if ( (LA72_166==OR) && (synpred32_FTS())) {s = 177;}
-						else if ( (LA72_166==BAR) && (synpred32_FTS())) {s = 178;}
-						else if ( (LA72_166==ID) ) {s = 179;}
-						else if ( (LA72_166==EXCLAMATION) && (synpred32_FTS())) {s = 180;}
-						else if ( (LA72_166==QUESTION_MARK||LA72_166==STAR) ) {s = 181;}
-						else if ( (LA72_166==AT) && (synpred32_FTS())) {s = 182;}
-						else if ( (LA72_166==TO) ) {s = 183;}
-						else if ( ((LA72_166 >= DATETIME && LA72_166 <= DECIMAL_INTEGER_LITERAL)||LA72_166==FLOATING_POINT_LITERAL||(LA72_166 >= FTSPRE && LA72_166 <= FTSWORD)) ) {s = 184;}
-						else if ( (LA72_166==URI) && (synpred32_FTS())) {s = 185;}
-						else if ( (LA72_166==FTSPHRASE) && (synpred32_FTS())) {s = 186;}
-						else if ( (LA72_166==COMMA||LA72_166==DOT) && (synpred32_FTS())) {s = 187;}
-						else if ( (LA72_166==EQUALS) && (synpred32_FTS())) {s = 188;}
-						else if ( (LA72_166==LSQUARE) && (synpred32_FTS())) {s = 189;}
-						else if ( (LA72_166==LT) && (synpred32_FTS())) {s = 190;}
-						else if ( (LA72_166==LPAREN) && (synpred32_FTS())) {s = 191;}
-						else if ( (LA72_166==PERCENT) && (synpred32_FTS())) {s = 192;}
-						else if ( (LA72_166==PLUS) && (synpred32_FTS())) {s = 193;}
-						else if ( (LA72_166==MINUS) && (synpred32_FTS())) {s = 194;}
+						if ( (synpred34_FTS()) ) {s = 221;}
+						else if ( (synpred36_FTS()) ) {s = 219;}
 						 
-						input.seek(index72_166);
+						input.seek(index72_208);
 						if ( s>=0 ) return s;
 						break;
 
 					case 2 : 
-						int LA72_6 = input.LA(1);
-						 
-						int index72_6 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_6==NOT) ) {s = 33;}
-						else if ( (LA72_6==TILDA) && (synpred43_FTS())) {s = 34;}
-						else if ( (LA72_6==CARAT) && (synpred43_FTS())) {s = 35;}
-						else if ( (LA72_6==AND) && (synpred43_FTS())) {s = 36;}
-						else if ( (LA72_6==AMP) && (synpred43_FTS())) {s = 37;}
-						else if ( (LA72_6==EOF) && (synpred43_FTS())) {s = 38;}
-						else if ( (LA72_6==RPAREN) && (synpred43_FTS())) {s = 39;}
-						else if ( (LA72_6==OR) && (synpred43_FTS())) {s = 40;}
-						else if ( (LA72_6==BAR) && (synpred43_FTS())) {s = 41;}
-						else if ( (LA72_6==ID) ) {s = 42;}
-						else if ( (LA72_6==EXCLAMATION) && (synpred43_FTS())) {s = 43;}
-						else if ( (LA72_6==QUESTION_MARK||LA72_6==STAR) ) {s = 44;}
-						else if ( (LA72_6==AT) && (synpred43_FTS())) {s = 45;}
-						else if ( (LA72_6==TO) ) {s = 46;}
-						else if ( ((LA72_6 >= DATETIME && LA72_6 <= DECIMAL_INTEGER_LITERAL)||LA72_6==FLOATING_POINT_LITERAL||(LA72_6 >= FTSPRE && LA72_6 <= FTSWORD)) ) {s = 47;}
-						else if ( (LA72_6==URI) && (synpred43_FTS())) {s = 48;}
-						else if ( (LA72_6==FTSPHRASE) && (synpred43_FTS())) {s = 49;}
-						else if ( (LA72_6==COMMA||LA72_6==DOT) && (synpred43_FTS())) {s = 50;}
-						else if ( (LA72_6==EQUALS) && (synpred43_FTS())) {s = 51;}
-						else if ( (LA72_6==LSQUARE) && (synpred43_FTS())) {s = 52;}
-						else if ( (LA72_6==LT) && (synpred43_FTS())) {s = 53;}
-						else if ( (LA72_6==LPAREN) && (synpred43_FTS())) {s = 54;}
-						else if ( (LA72_6==PERCENT) && (synpred43_FTS())) {s = 55;}
-						else if ( (LA72_6==PLUS) && (synpred43_FTS())) {s = 56;}
-						else if ( (LA72_6==MINUS) && (synpred43_FTS())) {s = 57;}
-						 
-						input.seek(index72_6);
-						if ( s>=0 ) return s;
-						break;
-
-					case 3 : 
-						int LA72_204 = input.LA(1);
-						 
-						int index72_204 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred29_FTS()) ) {s = 221;}
-						else if ( (synpred31_FTS()) ) {s = 219;}
-						 
-						input.seek(index72_204);
-						if ( s>=0 ) return s;
-						break;
-
-					case 4 : 
-						int LA72_206 = input.LA(1);
-						 
-						int index72_206 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred29_FTS()) ) {s = 221;}
-						else if ( (synpred31_FTS()) ) {s = 219;}
-						 
-						input.seek(index72_206);
-						if ( s>=0 ) return s;
-						break;
-
-					case 5 : 
-						int LA72_168 = input.LA(1);
-						 
-						int index72_168 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_168==NOT) ) {s = 195;}
-						else if ( (LA72_168==TILDA) && (synpred31_FTS())) {s = 196;}
-						else if ( (LA72_168==CARAT) && (synpred31_FTS())) {s = 197;}
-						else if ( (LA72_168==AND) && (synpred31_FTS())) {s = 198;}
-						else if ( (LA72_168==AMP) && (synpred31_FTS())) {s = 199;}
-						else if ( (LA72_168==EOF) && (synpred31_FTS())) {s = 200;}
-						else if ( (LA72_168==RPAREN) && (synpred31_FTS())) {s = 201;}
-						else if ( (LA72_168==OR) && (synpred31_FTS())) {s = 202;}
-						else if ( (LA72_168==BAR) && (synpred31_FTS())) {s = 203;}
-						else if ( (LA72_168==ID) ) {s = 204;}
-						else if ( (LA72_168==EXCLAMATION) && (synpred31_FTS())) {s = 205;}
-						else if ( (LA72_168==QUESTION_MARK||LA72_168==STAR) ) {s = 206;}
-						else if ( (LA72_168==AT) && (synpred31_FTS())) {s = 207;}
-						else if ( (LA72_168==TO) ) {s = 208;}
-						else if ( ((LA72_168 >= DATETIME && LA72_168 <= DECIMAL_INTEGER_LITERAL)||LA72_168==FLOATING_POINT_LITERAL||(LA72_168 >= FTSPRE && LA72_168 <= FTSWORD)) ) {s = 209;}
-						else if ( (LA72_168==URI) && (synpred31_FTS())) {s = 210;}
-						else if ( (LA72_168==FTSPHRASE) && (synpred31_FTS())) {s = 211;}
-						else if ( (LA72_168==COMMA||LA72_168==DOT) && (synpred31_FTS())) {s = 212;}
-						else if ( (LA72_168==EQUALS) && (synpred31_FTS())) {s = 213;}
-						else if ( (LA72_168==LSQUARE) && (synpred31_FTS())) {s = 214;}
-						else if ( (LA72_168==LT) && (synpred31_FTS())) {s = 215;}
-						else if ( (LA72_168==LPAREN) && (synpred31_FTS())) {s = 216;}
-						else if ( (LA72_168==PERCENT) && (synpred31_FTS())) {s = 217;}
-						else if ( (LA72_168==PLUS) && (synpred31_FTS())) {s = 218;}
-						else if ( (LA72_168==MINUS) && (synpred31_FTS())) {s = 219;}
-						 
-						input.seek(index72_168);
-						if ( s>=0 ) return s;
-						break;
-
-					case 6 : 
-						int LA72_170 = input.LA(1);
-						 
-						int index72_170 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred30_FTS()) ) {s = 220;}
-						else if ( (synpred32_FTS()) ) {s = 194;}
-						 
-						input.seek(index72_170);
-						if ( s>=0 ) return s;
-						break;
-
-					case 7 : 
-						int LA72_179 = input.LA(1);
-						 
-						int index72_179 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred30_FTS()) ) {s = 220;}
-						else if ( (synpred32_FTS()) ) {s = 194;}
-						 
-						input.seek(index72_179);
-						if ( s>=0 ) return s;
-						break;
-
-					case 8 : 
-						int LA72_155 = input.LA(1);
-						 
-						int index72_155 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_155==COMMA||LA72_155==DOT) ) {s = 168;}
-						else if ( (synpred33_FTS()) ) {s = 169;}
-						else if ( (synpred35_FTS()) ) {s = 165;}
-						 
-						input.seek(index72_155);
-						if ( s>=0 ) return s;
-						break;
-
-					case 9 : 
-						int LA72_76 = input.LA(1);
-						 
-						int index72_76 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_76==COMMA||LA72_76==DOT) ) {s = 112;}
-						else if ( (synpred38_FTS()) ) {s = 113;}
-						else if ( (synpred40_FTS()) ) {s = 86;}
-						 
-						input.seek(index72_76);
-						if ( s>=0 ) return s;
-						break;
-
-					case 10 : 
-						int LA72_150 = input.LA(1);
-						 
-						int index72_150 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_150==COMMA||LA72_150==DOT) ) {s = 168;}
-						else if ( (synpred33_FTS()) ) {s = 169;}
-						else if ( (synpred35_FTS()) ) {s = 165;}
-						 
-						input.seek(index72_150);
-						if ( s>=0 ) return s;
-						break;
-
-					case 11 : 
-						int LA72_42 = input.LA(1);
-						 
-						int index72_42 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_42==COMMA||LA72_42==DOT) ) {s = 60;}
-						else if ( (synpred41_FTS()) ) {s = 61;}
-						else if ( (synpred43_FTS()) ) {s = 57;}
-						else if ( (true) ) {s = 7;}
-						 
-						input.seek(index72_42);
-						if ( s>=0 ) return s;
-						break;
-
-					case 12 : 
-						int LA72_152 = input.LA(1);
-						 
-						int index72_152 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_152==COMMA||LA72_152==DOT) ) {s = 168;}
-						else if ( (synpred33_FTS()) ) {s = 169;}
-						else if ( (synpred35_FTS()) ) {s = 165;}
-						 
-						input.seek(index72_152);
-						if ( s>=0 ) return s;
-						break;
-
-					case 13 : 
-						int LA72_183 = input.LA(1);
-						 
-						int index72_183 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred30_FTS()) ) {s = 220;}
-						else if ( (synpred32_FTS()) ) {s = 194;}
-						 
-						input.seek(index72_183);
-						if ( s>=0 ) return s;
-						break;
-
-					case 14 : 
-						int LA72_87 = input.LA(1);
-						 
-						int index72_87 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_87==COMMA||LA72_87==DOT) ) {s = 114;}
-						else if ( (synpred37_FTS()) ) {s = 115;}
-						else if ( (synpred39_FTS()) ) {s = 111;}
-						 
-						input.seek(index72_87);
-						if ( s>=0 ) return s;
-						break;
-
-					case 15 : 
 						int LA72_129 = input.LA(1);
 						 
 						int index72_129 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (LA72_129==COMMA||LA72_129==DOT) ) {s = 166;}
-						else if ( (synpred34_FTS()) ) {s = 167;}
-						else if ( (synpred36_FTS()) ) {s = 140;}
+						else if ( (synpred39_FTS()) ) {s = 167;}
+						else if ( (synpred41_FTS()) ) {s = 140;}
 						 
 						input.seek(index72_129);
 						if ( s>=0 ) return s;
 						break;
 
-					case 16 : 
-						int LA72_46 = input.LA(1);
-						 
-						int index72_46 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_46==COMMA||LA72_46==DOT) ) {s = 60;}
-						else if ( (synpred41_FTS()) ) {s = 61;}
-						else if ( (synpred43_FTS()) ) {s = 57;}
-						else if ( (true) ) {s = 7;}
-						 
-						input.seek(index72_46);
-						if ( s>=0 ) return s;
-						break;
-
-					case 17 : 
-						int LA72_62 = input.LA(1);
-						 
-						int index72_62 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_62==COMMA||LA72_62==DOT) ) {s = 112;}
-						else if ( (synpred38_FTS()) ) {s = 113;}
-						else if ( (synpred40_FTS()) ) {s = 86;}
-						 
-						input.seek(index72_62);
-						if ( s>=0 ) return s;
-						break;
-
-					case 18 : 
-						int LA72_73 = input.LA(1);
-						 
-						int index72_73 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_73==COMMA||LA72_73==DOT) ) {s = 112;}
-						else if ( (synpred38_FTS()) ) {s = 113;}
-						else if ( (synpred40_FTS()) ) {s = 86;}
-						 
-						input.seek(index72_73);
-						if ( s>=0 ) return s;
-						break;
-
-					case 19 : 
-						int LA72_71 = input.LA(1);
-						 
-						int index72_71 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_71==COMMA||LA72_71==DOT) ) {s = 112;}
-						else if ( (synpred38_FTS()) ) {s = 113;}
-						else if ( (synpred40_FTS()) ) {s = 86;}
-						 
-						input.seek(index72_71);
-						if ( s>=0 ) return s;
-						break;
-
-					case 20 : 
-						int LA72_8 = input.LA(1);
-						 
-						int index72_8 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_8==COMMA||LA72_8==DOT) ) {s = 58;}
-						else if ( (synpred42_FTS()) ) {s = 59;}
-						else if ( (synpred44_FTS()) ) {s = 32;}
-						else if ( (true) ) {s = 5;}
-						 
-						input.seek(index72_8);
-						if ( s>=0 ) return s;
-						break;
-
-					case 21 : 
-						int LA72_47 = input.LA(1);
-						 
-						int index72_47 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_47==COMMA||LA72_47==DOT) ) {s = 60;}
-						else if ( (synpred41_FTS()) ) {s = 61;}
-						else if ( (synpred43_FTS()) ) {s = 57;}
-						else if ( (true) ) {s = 7;}
-						 
-						input.seek(index72_47);
-						if ( s>=0 ) return s;
-						break;
-
-					case 22 : 
-						int LA72_114 = input.LA(1);
-						 
-						int index72_114 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_114==NOT) ) {s = 141;}
-						else if ( (LA72_114==TILDA) && (synpred35_FTS())) {s = 142;}
-						else if ( (LA72_114==CARAT) && (synpred35_FTS())) {s = 143;}
-						else if ( (LA72_114==AND) && (synpred35_FTS())) {s = 144;}
-						else if ( (LA72_114==AMP) && (synpred35_FTS())) {s = 145;}
-						else if ( (LA72_114==EOF) && (synpred35_FTS())) {s = 146;}
-						else if ( (LA72_114==RPAREN) && (synpred35_FTS())) {s = 147;}
-						else if ( (LA72_114==OR) && (synpred35_FTS())) {s = 148;}
-						else if ( (LA72_114==BAR) && (synpred35_FTS())) {s = 149;}
-						else if ( (LA72_114==ID) ) {s = 150;}
-						else if ( (LA72_114==EXCLAMATION) && (synpred35_FTS())) {s = 151;}
-						else if ( (LA72_114==QUESTION_MARK||LA72_114==STAR) ) {s = 152;}
-						else if ( (LA72_114==AT) && (synpred35_FTS())) {s = 153;}
-						else if ( (LA72_114==TO) ) {s = 154;}
-						else if ( ((LA72_114 >= DATETIME && LA72_114 <= DECIMAL_INTEGER_LITERAL)||LA72_114==FLOATING_POINT_LITERAL||(LA72_114 >= FTSPRE && LA72_114 <= FTSWORD)) ) {s = 155;}
-						else if ( (LA72_114==URI) && (synpred35_FTS())) {s = 156;}
-						else if ( (LA72_114==FTSPHRASE) && (synpred35_FTS())) {s = 157;}
-						else if ( (LA72_114==COMMA||LA72_114==DOT) && (synpred35_FTS())) {s = 158;}
-						else if ( (LA72_114==EQUALS) && (synpred35_FTS())) {s = 159;}
-						else if ( (LA72_114==LSQUARE) && (synpred35_FTS())) {s = 160;}
-						else if ( (LA72_114==LT) && (synpred35_FTS())) {s = 161;}
-						else if ( (LA72_114==LPAREN) && (synpred35_FTS())) {s = 162;}
-						else if ( (LA72_114==PERCENT) && (synpred35_FTS())) {s = 163;}
-						else if ( (LA72_114==PLUS) && (synpred35_FTS())) {s = 164;}
-						else if ( (LA72_114==MINUS) && (synpred35_FTS())) {s = 165;}
-						 
-						input.seek(index72_114);
-						if ( s>=0 ) return s;
-						break;
-
-					case 23 : 
-						int LA72_58 = input.LA(1);
-						 
-						int index72_58 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_58==NOT) ) {s = 62;}
-						else if ( (LA72_58==TILDA) && (synpred40_FTS())) {s = 63;}
-						else if ( (LA72_58==CARAT) && (synpred40_FTS())) {s = 64;}
-						else if ( (LA72_58==AND) && (synpred40_FTS())) {s = 65;}
-						else if ( (LA72_58==AMP) && (synpred40_FTS())) {s = 66;}
-						else if ( (LA72_58==EOF) && (synpred40_FTS())) {s = 67;}
-						else if ( (LA72_58==RPAREN) && (synpred40_FTS())) {s = 68;}
-						else if ( (LA72_58==OR) && (synpred40_FTS())) {s = 69;}
-						else if ( (LA72_58==BAR) && (synpred40_FTS())) {s = 70;}
-						else if ( (LA72_58==ID) ) {s = 71;}
-						else if ( (LA72_58==EXCLAMATION) && (synpred40_FTS())) {s = 72;}
-						else if ( (LA72_58==QUESTION_MARK||LA72_58==STAR) ) {s = 73;}
-						else if ( (LA72_58==AT) && (synpred40_FTS())) {s = 74;}
-						else if ( (LA72_58==TO) ) {s = 75;}
-						else if ( ((LA72_58 >= DATETIME && LA72_58 <= DECIMAL_INTEGER_LITERAL)||LA72_58==FLOATING_POINT_LITERAL||(LA72_58 >= FTSPRE && LA72_58 <= FTSWORD)) ) {s = 76;}
-						else if ( (LA72_58==URI) && (synpred40_FTS())) {s = 77;}
-						else if ( (LA72_58==FTSPHRASE) && (synpred40_FTS())) {s = 78;}
-						else if ( (LA72_58==COMMA||LA72_58==DOT) && (synpred40_FTS())) {s = 79;}
-						else if ( (LA72_58==EQUALS) && (synpred40_FTS())) {s = 80;}
-						else if ( (LA72_58==LSQUARE) && (synpred40_FTS())) {s = 81;}
-						else if ( (LA72_58==LT) && (synpred40_FTS())) {s = 82;}
-						else if ( (LA72_58==LPAREN) && (synpred40_FTS())) {s = 83;}
-						else if ( (LA72_58==PERCENT) && (synpred40_FTS())) {s = 84;}
-						else if ( (LA72_58==PLUS) && (synpred40_FTS())) {s = 85;}
-						else if ( (LA72_58==MINUS) && (synpred40_FTS())) {s = 86;}
-						 
-						input.seek(index72_58);
-						if ( s>=0 ) return s;
-						break;
-
-					case 24 : 
-						int LA72_208 = input.LA(1);
-						 
-						int index72_208 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred29_FTS()) ) {s = 221;}
-						else if ( (synpred31_FTS()) ) {s = 219;}
-						 
-						input.seek(index72_208);
-						if ( s>=0 ) return s;
-						break;
-
-					case 25 : 
-						int LA72_22 = input.LA(1);
-						 
-						int index72_22 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_22==COMMA||LA72_22==DOT) ) {s = 58;}
-						else if ( (synpred42_FTS()) ) {s = 59;}
-						else if ( (synpred44_FTS()) ) {s = 32;}
-						else if ( (true) ) {s = 5;}
-						 
-						input.seek(index72_22);
-						if ( s>=0 ) return s;
-						break;
-
-					case 26 : 
-						int LA72_127 = input.LA(1);
-						 
-						int index72_127 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_127==COMMA||LA72_127==DOT) ) {s = 166;}
-						else if ( (synpred34_FTS()) ) {s = 167;}
-						else if ( (synpred36_FTS()) ) {s = 140;}
-						 
-						input.seek(index72_127);
-						if ( s>=0 ) return s;
-						break;
-
-					case 27 : 
+					case 3 : 
 						int LA72_112 = input.LA(1);
 						 
 						int index72_112 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (LA72_112==NOT) ) {s = 116;}
-						else if ( (LA72_112==TILDA) && (synpred36_FTS())) {s = 117;}
-						else if ( (LA72_112==CARAT) && (synpred36_FTS())) {s = 118;}
-						else if ( (LA72_112==AND) && (synpred36_FTS())) {s = 119;}
-						else if ( (LA72_112==AMP) && (synpred36_FTS())) {s = 120;}
-						else if ( (LA72_112==EOF) && (synpred36_FTS())) {s = 121;}
-						else if ( (LA72_112==RPAREN) && (synpred36_FTS())) {s = 122;}
-						else if ( (LA72_112==OR) && (synpred36_FTS())) {s = 123;}
-						else if ( (LA72_112==BAR) && (synpred36_FTS())) {s = 124;}
+						else if ( (LA72_112==TILDA) && (synpred41_FTS())) {s = 117;}
+						else if ( (LA72_112==CARAT) && (synpred41_FTS())) {s = 118;}
+						else if ( (LA72_112==AND) && (synpred41_FTS())) {s = 119;}
+						else if ( (LA72_112==AMP) && (synpred41_FTS())) {s = 120;}
+						else if ( (LA72_112==EOF) && (synpred41_FTS())) {s = 121;}
+						else if ( (LA72_112==RPAREN) && (synpred41_FTS())) {s = 122;}
+						else if ( (LA72_112==OR) && (synpred41_FTS())) {s = 123;}
+						else if ( (LA72_112==BAR) && (synpred41_FTS())) {s = 124;}
 						else if ( (LA72_112==ID) ) {s = 125;}
-						else if ( (LA72_112==EXCLAMATION) && (synpred36_FTS())) {s = 126;}
+						else if ( (LA72_112==EXCLAMATION) && (synpred41_FTS())) {s = 126;}
 						else if ( (LA72_112==QUESTION_MARK||LA72_112==STAR) ) {s = 127;}
-						else if ( (LA72_112==AT) && (synpred36_FTS())) {s = 128;}
+						else if ( (LA72_112==AT) && (synpred41_FTS())) {s = 128;}
 						else if ( (LA72_112==TO) ) {s = 129;}
 						else if ( ((LA72_112 >= DATETIME && LA72_112 <= DECIMAL_INTEGER_LITERAL)||LA72_112==FLOATING_POINT_LITERAL||(LA72_112 >= FTSPRE && LA72_112 <= FTSWORD)) ) {s = 130;}
-						else if ( (LA72_112==URI) && (synpred36_FTS())) {s = 131;}
-						else if ( (LA72_112==FTSPHRASE) && (synpred36_FTS())) {s = 132;}
-						else if ( (LA72_112==COMMA||LA72_112==DOT) && (synpred36_FTS())) {s = 133;}
-						else if ( (LA72_112==EQUALS) && (synpred36_FTS())) {s = 134;}
-						else if ( (LA72_112==LSQUARE) && (synpred36_FTS())) {s = 135;}
-						else if ( (LA72_112==LT) && (synpred36_FTS())) {s = 136;}
-						else if ( (LA72_112==LPAREN) && (synpred36_FTS())) {s = 137;}
-						else if ( (LA72_112==PERCENT) && (synpred36_FTS())) {s = 138;}
-						else if ( (LA72_112==PLUS) && (synpred36_FTS())) {s = 139;}
-						else if ( (LA72_112==MINUS) && (synpred36_FTS())) {s = 140;}
+						else if ( (LA72_112==URI) && (synpred41_FTS())) {s = 131;}
+						else if ( (LA72_112==FTSPHRASE) && (synpred41_FTS())) {s = 132;}
+						else if ( (LA72_112==COMMA||LA72_112==DOT) && (synpred41_FTS())) {s = 133;}
+						else if ( (LA72_112==EQUALS) && (synpred41_FTS())) {s = 134;}
+						else if ( (LA72_112==LSQUARE) && (synpred41_FTS())) {s = 135;}
+						else if ( (LA72_112==LT) && (synpred41_FTS())) {s = 136;}
+						else if ( (LA72_112==LPAREN) && (synpred41_FTS())) {s = 137;}
+						else if ( (LA72_112==PERCENT) && (synpred41_FTS())) {s = 138;}
+						else if ( (LA72_112==PLUS) && (synpred41_FTS())) {s = 139;}
+						else if ( (LA72_112==MINUS) && (synpred41_FTS())) {s = 140;}
 						 
 						input.seek(index72_112);
 						if ( s>=0 ) return s;
 						break;
 
-					case 28 : 
-						int LA72_184 = input.LA(1);
+					case 4 : 
+						int LA72_209 = input.LA(1);
 						 
-						int index72_184 = input.index();
+						int index72_209 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred30_FTS()) ) {s = 220;}
-						else if ( (synpred32_FTS()) ) {s = 194;}
+						if ( (synpred34_FTS()) ) {s = 221;}
+						else if ( (synpred36_FTS()) ) {s = 219;}
 						 
-						input.seek(index72_184);
+						input.seek(index72_209);
 						if ( s>=0 ) return s;
 						break;
 
-					case 29 : 
-						int LA72_19 = input.LA(1);
+					case 5 : 
+						int LA72_87 = input.LA(1);
 						 
-						int index72_19 = input.index();
+						int index72_87 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_19==COMMA||LA72_19==DOT) ) {s = 58;}
-						else if ( (synpred42_FTS()) ) {s = 59;}
-						else if ( (synpred44_FTS()) ) {s = 32;}
-						else if ( (true) ) {s = 5;}
+						if ( (LA72_87==COMMA||LA72_87==DOT) ) {s = 114;}
+						else if ( (synpred42_FTS()) ) {s = 115;}
+						else if ( (synpred44_FTS()) ) {s = 111;}
 						 
-						input.seek(index72_19);
+						input.seek(index72_87);
 						if ( s>=0 ) return s;
 						break;
 
-					case 30 : 
-						int LA72_60 = input.LA(1);
+					case 6 : 
+						int LA72_71 = input.LA(1);
 						 
-						int index72_60 = input.index();
+						int index72_71 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_60==NOT) ) {s = 87;}
-						else if ( (LA72_60==TILDA) && (synpred39_FTS())) {s = 88;}
-						else if ( (LA72_60==CARAT) && (synpred39_FTS())) {s = 89;}
-						else if ( (LA72_60==AND) && (synpred39_FTS())) {s = 90;}
-						else if ( (LA72_60==AMP) && (synpred39_FTS())) {s = 91;}
-						else if ( (LA72_60==EOF) && (synpred39_FTS())) {s = 92;}
-						else if ( (LA72_60==RPAREN) && (synpred39_FTS())) {s = 93;}
-						else if ( (LA72_60==OR) && (synpred39_FTS())) {s = 94;}
-						else if ( (LA72_60==BAR) && (synpred39_FTS())) {s = 95;}
-						else if ( (LA72_60==ID) ) {s = 96;}
-						else if ( (LA72_60==EXCLAMATION) && (synpred39_FTS())) {s = 97;}
-						else if ( (LA72_60==QUESTION_MARK||LA72_60==STAR) ) {s = 98;}
-						else if ( (LA72_60==AT) && (synpred39_FTS())) {s = 99;}
-						else if ( (LA72_60==TO) ) {s = 100;}
-						else if ( ((LA72_60 >= DATETIME && LA72_60 <= DECIMAL_INTEGER_LITERAL)||LA72_60==FLOATING_POINT_LITERAL||(LA72_60 >= FTSPRE && LA72_60 <= FTSWORD)) ) {s = 101;}
-						else if ( (LA72_60==URI) && (synpred39_FTS())) {s = 102;}
-						else if ( (LA72_60==FTSPHRASE) && (synpred39_FTS())) {s = 103;}
-						else if ( (LA72_60==COMMA||LA72_60==DOT) && (synpred39_FTS())) {s = 104;}
-						else if ( (LA72_60==EQUALS) && (synpred39_FTS())) {s = 105;}
-						else if ( (LA72_60==LSQUARE) && (synpred39_FTS())) {s = 106;}
-						else if ( (LA72_60==LT) && (synpred39_FTS())) {s = 107;}
-						else if ( (LA72_60==LPAREN) && (synpred39_FTS())) {s = 108;}
-						else if ( (LA72_60==PERCENT) && (synpred39_FTS())) {s = 109;}
-						else if ( (LA72_60==PLUS) && (synpred39_FTS())) {s = 110;}
-						else if ( (LA72_60==MINUS) && (synpred39_FTS())) {s = 111;}
+						if ( (LA72_71==COMMA||LA72_71==DOT) ) {s = 112;}
+						else if ( (synpred43_FTS()) ) {s = 113;}
+						else if ( (synpred45_FTS()) ) {s = 86;}
 						 
-						input.seek(index72_60);
+						input.seek(index72_71);
 						if ( s>=0 ) return s;
 						break;
 
-					case 31 : 
-						int LA72_100 = input.LA(1);
+					case 7 : 
+						int LA72_101 = input.LA(1);
 						 
-						int index72_100 = input.index();
+						int index72_101 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_100==COMMA||LA72_100==DOT) ) {s = 114;}
-						else if ( (synpred37_FTS()) ) {s = 115;}
-						else if ( (synpred39_FTS()) ) {s = 111;}
+						if ( (LA72_101==COMMA||LA72_101==DOT) ) {s = 114;}
+						else if ( (synpred42_FTS()) ) {s = 115;}
+						else if ( (synpred44_FTS()) ) {s = 111;}
 						 
-						input.seek(index72_100);
+						input.seek(index72_101);
 						if ( s>=0 ) return s;
 						break;
 
-					case 32 : 
-						int LA72_125 = input.LA(1);
-						 
-						int index72_125 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_125==COMMA||LA72_125==DOT) ) {s = 166;}
-						else if ( (synpred34_FTS()) ) {s = 167;}
-						else if ( (synpred36_FTS()) ) {s = 140;}
-						 
-						input.seek(index72_125);
-						if ( s>=0 ) return s;
-						break;
-
-					case 33 : 
+					case 8 : 
 						int LA72_96 = input.LA(1);
 						 
 						int index72_96 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (LA72_96==COMMA||LA72_96==DOT) ) {s = 114;}
-						else if ( (synpred37_FTS()) ) {s = 115;}
-						else if ( (synpred39_FTS()) ) {s = 111;}
+						else if ( (synpred42_FTS()) ) {s = 115;}
+						else if ( (synpred44_FTS()) ) {s = 111;}
 						 
 						input.seek(index72_96);
 						if ( s>=0 ) return s;
 						break;
 
-					case 34 : 
-						int LA72_209 = input.LA(1);
+					case 9 : 
+						int LA72_183 = input.LA(1);
 						 
-						int index72_209 = input.index();
+						int index72_183 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred29_FTS()) ) {s = 221;}
-						else if ( (synpred31_FTS()) ) {s = 219;}
+						if ( (synpred35_FTS()) ) {s = 220;}
+						else if ( (synpred37_FTS()) ) {s = 194;}
 						 
-						input.seek(index72_209);
+						input.seek(index72_183);
 						if ( s>=0 ) return s;
 						break;
 
-					case 35 : 
+					case 10 : 
+						int LA72_100 = input.LA(1);
+						 
+						int index72_100 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_100==COMMA||LA72_100==DOT) ) {s = 114;}
+						else if ( (synpred42_FTS()) ) {s = 115;}
+						else if ( (synpred44_FTS()) ) {s = 111;}
+						 
+						input.seek(index72_100);
+						if ( s>=0 ) return s;
+						break;
+
+					case 11 : 
+						int LA72_76 = input.LA(1);
+						 
+						int index72_76 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_76==COMMA||LA72_76==DOT) ) {s = 112;}
+						else if ( (synpred43_FTS()) ) {s = 113;}
+						else if ( (synpred45_FTS()) ) {s = 86;}
+						 
+						input.seek(index72_76);
+						if ( s>=0 ) return s;
+						break;
+
+					case 12 : 
+						int LA72_46 = input.LA(1);
+						 
+						int index72_46 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_46==COMMA||LA72_46==DOT) ) {s = 60;}
+						else if ( (synpred46_FTS()) ) {s = 61;}
+						else if ( (synpred48_FTS()) ) {s = 57;}
+						else if ( (true) ) {s = 7;}
+						 
+						input.seek(index72_46);
+						if ( s>=0 ) return s;
+						break;
+
+					case 13 : 
+						int LA72_60 = input.LA(1);
+						 
+						int index72_60 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_60==NOT) ) {s = 87;}
+						else if ( (LA72_60==TILDA) && (synpred44_FTS())) {s = 88;}
+						else if ( (LA72_60==CARAT) && (synpred44_FTS())) {s = 89;}
+						else if ( (LA72_60==AND) && (synpred44_FTS())) {s = 90;}
+						else if ( (LA72_60==AMP) && (synpred44_FTS())) {s = 91;}
+						else if ( (LA72_60==EOF) && (synpred44_FTS())) {s = 92;}
+						else if ( (LA72_60==RPAREN) && (synpred44_FTS())) {s = 93;}
+						else if ( (LA72_60==OR) && (synpred44_FTS())) {s = 94;}
+						else if ( (LA72_60==BAR) && (synpred44_FTS())) {s = 95;}
+						else if ( (LA72_60==ID) ) {s = 96;}
+						else if ( (LA72_60==EXCLAMATION) && (synpred44_FTS())) {s = 97;}
+						else if ( (LA72_60==QUESTION_MARK||LA72_60==STAR) ) {s = 98;}
+						else if ( (LA72_60==AT) && (synpred44_FTS())) {s = 99;}
+						else if ( (LA72_60==TO) ) {s = 100;}
+						else if ( ((LA72_60 >= DATETIME && LA72_60 <= DECIMAL_INTEGER_LITERAL)||LA72_60==FLOATING_POINT_LITERAL||(LA72_60 >= FTSPRE && LA72_60 <= FTSWORD)) ) {s = 101;}
+						else if ( (LA72_60==URI) && (synpred44_FTS())) {s = 102;}
+						else if ( (LA72_60==FTSPHRASE) && (synpred44_FTS())) {s = 103;}
+						else if ( (LA72_60==COMMA||LA72_60==DOT) && (synpred44_FTS())) {s = 104;}
+						else if ( (LA72_60==EQUALS) && (synpred44_FTS())) {s = 105;}
+						else if ( (LA72_60==LSQUARE) && (synpred44_FTS())) {s = 106;}
+						else if ( (LA72_60==LT) && (synpred44_FTS())) {s = 107;}
+						else if ( (LA72_60==LPAREN) && (synpred44_FTS())) {s = 108;}
+						else if ( (LA72_60==PERCENT) && (synpred44_FTS())) {s = 109;}
+						else if ( (LA72_60==PLUS) && (synpred44_FTS())) {s = 110;}
+						else if ( (LA72_60==MINUS) && (synpred44_FTS())) {s = 111;}
+						 
+						input.seek(index72_60);
+						if ( s>=0 ) return s;
+						break;
+
+					case 14 : 
+						int LA72_62 = input.LA(1);
+						 
+						int index72_62 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_62==COMMA||LA72_62==DOT) ) {s = 112;}
+						else if ( (synpred43_FTS()) ) {s = 113;}
+						else if ( (synpred45_FTS()) ) {s = 86;}
+						 
+						input.seek(index72_62);
+						if ( s>=0 ) return s;
+						break;
+
+					case 15 : 
+						int LA72_114 = input.LA(1);
+						 
+						int index72_114 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_114==NOT) ) {s = 141;}
+						else if ( (LA72_114==TILDA) && (synpred40_FTS())) {s = 142;}
+						else if ( (LA72_114==CARAT) && (synpred40_FTS())) {s = 143;}
+						else if ( (LA72_114==AND) && (synpred40_FTS())) {s = 144;}
+						else if ( (LA72_114==AMP) && (synpred40_FTS())) {s = 145;}
+						else if ( (LA72_114==EOF) && (synpred40_FTS())) {s = 146;}
+						else if ( (LA72_114==RPAREN) && (synpred40_FTS())) {s = 147;}
+						else if ( (LA72_114==OR) && (synpred40_FTS())) {s = 148;}
+						else if ( (LA72_114==BAR) && (synpred40_FTS())) {s = 149;}
+						else if ( (LA72_114==ID) ) {s = 150;}
+						else if ( (LA72_114==EXCLAMATION) && (synpred40_FTS())) {s = 151;}
+						else if ( (LA72_114==QUESTION_MARK||LA72_114==STAR) ) {s = 152;}
+						else if ( (LA72_114==AT) && (synpred40_FTS())) {s = 153;}
+						else if ( (LA72_114==TO) ) {s = 154;}
+						else if ( ((LA72_114 >= DATETIME && LA72_114 <= DECIMAL_INTEGER_LITERAL)||LA72_114==FLOATING_POINT_LITERAL||(LA72_114 >= FTSPRE && LA72_114 <= FTSWORD)) ) {s = 155;}
+						else if ( (LA72_114==URI) && (synpred40_FTS())) {s = 156;}
+						else if ( (LA72_114==FTSPHRASE) && (synpred40_FTS())) {s = 157;}
+						else if ( (LA72_114==COMMA||LA72_114==DOT) && (synpred40_FTS())) {s = 158;}
+						else if ( (LA72_114==EQUALS) && (synpred40_FTS())) {s = 159;}
+						else if ( (LA72_114==LSQUARE) && (synpred40_FTS())) {s = 160;}
+						else if ( (LA72_114==LT) && (synpred40_FTS())) {s = 161;}
+						else if ( (LA72_114==LPAREN) && (synpred40_FTS())) {s = 162;}
+						else if ( (LA72_114==PERCENT) && (synpred40_FTS())) {s = 163;}
+						else if ( (LA72_114==PLUS) && (synpred40_FTS())) {s = 164;}
+						else if ( (LA72_114==MINUS) && (synpred40_FTS())) {s = 165;}
+						 
+						input.seek(index72_114);
+						if ( s>=0 ) return s;
+						break;
+
+					case 16 : 
+						int LA72_127 = input.LA(1);
+						 
+						int index72_127 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_127==COMMA||LA72_127==DOT) ) {s = 166;}
+						else if ( (synpred39_FTS()) ) {s = 167;}
+						else if ( (synpred41_FTS()) ) {s = 140;}
+						 
+						input.seek(index72_127);
+						if ( s>=0 ) return s;
+						break;
+
+					case 17 : 
 						int LA72_44 = input.LA(1);
 						 
 						int index72_44 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (LA72_44==COMMA||LA72_44==DOT) ) {s = 60;}
-						else if ( (synpred41_FTS()) ) {s = 61;}
-						else if ( (synpred43_FTS()) ) {s = 57;}
+						else if ( (synpred46_FTS()) ) {s = 61;}
+						else if ( (synpred48_FTS()) ) {s = 57;}
 						else if ( (true) ) {s = 7;}
 						 
 						input.seek(index72_44);
+						if ( s>=0 ) return s;
+						break;
+
+					case 18 : 
+						int LA72_170 = input.LA(1);
+						 
+						int index72_170 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred35_FTS()) ) {s = 220;}
+						else if ( (synpred37_FTS()) ) {s = 194;}
+						 
+						input.seek(index72_170);
+						if ( s>=0 ) return s;
+						break;
+
+					case 19 : 
+						int LA72_58 = input.LA(1);
+						 
+						int index72_58 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_58==NOT) ) {s = 62;}
+						else if ( (LA72_58==TILDA) && (synpred45_FTS())) {s = 63;}
+						else if ( (LA72_58==CARAT) && (synpred45_FTS())) {s = 64;}
+						else if ( (LA72_58==AND) && (synpred45_FTS())) {s = 65;}
+						else if ( (LA72_58==AMP) && (synpred45_FTS())) {s = 66;}
+						else if ( (LA72_58==EOF) && (synpred45_FTS())) {s = 67;}
+						else if ( (LA72_58==RPAREN) && (synpred45_FTS())) {s = 68;}
+						else if ( (LA72_58==OR) && (synpred45_FTS())) {s = 69;}
+						else if ( (LA72_58==BAR) && (synpred45_FTS())) {s = 70;}
+						else if ( (LA72_58==ID) ) {s = 71;}
+						else if ( (LA72_58==EXCLAMATION) && (synpred45_FTS())) {s = 72;}
+						else if ( (LA72_58==QUESTION_MARK||LA72_58==STAR) ) {s = 73;}
+						else if ( (LA72_58==AT) && (synpred45_FTS())) {s = 74;}
+						else if ( (LA72_58==TO) ) {s = 75;}
+						else if ( ((LA72_58 >= DATETIME && LA72_58 <= DECIMAL_INTEGER_LITERAL)||LA72_58==FLOATING_POINT_LITERAL||(LA72_58 >= FTSPRE && LA72_58 <= FTSWORD)) ) {s = 76;}
+						else if ( (LA72_58==URI) && (synpred45_FTS())) {s = 77;}
+						else if ( (LA72_58==FTSPHRASE) && (synpred45_FTS())) {s = 78;}
+						else if ( (LA72_58==COMMA||LA72_58==DOT) && (synpred45_FTS())) {s = 79;}
+						else if ( (LA72_58==EQUALS) && (synpred45_FTS())) {s = 80;}
+						else if ( (LA72_58==LSQUARE) && (synpred45_FTS())) {s = 81;}
+						else if ( (LA72_58==LT) && (synpred45_FTS())) {s = 82;}
+						else if ( (LA72_58==LPAREN) && (synpred45_FTS())) {s = 83;}
+						else if ( (LA72_58==PERCENT) && (synpred45_FTS())) {s = 84;}
+						else if ( (LA72_58==PLUS) && (synpred45_FTS())) {s = 85;}
+						else if ( (LA72_58==MINUS) && (synpred45_FTS())) {s = 86;}
+						 
+						input.seek(index72_58);
+						if ( s>=0 ) return s;
+						break;
+
+					case 20 : 
+						int LA72_33 = input.LA(1);
+						 
+						int index72_33 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_33==COMMA||LA72_33==DOT) ) {s = 60;}
+						else if ( (synpred46_FTS()) ) {s = 61;}
+						else if ( (synpred48_FTS()) ) {s = 57;}
+						else if ( (true) ) {s = 7;}
+						 
+						input.seek(index72_33);
+						if ( s>=0 ) return s;
+						break;
+
+					case 21 : 
+						int LA72_152 = input.LA(1);
+						 
+						int index72_152 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_152==COMMA||LA72_152==DOT) ) {s = 168;}
+						else if ( (synpred38_FTS()) ) {s = 169;}
+						else if ( (synpred40_FTS()) ) {s = 165;}
+						 
+						input.seek(index72_152);
+						if ( s>=0 ) return s;
+						break;
+
+					case 22 : 
+						int LA72_19 = input.LA(1);
+						 
+						int index72_19 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_19==COMMA||LA72_19==DOT) ) {s = 58;}
+						else if ( (synpred47_FTS()) ) {s = 59;}
+						else if ( (synpred49_FTS()) ) {s = 32;}
+						else if ( (true) ) {s = 5;}
+						 
+						input.seek(index72_19);
+						if ( s>=0 ) return s;
+						break;
+
+					case 23 : 
+						int LA72_17 = input.LA(1);
+						 
+						int index72_17 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_17==COMMA||LA72_17==DOT) ) {s = 58;}
+						else if ( (synpred47_FTS()) ) {s = 59;}
+						else if ( (synpred49_FTS()) ) {s = 32;}
+						else if ( (true) ) {s = 5;}
+						 
+						input.seek(index72_17);
+						if ( s>=0 ) return s;
+						break;
+
+					case 24 : 
+						int LA72_21 = input.LA(1);
+						 
+						int index72_21 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_21==COMMA||LA72_21==DOT) ) {s = 58;}
+						else if ( (synpred47_FTS()) ) {s = 59;}
+						else if ( (synpred49_FTS()) ) {s = 32;}
+						else if ( (true) ) {s = 5;}
+						 
+						input.seek(index72_21);
+						if ( s>=0 ) return s;
+						break;
+
+					case 25 : 
+						int LA72_130 = input.LA(1);
+						 
+						int index72_130 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_130==COMMA||LA72_130==DOT) ) {s = 166;}
+						else if ( (synpred39_FTS()) ) {s = 167;}
+						else if ( (synpred41_FTS()) ) {s = 140;}
+						 
+						input.seek(index72_130);
+						if ( s>=0 ) return s;
+						break;
+
+					case 26 : 
+						int LA72_8 = input.LA(1);
+						 
+						int index72_8 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_8==COMMA||LA72_8==DOT) ) {s = 58;}
+						else if ( (synpred47_FTS()) ) {s = 59;}
+						else if ( (synpred49_FTS()) ) {s = 32;}
+						else if ( (true) ) {s = 5;}
+						 
+						input.seek(index72_8);
+						if ( s>=0 ) return s;
+						break;
+
+					case 27 : 
+						int LA72_98 = input.LA(1);
+						 
+						int index72_98 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_98==COMMA||LA72_98==DOT) ) {s = 114;}
+						else if ( (synpred42_FTS()) ) {s = 115;}
+						else if ( (synpred44_FTS()) ) {s = 111;}
+						 
+						input.seek(index72_98);
+						if ( s>=0 ) return s;
+						break;
+
+					case 28 : 
+						int LA72_125 = input.LA(1);
+						 
+						int index72_125 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_125==COMMA||LA72_125==DOT) ) {s = 166;}
+						else if ( (synpred39_FTS()) ) {s = 167;}
+						else if ( (synpred41_FTS()) ) {s = 140;}
+						 
+						input.seek(index72_125);
+						if ( s>=0 ) return s;
+						break;
+
+					case 29 : 
+						int LA72_75 = input.LA(1);
+						 
+						int index72_75 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_75==COMMA||LA72_75==DOT) ) {s = 112;}
+						else if ( (synpred43_FTS()) ) {s = 113;}
+						else if ( (synpred45_FTS()) ) {s = 86;}
+						 
+						input.seek(index72_75);
+						if ( s>=0 ) return s;
+						break;
+
+					case 30 : 
+						int LA72_42 = input.LA(1);
+						 
+						int index72_42 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_42==COMMA||LA72_42==DOT) ) {s = 60;}
+						else if ( (synpred46_FTS()) ) {s = 61;}
+						else if ( (synpred48_FTS()) ) {s = 57;}
+						else if ( (true) ) {s = 7;}
+						 
+						input.seek(index72_42);
+						if ( s>=0 ) return s;
+						break;
+
+					case 31 : 
+						int LA72_166 = input.LA(1);
+						 
+						int index72_166 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_166==NOT) ) {s = 170;}
+						else if ( (LA72_166==TILDA) && (synpred37_FTS())) {s = 171;}
+						else if ( (LA72_166==CARAT) && (synpred37_FTS())) {s = 172;}
+						else if ( (LA72_166==AND) && (synpred37_FTS())) {s = 173;}
+						else if ( (LA72_166==AMP) && (synpred37_FTS())) {s = 174;}
+						else if ( (LA72_166==EOF) && (synpred37_FTS())) {s = 175;}
+						else if ( (LA72_166==RPAREN) && (synpred37_FTS())) {s = 176;}
+						else if ( (LA72_166==OR) && (synpred37_FTS())) {s = 177;}
+						else if ( (LA72_166==BAR) && (synpred37_FTS())) {s = 178;}
+						else if ( (LA72_166==ID) ) {s = 179;}
+						else if ( (LA72_166==EXCLAMATION) && (synpred37_FTS())) {s = 180;}
+						else if ( (LA72_166==QUESTION_MARK||LA72_166==STAR) ) {s = 181;}
+						else if ( (LA72_166==AT) && (synpred37_FTS())) {s = 182;}
+						else if ( (LA72_166==TO) ) {s = 183;}
+						else if ( ((LA72_166 >= DATETIME && LA72_166 <= DECIMAL_INTEGER_LITERAL)||LA72_166==FLOATING_POINT_LITERAL||(LA72_166 >= FTSPRE && LA72_166 <= FTSWORD)) ) {s = 184;}
+						else if ( (LA72_166==URI) && (synpred37_FTS())) {s = 185;}
+						else if ( (LA72_166==FTSPHRASE) && (synpred37_FTS())) {s = 186;}
+						else if ( (LA72_166==COMMA||LA72_166==DOT) && (synpred37_FTS())) {s = 187;}
+						else if ( (LA72_166==EQUALS) && (synpred37_FTS())) {s = 188;}
+						else if ( (LA72_166==LSQUARE) && (synpred37_FTS())) {s = 189;}
+						else if ( (LA72_166==LT) && (synpred37_FTS())) {s = 190;}
+						else if ( (LA72_166==LPAREN) && (synpred37_FTS())) {s = 191;}
+						else if ( (LA72_166==PERCENT) && (synpred37_FTS())) {s = 192;}
+						else if ( (LA72_166==PLUS) && (synpred37_FTS())) {s = 193;}
+						else if ( (LA72_166==MINUS) && (synpred37_FTS())) {s = 194;}
+						 
+						input.seek(index72_166);
+						if ( s>=0 ) return s;
+						break;
+
+					case 32 : 
+						int LA72_141 = input.LA(1);
+						 
+						int index72_141 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_141==COMMA||LA72_141==DOT) ) {s = 168;}
+						else if ( (synpred38_FTS()) ) {s = 169;}
+						else if ( (synpred40_FTS()) ) {s = 165;}
+						 
+						input.seek(index72_141);
+						if ( s>=0 ) return s;
+						break;
+
+					case 33 : 
+						int LA72_116 = input.LA(1);
+						 
+						int index72_116 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_116==COMMA||LA72_116==DOT) ) {s = 166;}
+						else if ( (synpred39_FTS()) ) {s = 167;}
+						else if ( (synpred41_FTS()) ) {s = 140;}
+						 
+						input.seek(index72_116);
+						if ( s>=0 ) return s;
+						break;
+
+					case 34 : 
+						int LA72_154 = input.LA(1);
+						 
+						int index72_154 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_154==COMMA||LA72_154==DOT) ) {s = 168;}
+						else if ( (synpred38_FTS()) ) {s = 169;}
+						else if ( (synpred40_FTS()) ) {s = 165;}
+						 
+						input.seek(index72_154);
+						if ( s>=0 ) return s;
+						break;
+
+					case 35 : 
+						int LA72_168 = input.LA(1);
+						 
+						int index72_168 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_168==NOT) ) {s = 195;}
+						else if ( (LA72_168==TILDA) && (synpred36_FTS())) {s = 196;}
+						else if ( (LA72_168==CARAT) && (synpred36_FTS())) {s = 197;}
+						else if ( (LA72_168==AND) && (synpred36_FTS())) {s = 198;}
+						else if ( (LA72_168==AMP) && (synpred36_FTS())) {s = 199;}
+						else if ( (LA72_168==EOF) && (synpred36_FTS())) {s = 200;}
+						else if ( (LA72_168==RPAREN) && (synpred36_FTS())) {s = 201;}
+						else if ( (LA72_168==OR) && (synpred36_FTS())) {s = 202;}
+						else if ( (LA72_168==BAR) && (synpred36_FTS())) {s = 203;}
+						else if ( (LA72_168==ID) ) {s = 204;}
+						else if ( (LA72_168==EXCLAMATION) && (synpred36_FTS())) {s = 205;}
+						else if ( (LA72_168==QUESTION_MARK||LA72_168==STAR) ) {s = 206;}
+						else if ( (LA72_168==AT) && (synpred36_FTS())) {s = 207;}
+						else if ( (LA72_168==TO) ) {s = 208;}
+						else if ( ((LA72_168 >= DATETIME && LA72_168 <= DECIMAL_INTEGER_LITERAL)||LA72_168==FLOATING_POINT_LITERAL||(LA72_168 >= FTSPRE && LA72_168 <= FTSWORD)) ) {s = 209;}
+						else if ( (LA72_168==URI) && (synpred36_FTS())) {s = 210;}
+						else if ( (LA72_168==FTSPHRASE) && (synpred36_FTS())) {s = 211;}
+						else if ( (LA72_168==COMMA||LA72_168==DOT) && (synpred36_FTS())) {s = 212;}
+						else if ( (LA72_168==EQUALS) && (synpred36_FTS())) {s = 213;}
+						else if ( (LA72_168==LSQUARE) && (synpred36_FTS())) {s = 214;}
+						else if ( (LA72_168==LT) && (synpred36_FTS())) {s = 215;}
+						else if ( (LA72_168==LPAREN) && (synpred36_FTS())) {s = 216;}
+						else if ( (LA72_168==PERCENT) && (synpred36_FTS())) {s = 217;}
+						else if ( (LA72_168==PLUS) && (synpred36_FTS())) {s = 218;}
+						else if ( (LA72_168==MINUS) && (synpred36_FTS())) {s = 219;}
+						 
+						input.seek(index72_168);
 						if ( s>=0 ) return s;
 						break;
 
@@ -26988,188 +16804,183 @@ public class FTSParser extends Parser {
 						int index72_195 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred29_FTS()) ) {s = 221;}
-						else if ( (synpred31_FTS()) ) {s = 219;}
+						if ( (synpred34_FTS()) ) {s = 221;}
+						else if ( (synpred36_FTS()) ) {s = 219;}
 						 
 						input.seek(index72_195);
 						if ( s>=0 ) return s;
 						break;
 
 					case 37 : 
-						int LA72_21 = input.LA(1);
+						int LA72_179 = input.LA(1);
 						 
-						int index72_21 = input.index();
+						int index72_179 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_21==COMMA||LA72_21==DOT) ) {s = 58;}
-						else if ( (synpred42_FTS()) ) {s = 59;}
-						else if ( (synpred44_FTS()) ) {s = 32;}
-						else if ( (true) ) {s = 5;}
+						if ( (synpred35_FTS()) ) {s = 220;}
+						else if ( (synpred37_FTS()) ) {s = 194;}
 						 
-						input.seek(index72_21);
+						input.seek(index72_179);
 						if ( s>=0 ) return s;
 						break;
 
 					case 38 : 
-						int LA72_130 = input.LA(1);
-						 
-						int index72_130 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_130==COMMA||LA72_130==DOT) ) {s = 166;}
-						else if ( (synpred34_FTS()) ) {s = 167;}
-						else if ( (synpred36_FTS()) ) {s = 140;}
-						 
-						input.seek(index72_130);
-						if ( s>=0 ) return s;
-						break;
-
-					case 39 : 
-						int LA72_33 = input.LA(1);
-						 
-						int index72_33 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_33==COMMA||LA72_33==DOT) ) {s = 60;}
-						else if ( (synpred41_FTS()) ) {s = 61;}
-						else if ( (synpred43_FTS()) ) {s = 57;}
-						else if ( (true) ) {s = 7;}
-						 
-						input.seek(index72_33);
-						if ( s>=0 ) return s;
-						break;
-
-					case 40 : 
-						int LA72_101 = input.LA(1);
-						 
-						int index72_101 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA72_101==COMMA||LA72_101==DOT) ) {s = 114;}
-						else if ( (synpred37_FTS()) ) {s = 115;}
-						else if ( (synpred39_FTS()) ) {s = 111;}
-						 
-						input.seek(index72_101);
-						if ( s>=0 ) return s;
-						break;
-
-					case 41 : 
 						int LA72_181 = input.LA(1);
 						 
 						int index72_181 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred30_FTS()) ) {s = 220;}
-						else if ( (synpred32_FTS()) ) {s = 194;}
+						if ( (synpred35_FTS()) ) {s = 220;}
+						else if ( (synpred37_FTS()) ) {s = 194;}
 						 
 						input.seek(index72_181);
 						if ( s>=0 ) return s;
 						break;
 
-					case 42 : 
-						int LA72_154 = input.LA(1);
+					case 39 : 
+						int LA72_47 = input.LA(1);
 						 
-						int index72_154 = input.index();
+						int index72_47 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_154==COMMA||LA72_154==DOT) ) {s = 168;}
-						else if ( (synpred33_FTS()) ) {s = 169;}
-						else if ( (synpred35_FTS()) ) {s = 165;}
+						if ( (LA72_47==COMMA||LA72_47==DOT) ) {s = 60;}
+						else if ( (synpred46_FTS()) ) {s = 61;}
+						else if ( (synpred48_FTS()) ) {s = 57;}
+						else if ( (true) ) {s = 7;}
 						 
-						input.seek(index72_154);
+						input.seek(index72_47);
+						if ( s>=0 ) return s;
+						break;
+
+					case 40 : 
+						int LA72_204 = input.LA(1);
+						 
+						int index72_204 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred34_FTS()) ) {s = 221;}
+						else if ( (synpred36_FTS()) ) {s = 219;}
+						 
+						input.seek(index72_204);
+						if ( s>=0 ) return s;
+						break;
+
+					case 41 : 
+						int LA72_206 = input.LA(1);
+						 
+						int index72_206 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred34_FTS()) ) {s = 221;}
+						else if ( (synpred36_FTS()) ) {s = 219;}
+						 
+						input.seek(index72_206);
+						if ( s>=0 ) return s;
+						break;
+
+					case 42 : 
+						int LA72_73 = input.LA(1);
+						 
+						int index72_73 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA72_73==COMMA||LA72_73==DOT) ) {s = 112;}
+						else if ( (synpred43_FTS()) ) {s = 113;}
+						else if ( (synpred45_FTS()) ) {s = 86;}
+						 
+						input.seek(index72_73);
 						if ( s>=0 ) return s;
 						break;
 
 					case 43 : 
-						int LA72_141 = input.LA(1);
+						int LA72_184 = input.LA(1);
 						 
-						int index72_141 = input.index();
+						int index72_184 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_141==COMMA||LA72_141==DOT) ) {s = 168;}
-						else if ( (synpred33_FTS()) ) {s = 169;}
-						else if ( (synpred35_FTS()) ) {s = 165;}
+						if ( (synpred35_FTS()) ) {s = 220;}
+						else if ( (synpred37_FTS()) ) {s = 194;}
 						 
-						input.seek(index72_141);
+						input.seek(index72_184);
 						if ( s>=0 ) return s;
 						break;
 
 					case 44 : 
-						int LA72_116 = input.LA(1);
+						int LA72_150 = input.LA(1);
 						 
-						int index72_116 = input.index();
+						int index72_150 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_116==COMMA||LA72_116==DOT) ) {s = 166;}
-						else if ( (synpred34_FTS()) ) {s = 167;}
-						else if ( (synpred36_FTS()) ) {s = 140;}
+						if ( (LA72_150==COMMA||LA72_150==DOT) ) {s = 168;}
+						else if ( (synpred38_FTS()) ) {s = 169;}
+						else if ( (synpred40_FTS()) ) {s = 165;}
 						 
-						input.seek(index72_116);
+						input.seek(index72_150);
 						if ( s>=0 ) return s;
 						break;
 
 					case 45 : 
-						int LA72_4 = input.LA(1);
+						int LA72_6 = input.LA(1);
 						 
-						int index72_4 = input.index();
+						int index72_6 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_4==NOT) ) {s = 8;}
-						else if ( (LA72_4==TILDA) && (synpred44_FTS())) {s = 9;}
-						else if ( (LA72_4==CARAT) && (synpred44_FTS())) {s = 10;}
-						else if ( (LA72_4==AND) && (synpred44_FTS())) {s = 11;}
-						else if ( (LA72_4==AMP) && (synpred44_FTS())) {s = 12;}
-						else if ( (LA72_4==EOF) && (synpred44_FTS())) {s = 13;}
-						else if ( (LA72_4==RPAREN) && (synpred44_FTS())) {s = 14;}
-						else if ( (LA72_4==OR) && (synpred44_FTS())) {s = 15;}
-						else if ( (LA72_4==BAR) && (synpred44_FTS())) {s = 16;}
-						else if ( (LA72_4==ID) ) {s = 17;}
-						else if ( (LA72_4==EXCLAMATION) && (synpred44_FTS())) {s = 18;}
-						else if ( (LA72_4==QUESTION_MARK||LA72_4==STAR) ) {s = 19;}
-						else if ( (LA72_4==AT) && (synpred44_FTS())) {s = 20;}
-						else if ( (LA72_4==TO) ) {s = 21;}
-						else if ( ((LA72_4 >= DATETIME && LA72_4 <= DECIMAL_INTEGER_LITERAL)||LA72_4==FLOATING_POINT_LITERAL||(LA72_4 >= FTSPRE && LA72_4 <= FTSWORD)) ) {s = 22;}
-						else if ( (LA72_4==URI) && (synpred44_FTS())) {s = 23;}
-						else if ( (LA72_4==FTSPHRASE) && (synpred44_FTS())) {s = 24;}
-						else if ( (LA72_4==COMMA||LA72_4==DOT) && (synpred44_FTS())) {s = 25;}
-						else if ( (LA72_4==EQUALS) && (synpred44_FTS())) {s = 26;}
-						else if ( (LA72_4==LSQUARE) && (synpred44_FTS())) {s = 27;}
-						else if ( (LA72_4==LT) && (synpred44_FTS())) {s = 28;}
-						else if ( (LA72_4==LPAREN) && (synpred44_FTS())) {s = 29;}
-						else if ( (LA72_4==PERCENT) && (synpred44_FTS())) {s = 30;}
-						else if ( (LA72_4==PLUS) && (synpred44_FTS())) {s = 31;}
-						else if ( (LA72_4==MINUS) && (synpred44_FTS())) {s = 32;}
+						if ( (LA72_6==NOT) ) {s = 33;}
+						else if ( (LA72_6==TILDA) && (synpred48_FTS())) {s = 34;}
+						else if ( (LA72_6==CARAT) && (synpred48_FTS())) {s = 35;}
+						else if ( (LA72_6==AND) && (synpred48_FTS())) {s = 36;}
+						else if ( (LA72_6==AMP) && (synpred48_FTS())) {s = 37;}
+						else if ( (LA72_6==EOF) && (synpred48_FTS())) {s = 38;}
+						else if ( (LA72_6==RPAREN) && (synpred48_FTS())) {s = 39;}
+						else if ( (LA72_6==OR) && (synpred48_FTS())) {s = 40;}
+						else if ( (LA72_6==BAR) && (synpred48_FTS())) {s = 41;}
+						else if ( (LA72_6==ID) ) {s = 42;}
+						else if ( (LA72_6==EXCLAMATION) && (synpred48_FTS())) {s = 43;}
+						else if ( (LA72_6==QUESTION_MARK||LA72_6==STAR) ) {s = 44;}
+						else if ( (LA72_6==AT) && (synpred48_FTS())) {s = 45;}
+						else if ( (LA72_6==TO) ) {s = 46;}
+						else if ( ((LA72_6 >= DATETIME && LA72_6 <= DECIMAL_INTEGER_LITERAL)||LA72_6==FLOATING_POINT_LITERAL||(LA72_6 >= FTSPRE && LA72_6 <= FTSWORD)) ) {s = 47;}
+						else if ( (LA72_6==URI) && (synpred48_FTS())) {s = 48;}
+						else if ( (LA72_6==FTSPHRASE) && (synpred48_FTS())) {s = 49;}
+						else if ( (LA72_6==COMMA||LA72_6==DOT) && (synpred48_FTS())) {s = 50;}
+						else if ( (LA72_6==EQUALS) && (synpred48_FTS())) {s = 51;}
+						else if ( (LA72_6==LSQUARE) && (synpred48_FTS())) {s = 52;}
+						else if ( (LA72_6==LT) && (synpred48_FTS())) {s = 53;}
+						else if ( (LA72_6==LPAREN) && (synpred48_FTS())) {s = 54;}
+						else if ( (LA72_6==PERCENT) && (synpred48_FTS())) {s = 55;}
+						else if ( (LA72_6==PLUS) && (synpred48_FTS())) {s = 56;}
+						else if ( (LA72_6==MINUS) && (synpred48_FTS())) {s = 57;}
 						 
-						input.seek(index72_4);
+						input.seek(index72_6);
 						if ( s>=0 ) return s;
 						break;
 
 					case 46 : 
-						int LA72_98 = input.LA(1);
+						int LA72_155 = input.LA(1);
 						 
-						int index72_98 = input.index();
+						int index72_155 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_98==COMMA||LA72_98==DOT) ) {s = 114;}
-						else if ( (synpred37_FTS()) ) {s = 115;}
-						else if ( (synpred39_FTS()) ) {s = 111;}
+						if ( (LA72_155==COMMA||LA72_155==DOT) ) {s = 168;}
+						else if ( (synpred38_FTS()) ) {s = 169;}
+						else if ( (synpred40_FTS()) ) {s = 165;}
 						 
-						input.seek(index72_98);
+						input.seek(index72_155);
 						if ( s>=0 ) return s;
 						break;
 
 					case 47 : 
-						int LA72_17 = input.LA(1);
+						int LA72_22 = input.LA(1);
 						 
-						int index72_17 = input.index();
+						int index72_22 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA72_17==COMMA||LA72_17==DOT) ) {s = 58;}
-						else if ( (synpred42_FTS()) ) {s = 59;}
-						else if ( (synpred44_FTS()) ) {s = 32;}
+						if ( (LA72_22==COMMA||LA72_22==DOT) ) {s = 58;}
+						else if ( (synpred47_FTS()) ) {s = 59;}
+						else if ( (synpred49_FTS()) ) {s = 32;}
 						else if ( (true) ) {s = 5;}
 						 
-						input.seek(index72_17);
+						input.seek(index72_22);
 						if ( s>=0 ) return s;
 						break;
 			}
@@ -27218,396 +17029,401 @@ public class FTSParser extends Parser {
 	public static final BitSet FOLLOW_MINUS_in_cmisPrefixed1657 = new BitSet(new long[]{0x100F400000106800L,0x0000000020820100L});
 	public static final BitSet FOLLOW_cmisTest_in_cmisPrefixed1659 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_ftsTest1751 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsTermOrPhrase_in_ftsTest1822 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsExactTermOrPhrase_in_ftsTest1845 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsTokenisedTermOrPhrase_in_ftsTest1869 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsRange_in_ftsTest1892 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroup_in_ftsTest1965 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LPAREN_in_ftsTest1998 = new BitSet(new long[]{0x100F4000049068F0L,0x0000000070822D17L});
-	public static final BitSet FOLLOW_ftsDisjunction_in_ftsTest2000 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-	public static final BitSet FOLLOW_RPAREN_in_ftsTest2002 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_template_in_ftsTest2035 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_cmisTerm_in_cmisTest2088 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_cmisPhrase_in_cmisTest2148 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_PERCENT_in_template2229 = new BitSet(new long[]{0x1000000000000060L,0x0000000060000500L});
-	public static final BitSet FOLLOW_tempReference_in_template2231 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_PERCENT_in_template2291 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000001L});
-	public static final BitSet FOLLOW_LPAREN_in_template2293 = new BitSet(new long[]{0x1000000000000060L,0x0000000060000500L});
-	public static final BitSet FOLLOW_tempReference_in_template2296 = new BitSet(new long[]{0x1000000000000860L,0x0000000060100500L});
-	public static final BitSet FOLLOW_COMMA_in_template2298 = new BitSet(new long[]{0x1000000000000060L,0x0000000060100500L});
-	public static final BitSet FOLLOW_RPAREN_in_template2303 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TILDA_in_fuzzy2385 = new BitSet(new long[]{0x0000400000004000L});
-	public static final BitSet FOLLOW_number_in_fuzzy2387 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TILDA_in_slop2468 = new BitSet(new long[]{0x0000000000004000L});
-	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_slop2470 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_CARAT_in_boost2551 = new BitSet(new long[]{0x0000400000004000L});
-	public static final BitSet FOLLOW_number_in_boost2553 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fieldReference_in_ftsTermOrPhrase2642 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_ftsTermOrPhrase2644 = new BitSet(new long[]{0x100F400000106800L,0x0000000020820100L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsTermOrPhrase2672 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsTermOrPhrase2680 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_ftsTermOrPhrase2747 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsTermOrPhrase2756 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsTermOrPhrase2817 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsTermOrPhrase2825 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_ftsTermOrPhrase2875 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsTermOrPhrase2884 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_EQUALS_in_ftsExactTermOrPhrase2963 = new BitSet(new long[]{0x100F400000106860L,0x0000000060820500L});
-	public static final BitSet FOLLOW_fieldReference_in_ftsExactTermOrPhrase2991 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_ftsExactTermOrPhrase2993 = new BitSet(new long[]{0x100F400000106800L,0x0000000020820100L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsExactTermOrPhrase3021 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsExactTermOrPhrase3029 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_ftsExactTermOrPhrase3096 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsExactTermOrPhrase3105 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsExactTermOrPhrase3166 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsExactTermOrPhrase3174 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_ftsExactTermOrPhrase3224 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsExactTermOrPhrase3233 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TILDA_in_ftsTokenisedTermOrPhrase3314 = new BitSet(new long[]{0x100F400000106860L,0x0000000060820500L});
-	public static final BitSet FOLLOW_fieldReference_in_ftsTokenisedTermOrPhrase3342 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_ftsTokenisedTermOrPhrase3344 = new BitSet(new long[]{0x100F400000106800L,0x0000000020820100L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsTokenisedTermOrPhrase3372 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsTokenisedTermOrPhrase3380 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_ftsTokenisedTermOrPhrase3447 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsTokenisedTermOrPhrase3456 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsTokenisedTermOrPhrase3517 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsTokenisedTermOrPhrase3525 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_ftsTokenisedTermOrPhrase3575 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsTokenisedTermOrPhrase3584 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_cmisTerm3657 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_cmisPhrase3711 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fieldReference_in_ftsRange3766 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_ftsRange3768 = new BitSet(new long[]{0x100F400000006000L,0x0000000000000006L});
-	public static final BitSet FOLLOW_ftsFieldGroupRange_in_ftsRange3772 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fieldReference_in_ftsFieldGroup3828 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_ftsFieldGroup3830 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000001L});
-	public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroup3832 = new BitSet(new long[]{0x100F4000049068B0L,0x0000000030822517L});
-	public static final BitSet FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroup3834 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-	public static final BitSet FOLLOW_RPAREN_in_ftsFieldGroup3836 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupExplicitDisjunction_in_ftsFieldGroupDisjunction3921 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupImplicitDisjunction_in_ftsFieldGroupDisjunction3935 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3968 = new BitSet(new long[]{0x0000000000000082L,0x0000000000000400L});
-	public static final BitSet FOLLOW_or_in_ftsFieldGroupExplicitDisjunction3971 = new BitSet(new long[]{0x100F4000049068B0L,0x0000000030822117L});
-	public static final BitSet FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3973 = new BitSet(new long[]{0x0000000000000082L,0x0000000000000400L});
-	public static final BitSet FOLLOW_or_in_ftsFieldGroupImplicitDisjunction4058 = new BitSet(new long[]{0x100F400004906880L,0x0000000030822117L});
-	public static final BitSet FOLLOW_ftsFieldGroupExplicitConjunction_in_ftsFieldGroupImplicitDisjunction4061 = new BitSet(new long[]{0x100F400004906882L,0x0000000030822517L});
-	public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction4148 = new BitSet(new long[]{0x0000000000000032L});
-	public static final BitSet FOLLOW_and_in_ftsFieldGroupExplicitConjunction4151 = new BitSet(new long[]{0x100F400004906880L,0x0000000030822117L});
-	public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction4153 = new BitSet(new long[]{0x0000000000000032L});
-	public static final BitSet FOLLOW_and_in_ftsFieldGroupImplicitConjunction4238 = new BitSet(new long[]{0x100F400004906880L,0x0000000030822117L});
-	public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupImplicitConjunction4241 = new BitSet(new long[]{0x100F4000049068B2L,0x0000000030822117L});
-	public static final BitSet FOLLOW_not_in_ftsFieldGroupPrefixed4331 = new BitSet(new long[]{0x100F400000906800L,0x0000000030820107L});
-	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4333 = new BitSet(new long[]{0x0000000000000202L});
-	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4335 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4399 = new BitSet(new long[]{0x0000000000000202L});
-	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4401 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_PLUS_in_ftsFieldGroupPrefixed4465 = new BitSet(new long[]{0x100F400000906800L,0x0000000030820107L});
-	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4467 = new BitSet(new long[]{0x0000000000000202L});
-	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4469 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_BAR_in_ftsFieldGroupPrefixed4533 = new BitSet(new long[]{0x100F400000906800L,0x0000000030820107L});
-	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4535 = new BitSet(new long[]{0x0000000000000202L});
-	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4537 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_MINUS_in_ftsFieldGroupPrefixed4601 = new BitSet(new long[]{0x100F400000906800L,0x0000000030820107L});
-	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4603 = new BitSet(new long[]{0x0000000000000202L});
-	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4605 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_ftsFieldGroupTest4696 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupTest4756 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4766 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupExactTerm_in_ftsFieldGroupTest4831 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4841 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupPhrase_in_ftsFieldGroupTest4906 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest4916 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTest4981 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest4991 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupTokenisedPhrase_in_ftsFieldGroupTest5056 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest5066 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest5131 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest5141 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest5206 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroupTest5266 = new BitSet(new long[]{0x100F4000049068B0L,0x0000000030822517L});
-	public static final BitSet FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest5268 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-	public static final BitSet FOLLOW_RPAREN_in_ftsFieldGroupTest5270 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_ftsFieldGroupTerm5323 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactTerm5356 = new BitSet(new long[]{0x100E400000106800L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm5358 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase5411 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactPhrase5452 = new BitSet(new long[]{0x0000000000800000L});
-	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupExactPhrase5454 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupTokenisedPhrase5515 = new BitSet(new long[]{0x0000000000800000L});
-	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTokenisedPhrase5517 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupSynonym5570 = new BitSet(new long[]{0x100E400000106800L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym5572 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5625 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-	public static final BitSet FOLLOW_proximityGroup_in_ftsFieldGroupProximity5635 = new BitSet(new long[]{0x100E400000006000L,0x0000000020000100L});
-	public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5637 = new BitSet(new long[]{0x0000000000000002L,0x0000000000800000L});
-	public static final BitSet FOLLOW_STAR_in_proximityGroup5830 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000001L});
-	public static final BitSet FOLLOW_LPAREN_in_proximityGroup5833 = new BitSet(new long[]{0x0000000000004000L,0x0000000000100000L});
-	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_proximityGroup5835 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-	public static final BitSet FOLLOW_RPAREN_in_proximityGroup5838 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5922 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_DOTDOT_in_ftsFieldGroupRange5924 = new BitSet(new long[]{0x100F400000006000L});
-	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5926 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_range_left_in_ftsFieldGroupRange5964 = new BitSet(new long[]{0x100F400000006000L});
-	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5966 = new BitSet(new long[]{0x0000000000000000L,0x0000000020000000L});
-	public static final BitSet FOLLOW_TO_in_ftsFieldGroupRange5968 = new BitSet(new long[]{0x100F400000006000L});
-	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5970 = new BitSet(new long[]{0x0800000000000000L,0x0000000000200000L});
-	public static final BitSet FOLLOW_range_right_in_ftsFieldGroupRange5972 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LSQUARE_in_range_left6031 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LT_in_range_left6063 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_RSQUARE_in_range_right6116 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_GT_in_range_right6148 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AT_in_fieldReference6204 = new BitSet(new long[]{0x1000000000000020L,0x0000000060000500L});
-	public static final BitSet FOLLOW_prefix_in_fieldReference6241 = new BitSet(new long[]{0x1000000000000020L,0x0000000020000500L});
-	public static final BitSet FOLLOW_uri_in_fieldReference6261 = new BitSet(new long[]{0x1000000000000020L,0x0000000020000500L});
-	public static final BitSet FOLLOW_identifier_in_fieldReference6282 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AT_in_tempReference6369 = new BitSet(new long[]{0x1000000000000020L,0x0000000060000500L});
-	public static final BitSet FOLLOW_prefix_in_tempReference6398 = new BitSet(new long[]{0x1000000000000020L,0x0000000020000500L});
-	public static final BitSet FOLLOW_uri_in_tempReference6418 = new BitSet(new long[]{0x1000000000000020L,0x0000000020000500L});
-	public static final BitSet FOLLOW_identifier_in_tempReference6439 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_identifier_in_prefix6526 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_prefix6528 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_URI_in_uri6609 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_identifier6711 = new BitSet(new long[]{0x0000000000100000L});
-	public static final BitSet FOLLOW_DOT_in_identifier6713 = new BitSet(new long[]{0x1000000000000000L});
-	public static final BitSet FOLLOW_ID_in_identifier6717 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_identifier6766 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TO_in_identifier6833 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_OR_in_identifier6871 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AND_in_identifier6909 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_NOT_in_identifier6948 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7066 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7072 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7074 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7080 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7082 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7088 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7090 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7096 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7098 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7104 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7164 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7166 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7172 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7174 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7180 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7182 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7188 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7190 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7196 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7263 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7269 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7271 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7277 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7279 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7285 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7287 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7293 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7295 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7359 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7361 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7367 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7369 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7375 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7377 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7383 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7385 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7450 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7456 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7458 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7464 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7466 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7472 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7474 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7480 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7534 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7536 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7542 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7544 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7550 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7552 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7558 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7616 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7622 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7624 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7630 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7632 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7638 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7640 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7696 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7698 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7704 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7706 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7712 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7714 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7770 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7776 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7778 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7784 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7786 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7792 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7838 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7840 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7846 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7848 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7854 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7905 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7911 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7913 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7919 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7921 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7970 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7972 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7978 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7980 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord8029 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8035 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8037 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8043 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8081 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8083 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8089 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord8131 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8137 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8139 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8179 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8181 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord8197 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8203 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8216 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_OR_in_or8581 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_BAR_in_or8593 = new BitSet(new long[]{0x0000000000000080L});
-	public static final BitSet FOLLOW_BAR_in_or8595 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AND_in_and8628 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AMP_in_and8640 = new BitSet(new long[]{0x0000000000000010L});
-	public static final BitSet FOLLOW_AMP_in_and8642 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsTermOrPhrase_in_ftsTest1828 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsExactTermOrPhrase_in_ftsTest1857 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsTokenisedTermOrPhrase_in_ftsTest1887 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsRange_in_ftsTest1916 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroup_in_ftsTest1995 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LPAREN_in_ftsTest2028 = new BitSet(new long[]{0x100F4000049068F0L,0x0000000070822D17L});
+	public static final BitSet FOLLOW_ftsDisjunction_in_ftsTest2030 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
+	public static final BitSet FOLLOW_RPAREN_in_ftsTest2032 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_template_in_ftsTest2065 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_cmisTerm_in_cmisTest2118 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_cmisPhrase_in_cmisTest2178 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_PERCENT_in_template2259 = new BitSet(new long[]{0x1000000000000060L,0x0000000060000500L});
+	public static final BitSet FOLLOW_tempReference_in_template2261 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_PERCENT_in_template2321 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000001L});
+	public static final BitSet FOLLOW_LPAREN_in_template2323 = new BitSet(new long[]{0x1000000000000060L,0x0000000060000500L});
+	public static final BitSet FOLLOW_tempReference_in_template2326 = new BitSet(new long[]{0x1000000000000860L,0x0000000060100500L});
+	public static final BitSet FOLLOW_COMMA_in_template2328 = new BitSet(new long[]{0x1000000000000060L,0x0000000060100500L});
+	public static final BitSet FOLLOW_RPAREN_in_template2333 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TILDA_in_fuzzy2415 = new BitSet(new long[]{0x0000400000004000L});
+	public static final BitSet FOLLOW_number_in_fuzzy2417 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TILDA_in_slop2498 = new BitSet(new long[]{0x0000000000004000L});
+	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_slop2500 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_CARAT_in_boost2581 = new BitSet(new long[]{0x0000400000004000L});
+	public static final BitSet FOLLOW_number_in_boost2583 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fieldReference_in_ftsTermOrPhrase2672 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_ftsTermOrPhrase2674 = new BitSet(new long[]{0x100F400000106800L,0x0000000020820100L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsTermOrPhrase2702 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsTermOrPhrase2710 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_ftsTermOrPhrase2777 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsTermOrPhrase2786 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsTermOrPhrase2847 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsTermOrPhrase2855 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_ftsTermOrPhrase2905 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsTermOrPhrase2914 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_EQUALS_in_ftsExactTermOrPhrase2993 = new BitSet(new long[]{0x100F400000106860L,0x0000000060820500L});
+	public static final BitSet FOLLOW_fieldReference_in_ftsExactTermOrPhrase3021 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_ftsExactTermOrPhrase3023 = new BitSet(new long[]{0x100F400000106800L,0x0000000020820100L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsExactTermOrPhrase3051 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsExactTermOrPhrase3059 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_ftsExactTermOrPhrase3126 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsExactTermOrPhrase3135 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsExactTermOrPhrase3196 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsExactTermOrPhrase3204 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_ftsExactTermOrPhrase3254 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsExactTermOrPhrase3263 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TILDA_in_ftsTokenisedTermOrPhrase3344 = new BitSet(new long[]{0x100F400000106860L,0x0000000060820500L});
+	public static final BitSet FOLLOW_fieldReference_in_ftsTokenisedTermOrPhrase3372 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_ftsTokenisedTermOrPhrase3374 = new BitSet(new long[]{0x100F400000106800L,0x0000000020820100L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsTokenisedTermOrPhrase3402 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsTokenisedTermOrPhrase3410 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_ftsTokenisedTermOrPhrase3477 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsTokenisedTermOrPhrase3486 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsTokenisedTermOrPhrase3547 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsTokenisedTermOrPhrase3555 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_ftsTokenisedTermOrPhrase3605 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsTokenisedTermOrPhrase3614 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_cmisTerm3687 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_cmisPhrase3741 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fieldReference_in_ftsRange3796 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_ftsRange3798 = new BitSet(new long[]{0x100F400000006000L,0x0000000000000006L});
+	public static final BitSet FOLLOW_ftsFieldGroupRange_in_ftsRange3802 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fieldReference_in_ftsFieldGroup3858 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_ftsFieldGroup3860 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000001L});
+	public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroup3862 = new BitSet(new long[]{0x100F4000049068B0L,0x0000000030822517L});
+	public static final BitSet FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroup3864 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
+	public static final BitSet FOLLOW_RPAREN_in_ftsFieldGroup3866 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupExplicitDisjunction_in_ftsFieldGroupDisjunction3951 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupImplicitDisjunction_in_ftsFieldGroupDisjunction3965 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction3998 = new BitSet(new long[]{0x0000000000000082L,0x0000000000000400L});
+	public static final BitSet FOLLOW_or_in_ftsFieldGroupExplicitDisjunction4001 = new BitSet(new long[]{0x100F4000049068B0L,0x0000000030822117L});
+	public static final BitSet FOLLOW_ftsFieldGroupImplicitConjunction_in_ftsFieldGroupExplicitDisjunction4003 = new BitSet(new long[]{0x0000000000000082L,0x0000000000000400L});
+	public static final BitSet FOLLOW_or_in_ftsFieldGroupImplicitDisjunction4088 = new BitSet(new long[]{0x100F400004906880L,0x0000000030822117L});
+	public static final BitSet FOLLOW_ftsFieldGroupExplicitConjunction_in_ftsFieldGroupImplicitDisjunction4091 = new BitSet(new long[]{0x100F400004906882L,0x0000000030822517L});
+	public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction4178 = new BitSet(new long[]{0x0000000000000032L});
+	public static final BitSet FOLLOW_and_in_ftsFieldGroupExplicitConjunction4181 = new BitSet(new long[]{0x100F400004906880L,0x0000000030822117L});
+	public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupExplicitConjunction4183 = new BitSet(new long[]{0x0000000000000032L});
+	public static final BitSet FOLLOW_and_in_ftsFieldGroupImplicitConjunction4268 = new BitSet(new long[]{0x100F400004906880L,0x0000000030822117L});
+	public static final BitSet FOLLOW_ftsFieldGroupPrefixed_in_ftsFieldGroupImplicitConjunction4271 = new BitSet(new long[]{0x100F4000049068B2L,0x0000000030822117L});
+	public static final BitSet FOLLOW_not_in_ftsFieldGroupPrefixed4361 = new BitSet(new long[]{0x100F400000906800L,0x0000000030820107L});
+	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4363 = new BitSet(new long[]{0x0000000000000202L});
+	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4365 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4429 = new BitSet(new long[]{0x0000000000000202L});
+	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4431 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_PLUS_in_ftsFieldGroupPrefixed4495 = new BitSet(new long[]{0x100F400000906800L,0x0000000030820107L});
+	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4497 = new BitSet(new long[]{0x0000000000000202L});
+	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4499 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_BAR_in_ftsFieldGroupPrefixed4563 = new BitSet(new long[]{0x100F400000906800L,0x0000000030820107L});
+	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4565 = new BitSet(new long[]{0x0000000000000202L});
+	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4567 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_MINUS_in_ftsFieldGroupPrefixed4631 = new BitSet(new long[]{0x100F400000906800L,0x0000000030820107L});
+	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4633 = new BitSet(new long[]{0x0000000000000202L});
+	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4635 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_ftsFieldGroupTest4726 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupTest4786 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4796 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactTerm_in_ftsFieldGroupTest4861 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4871 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupPhrase_in_ftsFieldGroupTest4936 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest4946 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTest5011 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest5021 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupTokenisedPhrase_in_ftsFieldGroupTest5086 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest5096 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest5161 = new BitSet(new long[]{0x0000000000000002L,0x0000000010000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest5171 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest5236 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroupTest5296 = new BitSet(new long[]{0x100F4000049068B0L,0x0000000030822517L});
+	public static final BitSet FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest5298 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
+	public static final BitSet FOLLOW_RPAREN_in_ftsFieldGroupTest5300 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_ftsFieldGroupTerm5353 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactTerm5386 = new BitSet(new long[]{0x100E400000106800L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm5388 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase5441 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactPhrase5482 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupExactPhrase5484 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupTokenisedPhrase5545 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTokenisedPhrase5547 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupSynonym5600 = new BitSet(new long[]{0x100E400000106800L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym5602 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5655 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
+	public static final BitSet FOLLOW_proximityGroup_in_ftsFieldGroupProximity5665 = new BitSet(new long[]{0x100E400000006000L,0x0000000020000100L});
+	public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5667 = new BitSet(new long[]{0x0000000000000002L,0x0000000000800000L});
+	public static final BitSet FOLLOW_STAR_in_proximityGroup5860 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000001L});
+	public static final BitSet FOLLOW_LPAREN_in_proximityGroup5863 = new BitSet(new long[]{0x0000000000004000L,0x0000000000100000L});
+	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_proximityGroup5865 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
+	public static final BitSet FOLLOW_RPAREN_in_proximityGroup5868 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5952 = new BitSet(new long[]{0x0000000000200000L});
+	public static final BitSet FOLLOW_DOTDOT_in_ftsFieldGroupRange5954 = new BitSet(new long[]{0x100F400000006000L});
+	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5956 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_range_left_in_ftsFieldGroupRange5994 = new BitSet(new long[]{0x100F400000006000L});
+	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5996 = new BitSet(new long[]{0x0000000000000000L,0x0000000020000000L});
+	public static final BitSet FOLLOW_TO_in_ftsFieldGroupRange5998 = new BitSet(new long[]{0x100F400000006000L});
+	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6000 = new BitSet(new long[]{0x0800000000000000L,0x0000000000200000L});
+	public static final BitSet FOLLOW_range_right_in_ftsFieldGroupRange6002 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LSQUARE_in_range_left6061 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LT_in_range_left6093 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_RSQUARE_in_range_right6146 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_GT_in_range_right6178 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AT_in_fieldReference6234 = new BitSet(new long[]{0x1000000000000020L,0x0000000060000500L});
+	public static final BitSet FOLLOW_prefix_in_fieldReference6271 = new BitSet(new long[]{0x1000000000000020L,0x0000000020000500L});
+	public static final BitSet FOLLOW_uri_in_fieldReference6291 = new BitSet(new long[]{0x1000000000000020L,0x0000000020000500L});
+	public static final BitSet FOLLOW_identifier_in_fieldReference6312 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AT_in_tempReference6399 = new BitSet(new long[]{0x1000000000000020L,0x0000000060000500L});
+	public static final BitSet FOLLOW_prefix_in_tempReference6428 = new BitSet(new long[]{0x1000000000000020L,0x0000000020000500L});
+	public static final BitSet FOLLOW_uri_in_tempReference6448 = new BitSet(new long[]{0x1000000000000020L,0x0000000020000500L});
+	public static final BitSet FOLLOW_identifier_in_tempReference6469 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_identifier_in_prefix6556 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_prefix6558 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_URI_in_uri6639 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_identifier6741 = new BitSet(new long[]{0x0000000000100000L});
+	public static final BitSet FOLLOW_DOT_in_identifier6743 = new BitSet(new long[]{0x1000000000000000L});
+	public static final BitSet FOLLOW_ID_in_identifier6747 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_identifier6796 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TO_in_identifier6863 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_OR_in_identifier6901 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AND_in_identifier6939 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_NOT_in_identifier6978 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7096 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7102 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7104 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7110 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7112 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7118 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7120 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7126 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7128 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7134 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7194 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7196 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7202 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7204 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7210 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7212 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7218 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7220 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7226 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7293 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7299 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7301 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7307 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7309 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7315 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7317 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7323 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7325 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7389 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7391 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7397 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7399 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7405 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7407 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7413 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7415 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7480 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7486 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7488 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7494 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7496 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7502 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7504 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7510 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7564 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7566 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7572 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7574 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7580 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7582 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7588 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7646 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7652 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7654 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7660 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7662 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7668 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7670 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7726 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7728 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7734 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7736 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7742 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7744 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7800 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7806 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7808 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7814 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7816 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7822 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7868 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7870 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7876 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7878 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7884 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7935 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7941 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7943 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7949 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7951 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8000 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8002 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8008 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8010 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord8059 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8065 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8067 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8073 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8111 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8113 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8119 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord8161 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8167 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8169 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8209 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8211 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord8227 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8233 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8246 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_OR_in_or8611 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_BAR_in_or8623 = new BitSet(new long[]{0x0000000000000080L});
+	public static final BitSet FOLLOW_BAR_in_or8625 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AND_in_and8658 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AMP_in_and8670 = new BitSet(new long[]{0x0000000000000010L});
+	public static final BitSet FOLLOW_AMP_in_and8672 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_not_in_synpred1_FTS1233 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_synpred2_FTS1746 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fieldReference_in_synpred3_FTS2635 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_synpred3_FTS2637 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred4_FTS2676 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred5_FTS2751 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred6_FTS2821 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred7_FTS2879 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fieldReference_in_synpred8_FTS2984 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_synpred8_FTS2986 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred9_FTS3025 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred10_FTS3100 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred11_FTS3170 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred12_FTS3228 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fieldReference_in_synpred13_FTS3335 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_synpred13_FTS3337 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred14_FTS3376 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred15_FTS3451 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred16_FTS3521 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred17_FTS3579 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_not_in_synpred18_FTS4326 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_synpred19_FTS4691 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred20_FTS4761 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred21_FTS4836 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred22_FTS4911 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred23_FTS4986 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred24_FTS5061 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred25_FTS5136 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_proximityGroup_in_synpred26_FTS5630 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_prefix_in_synpred27_FTS6236 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_synpred28_FTS6691 = new BitSet(new long[]{0x0000000000100000L});
-	public static final BitSet FOLLOW_DOT_in_synpred28_FTS6693 = new BitSet(new long[]{0x1000000000000000L});
-	public static final BitSet FOLLOW_ID_in_synpred28_FTS6695 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred29_FTS7011 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred29_FTS7017 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred29_FTS7019 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred29_FTS7025 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred29_FTS7027 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred29_FTS7033 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred29_FTS7035 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred29_FTS7041 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred29_FTS7043 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred29_FTS7049 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred30_FTS7117 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred30_FTS7119 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred30_FTS7125 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred30_FTS7127 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred30_FTS7133 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred30_FTS7135 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred30_FTS7141 = new BitSet(new long[]{0x0000000000100000L});
-	public static final BitSet FOLLOW_DOT_in_synpred30_FTS7143 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_COMMA_in_synpred30_FTS7145 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred30_FTS7147 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred31_FTS7210 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred31_FTS7216 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred31_FTS7218 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred31_FTS7224 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred31_FTS7226 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred31_FTS7232 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred31_FTS7234 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred31_FTS7240 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred31_FTS7242 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred32_FTS7312 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred32_FTS7314 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred32_FTS7320 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred32_FTS7322 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred32_FTS7328 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred32_FTS7330 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred32_FTS7336 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred32_FTS7338 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred33_FTS7403 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred33_FTS7409 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred33_FTS7411 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred33_FTS7417 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred33_FTS7419 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred33_FTS7425 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred33_FTS7427 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred33_FTS7433 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7493 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred34_FTS7495 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7501 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred34_FTS7503 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7509 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred34_FTS7511 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7517 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred35_FTS7571 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7577 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred35_FTS7579 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7585 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred35_FTS7587 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7593 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred35_FTS7595 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7657 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred36_FTS7659 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7665 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred36_FTS7667 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7673 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred36_FTS7675 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred37_FTS7731 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7737 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred37_FTS7739 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7745 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred37_FTS7747 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7753 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7805 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred38_FTS7807 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7813 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred38_FTS7815 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7821 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred39_FTS7868 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7874 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred39_FTS7876 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7882 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred39_FTS7884 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred40_FTS7938 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred40_FTS7940 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred40_FTS7946 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred40_FTS7948 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred41_FTS7998 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS8004 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred41_FTS8006 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS8012 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS8056 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred42_FTS8058 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS8064 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred43_FTS8102 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS8108 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred43_FTS8110 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS8156 = new BitSet(new long[]{0x0000000000100800L});
-	public static final BitSet FOLLOW_set_in_synpred44_FTS8158 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsTermOrPhrase_in_synpred3_FTS1823 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsExactTermOrPhrase_in_synpred4_FTS1852 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsTokenisedTermOrPhrase_in_synpred5_FTS1882 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsRange_in_synpred6_FTS1911 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroup_in_synpred7_FTS1990 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fieldReference_in_synpred8_FTS2665 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_synpred8_FTS2667 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred9_FTS2706 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred10_FTS2781 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred11_FTS2851 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred12_FTS2909 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fieldReference_in_synpred13_FTS3014 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_synpred13_FTS3016 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred14_FTS3055 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred15_FTS3130 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred16_FTS3200 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred17_FTS3258 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fieldReference_in_synpred18_FTS3365 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_synpred18_FTS3367 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred19_FTS3406 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred20_FTS3481 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred21_FTS3551 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred22_FTS3609 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_not_in_synpred23_FTS4356 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_synpred24_FTS4721 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred25_FTS4791 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred26_FTS4866 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred27_FTS4941 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred28_FTS5016 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred29_FTS5091 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred30_FTS5166 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_proximityGroup_in_synpred31_FTS5660 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_prefix_in_synpred32_FTS6266 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_synpred33_FTS6721 = new BitSet(new long[]{0x0000000000100000L});
+	public static final BitSet FOLLOW_DOT_in_synpred33_FTS6723 = new BitSet(new long[]{0x1000000000000000L});
+	public static final BitSet FOLLOW_ID_in_synpred33_FTS6725 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred34_FTS7041 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7047 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred34_FTS7049 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7055 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred34_FTS7057 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7063 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred34_FTS7065 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7071 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred34_FTS7073 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7079 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7147 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred35_FTS7149 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7155 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred35_FTS7157 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7163 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred35_FTS7165 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7171 = new BitSet(new long[]{0x0000000000100000L});
+	public static final BitSet FOLLOW_DOT_in_synpred35_FTS7173 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_COMMA_in_synpred35_FTS7175 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7177 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred36_FTS7240 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7246 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred36_FTS7248 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7254 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred36_FTS7256 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7262 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred36_FTS7264 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7270 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred36_FTS7272 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7342 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred37_FTS7344 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7350 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred37_FTS7352 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7358 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred37_FTS7360 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7366 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred37_FTS7368 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred38_FTS7433 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7439 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred38_FTS7441 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7447 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred38_FTS7449 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7455 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred38_FTS7457 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7463 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7523 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred39_FTS7525 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7531 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred39_FTS7533 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7539 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred39_FTS7541 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7547 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred40_FTS7601 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred40_FTS7607 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred40_FTS7609 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred40_FTS7615 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred40_FTS7617 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred40_FTS7623 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred40_FTS7625 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7687 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred41_FTS7689 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7695 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred41_FTS7697 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7703 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred41_FTS7705 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred42_FTS7761 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7767 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred42_FTS7769 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7775 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred42_FTS7777 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7783 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7835 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred43_FTS7837 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7843 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred43_FTS7845 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7851 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred44_FTS7898 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS7904 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred44_FTS7906 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS7912 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred44_FTS7914 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred45_FTS7968 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred45_FTS7970 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred45_FTS7976 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred45_FTS7978 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred46_FTS8028 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred46_FTS8034 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred46_FTS8036 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred46_FTS8042 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred47_FTS8086 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred47_FTS8088 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred47_FTS8094 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred48_FTS8132 = new BitSet(new long[]{0x100E400000006000L,0x0000000020820100L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred48_FTS8138 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred48_FTS8140 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred49_FTS8186 = new BitSet(new long[]{0x0000000000100800L});
+	public static final BitSet FOLLOW_set_in_synpred49_FTS8188 = new BitSet(new long[]{0x0000000000000002L});
 }
