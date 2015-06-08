@@ -19,6 +19,7 @@
 package org.alfresco.solr.component;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.solr.common.util.NamedList;
@@ -53,7 +54,8 @@ public class RewriteFacetCountsComponent extends SearchComponent
         rewrite(rb, "_date_mappings_", "facet_counts", "facet_dates");
         rewrite(rb, "_range_mappings_", "facet_counts", "facet_ranges");
         
-        //rewrite(rb, "_pivot_mappings_", "facet_counts", "facet_fields");
+        rewrite(rb, "_pivot_mappings_", "facet_counts", "facet_pivot");
+        rewritePivotFields(rb, "facet_counts", "facet_pivot");
         // TODO: rewrite(rb, "_interval_mappings_", "facet_counts", "facet_fields");
         
         rewrite(rb, "_stats_field_mappings_", "stats", "stats_fields");
@@ -68,6 +70,59 @@ public class RewriteFacetCountsComponent extends SearchComponent
         }
         
 
+    }
+
+    /**
+     * @param rb
+     */
+    private void rewritePivotFields(ResponseBuilder rb, String ... sections)
+    {
+        HashMap<String, String> mappings = (HashMap<String, String>)rb.rsp.getValues().get("_pivot_mappings_");
+        if(mappings != null)
+        {
+            NamedList<Object>  found = (NamedList<Object>) rb.rsp.getValues();
+            for(String section : sections)
+            {
+                found = (NamedList<Object>)found.get(section);
+                if(found == null)
+                {
+                    return;
+                }
+            }
+            for(int i = 0; i < found.size(); i++)
+            {
+                String pivotName = found.getName(i);
+                String[] fromParts = pivotName.split(",");
+                String[] toParts = mappings.get(pivotName).split(",");
+                Collection<NamedList<Object>> current = (Collection<NamedList<Object>>)found.getVal(i);
+                processPivot(fromParts, toParts, current, 0);
+            }
+        }
+        
+    }
+    
+    private void processPivot(String[] fromParts, String[] toParts, Collection<NamedList<Object>> current, int level)
+    {
+        for(NamedList<Object> entry : current)
+        {
+            for(int i = 0; i < entry.size(); i++)
+            {
+                String name = entry.getName(i);
+                if(name.equals("field"))
+                {
+                    entry.setVal(i, fromParts[level].trim());
+                }
+                else if(name.equals("pivot"))
+                {
+                    Collection<NamedList<Object>> pivot = (Collection<NamedList<Object>>)entry.getVal(i);
+                    processPivot(fromParts, toParts, pivot, level+1);
+                }
+                else
+                {
+                    // leave alone
+                }
+            }
+        }
     }
 
     /**

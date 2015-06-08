@@ -201,21 +201,38 @@ public class RewriteFacetParametersComponent extends SearchComponent
         if(facetFieldsOrig != null)
         {
             ArrayList<String> newFacetFields = new ArrayList<String>();
-            for(String facetField : facetFieldsOrig)
+            for(String facetFields : facetFieldsOrig)
             {
-                if(req.getSchema().getFieldOrNull(facetField) != null)
+                StringBuilder commaSeparated = new StringBuilder();
+                String[] fields = facetFields.split(",");
+                
+                for(String field : fields)
                 {
-                    newFacetFields.add(facetField);
-                }
-                else
-                {
-                    String mappedField = AlfrescoSolrDataModel.getInstance().mapProperty(facetField, FieldUse.FACET, req);
-                    if(!mappedField.equals(facetField))
+                    field = field.trim();
+                    if(req.getSchema().getFieldOrNull(field) != null)
                     {
-                        fieldMappings.put(facetField, mappedField);
+                        if(commaSeparated.length() > 0)
+                        {
+                            commaSeparated.append(",");
+                        }
+                        commaSeparated.append(field);
                     }
-                    newFacetFields.add(mappedField);
+                    else
+                    {
+                        String mappedField = AlfrescoSolrDataModel.getInstance().mapProperty(field, FieldUse.FACET, req);
+                        
+                        if(commaSeparated.length() > 0)
+                        {
+                            commaSeparated.append(",");
+                        }
+                        commaSeparated.append(mappedField);
+                    }
                 }
+                if(!facetFields.equals(commaSeparated.toString()))
+                {
+                    fieldMappings.put(facetFields, commaSeparated.toString());
+                }
+                newFacetFields.add(commaSeparated.toString());
             }
             fixed.set(paramName,  newFacetFields.toArray(new String[newFacetFields.size()]));
         }
