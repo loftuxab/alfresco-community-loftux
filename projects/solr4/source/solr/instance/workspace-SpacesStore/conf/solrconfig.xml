@@ -1579,7 +1579,7 @@
        http://wiki.apache.org/solr/HighlightingParameters
     -->
   <searchComponent class="solr.HighlightComponent" name="highlight">
-    <highlighting>
+    <highlighting class="org.apache.solr.handler.component.AlfrescoSolrHighlighter" >
       <!-- Configure the standard fragmenter -->
       <!-- This could most likely be commented out in the "default" case -->
       <fragmenter name="gap" 
