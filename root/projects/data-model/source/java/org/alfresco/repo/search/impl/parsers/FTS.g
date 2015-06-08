@@ -737,6 +737,8 @@ ftsFieldGroupProximityTerm
         | DECIMAL_INTEGER_LITERAL
         | FLOATING_POINT_LITERAL
         | DATETIME
+        | STAR
+        | URI identifier
         ;
 
 proximityGroup
@@ -849,6 +851,7 @@ ftsWordBase
         | STAR
         | QUESTION_MARK
         | DATETIME
+        | URI identifier
         ;
 
 number
@@ -868,6 +871,7 @@ ftsRangeWord
         | FLOATING_POINT_LITERAL
         | DATETIME
         | STAR
+        | URI identifier
         ;
 
 //
