@@ -203,12 +203,19 @@ public class RewriteFacetParametersComponent extends SearchComponent
             ArrayList<String> newFacetFields = new ArrayList<String>();
             for(String facetField : facetFieldsOrig)
             {
-                String mappedField = AlfrescoSolrDataModel.getInstance().mapProperty(facetField, FieldUse.FACET, req);
-                if(!mappedField.equals(facetField))
+                if(req.getSchema().getFieldOrNull(facetField) != null)
                 {
-                    fieldMappings.put(facetField, mappedField);
+                    newFacetFields.add(facetField);
                 }
-                newFacetFields.add(mappedField);
+                else
+                {
+                    String mappedField = AlfrescoSolrDataModel.getInstance().mapProperty(facetField, FieldUse.FACET, req);
+                    if(!mappedField.equals(facetField))
+                    {
+                        fieldMappings.put(facetField, mappedField);
+                    }
+                    newFacetFields.add(mappedField);
+                }
             }
             fixed.set(paramName,  newFacetFields.toArray(new String[newFacetFields.size()]));
         }
