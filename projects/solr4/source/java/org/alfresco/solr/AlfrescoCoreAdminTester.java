@@ -5629,8 +5629,8 @@ public class AlfrescoCoreAdminTester
         // testOrderablePropertyFail("cmistest:multipleMLTextTokenised");
         // testOrderablePropertyFail("cmistest:multipleMLTextBoth");
 
-        asc = new Integer[] { 1000, 200, 201, 202, 100, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009  };
-        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 1000, 202, 201, 200 };
+        asc = new Integer[] { 200, 1000, 201, 202, 100, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009  };     
+        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 202, 201, 1000, 200 };
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleFloat", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleFloat");
@@ -5638,8 +5638,8 @@ public class AlfrescoCoreAdminTester
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleDouble", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleDouble");
 
-        asc = new Integer[] {1000, 200, 201, 202, 100, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009 };
-        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 1000, 202, 201, 200 };
+        asc = new Integer[] { 200, 1000, 201, 202, 100, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009  };     
+        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 202, 201, 1000, 200 };
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleInteger", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleInteger");
@@ -5647,8 +5647,8 @@ public class AlfrescoCoreAdminTester
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleLong", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleLong");
 
-        asc = new Integer[] { 200, 201, 202, 100, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009 };
-        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 1000, 100, 202, 201, 200 }; 
+        asc = new Integer[] { 200, 201, 202, 100, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009  };     
+        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 1000, 100, 202, 201, 200 };
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleDate", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleDate");
