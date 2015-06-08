@@ -1902,6 +1902,13 @@
      <str name="spellcheck.collateExtendedResults">true</str>
      <str name="spellcheck.maxCollationTries">5</str>
      <str name="spellcheck.maxCollations">3</str>
+
+     <str name="carrot.title">mltext@m___t@{http://www.alfresco.org/model/content/1.0}title</str>
+     <str name="carrot.url">id</str>
+     <str name="carrot.snippet">content@s___t@{http://www.alfresco.org/model/content/1.0}content</str>
+     <bool name="carrot.produceSummary">true</bool>
+     <bool name="carrot.outputSubClusters">false</bool>
+    
     </lst>
     <arr name="components">
       <str>setLocale</str>
@@ -1918,6 +1925,8 @@
       <!-- <str>addTxId</str> -->
       <str>spellcheck</str>
       <str>setProcessedDenies</str>
+
+      <str>clustering</str>
     </arr>
       <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
