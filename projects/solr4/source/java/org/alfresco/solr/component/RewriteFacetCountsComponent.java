@@ -60,6 +60,8 @@ public class RewriteFacetCountsComponent extends SearchComponent
         
         rewrite(rb, "_stats_field_mappings_", "stats", "stats_fields");
         
+        copyAnalytics(rb, "facet_counts", "facet_fields");
+        
         HashMap<String, String> mappings = (HashMap<String, String>)rb.rsp.getValues().get("_stats_field_mappings_");
         if(mappings != null)
         {
@@ -68,9 +70,42 @@ public class RewriteFacetCountsComponent extends SearchComponent
                 rewrite(rb, "_stats_facet_mappings_", "stats", "stats_fields", key, "facets");
             }
         }
+    }
+    
+    
+    /**
+     * @param rb
+     */
+    private void copyAnalytics(ResponseBuilder rb, String ... sections)
+    {
+        NamedList<Object>  found = (NamedList<Object>) rb.rsp.getValues();
+        for(String section : sections)
+        {
+            found = (NamedList<Object>)found.get(section);
+            if(found == null)
+            {
+                return;
+            }
+        }
+
+        NamedList<Object>  analytics = (NamedList<Object>) rb.rsp.getValues();
+        analytics =  (NamedList<Object>)analytics.get("analytics");
+        if(analytics != null)
+        {
+            for(int i = 0; i < analytics.size(); i++)
+            {
+                String name = analytics.getName(i);
+                Object value = analytics.getVal(i);
+                found.add(name, value);
+            }
+        }
+        
         
 
+
+
     }
+
 
     /**
      * @param rb

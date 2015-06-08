@@ -89,12 +89,12 @@ public class MimetypeGroupingCollector extends DelegatingCollector
     {
         NamedList<Object> analytics = new NamedList<>();
         rb.rsp.add("analytics", analytics);
-        NamedList<Object> map = new NamedList<>();
-        analytics.add("groupings", map);
+        NamedList<Object> fieldCounts = new NamedList<>(); 
+        analytics.add("mimetype()", fieldCounts);
         for(String key : counters.keySet())
         {
             Counter counter = counters.get(key);
-            map.add(key, counter.get());
+            fieldCounts.add(key, counter.get());
         }
         
         if(this.delegate instanceof DelegatingCollector) {
