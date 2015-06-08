@@ -448,18 +448,20 @@ ftsTest
                 ->
                         ^(PROXIMITY ftsFieldGroupProximity)
         |
-           (ftsTermOrPhrase) => ftsTermOrPhrase
-        |
-           (ftsExactTermOrPhrase) => ftsExactTermOrPhrase
-        | 
-           (ftsTokenisedTermOrPhrase) => ftsTokenisedTermOrPhrase
-        |
            (ftsRange) => ftsRange
                 ->
                         ^(RANGE ftsRange)
         |  
            (ftsFieldGroup) => ftsFieldGroup
                 -> ftsFieldGroup
+        |
+           (ftsTermOrPhrase) => ftsTermOrPhrase
+        |
+           (ftsExactTermOrPhrase) => ftsExactTermOrPhrase
+        | 
+           (ftsTokenisedTermOrPhrase) => ftsTokenisedTermOrPhrase
+        
+        
         |  LPAREN ftsDisjunction RPAREN
                 -> ftsDisjunction
         |  template
@@ -897,6 +899,7 @@ ftsRangeWord
         | DECIMAL_INTEGER_LITERAL
         | FLOATING_POINT_LITERAL
         | DATETIME
+        | STAR
         ;
 
 //
@@ -1070,10 +1073,66 @@ F_URI_OTHER
  
 DATETIME
         :
+         (SPECIFICDATETIME | NOW) (FS UNIT)? ( (PLUS|MINUS) DIGIT+ UNIT)*
+        ; 
+
+fragment UNIT 
+        :
+        (YEAR | MONTH | DAY | HOUR | MINUTE | SECOND | MILLIS)
+        ;
+ 
+fragment SPECIFICDATETIME
+        :
            DIGIT DIGIT DIGIT DIGIT 
               ( '-' DIGIT DIGIT ( '-' DIGIT DIGIT ( 'T' (DIGIT DIGIT ( ':' DIGIT DIGIT ( ':' DIGIT DIGIT ( '.' DIGIT DIGIT DIGIT ( 'Z' | (( '+' | '-') DIGIT DIGIT ( ':' DIGIT DIGIT)? ) )? )? )? )? )? )? )? )?
         ;
         
+fragment NOW
+        :
+           ('N'|'n') ('O'|'o') ('W'|'w')
+        ;
+        
+fragment YEAR
+        :
+          ('Y'|'y') ('E'|'e') ('A'|'a') ('R'|'r') ('S'|'s')? 
+        ; 
+        
+fragment MONTH
+        :
+          ('M'|'m') ('O'|'o') ('N'|'n') ('T'|'t') ('H'|'h') ('S'|'s')? 
+        ;
+
+fragment DAY
+        :
+          ('D'|'d') ('A'|'a') ('Y'|'y') ('S'|'s')?
+        | ('D'|'d') ('A'|'a') ('T'|'t') ('E'|'e')
+        ; 
+        
+fragment HOUR
+        :
+          ('H'|'h') ('O'|'o') ('U'|'u') ('R'|'r') ('S'|'s')? 
+        ; 
+        
+fragment MINUTE
+        :
+          ('M'|'m') ('I'|'i') ('N'|'n') ('U'|'u') ('T'|'t') ('E'|'e') ('S'|'s')? 
+        ; 
+        
+fragment SECOND
+        :
+          ('S'|'s') ('E'|'e') ('C'|'c') ('O'|'o') ('N'|'n') ('D'|'d') ('S'|'s')? 
+        ;
+        
+fragment MILLIS
+        :
+          ('M'|'m') ('I'|'i') ('L'|'l') ('L'|'l') ('I'|'i') ('S'|'s') ('E'|'e') ('C'|'c') ('O'|'o') ('N'|'n') ('D'|'d') ('S'|'s')?
+        | ('M'|'m') ('I'|'i') ('L'|'l') ('L'|'l') ('I'|'i') ('S'|'s')?
+        ;         
+        
+fragment FS
+        :
+        '/'
+        ;
         
 /*
  * Simple tokens, note all are case insensitive
@@ -1262,6 +1321,7 @@ PERCENT
         :
         '%'
         ;
+
 
 /**
  * ID

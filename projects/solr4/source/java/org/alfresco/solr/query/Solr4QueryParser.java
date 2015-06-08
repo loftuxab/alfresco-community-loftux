@@ -2670,6 +2670,14 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
                     {
                         String start = dateAndResolution1 == null ? part1 : (includeLower ? getDateStart(dateAndResolution1) : getDateEnd(dateAndResolution1) );
                         String end = dateAndResolution2 == null ? part2 : (includeUpper ? getDateEnd(dateAndResolution2) : getDateStart(dateAndResolution2) );
+                        if(start.equals("*"))
+                        {
+                            start = null;
+                        }
+                        if(end.equals("*"))
+                        {
+                            end = null;
+                        }
 
                         SchemaField sf = schema.getField(instance.getField());
                         
