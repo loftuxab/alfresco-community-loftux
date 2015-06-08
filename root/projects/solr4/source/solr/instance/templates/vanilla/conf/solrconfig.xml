@@ -1440,7 +1440,6 @@
        http://carrot2.github.io/solr-integration-strategies/
     -->
   <searchComponent name="clustering"
-                   enable="${solr.clustering.enabled:false}"
                    class="org.apache.solr.handler.component.AlfrescoSolrClusteringComponent" >
     <lst name="engine">
       <str name="name">lingo</str>
