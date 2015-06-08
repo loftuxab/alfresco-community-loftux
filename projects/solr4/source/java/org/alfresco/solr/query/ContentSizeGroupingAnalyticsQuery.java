@@ -29,19 +29,19 @@ import org.apache.solr.search.DelegatingCollector;
  * @author Andy
  *
  */
-public class MimetypeGroupingAnalyticsQuery extends AnalyticsQuery
+public class ContentSizeGroupingAnalyticsQuery extends AnalyticsQuery
 {
-    private HashMap<String, String> mappings;
-    private boolean group;
+    private int buckets;
+    private int scale;
 
     /**
+     * @param buckets 
      * @param mappings
-     * @param group 
      */
-    public MimetypeGroupingAnalyticsQuery(HashMap<String, String> mappings, boolean group)
+    public ContentSizeGroupingAnalyticsQuery(int scale, int buckets)
     {
-        this.mappings = mappings;
-        this.group = group;
+        this.scale = scale;
+        this.buckets = buckets;
         
     }
 
@@ -51,7 +51,7 @@ public class MimetypeGroupingAnalyticsQuery extends AnalyticsQuery
     @Override
     public DelegatingCollector getAnalyticsCollector(ResponseBuilder rb, IndexSearcher searcher)
     {
-        return new MimetypeGroupingCollector(rb, mappings, group);
+        return new ContentSizeGroupingCollector(rb, scale, buckets);
     }
 
 }

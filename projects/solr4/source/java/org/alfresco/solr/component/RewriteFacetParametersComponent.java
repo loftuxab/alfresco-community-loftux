@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
+import org.alfresco.solr.query.MimetypeGroupingQParserPlugin;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
@@ -75,6 +76,37 @@ public class RewriteFacetParametersComponent extends SearchComponent
                         }
                         else
                         {
+                            if(value.startsWith("contentSize():"))
+                            {
+                                value = "cm:content.size:" + removeQuotes(value.substring("contentSize():".length()));
+                            }
+                            else if(value.startsWith("mimetype():"))
+                            {
+                                value = removeQuotes(value.substring("mimetype():".length()));
+                                ArrayList<String> expand = MimetypeGroupingQParserPlugin.getReverseMappings().get(value);
+                                if(expand == null)
+                                {
+                                    value = "cm:content.mimetype:\""+value+"\"";
+                                }
+                                else
+                                {
+                                    StringBuilder builder = new StringBuilder();
+                                    builder.append("cm:content.mimetype:(");
+                                    for(int j = 0; j < expand.size(); j++)
+                                    {
+                                        if(j > 0)
+                                        {
+                                            builder.append(" OR ");
+                                        }
+                                        builder.append('"');
+                                        builder.append(expand.get(j));
+                                        builder.append('"');
+                                    }
+                                    builder.append(')');
+                                    value = builder.toString();
+                                    
+                                }
+                            }
                             fixedValues[i] = "{!afts}"+value;
                         }
                     }
@@ -85,6 +117,18 @@ public class RewriteFacetParametersComponent extends SearchComponent
         }
     }
 
+    private String removeQuotes(String quoted)
+    {
+        if(quoted.startsWith("\"") && quoted.endsWith("\""))
+        {
+            return quoted.substring(1, quoted.length()-1);
+        }
+        else
+        {
+            return quoted;
+        }
+    }
+    
 
     /**
      * @param params
@@ -150,7 +194,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
     private void mapFacetFunctions(ModifiableSolrParams fixed, SolrParams params, String string, HashMap<String, String> facetFunctionMappings)
     {
         
-        String[] facetFieldsOrig = params.getParams("facet.field");
+        String[] facetFieldsOrig = params.getParams(string);
         if(facetFieldsOrig != null)
         {
             for(String facetFields : facetFieldsOrig)
@@ -162,14 +206,49 @@ public class RewriteFacetParametersComponent extends SearchComponent
                     field = field.trim();
                     if(field.endsWith("()"))
                     {
-                        String function =  "{!" + field.substring(0, field.length()-2)+ "}";
-                        fixed.add("fq", function);
-                        facetFunctionMappings.put(field,  function);
+                        if(isMimetypeAndHasFQ(params, field))
+                        {
+                            String function =  "{!" + field.substring(0, field.length()-2)+ " group=false }";
+                            fixed.add("fq", function);
+                            facetFunctionMappings.put(field,  function);
+                        }
+                        else
+                        {
+                            String function =  "{!" + field.substring(0, field.length()-2)+ " group=true}";
+                            fixed.add("fq", function);
+                            facetFunctionMappings.put(field,  function);
+                        }
                     }
 
                 }
             }   
         }
+    }
+
+
+    /**
+     * @param params
+     * @param field
+     * @return
+     */
+    private boolean isMimetypeAndHasFQ(SolrParams params, String field)
+    {
+        if(!field.equals("mimetype()"))
+        {
+            return false;
+        }
+        else
+        {
+            String[] filterQueries = params.getParams("fq");
+            for(String fq : filterQueries)
+            {
+                if(fq.startsWith("mimetype():"))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
