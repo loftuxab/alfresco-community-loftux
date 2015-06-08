@@ -1441,7 +1441,7 @@
     -->
   <searchComponent name="clustering"
                    enable="${solr.clustering.enabled:false}"
-                   class="solr.clustering.ClusteringComponent" >
+                   class="org.apache.solr.handler.component.AlfrescoSolrClusteringComponent" >
     <lst name="engine">
       <str name="name">lingo</str>
 
@@ -1502,11 +1502,11 @@
       <bool name="clustering">true</bool>
       <bool name="clustering.results">true</bool>
       <!-- Field name with the logical "title" of a each document (optional) -->
-      <str name="carrot.title">name</str>
+      <str name="carrot.title">mltext@m___t@{http://www.alfresco.org/model/content/1.0}title</str>
       <!-- Field name with the logical "URL" of a each document (optional) -->
       <str name="carrot.url">id</str>
       <!-- Field name with the logical "content" of a each document (optional) -->
-      <str name="carrot.snippet">features</str>
+      <str name="carrot.snippet">content@s___t@{http://www.alfresco.org/model/content/1.0}content</str>
       <!-- Apply highlighter to the title/ content and use this for clustering. -->
       <bool name="carrot.produceSummary">true</bool>
       <!-- the maximum number of labels per cluster -->
