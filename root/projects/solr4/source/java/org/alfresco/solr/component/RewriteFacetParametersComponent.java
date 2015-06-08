@@ -101,6 +101,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
         HashMap<String, String> statsFieldMappings = new HashMap<>();
         HashMap<String, String> statsFacetMappings = new HashMap<>();
        
+        HashMap<String, String> functionMappings = new HashMap<>();
         
         rewriteFacetFieldList(fixed, params, "facet.field", fieldMappings, rb.req);
         rewriteFacetFieldList(fixed, params, "facet.date", dateMappings, rb.req);
@@ -111,11 +112,14 @@ public class RewriteFacetParametersComponent extends SearchComponent
         rewriteFacetFieldList(fixed, params, "stats.field", statsFieldMappings, rb.req);
         rewriteFacetFieldList(fixed, params, "stats.facet", statsFacetMappings, rb.req);
         
+        mapFacetFunctions(fixed, params, "facet.field", functionMappings);
         rewriteFacetFieldOptions(fixed, params, "facet.field", fieldMappings);
         rewriteFacetFieldOptions(fixed, params, "facet.date", dateMappings);
         rewriteFacetFieldOptions(fixed, params, "facet.range", rangeMappings);
         rewriteFacetFieldOptions(fixed, params, "facet.pivot", pivotMappings);
         rewriteFacetFieldOptions(fixed, params, "facet.interval", intervalMappings);
+        
+       
         
         // TODO: 
         //    f.<stats_field>.stats.facet=<new Field> 
@@ -131,8 +135,41 @@ public class RewriteFacetParametersComponent extends SearchComponent
         rb.rsp.add("_interval_mappings_", intervalMappings);
         rb.rsp.add("_stats_field_mappings_", statsFieldMappings);
         rb.rsp.add("_stats_facet_mappings_", statsFacetMappings);
+        rb.rsp.add("_facet_function_mappings_", functionMappings);
         
         return fixed;
+    }
+
+
+    /**
+     * @param fixed
+     * @param params
+     * @param string
+     * @param fieldMappings
+     */
+    private void mapFacetFunctions(ModifiableSolrParams fixed, SolrParams params, String string, HashMap<String, String> facetFunctionMappings)
+    {
+        
+        String[] facetFieldsOrig = params.getParams("facet.field");
+        if(facetFieldsOrig != null)
+        {
+            for(String facetFields : facetFieldsOrig)
+            {
+                String[] fields = facetFields.split(",");
+
+                for(String field : fields)
+                {
+                    field = field.trim();
+                    if(field.endsWith("()"))
+                    {
+                        String function =  "{!" + field.substring(0, field.length()-2)+ "}";
+                        fixed.add("fq", function);
+                        facetFunctionMappings.put(field,  function);
+                    }
+
+                }
+            }   
+        }
     }
 
 
@@ -209,6 +246,14 @@ public class RewriteFacetParametersComponent extends SearchComponent
                 for(String field : fields)
                 {
                     field = field.trim();
+                    
+                    if(field.endsWith("()"))
+                    {
+                        // skip facet functions 
+                        continue;
+                    }
+                    
+                    
                     if(req.getSchema().getFieldOrNull(field) != null)
                     {
                         if(commaSeparated.length() > 0)
@@ -232,7 +277,10 @@ public class RewriteFacetParametersComponent extends SearchComponent
                 {
                     fieldMappings.put(facetFields, commaSeparated.toString());
                 }
-                newFacetFields.add(commaSeparated.toString());
+                if(commaSeparated.length() > 0)
+                {
+                    newFacetFields.add(commaSeparated.toString());
+                }
             }
             fixed.set(paramName,  newFacetFields.toArray(new String[newFacetFields.size()]));
         }
