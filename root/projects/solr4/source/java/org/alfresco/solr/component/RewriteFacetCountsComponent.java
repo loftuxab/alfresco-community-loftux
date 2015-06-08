@@ -128,7 +128,8 @@ public class RewriteFacetCountsComponent extends SearchComponent
             {
                 String pivotName = found.getName(i);
                 String[] fromParts = pivotName.split(",");
-                String[] toParts = mappings.get(pivotName).split(",");
+                String mapping = mappings.get(pivotName);
+                String[] toParts = mapping != null ? mapping.split(",") : fromParts;
                 Collection<NamedList<Object>> current = (Collection<NamedList<Object>>)found.getVal(i);
                 processPivot(fromParts, toParts, current, 0);
             }
