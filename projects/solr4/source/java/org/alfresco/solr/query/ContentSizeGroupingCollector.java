@@ -28,6 +28,7 @@ import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
 import org.alfresco.solr.tracker.TrackerStats.Bucket;
 import org.alfresco.solr.tracker.TrackerStats.IncrementalStats;
 import org.alfresco.solr.tracker.TrackerStats.SimpleStats;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.util.Counter;
@@ -46,7 +47,9 @@ public class ContentSizeGroupingCollector extends DelegatingCollector
     private int buckets;
     private int scale;
     IncrementalStats stats;
-    
+    String schemaFieldName;
+    SchemaField schemaField;
+    NumericDocValues numericDocValues;    
     /**
      * @param rb
      * @param buckets 
@@ -56,25 +59,46 @@ public class ContentSizeGroupingCollector extends DelegatingCollector
         this.rb = rb;
         this.buckets = buckets;
         stats = new IncrementalStats(scale, buckets, null);
+        schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty("content.size", FieldUse.FACET, rb.req);
+        schemaField = rb.req.getSchema().getFieldOrNull(schemaFieldName);
     }
     
-    public void collect(int doc) throws IOException 
+    
+    
+    /* (non-Javadoc)
+     * @see org.apache.solr.search.DelegatingCollector#setNextReader(org.apache.lucene.index.AtomicReaderContext)
+     */
+    @Override
+    public void setNextReader(AtomicReaderContext context) throws IOException
     {
-        String schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty("content.size", FieldUse.FACET, rb.req);
-        SchemaField schemaField = rb.req.getSchema().getFieldOrNull(schemaFieldName);
+        super.setNextReader(context);
         if(schemaField != null)
         {
             if(schemaField.getType().getNumericType() != null)
             {
-                NumericDocValues numericDocValues = context.reader().getNumericDocValues(schemaFieldName);
-                if(numericDocValues != null)
+                try
                 {
-                    long value = numericDocValues.get(doc);
-                    stats.add(value);
+                    numericDocValues = context.reader().getNumericDocValues(schemaFieldName);
+                }
+                catch (IOException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
         }
+    }
 
+
+
+    public void collect(int doc) throws IOException 
+    {
+
+        if(numericDocValues != null)
+        {
+            long value = numericDocValues.get(doc);
+            stats.add(value);
+        }
         delegate.collect(doc);
     }
 

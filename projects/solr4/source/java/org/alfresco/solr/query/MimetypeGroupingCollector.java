@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.util.Counter;
 import org.apache.solr.common.util.NamedList;
@@ -40,6 +41,9 @@ public class MimetypeGroupingCollector extends DelegatingCollector
     ResponseBuilder rb;
     private HashMap<String, String> mappings;
     private boolean doGroup;
+    String schemaFieldName;
+    SchemaField schemaField;
+    SortedDocValues sortedDocValues;
     /**
      * @param rb
      * @param mappings 
@@ -50,39 +54,54 @@ public class MimetypeGroupingCollector extends DelegatingCollector
         this.rb = rb;
         this.mappings = mappings;
         this.doGroup = doGroup;
+        schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty("content.mimetype", FieldUse.FACET, rb.req);
+        schemaField = rb.req.getSchema().getFieldOrNull(schemaFieldName);
     }
     
-    public void collect(int doc) throws IOException 
+    
+    @Override
+    public void setNextReader(AtomicReaderContext context) throws IOException
     {
-        String schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty("content.mimetype", FieldUse.FACET, rb.req);
-        SchemaField schemaField = rb.req.getSchema().getFieldOrNull(schemaFieldName);
+        super.setNextReader(context);
         if(schemaField != null)
         {
-            SortedDocValues sortedDocValues = context.reader().getSortedDocValues(schemaFieldName);
-            
-            if(sortedDocValues != null)
+            try
             {
-                int ordinal = sortedDocValues.getOrd(doc);
-                if(ordinal > -1)
-                {
-                   String value = (String)schemaField.getType().toObject(schemaField, sortedDocValues.lookupOrd(ordinal));
-                   String group = doGroup ? mappings.get(value) : value;
-                   if(group == null)
-                   {
-                       group = value;
-                   }
-                   
-                   Counter counter = counters.get(group);
-                   if(counter == null)
-                   {
-                       counter = Counter.newCounter();
-                       counters.put(group, counter);
-                   }
-                   counter.addAndGet(1);
-                }
+                sortedDocValues = context.reader().getSortedDocValues(schemaFieldName);
+            }
+            catch (IOException e)
+            {
+               
             }
         }
-       
+    }
+
+    @Override
+    public void collect(int doc) throws IOException 
+    {
+        if(sortedDocValues != null)
+        {
+            int ordinal = sortedDocValues.getOrd(doc);
+            if(ordinal > -1)
+            {
+                String value = (String)schemaField.getType().toObject(schemaField, sortedDocValues.lookupOrd(ordinal));
+                String group = doGroup ? mappings.get(value) : value;
+                if(group == null)
+                {
+                    group = value;
+                }
+
+                Counter counter = counters.get(group);
+                if(counter == null)
+                {
+                    counter = Counter.newCounter();
+                    counters.put(group, counter);
+                }
+                counter.addAndGet(1);
+            }
+        }
+
+
         delegate.collect(doc);
     }
 
