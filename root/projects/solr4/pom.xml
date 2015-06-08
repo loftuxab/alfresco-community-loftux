@@ -95,6 +95,21 @@
             </exclusions>
         </dependency>
         <dependency>
+	    <groupId>org.apache.solr</groupId>
+	    <artifactId>solr-clustering</artifactId>
+	    <version>4.10.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.orbit</groupId>
+                    <artifactId>javax.servlet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.6.6</version>
