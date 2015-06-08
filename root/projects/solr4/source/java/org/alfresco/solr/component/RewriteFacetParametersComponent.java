@@ -26,7 +26,6 @@ import java.util.Iterator;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
 import org.alfresco.solr.query.MimetypeGroupingQParserPlugin;
-import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -47,7 +46,13 @@ public class RewriteFacetParametersComponent extends SearchComponent
     @Override
     public void prepare(ResponseBuilder rb) throws IOException
     {
-
+    	 SolrQueryRequest req = rb.req;
+         SolrParams params = req.getParams();
+         
+         ModifiableSolrParams fixed = new ModifiableSolrParams();
+         fixFilterQueries(fixed, params, rb);
+         copyNonFilterQueryParams(fixed, params);
+         req.setParams(fixed);
     }
 
     
@@ -261,7 +266,28 @@ public class RewriteFacetParametersComponent extends SearchComponent
         for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
         {
             String name = it.next();
-            if(name.equals("fq") || name.startsWith("f.") || name.equals("facet.field") || name.equals("facet.date") || name.equals("facet.range") || name.equals("facet.pivot") || name.equals("facet.interval")|| name.startsWith("stats."))
+            if(name.startsWith("f.") || name.equals("facet.field") || name.equals("facet.date") || name.equals("facet.range") || name.equals("facet.pivot") || name.equals("facet.interval")|| name.startsWith("stats."))
+            {
+                // Already done 
+                continue;
+            }    
+            else
+            {
+                fixed.set(name, params.getParams(name));
+            }
+        }
+    }
+    
+    /**
+     * @param fixed
+     * @param params
+     */
+    private void copyNonFilterQueryParams(ModifiableSolrParams fixed, SolrParams params)
+    {
+        for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
+        {
+            String name = it.next();
+            if(name.equals("fq"))
             {
                 // Already done 
                 continue;
@@ -377,7 +403,6 @@ public class RewriteFacetParametersComponent extends SearchComponent
         
         ModifiableSolrParams fixed = new ModifiableSolrParams();
         fixFacetParams(fixed, params, rb);
-        fixFilterQueries(fixed, params, rb);
         copyNonFacetParams(fixed, params);
         req.setParams(fixed);
     }
