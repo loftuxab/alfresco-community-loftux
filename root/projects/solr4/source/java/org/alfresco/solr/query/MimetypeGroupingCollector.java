@@ -38,12 +38,15 @@ public class MimetypeGroupingCollector extends DelegatingCollector
 {
     HashMap<String, Counter> counters = new HashMap<String, Counter>();
     ResponseBuilder rb;
+    private HashMap<String, String> mappings;
     /**
      * @param rb
+     * @param mappings 
      */
-    public MimetypeGroupingCollector(ResponseBuilder rb)
+    public MimetypeGroupingCollector(ResponseBuilder rb, HashMap<String, String> mappings)
     {
         this.rb = rb;
+        this.mappings = mappings;
     }
     
     public void collect(int doc) throws IOException 
@@ -60,16 +63,7 @@ public class MimetypeGroupingCollector extends DelegatingCollector
                 if(ordinal > -1)
                 {
                    String value = (String)schemaField.getType().toObject(schemaField, sortedDocValues.lookupOrd(ordinal));
-                   String group;
-                   int index = value.indexOf('/');
-                   if(index == -1)
-                   {
-                       group = value;
-                   }
-                   else
-                   {
-                       group = value.substring(0, index);
-                   }
+                   String group = mappings.get(value);
                    
                    Counter counter = counters.get(group);
                    if(counter == null)
