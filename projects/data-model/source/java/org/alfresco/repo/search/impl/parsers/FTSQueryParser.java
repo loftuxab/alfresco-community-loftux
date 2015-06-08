@@ -1225,6 +1225,7 @@ public class FTSQueryParser
         case FTSParser.PERCENT:
         case FTSParser.DECIMAL_INTEGER_LITERAL:
         case FTSParser.FLOATING_POINT_LITERAL:
+        case FTSParser.DATETIME:
             return text;
         default:
             if(returnTextFromUnknownNodes)

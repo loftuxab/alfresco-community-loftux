@@ -1,4 +1,4 @@
-// $ANTLR 3.5 W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g 2014-07-02 21:17:29
+// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g 2015-06-06 12:06:55
 
 package org.alfresco.repo.search.impl.parsers;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
@@ -35,7 +35,7 @@ public class CMIS_FTSLexer extends Lexer {
 	public Token nextToken() {
 	        nextTokenImpl();
 	        if ( tokens.size()==0 ) {
-                return getEOFToken();
+	            return getEOFToken();
 	        }
 	        return (Token)tokens.remove(0);
 	}
@@ -51,7 +51,7 @@ public class CMIS_FTSLexer extends Lexer {
 	            state.text = null;
 	            if ( input.LA(1)==CharStream.EOF ) 
 	            {
-	                  return getEOFToken();
+	                return getEOFToken();
 	            }
 	            try 
 	            {
@@ -94,18 +94,18 @@ public class CMIS_FTSLexer extends Lexer {
 	public CMIS_FTSLexer(CharStream input, RecognizerSharedState state) {
 		super(input,state);
 	}
-	@Override public String getGrammarFileName() { return "W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g"; }
+	@Override public String getGrammarFileName() { return "W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g"; }
 
 	// $ANTLR start "FTSPHRASE"
 	public final void mFTSPHRASE() throws RecognitionException {
 		try {
 			int _type = FTSPHRASE;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:346:9: ( '\\'' ( F_ESC |~ ( '\\\\' | '\\'' ) )* '\\'' )
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:347:9: '\\'' ( F_ESC |~ ( '\\\\' | '\\'' ) )* '\\''
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:346:9: ( '\\'' ( F_ESC |~ ( '\\\\' | '\\'' ) )* '\\'' )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:347:9: '\\'' ( F_ESC |~ ( '\\\\' | '\\'' ) )* '\\''
 			{
 			match('\''); 
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:348:9: ( F_ESC |~ ( '\\\\' | '\\'' ) )*
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:348:9: ( F_ESC |~ ( '\\\\' | '\\'' ) )*
 			loop1:
 			while (true) {
 				int alt1=3;
@@ -119,14 +119,14 @@ public class CMIS_FTSLexer extends Lexer {
 
 				switch (alt1) {
 				case 1 :
-					// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:349:17: F_ESC
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:349:17: F_ESC
 					{
 					mF_ESC(); 
 
 					}
 					break;
 				case 2 :
-					// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:351:17: ~ ( '\\\\' | '\\'' )
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:351:17: ~ ( '\\\\' | '\\'' )
 					{
 					if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&')||(input.LA(1) >= '(' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
 						input.consume();
@@ -159,8 +159,8 @@ public class CMIS_FTSLexer extends Lexer {
 	// $ANTLR start "F_ESC"
 	public final void mF_ESC() throws RecognitionException {
 		try {
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:363:9: ( '\\\\' ( '\\\\' | '\\'' ) )
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:364:9: '\\\\' ( '\\\\' | '\\'' )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:363:9: ( '\\\\' ( '\\\\' | '\\'' ) )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:364:9: '\\\\' ( '\\\\' | '\\'' )
 			{
 			match('\\'); 
 			if ( input.LA(1)=='\''||input.LA(1)=='\\' ) {
@@ -185,8 +185,8 @@ public class CMIS_FTSLexer extends Lexer {
 		try {
 			int _type = OR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:372:9: ( ( 'O' | 'o' ) ( 'R' | 'r' ) )
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:373:9: ( 'O' | 'o' ) ( 'R' | 'r' )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:372:9: ( ( 'O' | 'o' ) ( 'R' | 'r' ) )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:373:9: ( 'O' | 'o' ) ( 'R' | 'r' )
 			{
 			if ( input.LA(1)=='O'||input.LA(1)=='o' ) {
 				input.consume();
@@ -220,8 +220,8 @@ public class CMIS_FTSLexer extends Lexer {
 		try {
 			int _type = MINUS;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:384:9: ( '-' )
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:385:9: '-'
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:384:9: ( '-' )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:385:9: '-'
 			{
 			match('-'); 
 			}
@@ -240,10 +240,10 @@ public class CMIS_FTSLexer extends Lexer {
 		try {
 			int _type = WS;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:395:9: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ )
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:396:9: ( ' ' | '\\t' | '\\r' | '\\n' )+
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:395:9: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:396:9: ( ' ' | '\\t' | '\\r' | '\\n' )+
 			{
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:396:9: ( ' ' | '\\t' | '\\r' | '\\n' )+
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:396:9: ( ' ' | '\\t' | '\\r' | '\\n' )+
 			int cnt2=0;
 			loop2:
 			while (true) {
@@ -255,7 +255,7 @@ public class CMIS_FTSLexer extends Lexer {
 
 				switch (alt2) {
 				case 1 :
-					// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:
 					{
 					if ( (input.LA(1) >= '\t' && input.LA(1) <= '\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
 						input.consume();
@@ -293,12 +293,12 @@ public class CMIS_FTSLexer extends Lexer {
 		try {
 			int _type = FTSWORD;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:407:9: ( START_WORD ( IN_WORD )* )
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:408:9: START_WORD ( IN_WORD )*
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:407:9: ( START_WORD ( IN_WORD )* )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:408:9: START_WORD ( IN_WORD )*
 			{
 			mSTART_WORD(); 
 
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:408:20: ( IN_WORD )*
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:408:20: ( IN_WORD )*
 			loop3:
 			while (true) {
 				int alt3=2;
@@ -309,7 +309,7 @@ public class CMIS_FTSLexer extends Lexer {
 
 				switch (alt3) {
 				case 1 :
-					// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:
 					{
 					if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\b')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '\u001F')||(input.LA(1) >= '!' && input.LA(1) <= '\uFFFF') ) {
 						input.consume();
@@ -341,8 +341,8 @@ public class CMIS_FTSLexer extends Lexer {
 	// $ANTLR start "START_WORD"
 	public final void mSTART_WORD() throws RecognitionException {
 		try {
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:414:9: (~ ( ' ' | '\\t' | '\\r' | '\\n' | '-' ) )
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:414:9: (~ ( ' ' | '\\t' | '\\r' | '\\n' | '-' ) )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:
 			{
 			if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\b')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '\u001F')||(input.LA(1) >= '!' && input.LA(1) <= ',')||(input.LA(1) >= '.' && input.LA(1) <= '\uFFFF') ) {
 				input.consume();
@@ -364,8 +364,8 @@ public class CMIS_FTSLexer extends Lexer {
 	// $ANTLR start "IN_WORD"
 	public final void mIN_WORD() throws RecognitionException {
 		try {
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:426:9: (~ ( ' ' | '\\t' | '\\r' | '\\n' ) )
-			// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:426:9: (~ ( ' ' | '\\t' | '\\r' | '\\n' ) )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:
 			{
 			if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\b')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '\u001F')||(input.LA(1) >= '!' && input.LA(1) <= '\uFFFF') ) {
 				input.consume();
@@ -386,40 +386,40 @@ public class CMIS_FTSLexer extends Lexer {
 
 	@Override
 	public void mTokens() throws RecognitionException {
-		// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:8: ( FTSPHRASE | OR | MINUS | WS | FTSWORD )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:8: ( FTSPHRASE | OR | MINUS | WS | FTSWORD )
 		int alt4=5;
 		alt4 = dfa4.predict(input);
 		switch (alt4) {
 			case 1 :
-				// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:10: FTSPHRASE
+				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:10: FTSPHRASE
 				{
 				mFTSPHRASE(); 
 
 				}
 				break;
 			case 2 :
-				// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:20: OR
+				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:20: OR
 				{
 				mOR(); 
 
 				}
 				break;
 			case 3 :
-				// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:23: MINUS
+				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:23: MINUS
 				{
 				mMINUS(); 
 
 				}
 				break;
 			case 4 :
-				// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:29: WS
+				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:29: WS
 				{
 				mWS(); 
 
 				}
 				break;
 			case 5 :
-				// W:\\alfresco\\WORK\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:32: FTSWORD
+				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g:1:32: FTSWORD
 				{
 				mFTSWORD(); 
 
@@ -432,35 +432,30 @@ public class CMIS_FTSLexer extends Lexer {
 
 	protected DFA4 dfa4 = new DFA4(this);
 	static final String DFA4_eotS =
-		"\1\uffff\2\11\3\uffff\2\11\1\16\2\uffff\1\17\1\uffff\1\11\2\uffff";
+		"\1\uffff\2\5\3\uffff\2\5\1\11\1\uffff\1\14\1\5\1\uffff";
 	static final String DFA4_eofS =
-		"\20\uffff";
+		"\15\uffff";
 	static final String DFA4_minS =
-		"\3\0\3\uffff\3\0\2\uffff\1\0\1\uffff\1\0\2\uffff";
+		"\2\0\1\122\3\uffff\1\47\2\0\1\uffff\2\0\1\uffff";
 	static final String DFA4_maxS =
-		"\3\uffff\3\uffff\3\uffff\2\uffff\1\uffff\1\uffff\1\uffff\2\uffff";
+		"\2\uffff\1\162\3\uffff\1\134\2\uffff\1\uffff\2\uffff\1\uffff";
 	static final String DFA4_acceptS =
-		"\3\uffff\1\3\1\4\1\5\3\uffff\1\5\1\1\1\uffff\1\5\1\uffff\1\1\1\2";
+		"\3\uffff\1\3\1\4\1\5\3\uffff\1\1\2\uffff\1\2";
 	static final String DFA4_specialS =
-		"\1\0\1\1\1\6\3\uffff\1\2\1\7\1\4\2\uffff\1\5\1\uffff\1\3\2\uffff}>";
+		"\1\0\1\1\5\uffff\1\5\1\3\1\uffff\1\4\1\2\1\uffff}>";
 	static final String[] DFA4_transitionS = {
 			"\11\5\2\4\2\5\1\4\22\5\1\4\6\5\1\1\5\5\1\3\41\5\1\2\37\5\1\2\uff90\5",
-			"\11\7\2\12\2\7\1\12\22\7\1\12\6\7\1\10\64\7\1\6\uffa3\7",
-			"\11\14\2\uffff\2\14\1\uffff\22\14\1\uffff\61\14\1\13\37\14\1\13\uff8d"+
-			"\14",
+			"\11\7\2\11\2\7\1\11\22\7\1\11\6\7\1\10\64\7\1\6\uffa3\7",
+			"\1\12\37\uffff\1\12",
 			"",
 			"",
 			"",
-			"\11\14\2\uffff\2\14\1\uffff\22\14\1\uffff\6\14\1\15\64\14\1\15\uffa3"+
-			"\14",
-			"\11\7\2\12\2\7\1\12\22\7\1\12\6\7\1\10\64\7\1\6\uffa3\7",
-			"\11\14\2\uffff\2\14\1\uffff\22\14\1\uffff\uffdf\14",
+			"\1\13\64\uffff\1\13",
+			"\11\7\2\11\2\7\1\11\22\7\1\11\6\7\1\10\64\7\1\6\uffa3\7",
+			"\11\5\2\uffff\2\5\1\uffff\22\5\1\uffff\uffdf\5",
 			"",
-			"",
-			"\11\14\2\uffff\2\14\1\uffff\22\14\1\uffff\uffdf\14",
-			"",
-			"\11\7\2\12\2\7\1\12\22\7\1\12\6\7\1\10\64\7\1\6\uffa3\7",
-			"",
+			"\11\5\2\uffff\2\5\1\uffff\22\5\1\uffff\uffdf\5",
+			"\11\7\2\11\2\7\1\11\22\7\1\11\6\7\1\10\64\7\1\6\uffa3\7",
 			""
 	};
 
@@ -519,64 +514,46 @@ public class CMIS_FTSLexer extends Lexer {
 						if ( (LA4_1=='\\') ) {s = 6;}
 						else if ( ((LA4_1 >= '\u0000' && LA4_1 <= '\b')||(LA4_1 >= '\u000B' && LA4_1 <= '\f')||(LA4_1 >= '\u000E' && LA4_1 <= '\u001F')||(LA4_1 >= '!' && LA4_1 <= '&')||(LA4_1 >= '(' && LA4_1 <= '[')||(LA4_1 >= ']' && LA4_1 <= '\uFFFF')) ) {s = 7;}
 						else if ( (LA4_1=='\'') ) {s = 8;}
-						else if ( ((LA4_1 >= '\t' && LA4_1 <= '\n')||LA4_1=='\r'||LA4_1==' ') ) {s = 10;}
-						else s = 9;
+						else if ( ((LA4_1 >= '\t' && LA4_1 <= '\n')||LA4_1=='\r'||LA4_1==' ') ) {s = 9;}
+						else s = 5;
 						if ( s>=0 ) return s;
 						break;
 
 					case 2 : 
-						int LA4_6 = input.LA(1);
+						int LA4_11 = input.LA(1);
 						s = -1;
-						if ( (LA4_6=='\''||LA4_6=='\\') ) {s = 13;}
-						else if ( ((LA4_6 >= '\u0000' && LA4_6 <= '\b')||(LA4_6 >= '\u000B' && LA4_6 <= '\f')||(LA4_6 >= '\u000E' && LA4_6 <= '\u001F')||(LA4_6 >= '!' && LA4_6 <= '&')||(LA4_6 >= '(' && LA4_6 <= '[')||(LA4_6 >= ']' && LA4_6 <= '\uFFFF')) ) {s = 12;}
-						else s = 9;
+						if ( (LA4_11=='\'') ) {s = 8;}
+						else if ( (LA4_11=='\\') ) {s = 6;}
+						else if ( ((LA4_11 >= '\u0000' && LA4_11 <= '\b')||(LA4_11 >= '\u000B' && LA4_11 <= '\f')||(LA4_11 >= '\u000E' && LA4_11 <= '\u001F')||(LA4_11 >= '!' && LA4_11 <= '&')||(LA4_11 >= '(' && LA4_11 <= '[')||(LA4_11 >= ']' && LA4_11 <= '\uFFFF')) ) {s = 7;}
+						else if ( ((LA4_11 >= '\t' && LA4_11 <= '\n')||LA4_11=='\r'||LA4_11==' ') ) {s = 9;}
+						else s = 5;
 						if ( s>=0 ) return s;
 						break;
 
 					case 3 : 
-						int LA4_13 = input.LA(1);
+						int LA4_8 = input.LA(1);
 						s = -1;
-						if ( (LA4_13=='\'') ) {s = 8;}
-						else if ( (LA4_13=='\\') ) {s = 6;}
-						else if ( ((LA4_13 >= '\u0000' && LA4_13 <= '\b')||(LA4_13 >= '\u000B' && LA4_13 <= '\f')||(LA4_13 >= '\u000E' && LA4_13 <= '\u001F')||(LA4_13 >= '!' && LA4_13 <= '&')||(LA4_13 >= '(' && LA4_13 <= '[')||(LA4_13 >= ']' && LA4_13 <= '\uFFFF')) ) {s = 7;}
-						else if ( ((LA4_13 >= '\t' && LA4_13 <= '\n')||LA4_13=='\r'||LA4_13==' ') ) {s = 10;}
+						if ( ((LA4_8 >= '\u0000' && LA4_8 <= '\b')||(LA4_8 >= '\u000B' && LA4_8 <= '\f')||(LA4_8 >= '\u000E' && LA4_8 <= '\u001F')||(LA4_8 >= '!' && LA4_8 <= '\uFFFF')) ) {s = 5;}
 						else s = 9;
 						if ( s>=0 ) return s;
 						break;
 
 					case 4 : 
-						int LA4_8 = input.LA(1);
+						int LA4_10 = input.LA(1);
 						s = -1;
-						if ( ((LA4_8 >= '\u0000' && LA4_8 <= '\b')||(LA4_8 >= '\u000B' && LA4_8 <= '\f')||(LA4_8 >= '\u000E' && LA4_8 <= '\u001F')||(LA4_8 >= '!' && LA4_8 <= '\uFFFF')) ) {s = 12;}
-						else s = 14;
+						if ( ((LA4_10 >= '\u0000' && LA4_10 <= '\b')||(LA4_10 >= '\u000B' && LA4_10 <= '\f')||(LA4_10 >= '\u000E' && LA4_10 <= '\u001F')||(LA4_10 >= '!' && LA4_10 <= '\uFFFF')) ) {s = 5;}
+						else s = 12;
 						if ( s>=0 ) return s;
 						break;
 
 					case 5 : 
-						int LA4_11 = input.LA(1);
-						s = -1;
-						if ( ((LA4_11 >= '\u0000' && LA4_11 <= '\b')||(LA4_11 >= '\u000B' && LA4_11 <= '\f')||(LA4_11 >= '\u000E' && LA4_11 <= '\u001F')||(LA4_11 >= '!' && LA4_11 <= '\uFFFF')) ) {s = 12;}
-						else s = 15;
-						if ( s>=0 ) return s;
-						break;
-
-					case 6 : 
-						int LA4_2 = input.LA(1);
-						s = -1;
-						if ( (LA4_2=='R'||LA4_2=='r') ) {s = 11;}
-						else if ( ((LA4_2 >= '\u0000' && LA4_2 <= '\b')||(LA4_2 >= '\u000B' && LA4_2 <= '\f')||(LA4_2 >= '\u000E' && LA4_2 <= '\u001F')||(LA4_2 >= '!' && LA4_2 <= 'Q')||(LA4_2 >= 'S' && LA4_2 <= 'q')||(LA4_2 >= 's' && LA4_2 <= '\uFFFF')) ) {s = 12;}
-						else s = 9;
-						if ( s>=0 ) return s;
-						break;
-
-					case 7 : 
 						int LA4_7 = input.LA(1);
 						s = -1;
 						if ( (LA4_7=='\'') ) {s = 8;}
 						else if ( (LA4_7=='\\') ) {s = 6;}
 						else if ( ((LA4_7 >= '\u0000' && LA4_7 <= '\b')||(LA4_7 >= '\u000B' && LA4_7 <= '\f')||(LA4_7 >= '\u000E' && LA4_7 <= '\u001F')||(LA4_7 >= '!' && LA4_7 <= '&')||(LA4_7 >= '(' && LA4_7 <= '[')||(LA4_7 >= ']' && LA4_7 <= '\uFFFF')) ) {s = 7;}
-						else if ( ((LA4_7 >= '\t' && LA4_7 <= '\n')||LA4_7=='\r'||LA4_7==' ') ) {s = 10;}
-						else s = 9;
+						else if ( ((LA4_7 >= '\t' && LA4_7 <= '\n')||LA4_7=='\r'||LA4_7==' ') ) {s = 9;}
+						else s = 5;
 						if ( s>=0 ) return s;
 						break;
 			}
