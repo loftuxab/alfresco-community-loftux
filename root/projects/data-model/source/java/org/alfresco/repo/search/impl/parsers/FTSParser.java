@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g 2015-06-06 20:34:49
+// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g 2015-06-06 20:45:58
 
 package org.alfresco.repo.search.impl.parsers;
 
@@ -2157,7 +2157,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsTest, boost
+					// elements: boost, ftsTest
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -2221,7 +2221,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsTest, boost
+					// elements: boost, ftsTest
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -2288,7 +2288,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: boost, ftsTest
+					// elements: ftsTest, boost
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -2355,7 +2355,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: boost, ftsTest
+					// elements: ftsTest, boost
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -3939,7 +3939,7 @@ public class FTSParser extends Parser {
 							}
 
 							// AST REWRITE
-							// elements: FTSPHRASE, slop, fieldReference
+							// elements: fieldReference, slop, FTSPHRASE
 							// token labels: 
 							// rule labels: retval
 							// token list labels: 
@@ -4016,7 +4016,7 @@ public class FTSParser extends Parser {
 							}
 
 							// AST REWRITE
-							// elements: ftsWord, fuzzy, fieldReference
+							// elements: fieldReference, ftsWord, fuzzy
 							// token labels: 
 							// rule labels: retval
 							// token list labels: 
@@ -4090,7 +4090,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: slop, FTSPHRASE
+					// elements: FTSPHRASE, slop
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -4336,7 +4336,7 @@ public class FTSParser extends Parser {
 							}
 
 							// AST REWRITE
-							// elements: fieldReference, FTSPHRASE, slop
+							// elements: FTSPHRASE, slop, fieldReference
 							// token labels: 
 							// rule labels: retval
 							// token list labels: 
@@ -4413,7 +4413,7 @@ public class FTSParser extends Parser {
 							}
 
 							// AST REWRITE
-							// elements: ftsWord, fuzzy, fieldReference
+							// elements: fuzzy, fieldReference, ftsWord
 							// token labels: 
 							// rule labels: retval
 							// token list labels: 
@@ -4487,7 +4487,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: FTSPHRASE, slop
+					// elements: slop, FTSPHRASE
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -4736,7 +4736,7 @@ public class FTSParser extends Parser {
 							}
 
 							// AST REWRITE
-							// elements: fieldReference, FTSPHRASE, slop
+							// elements: FTSPHRASE, slop, fieldReference
 							// token labels: 
 							// rule labels: retval
 							// token list labels: 
@@ -4813,7 +4813,7 @@ public class FTSParser extends Parser {
 							}
 
 							// AST REWRITE
-							// elements: fuzzy, fieldReference, ftsWord
+							// elements: fieldReference, fuzzy, ftsWord
 							// token labels: 
 							// rule labels: retval
 							// token list labels: 
@@ -4887,7 +4887,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: FTSPHRASE, slop
+					// elements: slop, FTSPHRASE
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -4963,7 +4963,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: fuzzy, ftsWord
+					// elements: ftsWord, fuzzy
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -5294,7 +5294,7 @@ public class FTSParser extends Parser {
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_ftsFieldGroupRange.add(ftsFieldGroupRange98.getTree());
 			// AST REWRITE
-			// elements: fieldReference, ftsFieldGroupRange
+			// elements: ftsFieldGroupRange, fieldReference
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -5397,7 +5397,7 @@ public class FTSParser extends Parser {
 			if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN103);
 
 			// AST REWRITE
-			// elements: fieldReference, ftsFieldGroupDisjunction
+			// elements: ftsFieldGroupDisjunction, fieldReference
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -6757,7 +6757,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsFieldGroupTest, boost
+					// elements: boost, ftsFieldGroupTest
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -6821,7 +6821,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsFieldGroupTest, boost
+					// elements: boost, ftsFieldGroupTest
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -6888,7 +6888,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsFieldGroupTest, boost
+					// elements: boost, ftsFieldGroupTest
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -6955,7 +6955,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: boost, ftsFieldGroupTest
+					// elements: ftsFieldGroupTest, boost
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -7022,7 +7022,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsFieldGroupTest, boost
+					// elements: boost, ftsFieldGroupTest
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -7088,7 +7088,7 @@ public class FTSParser extends Parser {
 
 
 	// $ANTLR start "ftsFieldGroupTest"
-	// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:659:1: ftsFieldGroupTest : ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( FG_PROXIMITY ftsFieldGroupProximity ) | ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_TERM ftsFieldGroupTerm ( fuzzy )? ) | ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_EXACT_TERM ftsFieldGroupExactTerm ( fuzzy )? ) | ftsFieldGroupPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupPhrase ( slop )? ) | ftsFieldGroupExactPhrase ( ( slop )=> slop )? -> ^( FG_EXACT_PHRASE ftsFieldGroupExactPhrase ( slop )? ) | ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupTokenisedPhrase ( slop )? ) | ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )? -> ^( FG_SYNONYM ftsFieldGroupSynonym ( fuzzy )? ) | ftsFieldGroupRange -> ^( FG_RANGE ftsFieldGroupRange ) | LPAREN ftsFieldGroupDisjunction RPAREN -> ftsFieldGroupDisjunction );
+	// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:659:1: ftsFieldGroupTest : ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( FG_PROXIMITY ftsFieldGroupProximity ) | ( ftsFieldGroupTerm )=> ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_TERM ftsFieldGroupTerm ( fuzzy )? ) | ( ftsFieldGroupExactTerm )=> ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_EXACT_TERM ftsFieldGroupExactTerm ( fuzzy )? ) | ( ftsFieldGroupPhrase )=> ftsFieldGroupPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupPhrase ( slop )? ) | ( ftsFieldGroupExactPhrase )=> ftsFieldGroupExactPhrase ( ( slop )=> slop )? -> ^( FG_EXACT_PHRASE ftsFieldGroupExactPhrase ( slop )? ) | ( ftsFieldGroupTokenisedPhrase )=> ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupTokenisedPhrase ( slop )? ) | ( ftsFieldGroupSynonym )=> ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )? -> ^( FG_SYNONYM ftsFieldGroupSynonym ( fuzzy )? ) | ( ftsFieldGroupRange )=> ftsFieldGroupRange -> ^( FG_RANGE ftsFieldGroupRange ) | LPAREN ftsFieldGroupDisjunction RPAREN -> ftsFieldGroupDisjunction );
 	public final FTSParser.ftsFieldGroupTest_return ftsFieldGroupTest() throws RecognitionException {
 		FTSParser.ftsFieldGroupTest_return retval = new FTSParser.ftsFieldGroupTest_return();
 		retval.start = input.LT(1);
@@ -7130,7 +7130,7 @@ public class FTSParser extends Parser {
 		RewriteRuleSubtreeStream stream_ftsFieldGroupProximity=new RewriteRuleSubtreeStream(adaptor,"rule ftsFieldGroupProximity");
 
 		try {
-			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:660:9: ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( FG_PROXIMITY ftsFieldGroupProximity ) | ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_TERM ftsFieldGroupTerm ( fuzzy )? ) | ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_EXACT_TERM ftsFieldGroupExactTerm ( fuzzy )? ) | ftsFieldGroupPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupPhrase ( slop )? ) | ftsFieldGroupExactPhrase ( ( slop )=> slop )? -> ^( FG_EXACT_PHRASE ftsFieldGroupExactPhrase ( slop )? ) | ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupTokenisedPhrase ( slop )? ) | ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )? -> ^( FG_SYNONYM ftsFieldGroupSynonym ( fuzzy )? ) | ftsFieldGroupRange -> ^( FG_RANGE ftsFieldGroupRange ) | LPAREN ftsFieldGroupDisjunction RPAREN -> ftsFieldGroupDisjunction )
+			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:660:9: ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( FG_PROXIMITY ftsFieldGroupProximity ) | ( ftsFieldGroupTerm )=> ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_TERM ftsFieldGroupTerm ( fuzzy )? ) | ( ftsFieldGroupExactTerm )=> ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_EXACT_TERM ftsFieldGroupExactTerm ( fuzzy )? ) | ( ftsFieldGroupPhrase )=> ftsFieldGroupPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupPhrase ( slop )? ) | ( ftsFieldGroupExactPhrase )=> ftsFieldGroupExactPhrase ( ( slop )=> slop )? -> ^( FG_EXACT_PHRASE ftsFieldGroupExactPhrase ( slop )? ) | ( ftsFieldGroupTokenisedPhrase )=> ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupTokenisedPhrase ( slop )? ) | ( ftsFieldGroupSynonym )=> ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )? -> ^( FG_SYNONYM ftsFieldGroupSynonym ( fuzzy )? ) | ( ftsFieldGroupRange )=> ftsFieldGroupRange -> ^( FG_RANGE ftsFieldGroupRange ) | LPAREN ftsFieldGroupDisjunction RPAREN -> ftsFieldGroupDisjunction )
 			int alt60=9;
 			alt60 = dfa60.predict(input);
 			switch (alt60) {
@@ -7173,36 +7173,36 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 2 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:11: ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:11: ( ftsFieldGroupTerm )=> ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupTest4804);
+					pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupTest4810);
 					ftsFieldGroupTerm131=ftsFieldGroupTerm();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsFieldGroupTerm.add(ftsFieldGroupTerm131.getTree());
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:29: ( ( fuzzy )=> fuzzy )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:52: ( ( fuzzy )=> fuzzy )?
 					int alt54=2;
 					int LA54_0 = input.LA(1);
 					if ( (LA54_0==TILDA) ) {
 						int LA54_1 = input.LA(2);
 						if ( (LA54_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA54_3 = input.LA(3);
-							if ( (synpred25_FTS()) ) {
+							if ( (synpred26_FTS()) ) {
 								alt54=1;
 							}
 						}
 						else if ( (LA54_1==FLOATING_POINT_LITERAL) ) {
 							int LA54_4 = input.LA(3);
-							if ( (synpred25_FTS()) ) {
+							if ( (synpred26_FTS()) ) {
 								alt54=1;
 							}
 						}
 					}
 					switch (alt54) {
 						case 1 :
-							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:31: ( fuzzy )=> fuzzy
+							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:54: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest4814);
+							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest4820);
 							fuzzy132=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -7213,7 +7213,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsFieldGroupTerm, fuzzy
+					// elements: fuzzy, ftsFieldGroupTerm
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -7249,36 +7249,36 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 3 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:11: ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:11: ( ftsFieldGroupExactTerm )=> ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupExactTerm_in_ftsFieldGroupTest4879);
+					pushFollow(FOLLOW_ftsFieldGroupExactTerm_in_ftsFieldGroupTest4891);
 					ftsFieldGroupExactTerm133=ftsFieldGroupExactTerm();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsFieldGroupExactTerm.add(ftsFieldGroupExactTerm133.getTree());
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:34: ( ( fuzzy )=> fuzzy )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:62: ( ( fuzzy )=> fuzzy )?
 					int alt55=2;
 					int LA55_0 = input.LA(1);
 					if ( (LA55_0==TILDA) ) {
 						int LA55_1 = input.LA(2);
 						if ( (LA55_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA55_3 = input.LA(3);
-							if ( (synpred26_FTS()) ) {
+							if ( (synpred28_FTS()) ) {
 								alt55=1;
 							}
 						}
 						else if ( (LA55_1==FLOATING_POINT_LITERAL) ) {
 							int LA55_4 = input.LA(3);
-							if ( (synpred26_FTS()) ) {
+							if ( (synpred28_FTS()) ) {
 								alt55=1;
 							}
 						}
 					}
 					switch (alt55) {
 						case 1 :
-							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:36: ( fuzzy )=> fuzzy
+							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:64: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest4889);
+							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest4901);
 							fuzzy134=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -7289,7 +7289,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsFieldGroupExactTerm, fuzzy
+					// elements: fuzzy, ftsFieldGroupExactTerm
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -7325,30 +7325,30 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 4 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:11: ftsFieldGroupPhrase ( ( slop )=> slop )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:11: ( ftsFieldGroupPhrase )=> ftsFieldGroupPhrase ( ( slop )=> slop )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupPhrase_in_ftsFieldGroupTest4954);
+					pushFollow(FOLLOW_ftsFieldGroupPhrase_in_ftsFieldGroupTest4972);
 					ftsFieldGroupPhrase135=ftsFieldGroupPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsFieldGroupPhrase.add(ftsFieldGroupPhrase135.getTree());
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:31: ( ( slop )=> slop )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:56: ( ( slop )=> slop )?
 					int alt56=2;
 					int LA56_0 = input.LA(1);
 					if ( (LA56_0==TILDA) ) {
 						int LA56_1 = input.LA(2);
 						if ( (LA56_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA56_3 = input.LA(3);
-							if ( (synpred27_FTS()) ) {
+							if ( (synpred30_FTS()) ) {
 								alt56=1;
 							}
 						}
 					}
 					switch (alt56) {
 						case 1 :
-							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:33: ( slop )=> slop
+							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:58: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest4964);
+							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest4982);
 							slop136=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -7359,7 +7359,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: slop, ftsFieldGroupPhrase
+					// elements: ftsFieldGroupPhrase, slop
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -7395,30 +7395,30 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 5 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:11: ftsFieldGroupExactPhrase ( ( slop )=> slop )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:11: ( ftsFieldGroupExactPhrase )=> ftsFieldGroupExactPhrase ( ( slop )=> slop )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTest5029);
+					pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTest5053);
 					ftsFieldGroupExactPhrase137=ftsFieldGroupExactPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsFieldGroupExactPhrase.add(ftsFieldGroupExactPhrase137.getTree());
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:36: ( ( slop )=> slop )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:66: ( ( slop )=> slop )?
 					int alt57=2;
 					int LA57_0 = input.LA(1);
 					if ( (LA57_0==TILDA) ) {
 						int LA57_1 = input.LA(2);
 						if ( (LA57_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA57_3 = input.LA(3);
-							if ( (synpred28_FTS()) ) {
+							if ( (synpred32_FTS()) ) {
 								alt57=1;
 							}
 						}
 					}
 					switch (alt57) {
 						case 1 :
-							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:38: ( slop )=> slop
+							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:68: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest5039);
+							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest5063);
 							slop138=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -7429,7 +7429,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsFieldGroupExactPhrase, slop
+					// elements: slop, ftsFieldGroupExactPhrase
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -7465,30 +7465,30 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 6 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:11: ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:11: ( ftsFieldGroupTokenisedPhrase )=> ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupTokenisedPhrase_in_ftsFieldGroupTest5104);
+					pushFollow(FOLLOW_ftsFieldGroupTokenisedPhrase_in_ftsFieldGroupTest5134);
 					ftsFieldGroupTokenisedPhrase139=ftsFieldGroupTokenisedPhrase();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsFieldGroupTokenisedPhrase.add(ftsFieldGroupTokenisedPhrase139.getTree());
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:40: ( ( slop )=> slop )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:74: ( ( slop )=> slop )?
 					int alt58=2;
 					int LA58_0 = input.LA(1);
 					if ( (LA58_0==TILDA) ) {
 						int LA58_1 = input.LA(2);
 						if ( (LA58_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA58_3 = input.LA(3);
-							if ( (synpred29_FTS()) ) {
+							if ( (synpred34_FTS()) ) {
 								alt58=1;
 							}
 						}
 					}
 					switch (alt58) {
 						case 1 :
-							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:42: ( slop )=> slop
+							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:76: ( slop )=> slop
 							{
-							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest5114);
+							pushFollow(FOLLOW_slop_in_ftsFieldGroupTest5144);
 							slop140=slop();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -7499,7 +7499,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: ftsFieldGroupTokenisedPhrase, slop
+					// elements: slop, ftsFieldGroupTokenisedPhrase
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -7535,36 +7535,36 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 7 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:11: ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:11: ( ftsFieldGroupSynonym )=> ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )?
 					{
-					pushFollow(FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest5179);
+					pushFollow(FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest5215);
 					ftsFieldGroupSynonym141=ftsFieldGroupSynonym();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsFieldGroupSynonym.add(ftsFieldGroupSynonym141.getTree());
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:32: ( ( fuzzy )=> fuzzy )?
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:58: ( ( fuzzy )=> fuzzy )?
 					int alt59=2;
 					int LA59_0 = input.LA(1);
 					if ( (LA59_0==TILDA) ) {
 						int LA59_1 = input.LA(2);
 						if ( (LA59_1==DECIMAL_INTEGER_LITERAL) ) {
 							int LA59_3 = input.LA(3);
-							if ( (synpred30_FTS()) ) {
+							if ( (synpred36_FTS()) ) {
 								alt59=1;
 							}
 						}
 						else if ( (LA59_1==FLOATING_POINT_LITERAL) ) {
 							int LA59_4 = input.LA(3);
-							if ( (synpred30_FTS()) ) {
+							if ( (synpred36_FTS()) ) {
 								alt59=1;
 							}
 						}
 					}
 					switch (alt59) {
 						case 1 :
-							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:34: ( fuzzy )=> fuzzy
+							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:60: ( fuzzy )=> fuzzy
 							{
-							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest5189);
+							pushFollow(FOLLOW_fuzzy_in_ftsFieldGroupTest5225);
 							fuzzy142=fuzzy();
 							state._fsp--;
 							if (state.failed) return retval;
@@ -7575,7 +7575,7 @@ public class FTSParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: fuzzy, ftsFieldGroupSynonym
+					// elements: ftsFieldGroupSynonym, fuzzy
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -7611,9 +7611,9 @@ public class FTSParser extends Parser {
 					}
 					break;
 				case 8 :
-					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:682:11: ftsFieldGroupRange
+					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:682:11: ( ftsFieldGroupRange )=> ftsFieldGroupRange
 					{
-					pushFollow(FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest5254);
+					pushFollow(FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest5296);
 					ftsFieldGroupRange143=ftsFieldGroupRange();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -7651,15 +7651,15 @@ public class FTSParser extends Parser {
 				case 9 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:685:11: LPAREN ftsFieldGroupDisjunction RPAREN
 					{
-					LPAREN144=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_ftsFieldGroupTest5314); if (state.failed) return retval; 
+					LPAREN144=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_ftsFieldGroupTest5356); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN144);
 
-					pushFollow(FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest5316);
+					pushFollow(FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest5358);
 					ftsFieldGroupDisjunction145=ftsFieldGroupDisjunction();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsFieldGroupDisjunction.add(ftsFieldGroupDisjunction145.getTree());
-					RPAREN146=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_ftsFieldGroupTest5318); if (state.failed) return retval; 
+					RPAREN146=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_ftsFieldGroupTest5360); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN146);
 
 					// AST REWRITE
@@ -7733,7 +7733,7 @@ public class FTSParser extends Parser {
 			root_0 = (Object)adaptor.nil();
 
 
-			pushFollow(FOLLOW_ftsWord_in_ftsFieldGroupTerm5371);
+			pushFollow(FOLLOW_ftsWord_in_ftsFieldGroupTerm5413);
 			ftsWord147=ftsWord();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -7788,10 +7788,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:695:9: ( EQUALS ftsFieldGroupTerm -> ftsFieldGroupTerm )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:696:9: EQUALS ftsFieldGroupTerm
 			{
-			EQUALS148=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsFieldGroupExactTerm5404); if (state.failed) return retval; 
+			EQUALS148=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsFieldGroupExactTerm5446); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_EQUALS.add(EQUALS148);
 
-			pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm5406);
+			pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm5448);
 			ftsFieldGroupTerm149=ftsFieldGroupTerm();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -7866,7 +7866,7 @@ public class FTSParser extends Parser {
 			root_0 = (Object)adaptor.nil();
 
 
-			FTSPHRASE150=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase5459); if (state.failed) return retval;
+			FTSPHRASE150=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase5501); if (state.failed) return retval;
 			if ( state.backtracking==0 ) {
 			FTSPHRASE150_tree = (Object)adaptor.create(FTSPHRASE150);
 			adaptor.addChild(root_0, FTSPHRASE150_tree);
@@ -7921,10 +7921,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:706:9: ( EQUALS ftsFieldGroupExactPhrase -> ftsFieldGroupExactPhrase )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:707:9: EQUALS ftsFieldGroupExactPhrase
 			{
-			EQUALS151=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsFieldGroupExactPhrase5500); if (state.failed) return retval; 
+			EQUALS151=(Token)match(input,EQUALS,FOLLOW_EQUALS_in_ftsFieldGroupExactPhrase5542); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_EQUALS.add(EQUALS151);
 
-			pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupExactPhrase5502);
+			pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupExactPhrase5544);
 			ftsFieldGroupExactPhrase152=ftsFieldGroupExactPhrase();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -7999,10 +7999,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:712:9: ( TILDA ftsFieldGroupExactPhrase -> ftsFieldGroupExactPhrase )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:713:9: TILDA ftsFieldGroupExactPhrase
 			{
-			TILDA153=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsFieldGroupTokenisedPhrase5563); if (state.failed) return retval; 
+			TILDA153=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsFieldGroupTokenisedPhrase5605); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_TILDA.add(TILDA153);
 
-			pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTokenisedPhrase5565);
+			pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTokenisedPhrase5607);
 			ftsFieldGroupExactPhrase154=ftsFieldGroupExactPhrase();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -8077,10 +8077,10 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:718:9: ( TILDA ftsFieldGroupTerm -> ftsFieldGroupTerm )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:719:9: TILDA ftsFieldGroupTerm
 			{
-			TILDA155=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsFieldGroupSynonym5618); if (state.failed) return retval; 
+			TILDA155=(Token)match(input,TILDA,FOLLOW_TILDA_in_ftsFieldGroupSynonym5660); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_TILDA.add(TILDA155);
 
-			pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym5620);
+			pushFollow(FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym5662);
 			ftsFieldGroupTerm156=ftsFieldGroupTerm();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -8155,7 +8155,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:724:9: ( ftsFieldGroupProximityTerm ( ( proximityGroup )=> proximityGroup ftsFieldGroupProximityTerm )+ -> ftsFieldGroupProximityTerm ( proximityGroup ftsFieldGroupProximityTerm )+ )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:725:9: ftsFieldGroupProximityTerm ( ( proximityGroup )=> proximityGroup ftsFieldGroupProximityTerm )+
 			{
-			pushFollow(FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5673);
+			pushFollow(FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5715);
 			ftsFieldGroupProximityTerm157=ftsFieldGroupProximityTerm();
 			state._fsp--;
 			if (state.failed) return retval;
@@ -8171,7 +8171,7 @@ public class FTSParser extends Parser {
 					case STAR:
 						{
 						int LA61_3 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8180,7 +8180,7 @@ public class FTSParser extends Parser {
 					case NOT:
 						{
 						int LA61_4 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8189,7 +8189,7 @@ public class FTSParser extends Parser {
 					case ID:
 						{
 						int LA61_5 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8198,7 +8198,7 @@ public class FTSParser extends Parser {
 					case FTSWORD:
 						{
 						int LA61_6 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8207,7 +8207,7 @@ public class FTSParser extends Parser {
 					case FTSPRE:
 						{
 						int LA61_7 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8216,7 +8216,7 @@ public class FTSParser extends Parser {
 					case FTSWILD:
 						{
 						int LA61_8 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8225,7 +8225,7 @@ public class FTSParser extends Parser {
 					case TO:
 						{
 						int LA61_9 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8234,7 +8234,7 @@ public class FTSParser extends Parser {
 					case DECIMAL_INTEGER_LITERAL:
 						{
 						int LA61_10 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8243,7 +8243,7 @@ public class FTSParser extends Parser {
 					case FLOATING_POINT_LITERAL:
 						{
 						int LA61_11 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8252,7 +8252,7 @@ public class FTSParser extends Parser {
 					case DATETIME:
 						{
 						int LA61_12 = input.LA(3);
-						if ( (synpred31_FTS()) ) {
+						if ( (synpred38_FTS()) ) {
 							alt61=1;
 						}
 
@@ -8264,7 +8264,7 @@ public class FTSParser extends Parser {
 						case ID:
 							{
 							int LA61_16 = input.LA(4);
-							if ( (synpred31_FTS()) ) {
+							if ( (synpred38_FTS()) ) {
 								alt61=1;
 							}
 
@@ -8273,7 +8273,7 @@ public class FTSParser extends Parser {
 						case TO:
 							{
 							int LA61_17 = input.LA(4);
-							if ( (synpred31_FTS()) ) {
+							if ( (synpred38_FTS()) ) {
 								alt61=1;
 							}
 
@@ -8282,7 +8282,7 @@ public class FTSParser extends Parser {
 						case OR:
 							{
 							int LA61_18 = input.LA(4);
-							if ( (synpred31_FTS()) ) {
+							if ( (synpred38_FTS()) ) {
 								alt61=1;
 							}
 
@@ -8291,7 +8291,7 @@ public class FTSParser extends Parser {
 						case AND:
 							{
 							int LA61_19 = input.LA(4);
-							if ( (synpred31_FTS()) ) {
+							if ( (synpred38_FTS()) ) {
 								alt61=1;
 							}
 
@@ -8300,7 +8300,7 @@ public class FTSParser extends Parser {
 						case NOT:
 							{
 							int LA61_20 = input.LA(4);
-							if ( (synpred31_FTS()) ) {
+							if ( (synpred38_FTS()) ) {
 								alt61=1;
 							}
 
@@ -8319,7 +8319,7 @@ public class FTSParser extends Parser {
 								case NOT:
 									{
 									int LA61_24 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8328,7 +8328,7 @@ public class FTSParser extends Parser {
 								case ID:
 									{
 									int LA61_25 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8337,7 +8337,7 @@ public class FTSParser extends Parser {
 								case FTSWORD:
 									{
 									int LA61_26 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8346,7 +8346,7 @@ public class FTSParser extends Parser {
 								case FTSPRE:
 									{
 									int LA61_27 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8355,7 +8355,7 @@ public class FTSParser extends Parser {
 								case FTSWILD:
 									{
 									int LA61_28 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8364,7 +8364,7 @@ public class FTSParser extends Parser {
 								case TO:
 									{
 									int LA61_29 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8373,7 +8373,7 @@ public class FTSParser extends Parser {
 								case DECIMAL_INTEGER_LITERAL:
 									{
 									int LA61_30 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8382,7 +8382,7 @@ public class FTSParser extends Parser {
 								case FLOATING_POINT_LITERAL:
 									{
 									int LA61_31 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8391,7 +8391,7 @@ public class FTSParser extends Parser {
 								case DATETIME:
 									{
 									int LA61_32 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8400,7 +8400,7 @@ public class FTSParser extends Parser {
 								case STAR:
 									{
 									int LA61_33 = input.LA(6);
-									if ( (synpred31_FTS()) ) {
+									if ( (synpred38_FTS()) ) {
 										alt61=1;
 									}
 
@@ -8412,7 +8412,7 @@ public class FTSParser extends Parser {
 									case ID:
 										{
 										int LA61_16 = input.LA(7);
-										if ( (synpred31_FTS()) ) {
+										if ( (synpred38_FTS()) ) {
 											alt61=1;
 										}
 
@@ -8421,7 +8421,7 @@ public class FTSParser extends Parser {
 									case TO:
 										{
 										int LA61_17 = input.LA(7);
-										if ( (synpred31_FTS()) ) {
+										if ( (synpred38_FTS()) ) {
 											alt61=1;
 										}
 
@@ -8430,7 +8430,7 @@ public class FTSParser extends Parser {
 									case OR:
 										{
 										int LA61_18 = input.LA(7);
-										if ( (synpred31_FTS()) ) {
+										if ( (synpred38_FTS()) ) {
 											alt61=1;
 										}
 
@@ -8439,7 +8439,7 @@ public class FTSParser extends Parser {
 									case AND:
 										{
 										int LA61_19 = input.LA(7);
-										if ( (synpred31_FTS()) ) {
+										if ( (synpred38_FTS()) ) {
 											alt61=1;
 										}
 
@@ -8448,7 +8448,7 @@ public class FTSParser extends Parser {
 									case NOT:
 										{
 										int LA61_20 = input.LA(7);
-										if ( (synpred31_FTS()) ) {
+										if ( (synpred38_FTS()) ) {
 											alt61=1;
 										}
 
@@ -8461,7 +8461,7 @@ public class FTSParser extends Parser {
 							}
 
 						}
-						else if ( (LA61_14==RPAREN) && (synpred31_FTS())) {
+						else if ( (LA61_14==RPAREN) && (synpred38_FTS())) {
 							alt61=1;
 						}
 
@@ -8474,12 +8474,12 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:725:38: ( proximityGroup )=> proximityGroup ftsFieldGroupProximityTerm
 					{
-					pushFollow(FOLLOW_proximityGroup_in_ftsFieldGroupProximity5683);
+					pushFollow(FOLLOW_proximityGroup_in_ftsFieldGroupProximity5725);
 					proximityGroup158=proximityGroup();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_proximityGroup.add(proximityGroup158.getTree());
-					pushFollow(FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5685);
+					pushFollow(FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5727);
 					ftsFieldGroupProximityTerm159=ftsFieldGroupProximityTerm();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -8497,7 +8497,7 @@ public class FTSParser extends Parser {
 			}
 
 			// AST REWRITE
-			// elements: ftsFieldGroupProximityTerm, proximityGroup, ftsFieldGroupProximityTerm
+			// elements: ftsFieldGroupProximityTerm, ftsFieldGroupProximityTerm, proximityGroup
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -8511,15 +8511,15 @@ public class FTSParser extends Parser {
 			// 726:17: -> ftsFieldGroupProximityTerm ( proximityGroup ftsFieldGroupProximityTerm )+
 			{
 				adaptor.addChild(root_0, stream_ftsFieldGroupProximityTerm.nextTree());
-				if ( !(stream_proximityGroup.hasNext()||stream_ftsFieldGroupProximityTerm.hasNext()) ) {
+				if ( !(stream_ftsFieldGroupProximityTerm.hasNext()||stream_proximityGroup.hasNext()) ) {
 					throw new RewriteEarlyExitException();
 				}
-				while ( stream_proximityGroup.hasNext()||stream_ftsFieldGroupProximityTerm.hasNext() ) {
+				while ( stream_ftsFieldGroupProximityTerm.hasNext()||stream_proximityGroup.hasNext() ) {
 					adaptor.addChild(root_0, stream_proximityGroup.nextTree());
 					adaptor.addChild(root_0, stream_ftsFieldGroupProximityTerm.nextTree());
 				}
-				stream_proximityGroup.reset();
 				stream_ftsFieldGroupProximityTerm.reset();
+				stream_proximityGroup.reset();
 
 			}
 
@@ -8662,7 +8662,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					ID160=(Token)match(input,ID,FOLLOW_ID_in_ftsFieldGroupProximityTerm5749); if (state.failed) return retval;
+					ID160=(Token)match(input,ID,FOLLOW_ID_in_ftsFieldGroupProximityTerm5791); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					ID160_tree = (Object)adaptor.create(ID160);
 					adaptor.addChild(root_0, ID160_tree);
@@ -8676,7 +8676,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSWORD161=(Token)match(input,FTSWORD,FOLLOW_FTSWORD_in_ftsFieldGroupProximityTerm5761); if (state.failed) return retval;
+					FTSWORD161=(Token)match(input,FTSWORD,FOLLOW_FTSWORD_in_ftsFieldGroupProximityTerm5803); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSWORD161_tree = (Object)adaptor.create(FTSWORD161);
 					adaptor.addChild(root_0, FTSWORD161_tree);
@@ -8690,7 +8690,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSPRE162=(Token)match(input,FTSPRE,FOLLOW_FTSPRE_in_ftsFieldGroupProximityTerm5773); if (state.failed) return retval;
+					FTSPRE162=(Token)match(input,FTSPRE,FOLLOW_FTSPRE_in_ftsFieldGroupProximityTerm5815); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSPRE162_tree = (Object)adaptor.create(FTSPRE162);
 					adaptor.addChild(root_0, FTSPRE162_tree);
@@ -8704,7 +8704,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSWILD163=(Token)match(input,FTSWILD,FOLLOW_FTSWILD_in_ftsFieldGroupProximityTerm5785); if (state.failed) return retval;
+					FTSWILD163=(Token)match(input,FTSWILD,FOLLOW_FTSWILD_in_ftsFieldGroupProximityTerm5827); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSWILD163_tree = (Object)adaptor.create(FTSWILD163);
 					adaptor.addChild(root_0, FTSWILD163_tree);
@@ -8718,7 +8718,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					NOT164=(Token)match(input,NOT,FOLLOW_NOT_in_ftsFieldGroupProximityTerm5797); if (state.failed) return retval;
+					NOT164=(Token)match(input,NOT,FOLLOW_NOT_in_ftsFieldGroupProximityTerm5839); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					NOT164_tree = (Object)adaptor.create(NOT164);
 					adaptor.addChild(root_0, NOT164_tree);
@@ -8732,7 +8732,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					TO165=(Token)match(input,TO,FOLLOW_TO_in_ftsFieldGroupProximityTerm5809); if (state.failed) return retval;
+					TO165=(Token)match(input,TO,FOLLOW_TO_in_ftsFieldGroupProximityTerm5851); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					TO165_tree = (Object)adaptor.create(TO165);
 					adaptor.addChild(root_0, TO165_tree);
@@ -8746,7 +8746,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					DECIMAL_INTEGER_LITERAL166=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsFieldGroupProximityTerm5821); if (state.failed) return retval;
+					DECIMAL_INTEGER_LITERAL166=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsFieldGroupProximityTerm5863); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					DECIMAL_INTEGER_LITERAL166_tree = (Object)adaptor.create(DECIMAL_INTEGER_LITERAL166);
 					adaptor.addChild(root_0, DECIMAL_INTEGER_LITERAL166_tree);
@@ -8760,7 +8760,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FLOATING_POINT_LITERAL167=(Token)match(input,FLOATING_POINT_LITERAL,FOLLOW_FLOATING_POINT_LITERAL_in_ftsFieldGroupProximityTerm5833); if (state.failed) return retval;
+					FLOATING_POINT_LITERAL167=(Token)match(input,FLOATING_POINT_LITERAL,FOLLOW_FLOATING_POINT_LITERAL_in_ftsFieldGroupProximityTerm5875); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FLOATING_POINT_LITERAL167_tree = (Object)adaptor.create(FLOATING_POINT_LITERAL167);
 					adaptor.addChild(root_0, FLOATING_POINT_LITERAL167_tree);
@@ -8774,7 +8774,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					DATETIME168=(Token)match(input,DATETIME,FOLLOW_DATETIME_in_ftsFieldGroupProximityTerm5845); if (state.failed) return retval;
+					DATETIME168=(Token)match(input,DATETIME,FOLLOW_DATETIME_in_ftsFieldGroupProximityTerm5887); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					DATETIME168_tree = (Object)adaptor.create(DATETIME168);
 					adaptor.addChild(root_0, DATETIME168_tree);
@@ -8788,7 +8788,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					STAR169=(Token)match(input,STAR,FOLLOW_STAR_in_ftsFieldGroupProximityTerm5857); if (state.failed) return retval;
+					STAR169=(Token)match(input,STAR,FOLLOW_STAR_in_ftsFieldGroupProximityTerm5899); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					STAR169_tree = (Object)adaptor.create(STAR169);
 					adaptor.addChild(root_0, STAR169_tree);
@@ -8802,13 +8802,13 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					URI170=(Token)match(input,URI,FOLLOW_URI_in_ftsFieldGroupProximityTerm5869); if (state.failed) return retval;
+					URI170=(Token)match(input,URI,FOLLOW_URI_in_ftsFieldGroupProximityTerm5911); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					URI170_tree = (Object)adaptor.create(URI170);
 					adaptor.addChild(root_0, URI170_tree);
 					}
 
-					pushFollow(FOLLOW_identifier_in_ftsFieldGroupProximityTerm5871);
+					pushFollow(FOLLOW_identifier_in_ftsFieldGroupProximityTerm5913);
 					identifier171=identifier();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -8872,7 +8872,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:745:9: ( STAR ( LPAREN ( DECIMAL_INTEGER_LITERAL )? RPAREN )? -> ^( PROXIMITY ( DECIMAL_INTEGER_LITERAL )? ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:746:9: STAR ( LPAREN ( DECIMAL_INTEGER_LITERAL )? RPAREN )?
 			{
-			STAR172=(Token)match(input,STAR,FOLLOW_STAR_in_proximityGroup5904); if (state.failed) return retval; 
+			STAR172=(Token)match(input,STAR,FOLLOW_STAR_in_proximityGroup5946); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_STAR.add(STAR172);
 
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:746:14: ( LPAREN ( DECIMAL_INTEGER_LITERAL )? RPAREN )?
@@ -8885,7 +8885,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:746:15: LPAREN ( DECIMAL_INTEGER_LITERAL )? RPAREN
 					{
-					LPAREN173=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_proximityGroup5907); if (state.failed) return retval; 
+					LPAREN173=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_proximityGroup5949); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN173);
 
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:746:22: ( DECIMAL_INTEGER_LITERAL )?
@@ -8898,7 +8898,7 @@ public class FTSParser extends Parser {
 						case 1 :
 							// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:746:22: DECIMAL_INTEGER_LITERAL
 							{
-							DECIMAL_INTEGER_LITERAL174=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_proximityGroup5909); if (state.failed) return retval; 
+							DECIMAL_INTEGER_LITERAL174=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_proximityGroup5951); if (state.failed) return retval; 
 							if ( state.backtracking==0 ) stream_DECIMAL_INTEGER_LITERAL.add(DECIMAL_INTEGER_LITERAL174);
 
 							}
@@ -8906,7 +8906,7 @@ public class FTSParser extends Parser {
 
 					}
 
-					RPAREN175=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_proximityGroup5912); if (state.failed) return retval; 
+					RPAREN175=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_proximityGroup5954); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN175);
 
 					}
@@ -9024,15 +9024,15 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:753:9: ftsRangeWord DOTDOT ftsRangeWord
 					{
-					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5996);
+					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6038);
 					ftsRangeWord176=ftsRangeWord();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsRangeWord.add(ftsRangeWord176.getTree());
-					DOTDOT177=(Token)match(input,DOTDOT,FOLLOW_DOTDOT_in_ftsFieldGroupRange5998); if (state.failed) return retval; 
+					DOTDOT177=(Token)match(input,DOTDOT,FOLLOW_DOTDOT_in_ftsFieldGroupRange6040); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_DOTDOT.add(DOTDOT177);
 
-					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6000);
+					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6042);
 					ftsRangeWord178=ftsRangeWord();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -9066,31 +9066,31 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:755:11: range_left ftsRangeWord TO ftsRangeWord range_right
 					{
-					pushFollow(FOLLOW_range_left_in_ftsFieldGroupRange6038);
+					pushFollow(FOLLOW_range_left_in_ftsFieldGroupRange6080);
 					range_left179=range_left();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_range_left.add(range_left179.getTree());
-					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6040);
+					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6082);
 					ftsRangeWord180=ftsRangeWord();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsRangeWord.add(ftsRangeWord180.getTree());
-					TO181=(Token)match(input,TO,FOLLOW_TO_in_ftsFieldGroupRange6042); if (state.failed) return retval; 
+					TO181=(Token)match(input,TO,FOLLOW_TO_in_ftsFieldGroupRange6084); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_TO.add(TO181);
 
-					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6044);
+					pushFollow(FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6086);
 					ftsRangeWord182=ftsRangeWord();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ftsRangeWord.add(ftsRangeWord182.getTree());
-					pushFollow(FOLLOW_range_right_in_ftsFieldGroupRange6046);
+					pushFollow(FOLLOW_range_right_in_ftsFieldGroupRange6088);
 					range_right183=range_right();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_range_right.add(range_right183.getTree());
 					// AST REWRITE
-					// elements: ftsRangeWord, range_left, range_right, ftsRangeWord
+					// elements: range_left, range_right, ftsRangeWord, ftsRangeWord
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -9183,7 +9183,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:761:9: LSQUARE
 					{
-					LSQUARE184=(Token)match(input,LSQUARE,FOLLOW_LSQUARE_in_range_left6105); if (state.failed) return retval; 
+					LSQUARE184=(Token)match(input,LSQUARE,FOLLOW_LSQUARE_in_range_left6147); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LSQUARE.add(LSQUARE184);
 
 					// AST REWRITE
@@ -9212,7 +9212,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:763:11: LT
 					{
-					LT185=(Token)match(input,LT,FOLLOW_LT_in_range_left6137); if (state.failed) return retval; 
+					LT185=(Token)match(input,LT,FOLLOW_LT_in_range_left6179); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_LT.add(LT185);
 
 					// AST REWRITE
@@ -9306,7 +9306,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:769:9: RSQUARE
 					{
-					RSQUARE186=(Token)match(input,RSQUARE,FOLLOW_RSQUARE_in_range_right6190); if (state.failed) return retval; 
+					RSQUARE186=(Token)match(input,RSQUARE,FOLLOW_RSQUARE_in_range_right6232); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_RSQUARE.add(RSQUARE186);
 
 					// AST REWRITE
@@ -9335,7 +9335,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:771:11: GT
 					{
-					GT187=(Token)match(input,GT,FOLLOW_GT_in_range_right6222); if (state.failed) return retval; 
+					GT187=(Token)match(input,GT,FOLLOW_GT_in_range_right6264); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_GT.add(GT187);
 
 					// AST REWRITE
@@ -9424,7 +9424,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:779:9: AT
 					{
-					AT188=(Token)match(input,AT,FOLLOW_AT_in_fieldReference6278); if (state.failed) return retval; 
+					AT188=(Token)match(input,AT,FOLLOW_AT_in_fieldReference6320); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_AT.add(AT188);
 
 					}
@@ -9450,30 +9450,30 @@ public class FTSParser extends Parser {
 										int LA69_16 = input.LA(7);
 										if ( (LA69_16==ID) ) {
 											int LA69_18 = input.LA(8);
-											if ( (synpred32_FTS()) ) {
+											if ( (synpred39_FTS()) ) {
 												alt69=1;
 											}
 										}
 									}
-									else if ( (LA69_11==COLON) && (synpred32_FTS())) {
+									else if ( (LA69_11==COLON) && (synpred39_FTS())) {
 										alt69=1;
 									}
 								}
 								else if ( (LA69_8==TO) ) {
 									int LA69_12 = input.LA(6);
-									if ( (LA69_12==COLON) && (synpred32_FTS())) {
+									if ( (LA69_12==COLON) && (synpred39_FTS())) {
 										alt69=1;
 									}
 								}
-								else if ( (LA69_8==OR) && (synpred32_FTS())) {
+								else if ( (LA69_8==OR) && (synpred39_FTS())) {
 									alt69=1;
 								}
-								else if ( (LA69_8==AND) && (synpred32_FTS())) {
+								else if ( (LA69_8==AND) && (synpred39_FTS())) {
 									alt69=1;
 								}
 								else if ( (LA69_8==NOT) ) {
 									int LA69_15 = input.LA(6);
-									if ( (LA69_15==COLON) && (synpred32_FTS())) {
+									if ( (LA69_15==COLON) && (synpred39_FTS())) {
 										alt69=1;
 									}
 								}
@@ -9488,30 +9488,30 @@ public class FTSParser extends Parser {
 								int LA69_16 = input.LA(5);
 								if ( (LA69_16==ID) ) {
 									int LA69_18 = input.LA(6);
-									if ( (synpred32_FTS()) ) {
+									if ( (synpred39_FTS()) ) {
 										alt69=1;
 									}
 								}
 							}
-							else if ( (LA69_11==COLON) && (synpred32_FTS())) {
+							else if ( (LA69_11==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
 						else if ( (LA69_8==TO) ) {
 							int LA69_12 = input.LA(4);
-							if ( (LA69_12==COLON) && (synpred32_FTS())) {
+							if ( (LA69_12==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
-						else if ( (LA69_8==OR) && (synpred32_FTS())) {
+						else if ( (LA69_8==OR) && (synpred39_FTS())) {
 							alt69=1;
 						}
-						else if ( (LA69_8==AND) && (synpred32_FTS())) {
+						else if ( (LA69_8==AND) && (synpred39_FTS())) {
 							alt69=1;
 						}
 						else if ( (LA69_8==NOT) ) {
 							int LA69_15 = input.LA(4);
-							if ( (LA69_15==COLON) && (synpred32_FTS())) {
+							if ( (LA69_15==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
@@ -9529,30 +9529,30 @@ public class FTSParser extends Parser {
 								int LA69_16 = input.LA(5);
 								if ( (LA69_16==ID) ) {
 									int LA69_18 = input.LA(6);
-									if ( (synpred32_FTS()) ) {
+									if ( (synpred39_FTS()) ) {
 										alt69=1;
 									}
 								}
 							}
-							else if ( (LA69_11==COLON) && (synpred32_FTS())) {
+							else if ( (LA69_11==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
 						else if ( (LA69_8==TO) ) {
 							int LA69_12 = input.LA(4);
-							if ( (LA69_12==COLON) && (synpred32_FTS())) {
+							if ( (LA69_12==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
-						else if ( (LA69_8==OR) && (synpred32_FTS())) {
+						else if ( (LA69_8==OR) && (synpred39_FTS())) {
 							alt69=1;
 						}
-						else if ( (LA69_8==AND) && (synpred32_FTS())) {
+						else if ( (LA69_8==AND) && (synpred39_FTS())) {
 							alt69=1;
 						}
 						else if ( (LA69_8==NOT) ) {
 							int LA69_15 = input.LA(4);
-							if ( (LA69_15==COLON) && (synpred32_FTS())) {
+							if ( (LA69_15==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
@@ -9570,30 +9570,30 @@ public class FTSParser extends Parser {
 								int LA69_16 = input.LA(5);
 								if ( (LA69_16==ID) ) {
 									int LA69_18 = input.LA(6);
-									if ( (synpred32_FTS()) ) {
+									if ( (synpred39_FTS()) ) {
 										alt69=1;
 									}
 								}
 							}
-							else if ( (LA69_11==COLON) && (synpred32_FTS())) {
+							else if ( (LA69_11==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
 						else if ( (LA69_8==TO) ) {
 							int LA69_12 = input.LA(4);
-							if ( (LA69_12==COLON) && (synpred32_FTS())) {
+							if ( (LA69_12==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
-						else if ( (LA69_8==OR) && (synpred32_FTS())) {
+						else if ( (LA69_8==OR) && (synpred39_FTS())) {
 							alt69=1;
 						}
-						else if ( (LA69_8==AND) && (synpred32_FTS())) {
+						else if ( (LA69_8==AND) && (synpred39_FTS())) {
 							alt69=1;
 						}
 						else if ( (LA69_8==NOT) ) {
 							int LA69_15 = input.LA(4);
-							if ( (LA69_15==COLON) && (synpred32_FTS())) {
+							if ( (LA69_15==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
@@ -9611,30 +9611,30 @@ public class FTSParser extends Parser {
 								int LA69_16 = input.LA(5);
 								if ( (LA69_16==ID) ) {
 									int LA69_18 = input.LA(6);
-									if ( (synpred32_FTS()) ) {
+									if ( (synpred39_FTS()) ) {
 										alt69=1;
 									}
 								}
 							}
-							else if ( (LA69_11==COLON) && (synpred32_FTS())) {
+							else if ( (LA69_11==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
 						else if ( (LA69_8==TO) ) {
 							int LA69_12 = input.LA(4);
-							if ( (LA69_12==COLON) && (synpred32_FTS())) {
+							if ( (LA69_12==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
-						else if ( (LA69_8==OR) && (synpred32_FTS())) {
+						else if ( (LA69_8==OR) && (synpred39_FTS())) {
 							alt69=1;
 						}
-						else if ( (LA69_8==AND) && (synpred32_FTS())) {
+						else if ( (LA69_8==AND) && (synpred39_FTS())) {
 							alt69=1;
 						}
 						else if ( (LA69_8==NOT) ) {
 							int LA69_15 = input.LA(4);
-							if ( (LA69_15==COLON) && (synpred32_FTS())) {
+							if ( (LA69_15==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
@@ -9652,30 +9652,30 @@ public class FTSParser extends Parser {
 								int LA69_16 = input.LA(5);
 								if ( (LA69_16==ID) ) {
 									int LA69_18 = input.LA(6);
-									if ( (synpred32_FTS()) ) {
+									if ( (synpred39_FTS()) ) {
 										alt69=1;
 									}
 								}
 							}
-							else if ( (LA69_11==COLON) && (synpred32_FTS())) {
+							else if ( (LA69_11==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
 						else if ( (LA69_8==TO) ) {
 							int LA69_12 = input.LA(4);
-							if ( (LA69_12==COLON) && (synpred32_FTS())) {
+							if ( (LA69_12==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
-						else if ( (LA69_8==OR) && (synpred32_FTS())) {
+						else if ( (LA69_8==OR) && (synpred39_FTS())) {
 							alt69=1;
 						}
-						else if ( (LA69_8==AND) && (synpred32_FTS())) {
+						else if ( (LA69_8==AND) && (synpred39_FTS())) {
 							alt69=1;
 						}
 						else if ( (LA69_8==NOT) ) {
 							int LA69_15 = input.LA(4);
-							if ( (LA69_15==COLON) && (synpred32_FTS())) {
+							if ( (LA69_15==COLON) && (synpred39_FTS())) {
 								alt69=1;
 							}
 						}
@@ -9692,7 +9692,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:781:19: ( prefix )=> prefix
 					{
-					pushFollow(FOLLOW_prefix_in_fieldReference6315);
+					pushFollow(FOLLOW_prefix_in_fieldReference6357);
 					prefix189=prefix();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -9702,7 +9702,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:782:19: uri
 					{
-					pushFollow(FOLLOW_uri_in_fieldReference6335);
+					pushFollow(FOLLOW_uri_in_fieldReference6377);
 					uri190=uri();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -9712,13 +9712,13 @@ public class FTSParser extends Parser {
 
 			}
 
-			pushFollow(FOLLOW_identifier_in_fieldReference6356);
+			pushFollow(FOLLOW_identifier_in_fieldReference6398);
 			identifier191=identifier();
 			state._fsp--;
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_identifier.add(identifier191.getTree());
 			// AST REWRITE
-			// elements: identifier, uri, prefix
+			// elements: uri, prefix, identifier
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -9820,7 +9820,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:791:9: AT
 					{
-					AT192=(Token)match(input,AT,FOLLOW_AT_in_tempReference6443); if (state.failed) return retval; 
+					AT192=(Token)match(input,AT,FOLLOW_AT_in_tempReference6485); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_AT.add(AT192);
 
 					}
@@ -9890,7 +9890,7 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:793:17: prefix
 					{
-					pushFollow(FOLLOW_prefix_in_tempReference6472);
+					pushFollow(FOLLOW_prefix_in_tempReference6514);
 					prefix193=prefix();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -9900,7 +9900,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:794:19: uri
 					{
-					pushFollow(FOLLOW_uri_in_tempReference6492);
+					pushFollow(FOLLOW_uri_in_tempReference6534);
 					uri194=uri();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -9910,13 +9910,13 @@ public class FTSParser extends Parser {
 
 			}
 
-			pushFollow(FOLLOW_identifier_in_tempReference6513);
+			pushFollow(FOLLOW_identifier_in_tempReference6555);
 			identifier195=identifier();
 			state._fsp--;
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_identifier.add(identifier195.getTree());
 			// AST REWRITE
-			// elements: identifier, uri, prefix
+			// elements: uri, prefix, identifier
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -10004,12 +10004,12 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:802:9: ( identifier COLON -> ^( PREFIX identifier ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:803:9: identifier COLON
 			{
-			pushFollow(FOLLOW_identifier_in_prefix6600);
+			pushFollow(FOLLOW_identifier_in_prefix6642);
 			identifier196=identifier();
 			state._fsp--;
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_identifier.add(identifier196.getTree());
-			COLON197=(Token)match(input,COLON,FOLLOW_COLON_in_prefix6602); if (state.failed) return retval; 
+			COLON197=(Token)match(input,COLON,FOLLOW_COLON_in_prefix6644); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_COLON.add(COLON197);
 
 			// AST REWRITE
@@ -10087,7 +10087,7 @@ public class FTSParser extends Parser {
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:809:9: ( URI -> ^( NAME_SPACE URI ) )
 			// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:810:9: URI
 			{
-			URI198=(Token)match(input,URI,FOLLOW_URI_in_uri6683); if (state.failed) return retval; 
+			URI198=(Token)match(input,URI,FOLLOW_URI_in_uri6725); if (state.failed) return retval; 
 			if ( state.backtracking==0 ) stream_URI.add(URI198);
 
 			// AST REWRITE
@@ -10191,7 +10191,7 @@ public class FTSParser extends Parser {
 					int LA72_6 = input.LA(3);
 					if ( (LA72_6==ID) ) {
 						int LA72_8 = input.LA(4);
-						if ( (synpred33_FTS()) ) {
+						if ( (synpred40_FTS()) ) {
 							alt72=1;
 						}
 						else if ( (true) ) {
@@ -10268,13 +10268,13 @@ public class FTSParser extends Parser {
 				case 1 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:817:9: ( ID DOT ID )=>id1= ID DOT id2= ID
 					{
-					id1=(Token)match(input,ID,FOLLOW_ID_in_identifier6785); if (state.failed) return retval; 
+					id1=(Token)match(input,ID,FOLLOW_ID_in_identifier6827); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_ID.add(id1);
 
-					DOT199=(Token)match(input,DOT,FOLLOW_DOT_in_identifier6787); if (state.failed) return retval; 
+					DOT199=(Token)match(input,DOT,FOLLOW_DOT_in_identifier6829); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_DOT.add(DOT199);
 
-					id2=(Token)match(input,ID,FOLLOW_ID_in_identifier6791); if (state.failed) return retval; 
+					id2=(Token)match(input,ID,FOLLOW_ID_in_identifier6833); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_ID.add(id2);
 
 					// AST REWRITE
@@ -10303,7 +10303,7 @@ public class FTSParser extends Parser {
 				case 2 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:821:12: ID
 					{
-					ID200=(Token)match(input,ID,FOLLOW_ID_in_identifier6840); if (state.failed) return retval; 
+					ID200=(Token)match(input,ID,FOLLOW_ID_in_identifier6882); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_ID.add(ID200);
 
 					// AST REWRITE
@@ -10332,7 +10332,7 @@ public class FTSParser extends Parser {
 				case 3 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:825:12: TO
 					{
-					TO201=(Token)match(input,TO,FOLLOW_TO_in_identifier6907); if (state.failed) return retval; 
+					TO201=(Token)match(input,TO,FOLLOW_TO_in_identifier6949); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_TO.add(TO201);
 
 					// AST REWRITE
@@ -10361,7 +10361,7 @@ public class FTSParser extends Parser {
 				case 4 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:827:12: OR
 					{
-					OR202=(Token)match(input,OR,FOLLOW_OR_in_identifier6945); if (state.failed) return retval; 
+					OR202=(Token)match(input,OR,FOLLOW_OR_in_identifier6987); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_OR.add(OR202);
 
 					// AST REWRITE
@@ -10390,7 +10390,7 @@ public class FTSParser extends Parser {
 				case 5 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:829:12: AND
 					{
-					AND203=(Token)match(input,AND,FOLLOW_AND_in_identifier6983); if (state.failed) return retval; 
+					AND203=(Token)match(input,AND,FOLLOW_AND_in_identifier7025); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_AND.add(AND203);
 
 					// AST REWRITE
@@ -10419,7 +10419,7 @@ public class FTSParser extends Parser {
 				case 6 :
 					// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:831:12: NOT
 					{
-					NOT204=(Token)match(input,NOT,FOLLOW_NOT_in_identifier7022); if (state.failed) return retval; 
+					NOT204=(Token)match(input,NOT,FOLLOW_NOT_in_identifier7064); if (state.failed) return retval; 
 					if ( state.backtracking==0 ) stream_NOT.add(NOT204);
 
 					// AST REWRITE
@@ -10656,7 +10656,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7146);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7188);
 					ftsWordBase206=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10674,7 +10674,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7154);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7196);
 					ftsWordBase208=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10692,7 +10692,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7162);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7204);
 					ftsWordBase210=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10710,7 +10710,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7170);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7212);
 					ftsWordBase212=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10728,7 +10728,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7178);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7220);
 					ftsWordBase214=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10742,7 +10742,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7238);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7280);
 					ftsWordBase215=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10760,7 +10760,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7246);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7288);
 					ftsWordBase217=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10778,7 +10778,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7254);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7296);
 					ftsWordBase219=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10796,7 +10796,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7262);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7304);
 					ftsWordBase221=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10814,7 +10814,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7270);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7312);
 					ftsWordBase223=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10840,7 +10840,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7343);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7385);
 					ftsWordBase225=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10858,7 +10858,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7351);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7393);
 					ftsWordBase227=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10876,7 +10876,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7359);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7401);
 					ftsWordBase229=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10894,7 +10894,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7367);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7409);
 					ftsWordBase231=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10920,7 +10920,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7433);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7475);
 					ftsWordBase233=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10938,7 +10938,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7441);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7483);
 					ftsWordBase235=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10956,7 +10956,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7449);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7491);
 					ftsWordBase237=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -10974,7 +10974,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7457);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7499);
 					ftsWordBase239=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11012,7 +11012,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7530);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7572);
 					ftsWordBase242=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11030,7 +11030,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7538);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7580);
 					ftsWordBase244=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11048,7 +11048,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7546);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7588);
 					ftsWordBase246=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11066,7 +11066,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7554);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7596);
 					ftsWordBase248=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11080,7 +11080,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7608);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7650);
 					ftsWordBase249=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11098,7 +11098,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7616);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7658);
 					ftsWordBase251=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11116,7 +11116,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7624);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7666);
 					ftsWordBase253=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11134,7 +11134,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7632);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7674);
 					ftsWordBase255=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11160,7 +11160,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7696);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7738);
 					ftsWordBase257=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11178,7 +11178,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7704);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7746);
 					ftsWordBase259=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11196,7 +11196,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7712);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7754);
 					ftsWordBase261=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11222,7 +11222,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7770);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7812);
 					ftsWordBase263=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11240,7 +11240,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7778);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7820);
 					ftsWordBase265=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11258,7 +11258,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7786);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7828);
 					ftsWordBase267=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11296,7 +11296,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7850);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7892);
 					ftsWordBase270=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11314,7 +11314,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7858);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7900);
 					ftsWordBase272=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11332,7 +11332,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7866);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7908);
 					ftsWordBase274=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11346,7 +11346,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7912);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7954);
 					ftsWordBase275=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11364,7 +11364,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7920);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7962);
 					ftsWordBase277=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11382,7 +11382,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7928);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7970);
 					ftsWordBase279=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11408,7 +11408,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7985);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8027);
 					ftsWordBase281=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11426,7 +11426,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord7993);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8035);
 					ftsWordBase283=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11452,7 +11452,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8044);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8086);
 					ftsWordBase285=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11470,7 +11470,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8052);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8094);
 					ftsWordBase287=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11508,7 +11508,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8109);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8151);
 					ftsWordBase290=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11526,7 +11526,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8117);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8159);
 					ftsWordBase292=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11540,7 +11540,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8155);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8197);
 					ftsWordBase293=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11558,7 +11558,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8163);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8205);
 					ftsWordBase295=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11584,7 +11584,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8211);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8253);
 					ftsWordBase297=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11610,7 +11610,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8253);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8295);
 					ftsWordBase299=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11648,7 +11648,7 @@ public class FTSParser extends Parser {
 						MismatchedSetException mse = new MismatchedSetException(null,input);
 						throw mse;
 					}
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8277);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8319);
 					ftsWordBase302=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11662,7 +11662,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8290);
+					pushFollow(FOLLOW_ftsWordBase_in_ftsWord8332);
 					ftsWordBase303=ftsWordBase();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -11812,7 +11812,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					ID304=(Token)match(input,ID,FOLLOW_ID_in_ftsWordBase8335); if (state.failed) return retval;
+					ID304=(Token)match(input,ID,FOLLOW_ID_in_ftsWordBase8377); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					ID304_tree = (Object)adaptor.create(ID304);
 					adaptor.addChild(root_0, ID304_tree);
@@ -11826,7 +11826,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSWORD305=(Token)match(input,FTSWORD,FOLLOW_FTSWORD_in_ftsWordBase8347); if (state.failed) return retval;
+					FTSWORD305=(Token)match(input,FTSWORD,FOLLOW_FTSWORD_in_ftsWordBase8389); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSWORD305_tree = (Object)adaptor.create(FTSWORD305);
 					adaptor.addChild(root_0, FTSWORD305_tree);
@@ -11840,7 +11840,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSPRE306=(Token)match(input,FTSPRE,FOLLOW_FTSPRE_in_ftsWordBase8359); if (state.failed) return retval;
+					FTSPRE306=(Token)match(input,FTSPRE,FOLLOW_FTSPRE_in_ftsWordBase8401); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSPRE306_tree = (Object)adaptor.create(FTSPRE306);
 					adaptor.addChild(root_0, FTSPRE306_tree);
@@ -11854,7 +11854,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSWILD307=(Token)match(input,FTSWILD,FOLLOW_FTSWILD_in_ftsWordBase8372); if (state.failed) return retval;
+					FTSWILD307=(Token)match(input,FTSWILD,FOLLOW_FTSWILD_in_ftsWordBase8414); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSWILD307_tree = (Object)adaptor.create(FTSWILD307);
 					adaptor.addChild(root_0, FTSWILD307_tree);
@@ -11868,7 +11868,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					NOT308=(Token)match(input,NOT,FOLLOW_NOT_in_ftsWordBase8385); if (state.failed) return retval;
+					NOT308=(Token)match(input,NOT,FOLLOW_NOT_in_ftsWordBase8427); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					NOT308_tree = (Object)adaptor.create(NOT308);
 					adaptor.addChild(root_0, NOT308_tree);
@@ -11882,7 +11882,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					TO309=(Token)match(input,TO,FOLLOW_TO_in_ftsWordBase8397); if (state.failed) return retval;
+					TO309=(Token)match(input,TO,FOLLOW_TO_in_ftsWordBase8439); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					TO309_tree = (Object)adaptor.create(TO309);
 					adaptor.addChild(root_0, TO309_tree);
@@ -11896,7 +11896,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					DECIMAL_INTEGER_LITERAL310=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsWordBase8409); if (state.failed) return retval;
+					DECIMAL_INTEGER_LITERAL310=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsWordBase8451); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					DECIMAL_INTEGER_LITERAL310_tree = (Object)adaptor.create(DECIMAL_INTEGER_LITERAL310);
 					adaptor.addChild(root_0, DECIMAL_INTEGER_LITERAL310_tree);
@@ -11910,7 +11910,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FLOATING_POINT_LITERAL311=(Token)match(input,FLOATING_POINT_LITERAL,FOLLOW_FLOATING_POINT_LITERAL_in_ftsWordBase8421); if (state.failed) return retval;
+					FLOATING_POINT_LITERAL311=(Token)match(input,FLOATING_POINT_LITERAL,FOLLOW_FLOATING_POINT_LITERAL_in_ftsWordBase8463); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FLOATING_POINT_LITERAL311_tree = (Object)adaptor.create(FLOATING_POINT_LITERAL311);
 					adaptor.addChild(root_0, FLOATING_POINT_LITERAL311_tree);
@@ -11924,7 +11924,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					STAR312=(Token)match(input,STAR,FOLLOW_STAR_in_ftsWordBase8433); if (state.failed) return retval;
+					STAR312=(Token)match(input,STAR,FOLLOW_STAR_in_ftsWordBase8475); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					STAR312_tree = (Object)adaptor.create(STAR312);
 					adaptor.addChild(root_0, STAR312_tree);
@@ -11938,7 +11938,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					QUESTION_MARK313=(Token)match(input,QUESTION_MARK,FOLLOW_QUESTION_MARK_in_ftsWordBase8445); if (state.failed) return retval;
+					QUESTION_MARK313=(Token)match(input,QUESTION_MARK,FOLLOW_QUESTION_MARK_in_ftsWordBase8487); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					QUESTION_MARK313_tree = (Object)adaptor.create(QUESTION_MARK313);
 					adaptor.addChild(root_0, QUESTION_MARK313_tree);
@@ -11952,7 +11952,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					DATETIME314=(Token)match(input,DATETIME,FOLLOW_DATETIME_in_ftsWordBase8457); if (state.failed) return retval;
+					DATETIME314=(Token)match(input,DATETIME,FOLLOW_DATETIME_in_ftsWordBase8499); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					DATETIME314_tree = (Object)adaptor.create(DATETIME314);
 					adaptor.addChild(root_0, DATETIME314_tree);
@@ -11966,13 +11966,13 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					URI315=(Token)match(input,URI,FOLLOW_URI_in_ftsWordBase8469); if (state.failed) return retval;
+					URI315=(Token)match(input,URI,FOLLOW_URI_in_ftsWordBase8511); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					URI315_tree = (Object)adaptor.create(URI315);
 					adaptor.addChild(root_0, URI315_tree);
 					}
 
-					pushFollow(FOLLOW_identifier_in_ftsWordBase8471);
+					pushFollow(FOLLOW_identifier_in_ftsWordBase8513);
 					identifier316=identifier();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -12169,7 +12169,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					ID318=(Token)match(input,ID,FOLLOW_ID_in_ftsRangeWord8551); if (state.failed) return retval;
+					ID318=(Token)match(input,ID,FOLLOW_ID_in_ftsRangeWord8593); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					ID318_tree = (Object)adaptor.create(ID318);
 					adaptor.addChild(root_0, ID318_tree);
@@ -12183,7 +12183,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSWORD319=(Token)match(input,FTSWORD,FOLLOW_FTSWORD_in_ftsRangeWord8563); if (state.failed) return retval;
+					FTSWORD319=(Token)match(input,FTSWORD,FOLLOW_FTSWORD_in_ftsRangeWord8605); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSWORD319_tree = (Object)adaptor.create(FTSWORD319);
 					adaptor.addChild(root_0, FTSWORD319_tree);
@@ -12197,7 +12197,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSPRE320=(Token)match(input,FTSPRE,FOLLOW_FTSPRE_in_ftsRangeWord8575); if (state.failed) return retval;
+					FTSPRE320=(Token)match(input,FTSPRE,FOLLOW_FTSPRE_in_ftsRangeWord8617); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSPRE320_tree = (Object)adaptor.create(FTSPRE320);
 					adaptor.addChild(root_0, FTSPRE320_tree);
@@ -12211,7 +12211,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSWILD321=(Token)match(input,FTSWILD,FOLLOW_FTSWILD_in_ftsRangeWord8587); if (state.failed) return retval;
+					FTSWILD321=(Token)match(input,FTSWILD,FOLLOW_FTSWILD_in_ftsRangeWord8629); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSWILD321_tree = (Object)adaptor.create(FTSWILD321);
 					adaptor.addChild(root_0, FTSWILD321_tree);
@@ -12225,7 +12225,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FTSPHRASE322=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsRangeWord8599); if (state.failed) return retval;
+					FTSPHRASE322=(Token)match(input,FTSPHRASE,FOLLOW_FTSPHRASE_in_ftsRangeWord8641); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FTSPHRASE322_tree = (Object)adaptor.create(FTSPHRASE322);
 					adaptor.addChild(root_0, FTSPHRASE322_tree);
@@ -12239,7 +12239,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					DECIMAL_INTEGER_LITERAL323=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsRangeWord8611); if (state.failed) return retval;
+					DECIMAL_INTEGER_LITERAL323=(Token)match(input,DECIMAL_INTEGER_LITERAL,FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsRangeWord8653); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					DECIMAL_INTEGER_LITERAL323_tree = (Object)adaptor.create(DECIMAL_INTEGER_LITERAL323);
 					adaptor.addChild(root_0, DECIMAL_INTEGER_LITERAL323_tree);
@@ -12253,7 +12253,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					FLOATING_POINT_LITERAL324=(Token)match(input,FLOATING_POINT_LITERAL,FOLLOW_FLOATING_POINT_LITERAL_in_ftsRangeWord8623); if (state.failed) return retval;
+					FLOATING_POINT_LITERAL324=(Token)match(input,FLOATING_POINT_LITERAL,FOLLOW_FLOATING_POINT_LITERAL_in_ftsRangeWord8665); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					FLOATING_POINT_LITERAL324_tree = (Object)adaptor.create(FLOATING_POINT_LITERAL324);
 					adaptor.addChild(root_0, FLOATING_POINT_LITERAL324_tree);
@@ -12267,7 +12267,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					DATETIME325=(Token)match(input,DATETIME,FOLLOW_DATETIME_in_ftsRangeWord8635); if (state.failed) return retval;
+					DATETIME325=(Token)match(input,DATETIME,FOLLOW_DATETIME_in_ftsRangeWord8677); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					DATETIME325_tree = (Object)adaptor.create(DATETIME325);
 					adaptor.addChild(root_0, DATETIME325_tree);
@@ -12281,7 +12281,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					STAR326=(Token)match(input,STAR,FOLLOW_STAR_in_ftsRangeWord8647); if (state.failed) return retval;
+					STAR326=(Token)match(input,STAR,FOLLOW_STAR_in_ftsRangeWord8689); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					STAR326_tree = (Object)adaptor.create(STAR326);
 					adaptor.addChild(root_0, STAR326_tree);
@@ -12295,13 +12295,13 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					URI327=(Token)match(input,URI,FOLLOW_URI_in_ftsRangeWord8659); if (state.failed) return retval;
+					URI327=(Token)match(input,URI,FOLLOW_URI_in_ftsRangeWord8701); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					URI327_tree = (Object)adaptor.create(URI327);
 					adaptor.addChild(root_0, URI327_tree);
 					}
 
-					pushFollow(FOLLOW_identifier_in_ftsRangeWord8661);
+					pushFollow(FOLLOW_identifier_in_ftsRangeWord8703);
 					identifier328=identifier();
 					state._fsp--;
 					if (state.failed) return retval;
@@ -12380,7 +12380,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					OR329=(Token)match(input,OR,FOLLOW_OR_in_or8696); if (state.failed) return retval;
+					OR329=(Token)match(input,OR,FOLLOW_OR_in_or8738); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					OR329_tree = (Object)adaptor.create(OR329);
 					adaptor.addChild(root_0, OR329_tree);
@@ -12394,13 +12394,13 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					BAR330=(Token)match(input,BAR,FOLLOW_BAR_in_or8708); if (state.failed) return retval;
+					BAR330=(Token)match(input,BAR,FOLLOW_BAR_in_or8750); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					BAR330_tree = (Object)adaptor.create(BAR330);
 					adaptor.addChild(root_0, BAR330_tree);
 					}
 
-					BAR331=(Token)match(input,BAR,FOLLOW_BAR_in_or8710); if (state.failed) return retval;
+					BAR331=(Token)match(input,BAR,FOLLOW_BAR_in_or8752); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					BAR331_tree = (Object)adaptor.create(BAR331);
 					adaptor.addChild(root_0, BAR331_tree);
@@ -12479,7 +12479,7 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					AND332=(Token)match(input,AND,FOLLOW_AND_in_and8743); if (state.failed) return retval;
+					AND332=(Token)match(input,AND,FOLLOW_AND_in_and8785); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					AND332_tree = (Object)adaptor.create(AND332);
 					adaptor.addChild(root_0, AND332_tree);
@@ -12493,13 +12493,13 @@ public class FTSParser extends Parser {
 					root_0 = (Object)adaptor.nil();
 
 
-					AMP333=(Token)match(input,AMP,FOLLOW_AMP_in_and8755); if (state.failed) return retval;
+					AMP333=(Token)match(input,AMP,FOLLOW_AMP_in_and8797); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					AMP333_tree = (Object)adaptor.create(AMP333);
 					adaptor.addChild(root_0, AMP333_tree);
 					}
 
-					AMP334=(Token)match(input,AMP,FOLLOW_AMP_in_and8757); if (state.failed) return retval;
+					AMP334=(Token)match(input,AMP,FOLLOW_AMP_in_and8799); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
 					AMP334_tree = (Object)adaptor.create(AMP334);
 					adaptor.addChild(root_0, AMP334_tree);
@@ -12958,11 +12958,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred25_FTS
 	public final void synpred25_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:31: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:32: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:11: ( ftsFieldGroupTerm )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:12: ftsFieldGroupTerm
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred25_FTS4809);
-		fuzzy();
+		pushFollow(FOLLOW_ftsFieldGroupTerm_in_synpred25_FTS4805);
+		ftsFieldGroupTerm();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -12973,10 +12973,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred26_FTS
 	public final void synpred26_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:36: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:37: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:54: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:664:55: fuzzy
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred26_FTS4884);
+		pushFollow(FOLLOW_fuzzy_in_synpred26_FTS4815);
 		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
@@ -12988,11 +12988,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred27_FTS
 	public final void synpred27_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:33: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:34: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:11: ( ftsFieldGroupExactTerm )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:12: ftsFieldGroupExactTerm
 		{
-		pushFollow(FOLLOW_slop_in_synpred27_FTS4959);
-		slop();
+		pushFollow(FOLLOW_ftsFieldGroupExactTerm_in_synpred27_FTS4886);
+		ftsFieldGroupExactTerm();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -13003,11 +13003,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred28_FTS
 	public final void synpred28_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:38: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:39: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:64: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:667:65: fuzzy
 		{
-		pushFollow(FOLLOW_slop_in_synpred28_FTS5034);
-		slop();
+		pushFollow(FOLLOW_fuzzy_in_synpred28_FTS4896);
+		fuzzy();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -13018,11 +13018,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred29_FTS
 	public final void synpred29_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:42: ( slop )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:43: slop
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:11: ( ftsFieldGroupPhrase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:12: ftsFieldGroupPhrase
 		{
-		pushFollow(FOLLOW_slop_in_synpred29_FTS5109);
-		slop();
+		pushFollow(FOLLOW_ftsFieldGroupPhrase_in_synpred29_FTS4967);
+		ftsFieldGroupPhrase();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -13033,11 +13033,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred30_FTS
 	public final void synpred30_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:34: ( fuzzy )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:35: fuzzy
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:58: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:670:59: slop
 		{
-		pushFollow(FOLLOW_fuzzy_in_synpred30_FTS5184);
-		fuzzy();
+		pushFollow(FOLLOW_slop_in_synpred30_FTS4977);
+		slop();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -13048,11 +13048,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred31_FTS
 	public final void synpred31_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:725:38: ( proximityGroup )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:725:39: proximityGroup
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:11: ( ftsFieldGroupExactPhrase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:12: ftsFieldGroupExactPhrase
 		{
-		pushFollow(FOLLOW_proximityGroup_in_synpred31_FTS5678);
-		proximityGroup();
+		pushFollow(FOLLOW_ftsFieldGroupExactPhrase_in_synpred31_FTS5048);
+		ftsFieldGroupExactPhrase();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -13063,11 +13063,11 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred32_FTS
 	public final void synpred32_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:781:19: ( prefix )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:781:20: prefix
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:68: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:673:69: slop
 		{
-		pushFollow(FOLLOW_prefix_in_synpred32_FTS6310);
-		prefix();
+		pushFollow(FOLLOW_slop_in_synpred32_FTS5058);
+		slop();
 		state._fsp--;
 		if (state.failed) return;
 
@@ -13078,14 +13078,13 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred33_FTS
 	public final void synpred33_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:817:9: ( ID DOT ID )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:817:10: ID DOT ID
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:11: ( ftsFieldGroupTokenisedPhrase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:12: ftsFieldGroupTokenisedPhrase
 		{
-		match(input,ID,FOLLOW_ID_in_synpred33_FTS6765); if (state.failed) return;
-
-		match(input,DOT,FOLLOW_DOT_in_synpred33_FTS6767); if (state.failed) return;
-
-		match(input,ID,FOLLOW_ID_in_synpred33_FTS6769); if (state.failed) return;
+		pushFollow(FOLLOW_ftsFieldGroupTokenisedPhrase_in_synpred33_FTS5129);
+		ftsFieldGroupTokenisedPhrase();
+		state._fsp--;
+		if (state.failed) return;
 
 		}
 
@@ -13094,6 +13093,112 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred34_FTS
 	public final void synpred34_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:76: ( slop )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:676:77: slop
+		{
+		pushFollow(FOLLOW_slop_in_synpred34_FTS5139);
+		slop();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred34_FTS
+
+	// $ANTLR start synpred35_FTS
+	public final void synpred35_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:11: ( ftsFieldGroupSynonym )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:12: ftsFieldGroupSynonym
+		{
+		pushFollow(FOLLOW_ftsFieldGroupSynonym_in_synpred35_FTS5210);
+		ftsFieldGroupSynonym();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred35_FTS
+
+	// $ANTLR start synpred36_FTS
+	public final void synpred36_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:60: ( fuzzy )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:679:61: fuzzy
+		{
+		pushFollow(FOLLOW_fuzzy_in_synpred36_FTS5220);
+		fuzzy();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred36_FTS
+
+	// $ANTLR start synpred37_FTS
+	public final void synpred37_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:682:11: ( ftsFieldGroupRange )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:682:12: ftsFieldGroupRange
+		{
+		pushFollow(FOLLOW_ftsFieldGroupRange_in_synpred37_FTS5291);
+		ftsFieldGroupRange();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred37_FTS
+
+	// $ANTLR start synpred38_FTS
+	public final void synpred38_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:725:38: ( proximityGroup )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:725:39: proximityGroup
+		{
+		pushFollow(FOLLOW_proximityGroup_in_synpred38_FTS5720);
+		proximityGroup();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred38_FTS
+
+	// $ANTLR start synpred39_FTS
+	public final void synpred39_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:781:19: ( prefix )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:781:20: prefix
+		{
+		pushFollow(FOLLOW_prefix_in_synpred39_FTS6352);
+		prefix();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred39_FTS
+
+	// $ANTLR start synpred40_FTS
+	public final void synpred40_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:817:9: ( ID DOT ID )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:817:10: ID DOT ID
+		{
+		match(input,ID,FOLLOW_ID_in_synpred40_FTS6807); if (state.failed) return;
+
+		match(input,DOT,FOLLOW_DOT_in_synpred40_FTS6809); if (state.failed) return;
+
+		match(input,ID,FOLLOW_ID_in_synpred40_FTS6811); if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred40_FTS
+
+	// $ANTLR start synpred41_FTS
+	public final void synpred41_FTS_fragment() throws RecognitionException {
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:837:12: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:837:13: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
@@ -13107,7 +13212,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7091);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7133);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13122,7 +13227,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7099);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7141);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13137,7 +13242,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7107);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7149);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13152,7 +13257,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7115);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7157);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13167,7 +13272,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred34_FTS7123);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7165);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13175,10 +13280,10 @@ public class FTSParser extends Parser {
 		}
 
 	}
-	// $ANTLR end synpred34_FTS
+	// $ANTLR end synpred41_FTS
 
-	// $ANTLR start synpred35_FTS
-	public final void synpred35_FTS_fragment() throws RecognitionException {
+	// $ANTLR start synpred42_FTS
+	public final void synpred42_FTS_fragment() throws RecognitionException {
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:839:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase DOT | COMMA ftsWordBase )
 		int alt78=2;
 		int LA78_0 = input.LA(1);
@@ -13200,7 +13305,7 @@ public class FTSParser extends Parser {
 			case 1 :
 				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:839:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase DOT
 				{
-				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7191);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7233);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
@@ -13215,7 +13320,7 @@ public class FTSParser extends Parser {
 					MismatchedSetException mse = new MismatchedSetException(null,input);
 					throw mse;
 				}
-				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7199);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7241);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
@@ -13230,7 +13335,7 @@ public class FTSParser extends Parser {
 					MismatchedSetException mse = new MismatchedSetException(null,input);
 					throw mse;
 				}
-				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7207);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7249);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
@@ -13245,21 +13350,21 @@ public class FTSParser extends Parser {
 					MismatchedSetException mse = new MismatchedSetException(null,input);
 					throw mse;
 				}
-				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7215);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7257);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
 
-				match(input,DOT,FOLLOW_DOT_in_synpred35_FTS7217); if (state.failed) return;
+				match(input,DOT,FOLLOW_DOT_in_synpred42_FTS7259); if (state.failed) return;
 
 				}
 				break;
 			case 2 :
 				// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:839:100: COMMA ftsWordBase
 				{
-				match(input,COMMA,FOLLOW_COMMA_in_synpred35_FTS7219); if (state.failed) return;
+				match(input,COMMA,FOLLOW_COMMA_in_synpred42_FTS7261); if (state.failed) return;
 
-				pushFollow(FOLLOW_ftsWordBase_in_synpred35_FTS7221);
+				pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7263);
 				ftsWordBase();
 				state._fsp--;
 				if (state.failed) return;
@@ -13269,10 +13374,10 @@ public class FTSParser extends Parser {
 
 		}
 	}
-	// $ANTLR end synpred35_FTS
+	// $ANTLR end synpred42_FTS
 
-	// $ANTLR start synpred36_FTS
-	public final void synpred36_FTS_fragment() throws RecognitionException {
+	// $ANTLR start synpred43_FTS
+	public final void synpred43_FTS_fragment() throws RecognitionException {
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:841:12: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
 		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:841:13: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
@@ -13286,7 +13391,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7290);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7332);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13301,7 +13406,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7298);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7340);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13316,7 +13421,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7306);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7348);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13331,7 +13436,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred36_FTS7314);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7356);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13346,426 +13451,6 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		}
-
-	}
-	// $ANTLR end synpred36_FTS
-
-	// $ANTLR start synpred37_FTS
-	public final void synpred37_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:843:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:843:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
-		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7386);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7394);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7402);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred37_FTS7410);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		}
-
-	}
-	// $ANTLR end synpred37_FTS
-
-	// $ANTLR start synpred38_FTS
-	public final void synpred38_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:845:12: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:845:13: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
-		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7483);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7491);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7499);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred38_FTS7507);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		}
-
-	}
-	// $ANTLR end synpred38_FTS
-
-	// $ANTLR start synpred39_FTS
-	public final void synpred39_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:847:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:847:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
-		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7567);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7575);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7583);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred39_FTS7591);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		}
-
-	}
-	// $ANTLR end synpred39_FTS
-
-	// $ANTLR start synpred40_FTS
-	public final void synpred40_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:849:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:849:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
-		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred40_FTS7651);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred40_FTS7659);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred40_FTS7667);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		}
-
-	}
-	// $ANTLR end synpred40_FTS
-
-	// $ANTLR start synpred41_FTS
-	public final void synpred41_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:851:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:851:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
-		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7731);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7739);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred41_FTS7747);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		}
-
-	}
-	// $ANTLR end synpred41_FTS
-
-	// $ANTLR start synpred42_FTS
-	public final void synpred42_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:853:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:853:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
-		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7811);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7819);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred42_FTS7827);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		}
-
-	}
-	// $ANTLR end synpred42_FTS
-
-	// $ANTLR start synpred43_FTS
-	public final void synpred43_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:855:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:855:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
-		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7879);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7887);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred43_FTS7895);
-		ftsWordBase();
-		state._fsp--;
-		if (state.failed) return;
-
 		}
 
 	}
@@ -13773,20 +13458,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred44_FTS
 	public final void synpred44_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:857:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:857:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:843:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:843:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS7948);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS7428);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13801,7 +13476,37 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS7956);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS7436);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS7444);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred44_FTS7452);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13823,10 +13528,20 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred45_FTS
 	public final void synpred45_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:859:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:859:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:845:12: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:845:13: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred45_FTS8012);
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred45_FTS7525);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13841,7 +13556,7 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred45_FTS8020);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred45_FTS7533);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13856,6 +13571,26 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred45_FTS7541);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred45_FTS7549);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
 		}
 
 	}
@@ -13863,20 +13598,10 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred46_FTS
 	public final void synpred46_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:861:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:861:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:847:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:847:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
-		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
-			input.consume();
-			state.errorRecovery=false;
-			state.failed=false;
-		}
-		else {
-			if (state.backtracking>0) {state.failed=true; return;}
-			MismatchedSetException mse = new MismatchedSetException(null,input);
-			throw mse;
-		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred46_FTS8078);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred46_FTS7609);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13891,7 +13616,37 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred46_FTS8086);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred46_FTS7617);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred46_FTS7625);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred46_FTS7633);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13903,10 +13658,20 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred47_FTS
 	public final void synpred47_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:863:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:863:12: ftsWordBase ( DOT | COMMA ) ftsWordBase
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:849:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:849:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred47_FTS8130);
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred47_FTS7693);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13921,11 +13686,36 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred47_FTS8138);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred47_FTS7701);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
 
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred47_FTS7709);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
 		}
 
 	}
@@ -13933,9 +13723,14 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred48_FTS
 	public final void synpred48_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:865:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:865:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:851:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:851:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
 		{
+		pushFollow(FOLLOW_ftsWordBase_in_synpred48_FTS7773);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
 		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
 			input.consume();
 			state.errorRecovery=false;
@@ -13946,7 +13741,22 @@ public class FTSParser extends Parser {
 			MismatchedSetException mse = new MismatchedSetException(null,input);
 			throw mse;
 		}
-		pushFollow(FOLLOW_ftsWordBase_in_synpred48_FTS8182);
+		pushFollow(FOLLOW_ftsWordBase_in_synpred48_FTS7781);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred48_FTS7789);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13968,10 +13778,135 @@ public class FTSParser extends Parser {
 
 	// $ANTLR start synpred49_FTS
 	public final void synpred49_FTS_fragment() throws RecognitionException {
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:867:11: ( ftsWordBase ( DOT | COMMA ) )
-		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:867:12: ftsWordBase ( DOT | COMMA )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:853:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:853:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
 		{
-		pushFollow(FOLLOW_ftsWordBase_in_synpred49_FTS8230);
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred49_FTS7853);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred49_FTS7861);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred49_FTS7869);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred49_FTS
+
+	// $ANTLR start synpred50_FTS
+	public final void synpred50_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:855:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:855:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
+		{
+		pushFollow(FOLLOW_ftsWordBase_in_synpred50_FTS7921);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred50_FTS7929);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred50_FTS7937);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred50_FTS
+
+	// $ANTLR start synpred51_FTS
+	public final void synpred51_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:857:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:857:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		{
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred51_FTS7990);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred51_FTS7998);
 		ftsWordBase();
 		state._fsp--;
 		if (state.failed) return;
@@ -13989,24 +13924,180 @@ public class FTSParser extends Parser {
 		}
 
 	}
-	// $ANTLR end synpred49_FTS
+	// $ANTLR end synpred51_FTS
+
+	// $ANTLR start synpred52_FTS
+	public final void synpred52_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:859:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:859:12: ftsWordBase ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		{
+		pushFollow(FOLLOW_ftsWordBase_in_synpred52_FTS8054);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred52_FTS8062);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		}
+
+	}
+	// $ANTLR end synpred52_FTS
+
+	// $ANTLR start synpred53_FTS
+	public final void synpred53_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:861:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:861:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) ftsWordBase
+		{
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred53_FTS8120);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred53_FTS8128);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred53_FTS
+
+	// $ANTLR start synpred54_FTS
+	public final void synpred54_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:863:11: ( ftsWordBase ( DOT | COMMA ) ftsWordBase )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:863:12: ftsWordBase ( DOT | COMMA ) ftsWordBase
+		{
+		pushFollow(FOLLOW_ftsWordBase_in_synpred54_FTS8172);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred54_FTS8180);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		}
+
+	}
+	// $ANTLR end synpred54_FTS
+
+	// $ANTLR start synpred55_FTS
+	public final void synpred55_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:865:11: ( ( DOT | COMMA ) ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:865:12: ( DOT | COMMA ) ftsWordBase ( DOT | COMMA )
+		{
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		pushFollow(FOLLOW_ftsWordBase_in_synpred55_FTS8224);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		}
+
+	}
+	// $ANTLR end synpred55_FTS
+
+	// $ANTLR start synpred56_FTS
+	public final void synpred56_FTS_fragment() throws RecognitionException {
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:867:11: ( ftsWordBase ( DOT | COMMA ) )
+		// W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g:867:12: ftsWordBase ( DOT | COMMA )
+		{
+		pushFollow(FOLLOW_ftsWordBase_in_synpred56_FTS8272);
+		ftsWordBase();
+		state._fsp--;
+		if (state.failed) return;
+
+		if ( input.LA(1)==COMMA||input.LA(1)==DOT ) {
+			input.consume();
+			state.errorRecovery=false;
+			state.failed=false;
+		}
+		else {
+			if (state.backtracking>0) {state.failed=true; return;}
+			MismatchedSetException mse = new MismatchedSetException(null,input);
+			throw mse;
+		}
+		}
+
+	}
+	// $ANTLR end synpred56_FTS
 
 	// Delegated rules
 
-	public final boolean synpred17_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred17_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
 	public final boolean synpred22_FTS() {
 		state.backtracking++;
 		int start = input.mark();
@@ -14049,34 +14140,6 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred14_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred14_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred34_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred34_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
 	public final boolean synpred43_FTS() {
 		state.backtracking++;
 		int start = input.mark();
@@ -14091,11 +14154,11 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred12_FTS() {
+	public final boolean synpred34_FTS() {
 		state.backtracking++;
 		int start = input.mark();
 		try {
-			synpred12_FTS_fragment(); // can never throw exception
+			synpred34_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -14189,95 +14252,11 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred19_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred19_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred32_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred32_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred9_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred9_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred16_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred16_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred29_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred29_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
 	public final boolean synpred24_FTS() {
 		state.backtracking++;
 		int start = input.mark();
 		try {
 			synpred24_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred11_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred11_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -14315,11 +14294,11 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred3_FTS() {
+	public final boolean synpred52_FTS() {
 		state.backtracking++;
 		int start = input.mark();
 		try {
-			synpred3_FTS_fragment(); // can never throw exception
+			synpred52_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -14343,123 +14322,11 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred44_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred44_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred46_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred46_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred18_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred18_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred25_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred25_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred2_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred2_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
 	public final boolean synpred41_FTS() {
 		state.backtracking++;
 		int start = input.mark();
 		try {
 			synpred41_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred42_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred42_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred38_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred38_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred47_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred47_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -14483,20 +14350,6 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred40_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred40_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
 	public final boolean synpred26_FTS() {
 		state.backtracking++;
 		int start = input.mark();
@@ -14511,11 +14364,25 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred13_FTS() {
+	public final boolean synpred40_FTS() {
 		state.backtracking++;
 		int start = input.mark();
 		try {
-			synpred13_FTS_fragment(); // can never throw exception
+			synpred40_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred56_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred56_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -14581,6 +14448,356 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
+	public final boolean synpred23_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred23_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred17_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred17_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred14_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred14_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred12_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred12_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred50_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred50_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred51_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred51_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred53_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred53_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred19_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred19_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred9_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred9_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred32_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred32_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred16_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred16_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred29_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred29_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred11_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred11_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred3_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred3_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred44_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred44_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred54_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred54_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred46_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred46_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred18_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred18_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred25_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred25_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred2_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred2_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred55_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred55_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred47_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred47_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred38_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred38_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred42_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred42_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
+	public final boolean synpred13_FTS() {
+		state.backtracking++;
+		int start = input.mark();
+		try {
+			synpred13_FTS_fragment(); // can never throw exception
+		} catch (RecognitionException re) {
+			System.err.println("impossible: "+re);
+		}
+		boolean success = !state.failed;
+		input.rewind(start);
+		state.backtracking--;
+		state.failed=false;
+		return success;
+	}
 	public final boolean synpred5_FTS() {
 		state.backtracking++;
 		int start = input.mark();
@@ -14609,11 +14826,11 @@ public class FTSParser extends Parser {
 		state.failed=false;
 		return success;
 	}
-	public final boolean synpred23_FTS() {
+	public final boolean synpred15_FTS() {
 		state.backtracking++;
 		int start = input.mark();
 		try {
-			synpred23_FTS_fragment(); // can never throw exception
+			synpred15_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -14628,20 +14845,6 @@ public class FTSParser extends Parser {
 		int start = input.mark();
 		try {
 			synpred39_FTS_fragment(); // can never throw exception
-		} catch (RecognitionException re) {
-			System.err.println("impossible: "+re);
-		}
-		boolean success = !state.failed;
-		input.rewind(start);
-		state.backtracking--;
-		state.failed=false;
-		return success;
-	}
-	public final boolean synpred15_FTS() {
-		state.backtracking++;
-		int start = input.mark();
-		try {
-			synpred15_FTS_fragment(); // can never throw exception
 		} catch (RecognitionException re) {
 			System.err.println("impossible: "+re);
 		}
@@ -14708,13 +14911,13 @@ public class FTSParser extends Parser {
 		"\13\4\14\uffff\6\4\1\3\16\uffff\2\4\7\uffff\1\1\33\4\6\uffff\3\4\7\uffff"+
 		"\2\4\3\uffff\12\4\1\uffff\13\4\3\uffff\1\4\1\uffff";
 	static final String DFA17_specialS =
-		"\1\21\1\14\1\6\1\3\1\7\1\10\1\20\1\22\1\32\1\42\1\36\4\uffff\1\30\10\uffff"+
-		"\1\71\1\25\1\64\37\uffff\1\50\1\15\1\0\1\5\1\77\7\uffff\1\76\13\uffff"+
-		"\1\16\1\33\1\2\1\12\1\24\1\63\1\56\1\53\1\43\1\60\1\62\10\uffff\1\67\1"+
-		"\37\2\uffff\1\40\1\74\1\66\1\61\1\73\1\55\1\57\1\44\1\47\3\uffff\1\11"+
-		"\1\45\4\uffff\1\17\34\uffff\1\4\1\51\1\75\1\65\1\13\1\52\3\uffff\1\34"+
-		"\1\31\1\27\1\23\1\41\1\35\1\72\4\uffff\1\1\12\uffff\1\70\13\uffff\1\26"+
-		"\1\uffff\1\54\1\uffff\1\46}>";
+		"\1\45\1\73\1\40\1\43\1\44\1\66\1\77\1\54\1\55\1\71\1\63\4\uffff\1\62\10"+
+		"\uffff\1\53\1\20\1\56\37\uffff\1\47\1\4\1\2\1\5\1\27\7\uffff\1\41\13\uffff"+
+		"\1\17\1\60\1\57\1\65\1\11\1\75\1\12\1\25\1\35\1\31\1\24\10\uffff\1\3\1"+
+		"\0\2\uffff\1\1\1\67\1\72\1\42\1\10\1\51\1\52\1\26\1\46\3\uffff\1\37\1"+
+		"\34\4\uffff\1\6\34\uffff\1\32\1\33\1\22\1\14\1\7\1\76\3\uffff\1\50\1\15"+
+		"\1\13\1\64\1\70\1\16\1\74\4\uffff\1\36\12\uffff\1\23\13\uffff\1\21\1\uffff"+
+		"\1\30\1\uffff\1\61}>";
 	static final String[] DFA17_transitionS = {
 			"\1\16\1\14\4\uffff\1\22\1\uffff\1\11\1\uffff\1\7\5\uffff\1\22\2\uffff"+
 			"\1\24\26\uffff\1\10\2\uffff\1\17\1\3\1\4\1\2\11\uffff\1\1\3\uffff\1\26"+
@@ -15137,6 +15340,92 @@ public class FTSParser extends Parser {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
+						int LA17_102 = input.LA(1);
+						 
+						int index17_102 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_102==COLON) ) {s = 118;}
+						else if ( (LA17_102==COMMA||LA17_102==DOT) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_102==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_102==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_102==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_102==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_102==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_102==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_102==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_102==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_102==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_102==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_102==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_102==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_102==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_102==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_102==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_102==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_102==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_102==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_102==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_102==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_102==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_102==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_102==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_102==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_102==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_102==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_102==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_102==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_102==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_102==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_102);
+						if ( s>=0 ) return s;
+						break;
+
+					case 1 : 
+						int LA17_105 = input.LA(1);
+						 
+						int index17_105 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_105==COLON) ) {s = 118;}
+						else if ( (LA17_105==COMMA||LA17_105==DOT) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_105==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_105==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_105==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_105==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_105==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_105==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_105==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_105==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_105==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_105==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_105==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_105==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_105==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_105==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_105==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_105==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_105==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_105==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_105==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_105==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_105==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_105==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_105==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_105==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_105==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_105==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_105==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_105==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_105==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_105==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_105);
+						if ( s>=0 ) return s;
+						break;
+
+					case 2 : 
 						int LA17_60 = input.LA(1);
 						 
 						int index17_60 = input.index();
@@ -15180,114 +15469,92 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 1 : 
-						int LA17_172 = input.LA(1);
-						 
-						int index17_172 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_172==ID) ) {s = 83;}
-						else if ( (LA17_172==FTSWORD) ) {s = 84;}
-						else if ( (LA17_172==FTSPRE) ) {s = 85;}
-						else if ( (LA17_172==FTSWILD) ) {s = 86;}
-						else if ( (LA17_172==NOT) ) {s = 87;}
-						else if ( (LA17_172==TO) ) {s = 88;}
-						else if ( (LA17_172==DECIMAL_INTEGER_LITERAL) ) {s = 89;}
-						else if ( (LA17_172==FLOATING_POINT_LITERAL) ) {s = 90;}
-						else if ( (LA17_172==DATETIME) ) {s = 91;}
-						else if ( (LA17_172==STAR) ) {s = 197;}
-						else if ( (LA17_172==URI) ) {s = 93;}
-						else if ( (LA17_172==CARAT) && (synpred5_FTS())) {s = 97;}
-						else if ( (LA17_172==AND) && (synpred5_FTS())) {s = 98;}
-						else if ( (LA17_172==AMP) && (synpred5_FTS())) {s = 99;}
-						else if ( (LA17_172==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_172==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_172==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_172==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_172==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_172==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_172==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_172==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_172==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_172==COMMA||LA17_172==DOT) && (synpred5_FTS())) {s = 69;}
-						else if ( (LA17_172==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_172==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_172==TILDA) && (synpred5_FTS())) {s = 198;}
-						else if ( (LA17_172==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_172==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_172==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_172==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_172);
-						if ( s>=0 ) return s;
-						break;
-
-					case 2 : 
-						int LA17_84 = input.LA(1);
-						 
-						int index17_84 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 151;}
-						 
-						input.seek(index17_84);
-						if ( s>=0 ) return s;
-						break;
-
 					case 3 : 
-						int LA17_3 = input.LA(1);
+						int LA17_101 = input.LA(1);
 						 
-						int index17_3 = input.index();
+						int index17_101 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_3==STAR) ) {s = 25;}
-						else if ( (LA17_3==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_3==COMMA||LA17_3==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_3==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_3==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_3==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_3==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_3==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_3==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_3==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_3==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_3==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_3==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_3==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_3==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_3==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_3==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_3==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_3==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_3==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_3==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_3==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_3==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_3==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_3==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_3==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_3==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_3==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_3==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_3==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_3==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_3==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (LA17_101==DOT) ) {s = 157;}
+						else if ( (LA17_101==COLON) ) {s = 118;}
+						else if ( (LA17_101==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_101==COMMA) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_101==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_101==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_101==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_101==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_101==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_101==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_101==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_101==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_101==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_101==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_101==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_101==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_101==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_101==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_101==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_101==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_101==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_101==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_101==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_101==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_101==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_101==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_101==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_101==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_101==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_101==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_101==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_101==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_101==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_101==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_3);
+						input.seek(index17_101);
 						if ( s>=0 ) return s;
 						break;
 
 					case 4 : 
-						int LA17_152 = input.LA(1);
+						int LA17_59 = input.LA(1);
 						 
-						int index17_152 = input.index();
+						int index17_59 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 182;}
+						if ( (LA17_59==STAR) ) {s = 25;}
+						else if ( (LA17_59==COLON) ) {s = 118;}
+						else if ( (LA17_59==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_59==COMMA||LA17_59==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_59==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_59==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_59==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_59==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_59==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_59==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_59==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_59==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_59==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_59==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_59==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_59==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_59==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_59==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_59==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_59==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_59==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_59==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_59==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_59==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_59==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_59==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_59==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_59==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_59==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_59==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_59==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_59==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_59==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_152);
+						input.seek(index17_59);
 						if ( s>=0 ) return s;
 						break;
 
@@ -15336,332 +15603,6 @@ public class FTSParser extends Parser {
 						break;
 
 					case 6 : 
-						int LA17_2 = input.LA(1);
-						 
-						int index17_2 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_2==STAR) ) {s = 25;}
-						else if ( (LA17_2==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_2==COMMA||LA17_2==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_2==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_2==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_2==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_2==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_2==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_2==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_2==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_2==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_2==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_2==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_2==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_2==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_2==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_2==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_2==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_2==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_2==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_2==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_2==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_2==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_2==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_2==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_2==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_2==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_2==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_2==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_2==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_2==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_2==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_2);
-						if ( s>=0 ) return s;
-						break;
-
-					case 7 : 
-						int LA17_4 = input.LA(1);
-						 
-						int index17_4 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_4==STAR) ) {s = 25;}
-						else if ( (LA17_4==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_4==COMMA||LA17_4==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_4==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_4==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_4==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_4==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_4==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_4==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_4==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_4==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_4==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_4==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_4==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_4==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_4==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_4==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_4==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_4==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_4==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_4==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_4==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_4==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_4==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_4==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_4==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_4==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_4==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_4==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_4==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_4==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_4==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_4);
-						if ( s>=0 ) return s;
-						break;
-
-					case 8 : 
-						int LA17_5 = input.LA(1);
-						 
-						int index17_5 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_5==STAR) ) {s = 25;}
-						else if ( (LA17_5==COLON) ) {s = 26;}
-						else if ( (LA17_5==COMMA||LA17_5==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_5==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_5==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_5==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_5==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_5==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_5==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_5==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_5==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_5==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_5==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_5==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_5==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_5==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_5==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_5==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_5==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_5==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_5==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_5==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_5==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_5==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_5==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_5==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_5==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_5==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_5==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_5==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_5==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_5==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_5);
-						if ( s>=0 ) return s;
-						break;
-
-					case 9 : 
-						int LA17_117 = input.LA(1);
-						 
-						int index17_117 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_117==ID) ) {s = 166;}
-						else if ( (LA17_117==FTSWORD) && (synpred5_FTS())) {s = 71;}
-						else if ( (LA17_117==FTSPRE) && (synpred5_FTS())) {s = 72;}
-						else if ( (LA17_117==FTSWILD) && (synpred5_FTS())) {s = 73;}
-						else if ( (LA17_117==NOT) && (synpred5_FTS())) {s = 74;}
-						else if ( (LA17_117==TO) && (synpred5_FTS())) {s = 75;}
-						else if ( (LA17_117==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 76;}
-						else if ( (LA17_117==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 77;}
-						else if ( (LA17_117==STAR) && (synpred5_FTS())) {s = 78;}
-						else if ( (LA17_117==QUESTION_MARK) && (synpred5_FTS())) {s = 79;}
-						else if ( (LA17_117==DATETIME) && (synpred5_FTS())) {s = 80;}
-						else if ( (LA17_117==URI) && (synpred5_FTS())) {s = 81;}
-						else if ( (LA17_117==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_117==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_117==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_117==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_117==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_117==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_117==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_117==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_117==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_117==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_117==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_117==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_117==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_117==COMMA||LA17_117==DOT) && (synpred5_FTS())) {s = 69;}
-						else if ( (LA17_117==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_117==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_117==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_117==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_117==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_117);
-						if ( s>=0 ) return s;
-						break;
-
-					case 10 : 
-						int LA17_85 = input.LA(1);
-						 
-						int index17_85 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 151;}
-						 
-						input.seek(index17_85);
-						if ( s>=0 ) return s;
-						break;
-
-					case 11 : 
-						int LA17_156 = input.LA(1);
-						 
-						int index17_156 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 182;}
-						 
-						input.seek(index17_156);
-						if ( s>=0 ) return s;
-						break;
-
-					case 12 : 
-						int LA17_1 = input.LA(1);
-						 
-						int index17_1 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_1==DOT) ) {s = 24;}
-						else if ( (LA17_1==STAR) ) {s = 25;}
-						else if ( (LA17_1==COLON) ) {s = 26;}
-						else if ( (LA17_1==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_1==COMMA) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_1==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_1==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_1==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_1==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_1==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_1==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_1==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_1==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_1==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_1==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_1==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_1==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_1==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_1==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_1==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_1==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_1==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_1==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_1==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_1==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_1==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_1==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_1==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_1==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_1==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_1==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_1==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_1==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_1==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_1);
-						if ( s>=0 ) return s;
-						break;
-
-					case 13 : 
-						int LA17_59 = input.LA(1);
-						 
-						int index17_59 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_59==STAR) ) {s = 25;}
-						else if ( (LA17_59==COLON) ) {s = 118;}
-						else if ( (LA17_59==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_59==COMMA||LA17_59==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_59==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_59==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_59==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_59==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_59==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_59==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_59==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_59==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_59==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_59==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_59==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_59==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_59==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_59==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_59==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_59==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_59==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_59==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_59==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_59==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_59==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_59==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_59==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_59==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_59==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_59==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_59==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_59==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_59==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_59);
-						if ( s>=0 ) return s;
-						break;
-
-					case 14 : 
-						int LA17_82 = input.LA(1);
-						 
-						int index17_82 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_82==DECIMAL_INTEGER_LITERAL) ) {s = 123;}
-						else if ( (LA17_82==RPAREN) && (synpred2_FTS())) {s = 124;}
-						else if ( (LA17_82==COMMA||LA17_82==DOT) && (synpred5_FTS())) {s = 125;}
-						else if ( (LA17_82==ID) && (synpred5_FTS())) {s = 126;}
-						else if ( (LA17_82==FTSWORD) && (synpred5_FTS())) {s = 127;}
-						else if ( (LA17_82==FTSPRE) && (synpred5_FTS())) {s = 128;}
-						else if ( (LA17_82==FTSWILD) && (synpred5_FTS())) {s = 129;}
-						else if ( (LA17_82==NOT) && (synpred5_FTS())) {s = 130;}
-						else if ( (LA17_82==TO) && (synpred5_FTS())) {s = 131;}
-						else if ( (LA17_82==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 132;}
-						else if ( (LA17_82==STAR) && (synpred5_FTS())) {s = 133;}
-						else if ( (LA17_82==QUESTION_MARK) && (synpred5_FTS())) {s = 134;}
-						else if ( (LA17_82==DATETIME) && (synpred5_FTS())) {s = 135;}
-						else if ( (LA17_82==URI) && (synpred5_FTS())) {s = 136;}
-						else if ( (LA17_82==FTSPHRASE) && (synpred5_FTS())) {s = 137;}
-						else if ( (LA17_82==MINUS) && (synpred5_FTS())) {s = 138;}
-						else if ( (LA17_82==AND) && (synpred5_FTS())) {s = 139;}
-						else if ( (LA17_82==AMP) && (synpred5_FTS())) {s = 140;}
-						else if ( (LA17_82==EXCLAMATION) && (synpred5_FTS())) {s = 141;}
-						else if ( (LA17_82==AT) && (synpred5_FTS())) {s = 142;}
-						else if ( (LA17_82==OR) && (synpred5_FTS())) {s = 143;}
-						else if ( (LA17_82==LSQUARE) && (synpred5_FTS())) {s = 144;}
-						else if ( (LA17_82==LT) && (synpred5_FTS())) {s = 145;}
-						else if ( (LA17_82==EQUALS) && (synpred5_FTS())) {s = 146;}
-						else if ( (LA17_82==TILDA) && (synpred5_FTS())) {s = 147;}
-						else if ( (LA17_82==LPAREN) && (synpred5_FTS())) {s = 148;}
-						else if ( (LA17_82==PERCENT) && (synpred5_FTS())) {s = 149;}
-						else if ( (LA17_82==PLUS) && (synpred5_FTS())) {s = 150;}
-						else if ( (LA17_82==BAR) && (synpred5_FTS())) {s = 151;}
-						 
-						input.seek(index17_82);
-						if ( s>=0 ) return s;
-						break;
-
-					case 15 : 
 						int LA17_123 = input.LA(1);
 						 
 						int index17_123 = input.index();
@@ -15703,170 +15644,63 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 16 : 
-						int LA17_6 = input.LA(1);
+					case 7 : 
+						int LA17_156 = input.LA(1);
 						 
-						int index17_6 = input.index();
+						int index17_156 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_6==STAR) ) {s = 25;}
-						else if ( (LA17_6==COLON) ) {s = 26;}
-						else if ( (LA17_6==COMMA||LA17_6==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_6==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_6==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_6==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_6==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_6==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_6==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_6==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_6==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_6==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_6==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_6==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_6==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_6==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_6==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_6==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_6==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_6==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_6==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_6==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_6==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_6==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_6==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_6==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_6==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_6==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_6==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_6==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_6==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_6==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 182;}
 						 
-						input.seek(index17_6);
+						input.seek(index17_156);
 						if ( s>=0 ) return s;
 						break;
 
-					case 17 : 
-						int LA17_0 = input.LA(1);
+					case 8 : 
+						int LA17_109 = input.LA(1);
 						 
-						int index17_0 = input.index();
+						int index17_109 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_0==ID) ) {s = 1;}
-						else if ( (LA17_0==FTSWORD) ) {s = 2;}
-						else if ( (LA17_0==FTSPRE) ) {s = 3;}
-						else if ( (LA17_0==FTSWILD) ) {s = 4;}
-						else if ( (LA17_0==NOT) ) {s = 5;}
-						else if ( (LA17_0==TO) ) {s = 6;}
-						else if ( (LA17_0==DECIMAL_INTEGER_LITERAL) ) {s = 7;}
-						else if ( (LA17_0==FLOATING_POINT_LITERAL) ) {s = 8;}
-						else if ( (LA17_0==DATETIME) ) {s = 9;}
-						else if ( (LA17_0==STAR) ) {s = 10;}
-						else if ( (LA17_0==URI) ) {s = 11;}
-						else if ( (LA17_0==AT) ) {s = 12;}
-						else if ( (LA17_0==OR) ) {s = 13;}
-						else if ( (LA17_0==AND) ) {s = 14;}
-						else if ( (LA17_0==FTSPHRASE) ) {s = 15;}
-						else if ( (LA17_0==LSQUARE) && (synpred3_FTS())) {s = 16;}
-						else if ( (LA17_0==LT) && (synpred3_FTS())) {s = 17;}
-						else if ( (LA17_0==COMMA||LA17_0==DOT) && (synpred5_FTS())) {s = 18;}
-						else if ( (LA17_0==QUESTION_MARK) && (synpred5_FTS())) {s = 19;}
-						else if ( (LA17_0==EQUALS) && (synpred6_FTS())) {s = 20;}
-						else if ( (LA17_0==TILDA) && (synpred7_FTS())) {s = 21;}
-						else if ( (LA17_0==LPAREN) ) {s = 22;}
-						else if ( (LA17_0==PERCENT) ) {s = 23;}
+						if ( (LA17_109==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_109==TILDA) && (synpred5_FTS())) {s = 160;}
+						else if ( (LA17_109==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_109==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_109==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_109==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_109==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_109==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_109==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_109==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_109==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_109==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_109==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_109==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_109==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_109==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_109==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_109==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_109==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_109==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_109==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_109==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_109==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_109==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_109==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_109==COMMA||LA17_109==DOT) && (synpred5_FTS())) {s = 69;}
+						else if ( (LA17_109==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_109==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_109==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_109==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_109==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_109==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_0);
+						input.seek(index17_109);
 						if ( s>=0 ) return s;
 						break;
 
-					case 18 : 
-						int LA17_7 = input.LA(1);
-						 
-						int index17_7 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_7==STAR) ) {s = 25;}
-						else if ( (LA17_7==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_7==COMMA||LA17_7==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_7==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_7==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_7==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_7==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_7==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_7==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_7==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_7==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_7==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_7==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_7==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_7==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_7==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_7==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_7==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_7==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_7==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_7==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_7==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_7==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_7==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_7==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_7==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_7==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_7==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_7==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_7==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_7==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_7==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_7);
-						if ( s>=0 ) return s;
-						break;
-
-					case 19 : 
-						int LA17_164 = input.LA(1);
-						 
-						int index17_164 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_164==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_164==COMMA||LA17_164==DOT) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_164==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_164==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_164==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_164==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_164==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_164==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_164==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_164==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_164==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_164==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_164==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_164==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_164==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_164==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_164==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_164==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_164==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_164==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_164==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_164==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_164==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_164==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_164==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_164==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_164==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_164==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_164==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_164==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_164==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_164==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_164);
-						if ( s>=0 ) return s;
-						break;
-
-					case 20 : 
+					case 9 : 
 						int LA17_86 = input.LA(1);
 						 
 						int index17_86 = input.index();
@@ -15879,92 +15713,20 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 21 : 
-						int LA17_25 = input.LA(1);
+					case 10 : 
+						int LA17_88 = input.LA(1);
 						 
-						int index17_25 = input.index();
+						int index17_88 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_25==LPAREN) ) {s = 82;}
-						else if ( (LA17_25==ID) ) {s = 83;}
-						else if ( (LA17_25==FTSWORD) ) {s = 84;}
-						else if ( (LA17_25==FTSPRE) ) {s = 85;}
-						else if ( (LA17_25==FTSWILD) ) {s = 86;}
-						else if ( (LA17_25==NOT) ) {s = 87;}
-						else if ( (LA17_25==TO) ) {s = 88;}
-						else if ( (LA17_25==DECIMAL_INTEGER_LITERAL) ) {s = 89;}
-						else if ( (LA17_25==FLOATING_POINT_LITERAL) ) {s = 90;}
-						else if ( (LA17_25==DATETIME) ) {s = 91;}
-						else if ( (LA17_25==STAR) ) {s = 92;}
-						else if ( (LA17_25==URI) ) {s = 93;}
-						else if ( (LA17_25==DOTDOT) && (synpred5_FTS())) {s = 94;}
-						else if ( (LA17_25==COMMA||LA17_25==DOT) && (synpred5_FTS())) {s = 95;}
-						else if ( (LA17_25==TILDA) && (synpred5_FTS())) {s = 96;}
-						else if ( (LA17_25==CARAT) && (synpred5_FTS())) {s = 97;}
-						else if ( (LA17_25==AND) && (synpred5_FTS())) {s = 98;}
-						else if ( (LA17_25==AMP) && (synpred5_FTS())) {s = 99;}
-						else if ( (LA17_25==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_25==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_25==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_25==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_25==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_25==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_25==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_25==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_25==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_25==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_25==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_25==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_25==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_25==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 151;}
 						 
-						input.seek(index17_25);
+						input.seek(index17_88);
 						if ( s>=0 ) return s;
 						break;
 
-					case 22 : 
-						int LA17_195 = input.LA(1);
-						 
-						int index17_195 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_195==ID) ) {s = 199;}
-						else if ( (LA17_195==FTSWORD) && (synpred5_FTS())) {s = 184;}
-						else if ( (LA17_195==FTSPRE) && (synpred5_FTS())) {s = 185;}
-						else if ( (LA17_195==FTSWILD) && (synpred5_FTS())) {s = 186;}
-						else if ( (LA17_195==NOT) && (synpred5_FTS())) {s = 187;}
-						else if ( (LA17_195==TO) && (synpred5_FTS())) {s = 188;}
-						else if ( (LA17_195==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 189;}
-						else if ( (LA17_195==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 190;}
-						else if ( (LA17_195==STAR) && (synpred5_FTS())) {s = 191;}
-						else if ( (LA17_195==QUESTION_MARK) && (synpred5_FTS())) {s = 192;}
-						else if ( (LA17_195==DATETIME) && (synpred5_FTS())) {s = 193;}
-						else if ( (LA17_195==URI) && (synpred5_FTS())) {s = 194;}
-						else if ( (LA17_195==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_195==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_195==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_195==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_195==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_195==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_195==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_195==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_195==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_195==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_195==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_195==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_195==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_195==COMMA||LA17_195==DOT) && (synpred5_FTS())) {s = 69;}
-						else if ( (LA17_195==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_195==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_195==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_195==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_195==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_195);
-						if ( s>=0 ) return s;
-						break;
-
-					case 23 : 
+					case 11 : 
 						int LA17_163 = input.LA(1);
 						 
 						int index17_163 = input.index();
@@ -16007,50 +15769,20 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 24 : 
-						int LA17_15 = input.LA(1);
+					case 12 : 
+						int LA17_155 = input.LA(1);
 						 
-						int index17_15 = input.index();
+						int index17_155 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_15==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_15==TILDA) && (synpred5_FTS())) {s = 67;}
-						else if ( (LA17_15==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_15==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_15==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_15==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_15==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_15==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_15==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_15==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_15==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_15==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_15==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_15==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_15==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_15==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_15==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_15==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_15==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_15==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_15==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_15==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_15==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_15==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_15==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_15==COMMA||LA17_15==DOT) && (synpred5_FTS())) {s = 69;}
-						else if ( (LA17_15==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_15==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_15==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_15==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_15==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_15==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 182;}
 						 
-						input.seek(index17_15);
+						input.seek(index17_155);
 						if ( s>=0 ) return s;
 						break;
 
-					case 25 : 
+					case 13 : 
 						int LA17_162 = input.LA(1);
 						 
 						int index17_162 = input.index();
@@ -16093,107 +15825,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 26 : 
-						int LA17_8 = input.LA(1);
-						 
-						int index17_8 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_8==STAR) ) {s = 25;}
-						else if ( (LA17_8==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_8==COMMA||LA17_8==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_8==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_8==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_8==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_8==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_8==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_8==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_8==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_8==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_8==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_8==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_8==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_8==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_8==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_8==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_8==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_8==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_8==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_8==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_8==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_8==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_8==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_8==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_8==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_8==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_8==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_8==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_8==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_8==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_8==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_8);
-						if ( s>=0 ) return s;
-						break;
-
-					case 27 : 
-						int LA17_83 = input.LA(1);
-						 
-						int index17_83 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 151;}
-						 
-						input.seek(index17_83);
-						if ( s>=0 ) return s;
-						break;
-
-					case 28 : 
-						int LA17_161 = input.LA(1);
-						 
-						int index17_161 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_161==DOT) ) {s = 195;}
-						else if ( (LA17_161==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_161==COMMA) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_161==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_161==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_161==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_161==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_161==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_161==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_161==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_161==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_161==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_161==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_161==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_161==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_161==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_161==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_161==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_161==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_161==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_161==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_161==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_161==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_161==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_161==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_161==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_161==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_161==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_161==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_161==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_161==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_161==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_161==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_161);
-						if ( s>=0 ) return s;
-						break;
-
-					case 29 : 
+					case 14 : 
 						int LA17_166 = input.LA(1);
 						 
 						int index17_166 = input.index();
@@ -16208,235 +15840,185 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 30 : 
-						int LA17_10 = input.LA(1);
+					case 15 : 
+						int LA17_82 = input.LA(1);
 						 
-						int index17_10 = input.index();
+						int index17_82 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_10==STAR) ) {s = 25;}
-						else if ( (LA17_10==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_10==COMMA||LA17_10==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_10==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_10==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_10==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_10==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_10==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_10==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_10==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_10==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_10==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_10==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_10==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_10==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_10==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_10==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_10==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_10==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_10==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_10==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_10==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_10==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_10==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_10==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_10==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_10==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_10==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_10==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_10==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_10==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_10==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (LA17_82==DECIMAL_INTEGER_LITERAL) ) {s = 123;}
+						else if ( (LA17_82==RPAREN) && (synpred2_FTS())) {s = 124;}
+						else if ( (LA17_82==COMMA||LA17_82==DOT) && (synpred5_FTS())) {s = 125;}
+						else if ( (LA17_82==ID) && (synpred5_FTS())) {s = 126;}
+						else if ( (LA17_82==FTSWORD) && (synpred5_FTS())) {s = 127;}
+						else if ( (LA17_82==FTSPRE) && (synpred5_FTS())) {s = 128;}
+						else if ( (LA17_82==FTSWILD) && (synpred5_FTS())) {s = 129;}
+						else if ( (LA17_82==NOT) && (synpred5_FTS())) {s = 130;}
+						else if ( (LA17_82==TO) && (synpred5_FTS())) {s = 131;}
+						else if ( (LA17_82==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 132;}
+						else if ( (LA17_82==STAR) && (synpred5_FTS())) {s = 133;}
+						else if ( (LA17_82==QUESTION_MARK) && (synpred5_FTS())) {s = 134;}
+						else if ( (LA17_82==DATETIME) && (synpred5_FTS())) {s = 135;}
+						else if ( (LA17_82==URI) && (synpred5_FTS())) {s = 136;}
+						else if ( (LA17_82==FTSPHRASE) && (synpred5_FTS())) {s = 137;}
+						else if ( (LA17_82==MINUS) && (synpred5_FTS())) {s = 138;}
+						else if ( (LA17_82==AND) && (synpred5_FTS())) {s = 139;}
+						else if ( (LA17_82==AMP) && (synpred5_FTS())) {s = 140;}
+						else if ( (LA17_82==EXCLAMATION) && (synpred5_FTS())) {s = 141;}
+						else if ( (LA17_82==AT) && (synpred5_FTS())) {s = 142;}
+						else if ( (LA17_82==OR) && (synpred5_FTS())) {s = 143;}
+						else if ( (LA17_82==LSQUARE) && (synpred5_FTS())) {s = 144;}
+						else if ( (LA17_82==LT) && (synpred5_FTS())) {s = 145;}
+						else if ( (LA17_82==EQUALS) && (synpred5_FTS())) {s = 146;}
+						else if ( (LA17_82==TILDA) && (synpred5_FTS())) {s = 147;}
+						else if ( (LA17_82==LPAREN) && (synpred5_FTS())) {s = 148;}
+						else if ( (LA17_82==PERCENT) && (synpred5_FTS())) {s = 149;}
+						else if ( (LA17_82==PLUS) && (synpred5_FTS())) {s = 150;}
+						else if ( (LA17_82==BAR) && (synpred5_FTS())) {s = 151;}
 						 
-						input.seek(index17_10);
+						input.seek(index17_82);
 						if ( s>=0 ) return s;
 						break;
 
-					case 31 : 
-						int LA17_102 = input.LA(1);
+					case 16 : 
+						int LA17_25 = input.LA(1);
 						 
-						int index17_102 = input.index();
+						int index17_25 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_102==COLON) ) {s = 118;}
-						else if ( (LA17_102==COMMA||LA17_102==DOT) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_102==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_102==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_102==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_102==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_102==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_102==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_102==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_102==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_102==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_102==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_102==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_102==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_102==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_102==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_102==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_102==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_102==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_102==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_102==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_102==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_102==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_102==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_102==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_102==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_102==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_102==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_102==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_102==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_102==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_102==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (LA17_25==LPAREN) ) {s = 82;}
+						else if ( (LA17_25==ID) ) {s = 83;}
+						else if ( (LA17_25==FTSWORD) ) {s = 84;}
+						else if ( (LA17_25==FTSPRE) ) {s = 85;}
+						else if ( (LA17_25==FTSWILD) ) {s = 86;}
+						else if ( (LA17_25==NOT) ) {s = 87;}
+						else if ( (LA17_25==TO) ) {s = 88;}
+						else if ( (LA17_25==DECIMAL_INTEGER_LITERAL) ) {s = 89;}
+						else if ( (LA17_25==FLOATING_POINT_LITERAL) ) {s = 90;}
+						else if ( (LA17_25==DATETIME) ) {s = 91;}
+						else if ( (LA17_25==STAR) ) {s = 92;}
+						else if ( (LA17_25==URI) ) {s = 93;}
+						else if ( (LA17_25==DOTDOT) && (synpred5_FTS())) {s = 94;}
+						else if ( (LA17_25==COMMA||LA17_25==DOT) && (synpred5_FTS())) {s = 95;}
+						else if ( (LA17_25==TILDA) && (synpred5_FTS())) {s = 96;}
+						else if ( (LA17_25==CARAT) && (synpred5_FTS())) {s = 97;}
+						else if ( (LA17_25==AND) && (synpred5_FTS())) {s = 98;}
+						else if ( (LA17_25==AMP) && (synpred5_FTS())) {s = 99;}
+						else if ( (LA17_25==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_25==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_25==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_25==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_25==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_25==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_25==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_25==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_25==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_25==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_25==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_25==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_25==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_25==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_102);
+						input.seek(index17_25);
 						if ( s>=0 ) return s;
 						break;
 
-					case 32 : 
-						int LA17_105 = input.LA(1);
+					case 17 : 
+						int LA17_195 = input.LA(1);
 						 
-						int index17_105 = input.index();
+						int index17_195 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_105==COLON) ) {s = 118;}
-						else if ( (LA17_105==COMMA||LA17_105==DOT) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_105==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_105==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_105==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_105==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_105==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_105==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_105==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_105==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_105==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_105==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_105==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_105==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_105==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_105==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_105==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_105==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_105==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_105==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_105==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_105==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_105==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_105==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_105==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_105==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_105==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_105==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_105==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_105==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_105==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_105==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (LA17_195==ID) ) {s = 199;}
+						else if ( (LA17_195==FTSWORD) && (synpred5_FTS())) {s = 184;}
+						else if ( (LA17_195==FTSPRE) && (synpred5_FTS())) {s = 185;}
+						else if ( (LA17_195==FTSWILD) && (synpred5_FTS())) {s = 186;}
+						else if ( (LA17_195==NOT) && (synpred5_FTS())) {s = 187;}
+						else if ( (LA17_195==TO) && (synpred5_FTS())) {s = 188;}
+						else if ( (LA17_195==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 189;}
+						else if ( (LA17_195==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 190;}
+						else if ( (LA17_195==STAR) && (synpred5_FTS())) {s = 191;}
+						else if ( (LA17_195==QUESTION_MARK) && (synpred5_FTS())) {s = 192;}
+						else if ( (LA17_195==DATETIME) && (synpred5_FTS())) {s = 193;}
+						else if ( (LA17_195==URI) && (synpred5_FTS())) {s = 194;}
+						else if ( (LA17_195==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_195==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_195==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_195==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_195==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_195==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_195==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_195==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_195==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_195==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_195==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_195==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_195==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_195==COMMA||LA17_195==DOT) && (synpred5_FTS())) {s = 69;}
+						else if ( (LA17_195==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_195==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_195==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_195==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_195==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_105);
+						input.seek(index17_195);
 						if ( s>=0 ) return s;
 						break;
 
-					case 33 : 
-						int LA17_165 = input.LA(1);
+					case 18 : 
+						int LA17_154 = input.LA(1);
 						 
-						int index17_165 = input.index();
+						int index17_154 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_165==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_165==COMMA||LA17_165==DOT) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_165==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_165==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_165==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_165==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_165==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_165==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_165==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_165==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_165==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_165==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_165==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_165==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_165==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_165==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_165==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_165==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_165==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_165==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_165==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_165==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_165==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_165==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_165==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_165==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_165==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_165==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_165==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_165==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_165==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_165==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 182;}
 						 
-						input.seek(index17_165);
+						input.seek(index17_154);
 						if ( s>=0 ) return s;
 						break;
 
-					case 34 : 
-						int LA17_9 = input.LA(1);
+					case 19 : 
+						int LA17_183 = input.LA(1);
 						 
-						int index17_9 = input.index();
+						int index17_183 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_9==STAR) ) {s = 25;}
-						else if ( (LA17_9==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_9==COMMA||LA17_9==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_9==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_9==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_9==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_9==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_9==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_9==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_9==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_9==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_9==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_9==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_9==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_9==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_9==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_9==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_9==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_9==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_9==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_9==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_9==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_9==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_9==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_9==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_9==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_9==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_9==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_9==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_9==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_9==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_9==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (synpred3_FTS()) ) {s = 27;}
+						else if ( (synpred4_FTS()) ) {s = 100;}
+						else if ( (synpred5_FTS()) ) {s = 198;}
 						 
-						input.seek(index17_9);
+						input.seek(index17_183);
 						if ( s>=0 ) return s;
 						break;
 
-					case 35 : 
-						int LA17_90 = input.LA(1);
+					case 20 : 
+						int LA17_92 = input.LA(1);
 						 
-						int index17_90 = input.index();
+						int index17_92 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred2_FTS()) ) {s = 124;}
 						else if ( (synpred5_FTS()) ) {s = 151;}
 						 
-						input.seek(index17_90);
+						input.seek(index17_92);
 						if ( s>=0 ) return s;
 						break;
 
-					case 36 : 
+					case 21 : 
+						int LA17_89 = input.LA(1);
+						 
+						int index17_89 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 151;}
+						 
+						input.seek(index17_89);
+						if ( s>=0 ) return s;
+						break;
+
+					case 22 : 
 						int LA17_112 = input.LA(1);
 						 
 						int index17_112 = input.index();
@@ -16479,7 +16061,103 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 37 : 
+					case 23 : 
+						int LA17_62 = input.LA(1);
+						 
+						int index17_62 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_62==STAR) ) {s = 25;}
+						else if ( (LA17_62==COLON) ) {s = 118;}
+						else if ( (LA17_62==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_62==COMMA||LA17_62==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_62==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_62==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_62==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_62==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_62==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_62==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_62==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_62==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_62==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_62==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_62==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_62==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_62==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_62==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_62==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_62==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_62==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_62==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_62==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_62==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_62==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_62==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_62==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_62==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_62==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_62==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_62==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_62==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_62==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_62);
+						if ( s>=0 ) return s;
+						break;
+
+					case 24 : 
+						int LA17_197 = input.LA(1);
+						 
+						int index17_197 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 198;}
+						 
+						input.seek(index17_197);
+						if ( s>=0 ) return s;
+						break;
+
+					case 25 : 
+						int LA17_91 = input.LA(1);
+						 
+						int index17_91 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 151;}
+						 
+						input.seek(index17_91);
+						if ( s>=0 ) return s;
+						break;
+
+					case 26 : 
+						int LA17_152 = input.LA(1);
+						 
+						int index17_152 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 182;}
+						 
+						input.seek(index17_152);
+						if ( s>=0 ) return s;
+						break;
+
+					case 27 : 
+						int LA17_153 = input.LA(1);
+						 
+						int index17_153 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 182;}
+						 
+						input.seek(index17_153);
+						if ( s>=0 ) return s;
+						break;
+
+					case 28 : 
 						int LA17_118 = input.LA(1);
 						 
 						int index17_118 = input.index();
@@ -16507,20 +16185,324 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 38 : 
-						int LA17_199 = input.LA(1);
+					case 29 : 
+						int LA17_90 = input.LA(1);
 						 
-						int index17_199 = input.index();
+						int index17_90 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred3_FTS()) ) {s = 27;}
-						else if ( (synpred5_FTS()) ) {s = 198;}
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 151;}
 						 
-						input.seek(index17_199);
+						input.seek(index17_90);
 						if ( s>=0 ) return s;
 						break;
 
-					case 39 : 
+					case 30 : 
+						int LA17_172 = input.LA(1);
+						 
+						int index17_172 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_172==ID) ) {s = 83;}
+						else if ( (LA17_172==FTSWORD) ) {s = 84;}
+						else if ( (LA17_172==FTSPRE) ) {s = 85;}
+						else if ( (LA17_172==FTSWILD) ) {s = 86;}
+						else if ( (LA17_172==NOT) ) {s = 87;}
+						else if ( (LA17_172==TO) ) {s = 88;}
+						else if ( (LA17_172==DECIMAL_INTEGER_LITERAL) ) {s = 89;}
+						else if ( (LA17_172==FLOATING_POINT_LITERAL) ) {s = 90;}
+						else if ( (LA17_172==DATETIME) ) {s = 91;}
+						else if ( (LA17_172==STAR) ) {s = 197;}
+						else if ( (LA17_172==URI) ) {s = 93;}
+						else if ( (LA17_172==CARAT) && (synpred5_FTS())) {s = 97;}
+						else if ( (LA17_172==AND) && (synpred5_FTS())) {s = 98;}
+						else if ( (LA17_172==AMP) && (synpred5_FTS())) {s = 99;}
+						else if ( (LA17_172==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_172==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_172==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_172==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_172==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_172==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_172==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_172==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_172==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_172==COMMA||LA17_172==DOT) && (synpred5_FTS())) {s = 69;}
+						else if ( (LA17_172==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_172==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_172==TILDA) && (synpred5_FTS())) {s = 198;}
+						else if ( (LA17_172==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_172==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_172==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_172==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_172);
+						if ( s>=0 ) return s;
+						break;
+
+					case 31 : 
+						int LA17_117 = input.LA(1);
+						 
+						int index17_117 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_117==ID) ) {s = 166;}
+						else if ( (LA17_117==FTSWORD) && (synpred5_FTS())) {s = 71;}
+						else if ( (LA17_117==FTSPRE) && (synpred5_FTS())) {s = 72;}
+						else if ( (LA17_117==FTSWILD) && (synpred5_FTS())) {s = 73;}
+						else if ( (LA17_117==NOT) && (synpred5_FTS())) {s = 74;}
+						else if ( (LA17_117==TO) && (synpred5_FTS())) {s = 75;}
+						else if ( (LA17_117==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 76;}
+						else if ( (LA17_117==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 77;}
+						else if ( (LA17_117==STAR) && (synpred5_FTS())) {s = 78;}
+						else if ( (LA17_117==QUESTION_MARK) && (synpred5_FTS())) {s = 79;}
+						else if ( (LA17_117==DATETIME) && (synpred5_FTS())) {s = 80;}
+						else if ( (LA17_117==URI) && (synpred5_FTS())) {s = 81;}
+						else if ( (LA17_117==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_117==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_117==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_117==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_117==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_117==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_117==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_117==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_117==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_117==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_117==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_117==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_117==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_117==COMMA||LA17_117==DOT) && (synpred5_FTS())) {s = 69;}
+						else if ( (LA17_117==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_117==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_117==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_117==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_117==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_117);
+						if ( s>=0 ) return s;
+						break;
+
+					case 32 : 
+						int LA17_2 = input.LA(1);
+						 
+						int index17_2 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_2==STAR) ) {s = 25;}
+						else if ( (LA17_2==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_2==COMMA||LA17_2==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_2==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_2==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_2==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_2==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_2==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_2==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_2==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_2==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_2==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_2==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_2==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_2==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_2==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_2==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_2==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_2==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_2==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_2==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_2==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_2==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_2==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_2==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_2==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_2==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_2==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_2==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_2==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_2==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_2==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_2);
+						if ( s>=0 ) return s;
+						break;
+
+					case 33 : 
+						int LA17_70 = input.LA(1);
+						 
+						int index17_70 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred3_FTS()) ) {s = 27;}
+						else if ( (synpred4_FTS()) ) {s = 100;}
+						else if ( (synpred5_FTS()) ) {s = 116;}
+						 
+						input.seek(index17_70);
+						if ( s>=0 ) return s;
+						break;
+
+					case 34 : 
+						int LA17_108 = input.LA(1);
+						 
+						int index17_108 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_108==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_108==COMMA||LA17_108==DOT) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_108==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_108==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_108==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_108==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_108==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_108==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_108==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_108==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_108==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_108==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_108==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_108==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_108==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_108==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_108==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_108==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_108==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_108==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_108==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_108==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_108==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_108==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_108==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_108==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_108==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_108==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_108==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_108==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_108==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_108==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_108);
+						if ( s>=0 ) return s;
+						break;
+
+					case 35 : 
+						int LA17_3 = input.LA(1);
+						 
+						int index17_3 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_3==STAR) ) {s = 25;}
+						else if ( (LA17_3==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_3==COMMA||LA17_3==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_3==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_3==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_3==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_3==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_3==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_3==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_3==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_3==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_3==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_3==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_3==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_3==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_3==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_3==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_3==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_3==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_3==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_3==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_3==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_3==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_3==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_3==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_3==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_3==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_3==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_3==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_3==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_3==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_3==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_3);
+						if ( s>=0 ) return s;
+						break;
+
+					case 36 : 
+						int LA17_4 = input.LA(1);
+						 
+						int index17_4 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_4==STAR) ) {s = 25;}
+						else if ( (LA17_4==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_4==COMMA||LA17_4==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_4==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_4==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_4==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_4==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_4==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_4==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_4==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_4==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_4==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_4==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_4==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_4==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_4==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_4==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_4==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_4==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_4==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_4==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_4==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_4==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_4==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_4==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_4==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_4==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_4==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_4==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_4==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_4==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_4==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_4);
+						if ( s>=0 ) return s;
+						break;
+
+					case 37 : 
+						int LA17_0 = input.LA(1);
+						 
+						int index17_0 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_0==ID) ) {s = 1;}
+						else if ( (LA17_0==FTSWORD) ) {s = 2;}
+						else if ( (LA17_0==FTSPRE) ) {s = 3;}
+						else if ( (LA17_0==FTSWILD) ) {s = 4;}
+						else if ( (LA17_0==NOT) ) {s = 5;}
+						else if ( (LA17_0==TO) ) {s = 6;}
+						else if ( (LA17_0==DECIMAL_INTEGER_LITERAL) ) {s = 7;}
+						else if ( (LA17_0==FLOATING_POINT_LITERAL) ) {s = 8;}
+						else if ( (LA17_0==DATETIME) ) {s = 9;}
+						else if ( (LA17_0==STAR) ) {s = 10;}
+						else if ( (LA17_0==URI) ) {s = 11;}
+						else if ( (LA17_0==AT) ) {s = 12;}
+						else if ( (LA17_0==OR) ) {s = 13;}
+						else if ( (LA17_0==AND) ) {s = 14;}
+						else if ( (LA17_0==FTSPHRASE) ) {s = 15;}
+						else if ( (LA17_0==LSQUARE) && (synpred3_FTS())) {s = 16;}
+						else if ( (LA17_0==LT) && (synpred3_FTS())) {s = 17;}
+						else if ( (LA17_0==COMMA||LA17_0==DOT) && (synpred5_FTS())) {s = 18;}
+						else if ( (LA17_0==QUESTION_MARK) && (synpred5_FTS())) {s = 19;}
+						else if ( (LA17_0==EQUALS) && (synpred6_FTS())) {s = 20;}
+						else if ( (LA17_0==TILDA) && (synpred7_FTS())) {s = 21;}
+						else if ( (LA17_0==LPAREN) ) {s = 22;}
+						else if ( (LA17_0==PERCENT) ) {s = 23;}
+						 
+						input.seek(index17_0);
+						if ( s>=0 ) return s;
+						break;
+
+					case 38 : 
 						int LA17_113 = input.LA(1);
 						 
 						int index17_113 = input.index();
@@ -16563,7 +16545,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 40 : 
+					case 39 : 
 						int LA17_58 = input.LA(1);
 						 
 						int index17_58 = input.index();
@@ -16608,88 +16590,51 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
+					case 40 : 
+						int LA17_161 = input.LA(1);
+						 
+						int index17_161 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_161==DOT) ) {s = 195;}
+						else if ( (LA17_161==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_161==COMMA) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_161==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_161==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_161==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_161==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_161==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_161==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_161==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_161==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_161==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_161==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_161==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_161==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_161==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_161==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_161==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_161==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_161==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_161==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_161==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_161==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_161==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_161==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_161==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_161==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_161==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_161==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_161==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_161==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_161==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_161==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_161);
+						if ( s>=0 ) return s;
+						break;
+
 					case 41 : 
-						int LA17_153 = input.LA(1);
-						 
-						int index17_153 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 182;}
-						 
-						input.seek(index17_153);
-						if ( s>=0 ) return s;
-						break;
-
-					case 42 : 
-						int LA17_157 = input.LA(1);
-						 
-						int index17_157 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_157==ID) ) {s = 183;}
-						else if ( (LA17_157==FTSWORD) && (synpred5_FTS())) {s = 184;}
-						else if ( (LA17_157==FTSPRE) && (synpred5_FTS())) {s = 185;}
-						else if ( (LA17_157==FTSWILD) && (synpred5_FTS())) {s = 186;}
-						else if ( (LA17_157==NOT) && (synpred5_FTS())) {s = 187;}
-						else if ( (LA17_157==TO) && (synpred5_FTS())) {s = 188;}
-						else if ( (LA17_157==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 189;}
-						else if ( (LA17_157==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 190;}
-						else if ( (LA17_157==STAR) && (synpred5_FTS())) {s = 191;}
-						else if ( (LA17_157==QUESTION_MARK) && (synpred5_FTS())) {s = 192;}
-						else if ( (LA17_157==DATETIME) && (synpred5_FTS())) {s = 193;}
-						else if ( (LA17_157==URI) && (synpred5_FTS())) {s = 194;}
-						else if ( (LA17_157==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_157==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_157==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_157==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_157==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_157==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_157==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_157==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_157==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_157==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_157==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_157==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_157==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_157==COMMA||LA17_157==DOT) && (synpred5_FTS())) {s = 69;}
-						else if ( (LA17_157==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_157==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_157==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_157==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_157==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_157);
-						if ( s>=0 ) return s;
-						break;
-
-					case 43 : 
-						int LA17_89 = input.LA(1);
-						 
-						int index17_89 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 151;}
-						 
-						input.seek(index17_89);
-						if ( s>=0 ) return s;
-						break;
-
-					case 44 : 
-						int LA17_197 = input.LA(1);
-						 
-						int index17_197 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 198;}
-						 
-						input.seek(index17_197);
-						if ( s>=0 ) return s;
-						break;
-
-					case 45 : 
 						int LA17_110 = input.LA(1);
 						 
 						int index17_110 = input.index();
@@ -16732,20 +16677,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 46 : 
-						int LA17_88 = input.LA(1);
-						 
-						int index17_88 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 151;}
-						 
-						input.seek(index17_88);
-						if ( s>=0 ) return s;
-						break;
-
-					case 47 : 
+					case 42 : 
 						int LA17_111 = input.LA(1);
 						 
 						int index17_111 = input.index();
@@ -16788,234 +16720,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 48 : 
-						int LA17_91 = input.LA(1);
-						 
-						int index17_91 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 151;}
-						 
-						input.seek(index17_91);
-						if ( s>=0 ) return s;
-						break;
-
-					case 49 : 
-						int LA17_108 = input.LA(1);
-						 
-						int index17_108 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_108==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_108==COMMA||LA17_108==DOT) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_108==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_108==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_108==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_108==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_108==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_108==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_108==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_108==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_108==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_108==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_108==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_108==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_108==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_108==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_108==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_108==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_108==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_108==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_108==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_108==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_108==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_108==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_108==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_108==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_108==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_108==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_108==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_108==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_108==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_108==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_108);
-						if ( s>=0 ) return s;
-						break;
-
-					case 50 : 
-						int LA17_92 = input.LA(1);
-						 
-						int index17_92 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 151;}
-						 
-						input.seek(index17_92);
-						if ( s>=0 ) return s;
-						break;
-
-					case 51 : 
-						int LA17_87 = input.LA(1);
-						 
-						int index17_87 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 151;}
-						 
-						input.seek(index17_87);
-						if ( s>=0 ) return s;
-						break;
-
-					case 52 : 
-						int LA17_26 = input.LA(1);
-						 
-						int index17_26 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_26==LPAREN) && (synpred4_FTS())) {s = 100;}
-						else if ( (LA17_26==ID) ) {s = 101;}
-						else if ( (LA17_26==TO) ) {s = 102;}
-						else if ( (LA17_26==OR) ) {s = 103;}
-						else if ( (LA17_26==AND) ) {s = 104;}
-						else if ( (LA17_26==NOT) ) {s = 105;}
-						else if ( (LA17_26==FTSWORD) ) {s = 106;}
-						else if ( (LA17_26==FTSPRE) ) {s = 107;}
-						else if ( (LA17_26==FTSWILD) ) {s = 108;}
-						else if ( (LA17_26==FTSPHRASE) ) {s = 109;}
-						else if ( (LA17_26==DECIMAL_INTEGER_LITERAL) ) {s = 110;}
-						else if ( (LA17_26==FLOATING_POINT_LITERAL) ) {s = 111;}
-						else if ( (LA17_26==DATETIME) ) {s = 112;}
-						else if ( (LA17_26==STAR) ) {s = 113;}
-						else if ( (LA17_26==URI) ) {s = 114;}
-						else if ( (LA17_26==LSQUARE) && (synpred3_FTS())) {s = 16;}
-						else if ( (LA17_26==LT) && (synpred3_FTS())) {s = 17;}
-						else if ( (LA17_26==COMMA||LA17_26==DOT) && (synpred5_FTS())) {s = 115;}
-						else if ( (LA17_26==QUESTION_MARK) && (synpred5_FTS())) {s = 116;}
-						 
-						input.seek(index17_26);
-						if ( s>=0 ) return s;
-						break;
-
-					case 53 : 
-						int LA17_155 = input.LA(1);
-						 
-						int index17_155 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 182;}
-						 
-						input.seek(index17_155);
-						if ( s>=0 ) return s;
-						break;
-
-					case 54 : 
-						int LA17_107 = input.LA(1);
-						 
-						int index17_107 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_107==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_107==COMMA||LA17_107==DOT) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_107==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_107==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_107==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_107==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_107==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_107==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_107==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_107==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_107==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_107==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_107==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_107==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_107==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_107==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_107==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_107==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_107==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_107==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_107==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_107==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_107==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_107==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_107==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_107==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_107==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_107==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_107==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_107==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_107==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_107==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_107);
-						if ( s>=0 ) return s;
-						break;
-
-					case 55 : 
-						int LA17_101 = input.LA(1);
-						 
-						int index17_101 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA17_101==DOT) ) {s = 157;}
-						else if ( (LA17_101==COLON) ) {s = 118;}
-						else if ( (LA17_101==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_101==COMMA) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_101==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_101==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_101==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_101==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_101==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_101==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_101==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_101==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_101==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_101==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_101==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_101==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_101==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_101==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_101==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_101==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_101==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_101==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_101==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_101==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_101==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_101==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_101==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_101==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_101==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_101==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_101==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_101==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_101==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_101==MINUS) && (synpred5_FTS())) {s = 57;}
-						 
-						input.seek(index17_101);
-						if ( s>=0 ) return s;
-						break;
-
-					case 56 : 
-						int LA17_183 = input.LA(1);
-						 
-						int index17_183 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred3_FTS()) ) {s = 27;}
-						else if ( (synpred4_FTS()) ) {s = 100;}
-						else if ( (synpred5_FTS()) ) {s = 198;}
-						 
-						input.seek(index17_183);
-						if ( s>=0 ) return s;
-						break;
-
-					case 57 : 
+					case 43 : 
 						int LA17_24 = input.LA(1);
 						 
 						int index17_24 = input.index();
@@ -17057,93 +16762,347 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 58 : 
-						int LA17_167 = input.LA(1);
+					case 44 : 
+						int LA17_7 = input.LA(1);
 						 
-						int index17_167 = input.index();
+						int index17_7 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_167==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_167==COMMA||LA17_167==DOT) && (synpred5_FTS())) {s = 158;}
-						else if ( (LA17_167==TILDA) && (synpred5_FTS())) {s = 159;}
-						else if ( (LA17_167==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_167==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_167==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_167==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_167==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_167==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_167==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_167==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_167==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_167==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_167==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_167==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_167==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_167==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_167==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_167==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_167==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_167==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_167==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_167==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_167==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_167==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_167==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_167==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_167==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_167==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_167==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_167==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_167==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (LA17_7==STAR) ) {s = 25;}
+						else if ( (LA17_7==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_7==COMMA||LA17_7==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_7==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_7==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_7==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_7==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_7==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_7==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_7==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_7==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_7==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_7==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_7==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_7==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_7==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_7==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_7==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_7==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_7==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_7==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_7==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_7==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_7==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_7==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_7==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_7==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_7==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_7==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_7==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_7==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_7==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_167);
+						input.seek(index17_7);
 						if ( s>=0 ) return s;
 						break;
 
-					case 59 : 
-						int LA17_109 = input.LA(1);
+					case 45 : 
+						int LA17_8 = input.LA(1);
 						 
-						int index17_109 = input.index();
+						int index17_8 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_109==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_109==TILDA) && (synpred5_FTS())) {s = 160;}
-						else if ( (LA17_109==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_109==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_109==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_109==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_109==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_109==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_109==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_109==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_109==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_109==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_109==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_109==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_109==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_109==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_109==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_109==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_109==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_109==STAR) && (synpred5_FTS())) {s = 68;}
-						else if ( (LA17_109==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_109==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_109==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_109==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_109==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_109==COMMA||LA17_109==DOT) && (synpred5_FTS())) {s = 69;}
-						else if ( (LA17_109==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_109==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_109==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_109==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_109==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_109==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (LA17_8==STAR) ) {s = 25;}
+						else if ( (LA17_8==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_8==COMMA||LA17_8==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_8==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_8==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_8==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_8==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_8==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_8==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_8==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_8==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_8==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_8==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_8==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_8==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_8==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_8==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_8==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_8==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_8==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_8==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_8==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_8==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_8==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_8==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_8==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_8==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_8==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_8==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_8==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_8==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_8==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_109);
+						input.seek(index17_8);
 						if ( s>=0 ) return s;
 						break;
 
-					case 60 : 
+					case 46 : 
+						int LA17_26 = input.LA(1);
+						 
+						int index17_26 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_26==LPAREN) && (synpred4_FTS())) {s = 100;}
+						else if ( (LA17_26==ID) ) {s = 101;}
+						else if ( (LA17_26==TO) ) {s = 102;}
+						else if ( (LA17_26==OR) ) {s = 103;}
+						else if ( (LA17_26==AND) ) {s = 104;}
+						else if ( (LA17_26==NOT) ) {s = 105;}
+						else if ( (LA17_26==FTSWORD) ) {s = 106;}
+						else if ( (LA17_26==FTSPRE) ) {s = 107;}
+						else if ( (LA17_26==FTSWILD) ) {s = 108;}
+						else if ( (LA17_26==FTSPHRASE) ) {s = 109;}
+						else if ( (LA17_26==DECIMAL_INTEGER_LITERAL) ) {s = 110;}
+						else if ( (LA17_26==FLOATING_POINT_LITERAL) ) {s = 111;}
+						else if ( (LA17_26==DATETIME) ) {s = 112;}
+						else if ( (LA17_26==STAR) ) {s = 113;}
+						else if ( (LA17_26==URI) ) {s = 114;}
+						else if ( (LA17_26==LSQUARE) && (synpred3_FTS())) {s = 16;}
+						else if ( (LA17_26==LT) && (synpred3_FTS())) {s = 17;}
+						else if ( (LA17_26==COMMA||LA17_26==DOT) && (synpred5_FTS())) {s = 115;}
+						else if ( (LA17_26==QUESTION_MARK) && (synpred5_FTS())) {s = 116;}
+						 
+						input.seek(index17_26);
+						if ( s>=0 ) return s;
+						break;
+
+					case 47 : 
+						int LA17_84 = input.LA(1);
+						 
+						int index17_84 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 151;}
+						 
+						input.seek(index17_84);
+						if ( s>=0 ) return s;
+						break;
+
+					case 48 : 
+						int LA17_83 = input.LA(1);
+						 
+						int index17_83 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 151;}
+						 
+						input.seek(index17_83);
+						if ( s>=0 ) return s;
+						break;
+
+					case 49 : 
+						int LA17_199 = input.LA(1);
+						 
+						int index17_199 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred3_FTS()) ) {s = 27;}
+						else if ( (synpred5_FTS()) ) {s = 198;}
+						 
+						input.seek(index17_199);
+						if ( s>=0 ) return s;
+						break;
+
+					case 50 : 
+						int LA17_15 = input.LA(1);
+						 
+						int index17_15 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_15==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_15==TILDA) && (synpred5_FTS())) {s = 67;}
+						else if ( (LA17_15==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_15==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_15==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_15==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_15==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_15==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_15==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_15==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_15==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_15==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_15==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_15==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_15==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_15==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_15==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_15==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_15==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_15==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_15==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_15==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_15==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_15==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_15==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_15==COMMA||LA17_15==DOT) && (synpred5_FTS())) {s = 69;}
+						else if ( (LA17_15==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_15==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_15==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_15==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_15==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_15==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_15);
+						if ( s>=0 ) return s;
+						break;
+
+					case 51 : 
+						int LA17_10 = input.LA(1);
+						 
+						int index17_10 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_10==STAR) ) {s = 25;}
+						else if ( (LA17_10==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_10==COMMA||LA17_10==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_10==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_10==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_10==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_10==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_10==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_10==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_10==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_10==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_10==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_10==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_10==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_10==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_10==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_10==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_10==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_10==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_10==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_10==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_10==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_10==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_10==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_10==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_10==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_10==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_10==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_10==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_10==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_10==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_10==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_10);
+						if ( s>=0 ) return s;
+						break;
+
+					case 52 : 
+						int LA17_164 = input.LA(1);
+						 
+						int index17_164 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_164==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_164==COMMA||LA17_164==DOT) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_164==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_164==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_164==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_164==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_164==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_164==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_164==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_164==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_164==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_164==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_164==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_164==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_164==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_164==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_164==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_164==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_164==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_164==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_164==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_164==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_164==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_164==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_164==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_164==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_164==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_164==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_164==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_164==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_164==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_164==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_164);
+						if ( s>=0 ) return s;
+						break;
+
+					case 53 : 
+						int LA17_85 = input.LA(1);
+						 
+						int index17_85 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred2_FTS()) ) {s = 124;}
+						else if ( (synpred5_FTS()) ) {s = 151;}
+						 
+						input.seek(index17_85);
+						if ( s>=0 ) return s;
+						break;
+
+					case 54 : 
+						int LA17_5 = input.LA(1);
+						 
+						int index17_5 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_5==STAR) ) {s = 25;}
+						else if ( (LA17_5==COLON) ) {s = 26;}
+						else if ( (LA17_5==COMMA||LA17_5==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_5==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_5==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_5==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_5==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_5==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_5==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_5==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_5==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_5==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_5==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_5==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_5==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_5==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_5==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_5==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_5==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_5==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_5==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_5==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_5==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_5==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_5==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_5==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_5==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_5==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_5==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_5==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_5==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_5==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_5);
+						if ( s>=0 ) return s;
+						break;
+
+					case 55 : 
 						int LA17_106 = input.LA(1);
 						 
 						int index17_106 = input.index();
@@ -17186,74 +17145,318 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 61 : 
-						int LA17_154 = input.LA(1);
+					case 56 : 
+						int LA17_165 = input.LA(1);
 						 
-						int index17_154 = input.index();
+						int index17_165 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_165==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_165==COMMA||LA17_165==DOT) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_165==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_165==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_165==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_165==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_165==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_165==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_165==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_165==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_165==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_165==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_165==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_165==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_165==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_165==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_165==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_165==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_165==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_165==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_165==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_165==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_165==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_165==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_165==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_165==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_165==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_165==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_165==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_165==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_165==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_165==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_165);
+						if ( s>=0 ) return s;
+						break;
+
+					case 57 : 
+						int LA17_9 = input.LA(1);
+						 
+						int index17_9 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_9==STAR) ) {s = 25;}
+						else if ( (LA17_9==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_9==COMMA||LA17_9==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_9==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_9==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_9==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_9==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_9==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_9==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_9==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_9==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_9==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_9==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_9==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_9==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_9==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_9==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_9==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_9==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_9==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_9==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_9==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_9==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_9==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_9==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_9==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_9==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_9==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_9==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_9==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_9==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_9==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_9);
+						if ( s>=0 ) return s;
+						break;
+
+					case 58 : 
+						int LA17_107 = input.LA(1);
+						 
+						int index17_107 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_107==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_107==COMMA||LA17_107==DOT) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_107==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_107==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_107==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_107==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_107==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_107==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_107==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_107==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_107==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_107==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_107==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_107==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_107==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_107==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_107==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_107==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_107==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_107==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_107==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_107==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_107==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_107==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_107==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_107==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_107==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_107==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_107==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_107==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_107==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_107==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_107);
+						if ( s>=0 ) return s;
+						break;
+
+					case 59 : 
+						int LA17_1 = input.LA(1);
+						 
+						int index17_1 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_1==DOT) ) {s = 24;}
+						else if ( (LA17_1==STAR) ) {s = 25;}
+						else if ( (LA17_1==COLON) ) {s = 26;}
+						else if ( (LA17_1==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_1==COMMA) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_1==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_1==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_1==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_1==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_1==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_1==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_1==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_1==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_1==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_1==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_1==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_1==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_1==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_1==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_1==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_1==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_1==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_1==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_1==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_1==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_1==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_1==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_1==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_1==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_1==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_1==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_1==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_1==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_1==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_1);
+						if ( s>=0 ) return s;
+						break;
+
+					case 60 : 
+						int LA17_167 = input.LA(1);
+						 
+						int index17_167 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA17_167==DOTDOT) && (synpred3_FTS())) {s = 27;}
+						else if ( (LA17_167==COMMA||LA17_167==DOT) && (synpred5_FTS())) {s = 158;}
+						else if ( (LA17_167==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_167==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_167==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_167==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_167==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_167==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_167==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_167==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_167==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_167==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_167==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_167==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_167==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_167==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_167==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_167==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_167==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_167==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_167==STAR) && (synpred5_FTS())) {s = 68;}
+						else if ( (LA17_167==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_167==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_167==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_167==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_167==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_167==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_167==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_167==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_167==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_167==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_167==MINUS) && (synpred5_FTS())) {s = 57;}
+						 
+						input.seek(index17_167);
+						if ( s>=0 ) return s;
+						break;
+
+					case 61 : 
+						int LA17_87 = input.LA(1);
+						 
+						int index17_87 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred2_FTS()) ) {s = 124;}
-						else if ( (synpred5_FTS()) ) {s = 182;}
+						else if ( (synpred5_FTS()) ) {s = 151;}
 						 
-						input.seek(index17_154);
+						input.seek(index17_87);
 						if ( s>=0 ) return s;
 						break;
 
 					case 62 : 
-						int LA17_70 = input.LA(1);
+						int LA17_157 = input.LA(1);
 						 
-						int index17_70 = input.index();
+						int index17_157 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred3_FTS()) ) {s = 27;}
-						else if ( (synpred4_FTS()) ) {s = 100;}
-						else if ( (synpred5_FTS()) ) {s = 116;}
+						if ( (LA17_157==ID) ) {s = 183;}
+						else if ( (LA17_157==FTSWORD) && (synpred5_FTS())) {s = 184;}
+						else if ( (LA17_157==FTSPRE) && (synpred5_FTS())) {s = 185;}
+						else if ( (LA17_157==FTSWILD) && (synpred5_FTS())) {s = 186;}
+						else if ( (LA17_157==NOT) && (synpred5_FTS())) {s = 187;}
+						else if ( (LA17_157==TO) && (synpred5_FTS())) {s = 188;}
+						else if ( (LA17_157==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 189;}
+						else if ( (LA17_157==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 190;}
+						else if ( (LA17_157==STAR) && (synpred5_FTS())) {s = 191;}
+						else if ( (LA17_157==QUESTION_MARK) && (synpred5_FTS())) {s = 192;}
+						else if ( (LA17_157==DATETIME) && (synpred5_FTS())) {s = 193;}
+						else if ( (LA17_157==URI) && (synpred5_FTS())) {s = 194;}
+						else if ( (LA17_157==TILDA) && (synpred5_FTS())) {s = 159;}
+						else if ( (LA17_157==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_157==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_157==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_157==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_157==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_157==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_157==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_157==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_157==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_157==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_157==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_157==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_157==COMMA||LA17_157==DOT) && (synpred5_FTS())) {s = 69;}
+						else if ( (LA17_157==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_157==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_157==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_157==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_157==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_70);
+						input.seek(index17_157);
 						if ( s>=0 ) return s;
 						break;
 
 					case 63 : 
-						int LA17_62 = input.LA(1);
+						int LA17_6 = input.LA(1);
 						 
-						int index17_62 = input.index();
+						int index17_6 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA17_62==STAR) ) {s = 25;}
-						else if ( (LA17_62==COLON) ) {s = 118;}
-						else if ( (LA17_62==DOTDOT) && (synpred3_FTS())) {s = 27;}
-						else if ( (LA17_62==COMMA||LA17_62==DOT) && (synpred5_FTS())) {s = 28;}
-						else if ( (LA17_62==TILDA) && (synpred5_FTS())) {s = 29;}
-						else if ( (LA17_62==CARAT) && (synpred5_FTS())) {s = 30;}
-						else if ( (LA17_62==AND) && (synpred5_FTS())) {s = 31;}
-						else if ( (LA17_62==AMP) && (synpred5_FTS())) {s = 32;}
-						else if ( (LA17_62==EOF) && (synpred5_FTS())) {s = 33;}
-						else if ( (LA17_62==RPAREN) && (synpred5_FTS())) {s = 34;}
-						else if ( (LA17_62==OR) && (synpred5_FTS())) {s = 35;}
-						else if ( (LA17_62==BAR) && (synpred5_FTS())) {s = 36;}
-						else if ( (LA17_62==NOT) && (synpred5_FTS())) {s = 37;}
-						else if ( (LA17_62==ID) && (synpred5_FTS())) {s = 38;}
-						else if ( (LA17_62==FTSWORD) && (synpred5_FTS())) {s = 39;}
-						else if ( (LA17_62==FTSPRE) && (synpred5_FTS())) {s = 40;}
-						else if ( (LA17_62==FTSWILD) && (synpred5_FTS())) {s = 41;}
-						else if ( (LA17_62==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
-						else if ( (LA17_62==TO) && (synpred5_FTS())) {s = 43;}
-						else if ( (LA17_62==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
-						else if ( (LA17_62==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
-						else if ( (LA17_62==DATETIME) && (synpred5_FTS())) {s = 46;}
-						else if ( (LA17_62==URI) && (synpred5_FTS())) {s = 47;}
-						else if ( (LA17_62==AT) && (synpred5_FTS())) {s = 48;}
-						else if ( (LA17_62==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
-						else if ( (LA17_62==LSQUARE) && (synpred5_FTS())) {s = 50;}
-						else if ( (LA17_62==LT) && (synpred5_FTS())) {s = 51;}
-						else if ( (LA17_62==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
-						else if ( (LA17_62==EQUALS) && (synpred5_FTS())) {s = 53;}
-						else if ( (LA17_62==LPAREN) && (synpred5_FTS())) {s = 54;}
-						else if ( (LA17_62==PERCENT) && (synpred5_FTS())) {s = 55;}
-						else if ( (LA17_62==PLUS) && (synpred5_FTS())) {s = 56;}
-						else if ( (LA17_62==MINUS) && (synpred5_FTS())) {s = 57;}
+						if ( (LA17_6==STAR) ) {s = 25;}
+						else if ( (LA17_6==COLON) ) {s = 26;}
+						else if ( (LA17_6==COMMA||LA17_6==DOT) && (synpred5_FTS())) {s = 28;}
+						else if ( (LA17_6==TILDA) && (synpred5_FTS())) {s = 29;}
+						else if ( (LA17_6==CARAT) && (synpred5_FTS())) {s = 30;}
+						else if ( (LA17_6==AND) && (synpred5_FTS())) {s = 31;}
+						else if ( (LA17_6==AMP) && (synpred5_FTS())) {s = 32;}
+						else if ( (LA17_6==EOF) && (synpred5_FTS())) {s = 33;}
+						else if ( (LA17_6==RPAREN) && (synpred5_FTS())) {s = 34;}
+						else if ( (LA17_6==OR) && (synpred5_FTS())) {s = 35;}
+						else if ( (LA17_6==BAR) && (synpred5_FTS())) {s = 36;}
+						else if ( (LA17_6==NOT) && (synpred5_FTS())) {s = 37;}
+						else if ( (LA17_6==ID) && (synpred5_FTS())) {s = 38;}
+						else if ( (LA17_6==FTSWORD) && (synpred5_FTS())) {s = 39;}
+						else if ( (LA17_6==FTSPRE) && (synpred5_FTS())) {s = 40;}
+						else if ( (LA17_6==FTSWILD) && (synpred5_FTS())) {s = 41;}
+						else if ( (LA17_6==EXCLAMATION) && (synpred5_FTS())) {s = 42;}
+						else if ( (LA17_6==TO) && (synpred5_FTS())) {s = 43;}
+						else if ( (LA17_6==DECIMAL_INTEGER_LITERAL) && (synpred5_FTS())) {s = 44;}
+						else if ( (LA17_6==FLOATING_POINT_LITERAL) && (synpred5_FTS())) {s = 45;}
+						else if ( (LA17_6==DATETIME) && (synpred5_FTS())) {s = 46;}
+						else if ( (LA17_6==URI) && (synpred5_FTS())) {s = 47;}
+						else if ( (LA17_6==AT) && (synpred5_FTS())) {s = 48;}
+						else if ( (LA17_6==FTSPHRASE) && (synpred5_FTS())) {s = 49;}
+						else if ( (LA17_6==LSQUARE) && (synpred5_FTS())) {s = 50;}
+						else if ( (LA17_6==LT) && (synpred5_FTS())) {s = 51;}
+						else if ( (LA17_6==QUESTION_MARK) && (synpred5_FTS())) {s = 52;}
+						else if ( (LA17_6==EQUALS) && (synpred5_FTS())) {s = 53;}
+						else if ( (LA17_6==LPAREN) && (synpred5_FTS())) {s = 54;}
+						else if ( (LA17_6==PERCENT) && (synpred5_FTS())) {s = 55;}
+						else if ( (LA17_6==PLUS) && (synpred5_FTS())) {s = 56;}
+						else if ( (LA17_6==MINUS) && (synpred5_FTS())) {s = 57;}
 						 
-						input.seek(index17_62);
+						input.seek(index17_6);
 						if ( s>=0 ) return s;
 						break;
 			}
@@ -17279,12 +17482,12 @@ public class FTSParser extends Parser {
 	static final String DFA33_acceptS =
 		"\1\uffff\1\1\2\uffff\2\1\2\uffff\1\2\1\3\1\uffff\1\1\7\uffff\1\1\102\uffff";
 	static final String DFA33_specialS =
-		"\1\31\1\uffff\1\7\1\45\2\uffff\1\46\5\uffff\1\62\1\43\1\66\1\21\1\37\5"+
-		"\uffff\1\64\1\54\2\uffff\1\26\1\100\1\uffff\1\25\1\52\1\14\1\74\1\42\1"+
-		"\6\1\60\1\3\3\uffff\1\11\1\53\1\0\1\36\1\101\1\17\1\47\1\32\1\71\1\27"+
-		"\1\15\1\uffff\1\44\1\30\1\65\1\35\1\75\1\77\1\33\1\24\1\51\1\13\1\10\1"+
-		"\22\1\73\1\41\1\5\1\57\1\2\1\76\1\67\1\23\1\50\1\12\1\55\1\16\1\72\1\40"+
-		"\1\4\1\56\1\1\1\61\1\63\1\34\1\70\1\20}>";
+		"\1\46\1\uffff\1\61\1\74\2\uffff\1\75\5\uffff\1\24\1\7\1\60\1\77\1\42\5"+
+		"\uffff\1\22\1\15\2\uffff\1\55\1\33\1\uffff\1\62\1\21\1\70\1\51\1\12\1"+
+		"\54\1\3\1\37\3\uffff\1\100\1\23\1\40\1\4\1\27\1\0\1\43\1\13\1\71\1\25"+
+		"\1\64\1\uffff\1\30\1\73\1\26\1\44\1\5\1\32\1\72\1\57\1\20\1\67\1\14\1"+
+		"\45\1\50\1\11\1\53\1\2\1\36\1\31\1\101\1\56\1\17\1\66\1\16\1\63\1\47\1"+
+		"\10\1\52\1\1\1\35\1\65\1\34\1\6\1\41\1\76}>";
 	static final String[] DFA33_transitionS = {
 			"\1\5\1\1\4\uffff\1\11\1\uffff\1\11\1\uffff\1\11\5\uffff\1\11\31\uffff"+
 			"\1\11\2\uffff\1\10\3\11\11\uffff\1\2\16\uffff\1\6\2\uffff\1\4\6\uffff"+
@@ -17459,202 +17662,6 @@ public class FTSParser extends Parser {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
-						int LA33_42 = input.LA(1);
-						 
-						int index33_42 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_42);
-						if ( s>=0 ) return s;
-						break;
-
-					case 1 : 
-						int LA33_80 = input.LA(1);
-						 
-						int index33_80 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_80);
-						if ( s>=0 ) return s;
-						break;
-
-					case 2 : 
-						int LA33_68 = input.LA(1);
-						 
-						int index33_68 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_68);
-						if ( s>=0 ) return s;
-						break;
-
-					case 3 : 
-						int LA33_36 = input.LA(1);
-						 
-						int index33_36 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_36);
-						if ( s>=0 ) return s;
-						break;
-
-					case 4 : 
-						int LA33_78 = input.LA(1);
-						 
-						int index33_78 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_78);
-						if ( s>=0 ) return s;
-						break;
-
-					case 5 : 
-						int LA33_66 = input.LA(1);
-						 
-						int index33_66 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_66);
-						if ( s>=0 ) return s;
-						break;
-
-					case 6 : 
-						int LA33_34 = input.LA(1);
-						 
-						int index33_34 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_34);
-						if ( s>=0 ) return s;
-						break;
-
-					case 7 : 
-						int LA33_2 = input.LA(1);
-						 
-						int index33_2 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA33_2==DOT) ) {s = 10;}
-						else if ( (LA33_2==COLON) && (synpred13_FTS())) {s = 11;}
-						else if ( (LA33_2==EOF||(LA33_2 >= AMP && LA33_2 <= BAR)||LA33_2==CARAT||LA33_2==COMMA||LA33_2==DATETIME||LA33_2==DECIMAL_INTEGER_LITERAL||LA33_2==EQUALS||LA33_2==EXCLAMATION||LA33_2==FLOATING_POINT_LITERAL||(LA33_2 >= FTSPHRASE && LA33_2 <= FTSWORD)||LA33_2==ID||(LA33_2 >= LPAREN && LA33_2 <= LT)||LA33_2==MINUS||LA33_2==NOT||(LA33_2 >= OR && LA33_2 <= PERCENT)||LA33_2==PLUS||LA33_2==QUESTION_MARK||LA33_2==RPAREN||LA33_2==STAR||(LA33_2 >= TILDA && LA33_2 <= TO)||LA33_2==URI) ) {s = 9;}
-						 
-						input.seek(index33_2);
-						if ( s>=0 ) return s;
-						break;
-
-					case 8 : 
-						int LA33_62 = input.LA(1);
-						 
-						int index33_62 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_62);
-						if ( s>=0 ) return s;
-						break;
-
-					case 9 : 
-						int LA33_40 = input.LA(1);
-						 
-						int index33_40 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_40);
-						if ( s>=0 ) return s;
-						break;
-
-					case 10 : 
-						int LA33_73 = input.LA(1);
-						 
-						int index33_73 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_73);
-						if ( s>=0 ) return s;
-						break;
-
-					case 11 : 
-						int LA33_61 = input.LA(1);
-						 
-						int index33_61 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_61);
-						if ( s>=0 ) return s;
-						break;
-
-					case 12 : 
-						int LA33_31 = input.LA(1);
-						 
-						int index33_31 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_31);
-						if ( s>=0 ) return s;
-						break;
-
-					case 13 : 
-						int LA33_50 = input.LA(1);
-						 
-						int index33_50 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_50);
-						if ( s>=0 ) return s;
-						break;
-
-					case 14 : 
-						int LA33_75 = input.LA(1);
-						 
-						int index33_75 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_75);
-						if ( s>=0 ) return s;
-						break;
-
-					case 15 : 
 						int LA33_45 = input.LA(1);
 						 
 						int index33_45 = input.index();
@@ -17667,98 +17674,268 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 16 : 
-						int LA33_85 = input.LA(1);
+					case 1 : 
+						int LA33_79 = input.LA(1);
 						 
-						int index33_85 = input.index();
+						int index33_79 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_85);
+						input.seek(index33_79);
+						if ( s>=0 ) return s;
+						break;
+
+					case 2 : 
+						int LA33_67 = input.LA(1);
+						 
+						int index33_67 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_67);
+						if ( s>=0 ) return s;
+						break;
+
+					case 3 : 
+						int LA33_35 = input.LA(1);
+						 
+						int index33_35 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_35);
+						if ( s>=0 ) return s;
+						break;
+
+					case 4 : 
+						int LA33_43 = input.LA(1);
+						 
+						int index33_43 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_43);
+						if ( s>=0 ) return s;
+						break;
+
+					case 5 : 
+						int LA33_56 = input.LA(1);
+						 
+						int index33_56 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_56);
+						if ( s>=0 ) return s;
+						break;
+
+					case 6 : 
+						int LA33_83 = input.LA(1);
+						 
+						int index33_83 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_83);
+						if ( s>=0 ) return s;
+						break;
+
+					case 7 : 
+						int LA33_13 = input.LA(1);
+						 
+						int index33_13 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA33_13==COLON) && (synpred13_FTS())) {s = 19;}
+						else if ( (LA33_13==EOF||(LA33_13 >= AMP && LA33_13 <= BAR)||LA33_13==CARAT||LA33_13==COMMA||LA33_13==DATETIME||LA33_13==DECIMAL_INTEGER_LITERAL||LA33_13==DOT||LA33_13==EQUALS||LA33_13==EXCLAMATION||LA33_13==FLOATING_POINT_LITERAL||(LA33_13 >= FTSPHRASE && LA33_13 <= FTSWORD)||LA33_13==ID||(LA33_13 >= LPAREN && LA33_13 <= LT)||LA33_13==MINUS||LA33_13==NOT||(LA33_13 >= OR && LA33_13 <= PERCENT)||LA33_13==PLUS||LA33_13==QUESTION_MARK||LA33_13==RPAREN||LA33_13==STAR||(LA33_13 >= TILDA && LA33_13 <= TO)||LA33_13==URI) ) {s = 9;}
+						 
+						input.seek(index33_13);
+						if ( s>=0 ) return s;
+						break;
+
+					case 8 : 
+						int LA33_77 = input.LA(1);
+						 
+						int index33_77 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_77);
+						if ( s>=0 ) return s;
+						break;
+
+					case 9 : 
+						int LA33_65 = input.LA(1);
+						 
+						int index33_65 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_65);
+						if ( s>=0 ) return s;
+						break;
+
+					case 10 : 
+						int LA33_33 = input.LA(1);
+						 
+						int index33_33 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_33);
+						if ( s>=0 ) return s;
+						break;
+
+					case 11 : 
+						int LA33_47 = input.LA(1);
+						 
+						int index33_47 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_47);
+						if ( s>=0 ) return s;
+						break;
+
+					case 12 : 
+						int LA33_62 = input.LA(1);
+						 
+						int index33_62 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_62);
+						if ( s>=0 ) return s;
+						break;
+
+					case 13 : 
+						int LA33_23 = input.LA(1);
+						 
+						int index33_23 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_23);
+						if ( s>=0 ) return s;
+						break;
+
+					case 14 : 
+						int LA33_74 = input.LA(1);
+						 
+						int index33_74 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_74);
+						if ( s>=0 ) return s;
+						break;
+
+					case 15 : 
+						int LA33_72 = input.LA(1);
+						 
+						int index33_72 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_72);
+						if ( s>=0 ) return s;
+						break;
+
+					case 16 : 
+						int LA33_60 = input.LA(1);
+						 
+						int index33_60 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_60);
 						if ( s>=0 ) return s;
 						break;
 
 					case 17 : 
-						int LA33_15 = input.LA(1);
+						int LA33_30 = input.LA(1);
 						 
-						int index33_15 = input.index();
+						int index33_30 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA33_15==COLON) && (synpred13_FTS())) {s = 19;}
-						else if ( (LA33_15==EOF||(LA33_15 >= AMP && LA33_15 <= BAR)||LA33_15==CARAT||LA33_15==COMMA||LA33_15==DATETIME||LA33_15==DECIMAL_INTEGER_LITERAL||LA33_15==DOT||LA33_15==EQUALS||LA33_15==EXCLAMATION||LA33_15==FLOATING_POINT_LITERAL||(LA33_15 >= FTSPHRASE && LA33_15 <= FTSWORD)||LA33_15==ID||(LA33_15 >= LPAREN && LA33_15 <= LT)||LA33_15==MINUS||LA33_15==NOT||(LA33_15 >= OR && LA33_15 <= PERCENT)||LA33_15==PLUS||LA33_15==QUESTION_MARK||LA33_15==RPAREN||LA33_15==STAR||(LA33_15 >= TILDA && LA33_15 <= TO)||LA33_15==URI) ) {s = 9;}
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_15);
+						input.seek(index33_30);
 						if ( s>=0 ) return s;
 						break;
 
 					case 18 : 
-						int LA33_63 = input.LA(1);
+						int LA33_22 = input.LA(1);
 						 
-						int index33_63 = input.index();
+						int index33_22 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_63);
+						input.seek(index33_22);
 						if ( s>=0 ) return s;
 						break;
 
 					case 19 : 
-						int LA33_71 = input.LA(1);
+						int LA33_41 = input.LA(1);
 						 
-						int index33_71 = input.index();
+						int index33_41 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_71);
+						input.seek(index33_41);
 						if ( s>=0 ) return s;
 						break;
 
 					case 20 : 
-						int LA33_59 = input.LA(1);
+						int LA33_12 = input.LA(1);
 						 
-						int index33_59 = input.index();
+						int index33_12 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
+						if ( (LA33_12==DOT) ) {s = 18;}
+						else if ( (LA33_12==COLON) && (synpred13_FTS())) {s = 19;}
+						else if ( (LA33_12==EOF||(LA33_12 >= AMP && LA33_12 <= BAR)||LA33_12==CARAT||LA33_12==COMMA||LA33_12==DATETIME||LA33_12==DECIMAL_INTEGER_LITERAL||LA33_12==EQUALS||LA33_12==EXCLAMATION||LA33_12==FLOATING_POINT_LITERAL||(LA33_12 >= FTSPHRASE && LA33_12 <= FTSWORD)||LA33_12==ID||(LA33_12 >= LPAREN && LA33_12 <= LT)||LA33_12==MINUS||LA33_12==NOT||(LA33_12 >= OR && LA33_12 <= PERCENT)||LA33_12==PLUS||LA33_12==QUESTION_MARK||LA33_12==RPAREN||LA33_12==STAR||(LA33_12 >= TILDA && LA33_12 <= TO)||LA33_12==URI) ) {s = 9;}
 						 
-						input.seek(index33_59);
+						input.seek(index33_12);
 						if ( s>=0 ) return s;
 						break;
 
 					case 21 : 
-						int LA33_29 = input.LA(1);
-						 
-						int index33_29 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_29);
-						if ( s>=0 ) return s;
-						break;
-
-					case 22 : 
-						int LA33_26 = input.LA(1);
-						 
-						int index33_26 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_26);
-						if ( s>=0 ) return s;
-						break;
-
-					case 23 : 
 						int LA33_49 = input.LA(1);
 						 
 						int index33_49 = input.index();
@@ -17771,20 +17948,215 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 24 : 
-						int LA33_53 = input.LA(1);
+					case 22 : 
+						int LA33_54 = input.LA(1);
 						 
-						int index33_53 = input.index();
+						int index33_54 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_53);
+						input.seek(index33_54);
+						if ( s>=0 ) return s;
+						break;
+
+					case 23 : 
+						int LA33_44 = input.LA(1);
+						 
+						int index33_44 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_44);
+						if ( s>=0 ) return s;
+						break;
+
+					case 24 : 
+						int LA33_52 = input.LA(1);
+						 
+						int index33_52 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_52);
 						if ( s>=0 ) return s;
 						break;
 
 					case 25 : 
+						int LA33_69 = input.LA(1);
+						 
+						int index33_69 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_69);
+						if ( s>=0 ) return s;
+						break;
+
+					case 26 : 
+						int LA33_57 = input.LA(1);
+						 
+						int index33_57 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_57);
+						if ( s>=0 ) return s;
+						break;
+
+					case 27 : 
+						int LA33_27 = input.LA(1);
+						 
+						int index33_27 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_27);
+						if ( s>=0 ) return s;
+						break;
+
+					case 28 : 
+						int LA33_82 = input.LA(1);
+						 
+						int index33_82 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_82);
+						if ( s>=0 ) return s;
+						break;
+
+					case 29 : 
+						int LA33_80 = input.LA(1);
+						 
+						int index33_80 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_80);
+						if ( s>=0 ) return s;
+						break;
+
+					case 30 : 
+						int LA33_68 = input.LA(1);
+						 
+						int index33_68 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_68);
+						if ( s>=0 ) return s;
+						break;
+
+					case 31 : 
+						int LA33_36 = input.LA(1);
+						 
+						int index33_36 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_36);
+						if ( s>=0 ) return s;
+						break;
+
+					case 32 : 
+						int LA33_42 = input.LA(1);
+						 
+						int index33_42 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_42);
+						if ( s>=0 ) return s;
+						break;
+
+					case 33 : 
+						int LA33_84 = input.LA(1);
+						 
+						int index33_84 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_84);
+						if ( s>=0 ) return s;
+						break;
+
+					case 34 : 
+						int LA33_16 = input.LA(1);
+						 
+						int index33_16 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA33_16==COLON) && (synpred13_FTS())) {s = 19;}
+						else if ( (LA33_16==EOF||(LA33_16 >= AMP && LA33_16 <= BAR)||LA33_16==CARAT||LA33_16==COMMA||LA33_16==DATETIME||LA33_16==DECIMAL_INTEGER_LITERAL||LA33_16==DOT||LA33_16==EQUALS||LA33_16==EXCLAMATION||LA33_16==FLOATING_POINT_LITERAL||(LA33_16 >= FTSPHRASE && LA33_16 <= FTSWORD)||LA33_16==ID||(LA33_16 >= LPAREN && LA33_16 <= LT)||LA33_16==MINUS||LA33_16==NOT||(LA33_16 >= OR && LA33_16 <= PERCENT)||LA33_16==PLUS||LA33_16==QUESTION_MARK||LA33_16==RPAREN||LA33_16==STAR||(LA33_16 >= TILDA && LA33_16 <= TO)||LA33_16==URI) ) {s = 9;}
+						 
+						input.seek(index33_16);
+						if ( s>=0 ) return s;
+						break;
+
+					case 35 : 
+						int LA33_46 = input.LA(1);
+						 
+						int index33_46 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_46);
+						if ( s>=0 ) return s;
+						break;
+
+					case 36 : 
+						int LA33_55 = input.LA(1);
+						 
+						int index33_55 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_55);
+						if ( s>=0 ) return s;
+						break;
+
+					case 37 : 
+						int LA33_63 = input.LA(1);
+						 
+						int index33_63 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_63);
+						if ( s>=0 ) return s;
+						break;
+
+					case 38 : 
 						int LA33_0 = input.LA(1);
 						 
 						int index33_0 = input.index();
@@ -17804,372 +18176,124 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 26 : 
-						int LA33_47 = input.LA(1);
-						 
-						int index33_47 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_47);
-						if ( s>=0 ) return s;
-						break;
-
-					case 27 : 
-						int LA33_58 = input.LA(1);
-						 
-						int index33_58 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_58);
-						if ( s>=0 ) return s;
-						break;
-
-					case 28 : 
-						int LA33_83 = input.LA(1);
-						 
-						int index33_83 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_83);
-						if ( s>=0 ) return s;
-						break;
-
-					case 29 : 
-						int LA33_55 = input.LA(1);
-						 
-						int index33_55 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_55);
-						if ( s>=0 ) return s;
-						break;
-
-					case 30 : 
-						int LA33_43 = input.LA(1);
-						 
-						int index33_43 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_43);
-						if ( s>=0 ) return s;
-						break;
-
-					case 31 : 
-						int LA33_16 = input.LA(1);
-						 
-						int index33_16 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA33_16==COLON) && (synpred13_FTS())) {s = 19;}
-						else if ( (LA33_16==EOF||(LA33_16 >= AMP && LA33_16 <= BAR)||LA33_16==CARAT||LA33_16==COMMA||LA33_16==DATETIME||LA33_16==DECIMAL_INTEGER_LITERAL||LA33_16==DOT||LA33_16==EQUALS||LA33_16==EXCLAMATION||LA33_16==FLOATING_POINT_LITERAL||(LA33_16 >= FTSPHRASE && LA33_16 <= FTSWORD)||LA33_16==ID||(LA33_16 >= LPAREN && LA33_16 <= LT)||LA33_16==MINUS||LA33_16==NOT||(LA33_16 >= OR && LA33_16 <= PERCENT)||LA33_16==PLUS||LA33_16==QUESTION_MARK||LA33_16==RPAREN||LA33_16==STAR||(LA33_16 >= TILDA && LA33_16 <= TO)||LA33_16==URI) ) {s = 9;}
-						 
-						input.seek(index33_16);
-						if ( s>=0 ) return s;
-						break;
-
-					case 32 : 
-						int LA33_77 = input.LA(1);
-						 
-						int index33_77 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_77);
-						if ( s>=0 ) return s;
-						break;
-
-					case 33 : 
-						int LA33_65 = input.LA(1);
-						 
-						int index33_65 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_65);
-						if ( s>=0 ) return s;
-						break;
-
-					case 34 : 
-						int LA33_33 = input.LA(1);
-						 
-						int index33_33 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_33);
-						if ( s>=0 ) return s;
-						break;
-
-					case 35 : 
-						int LA33_13 = input.LA(1);
-						 
-						int index33_13 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA33_13==COLON) && (synpred13_FTS())) {s = 19;}
-						else if ( (LA33_13==EOF||(LA33_13 >= AMP && LA33_13 <= BAR)||LA33_13==CARAT||LA33_13==COMMA||LA33_13==DATETIME||LA33_13==DECIMAL_INTEGER_LITERAL||LA33_13==DOT||LA33_13==EQUALS||LA33_13==EXCLAMATION||LA33_13==FLOATING_POINT_LITERAL||(LA33_13 >= FTSPHRASE && LA33_13 <= FTSWORD)||LA33_13==ID||(LA33_13 >= LPAREN && LA33_13 <= LT)||LA33_13==MINUS||LA33_13==NOT||(LA33_13 >= OR && LA33_13 <= PERCENT)||LA33_13==PLUS||LA33_13==QUESTION_MARK||LA33_13==RPAREN||LA33_13==STAR||(LA33_13 >= TILDA && LA33_13 <= TO)||LA33_13==URI) ) {s = 9;}
-						 
-						input.seek(index33_13);
-						if ( s>=0 ) return s;
-						break;
-
-					case 36 : 
-						int LA33_52 = input.LA(1);
-						 
-						int index33_52 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_52);
-						if ( s>=0 ) return s;
-						break;
-
-					case 37 : 
-						int LA33_3 = input.LA(1);
-						 
-						int index33_3 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA33_3==COLON) && (synpred13_FTS())) {s = 11;}
-						else if ( (LA33_3==EOF||(LA33_3 >= AMP && LA33_3 <= BAR)||LA33_3==CARAT||LA33_3==COMMA||LA33_3==DATETIME||LA33_3==DECIMAL_INTEGER_LITERAL||LA33_3==DOT||LA33_3==EQUALS||LA33_3==EXCLAMATION||LA33_3==FLOATING_POINT_LITERAL||(LA33_3 >= FTSPHRASE && LA33_3 <= FTSWORD)||LA33_3==ID||(LA33_3 >= LPAREN && LA33_3 <= LT)||LA33_3==MINUS||LA33_3==NOT||(LA33_3 >= OR && LA33_3 <= PERCENT)||LA33_3==PLUS||LA33_3==QUESTION_MARK||LA33_3==RPAREN||LA33_3==STAR||(LA33_3 >= TILDA && LA33_3 <= TO)||LA33_3==URI) ) {s = 9;}
-						 
-						input.seek(index33_3);
-						if ( s>=0 ) return s;
-						break;
-
-					case 38 : 
-						int LA33_6 = input.LA(1);
-						 
-						int index33_6 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA33_6==COLON) && (synpred13_FTS())) {s = 11;}
-						else if ( (LA33_6==EOF||(LA33_6 >= AMP && LA33_6 <= BAR)||LA33_6==CARAT||LA33_6==COMMA||LA33_6==DATETIME||LA33_6==DECIMAL_INTEGER_LITERAL||LA33_6==DOT||LA33_6==EQUALS||LA33_6==EXCLAMATION||LA33_6==FLOATING_POINT_LITERAL||(LA33_6 >= FTSPHRASE && LA33_6 <= FTSWORD)||LA33_6==ID||(LA33_6 >= LPAREN && LA33_6 <= LT)||LA33_6==MINUS||LA33_6==NOT||(LA33_6 >= OR && LA33_6 <= PERCENT)||LA33_6==PLUS||LA33_6==QUESTION_MARK||LA33_6==RPAREN||LA33_6==STAR||(LA33_6 >= TILDA && LA33_6 <= TO)||LA33_6==URI) ) {s = 9;}
-						 
-						input.seek(index33_6);
-						if ( s>=0 ) return s;
-						break;
-
 					case 39 : 
-						int LA33_46 = input.LA(1);
+						int LA33_76 = input.LA(1);
 						 
-						int index33_46 = input.index();
+						int index33_76 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_46);
+						input.seek(index33_76);
 						if ( s>=0 ) return s;
 						break;
 
 					case 40 : 
-						int LA33_72 = input.LA(1);
+						int LA33_64 = input.LA(1);
 						 
-						int index33_72 = input.index();
+						int index33_64 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_72);
+						input.seek(index33_64);
 						if ( s>=0 ) return s;
 						break;
 
 					case 41 : 
-						int LA33_60 = input.LA(1);
+						int LA33_32 = input.LA(1);
 						 
-						int index33_60 = input.index();
+						int index33_32 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_60);
+						input.seek(index33_32);
 						if ( s>=0 ) return s;
 						break;
 
 					case 42 : 
-						int LA33_30 = input.LA(1);
+						int LA33_78 = input.LA(1);
 						 
-						int index33_30 = input.index();
+						int index33_78 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_30);
+						input.seek(index33_78);
 						if ( s>=0 ) return s;
 						break;
 
 					case 43 : 
-						int LA33_41 = input.LA(1);
+						int LA33_66 = input.LA(1);
 						 
-						int index33_41 = input.index();
+						int index33_66 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_41);
+						input.seek(index33_66);
 						if ( s>=0 ) return s;
 						break;
 
 					case 44 : 
-						int LA33_23 = input.LA(1);
+						int LA33_34 = input.LA(1);
 						 
-						int index33_23 = input.index();
+						int index33_34 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_23);
+						input.seek(index33_34);
 						if ( s>=0 ) return s;
 						break;
 
 					case 45 : 
-						int LA33_74 = input.LA(1);
+						int LA33_26 = input.LA(1);
 						 
-						int index33_74 = input.index();
+						int index33_26 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_74);
+						input.seek(index33_26);
 						if ( s>=0 ) return s;
 						break;
 
 					case 46 : 
-						int LA33_79 = input.LA(1);
+						int LA33_71 = input.LA(1);
 						 
-						int index33_79 = input.index();
+						int index33_71 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_79);
+						input.seek(index33_71);
 						if ( s>=0 ) return s;
 						break;
 
 					case 47 : 
-						int LA33_67 = input.LA(1);
+						int LA33_59 = input.LA(1);
 						 
-						int index33_67 = input.index();
+						int index33_59 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_67);
+						input.seek(index33_59);
 						if ( s>=0 ) return s;
 						break;
 
 					case 48 : 
-						int LA33_35 = input.LA(1);
-						 
-						int index33_35 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_35);
-						if ( s>=0 ) return s;
-						break;
-
-					case 49 : 
-						int LA33_81 = input.LA(1);
-						 
-						int index33_81 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_81);
-						if ( s>=0 ) return s;
-						break;
-
-					case 50 : 
-						int LA33_12 = input.LA(1);
-						 
-						int index33_12 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA33_12==DOT) ) {s = 18;}
-						else if ( (LA33_12==COLON) && (synpred13_FTS())) {s = 19;}
-						else if ( (LA33_12==EOF||(LA33_12 >= AMP && LA33_12 <= BAR)||LA33_12==CARAT||LA33_12==COMMA||LA33_12==DATETIME||LA33_12==DECIMAL_INTEGER_LITERAL||LA33_12==EQUALS||LA33_12==EXCLAMATION||LA33_12==FLOATING_POINT_LITERAL||(LA33_12 >= FTSPHRASE && LA33_12 <= FTSWORD)||LA33_12==ID||(LA33_12 >= LPAREN && LA33_12 <= LT)||LA33_12==MINUS||LA33_12==NOT||(LA33_12 >= OR && LA33_12 <= PERCENT)||LA33_12==PLUS||LA33_12==QUESTION_MARK||LA33_12==RPAREN||LA33_12==STAR||(LA33_12 >= TILDA && LA33_12 <= TO)||LA33_12==URI) ) {s = 9;}
-						 
-						input.seek(index33_12);
-						if ( s>=0 ) return s;
-						break;
-
-					case 51 : 
-						int LA33_82 = input.LA(1);
-						 
-						int index33_82 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_82);
-						if ( s>=0 ) return s;
-						break;
-
-					case 52 : 
-						int LA33_22 = input.LA(1);
-						 
-						int index33_22 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_22);
-						if ( s>=0 ) return s;
-						break;
-
-					case 53 : 
-						int LA33_54 = input.LA(1);
-						 
-						int index33_54 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index33_54);
-						if ( s>=0 ) return s;
-						break;
-
-					case 54 : 
 						int LA33_14 = input.LA(1);
 						 
 						int index33_14 = input.index();
@@ -18182,29 +18306,108 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 55 : 
-						int LA33_70 = input.LA(1);
+					case 49 : 
+						int LA33_2 = input.LA(1);
 						 
-						int index33_70 = input.index();
+						int index33_2 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA33_2==DOT) ) {s = 10;}
+						else if ( (LA33_2==COLON) && (synpred13_FTS())) {s = 11;}
+						else if ( (LA33_2==EOF||(LA33_2 >= AMP && LA33_2 <= BAR)||LA33_2==CARAT||LA33_2==COMMA||LA33_2==DATETIME||LA33_2==DECIMAL_INTEGER_LITERAL||LA33_2==EQUALS||LA33_2==EXCLAMATION||LA33_2==FLOATING_POINT_LITERAL||(LA33_2 >= FTSPHRASE && LA33_2 <= FTSWORD)||LA33_2==ID||(LA33_2 >= LPAREN && LA33_2 <= LT)||LA33_2==MINUS||LA33_2==NOT||(LA33_2 >= OR && LA33_2 <= PERCENT)||LA33_2==PLUS||LA33_2==QUESTION_MARK||LA33_2==RPAREN||LA33_2==STAR||(LA33_2 >= TILDA && LA33_2 <= TO)||LA33_2==URI) ) {s = 9;}
+						 
+						input.seek(index33_2);
+						if ( s>=0 ) return s;
+						break;
+
+					case 50 : 
+						int LA33_29 = input.LA(1);
+						 
+						int index33_29 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_70);
+						input.seek(index33_29);
+						if ( s>=0 ) return s;
+						break;
+
+					case 51 : 
+						int LA33_75 = input.LA(1);
+						 
+						int index33_75 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_75);
+						if ( s>=0 ) return s;
+						break;
+
+					case 52 : 
+						int LA33_50 = input.LA(1);
+						 
+						int index33_50 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_50);
+						if ( s>=0 ) return s;
+						break;
+
+					case 53 : 
+						int LA33_81 = input.LA(1);
+						 
+						int index33_81 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_81);
+						if ( s>=0 ) return s;
+						break;
+
+					case 54 : 
+						int LA33_73 = input.LA(1);
+						 
+						int index33_73 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_73);
+						if ( s>=0 ) return s;
+						break;
+
+					case 55 : 
+						int LA33_61 = input.LA(1);
+						 
+						int index33_61 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred13_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index33_61);
 						if ( s>=0 ) return s;
 						break;
 
 					case 56 : 
-						int LA33_84 = input.LA(1);
+						int LA33_31 = input.LA(1);
 						 
-						int index33_84 = input.index();
+						int index33_31 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_84);
+						input.seek(index33_31);
 						if ( s>=0 ) return s;
 						break;
 
@@ -18222,106 +18425,106 @@ public class FTSParser extends Parser {
 						break;
 
 					case 58 : 
-						int LA33_76 = input.LA(1);
+						int LA33_58 = input.LA(1);
 						 
-						int index33_76 = input.index();
+						int index33_58 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_76);
+						input.seek(index33_58);
 						if ( s>=0 ) return s;
 						break;
 
 					case 59 : 
-						int LA33_64 = input.LA(1);
+						int LA33_53 = input.LA(1);
 						 
-						int index33_64 = input.index();
+						int index33_53 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_64);
+						input.seek(index33_53);
 						if ( s>=0 ) return s;
 						break;
 
 					case 60 : 
-						int LA33_32 = input.LA(1);
+						int LA33_3 = input.LA(1);
 						 
-						int index33_32 = input.index();
+						int index33_3 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
+						if ( (LA33_3==COLON) && (synpred13_FTS())) {s = 11;}
+						else if ( (LA33_3==EOF||(LA33_3 >= AMP && LA33_3 <= BAR)||LA33_3==CARAT||LA33_3==COMMA||LA33_3==DATETIME||LA33_3==DECIMAL_INTEGER_LITERAL||LA33_3==DOT||LA33_3==EQUALS||LA33_3==EXCLAMATION||LA33_3==FLOATING_POINT_LITERAL||(LA33_3 >= FTSPHRASE && LA33_3 <= FTSWORD)||LA33_3==ID||(LA33_3 >= LPAREN && LA33_3 <= LT)||LA33_3==MINUS||LA33_3==NOT||(LA33_3 >= OR && LA33_3 <= PERCENT)||LA33_3==PLUS||LA33_3==QUESTION_MARK||LA33_3==RPAREN||LA33_3==STAR||(LA33_3 >= TILDA && LA33_3 <= TO)||LA33_3==URI) ) {s = 9;}
 						 
-						input.seek(index33_32);
+						input.seek(index33_3);
 						if ( s>=0 ) return s;
 						break;
 
 					case 61 : 
-						int LA33_56 = input.LA(1);
+						int LA33_6 = input.LA(1);
 						 
-						int index33_56 = input.index();
+						int index33_6 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
+						if ( (LA33_6==COLON) && (synpred13_FTS())) {s = 11;}
+						else if ( (LA33_6==EOF||(LA33_6 >= AMP && LA33_6 <= BAR)||LA33_6==CARAT||LA33_6==COMMA||LA33_6==DATETIME||LA33_6==DECIMAL_INTEGER_LITERAL||LA33_6==DOT||LA33_6==EQUALS||LA33_6==EXCLAMATION||LA33_6==FLOATING_POINT_LITERAL||(LA33_6 >= FTSPHRASE && LA33_6 <= FTSWORD)||LA33_6==ID||(LA33_6 >= LPAREN && LA33_6 <= LT)||LA33_6==MINUS||LA33_6==NOT||(LA33_6 >= OR && LA33_6 <= PERCENT)||LA33_6==PLUS||LA33_6==QUESTION_MARK||LA33_6==RPAREN||LA33_6==STAR||(LA33_6 >= TILDA && LA33_6 <= TO)||LA33_6==URI) ) {s = 9;}
 						 
-						input.seek(index33_56);
+						input.seek(index33_6);
 						if ( s>=0 ) return s;
 						break;
 
 					case 62 : 
-						int LA33_69 = input.LA(1);
+						int LA33_85 = input.LA(1);
 						 
-						int index33_69 = input.index();
+						int index33_85 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_69);
+						input.seek(index33_85);
 						if ( s>=0 ) return s;
 						break;
 
 					case 63 : 
-						int LA33_57 = input.LA(1);
+						int LA33_15 = input.LA(1);
 						 
-						int index33_57 = input.index();
+						int index33_15 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred13_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
+						if ( (LA33_15==COLON) && (synpred13_FTS())) {s = 19;}
+						else if ( (LA33_15==EOF||(LA33_15 >= AMP && LA33_15 <= BAR)||LA33_15==CARAT||LA33_15==COMMA||LA33_15==DATETIME||LA33_15==DECIMAL_INTEGER_LITERAL||LA33_15==DOT||LA33_15==EQUALS||LA33_15==EXCLAMATION||LA33_15==FLOATING_POINT_LITERAL||(LA33_15 >= FTSPHRASE && LA33_15 <= FTSWORD)||LA33_15==ID||(LA33_15 >= LPAREN && LA33_15 <= LT)||LA33_15==MINUS||LA33_15==NOT||(LA33_15 >= OR && LA33_15 <= PERCENT)||LA33_15==PLUS||LA33_15==QUESTION_MARK||LA33_15==RPAREN||LA33_15==STAR||(LA33_15 >= TILDA && LA33_15 <= TO)||LA33_15==URI) ) {s = 9;}
 						 
-						input.seek(index33_57);
+						input.seek(index33_15);
 						if ( s>=0 ) return s;
 						break;
 
 					case 64 : 
-						int LA33_27 = input.LA(1);
+						int LA33_40 = input.LA(1);
 						 
-						int index33_27 = input.index();
+						int index33_40 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_27);
+						input.seek(index33_40);
 						if ( s>=0 ) return s;
 						break;
 
 					case 65 : 
-						int LA33_44 = input.LA(1);
+						int LA33_70 = input.LA(1);
 						 
-						int index33_44 = input.index();
+						int index33_70 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred13_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index33_44);
+						input.seek(index33_70);
 						if ( s>=0 ) return s;
 						break;
 			}
@@ -18347,12 +18550,12 @@ public class FTSParser extends Parser {
 	static final String DFA39_acceptS =
 		"\1\uffff\1\1\2\uffff\2\1\2\uffff\1\2\1\3\1\uffff\1\1\7\uffff\1\1\102\uffff";
 	static final String DFA39_specialS =
-		"\1\30\1\uffff\1\100\1\13\2\uffff\1\0\5\uffff\1\63\1\101\1\56\1\44\1\50"+
-		"\5\uffff\1\35\1\43\2\uffff\1\51\1\17\1\uffff\1\26\1\67\1\47\1\76\1\33"+
-		"\1\73\1\3\1\40\3\uffff\1\20\1\14\1\42\1\4\1\77\1\41\1\10\1\21\1\60\1\34"+
-		"\1\64\1\uffff\1\12\1\22\1\7\1\53\1\6\1\16\1\55\1\25\1\66\1\46\1\61\1\11"+
-		"\1\75\1\32\1\72\1\2\1\37\1\15\1\71\1\24\1\65\1\45\1\23\1\52\1\74\1\31"+
-		"\1\70\1\1\1\36\1\5\1\54\1\57\1\27\1\62}>";
+		"\1\44\1\uffff\1\14\1\6\2\uffff\1\24\5\uffff\1\42\1\43\1\53\1\1\1\11\5"+
+		"\uffff\1\10\1\101\2\uffff\1\71\1\66\1\uffff\1\52\1\56\1\20\1\63\1\5\1"+
+		"\47\1\77\1\27\3\uffff\1\32\1\57\1\21\1\12\1\40\1\33\1\35\1\0\1\41\1\60"+
+		"\1\31\1\uffff\1\67\1\13\1\100\1\30\1\73\1\65\1\2\1\51\1\55\1\17\1\70\1"+
+		"\34\1\62\1\4\1\46\1\76\1\26\1\64\1\23\1\50\1\54\1\16\1\72\1\22\1\61\1"+
+		"\3\1\45\1\75\1\25\1\15\1\74\1\37\1\7\1\36}>";
 	static final String[] DFA39_transitionS = {
 			"\1\5\1\1\4\uffff\1\11\1\uffff\1\11\1\uffff\1\11\5\uffff\1\11\31\uffff"+
 			"\1\11\2\uffff\1\10\3\11\11\uffff\1\2\16\uffff\1\6\2\uffff\1\4\6\uffff"+
@@ -18527,227 +18730,6 @@ public class FTSParser extends Parser {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
-						int LA39_6 = input.LA(1);
-						 
-						int index39_6 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA39_6==COLON) && (synpred18_FTS())) {s = 11;}
-						else if ( (LA39_6==EOF||(LA39_6 >= AMP && LA39_6 <= BAR)||LA39_6==CARAT||LA39_6==COMMA||LA39_6==DATETIME||LA39_6==DECIMAL_INTEGER_LITERAL||LA39_6==DOT||LA39_6==EQUALS||LA39_6==EXCLAMATION||LA39_6==FLOATING_POINT_LITERAL||(LA39_6 >= FTSPHRASE && LA39_6 <= FTSWORD)||LA39_6==ID||(LA39_6 >= LPAREN && LA39_6 <= LT)||LA39_6==MINUS||LA39_6==NOT||(LA39_6 >= OR && LA39_6 <= PERCENT)||LA39_6==PLUS||LA39_6==QUESTION_MARK||LA39_6==RPAREN||LA39_6==STAR||(LA39_6 >= TILDA && LA39_6 <= TO)||LA39_6==URI) ) {s = 9;}
-						 
-						input.seek(index39_6);
-						if ( s>=0 ) return s;
-						break;
-
-					case 1 : 
-						int LA39_79 = input.LA(1);
-						 
-						int index39_79 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_79);
-						if ( s>=0 ) return s;
-						break;
-
-					case 2 : 
-						int LA39_67 = input.LA(1);
-						 
-						int index39_67 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_67);
-						if ( s>=0 ) return s;
-						break;
-
-					case 3 : 
-						int LA39_35 = input.LA(1);
-						 
-						int index39_35 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_35);
-						if ( s>=0 ) return s;
-						break;
-
-					case 4 : 
-						int LA39_43 = input.LA(1);
-						 
-						int index39_43 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_43);
-						if ( s>=0 ) return s;
-						break;
-
-					case 5 : 
-						int LA39_81 = input.LA(1);
-						 
-						int index39_81 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_81);
-						if ( s>=0 ) return s;
-						break;
-
-					case 6 : 
-						int LA39_56 = input.LA(1);
-						 
-						int index39_56 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_56);
-						if ( s>=0 ) return s;
-						break;
-
-					case 7 : 
-						int LA39_54 = input.LA(1);
-						 
-						int index39_54 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_54);
-						if ( s>=0 ) return s;
-						break;
-
-					case 8 : 
-						int LA39_46 = input.LA(1);
-						 
-						int index39_46 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_46);
-						if ( s>=0 ) return s;
-						break;
-
-					case 9 : 
-						int LA39_63 = input.LA(1);
-						 
-						int index39_63 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_63);
-						if ( s>=0 ) return s;
-						break;
-
-					case 10 : 
-						int LA39_52 = input.LA(1);
-						 
-						int index39_52 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_52);
-						if ( s>=0 ) return s;
-						break;
-
-					case 11 : 
-						int LA39_3 = input.LA(1);
-						 
-						int index39_3 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA39_3==COLON) && (synpred18_FTS())) {s = 11;}
-						else if ( (LA39_3==EOF||(LA39_3 >= AMP && LA39_3 <= BAR)||LA39_3==CARAT||LA39_3==COMMA||LA39_3==DATETIME||LA39_3==DECIMAL_INTEGER_LITERAL||LA39_3==DOT||LA39_3==EQUALS||LA39_3==EXCLAMATION||LA39_3==FLOATING_POINT_LITERAL||(LA39_3 >= FTSPHRASE && LA39_3 <= FTSWORD)||LA39_3==ID||(LA39_3 >= LPAREN && LA39_3 <= LT)||LA39_3==MINUS||LA39_3==NOT||(LA39_3 >= OR && LA39_3 <= PERCENT)||LA39_3==PLUS||LA39_3==QUESTION_MARK||LA39_3==RPAREN||LA39_3==STAR||(LA39_3 >= TILDA && LA39_3 <= TO)||LA39_3==URI) ) {s = 9;}
-						 
-						input.seek(index39_3);
-						if ( s>=0 ) return s;
-						break;
-
-					case 12 : 
-						int LA39_41 = input.LA(1);
-						 
-						int index39_41 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_41);
-						if ( s>=0 ) return s;
-						break;
-
-					case 13 : 
-						int LA39_69 = input.LA(1);
-						 
-						int index39_69 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_69);
-						if ( s>=0 ) return s;
-						break;
-
-					case 14 : 
-						int LA39_57 = input.LA(1);
-						 
-						int index39_57 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_57);
-						if ( s>=0 ) return s;
-						break;
-
-					case 15 : 
-						int LA39_27 = input.LA(1);
-						 
-						int index39_27 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_27);
-						if ( s>=0 ) return s;
-						break;
-
-					case 16 : 
-						int LA39_40 = input.LA(1);
-						 
-						int index39_40 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_40);
-						if ( s>=0 ) return s;
-						break;
-
-					case 17 : 
 						int LA39_47 = input.LA(1);
 						 
 						int index39_47 = input.index();
@@ -18760,72 +18742,85 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 18 : 
-						int LA39_53 = input.LA(1);
+					case 1 : 
+						int LA39_15 = input.LA(1);
 						 
-						int index39_53 = input.index();
+						int index39_15 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA39_15==COLON) && (synpred18_FTS())) {s = 19;}
+						else if ( (LA39_15==EOF||(LA39_15 >= AMP && LA39_15 <= BAR)||LA39_15==CARAT||LA39_15==COMMA||LA39_15==DATETIME||LA39_15==DECIMAL_INTEGER_LITERAL||LA39_15==DOT||LA39_15==EQUALS||LA39_15==EXCLAMATION||LA39_15==FLOATING_POINT_LITERAL||(LA39_15 >= FTSPHRASE && LA39_15 <= FTSWORD)||LA39_15==ID||(LA39_15 >= LPAREN && LA39_15 <= LT)||LA39_15==MINUS||LA39_15==NOT||(LA39_15 >= OR && LA39_15 <= PERCENT)||LA39_15==PLUS||LA39_15==QUESTION_MARK||LA39_15==RPAREN||LA39_15==STAR||(LA39_15 >= TILDA && LA39_15 <= TO)||LA39_15==URI) ) {s = 9;}
+						 
+						input.seek(index39_15);
+						if ( s>=0 ) return s;
+						break;
+
+					case 2 : 
+						int LA39_58 = input.LA(1);
+						 
+						int index39_58 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred18_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index39_53);
+						input.seek(index39_58);
 						if ( s>=0 ) return s;
 						break;
 
-					case 19 : 
-						int LA39_74 = input.LA(1);
+					case 3 : 
+						int LA39_77 = input.LA(1);
 						 
-						int index39_74 = input.index();
+						int index39_77 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred18_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index39_74);
+						input.seek(index39_77);
 						if ( s>=0 ) return s;
 						break;
 
-					case 20 : 
-						int LA39_71 = input.LA(1);
+					case 4 : 
+						int LA39_65 = input.LA(1);
 						 
-						int index39_71 = input.index();
+						int index39_65 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred18_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index39_71);
+						input.seek(index39_65);
 						if ( s>=0 ) return s;
 						break;
 
-					case 21 : 
-						int LA39_59 = input.LA(1);
+					case 5 : 
+						int LA39_33 = input.LA(1);
 						 
-						int index39_59 = input.index();
+						int index39_33 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred18_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index39_59);
+						input.seek(index39_33);
 						if ( s>=0 ) return s;
 						break;
 
-					case 22 : 
-						int LA39_29 = input.LA(1);
+					case 6 : 
+						int LA39_3 = input.LA(1);
 						 
-						int index39_29 = input.index();
+						int index39_3 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
+						if ( (LA39_3==COLON) && (synpred18_FTS())) {s = 11;}
+						else if ( (LA39_3==EOF||(LA39_3 >= AMP && LA39_3 <= BAR)||LA39_3==CARAT||LA39_3==COMMA||LA39_3==DATETIME||LA39_3==DECIMAL_INTEGER_LITERAL||LA39_3==DOT||LA39_3==EQUALS||LA39_3==EXCLAMATION||LA39_3==FLOATING_POINT_LITERAL||(LA39_3 >= FTSPHRASE && LA39_3 <= FTSWORD)||LA39_3==ID||(LA39_3 >= LPAREN && LA39_3 <= LT)||LA39_3==MINUS||LA39_3==NOT||(LA39_3 >= OR && LA39_3 <= PERCENT)||LA39_3==PLUS||LA39_3==QUESTION_MARK||LA39_3==RPAREN||LA39_3==STAR||(LA39_3 >= TILDA && LA39_3 <= TO)||LA39_3==URI) ) {s = 9;}
 						 
-						input.seek(index39_29);
+						input.seek(index39_3);
 						if ( s>=0 ) return s;
 						break;
 
-					case 23 : 
+					case 7 : 
 						int LA39_84 = input.LA(1);
 						 
 						int index39_84 = input.index();
@@ -18838,7 +18833,373 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
+					case 8 : 
+						int LA39_22 = input.LA(1);
+						 
+						int index39_22 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_22);
+						if ( s>=0 ) return s;
+						break;
+
+					case 9 : 
+						int LA39_16 = input.LA(1);
+						 
+						int index39_16 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA39_16==COLON) && (synpred18_FTS())) {s = 19;}
+						else if ( (LA39_16==EOF||(LA39_16 >= AMP && LA39_16 <= BAR)||LA39_16==CARAT||LA39_16==COMMA||LA39_16==DATETIME||LA39_16==DECIMAL_INTEGER_LITERAL||LA39_16==DOT||LA39_16==EQUALS||LA39_16==EXCLAMATION||LA39_16==FLOATING_POINT_LITERAL||(LA39_16 >= FTSPHRASE && LA39_16 <= FTSWORD)||LA39_16==ID||(LA39_16 >= LPAREN && LA39_16 <= LT)||LA39_16==MINUS||LA39_16==NOT||(LA39_16 >= OR && LA39_16 <= PERCENT)||LA39_16==PLUS||LA39_16==QUESTION_MARK||LA39_16==RPAREN||LA39_16==STAR||(LA39_16 >= TILDA && LA39_16 <= TO)||LA39_16==URI) ) {s = 9;}
+						 
+						input.seek(index39_16);
+						if ( s>=0 ) return s;
+						break;
+
+					case 10 : 
+						int LA39_43 = input.LA(1);
+						 
+						int index39_43 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_43);
+						if ( s>=0 ) return s;
+						break;
+
+					case 11 : 
+						int LA39_53 = input.LA(1);
+						 
+						int index39_53 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_53);
+						if ( s>=0 ) return s;
+						break;
+
+					case 12 : 
+						int LA39_2 = input.LA(1);
+						 
+						int index39_2 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA39_2==DOT) ) {s = 10;}
+						else if ( (LA39_2==COLON) && (synpred18_FTS())) {s = 11;}
+						else if ( (LA39_2==EOF||(LA39_2 >= AMP && LA39_2 <= BAR)||LA39_2==CARAT||LA39_2==COMMA||LA39_2==DATETIME||LA39_2==DECIMAL_INTEGER_LITERAL||LA39_2==EQUALS||LA39_2==EXCLAMATION||LA39_2==FLOATING_POINT_LITERAL||(LA39_2 >= FTSPHRASE && LA39_2 <= FTSWORD)||LA39_2==ID||(LA39_2 >= LPAREN && LA39_2 <= LT)||LA39_2==MINUS||LA39_2==NOT||(LA39_2 >= OR && LA39_2 <= PERCENT)||LA39_2==PLUS||LA39_2==QUESTION_MARK||LA39_2==RPAREN||LA39_2==STAR||(LA39_2 >= TILDA && LA39_2 <= TO)||LA39_2==URI) ) {s = 9;}
+						 
+						input.seek(index39_2);
+						if ( s>=0 ) return s;
+						break;
+
+					case 13 : 
+						int LA39_81 = input.LA(1);
+						 
+						int index39_81 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_81);
+						if ( s>=0 ) return s;
+						break;
+
+					case 14 : 
+						int LA39_73 = input.LA(1);
+						 
+						int index39_73 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_73);
+						if ( s>=0 ) return s;
+						break;
+
+					case 15 : 
+						int LA39_61 = input.LA(1);
+						 
+						int index39_61 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_61);
+						if ( s>=0 ) return s;
+						break;
+
+					case 16 : 
+						int LA39_31 = input.LA(1);
+						 
+						int index39_31 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_31);
+						if ( s>=0 ) return s;
+						break;
+
+					case 17 : 
+						int LA39_42 = input.LA(1);
+						 
+						int index39_42 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_42);
+						if ( s>=0 ) return s;
+						break;
+
+					case 18 : 
+						int LA39_75 = input.LA(1);
+						 
+						int index39_75 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_75);
+						if ( s>=0 ) return s;
+						break;
+
+					case 19 : 
+						int LA39_70 = input.LA(1);
+						 
+						int index39_70 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_70);
+						if ( s>=0 ) return s;
+						break;
+
+					case 20 : 
+						int LA39_6 = input.LA(1);
+						 
+						int index39_6 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA39_6==COLON) && (synpred18_FTS())) {s = 11;}
+						else if ( (LA39_6==EOF||(LA39_6 >= AMP && LA39_6 <= BAR)||LA39_6==CARAT||LA39_6==COMMA||LA39_6==DATETIME||LA39_6==DECIMAL_INTEGER_LITERAL||LA39_6==DOT||LA39_6==EQUALS||LA39_6==EXCLAMATION||LA39_6==FLOATING_POINT_LITERAL||(LA39_6 >= FTSPHRASE && LA39_6 <= FTSWORD)||LA39_6==ID||(LA39_6 >= LPAREN && LA39_6 <= LT)||LA39_6==MINUS||LA39_6==NOT||(LA39_6 >= OR && LA39_6 <= PERCENT)||LA39_6==PLUS||LA39_6==QUESTION_MARK||LA39_6==RPAREN||LA39_6==STAR||(LA39_6 >= TILDA && LA39_6 <= TO)||LA39_6==URI) ) {s = 9;}
+						 
+						input.seek(index39_6);
+						if ( s>=0 ) return s;
+						break;
+
+					case 21 : 
+						int LA39_80 = input.LA(1);
+						 
+						int index39_80 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_80);
+						if ( s>=0 ) return s;
+						break;
+
+					case 22 : 
+						int LA39_68 = input.LA(1);
+						 
+						int index39_68 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_68);
+						if ( s>=0 ) return s;
+						break;
+
+					case 23 : 
+						int LA39_36 = input.LA(1);
+						 
+						int index39_36 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_36);
+						if ( s>=0 ) return s;
+						break;
+
 					case 24 : 
+						int LA39_55 = input.LA(1);
+						 
+						int index39_55 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_55);
+						if ( s>=0 ) return s;
+						break;
+
+					case 25 : 
+						int LA39_50 = input.LA(1);
+						 
+						int index39_50 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_50);
+						if ( s>=0 ) return s;
+						break;
+
+					case 26 : 
+						int LA39_40 = input.LA(1);
+						 
+						int index39_40 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_40);
+						if ( s>=0 ) return s;
+						break;
+
+					case 27 : 
+						int LA39_45 = input.LA(1);
+						 
+						int index39_45 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_45);
+						if ( s>=0 ) return s;
+						break;
+
+					case 28 : 
+						int LA39_63 = input.LA(1);
+						 
+						int index39_63 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_63);
+						if ( s>=0 ) return s;
+						break;
+
+					case 29 : 
+						int LA39_46 = input.LA(1);
+						 
+						int index39_46 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_46);
+						if ( s>=0 ) return s;
+						break;
+
+					case 30 : 
+						int LA39_85 = input.LA(1);
+						 
+						int index39_85 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_85);
+						if ( s>=0 ) return s;
+						break;
+
+					case 31 : 
+						int LA39_83 = input.LA(1);
+						 
+						int index39_83 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_83);
+						if ( s>=0 ) return s;
+						break;
+
+					case 32 : 
+						int LA39_44 = input.LA(1);
+						 
+						int index39_44 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_44);
+						if ( s>=0 ) return s;
+						break;
+
+					case 33 : 
+						int LA39_48 = input.LA(1);
+						 
+						int index39_48 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_48);
+						if ( s>=0 ) return s;
+						break;
+
+					case 34 : 
+						int LA39_12 = input.LA(1);
+						 
+						int index39_12 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA39_12==DOT) ) {s = 18;}
+						else if ( (LA39_12==COLON) && (synpred18_FTS())) {s = 19;}
+						else if ( (LA39_12==EOF||(LA39_12 >= AMP && LA39_12 <= BAR)||LA39_12==CARAT||LA39_12==COMMA||LA39_12==DATETIME||LA39_12==DECIMAL_INTEGER_LITERAL||LA39_12==EQUALS||LA39_12==EXCLAMATION||LA39_12==FLOATING_POINT_LITERAL||(LA39_12 >= FTSPHRASE && LA39_12 <= FTSWORD)||LA39_12==ID||(LA39_12 >= LPAREN && LA39_12 <= LT)||LA39_12==MINUS||LA39_12==NOT||(LA39_12 >= OR && LA39_12 <= PERCENT)||LA39_12==PLUS||LA39_12==QUESTION_MARK||LA39_12==RPAREN||LA39_12==STAR||(LA39_12 >= TILDA && LA39_12 <= TO)||LA39_12==URI) ) {s = 9;}
+						 
+						input.seek(index39_12);
+						if ( s>=0 ) return s;
+						break;
+
+					case 35 : 
+						int LA39_13 = input.LA(1);
+						 
+						int index39_13 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA39_13==COLON) && (synpred18_FTS())) {s = 19;}
+						else if ( (LA39_13==EOF||(LA39_13 >= AMP && LA39_13 <= BAR)||LA39_13==CARAT||LA39_13==COMMA||LA39_13==DATETIME||LA39_13==DECIMAL_INTEGER_LITERAL||LA39_13==DOT||LA39_13==EQUALS||LA39_13==EXCLAMATION||LA39_13==FLOATING_POINT_LITERAL||(LA39_13 >= FTSPHRASE && LA39_13 <= FTSWORD)||LA39_13==ID||(LA39_13 >= LPAREN && LA39_13 <= LT)||LA39_13==MINUS||LA39_13==NOT||(LA39_13 >= OR && LA39_13 <= PERCENT)||LA39_13==PLUS||LA39_13==QUESTION_MARK||LA39_13==RPAREN||LA39_13==STAR||(LA39_13 >= TILDA && LA39_13 <= TO)||LA39_13==URI) ) {s = 9;}
+						 
+						input.seek(index39_13);
+						if ( s>=0 ) return s;
+						break;
+
+					case 36 : 
 						int LA39_0 = input.LA(1);
 						 
 						int index39_0 = input.index();
@@ -18858,411 +19219,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 25 : 
-						int LA39_77 = input.LA(1);
-						 
-						int index39_77 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_77);
-						if ( s>=0 ) return s;
-						break;
-
-					case 26 : 
-						int LA39_65 = input.LA(1);
-						 
-						int index39_65 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_65);
-						if ( s>=0 ) return s;
-						break;
-
-					case 27 : 
-						int LA39_33 = input.LA(1);
-						 
-						int index39_33 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_33);
-						if ( s>=0 ) return s;
-						break;
-
-					case 28 : 
-						int LA39_49 = input.LA(1);
-						 
-						int index39_49 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_49);
-						if ( s>=0 ) return s;
-						break;
-
-					case 29 : 
-						int LA39_22 = input.LA(1);
-						 
-						int index39_22 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_22);
-						if ( s>=0 ) return s;
-						break;
-
-					case 30 : 
-						int LA39_80 = input.LA(1);
-						 
-						int index39_80 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_80);
-						if ( s>=0 ) return s;
-						break;
-
-					case 31 : 
-						int LA39_68 = input.LA(1);
-						 
-						int index39_68 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_68);
-						if ( s>=0 ) return s;
-						break;
-
-					case 32 : 
-						int LA39_36 = input.LA(1);
-						 
-						int index39_36 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_36);
-						if ( s>=0 ) return s;
-						break;
-
-					case 33 : 
-						int LA39_45 = input.LA(1);
-						 
-						int index39_45 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_45);
-						if ( s>=0 ) return s;
-						break;
-
-					case 34 : 
-						int LA39_42 = input.LA(1);
-						 
-						int index39_42 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_42);
-						if ( s>=0 ) return s;
-						break;
-
-					case 35 : 
-						int LA39_23 = input.LA(1);
-						 
-						int index39_23 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_23);
-						if ( s>=0 ) return s;
-						break;
-
-					case 36 : 
-						int LA39_15 = input.LA(1);
-						 
-						int index39_15 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA39_15==COLON) && (synpred18_FTS())) {s = 19;}
-						else if ( (LA39_15==EOF||(LA39_15 >= AMP && LA39_15 <= BAR)||LA39_15==CARAT||LA39_15==COMMA||LA39_15==DATETIME||LA39_15==DECIMAL_INTEGER_LITERAL||LA39_15==DOT||LA39_15==EQUALS||LA39_15==EXCLAMATION||LA39_15==FLOATING_POINT_LITERAL||(LA39_15 >= FTSPHRASE && LA39_15 <= FTSWORD)||LA39_15==ID||(LA39_15 >= LPAREN && LA39_15 <= LT)||LA39_15==MINUS||LA39_15==NOT||(LA39_15 >= OR && LA39_15 <= PERCENT)||LA39_15==PLUS||LA39_15==QUESTION_MARK||LA39_15==RPAREN||LA39_15==STAR||(LA39_15 >= TILDA && LA39_15 <= TO)||LA39_15==URI) ) {s = 9;}
-						 
-						input.seek(index39_15);
-						if ( s>=0 ) return s;
-						break;
-
 					case 37 : 
-						int LA39_73 = input.LA(1);
-						 
-						int index39_73 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_73);
-						if ( s>=0 ) return s;
-						break;
-
-					case 38 : 
-						int LA39_61 = input.LA(1);
-						 
-						int index39_61 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_61);
-						if ( s>=0 ) return s;
-						break;
-
-					case 39 : 
-						int LA39_31 = input.LA(1);
-						 
-						int index39_31 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_31);
-						if ( s>=0 ) return s;
-						break;
-
-					case 40 : 
-						int LA39_16 = input.LA(1);
-						 
-						int index39_16 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA39_16==COLON) && (synpred18_FTS())) {s = 19;}
-						else if ( (LA39_16==EOF||(LA39_16 >= AMP && LA39_16 <= BAR)||LA39_16==CARAT||LA39_16==COMMA||LA39_16==DATETIME||LA39_16==DECIMAL_INTEGER_LITERAL||LA39_16==DOT||LA39_16==EQUALS||LA39_16==EXCLAMATION||LA39_16==FLOATING_POINT_LITERAL||(LA39_16 >= FTSPHRASE && LA39_16 <= FTSWORD)||LA39_16==ID||(LA39_16 >= LPAREN && LA39_16 <= LT)||LA39_16==MINUS||LA39_16==NOT||(LA39_16 >= OR && LA39_16 <= PERCENT)||LA39_16==PLUS||LA39_16==QUESTION_MARK||LA39_16==RPAREN||LA39_16==STAR||(LA39_16 >= TILDA && LA39_16 <= TO)||LA39_16==URI) ) {s = 9;}
-						 
-						input.seek(index39_16);
-						if ( s>=0 ) return s;
-						break;
-
-					case 41 : 
-						int LA39_26 = input.LA(1);
-						 
-						int index39_26 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_26);
-						if ( s>=0 ) return s;
-						break;
-
-					case 42 : 
-						int LA39_75 = input.LA(1);
-						 
-						int index39_75 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_75);
-						if ( s>=0 ) return s;
-						break;
-
-					case 43 : 
-						int LA39_55 = input.LA(1);
-						 
-						int index39_55 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_55);
-						if ( s>=0 ) return s;
-						break;
-
-					case 44 : 
-						int LA39_82 = input.LA(1);
-						 
-						int index39_82 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_82);
-						if ( s>=0 ) return s;
-						break;
-
-					case 45 : 
-						int LA39_58 = input.LA(1);
-						 
-						int index39_58 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_58);
-						if ( s>=0 ) return s;
-						break;
-
-					case 46 : 
-						int LA39_14 = input.LA(1);
-						 
-						int index39_14 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA39_14==COLON) && (synpred18_FTS())) {s = 19;}
-						else if ( (LA39_14==EOF||(LA39_14 >= AMP && LA39_14 <= BAR)||LA39_14==CARAT||LA39_14==COMMA||LA39_14==DATETIME||LA39_14==DECIMAL_INTEGER_LITERAL||LA39_14==DOT||LA39_14==EQUALS||LA39_14==EXCLAMATION||LA39_14==FLOATING_POINT_LITERAL||(LA39_14 >= FTSPHRASE && LA39_14 <= FTSWORD)||LA39_14==ID||(LA39_14 >= LPAREN && LA39_14 <= LT)||LA39_14==MINUS||LA39_14==NOT||(LA39_14 >= OR && LA39_14 <= PERCENT)||LA39_14==PLUS||LA39_14==QUESTION_MARK||LA39_14==RPAREN||LA39_14==STAR||(LA39_14 >= TILDA && LA39_14 <= TO)||LA39_14==URI) ) {s = 9;}
-						 
-						input.seek(index39_14);
-						if ( s>=0 ) return s;
-						break;
-
-					case 47 : 
-						int LA39_83 = input.LA(1);
-						 
-						int index39_83 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_83);
-						if ( s>=0 ) return s;
-						break;
-
-					case 48 : 
-						int LA39_48 = input.LA(1);
-						 
-						int index39_48 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_48);
-						if ( s>=0 ) return s;
-						break;
-
-					case 49 : 
-						int LA39_62 = input.LA(1);
-						 
-						int index39_62 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_62);
-						if ( s>=0 ) return s;
-						break;
-
-					case 50 : 
-						int LA39_85 = input.LA(1);
-						 
-						int index39_85 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_85);
-						if ( s>=0 ) return s;
-						break;
-
-					case 51 : 
-						int LA39_12 = input.LA(1);
-						 
-						int index39_12 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA39_12==DOT) ) {s = 18;}
-						else if ( (LA39_12==COLON) && (synpred18_FTS())) {s = 19;}
-						else if ( (LA39_12==EOF||(LA39_12 >= AMP && LA39_12 <= BAR)||LA39_12==CARAT||LA39_12==COMMA||LA39_12==DATETIME||LA39_12==DECIMAL_INTEGER_LITERAL||LA39_12==EQUALS||LA39_12==EXCLAMATION||LA39_12==FLOATING_POINT_LITERAL||(LA39_12 >= FTSPHRASE && LA39_12 <= FTSWORD)||LA39_12==ID||(LA39_12 >= LPAREN && LA39_12 <= LT)||LA39_12==MINUS||LA39_12==NOT||(LA39_12 >= OR && LA39_12 <= PERCENT)||LA39_12==PLUS||LA39_12==QUESTION_MARK||LA39_12==RPAREN||LA39_12==STAR||(LA39_12 >= TILDA && LA39_12 <= TO)||LA39_12==URI) ) {s = 9;}
-						 
-						input.seek(index39_12);
-						if ( s>=0 ) return s;
-						break;
-
-					case 52 : 
-						int LA39_50 = input.LA(1);
-						 
-						int index39_50 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_50);
-						if ( s>=0 ) return s;
-						break;
-
-					case 53 : 
-						int LA39_72 = input.LA(1);
-						 
-						int index39_72 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_72);
-						if ( s>=0 ) return s;
-						break;
-
-					case 54 : 
-						int LA39_60 = input.LA(1);
-						 
-						int index39_60 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_60);
-						if ( s>=0 ) return s;
-						break;
-
-					case 55 : 
-						int LA39_30 = input.LA(1);
-						 
-						int index39_30 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_30);
-						if ( s>=0 ) return s;
-						break;
-
-					case 56 : 
 						int LA39_78 = input.LA(1);
 						 
 						int index39_78 = input.index();
@@ -19275,20 +19232,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 57 : 
-						int LA39_70 = input.LA(1);
-						 
-						int index39_70 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred18_FTS()) ) {s = 19;}
-						else if ( (true) ) {s = 9;}
-						 
-						input.seek(index39_70);
-						if ( s>=0 ) return s;
-						break;
-
-					case 58 : 
+					case 38 : 
 						int LA39_66 = input.LA(1);
 						 
 						int index39_66 = input.index();
@@ -19301,7 +19245,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 59 : 
+					case 39 : 
 						int LA39_34 = input.LA(1);
 						 
 						int index39_34 = input.index();
@@ -19314,7 +19258,124 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 60 : 
+					case 40 : 
+						int LA39_71 = input.LA(1);
+						 
+						int index39_71 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_71);
+						if ( s>=0 ) return s;
+						break;
+
+					case 41 : 
+						int LA39_59 = input.LA(1);
+						 
+						int index39_59 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_59);
+						if ( s>=0 ) return s;
+						break;
+
+					case 42 : 
+						int LA39_29 = input.LA(1);
+						 
+						int index39_29 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_29);
+						if ( s>=0 ) return s;
+						break;
+
+					case 43 : 
+						int LA39_14 = input.LA(1);
+						 
+						int index39_14 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA39_14==COLON) && (synpred18_FTS())) {s = 19;}
+						else if ( (LA39_14==EOF||(LA39_14 >= AMP && LA39_14 <= BAR)||LA39_14==CARAT||LA39_14==COMMA||LA39_14==DATETIME||LA39_14==DECIMAL_INTEGER_LITERAL||LA39_14==DOT||LA39_14==EQUALS||LA39_14==EXCLAMATION||LA39_14==FLOATING_POINT_LITERAL||(LA39_14 >= FTSPHRASE && LA39_14 <= FTSWORD)||LA39_14==ID||(LA39_14 >= LPAREN && LA39_14 <= LT)||LA39_14==MINUS||LA39_14==NOT||(LA39_14 >= OR && LA39_14 <= PERCENT)||LA39_14==PLUS||LA39_14==QUESTION_MARK||LA39_14==RPAREN||LA39_14==STAR||(LA39_14 >= TILDA && LA39_14 <= TO)||LA39_14==URI) ) {s = 9;}
+						 
+						input.seek(index39_14);
+						if ( s>=0 ) return s;
+						break;
+
+					case 44 : 
+						int LA39_72 = input.LA(1);
+						 
+						int index39_72 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_72);
+						if ( s>=0 ) return s;
+						break;
+
+					case 45 : 
+						int LA39_60 = input.LA(1);
+						 
+						int index39_60 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_60);
+						if ( s>=0 ) return s;
+						break;
+
+					case 46 : 
+						int LA39_30 = input.LA(1);
+						 
+						int index39_30 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_30);
+						if ( s>=0 ) return s;
+						break;
+
+					case 47 : 
+						int LA39_41 = input.LA(1);
+						 
+						int index39_41 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_41);
+						if ( s>=0 ) return s;
+						break;
+
+					case 48 : 
+						int LA39_49 = input.LA(1);
+						 
+						int index39_49 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_49);
+						if ( s>=0 ) return s;
+						break;
+
+					case 49 : 
 						int LA39_76 = input.LA(1);
 						 
 						int index39_76 = input.index();
@@ -19327,7 +19388,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 61 : 
+					case 50 : 
 						int LA39_64 = input.LA(1);
 						 
 						int index39_64 = input.index();
@@ -19340,7 +19401,7 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 62 : 
+					case 51 : 
 						int LA39_32 = input.LA(1);
 						 
 						int index39_32 = input.index();
@@ -19353,43 +19414,185 @@ public class FTSParser extends Parser {
 						if ( s>=0 ) return s;
 						break;
 
-					case 63 : 
-						int LA39_44 = input.LA(1);
+					case 52 : 
+						int LA39_69 = input.LA(1);
 						 
-						int index39_44 = input.index();
+						int index39_69 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (synpred18_FTS()) ) {s = 19;}
 						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index39_44);
+						input.seek(index39_69);
+						if ( s>=0 ) return s;
+						break;
+
+					case 53 : 
+						int LA39_57 = input.LA(1);
+						 
+						int index39_57 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_57);
+						if ( s>=0 ) return s;
+						break;
+
+					case 54 : 
+						int LA39_27 = input.LA(1);
+						 
+						int index39_27 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_27);
+						if ( s>=0 ) return s;
+						break;
+
+					case 55 : 
+						int LA39_52 = input.LA(1);
+						 
+						int index39_52 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_52);
+						if ( s>=0 ) return s;
+						break;
+
+					case 56 : 
+						int LA39_62 = input.LA(1);
+						 
+						int index39_62 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_62);
+						if ( s>=0 ) return s;
+						break;
+
+					case 57 : 
+						int LA39_26 = input.LA(1);
+						 
+						int index39_26 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_26);
+						if ( s>=0 ) return s;
+						break;
+
+					case 58 : 
+						int LA39_74 = input.LA(1);
+						 
+						int index39_74 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_74);
+						if ( s>=0 ) return s;
+						break;
+
+					case 59 : 
+						int LA39_56 = input.LA(1);
+						 
+						int index39_56 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_56);
+						if ( s>=0 ) return s;
+						break;
+
+					case 60 : 
+						int LA39_82 = input.LA(1);
+						 
+						int index39_82 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_82);
+						if ( s>=0 ) return s;
+						break;
+
+					case 61 : 
+						int LA39_79 = input.LA(1);
+						 
+						int index39_79 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_79);
+						if ( s>=0 ) return s;
+						break;
+
+					case 62 : 
+						int LA39_67 = input.LA(1);
+						 
+						int index39_67 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_67);
+						if ( s>=0 ) return s;
+						break;
+
+					case 63 : 
+						int LA39_35 = input.LA(1);
+						 
+						int index39_35 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
+						 
+						input.seek(index39_35);
 						if ( s>=0 ) return s;
 						break;
 
 					case 64 : 
-						int LA39_2 = input.LA(1);
+						int LA39_54 = input.LA(1);
 						 
-						int index39_2 = input.index();
+						int index39_54 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA39_2==DOT) ) {s = 10;}
-						else if ( (LA39_2==COLON) && (synpred18_FTS())) {s = 11;}
-						else if ( (LA39_2==EOF||(LA39_2 >= AMP && LA39_2 <= BAR)||LA39_2==CARAT||LA39_2==COMMA||LA39_2==DATETIME||LA39_2==DECIMAL_INTEGER_LITERAL||LA39_2==EQUALS||LA39_2==EXCLAMATION||LA39_2==FLOATING_POINT_LITERAL||(LA39_2 >= FTSPHRASE && LA39_2 <= FTSWORD)||LA39_2==ID||(LA39_2 >= LPAREN && LA39_2 <= LT)||LA39_2==MINUS||LA39_2==NOT||(LA39_2 >= OR && LA39_2 <= PERCENT)||LA39_2==PLUS||LA39_2==QUESTION_MARK||LA39_2==RPAREN||LA39_2==STAR||(LA39_2 >= TILDA && LA39_2 <= TO)||LA39_2==URI) ) {s = 9;}
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index39_2);
+						input.seek(index39_54);
 						if ( s>=0 ) return s;
 						break;
 
 					case 65 : 
-						int LA39_13 = input.LA(1);
+						int LA39_23 = input.LA(1);
 						 
-						int index39_13 = input.index();
+						int index39_23 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA39_13==COLON) && (synpred18_FTS())) {s = 19;}
-						else if ( (LA39_13==EOF||(LA39_13 >= AMP && LA39_13 <= BAR)||LA39_13==CARAT||LA39_13==COMMA||LA39_13==DATETIME||LA39_13==DECIMAL_INTEGER_LITERAL||LA39_13==DOT||LA39_13==EQUALS||LA39_13==EXCLAMATION||LA39_13==FLOATING_POINT_LITERAL||(LA39_13 >= FTSPHRASE && LA39_13 <= FTSWORD)||LA39_13==ID||(LA39_13 >= LPAREN && LA39_13 <= LT)||LA39_13==MINUS||LA39_13==NOT||(LA39_13 >= OR && LA39_13 <= PERCENT)||LA39_13==PLUS||LA39_13==QUESTION_MARK||LA39_13==RPAREN||LA39_13==STAR||(LA39_13 >= TILDA && LA39_13 <= TO)||LA39_13==URI) ) {s = 9;}
+						if ( (synpred18_FTS()) ) {s = 19;}
+						else if ( (true) ) {s = 9;}
 						 
-						input.seek(index39_13);
+						input.seek(index39_23);
 						if ( s>=0 ) return s;
 						break;
 			}
@@ -19402,130 +19605,216 @@ public class FTSParser extends Parser {
 	}
 
 	static final String DFA60_eotS =
-		"\75\uffff";
+		"\u00bb\uffff";
 	static final String DFA60_eofS =
-		"\75\uffff";
+		"\u00bb\uffff";
 	static final String DFA60_minS =
-		"\1\13\12\4\1\5\1\uffff\1\13\1\4\1\13\2\uffff\6\4\5\uffff\1\4\12\0\1\5"+
-		"\2\4\1\uffff\5\0\1\uffff\1\4\12\0";
+		"\1\13\12\4\1\5\2\uffff\1\13\1\4\1\13\3\uffff\1\4\34\uffff\5\4\70\uffff"+
+		"\1\4\12\0\1\5\6\uffff\2\4\32\uffff\6\0\14\uffff\1\4\12\uffff\1\0\1\uffff";
 	static final String DFA60_maxS =
-		"\13\150\1\146\1\uffff\3\150\2\uffff\6\150\5\uffff\1\150\12\0\1\146\2\150"+
-		"\1\uffff\5\0\1\uffff\1\150\12\0";
+		"\13\150\1\146\2\uffff\3\150\3\uffff\1\150\34\uffff\5\150\70\uffff\1\150"+
+		"\12\0\1\146\6\uffff\2\150\32\uffff\6\0\14\uffff\1\150\12\uffff\1\0\1\uffff";
 	static final String DFA60_acceptS =
-		"\14\uffff\1\2\3\uffff\1\10\1\11\6\uffff\1\3\1\5\1\4\1\6\1\7\16\uffff\1"+
-		"\1\5\uffff\1\1\13\uffff";
+		"\14\uffff\2\2\3\uffff\2\10\1\11\1\uffff\33\2\1\10\5\uffff\15\3\1\5\34"+
+		"\4\1\6\15\7\14\uffff\6\2\2\uffff\1\1\31\2\6\uffff\14\2\1\uffff\12\2\1"+
+		"\uffff\1\2";
 	static final String DFA60_specialS =
-		"\35\uffff\1\30\1\27\1\13\1\17\1\24\1\22\1\11\1\6\1\3\1\1\1\4\4\uffff\1"+
-		"\14\1\31\1\7\1\25\1\20\2\uffff\1\26\1\12\1\16\1\23\1\21\1\10\1\5\1\2\1"+
-		"\0\1\15}>";
+		"\1\20\1\31\1\34\1\43\1\50\1\33\1\21\1\10\1\12\1\32\1\17\3\uffff\1\35\1"+
+		"\4\1\30\3\uffff\1\37\34\uffff\1\6\1\45\1\42\1\36\1\27\70\uffff\1\0\1\14"+
+		"\1\3\1\44\1\26\1\47\1\13\1\7\1\2\1\25\1\46\7\uffff\1\23\1\16\32\uffff"+
+		"\1\11\1\15\1\1\1\22\1\41\1\5\14\uffff\1\24\12\uffff\1\40\1\uffff}>";
 	static final String[] DFA60_transitionS = {
-			"\1\14\1\uffff\1\11\1\uffff\1\7\5\uffff\1\14\2\uffff\1\15\26\uffff\1\10"+
-			"\2\uffff\1\16\1\3\1\4\1\2\11\uffff\1\1\3\uffff\1\21\2\20\10\uffff\1\5"+
-			"\11\uffff\1\14\7\uffff\1\12\4\uffff\1\17\1\6\1\uffff\1\13",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\2\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff\4\14"+
-			"\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1\14\2"+
-			"\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14\1\uffff"+
-			"\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\2\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff\4\14"+
-			"\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1\14\2"+
-			"\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14\1\uffff"+
-			"\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\1\26\71\uffff\1\23\16\uffff\1\27\2\uffff\1\25\24\uffff\1\24",
-			"",
-			"\1\30\1\uffff\1\30\1\uffff\1\30\5\uffff\1\30\2\uffff\1\31\26\uffff\1"+
-			"\30\3\uffff\3\30\11\uffff\1\30\16\uffff\1\30\11\uffff\1\30\7\uffff\1"+
-			"\30\5\uffff\1\30\1\uffff\1\30",
-			"\2\32\1\uffff\1\32\1\uffff\1\32\1\uffff\1\32\1\uffff\1\32\1\uffff\1"+
-			"\32\5\uffff\1\32\1\20\1\uffff\1\32\2\uffff\1\32\23\uffff\1\32\2\uffff"+
-			"\4\32\11\uffff\1\32\3\uffff\3\32\2\uffff\1\32\5\uffff\1\32\2\uffff\1"+
-			"\32\2\uffff\1\32\3\uffff\1\32\2\uffff\1\32\4\uffff\1\32\4\uffff\2\32"+
-			"\1\uffff\1\32",
-			"\1\34\1\uffff\1\34\1\uffff\1\34\5\uffff\1\34\2\uffff\1\33\26\uffff\1"+
-			"\34\3\uffff\3\34\11\uffff\1\34\16\uffff\1\34\11\uffff\1\34\7\uffff\1"+
-			"\34\5\uffff\1\34\1\uffff\1\34",
+			"\1\14\1\uffff\1\11\1\uffff\1\7\5\uffff\1\14\2\uffff\1\16\26\uffff\1\10"+
+			"\2\uffff\1\17\1\3\1\4\1\2\11\uffff\1\1\3\uffff\1\23\1\21\1\22\10\uffff"+
+			"\1\5\11\uffff\1\15\7\uffff\1\12\4\uffff\1\20\1\6\1\uffff\1\13",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\2\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff\1"+
+			"\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\2\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff\1"+
+			"\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\64\71\uffff\1\61\16\uffff\1\65\2\uffff\1\63\24\uffff\1\62",
 			"",
 			"",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\46\1\uffff\1"+
-			"\44\5\uffff\2\14\1\uffff\1\14\2\uffff\1\14\23\uffff\1\45\2\uffff\1\14"+
-			"\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\35\2\14\2\uffff\1\14\5\uffff"+
-			"\1\42\2\uffff\1\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\47"+
-			"\4\uffff\1\14\1\43\1\uffff\1\50",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\51\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\1\20\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff"+
-			"\4\14\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1"+
-			"\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\22\4\uffff\2\14"+
-			"\1\uffff\1\14",
+			"\1\66\1\uffff\1\101\1\uffff\1\75\5\uffff\1\66\2\uffff\1\103\26\uffff"+
+			"\1\76\3\uffff\1\71\1\72\1\70\11\uffff\1\67\16\uffff\1\73\11\uffff\1\100"+
+			"\7\uffff\1\77\5\uffff\1\74\1\uffff\1\102",
+			"\1\107\1\106\1\uffff\1\112\1\uffff\1\105\1\uffff\1\127\1\uffff\1\124"+
+			"\1\uffff\1\122\5\uffff\1\127\1\60\1\uffff\1\131\2\uffff\1\120\23\uffff"+
+			"\1\123\2\uffff\1\132\1\116\1\117\1\115\11\uffff\1\114\3\uffff\1\135\1"+
+			"\133\1\134\2\uffff\1\137\5\uffff\1\113\2\uffff\1\111\2\uffff\1\136\3"+
+			"\uffff\1\130\2\uffff\1\110\4\uffff\1\125\4\uffff\1\104\1\121\1\uffff"+
+			"\1\126",
+			"\1\141\1\uffff\1\154\1\uffff\1\150\5\uffff\1\141\2\uffff\1\140\26\uffff"+
+			"\1\151\3\uffff\1\144\1\145\1\143\11\uffff\1\142\16\uffff\1\146\11\uffff"+
+			"\1\153\7\uffff\1\152\5\uffff\1\147\1\uffff\1\155",
+			"",
+			"",
+			"",
+			"\1\176\1\175\1\uffff\1\34\1\uffff\1\174\1\uffff\1\172\1\uffff\1\167"+
+			"\1\uffff\1\165\5\uffff\1\172\1\177\1\uffff\1\51\2\uffff\1\42\23\uffff"+
+			"\1\166\2\uffff\1\52\1\161\1\162\1\160\11\uffff\1\157\3\uffff\1\156\1"+
+			"\53\1\54\2\uffff\1\57\5\uffff\1\163\2\uffff\1\33\2\uffff\1\56\3\uffff"+
+			"\1\50\2\uffff\1\32\4\uffff\1\170\4\uffff\1\173\1\164\1\uffff\1\171",
 			"",
 			"",
 			"",
 			"",
 			"",
-			"\2\14\1\uffff\1\14\3\uffff\1\14\1\uffff\1\14\1\uffff\1\52\5\uffff\1"+
-			"\14\2\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff\4\14\11\uffff\1\14"+
-			"\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1\14\2\uffff\1\14\3\uffff"+
-			"\1\14\2\uffff\1\53\4\uffff\1\14\4\uffff\2\14\1\uffff\1\14",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\u0080\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2"+
+			"\uffff\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff"+
+			"\1\57\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32"+
+			"\4\uffff\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\25\1\uffff\1\46\1\uffff"+
+			"\1\44\5\uffff\1\25\1\60\1\uffff\1\51\2\uffff\1\42\23\uffff\1\45\2\uffff"+
+			"\1\52\1\40\1\41\1\37\11\uffff\1\36\3\uffff\1\55\1\53\1\54\2\uffff\1\57"+
+			"\5\uffff\1\35\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2\uffff\1\32\4\uffff"+
+			"\1\24\4\uffff\1\26\1\43\1\uffff\1\47",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\u0084\1\u0083\1\uffff\1\u0099\3\uffff\1\u0090\1\uffff\1\u008d\1\uffff"+
+			"\1\u0081\5\uffff\1\u0090\2\uffff\1\u0092\2\uffff\1\u008a\23\uffff\1\u008c"+
+			"\2\uffff\1\u0093\1\u0088\1\u0089\1\u0087\11\uffff\1\u0086\3\uffff\1\u0097"+
+			"\1\u0095\1\u0096\2\uffff\1\u009a\5\uffff\1\u0085\2\uffff\1\u009b\2\uffff"+
+			"\1\u0098\3\uffff\1\u0091\2\uffff\1\u0082\4\uffff\1\u008e\4\uffff\1\u0094"+
+			"\1\u008b\1\uffff\1\u008f",
 			"\1\uffff",
 			"\1\uffff",
 			"\1\uffff",
@@ -19536,39 +19825,87 @@ public class FTSParser extends Parser {
 			"\1\uffff",
 			"\1\uffff",
 			"\1\uffff",
-			"\1\57\71\uffff\1\54\16\uffff\1\60\2\uffff\1\56\24\uffff\1\55",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\1\14\2\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff\4\14"+
-			"\11\uffff\1\61\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1\14\2"+
-			"\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\14\4\uffff\2\14\1\uffff"+
-			"\1\14",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1"+
-			"\14\5\uffff\2\14\1\uffff\1\14\2\uffff\1\14\23\uffff\1\14\2\uffff\4\14"+
-			"\11\uffff\1\14\3\uffff\3\14\2\uffff\1\14\5\uffff\1\14\2\uffff\1\14\2"+
-			"\uffff\1\14\3\uffff\1\14\2\uffff\1\62\4\uffff\1\14\4\uffff\2\14\1\uffff"+
-			"\1\14",
+			"\1\u009f\71\uffff\1\u009c\16\uffff\1\u00a0\2\uffff\1\u009e\24\uffff"+
+			"\1\u009d",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\31\1\30\1\uffff\1\34\1\uffff\1\27\1\uffff\1\u00ad\1\uffff\1\u00ab"+
+			"\1\uffff\1\u00a7\5\uffff\1\u00ad\2\uffff\1\51\2\uffff\1\42\23\uffff\1"+
+			"\u00a8\2\uffff\1\52\1\u00a3\1\u00a4\1\u00a2\11\uffff\1\u00a1\3\uffff"+
+			"\1\55\1\53\1\54\2\uffff\1\57\5\uffff\1\u00a5\2\uffff\1\33\2\uffff\1\56"+
+			"\3\uffff\1\u00aa\2\uffff\1\32\4\uffff\1\u00a9\4\uffff\1\26\1\u00a6\1"+
+			"\uffff\1\u00ac",
+			"\1\u00b6\1\u00b5\1\uffff\1\u00b4\1\uffff\1\u00b2\1\uffff\1\u00b0\1\uffff"+
+			"\1\u008d\1\uffff\1\u00b7\5\uffff\1\u00b0\1\u00b8\1\uffff\1\u0092\2\uffff"+
+			"\1\u008a\23\uffff\1\u008c\2\uffff\1\u0093\1\u0088\1\u0089\1\u0087\11"+
+			"\uffff\1\u0086\3\uffff\1\u0097\1\u0095\1\u0096\2\uffff\1\u009a\5\uffff"+
+			"\1\u0085\2\uffff\1\u00b3\2\uffff\1\u0098\3\uffff\1\u0091\2\uffff\1\u00ae"+
+			"\4\uffff\1\u00af\4\uffff\1\u00b1\1\u008b\1\uffff\1\u008f",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
 			"",
 			"\1\uffff",
 			"\1\uffff",
 			"\1\uffff",
 			"\1\uffff",
 			"\1\uffff",
+			"\1\uffff",
 			"",
-			"\2\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\14\1\uffff\1\73\1\uffff\1"+
-			"\71\5\uffff\1\14\2\uffff\1\14\2\uffff\1\14\23\uffff\1\72\2\uffff\1\14"+
-			"\1\65\1\66\1\64\11\uffff\1\63\3\uffff\3\14\2\uffff\1\14\5\uffff\1\67"+
-			"\2\uffff\1\14\2\uffff\1\14\3\uffff\1\14\2\uffff\1\14\4\uffff\1\74\4\uffff"+
-			"\1\14\1\70\1\uffff\1\50",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"\1\176\1\175\1\uffff\1\34\1\uffff\1\174\1\uffff\1\u00ad\1\uffff\1\167"+
+			"\1\uffff\1\165\5\uffff\1\u00ad\2\uffff\1\51\2\uffff\1\42\23\uffff\1\166"+
+			"\2\uffff\1\52\1\161\1\162\1\160\11\uffff\1\157\3\uffff\1\55\1\53\1\54"+
+			"\2\uffff\1\57\5\uffff\1\163\2\uffff\1\33\2\uffff\1\56\3\uffff\1\50\2"+
+			"\uffff\1\32\4\uffff\1\u00b9\4\uffff\1\u00ba\1\164\1\uffff\1\171",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
 			"\1\uffff",
-			"\1\uffff",
-			"\1\uffff",
-			"\1\uffff",
-			"\1\uffff",
-			"\1\uffff",
-			"\1\uffff",
-			"\1\uffff",
-			"\1\uffff",
-			"\1\uffff"
+			""
 	};
 
 	static final short[] DFA60_eot = DFA.unpackEncodedString(DFA60_eotS);
@@ -19602,7 +19939,7 @@ public class FTSParser extends Parser {
 		}
 		@Override
 		public String getDescription() {
-			return "659:1: ftsFieldGroupTest : ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( FG_PROXIMITY ftsFieldGroupProximity ) | ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_TERM ftsFieldGroupTerm ( fuzzy )? ) | ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_EXACT_TERM ftsFieldGroupExactTerm ( fuzzy )? ) | ftsFieldGroupPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupPhrase ( slop )? ) | ftsFieldGroupExactPhrase ( ( slop )=> slop )? -> ^( FG_EXACT_PHRASE ftsFieldGroupExactPhrase ( slop )? ) | ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupTokenisedPhrase ( slop )? ) | ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )? -> ^( FG_SYNONYM ftsFieldGroupSynonym ( fuzzy )? ) | ftsFieldGroupRange -> ^( FG_RANGE ftsFieldGroupRange ) | LPAREN ftsFieldGroupDisjunction RPAREN -> ftsFieldGroupDisjunction );";
+			return "659:1: ftsFieldGroupTest : ( ( ftsFieldGroupProximity )=> ftsFieldGroupProximity -> ^( FG_PROXIMITY ftsFieldGroupProximity ) | ( ftsFieldGroupTerm )=> ftsFieldGroupTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_TERM ftsFieldGroupTerm ( fuzzy )? ) | ( ftsFieldGroupExactTerm )=> ftsFieldGroupExactTerm ( ( fuzzy )=> fuzzy )? -> ^( FG_EXACT_TERM ftsFieldGroupExactTerm ( fuzzy )? ) | ( ftsFieldGroupPhrase )=> ftsFieldGroupPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupPhrase ( slop )? ) | ( ftsFieldGroupExactPhrase )=> ftsFieldGroupExactPhrase ( ( slop )=> slop )? -> ^( FG_EXACT_PHRASE ftsFieldGroupExactPhrase ( slop )? ) | ( ftsFieldGroupTokenisedPhrase )=> ftsFieldGroupTokenisedPhrase ( ( slop )=> slop )? -> ^( FG_PHRASE ftsFieldGroupTokenisedPhrase ( slop )? ) | ( ftsFieldGroupSynonym )=> ftsFieldGroupSynonym ( ( fuzzy )=> fuzzy )? -> ^( FG_SYNONYM ftsFieldGroupSynonym ( fuzzy )? ) | ( ftsFieldGroupRange )=> ftsFieldGroupRange -> ^( FG_RANGE ftsFieldGroupRange ) | LPAREN ftsFieldGroupDisjunction RPAREN -> ftsFieldGroupDisjunction );";
 		}
 		@Override
 		public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
@@ -19610,341 +19947,1139 @@ public class FTSParser extends Parser {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
-						int LA60_59 = input.LA(1);
+						int LA60_110 = input.LA(1);
 						 
-						int index60_59 = input.index();
+						int index60_110 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_110==DECIMAL_INTEGER_LITERAL) ) {s = 129;}
+						else if ( (LA60_110==RPAREN) && (synpred24_FTS())) {s = 130;}
+						else if ( (LA60_110==AND) && (synpred25_FTS())) {s = 131;}
+						else if ( (LA60_110==AMP) && (synpred25_FTS())) {s = 132;}
+						else if ( (LA60_110==NOT) && (synpred25_FTS())) {s = 133;}
+						else if ( (LA60_110==ID) && (synpred25_FTS())) {s = 134;}
+						else if ( (LA60_110==FTSWORD) && (synpred25_FTS())) {s = 135;}
+						else if ( (LA60_110==FTSPRE) && (synpred25_FTS())) {s = 136;}
+						else if ( (LA60_110==FTSWILD) && (synpred25_FTS())) {s = 137;}
+						else if ( (LA60_110==EXCLAMATION) && (synpred25_FTS())) {s = 138;}
+						else if ( (LA60_110==TO) && (synpred25_FTS())) {s = 139;}
+						else if ( (LA60_110==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 140;}
+						else if ( (LA60_110==DATETIME) && (synpred25_FTS())) {s = 141;}
+						else if ( (LA60_110==STAR) && (synpred25_FTS())) {s = 142;}
+						else if ( (LA60_110==URI) && (synpred25_FTS())) {s = 143;}
+						else if ( (LA60_110==COMMA||LA60_110==DOT) && (synpred25_FTS())) {s = 144;}
+						else if ( (LA60_110==QUESTION_MARK) && (synpred25_FTS())) {s = 145;}
+						else if ( (LA60_110==EQUALS) && (synpred25_FTS())) {s = 146;}
+						else if ( (LA60_110==FTSPHRASE) && (synpred25_FTS())) {s = 147;}
+						else if ( (LA60_110==TILDA) && (synpred25_FTS())) {s = 148;}
+						else if ( (LA60_110==LSQUARE) && (synpred25_FTS())) {s = 149;}
+						else if ( (LA60_110==LT) && (synpred25_FTS())) {s = 150;}
+						else if ( (LA60_110==LPAREN) && (synpred25_FTS())) {s = 151;}
+						else if ( (LA60_110==PLUS) && (synpred25_FTS())) {s = 152;}
+						else if ( (LA60_110==BAR) && (synpred25_FTS())) {s = 153;}
+						else if ( (LA60_110==MINUS) && (synpred25_FTS())) {s = 154;}
+						else if ( (LA60_110==OR) && (synpred25_FTS())) {s = 155;}
 						 
-						input.seek(index60_59);
+						input.seek(index60_110);
 						if ( s>=0 ) return s;
 						break;
 
 					case 1 : 
-						int LA60_38 = input.LA(1);
+						int LA60_158 = input.LA(1);
 						 
-						int index60_38 = input.index();
+						int index60_158 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 184;}
 						 
-						input.seek(index60_38);
+						input.seek(index60_158);
 						if ( s>=0 ) return s;
 						break;
 
 					case 2 : 
-						int LA60_58 = input.LA(1);
+						int LA60_118 = input.LA(1);
 						 
-						int index60_58 = input.index();
+						int index60_118 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
 						 
-						input.seek(index60_58);
+						input.seek(index60_118);
 						if ( s>=0 ) return s;
 						break;
 
 					case 3 : 
-						int LA60_37 = input.LA(1);
+						int LA60_112 = input.LA(1);
 						 
-						int index60_37 = input.index();
+						int index60_112 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
 						 
-						input.seek(index60_37);
+						input.seek(index60_112);
 						if ( s>=0 ) return s;
 						break;
 
 					case 4 : 
-						int LA60_39 = input.LA(1);
+						int LA60_15 = input.LA(1);
 						 
-						int index60_39 = input.index();
+						int index60_15 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_15==TILDA) && (synpred29_FTS())) {s = 68;}
+						else if ( (LA60_15==CARAT) && (synpred29_FTS())) {s = 69;}
+						else if ( (LA60_15==AND) && (synpred29_FTS())) {s = 70;}
+						else if ( (LA60_15==AMP) && (synpred29_FTS())) {s = 71;}
+						else if ( (LA60_15==RPAREN) && (synpred29_FTS())) {s = 72;}
+						else if ( (LA60_15==OR) && (synpred29_FTS())) {s = 73;}
+						else if ( (LA60_15==BAR) && (synpred29_FTS())) {s = 74;}
+						else if ( (LA60_15==NOT) && (synpred29_FTS())) {s = 75;}
+						else if ( (LA60_15==ID) && (synpred29_FTS())) {s = 76;}
+						else if ( (LA60_15==FTSWORD) && (synpred29_FTS())) {s = 77;}
+						else if ( (LA60_15==FTSPRE) && (synpred29_FTS())) {s = 78;}
+						else if ( (LA60_15==FTSWILD) && (synpred29_FTS())) {s = 79;}
+						else if ( (LA60_15==EXCLAMATION) && (synpred29_FTS())) {s = 80;}
+						else if ( (LA60_15==TO) && (synpred29_FTS())) {s = 81;}
+						else if ( (LA60_15==DECIMAL_INTEGER_LITERAL) && (synpred29_FTS())) {s = 82;}
+						else if ( (LA60_15==FLOATING_POINT_LITERAL) && (synpred29_FTS())) {s = 83;}
+						else if ( (LA60_15==DATETIME) && (synpred29_FTS())) {s = 84;}
+						else if ( (LA60_15==STAR) && (synpred29_FTS())) {s = 85;}
+						else if ( (LA60_15==URI) && (synpred29_FTS())) {s = 86;}
+						else if ( (LA60_15==COMMA||LA60_15==DOT) && (synpred29_FTS())) {s = 87;}
+						else if ( (LA60_15==QUESTION_MARK) && (synpred29_FTS())) {s = 88;}
+						else if ( (LA60_15==EQUALS) && (synpred29_FTS())) {s = 89;}
+						else if ( (LA60_15==FTSPHRASE) && (synpred29_FTS())) {s = 90;}
+						else if ( (LA60_15==LSQUARE) && (synpred29_FTS())) {s = 91;}
+						else if ( (LA60_15==LT) && (synpred29_FTS())) {s = 92;}
+						else if ( (LA60_15==LPAREN) && (synpred29_FTS())) {s = 93;}
+						else if ( (LA60_15==PLUS) && (synpred29_FTS())) {s = 94;}
+						else if ( (LA60_15==MINUS) && (synpred29_FTS())) {s = 95;}
+						else if ( (LA60_15==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_39);
+						input.seek(index60_15);
 						if ( s>=0 ) return s;
 						break;
 
 					case 5 : 
-						int LA60_57 = input.LA(1);
+						int LA60_161 = input.LA(1);
 						 
-						int index60_57 = input.index();
+						int index60_161 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 184;}
+						else if ( (synpred37_FTS()) ) {s = 48;}
 						 
-						input.seek(index60_57);
+						input.seek(index60_161);
 						if ( s>=0 ) return s;
 						break;
 
 					case 6 : 
-						int LA60_36 = input.LA(1);
+						int LA60_49 = input.LA(1);
 						 
-						int index60_36 = input.index();
+						int index60_49 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_49==DOT) ) {s = 128;}
+						else if ( (LA60_49==STAR) ) {s = 20;}
+						else if ( (LA60_49==COMMA) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_49==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_49==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_49==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_49==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_49==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_49==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_49==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_49==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_49==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_49==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_49==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_49==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_49==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_49==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_49==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_49==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_49==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_49==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_49==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_49==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_49==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_49==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_49==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_49==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_49==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_49==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_49==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_36);
+						input.seek(index60_49);
 						if ( s>=0 ) return s;
 						break;
 
 					case 7 : 
-						int LA60_46 = input.LA(1);
+						int LA60_117 = input.LA(1);
 						 
-						int index60_46 = input.index();
+						int index60_117 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
 						 
-						input.seek(index60_46);
+						input.seek(index60_117);
 						if ( s>=0 ) return s;
 						break;
 
 					case 8 : 
-						int LA60_56 = input.LA(1);
+						int LA60_7 = input.LA(1);
 						 
-						int index60_56 = input.index();
+						int index60_7 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_7==STAR) ) {s = 20;}
+						else if ( (LA60_7==COMMA||LA60_7==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_7==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_7==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_7==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_7==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_7==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_7==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_7==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_7==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_7==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_7==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_7==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_7==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_7==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_7==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_7==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_7==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_7==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_7==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_7==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_7==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_7==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_7==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_7==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_7==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_7==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_7==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_7==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_56);
+						input.seek(index60_7);
 						if ( s>=0 ) return s;
 						break;
 
 					case 9 : 
-						int LA60_35 = input.LA(1);
+						int LA60_156 = input.LA(1);
 						 
-						int index60_35 = input.index();
+						int index60_156 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 184;}
 						 
-						input.seek(index60_35);
+						input.seek(index60_156);
 						if ( s>=0 ) return s;
 						break;
 
 					case 10 : 
-						int LA60_52 = input.LA(1);
+						int LA60_8 = input.LA(1);
 						 
-						int index60_52 = input.index();
+						int index60_8 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_8==STAR) ) {s = 20;}
+						else if ( (LA60_8==COMMA||LA60_8==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_8==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_8==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_8==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_8==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_8==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_8==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_8==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_8==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_8==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_8==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_8==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_8==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_8==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_8==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_8==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_8==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_8==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_8==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_8==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_8==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_8==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_8==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_8==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_8==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_8==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_8==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_8==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_52);
+						input.seek(index60_8);
 						if ( s>=0 ) return s;
 						break;
 
 					case 11 : 
-						int LA60_31 = input.LA(1);
+						int LA60_116 = input.LA(1);
 						 
-						int index60_31 = input.index();
+						int index60_116 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
 						 
-						input.seek(index60_31);
+						input.seek(index60_116);
 						if ( s>=0 ) return s;
 						break;
 
 					case 12 : 
-						int LA60_44 = input.LA(1);
+						int LA60_111 = input.LA(1);
 						 
-						int index60_44 = input.index();
+						int index60_111 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
 						 
-						input.seek(index60_44);
+						input.seek(index60_111);
 						if ( s>=0 ) return s;
 						break;
 
 					case 13 : 
-						int LA60_60 = input.LA(1);
+						int LA60_157 = input.LA(1);
 						 
-						int index60_60 = input.index();
+						int index60_157 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 184;}
 						 
-						input.seek(index60_60);
+						input.seek(index60_157);
 						if ( s>=0 ) return s;
 						break;
 
 					case 14 : 
+						int LA60_129 = input.LA(1);
+						 
+						int index60_129 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA60_129==RPAREN) ) {s = 174;}
+						else if ( (LA60_129==STAR) && (synpred25_FTS())) {s = 175;}
+						else if ( (LA60_129==COMMA||LA60_129==DOT) && (synpred25_FTS())) {s = 176;}
+						else if ( (LA60_129==TILDA) && (synpred25_FTS())) {s = 177;}
+						else if ( (LA60_129==CARAT) && (synpred25_FTS())) {s = 178;}
+						else if ( (LA60_129==OR) && (synpred25_FTS())) {s = 179;}
+						else if ( (LA60_129==BAR) && (synpred25_FTS())) {s = 180;}
+						else if ( (LA60_129==AND) && (synpred25_FTS())) {s = 181;}
+						else if ( (LA60_129==AMP) && (synpred25_FTS())) {s = 182;}
+						else if ( (LA60_129==NOT) && (synpred25_FTS())) {s = 133;}
+						else if ( (LA60_129==ID) && (synpred25_FTS())) {s = 134;}
+						else if ( (LA60_129==FTSWORD) && (synpred25_FTS())) {s = 135;}
+						else if ( (LA60_129==FTSPRE) && (synpred25_FTS())) {s = 136;}
+						else if ( (LA60_129==FTSWILD) && (synpred25_FTS())) {s = 137;}
+						else if ( (LA60_129==EXCLAMATION) && (synpred25_FTS())) {s = 138;}
+						else if ( (LA60_129==TO) && (synpred25_FTS())) {s = 139;}
+						else if ( (LA60_129==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 183;}
+						else if ( (LA60_129==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 140;}
+						else if ( (LA60_129==DATETIME) && (synpred25_FTS())) {s = 141;}
+						else if ( (LA60_129==URI) && (synpred25_FTS())) {s = 143;}
+						else if ( (LA60_129==QUESTION_MARK) && (synpred25_FTS())) {s = 145;}
+						else if ( (LA60_129==EQUALS) && (synpred25_FTS())) {s = 146;}
+						else if ( (LA60_129==FTSPHRASE) && (synpred25_FTS())) {s = 147;}
+						else if ( (LA60_129==LSQUARE) && (synpred25_FTS())) {s = 149;}
+						else if ( (LA60_129==LT) && (synpred25_FTS())) {s = 150;}
+						else if ( (LA60_129==LPAREN) && (synpred25_FTS())) {s = 151;}
+						else if ( (LA60_129==PLUS) && (synpred25_FTS())) {s = 152;}
+						else if ( (LA60_129==MINUS) && (synpred25_FTS())) {s = 154;}
+						else if ( (LA60_129==DOTDOT) && (synpred25_FTS())) {s = 184;}
+						 
+						input.seek(index60_129);
+						if ( s>=0 ) return s;
+						break;
+
+					case 15 : 
+						int LA60_10 = input.LA(1);
+						 
+						int index60_10 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA60_10==STAR) ) {s = 20;}
+						else if ( (LA60_10==COMMA||LA60_10==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_10==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_10==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_10==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_10==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_10==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_10==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_10==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_10==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_10==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_10==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_10==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_10==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_10==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_10==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_10==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_10==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_10==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_10==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_10==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_10==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_10==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_10==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_10==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_10==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_10==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_10==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_10==DOTDOT) && (synpred37_FTS())) {s = 48;}
+						 
+						input.seek(index60_10);
+						if ( s>=0 ) return s;
+						break;
+
+					case 16 : 
+						int LA60_0 = input.LA(1);
+						 
+						int index60_0 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA60_0==ID) ) {s = 1;}
+						else if ( (LA60_0==FTSWORD) ) {s = 2;}
+						else if ( (LA60_0==FTSPRE) ) {s = 3;}
+						else if ( (LA60_0==FTSWILD) ) {s = 4;}
+						else if ( (LA60_0==NOT) ) {s = 5;}
+						else if ( (LA60_0==TO) ) {s = 6;}
+						else if ( (LA60_0==DECIMAL_INTEGER_LITERAL) ) {s = 7;}
+						else if ( (LA60_0==FLOATING_POINT_LITERAL) ) {s = 8;}
+						else if ( (LA60_0==DATETIME) ) {s = 9;}
+						else if ( (LA60_0==STAR) ) {s = 10;}
+						else if ( (LA60_0==URI) ) {s = 11;}
+						else if ( (LA60_0==COMMA||LA60_0==DOT) && (synpred25_FTS())) {s = 12;}
+						else if ( (LA60_0==QUESTION_MARK) && (synpred25_FTS())) {s = 13;}
+						else if ( (LA60_0==EQUALS) ) {s = 14;}
+						else if ( (LA60_0==FTSPHRASE) ) {s = 15;}
+						else if ( (LA60_0==TILDA) ) {s = 16;}
+						else if ( (LA60_0==LSQUARE) && (synpred37_FTS())) {s = 17;}
+						else if ( (LA60_0==LT) && (synpred37_FTS())) {s = 18;}
+						else if ( (LA60_0==LPAREN) ) {s = 19;}
+						 
+						input.seek(index60_0);
+						if ( s>=0 ) return s;
+						break;
+
+					case 17 : 
+						int LA60_6 = input.LA(1);
+						 
+						int index60_6 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA60_6==STAR) ) {s = 20;}
+						else if ( (LA60_6==COMMA||LA60_6==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_6==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_6==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_6==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_6==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_6==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_6==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_6==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_6==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_6==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_6==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_6==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_6==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_6==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_6==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_6==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_6==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_6==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_6==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_6==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_6==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_6==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_6==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_6==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_6==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_6==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_6==MINUS) && (synpred25_FTS())) {s = 47;}
+						 
+						input.seek(index60_6);
+						if ( s>=0 ) return s;
+						break;
+
+					case 18 : 
+						int LA60_159 = input.LA(1);
+						 
+						int index60_159 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 184;}
+						 
+						input.seek(index60_159);
+						if ( s>=0 ) return s;
+						break;
+
+					case 19 : 
+						int LA60_128 = input.LA(1);
+						 
+						int index60_128 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA60_128==ID) ) {s = 161;}
+						else if ( (LA60_128==FTSWORD) && (synpred25_FTS())) {s = 162;}
+						else if ( (LA60_128==FTSPRE) && (synpred25_FTS())) {s = 163;}
+						else if ( (LA60_128==FTSWILD) && (synpred25_FTS())) {s = 164;}
+						else if ( (LA60_128==NOT) && (synpred25_FTS())) {s = 165;}
+						else if ( (LA60_128==TO) && (synpred25_FTS())) {s = 166;}
+						else if ( (LA60_128==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 167;}
+						else if ( (LA60_128==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 168;}
+						else if ( (LA60_128==STAR) && (synpred25_FTS())) {s = 169;}
+						else if ( (LA60_128==QUESTION_MARK) && (synpred25_FTS())) {s = 170;}
+						else if ( (LA60_128==DATETIME) && (synpred25_FTS())) {s = 171;}
+						else if ( (LA60_128==URI) && (synpred25_FTS())) {s = 172;}
+						else if ( (LA60_128==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_128==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_128==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_128==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_128==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_128==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_128==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_128==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_128==COMMA||LA60_128==DOT) && (synpred25_FTS())) {s = 173;}
+						else if ( (LA60_128==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_128==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_128==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_128==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_128==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_128==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_128==MINUS) && (synpred25_FTS())) {s = 47;}
+						 
+						input.seek(index60_128);
+						if ( s>=0 ) return s;
+						break;
+
+					case 20 : 
+						int LA60_174 = input.LA(1);
+						 
+						int index60_174 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA60_174==ID) ) {s = 111;}
+						else if ( (LA60_174==FTSWORD) ) {s = 112;}
+						else if ( (LA60_174==FTSPRE) ) {s = 113;}
+						else if ( (LA60_174==FTSWILD) ) {s = 114;}
+						else if ( (LA60_174==NOT) ) {s = 115;}
+						else if ( (LA60_174==TO) ) {s = 116;}
+						else if ( (LA60_174==DECIMAL_INTEGER_LITERAL) ) {s = 117;}
+						else if ( (LA60_174==FLOATING_POINT_LITERAL) ) {s = 118;}
+						else if ( (LA60_174==DATETIME) ) {s = 119;}
+						else if ( (LA60_174==STAR) ) {s = 185;}
+						else if ( (LA60_174==URI) ) {s = 121;}
+						else if ( (LA60_174==CARAT) && (synpred25_FTS())) {s = 124;}
+						else if ( (LA60_174==AND) && (synpred25_FTS())) {s = 125;}
+						else if ( (LA60_174==AMP) && (synpred25_FTS())) {s = 126;}
+						else if ( (LA60_174==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_174==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_174==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_174==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_174==COMMA||LA60_174==DOT) && (synpred25_FTS())) {s = 173;}
+						else if ( (LA60_174==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_174==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_174==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_174==TILDA) && (synpred25_FTS())) {s = 186;}
+						else if ( (LA60_174==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_174==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_174==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_174==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_174==MINUS) && (synpred25_FTS())) {s = 47;}
+						 
+						input.seek(index60_174);
+						if ( s>=0 ) return s;
+						break;
+
+					case 21 : 
+						int LA60_119 = input.LA(1);
+						 
+						int index60_119 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
+						 
+						input.seek(index60_119);
+						if ( s>=0 ) return s;
+						break;
+
+					case 22 : 
+						int LA60_114 = input.LA(1);
+						 
+						int index60_114 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
+						 
+						input.seek(index60_114);
+						if ( s>=0 ) return s;
+						break;
+
+					case 23 : 
 						int LA60_53 = input.LA(1);
 						 
 						int index60_53 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_53==STAR) ) {s = 20;}
+						else if ( (LA60_53==COMMA||LA60_53==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_53==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_53==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_53==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_53==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_53==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_53==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_53==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_53==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_53==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_53==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_53==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_53==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_53==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_53==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_53==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_53==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_53==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_53==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_53==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_53==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_53==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_53==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_53==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_53==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_53==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_53==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_53==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
 						input.seek(index60_53);
 						if ( s>=0 ) return s;
 						break;
 
-					case 15 : 
-						int LA60_32 = input.LA(1);
+					case 24 : 
+						int LA60_16 = input.LA(1);
 						 
-						int index60_32 = input.index();
+						int index60_16 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_16==EQUALS) && (synpred33_FTS())) {s = 96;}
+						else if ( (LA60_16==COMMA||LA60_16==DOT) && (synpred35_FTS())) {s = 97;}
+						else if ( (LA60_16==ID) && (synpred35_FTS())) {s = 98;}
+						else if ( (LA60_16==FTSWORD) && (synpred35_FTS())) {s = 99;}
+						else if ( (LA60_16==FTSPRE) && (synpred35_FTS())) {s = 100;}
+						else if ( (LA60_16==FTSWILD) && (synpred35_FTS())) {s = 101;}
+						else if ( (LA60_16==NOT) && (synpred35_FTS())) {s = 102;}
+						else if ( (LA60_16==TO) && (synpred35_FTS())) {s = 103;}
+						else if ( (LA60_16==DECIMAL_INTEGER_LITERAL) && (synpred35_FTS())) {s = 104;}
+						else if ( (LA60_16==FLOATING_POINT_LITERAL) && (synpred35_FTS())) {s = 105;}
+						else if ( (LA60_16==STAR) && (synpred35_FTS())) {s = 106;}
+						else if ( (LA60_16==QUESTION_MARK) && (synpred35_FTS())) {s = 107;}
+						else if ( (LA60_16==DATETIME) && (synpred35_FTS())) {s = 108;}
+						else if ( (LA60_16==URI) && (synpred35_FTS())) {s = 109;}
 						 
-						input.seek(index60_32);
+						input.seek(index60_16);
 						if ( s>=0 ) return s;
 						break;
 
-					case 16 : 
-						int LA60_48 = input.LA(1);
+					case 25 : 
+						int LA60_1 = input.LA(1);
 						 
-						int index60_48 = input.index();
+						int index60_1 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_1==STAR) ) {s = 20;}
+						else if ( (LA60_1==COMMA||LA60_1==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_1==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_1==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_1==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_1==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_1==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_1==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_1==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_1==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_1==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_1==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_1==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_1==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_1==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_1==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_1==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_1==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_1==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_1==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_1==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_1==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_1==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_1==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_1==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_1==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_1==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_1==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_1==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_48);
+						input.seek(index60_1);
 						if ( s>=0 ) return s;
 						break;
 
-					case 17 : 
-						int LA60_55 = input.LA(1);
+					case 26 : 
+						int LA60_9 = input.LA(1);
 						 
-						int index60_55 = input.index();
+						int index60_9 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_9==STAR) ) {s = 20;}
+						else if ( (LA60_9==COMMA||LA60_9==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_9==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_9==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_9==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_9==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_9==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_9==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_9==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_9==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_9==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_9==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_9==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_9==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_9==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_9==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_9==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_9==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_9==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_9==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_9==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_9==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_9==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_9==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_9==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_9==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_9==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_9==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_9==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_55);
+						input.seek(index60_9);
 						if ( s>=0 ) return s;
 						break;
 
-					case 18 : 
-						int LA60_34 = input.LA(1);
+					case 27 : 
+						int LA60_5 = input.LA(1);
 						 
-						int index60_34 = input.index();
+						int index60_5 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_5==STAR) ) {s = 20;}
+						else if ( (LA60_5==COMMA||LA60_5==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_5==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_5==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_5==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_5==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_5==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_5==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_5==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_5==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_5==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_5==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_5==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_5==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_5==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_5==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_5==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_5==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_5==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_5==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_5==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_5==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_5==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_5==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_5==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_5==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_5==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_5==MINUS) && (synpred25_FTS())) {s = 47;}
 						 
-						input.seek(index60_34);
+						input.seek(index60_5);
 						if ( s>=0 ) return s;
 						break;
 
-					case 19 : 
-						int LA60_54 = input.LA(1);
+					case 28 : 
+						int LA60_2 = input.LA(1);
 						 
-						int index60_54 = input.index();
+						int index60_2 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_2==STAR) ) {s = 20;}
+						else if ( (LA60_2==COMMA||LA60_2==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_2==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_2==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_2==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_2==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_2==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_2==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_2==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_2==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_2==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_2==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_2==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_2==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_2==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_2==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_2==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_2==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_2==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_2==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_2==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_2==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_2==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_2==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_2==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_2==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_2==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_2==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_2==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_54);
+						input.seek(index60_2);
 						if ( s>=0 ) return s;
 						break;
 
-					case 20 : 
-						int LA60_33 = input.LA(1);
+					case 29 : 
+						int LA60_14 = input.LA(1);
 						 
-						int index60_33 = input.index();
+						int index60_14 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_14==COMMA||LA60_14==DOT) && (synpred27_FTS())) {s = 54;}
+						else if ( (LA60_14==ID) && (synpred27_FTS())) {s = 55;}
+						else if ( (LA60_14==FTSWORD) && (synpred27_FTS())) {s = 56;}
+						else if ( (LA60_14==FTSPRE) && (synpred27_FTS())) {s = 57;}
+						else if ( (LA60_14==FTSWILD) && (synpred27_FTS())) {s = 58;}
+						else if ( (LA60_14==NOT) && (synpred27_FTS())) {s = 59;}
+						else if ( (LA60_14==TO) && (synpred27_FTS())) {s = 60;}
+						else if ( (LA60_14==DECIMAL_INTEGER_LITERAL) && (synpred27_FTS())) {s = 61;}
+						else if ( (LA60_14==FLOATING_POINT_LITERAL) && (synpred27_FTS())) {s = 62;}
+						else if ( (LA60_14==STAR) && (synpred27_FTS())) {s = 63;}
+						else if ( (LA60_14==QUESTION_MARK) && (synpred27_FTS())) {s = 64;}
+						else if ( (LA60_14==DATETIME) && (synpred27_FTS())) {s = 65;}
+						else if ( (LA60_14==URI) && (synpred27_FTS())) {s = 66;}
+						else if ( (LA60_14==EQUALS) && (synpred31_FTS())) {s = 67;}
 						 
-						input.seek(index60_33);
+						input.seek(index60_14);
 						if ( s>=0 ) return s;
 						break;
 
-					case 21 : 
-						int LA60_47 = input.LA(1);
+					case 30 : 
+						int LA60_52 = input.LA(1);
 						 
-						int index60_47 = input.index();
+						int index60_52 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_52==STAR) ) {s = 20;}
+						else if ( (LA60_52==COMMA||LA60_52==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_52==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_52==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_52==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_52==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_52==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_52==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_52==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_52==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_52==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_52==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_52==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_52==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_52==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_52==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_52==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_52==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_52==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_52==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_52==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_52==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_52==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_52==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_52==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_52==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_52==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_52==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_52==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_47);
+						input.seek(index60_52);
 						if ( s>=0 ) return s;
 						break;
 
-					case 22 : 
+					case 31 : 
+						int LA60_20 = input.LA(1);
+						 
+						int index60_20 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA60_20==LPAREN) ) {s = 110;}
+						else if ( (LA60_20==ID) ) {s = 111;}
+						else if ( (LA60_20==FTSWORD) ) {s = 112;}
+						else if ( (LA60_20==FTSPRE) ) {s = 113;}
+						else if ( (LA60_20==FTSWILD) ) {s = 114;}
+						else if ( (LA60_20==NOT) ) {s = 115;}
+						else if ( (LA60_20==TO) ) {s = 116;}
+						else if ( (LA60_20==DECIMAL_INTEGER_LITERAL) ) {s = 117;}
+						else if ( (LA60_20==FLOATING_POINT_LITERAL) ) {s = 118;}
+						else if ( (LA60_20==DATETIME) ) {s = 119;}
+						else if ( (LA60_20==STAR) ) {s = 120;}
+						else if ( (LA60_20==URI) ) {s = 121;}
+						else if ( (LA60_20==COMMA||LA60_20==DOT) && (synpred25_FTS())) {s = 122;}
+						else if ( (LA60_20==TILDA) && (synpred25_FTS())) {s = 123;}
+						else if ( (LA60_20==CARAT) && (synpred25_FTS())) {s = 124;}
+						else if ( (LA60_20==AND) && (synpred25_FTS())) {s = 125;}
+						else if ( (LA60_20==AMP) && (synpred25_FTS())) {s = 126;}
+						else if ( (LA60_20==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_20==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_20==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_20==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_20==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_20==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_20==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_20==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_20==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_20==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_20==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_20==DOTDOT) && (synpred25_FTS())) {s = 127;}
+						 
+						input.seek(index60_20);
+						if ( s>=0 ) return s;
+						break;
+
+					case 32 : 
+						int LA60_185 = input.LA(1);
+						 
+						int index60_185 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 186;}
+						 
+						input.seek(index60_185);
+						if ( s>=0 ) return s;
+						break;
+
+					case 33 : 
+						int LA60_160 = input.LA(1);
+						 
+						int index60_160 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 184;}
+						 
+						input.seek(index60_160);
+						if ( s>=0 ) return s;
+						break;
+
+					case 34 : 
 						int LA60_51 = input.LA(1);
 						 
 						int index60_51 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_51==STAR) ) {s = 20;}
+						else if ( (LA60_51==COMMA||LA60_51==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_51==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_51==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_51==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_51==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_51==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_51==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_51==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_51==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_51==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_51==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_51==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_51==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_51==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_51==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_51==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_51==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_51==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_51==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_51==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_51==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_51==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_51==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_51==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_51==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_51==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_51==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_51==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
 						input.seek(index60_51);
 						if ( s>=0 ) return s;
 						break;
 
-					case 23 : 
-						int LA60_30 = input.LA(1);
+					case 35 : 
+						int LA60_3 = input.LA(1);
 						 
-						int index60_30 = input.index();
+						int index60_3 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 43;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_3==STAR) ) {s = 20;}
+						else if ( (LA60_3==COMMA||LA60_3==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_3==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_3==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_3==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_3==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_3==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_3==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_3==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_3==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_3==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_3==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_3==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_3==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_3==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_3==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_3==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_3==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_3==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_3==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_3==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_3==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_3==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_3==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_3==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_3==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_3==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_3==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_3==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_30);
+						input.seek(index60_3);
 						if ( s>=0 ) return s;
 						break;
 
-					case 24 : 
-						int LA60_29 = input.LA(1);
+					case 36 : 
+						int LA60_113 = input.LA(1);
 						 
-						int index60_29 = input.index();
+						int index60_113 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA60_29==DECIMAL_INTEGER_LITERAL) ) {s = 42;}
-						else if ( (LA60_29==RPAREN) && (synpred24_FTS())) {s = 43;}
-						else if ( ((LA60_29 >= AMP && LA60_29 <= AND)||LA60_29==BAR||LA60_29==COMMA||LA60_29==DATETIME||LA60_29==DOT||LA60_29==EQUALS||LA60_29==EXCLAMATION||LA60_29==FLOATING_POINT_LITERAL||(LA60_29 >= FTSPHRASE && LA60_29 <= FTSWORD)||LA60_29==ID||(LA60_29 >= LPAREN && LA60_29 <= LT)||LA60_29==MINUS||LA60_29==NOT||LA60_29==OR||LA60_29==PLUS||LA60_29==QUESTION_MARK||LA60_29==STAR||(LA60_29 >= TILDA && LA60_29 <= TO)||LA60_29==URI) ) {s = 12;}
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
 						 
-						input.seek(index60_29);
+						input.seek(index60_113);
 						if ( s>=0 ) return s;
 						break;
 
-					case 25 : 
-						int LA60_45 = input.LA(1);
+					case 37 : 
+						int LA60_50 = input.LA(1);
 						 
-						int index60_45 = input.index();
+						int index60_50 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred24_FTS()) ) {s = 49;}
-						else if ( (true) ) {s = 12;}
+						if ( (LA60_50==STAR) ) {s = 20;}
+						else if ( (LA60_50==COMMA||LA60_50==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_50==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_50==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_50==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_50==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_50==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_50==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_50==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_50==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_50==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_50==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_50==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_50==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_50==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_50==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_50==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_50==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_50==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_50==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_50==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_50==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_50==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_50==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_50==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_50==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_50==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_50==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_50==DOTDOT) && (synpred37_FTS())) {s = 48;}
 						 
-						input.seek(index60_45);
+						input.seek(index60_50);
+						if ( s>=0 ) return s;
+						break;
+
+					case 38 : 
+						int LA60_120 = input.LA(1);
+						 
+						int index60_120 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
+						 
+						input.seek(index60_120);
+						if ( s>=0 ) return s;
+						break;
+
+					case 39 : 
+						int LA60_115 = input.LA(1);
+						 
+						int index60_115 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred24_FTS()) ) {s = 130;}
+						else if ( (synpred25_FTS()) ) {s = 155;}
+						 
+						input.seek(index60_115);
+						if ( s>=0 ) return s;
+						break;
+
+					case 40 : 
+						int LA60_4 = input.LA(1);
+						 
+						int index60_4 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA60_4==STAR) ) {s = 20;}
+						else if ( (LA60_4==COMMA||LA60_4==DOT) && (synpred25_FTS())) {s = 21;}
+						else if ( (LA60_4==TILDA) && (synpred25_FTS())) {s = 22;}
+						else if ( (LA60_4==CARAT) && (synpred25_FTS())) {s = 23;}
+						else if ( (LA60_4==AND) && (synpred25_FTS())) {s = 24;}
+						else if ( (LA60_4==AMP) && (synpred25_FTS())) {s = 25;}
+						else if ( (LA60_4==RPAREN) && (synpred25_FTS())) {s = 26;}
+						else if ( (LA60_4==OR) && (synpred25_FTS())) {s = 27;}
+						else if ( (LA60_4==BAR) && (synpred25_FTS())) {s = 28;}
+						else if ( (LA60_4==NOT) && (synpred25_FTS())) {s = 29;}
+						else if ( (LA60_4==ID) && (synpred25_FTS())) {s = 30;}
+						else if ( (LA60_4==FTSWORD) && (synpred25_FTS())) {s = 31;}
+						else if ( (LA60_4==FTSPRE) && (synpred25_FTS())) {s = 32;}
+						else if ( (LA60_4==FTSWILD) && (synpred25_FTS())) {s = 33;}
+						else if ( (LA60_4==EXCLAMATION) && (synpred25_FTS())) {s = 34;}
+						else if ( (LA60_4==TO) && (synpred25_FTS())) {s = 35;}
+						else if ( (LA60_4==DECIMAL_INTEGER_LITERAL) && (synpred25_FTS())) {s = 36;}
+						else if ( (LA60_4==FLOATING_POINT_LITERAL) && (synpred25_FTS())) {s = 37;}
+						else if ( (LA60_4==DATETIME) && (synpred25_FTS())) {s = 38;}
+						else if ( (LA60_4==URI) && (synpred25_FTS())) {s = 39;}
+						else if ( (LA60_4==QUESTION_MARK) && (synpred25_FTS())) {s = 40;}
+						else if ( (LA60_4==EQUALS) && (synpred25_FTS())) {s = 41;}
+						else if ( (LA60_4==FTSPHRASE) && (synpred25_FTS())) {s = 42;}
+						else if ( (LA60_4==LSQUARE) && (synpred25_FTS())) {s = 43;}
+						else if ( (LA60_4==LT) && (synpred25_FTS())) {s = 44;}
+						else if ( (LA60_4==LPAREN) && (synpred25_FTS())) {s = 45;}
+						else if ( (LA60_4==PLUS) && (synpred25_FTS())) {s = 46;}
+						else if ( (LA60_4==MINUS) && (synpred25_FTS())) {s = 47;}
+						else if ( (LA60_4==DOTDOT) && (synpred37_FTS())) {s = 48;}
+						 
+						input.seek(index60_4);
 						if ( s>=0 ) return s;
 						break;
 			}
@@ -19985,32 +21120,32 @@ public class FTSParser extends Parser {
 		"\13\1\uffff\1\1\1\3\1\5\1\7\1\11\32\uffff\23\10\16\uffff\23\7\64\uffff"+
 		"\23\4\23\uffff\23\3\71\uffff";
 	static final String DFA73_specialS =
-		"\32\uffff\1\u00aa\6\uffff\1\11\6\uffff\1\173\1\u00d4\1\u009a\1\146\1\116"+
-		"\1\u00ea\1\u00e0\1\176\1\111\1\u00d1\1\46\24\uffff\1\u00ef\1\u0093\1\u00e3"+
-		"\1\31\1\101\1\u00b9\1\71\1\u00c8\1\47\1\126\1\u00a6\1\u0089\24\uffff\1"+
-		"\u00b3\1\u00d7\1\uffff\1\u00b5\1\157\1\74\1\54\1\u00c0\1\u00f1\1\u00d3"+
-		"\1\u0099\1\145\1\115\1\u00e9\1\u00df\1\175\1\110\1\u00d0\1\45\1\u008b"+
-		"\1\uffff\1\65\1\u00b7\1\7\1\113\1\u009d\1\u0083\1\u00e2\1\30\1\100\1\u00b8"+
-		"\1\70\1\u00c7\1\44\1\125\1\u00a5\1\u0088\1\25\1\u0080\1\u00a4\1\u009e"+
-		"\1\u0098\1\u00cd\1\13\1\42\1\u00ac\1\u0090\1\u0082\24\uffff\1\164\5\uffff"+
-		"\1\177\1\37\1\14\1\133\1\114\1\136\1\u008c\1\u00ed\1\u00cf\1\u00b1\1\56"+
-		"\24\uffff\1\u00bc\5\uffff\1\60\1\u00f3\1\140\1\105\1\u00ae\1\u0092\1\23"+
-		"\1\62\1\u00e4\1\40\1\u00d5\1\u00ee\1\u0091\1\1\1\12\1\u00af\1\76\1\134"+
-		"\1\57\1\u00da\1\u00ca\1\u00e5\1\u0081\1\32\1\u00a9\24\uffff\1\u00f0\1"+
-		"\u00ec\1\4\1\u00d9\1\u00c1\1\16\1\64\1\u00e1\1\130\1\144\1\u0084\1\u00d6"+
-		"\1\u00b6\24\uffff\1\u008a\1\104\1\170\1\u00a8\1\161\1\u0094\1\117\1\147"+
-		"\1\u00ce\1\152\1\127\1\72\1\u00b0\1\102\1\131\1\u00d8\1\u00b2\1\50\1\124"+
-		"\1\151\1\uffff\1\63\1\u00a0\1\143\1\135\1\75\1\43\1\53\1\24\1\107\1\137"+
-		"\1\22\1\u0086\1\166\1\u00b4\1\u00d2\1\156\1\u00ab\1\155\1\uffff\1\51\1"+
-		"\10\1\41\1\u00c3\1\u00c4\1\u0097\1\u0087\1\u00ad\1\103\1\162\1\15\24\uffff"+
-		"\1\5\1\34\1\171\1\u00f2\1\20\1\52\1\106\1\u00cb\1\u00eb\1\u00c5\1\u00bb"+
-		"\1\167\1\u0085\1\73\1\132\1\165\1\u00e8\1\u009f\24\uffff\1\21\1\u0096"+
-		"\1\u00bf\1\u00a3\1\33\1\3\1\123\1\0\1\u00dd\1\u00ba\1\u00a2\1\174\1\35"+
-		"\1\u00c9\1\160\1\u00dc\1\u00c2\1\112\1\77\1\2\1\150\1\120\1\27\1\u0095"+
-		"\1\uffff\1\u008e\1\142\1\122\1\67\1\u009b\1\163\1\66\1\u009c\1\36\1\6"+
-		"\1\26\1\61\1\u00bd\1\172\1\u00a7\1\u00c6\1\17\1\u00db\1\uffff\1\u00e7"+
-		"\1\u008d\1\u00a1\1\u00be\1\u00de\1\154\1\u00e6\1\u00cc\1\u008f\1\153\1"+
-		"\121\1\55\1\141}>";
+		"\32\uffff\1\u00a8\6\uffff\1\u00f0\6\uffff\1\75\1\26\1\33\1\136\1\u00cb"+
+		"\1\62\1\1\1\111\1\144\1\71\1\u00c5\24\uffff\1\u00ae\1\u00a2\1\u00a4\1"+
+		"\u0091\1\103\1\u00c0\1\56\1\u00b0\1\165\1\74\1\174\1\154\24\uffff\1\17"+
+		"\1\u00ce\1\uffff\1\40\1\50\1\110\1\u008f\1\u00b8\1\u00db\1\25\1\32\1\135"+
+		"\1\u00ca\1\61\1\0\1\107\1\143\1\70\1\u00c4\1\u00b6\1\uffff\1\167\1\161"+
+		"\1\u00b1\1\u00e7\1\54\1\u00c8\1\u00a3\1\u0090\1\102\1\u00bf\1\55\1\u00af"+
+		"\1\164\1\73\1\173\1\153\1\125\1\137\1\134\1\14\1\u00b3\1\u00d2\1\u00e6"+
+		"\1\u0084\1\u00a7\1\152\1\115\24\uffff\1\65\5\uffff\1\145\1\4\1\u00f2\1"+
+		"\u00c3\1\53\1\u0099\1\172\1\130\1\100\1\u00c2\1\27\24\uffff\1\u00ab\5"+
+		"\uffff\1\11\1\30\1\u00f1\1\2\1\35\1\101\1\162\1\u008c\1\106\1\15\1\u00f3"+
+		"\1\u00cf\1\u00b2\1\66\1\51\1\u009e\1\175\1\u0085\1\104\1\116\1\u00ee\1"+
+		"\u00b9\1\u0097\1\23\1\u0089\24\uffff\1\146\1\u008d\1\u0087\1\42\1\5\1"+
+		"\u00d4\1\u00e2\1\u00d0\1\u008e\1\133\1\105\1\u00b4\1\41\24\uffff\1\166"+
+		"\1\13\1\u0094\1\126\1\u00de\1\u00c1\1\u00a5\1\176\1\157\1\151\1\u009b"+
+		"\1\u00be\1\u00e0\1\10\1\u0096\1\u00ac\1\u00cc\1\u00e4\1\127\1\47\1\uffff"+
+		"\1\34\1\u00ed\1\u0088\1\u00e8\1\u00c6\1\u00aa\1\22\1\141\1\64\1\u00c7"+
+		"\1\u00e9\1\u00ef\1\171\1\u009c\1\117\1\147\1\u00eb\1\37\1\uffff\1\u00ad"+
+		"\1\6\1\46\1\113\1\31\1\u00dc\1\u0080\1\u009d\1\u00b5\1\u00d5\1\123\24"+
+		"\uffff\1\132\1\160\1\76\1\140\1\114\1\57\1\u00d9\1\163\1\52\1\u00d7\1"+
+		"\u00d1\1\u008b\1\u00d6\1\170\1\122\1\72\1\u009a\1\24\24\uffff\1\45\1\u0083"+
+		"\1\36\1\u00a1\1\u00bc\1\u00dd\1\20\1\131\1\u008a\1\u00a9\1\120\1\155\1"+
+		"\63\1\u00e3\1\u0093\1\u0098\1\u00bb\1\u00a0\1\77\1\21\1\60\1\112\1\142"+
+		"\1\u00ea\1\uffff\1\150\1\u0086\1\u00df\1\u00bd\1\u009f\1\177\1\7\1\156"+
+		"\1\u0095\1\67\1\121\1\16\1\124\1\43\1\u00b7\1\u00d3\1\12\1\u0092\1\uffff"+
+		"\1\u00e1\1\u00da\1\u00cd\1\u00ec\1\u00c9\1\u00e5\1\3\1\u0081\1\44\1\u00ba"+
+		"\1\u00d8\1\u0082\1\u00a6}>";
 	static final String[] DFA73_transitionS = {
 			"\1\1\1\uffff\1\14\1\uffff\1\10\5\uffff\1\1\31\uffff\1\11\3\uffff\1\4"+
 			"\1\5\1\3\11\uffff\1\2\16\uffff\1\6\11\uffff\1\13\7\uffff\1\12\5\uffff"+
@@ -20728,785 +21863,131 @@ public class FTSParser extends Parser {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
-						int LA73_408 = input.LA(1);
+						int LA73_117 = input.LA(1);
 						 
-						int index73_408 = input.index();
+						int index73_117 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
+						if ( (LA73_117==COMMA||LA73_117==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_408);
+						input.seek(index73_117);
 						if ( s>=0 ) return s;
 						break;
 
 					case 1 : 
-						int LA73_227 = input.LA(1);
+						int LA73_46 = input.LA(1);
 						 
-						int index73_227 = input.index();
+						int index73_46 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_227==COMMA||LA73_227==DOT) ) {s = 293;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
+						if ( (LA73_46==COMMA||LA73_46==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_227);
+						input.seek(index73_46);
 						if ( s>=0 ) return s;
 						break;
 
 					case 2 : 
-						int LA73_420 = input.LA(1);
+						int LA73_217 = input.LA(1);
 						 
-						int index73_420 = input.index();
+						int index73_217 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
+						if ( (LA73_217==COMMA||LA73_217==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
 						 
-						input.seek(index73_420);
+						input.seek(index73_217);
 						if ( s>=0 ) return s;
 						break;
 
 					case 3 : 
-						int LA73_406 = input.LA(1);
+						int LA73_451 = input.LA(1);
 						 
-						int index73_406 = input.index();
+						int index73_451 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_406==COMMA||LA73_406==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
 						 
-						input.seek(index73_406);
+						input.seek(index73_451);
 						if ( s>=0 ) return s;
 						break;
 
 					case 4 : 
-						int LA73_261 = input.LA(1);
-						 
-						int index73_261 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_261==COMMA||LA73_261==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_261);
-						if ( s>=0 ) return s;
-						break;
-
-					case 5 : 
-						int LA73_363 = input.LA(1);
-						 
-						int index73_363 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_363==ID) ) {s = 413;}
-						else if ( (LA73_363==FTSWORD) ) {s = 333;}
-						else if ( (LA73_363==FTSPRE) ) {s = 334;}
-						else if ( (LA73_363==FTSWILD) ) {s = 335;}
-						else if ( (LA73_363==NOT) ) {s = 336;}
-						else if ( (LA73_363==TO) ) {s = 337;}
-						else if ( (LA73_363==DECIMAL_INTEGER_LITERAL) ) {s = 338;}
-						else if ( (LA73_363==FLOATING_POINT_LITERAL) ) {s = 339;}
-						else if ( (LA73_363==STAR) ) {s = 340;}
-						else if ( (LA73_363==QUESTION_MARK) ) {s = 341;}
-						else if ( (LA73_363==DATETIME) ) {s = 342;}
-						else if ( (LA73_363==URI) ) {s = 343;}
-						else if ( (LA73_363==TILDA) && (synpred37_FTS())) {s = 344;}
-						else if ( (LA73_363==CARAT) && (synpred37_FTS())) {s = 345;}
-						else if ( (LA73_363==AND) && (synpred37_FTS())) {s = 346;}
-						else if ( (LA73_363==AMP) && (synpred37_FTS())) {s = 347;}
-						else if ( (LA73_363==EOF) && (synpred37_FTS())) {s = 348;}
-						else if ( (LA73_363==RPAREN) && (synpred37_FTS())) {s = 349;}
-						else if ( (LA73_363==OR) && (synpred37_FTS())) {s = 350;}
-						else if ( (LA73_363==BAR) && (synpred37_FTS())) {s = 351;}
-						else if ( (LA73_363==EXCLAMATION) && (synpred37_FTS())) {s = 352;}
-						else if ( (LA73_363==AT) && (synpred37_FTS())) {s = 353;}
-						else if ( (LA73_363==FTSPHRASE) && (synpred37_FTS())) {s = 354;}
-						else if ( (LA73_363==LSQUARE) && (synpred37_FTS())) {s = 355;}
-						else if ( (LA73_363==LT) && (synpred37_FTS())) {s = 356;}
-						else if ( (LA73_363==COMMA||LA73_363==DOT) && (synpred37_FTS())) {s = 357;}
-						else if ( (LA73_363==EQUALS) && (synpred37_FTS())) {s = 358;}
-						else if ( (LA73_363==LPAREN) && (synpred37_FTS())) {s = 359;}
-						else if ( (LA73_363==PERCENT) && (synpred37_FTS())) {s = 360;}
-						else if ( (LA73_363==PLUS) && (synpred37_FTS())) {s = 361;}
-						else if ( (LA73_363==MINUS) && (synpred37_FTS())) {s = 362;}
-						 
-						input.seek(index73_363);
-						if ( s>=0 ) return s;
-						break;
-
-					case 6 : 
-						int LA73_435 = input.LA(1);
-						 
-						int index73_435 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_435);
-						if ( s>=0 ) return s;
-						break;
-
-					case 7 : 
-						int LA73_126 = input.LA(1);
-						 
-						int index73_126 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_126==COMMA||LA73_126==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_126);
-						if ( s>=0 ) return s;
-						break;
-
-					case 8 : 
-						int LA73_333 = input.LA(1);
-						 
-						int index73_333 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_333);
-						if ( s>=0 ) return s;
-						break;
-
-					case 9 : 
-						int LA73_33 = input.LA(1);
-						 
-						int index73_33 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_33==ID) ) {s = 72;}
-						else if ( (LA73_33==FTSWORD) ) {s = 73;}
-						else if ( (LA73_33==FTSPRE) ) {s = 74;}
-						else if ( (LA73_33==FTSWILD) ) {s = 75;}
-						else if ( (LA73_33==NOT) ) {s = 76;}
-						else if ( (LA73_33==TO) ) {s = 77;}
-						else if ( (LA73_33==DECIMAL_INTEGER_LITERAL) ) {s = 78;}
-						else if ( (LA73_33==FLOATING_POINT_LITERAL) ) {s = 79;}
-						else if ( (LA73_33==STAR) ) {s = 80;}
-						else if ( (LA73_33==QUESTION_MARK) ) {s = 81;}
-						else if ( (LA73_33==DATETIME) ) {s = 82;}
-						else if ( (LA73_33==URI) ) {s = 83;}
-						else if ( (LA73_33==TILDA) && (synpred48_FTS())) {s = 84;}
-						else if ( (LA73_33==CARAT) && (synpred48_FTS())) {s = 85;}
-						else if ( (LA73_33==AND) && (synpred48_FTS())) {s = 86;}
-						else if ( (LA73_33==AMP) && (synpred48_FTS())) {s = 87;}
-						else if ( (LA73_33==EOF) && (synpred48_FTS())) {s = 88;}
-						else if ( (LA73_33==RPAREN) && (synpred48_FTS())) {s = 89;}
-						else if ( (LA73_33==OR) && (synpred48_FTS())) {s = 90;}
-						else if ( (LA73_33==BAR) && (synpred48_FTS())) {s = 91;}
-						else if ( (LA73_33==EXCLAMATION) && (synpred48_FTS())) {s = 92;}
-						else if ( (LA73_33==AT) && (synpred48_FTS())) {s = 93;}
-						else if ( (LA73_33==FTSPHRASE) && (synpred48_FTS())) {s = 94;}
-						else if ( (LA73_33==LSQUARE) && (synpred48_FTS())) {s = 95;}
-						else if ( (LA73_33==LT) && (synpred48_FTS())) {s = 96;}
-						else if ( (LA73_33==COMMA||LA73_33==DOT) && (synpred48_FTS())) {s = 97;}
-						else if ( (LA73_33==EQUALS) && (synpred48_FTS())) {s = 98;}
-						else if ( (LA73_33==LPAREN) && (synpred48_FTS())) {s = 99;}
-						else if ( (LA73_33==PERCENT) && (synpred48_FTS())) {s = 100;}
-						else if ( (LA73_33==PLUS) && (synpred48_FTS())) {s = 101;}
-						else if ( (LA73_33==MINUS) && (synpred48_FTS())) {s = 102;}
-						 
-						input.seek(index73_33);
-						if ( s>=0 ) return s;
-						break;
-
-					case 10 : 
-						int LA73_228 = input.LA(1);
-						 
-						int index73_228 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_228==COMMA||LA73_228==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_228);
-						if ( s>=0 ) return s;
-						break;
-
-					case 11 : 
-						int LA73_146 = input.LA(1);
-						 
-						int index73_146 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_146==COMMA||LA73_146==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_146);
-						if ( s>=0 ) return s;
-						break;
-
-					case 12 : 
-						int LA73_179 = input.LA(1);
-						 
-						int index73_179 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_179==COMMA||LA73_179==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_179);
-						if ( s>=0 ) return s;
-						break;
-
-					case 13 : 
-						int LA73_342 = input.LA(1);
-						 
-						int index73_342 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_342);
-						if ( s>=0 ) return s;
-						break;
-
-					case 14 : 
-						int LA73_264 = input.LA(1);
-						 
-						int index73_264 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_264==COMMA||LA73_264==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_264);
-						if ( s>=0 ) return s;
-						break;
-
-					case 15 : 
-						int LA73_442 = input.LA(1);
-						 
-						int index73_442 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_442);
-						if ( s>=0 ) return s;
-						break;
-
-					case 16 : 
-						int LA73_367 = input.LA(1);
-						 
-						int index73_367 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_367==COMMA||LA73_367==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_367);
-						if ( s>=0 ) return s;
-						break;
-
-					case 17 : 
-						int LA73_401 = input.LA(1);
-						 
-						int index73_401 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_401==ID) ) {s = 432;}
-						else if ( (LA73_401==FTSWORD) ) {s = 371;}
-						else if ( (LA73_401==FTSPRE) ) {s = 372;}
-						else if ( (LA73_401==FTSWILD) ) {s = 373;}
-						else if ( (LA73_401==NOT) ) {s = 374;}
-						else if ( (LA73_401==TO) ) {s = 375;}
-						else if ( (LA73_401==DECIMAL_INTEGER_LITERAL) ) {s = 376;}
-						else if ( (LA73_401==FLOATING_POINT_LITERAL) ) {s = 377;}
-						else if ( (LA73_401==STAR) ) {s = 378;}
-						else if ( (LA73_401==QUESTION_MARK) ) {s = 379;}
-						else if ( (LA73_401==DATETIME) ) {s = 380;}
-						else if ( (LA73_401==URI) ) {s = 381;}
-						else if ( (LA73_401==TILDA) && (synpred36_FTS())) {s = 382;}
-						else if ( (LA73_401==CARAT) && (synpred36_FTS())) {s = 383;}
-						else if ( (LA73_401==AND) && (synpred36_FTS())) {s = 384;}
-						else if ( (LA73_401==AMP) && (synpred36_FTS())) {s = 385;}
-						else if ( (LA73_401==EOF) && (synpred36_FTS())) {s = 386;}
-						else if ( (LA73_401==RPAREN) && (synpred36_FTS())) {s = 387;}
-						else if ( (LA73_401==OR) && (synpred36_FTS())) {s = 388;}
-						else if ( (LA73_401==BAR) && (synpred36_FTS())) {s = 389;}
-						else if ( (LA73_401==EXCLAMATION) && (synpred36_FTS())) {s = 390;}
-						else if ( (LA73_401==AT) && (synpred36_FTS())) {s = 391;}
-						else if ( (LA73_401==FTSPHRASE) && (synpred36_FTS())) {s = 392;}
-						else if ( (LA73_401==LSQUARE) && (synpred36_FTS())) {s = 393;}
-						else if ( (LA73_401==LT) && (synpred36_FTS())) {s = 394;}
-						else if ( (LA73_401==COMMA||LA73_401==DOT) && (synpred36_FTS())) {s = 395;}
-						else if ( (LA73_401==EQUALS) && (synpred36_FTS())) {s = 396;}
-						else if ( (LA73_401==LPAREN) && (synpred36_FTS())) {s = 397;}
-						else if ( (LA73_401==PERCENT) && (synpred36_FTS())) {s = 398;}
-						else if ( (LA73_401==PLUS) && (synpred36_FTS())) {s = 399;}
-						else if ( (LA73_401==MINUS) && (synpred36_FTS())) {s = 400;}
-						 
-						input.seek(index73_401);
-						if ( s>=0 ) return s;
-						break;
-
-					case 18 : 
-						int LA73_323 = input.LA(1);
-						 
-						int index73_323 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_323==COMMA||LA73_323==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_323);
-						if ( s>=0 ) return s;
-						break;
-
-					case 19 : 
-						int LA73_220 = input.LA(1);
-						 
-						int index73_220 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_220==COMMA||LA73_220==DOT) ) {s = 260;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_220);
-						if ( s>=0 ) return s;
-						break;
-
-					case 20 : 
-						int LA73_320 = input.LA(1);
-						 
-						int index73_320 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_320==COMMA||LA73_320==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_320);
-						if ( s>=0 ) return s;
-						break;
-
-					case 21 : 
-						int LA73_140 = input.LA(1);
-						 
-						int index73_140 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_140==COMMA||LA73_140==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_140);
-						if ( s>=0 ) return s;
-						break;
-
-					case 22 : 
-						int LA73_436 = input.LA(1);
-						 
-						int index73_436 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_436);
-						if ( s>=0 ) return s;
-						break;
-
-					case 23 : 
-						int LA73_423 = input.LA(1);
-						 
-						int index73_423 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_423);
-						if ( s>=0 ) return s;
-						break;
-
-					case 24 : 
-						int LA73_131 = input.LA(1);
-						 
-						int index73_131 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_131==COMMA||LA73_131==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_131);
-						if ( s>=0 ) return s;
-						break;
-
-					case 25 : 
-						int LA73_74 = input.LA(1);
-						 
-						int index73_74 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_74==COMMA||LA73_74==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_74);
-						if ( s>=0 ) return s;
-						break;
-
-					case 26 : 
-						int LA73_237 = input.LA(1);
-						 
-						int index73_237 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_237==COMMA||LA73_237==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_237);
-						if ( s>=0 ) return s;
-						break;
-
-					case 27 : 
-						int LA73_405 = input.LA(1);
-						 
-						int index73_405 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_405==COMMA||LA73_405==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_405);
-						if ( s>=0 ) return s;
-						break;
-
-					case 28 : 
-						int LA73_364 = input.LA(1);
-						 
-						int index73_364 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_364==ID) ) {s = 414;}
-						else if ( (LA73_364==FTSWORD) ) {s = 415;}
-						else if ( (LA73_364==FTSPRE) ) {s = 416;}
-						else if ( (LA73_364==FTSWILD) ) {s = 417;}
-						else if ( (LA73_364==NOT) ) {s = 418;}
-						else if ( (LA73_364==TO) ) {s = 419;}
-						else if ( (LA73_364==DECIMAL_INTEGER_LITERAL) ) {s = 420;}
-						else if ( (LA73_364==FLOATING_POINT_LITERAL) ) {s = 421;}
-						else if ( (LA73_364==STAR) ) {s = 422;}
-						else if ( (LA73_364==QUESTION_MARK) ) {s = 423;}
-						else if ( (LA73_364==DATETIME) ) {s = 424;}
-						else if ( (LA73_364==URI) ) {s = 425;}
-						else if ( (LA73_364==TILDA) && (synpred37_FTS())) {s = 344;}
-						else if ( (LA73_364==CARAT) && (synpred37_FTS())) {s = 345;}
-						else if ( (LA73_364==AND) && (synpred37_FTS())) {s = 346;}
-						else if ( (LA73_364==AMP) && (synpred37_FTS())) {s = 347;}
-						else if ( (LA73_364==EOF) && (synpred37_FTS())) {s = 348;}
-						else if ( (LA73_364==RPAREN) && (synpred37_FTS())) {s = 349;}
-						else if ( (LA73_364==OR) && (synpred37_FTS())) {s = 350;}
-						else if ( (LA73_364==BAR) && (synpred37_FTS())) {s = 351;}
-						else if ( (LA73_364==EXCLAMATION) && (synpred37_FTS())) {s = 352;}
-						else if ( (LA73_364==AT) && (synpred37_FTS())) {s = 353;}
-						else if ( (LA73_364==FTSPHRASE) && (synpred37_FTS())) {s = 354;}
-						else if ( (LA73_364==LSQUARE) && (synpred37_FTS())) {s = 355;}
-						else if ( (LA73_364==LT) && (synpred37_FTS())) {s = 356;}
-						else if ( (LA73_364==COMMA||LA73_364==DOT) && (synpred37_FTS())) {s = 357;}
-						else if ( (LA73_364==EQUALS) && (synpred37_FTS())) {s = 358;}
-						else if ( (LA73_364==LPAREN) && (synpred37_FTS())) {s = 359;}
-						else if ( (LA73_364==PERCENT) && (synpred37_FTS())) {s = 360;}
-						else if ( (LA73_364==PLUS) && (synpred37_FTS())) {s = 361;}
-						else if ( (LA73_364==MINUS) && (synpred37_FTS())) {s = 362;}
-						 
-						input.seek(index73_364);
-						if ( s>=0 ) return s;
-						break;
-
-					case 29 : 
-						int LA73_413 = input.LA(1);
-						 
-						int index73_413 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_413);
-						if ( s>=0 ) return s;
-						break;
-
-					case 30 : 
-						int LA73_434 = input.LA(1);
-						 
-						int index73_434 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_434);
-						if ( s>=0 ) return s;
-						break;
-
-					case 31 : 
 						int LA73_178 = input.LA(1);
 						 
 						int index73_178 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (LA73_178==COMMA||LA73_178==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
 						 
 						input.seek(index73_178);
 						if ( s>=0 ) return s;
 						break;
 
-					case 32 : 
-						int LA73_223 = input.LA(1);
+					case 5 : 
+						int LA73_263 = input.LA(1);
 						 
-						int index73_223 = input.index();
+						int index73_263 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_223==COMMA||LA73_223==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
+						if ( (LA73_263==COMMA||LA73_263==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
 						 
-						input.seek(index73_223);
+						input.seek(index73_263);
 						if ( s>=0 ) return s;
 						break;
 
-					case 33 : 
-						int LA73_334 = input.LA(1);
+					case 6 : 
+						int LA73_333 = input.LA(1);
 						 
-						int index73_334 = input.index();
+						int index73_333 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
 						 
-						input.seek(index73_334);
+						input.seek(index73_333);
 						if ( s>=0 ) return s;
 						break;
 
-					case 34 : 
-						int LA73_147 = input.LA(1);
+					case 7 : 
+						int LA73_432 = input.LA(1);
 						 
-						int index73_147 = input.index();
+						int index73_432 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_147==COMMA||LA73_147==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
 						 
-						input.seek(index73_147);
+						input.seek(index73_432);
 						if ( s>=0 ) return s;
 						break;
 
-					case 35 : 
-						int LA73_318 = input.LA(1);
+					case 8 : 
+						int LA73_305 = input.LA(1);
 						 
-						int index73_318 = input.index();
+						int index73_305 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_318==COMMA||LA73_318==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						if ( (LA73_305==COMMA||LA73_305==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
 						 
-						input.seek(index73_318);
+						input.seek(index73_305);
 						if ( s>=0 ) return s;
 						break;
 
-					case 36 : 
-						int LA73_136 = input.LA(1);
-						 
-						int index73_136 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_136==COMMA||LA73_136==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_136);
-						if ( s>=0 ) return s;
-						break;
-
-					case 37 : 
-						int LA73_121 = input.LA(1);
-						 
-						int index73_121 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_121==COMMA||LA73_121==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_121);
-						if ( s>=0 ) return s;
-						break;
-
-					case 38 : 
-						int LA73_50 = input.LA(1);
-						 
-						int index73_50 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_50==COMMA||LA73_50==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_50);
-						if ( s>=0 ) return s;
-						break;
-
-					case 39 : 
-						int LA73_79 = input.LA(1);
-						 
-						int index73_79 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_79==COMMA||LA73_79==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_79);
-						if ( s>=0 ) return s;
-						break;
-
-					case 40 : 
-						int LA73_309 = input.LA(1);
-						 
-						int index73_309 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_309==COMMA||LA73_309==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_309);
-						if ( s>=0 ) return s;
-						break;
-
-					case 41 : 
-						int LA73_332 = input.LA(1);
-						 
-						int index73_332 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_332);
-						if ( s>=0 ) return s;
-						break;
-
-					case 42 : 
-						int LA73_368 = input.LA(1);
-						 
-						int index73_368 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_368==COMMA||LA73_368==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_368);
-						if ( s>=0 ) return s;
-						break;
-
-					case 43 : 
-						int LA73_319 = input.LA(1);
-						 
-						int index73_319 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_319==COMMA||LA73_319==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_319);
-						if ( s>=0 ) return s;
-						break;
-
-					case 44 : 
-						int LA73_109 = input.LA(1);
-						 
-						int index73_109 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_109==COMMA||LA73_109==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_109);
-						if ( s>=0 ) return s;
-						break;
-
-					case 45 : 
-						int LA73_456 = input.LA(1);
-						 
-						int index73_456 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_456);
-						if ( s>=0 ) return s;
-						break;
-
-					case 46 : 
-						int LA73_187 = input.LA(1);
-						 
-						int index73_187 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_187==COMMA||LA73_187==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_187);
-						if ( s>=0 ) return s;
-						break;
-
-					case 47 : 
-						int LA73_232 = input.LA(1);
-						 
-						int index73_232 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_232==COMMA||LA73_232==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_232);
-						if ( s>=0 ) return s;
-						break;
-
-					case 48 : 
+					case 9 : 
 						int LA73_214 = input.LA(1);
 						 
 						int index73_214 = input.index();
@@ -21524,354 +22005,44 @@ public class FTSParser extends Parser {
 						else if ( (LA73_214==QUESTION_MARK) ) {s = 237;}
 						else if ( (LA73_214==DATETIME) ) {s = 238;}
 						else if ( (LA73_214==URI) ) {s = 239;}
-						else if ( (LA73_214==TILDA) && (synpred41_FTS())) {s = 240;}
-						else if ( (LA73_214==CARAT) && (synpred41_FTS())) {s = 241;}
-						else if ( (LA73_214==AND) && (synpred41_FTS())) {s = 242;}
-						else if ( (LA73_214==AMP) && (synpred41_FTS())) {s = 243;}
-						else if ( (LA73_214==EOF) && (synpred41_FTS())) {s = 244;}
-						else if ( (LA73_214==RPAREN) && (synpred41_FTS())) {s = 245;}
-						else if ( (LA73_214==OR) && (synpred41_FTS())) {s = 246;}
-						else if ( (LA73_214==BAR) && (synpred41_FTS())) {s = 247;}
-						else if ( (LA73_214==EXCLAMATION) && (synpred41_FTS())) {s = 248;}
-						else if ( (LA73_214==AT) && (synpred41_FTS())) {s = 249;}
-						else if ( (LA73_214==FTSPHRASE) && (synpred41_FTS())) {s = 250;}
-						else if ( (LA73_214==LSQUARE) && (synpred41_FTS())) {s = 251;}
-						else if ( (LA73_214==LT) && (synpred41_FTS())) {s = 252;}
-						else if ( (LA73_214==COMMA||LA73_214==DOT) && (synpred41_FTS())) {s = 253;}
-						else if ( (LA73_214==EQUALS) && (synpred41_FTS())) {s = 254;}
-						else if ( (LA73_214==LPAREN) && (synpred41_FTS())) {s = 255;}
-						else if ( (LA73_214==PERCENT) && (synpred41_FTS())) {s = 256;}
-						else if ( (LA73_214==PLUS) && (synpred41_FTS())) {s = 257;}
-						else if ( (LA73_214==MINUS) && (synpred41_FTS())) {s = 258;}
+						else if ( (LA73_214==TILDA) && (synpred48_FTS())) {s = 240;}
+						else if ( (LA73_214==CARAT) && (synpred48_FTS())) {s = 241;}
+						else if ( (LA73_214==AND) && (synpred48_FTS())) {s = 242;}
+						else if ( (LA73_214==AMP) && (synpred48_FTS())) {s = 243;}
+						else if ( (LA73_214==EOF) && (synpred48_FTS())) {s = 244;}
+						else if ( (LA73_214==RPAREN) && (synpred48_FTS())) {s = 245;}
+						else if ( (LA73_214==OR) && (synpred48_FTS())) {s = 246;}
+						else if ( (LA73_214==BAR) && (synpred48_FTS())) {s = 247;}
+						else if ( (LA73_214==EXCLAMATION) && (synpred48_FTS())) {s = 248;}
+						else if ( (LA73_214==AT) && (synpred48_FTS())) {s = 249;}
+						else if ( (LA73_214==FTSPHRASE) && (synpred48_FTS())) {s = 250;}
+						else if ( (LA73_214==LSQUARE) && (synpred48_FTS())) {s = 251;}
+						else if ( (LA73_214==LT) && (synpred48_FTS())) {s = 252;}
+						else if ( (LA73_214==COMMA||LA73_214==DOT) && (synpred48_FTS())) {s = 253;}
+						else if ( (LA73_214==EQUALS) && (synpred48_FTS())) {s = 254;}
+						else if ( (LA73_214==LPAREN) && (synpred48_FTS())) {s = 255;}
+						else if ( (LA73_214==PERCENT) && (synpred48_FTS())) {s = 256;}
+						else if ( (LA73_214==PLUS) && (synpred48_FTS())) {s = 257;}
+						else if ( (LA73_214==MINUS) && (synpred48_FTS())) {s = 258;}
 						 
 						input.seek(index73_214);
 						if ( s>=0 ) return s;
 						break;
 
-					case 49 : 
-						int LA73_437 = input.LA(1);
+					case 10 : 
+						int LA73_442 = input.LA(1);
 						 
-						int index73_437 = input.index();
+						int index73_442 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
 						 
-						input.seek(index73_437);
+						input.seek(index73_442);
 						if ( s>=0 ) return s;
 						break;
 
-					case 50 : 
-						int LA73_221 = input.LA(1);
-						 
-						int index73_221 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_221==ID) ) {s = 261;}
-						else if ( (LA73_221==FTSWORD) ) {s = 262;}
-						else if ( (LA73_221==FTSPRE) ) {s = 263;}
-						else if ( (LA73_221==FTSWILD) ) {s = 264;}
-						else if ( (LA73_221==NOT) ) {s = 265;}
-						else if ( (LA73_221==TO) ) {s = 266;}
-						else if ( (LA73_221==DECIMAL_INTEGER_LITERAL) ) {s = 267;}
-						else if ( (LA73_221==FLOATING_POINT_LITERAL) ) {s = 268;}
-						else if ( (LA73_221==STAR) ) {s = 269;}
-						else if ( (LA73_221==QUESTION_MARK) ) {s = 270;}
-						else if ( (LA73_221==DATETIME) ) {s = 271;}
-						else if ( (LA73_221==URI) ) {s = 272;}
-						else if ( (LA73_221==TILDA) && (synpred40_FTS())) {s = 273;}
-						else if ( (LA73_221==CARAT) && (synpred40_FTS())) {s = 274;}
-						else if ( (LA73_221==AND) && (synpred40_FTS())) {s = 275;}
-						else if ( (LA73_221==AMP) && (synpred40_FTS())) {s = 276;}
-						else if ( (LA73_221==EOF) && (synpred40_FTS())) {s = 277;}
-						else if ( (LA73_221==RPAREN) && (synpred40_FTS())) {s = 278;}
-						else if ( (LA73_221==OR) && (synpred40_FTS())) {s = 279;}
-						else if ( (LA73_221==BAR) && (synpred40_FTS())) {s = 280;}
-						else if ( (LA73_221==EXCLAMATION) && (synpred40_FTS())) {s = 281;}
-						else if ( (LA73_221==AT) && (synpred40_FTS())) {s = 282;}
-						else if ( (LA73_221==FTSPHRASE) && (synpred40_FTS())) {s = 283;}
-						else if ( (LA73_221==LSQUARE) && (synpred40_FTS())) {s = 284;}
-						else if ( (LA73_221==LT) && (synpred40_FTS())) {s = 285;}
-						else if ( (LA73_221==COMMA||LA73_221==DOT) && (synpred40_FTS())) {s = 286;}
-						else if ( (LA73_221==EQUALS) && (synpred40_FTS())) {s = 287;}
-						else if ( (LA73_221==LPAREN) && (synpred40_FTS())) {s = 288;}
-						else if ( (LA73_221==PERCENT) && (synpred40_FTS())) {s = 289;}
-						else if ( (LA73_221==PLUS) && (synpred40_FTS())) {s = 290;}
-						else if ( (LA73_221==MINUS) && (synpred40_FTS())) {s = 291;}
-						 
-						input.seek(index73_221);
-						if ( s>=0 ) return s;
-						break;
-
-					case 51 : 
-						int LA73_313 = input.LA(1);
-						 
-						int index73_313 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_313==ID) ) {s = 370;}
-						else if ( (LA73_313==FTSWORD) ) {s = 371;}
-						else if ( (LA73_313==FTSPRE) ) {s = 372;}
-						else if ( (LA73_313==FTSWILD) ) {s = 373;}
-						else if ( (LA73_313==NOT) ) {s = 374;}
-						else if ( (LA73_313==TO) ) {s = 375;}
-						else if ( (LA73_313==DECIMAL_INTEGER_LITERAL) ) {s = 376;}
-						else if ( (LA73_313==FLOATING_POINT_LITERAL) ) {s = 377;}
-						else if ( (LA73_313==STAR) ) {s = 378;}
-						else if ( (LA73_313==QUESTION_MARK) ) {s = 379;}
-						else if ( (LA73_313==DATETIME) ) {s = 380;}
-						else if ( (LA73_313==URI) ) {s = 381;}
-						else if ( (LA73_313==TILDA) && (synpred36_FTS())) {s = 382;}
-						else if ( (LA73_313==CARAT) && (synpred36_FTS())) {s = 383;}
-						else if ( (LA73_313==AND) && (synpred36_FTS())) {s = 384;}
-						else if ( (LA73_313==AMP) && (synpred36_FTS())) {s = 385;}
-						else if ( (LA73_313==EOF) && (synpred36_FTS())) {s = 386;}
-						else if ( (LA73_313==RPAREN) && (synpred36_FTS())) {s = 387;}
-						else if ( (LA73_313==OR) && (synpred36_FTS())) {s = 388;}
-						else if ( (LA73_313==BAR) && (synpred36_FTS())) {s = 389;}
-						else if ( (LA73_313==EXCLAMATION) && (synpred36_FTS())) {s = 390;}
-						else if ( (LA73_313==AT) && (synpred36_FTS())) {s = 391;}
-						else if ( (LA73_313==FTSPHRASE) && (synpred36_FTS())) {s = 392;}
-						else if ( (LA73_313==LSQUARE) && (synpred36_FTS())) {s = 393;}
-						else if ( (LA73_313==LT) && (synpred36_FTS())) {s = 394;}
-						else if ( (LA73_313==COMMA||LA73_313==DOT) && (synpred36_FTS())) {s = 395;}
-						else if ( (LA73_313==EQUALS) && (synpred36_FTS())) {s = 396;}
-						else if ( (LA73_313==LPAREN) && (synpred36_FTS())) {s = 397;}
-						else if ( (LA73_313==PERCENT) && (synpred36_FTS())) {s = 398;}
-						else if ( (LA73_313==PLUS) && (synpred36_FTS())) {s = 399;}
-						else if ( (LA73_313==MINUS) && (synpred36_FTS())) {s = 400;}
-						 
-						input.seek(index73_313);
-						if ( s>=0 ) return s;
-						break;
-
-					case 52 : 
-						int LA73_265 = input.LA(1);
-						 
-						int index73_265 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_265==COMMA||LA73_265==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_265);
-						if ( s>=0 ) return s;
-						break;
-
-					case 53 : 
-						int LA73_124 = input.LA(1);
-						 
-						int index73_124 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_124==DOT) ) {s = 208;}
-						else if ( (LA73_124==COMMA) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_124);
-						if ( s>=0 ) return s;
-						break;
-
-					case 54 : 
-						int LA73_432 = input.LA(1);
-						 
-						int index73_432 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_432);
-						if ( s>=0 ) return s;
-						break;
-
-					case 55 : 
-						int LA73_429 = input.LA(1);
-						 
-						int index73_429 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_429);
-						if ( s>=0 ) return s;
-						break;
-
-					case 56 : 
-						int LA73_134 = input.LA(1);
-						 
-						int index73_134 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_134==COMMA||LA73_134==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_134);
-						if ( s>=0 ) return s;
-						break;
-
-					case 57 : 
-						int LA73_77 = input.LA(1);
-						 
-						int index73_77 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_77==COMMA||LA73_77==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_77);
-						if ( s>=0 ) return s;
-						break;
-
-					case 58 : 
-						int LA73_303 = input.LA(1);
-						 
-						int index73_303 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_303==COMMA||LA73_303==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_303);
-						if ( s>=0 ) return s;
-						break;
-
-					case 59 : 
-						int LA73_376 = input.LA(1);
-						 
-						int index73_376 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_376);
-						if ( s>=0 ) return s;
-						break;
-
-					case 60 : 
-						int LA73_108 = input.LA(1);
-						 
-						int index73_108 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_108==COMMA||LA73_108==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_108);
-						if ( s>=0 ) return s;
-						break;
-
-					case 61 : 
-						int LA73_317 = input.LA(1);
-						 
-						int index73_317 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_317==COMMA||LA73_317==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_317);
-						if ( s>=0 ) return s;
-						break;
-
-					case 62 : 
-						int LA73_230 = input.LA(1);
-						 
-						int index73_230 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_230==COMMA||LA73_230==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_230);
-						if ( s>=0 ) return s;
-						break;
-
-					case 63 : 
-						int LA73_419 = input.LA(1);
-						 
-						int index73_419 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_419);
-						if ( s>=0 ) return s;
-						break;
-
-					case 64 : 
-						int LA73_132 = input.LA(1);
-						 
-						int index73_132 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_132==COMMA||LA73_132==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_132);
-						if ( s>=0 ) return s;
-						break;
-
-					case 65 : 
-						int LA73_75 = input.LA(1);
-						 
-						int index73_75 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_75==COMMA||LA73_75==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_75);
-						if ( s>=0 ) return s;
-						break;
-
-					case 66 : 
-						int LA73_305 = input.LA(1);
-						 
-						int index73_305 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_305==COMMA||LA73_305==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_305);
-						if ( s>=0 ) return s;
-						break;
-
-					case 67 : 
-						int LA73_340 = input.LA(1);
-						 
-						int index73_340 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_340);
-						if ( s>=0 ) return s;
-						break;
-
-					case 68 : 
+					case 11 : 
 						int LA73_293 = input.LA(1);
 						 
 						int index73_293 = input.index();
@@ -21889,1767 +22060,72 @@ public class FTSParser extends Parser {
 						else if ( (LA73_293==QUESTION_MARK) ) {s = 329;}
 						else if ( (LA73_293==DATETIME) ) {s = 330;}
 						else if ( (LA73_293==URI) ) {s = 331;}
-						else if ( (LA73_293==TILDA) && (synpred40_FTS())) {s = 273;}
-						else if ( (LA73_293==CARAT) && (synpred40_FTS())) {s = 274;}
-						else if ( (LA73_293==AND) && (synpred40_FTS())) {s = 275;}
-						else if ( (LA73_293==AMP) && (synpred40_FTS())) {s = 276;}
-						else if ( (LA73_293==EOF) && (synpred40_FTS())) {s = 277;}
-						else if ( (LA73_293==RPAREN) && (synpred40_FTS())) {s = 278;}
-						else if ( (LA73_293==OR) && (synpred40_FTS())) {s = 279;}
-						else if ( (LA73_293==BAR) && (synpred40_FTS())) {s = 280;}
-						else if ( (LA73_293==EXCLAMATION) && (synpred40_FTS())) {s = 281;}
-						else if ( (LA73_293==AT) && (synpred40_FTS())) {s = 282;}
-						else if ( (LA73_293==FTSPHRASE) && (synpred40_FTS())) {s = 283;}
-						else if ( (LA73_293==LSQUARE) && (synpred40_FTS())) {s = 284;}
-						else if ( (LA73_293==LT) && (synpred40_FTS())) {s = 285;}
-						else if ( (LA73_293==COMMA||LA73_293==DOT) && (synpred40_FTS())) {s = 286;}
-						else if ( (LA73_293==EQUALS) && (synpred40_FTS())) {s = 287;}
-						else if ( (LA73_293==LPAREN) && (synpred40_FTS())) {s = 288;}
-						else if ( (LA73_293==PERCENT) && (synpred40_FTS())) {s = 289;}
-						else if ( (LA73_293==PLUS) && (synpred40_FTS())) {s = 290;}
-						else if ( (LA73_293==MINUS) && (synpred40_FTS())) {s = 291;}
+						else if ( (LA73_293==TILDA) && (synpred47_FTS())) {s = 273;}
+						else if ( (LA73_293==CARAT) && (synpred47_FTS())) {s = 274;}
+						else if ( (LA73_293==AND) && (synpred47_FTS())) {s = 275;}
+						else if ( (LA73_293==AMP) && (synpred47_FTS())) {s = 276;}
+						else if ( (LA73_293==EOF) && (synpred47_FTS())) {s = 277;}
+						else if ( (LA73_293==RPAREN) && (synpred47_FTS())) {s = 278;}
+						else if ( (LA73_293==OR) && (synpred47_FTS())) {s = 279;}
+						else if ( (LA73_293==BAR) && (synpred47_FTS())) {s = 280;}
+						else if ( (LA73_293==EXCLAMATION) && (synpred47_FTS())) {s = 281;}
+						else if ( (LA73_293==AT) && (synpred47_FTS())) {s = 282;}
+						else if ( (LA73_293==FTSPHRASE) && (synpred47_FTS())) {s = 283;}
+						else if ( (LA73_293==LSQUARE) && (synpred47_FTS())) {s = 284;}
+						else if ( (LA73_293==LT) && (synpred47_FTS())) {s = 285;}
+						else if ( (LA73_293==COMMA||LA73_293==DOT) && (synpred47_FTS())) {s = 286;}
+						else if ( (LA73_293==EQUALS) && (synpred47_FTS())) {s = 287;}
+						else if ( (LA73_293==LPAREN) && (synpred47_FTS())) {s = 288;}
+						else if ( (LA73_293==PERCENT) && (synpred47_FTS())) {s = 289;}
+						else if ( (LA73_293==PLUS) && (synpred47_FTS())) {s = 290;}
+						else if ( (LA73_293==MINUS) && (synpred47_FTS())) {s = 291;}
 						 
 						input.seek(index73_293);
 						if ( s>=0 ) return s;
 						break;
 
-					case 69 : 
-						int LA73_217 = input.LA(1);
-						 
-						int index73_217 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_217==COMMA||LA73_217==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_217);
-						if ( s>=0 ) return s;
-						break;
-
-					case 70 : 
-						int LA73_369 = input.LA(1);
-						 
-						int index73_369 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_369==COMMA||LA73_369==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_369);
-						if ( s>=0 ) return s;
-						break;
-
-					case 71 : 
-						int LA73_321 = input.LA(1);
-						 
-						int index73_321 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_321==COMMA||LA73_321==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_321);
-						if ( s>=0 ) return s;
-						break;
-
-					case 72 : 
-						int LA73_119 = input.LA(1);
-						 
-						int index73_119 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_119==COMMA||LA73_119==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_119);
-						if ( s>=0 ) return s;
-						break;
-
-					case 73 : 
-						int LA73_48 = input.LA(1);
-						 
-						int index73_48 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_48==COMMA||LA73_48==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_48);
-						if ( s>=0 ) return s;
-						break;
-
-					case 74 : 
-						int LA73_418 = input.LA(1);
-						 
-						int index73_418 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_418);
-						if ( s>=0 ) return s;
-						break;
-
-					case 75 : 
-						int LA73_127 = input.LA(1);
-						 
-						int index73_127 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_127==COMMA||LA73_127==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_127);
-						if ( s>=0 ) return s;
-						break;
-
-					case 76 : 
-						int LA73_181 = input.LA(1);
-						 
-						int index73_181 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_181==COMMA||LA73_181==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_181);
-						if ( s>=0 ) return s;
-						break;
-
-					case 77 : 
-						int LA73_115 = input.LA(1);
-						 
-						int index73_115 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_115==COMMA||LA73_115==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_115);
-						if ( s>=0 ) return s;
-						break;
-
-					case 78 : 
-						int LA73_44 = input.LA(1);
-						 
-						int index73_44 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_44==COMMA||LA73_44==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_44);
-						if ( s>=0 ) return s;
-						break;
-
-					case 79 : 
-						int LA73_298 = input.LA(1);
-						 
-						int index73_298 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_298==COMMA||LA73_298==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_298);
-						if ( s>=0 ) return s;
-						break;
-
-					case 80 : 
-						int LA73_422 = input.LA(1);
-						 
-						int index73_422 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_422);
-						if ( s>=0 ) return s;
-						break;
-
-					case 81 : 
-						int LA73_455 = input.LA(1);
-						 
-						int index73_455 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_455);
-						if ( s>=0 ) return s;
-						break;
-
-					case 82 : 
-						int LA73_428 = input.LA(1);
-						 
-						int index73_428 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_428);
-						if ( s>=0 ) return s;
-						break;
-
-					case 83 : 
-						int LA73_407 = input.LA(1);
-						 
-						int index73_407 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_407==COMMA||LA73_407==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_407);
-						if ( s>=0 ) return s;
-						break;
-
-					case 84 : 
-						int LA73_310 = input.LA(1);
-						 
-						int index73_310 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_310==COMMA||LA73_310==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_310);
-						if ( s>=0 ) return s;
-						break;
-
-					case 85 : 
-						int LA73_137 = input.LA(1);
-						 
-						int index73_137 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_137==COMMA||LA73_137==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_137);
-						if ( s>=0 ) return s;
-						break;
-
-					case 86 : 
-						int LA73_80 = input.LA(1);
-						 
-						int index73_80 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_80==COMMA||LA73_80==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_80);
-						if ( s>=0 ) return s;
-						break;
-
-					case 87 : 
-						int LA73_302 = input.LA(1);
-						 
-						int index73_302 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_302==COMMA||LA73_302==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_302);
-						if ( s>=0 ) return s;
-						break;
-
-					case 88 : 
-						int LA73_267 = input.LA(1);
-						 
-						int index73_267 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_267==COMMA||LA73_267==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_267);
-						if ( s>=0 ) return s;
-						break;
-
-					case 89 : 
-						int LA73_306 = input.LA(1);
-						 
-						int index73_306 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_306==COMMA||LA73_306==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_306);
-						if ( s>=0 ) return s;
-						break;
-
-					case 90 : 
-						int LA73_377 = input.LA(1);
-						 
-						int index73_377 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_377);
-						if ( s>=0 ) return s;
-						break;
-
-					case 91 : 
-						int LA73_180 = input.LA(1);
-						 
-						int index73_180 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_180==COMMA||LA73_180==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_180);
-						if ( s>=0 ) return s;
-						break;
-
-					case 92 : 
-						int LA73_231 = input.LA(1);
-						 
-						int index73_231 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_231==COMMA||LA73_231==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_231);
-						if ( s>=0 ) return s;
-						break;
-
-					case 93 : 
-						int LA73_316 = input.LA(1);
-						 
-						int index73_316 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_316==COMMA||LA73_316==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_316);
-						if ( s>=0 ) return s;
-						break;
-
-					case 94 : 
-						int LA73_182 = input.LA(1);
-						 
-						int index73_182 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_182==COMMA||LA73_182==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_182);
-						if ( s>=0 ) return s;
-						break;
-
-					case 95 : 
-						int LA73_322 = input.LA(1);
-						 
-						int index73_322 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_322==COMMA||LA73_322==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_322);
-						if ( s>=0 ) return s;
-						break;
-
-					case 96 : 
-						int LA73_216 = input.LA(1);
-						 
-						int index73_216 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_216==COMMA||LA73_216==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_216);
-						if ( s>=0 ) return s;
-						break;
-
-					case 97 : 
-						int LA73_457 = input.LA(1);
-						 
-						int index73_457 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_457);
-						if ( s>=0 ) return s;
-						break;
-
-					case 98 : 
-						int LA73_427 = input.LA(1);
-						 
-						int index73_427 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_427);
-						if ( s>=0 ) return s;
-						break;
-
-					case 99 : 
-						int LA73_315 = input.LA(1);
-						 
-						int index73_315 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_315==COMMA||LA73_315==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_315);
-						if ( s>=0 ) return s;
-						break;
-
-					case 100 : 
-						int LA73_268 = input.LA(1);
-						 
-						int index73_268 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_268==COMMA||LA73_268==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_268);
-						if ( s>=0 ) return s;
-						break;
-
-					case 101 : 
-						int LA73_114 = input.LA(1);
-						 
-						int index73_114 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_114==COMMA||LA73_114==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_114);
-						if ( s>=0 ) return s;
-						break;
-
-					case 102 : 
-						int LA73_43 = input.LA(1);
-						 
-						int index73_43 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_43==COMMA||LA73_43==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_43);
-						if ( s>=0 ) return s;
-						break;
-
-					case 103 : 
-						int LA73_299 = input.LA(1);
-						 
-						int index73_299 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_299==COMMA||LA73_299==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_299);
-						if ( s>=0 ) return s;
-						break;
-
-					case 104 : 
-						int LA73_421 = input.LA(1);
-						 
-						int index73_421 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_421);
-						if ( s>=0 ) return s;
-						break;
-
-					case 105 : 
-						int LA73_311 = input.LA(1);
-						 
-						int index73_311 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_311==COMMA||LA73_311==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_311);
-						if ( s>=0 ) return s;
-						break;
-
-					case 106 : 
-						int LA73_301 = input.LA(1);
-						 
-						int index73_301 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_301==COMMA||LA73_301==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_301);
-						if ( s>=0 ) return s;
-						break;
-
-					case 107 : 
-						int LA73_454 = input.LA(1);
-						 
-						int index73_454 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_454);
-						if ( s>=0 ) return s;
-						break;
-
-					case 108 : 
-						int LA73_450 = input.LA(1);
-						 
-						int index73_450 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_450);
-						if ( s>=0 ) return s;
-						break;
-
-					case 109 : 
-						int LA73_330 = input.LA(1);
-						 
-						int index73_330 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_330==COMMA||LA73_330==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_330);
-						if ( s>=0 ) return s;
-						break;
-
-					case 110 : 
-						int LA73_328 = input.LA(1);
-						 
-						int index73_328 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_328==COMMA||LA73_328==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_328);
-						if ( s>=0 ) return s;
-						break;
-
-					case 111 : 
-						int LA73_107 = input.LA(1);
-						 
-						int index73_107 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_107==COMMA||LA73_107==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_107);
-						if ( s>=0 ) return s;
-						break;
-
-					case 112 : 
-						int LA73_415 = input.LA(1);
-						 
-						int index73_415 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_415);
-						if ( s>=0 ) return s;
-						break;
-
-					case 113 : 
-						int LA73_296 = input.LA(1);
-						 
-						int index73_296 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_296==COMMA||LA73_296==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_296);
-						if ( s>=0 ) return s;
-						break;
-
-					case 114 : 
-						int LA73_341 = input.LA(1);
-						 
-						int index73_341 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_341);
-						if ( s>=0 ) return s;
-						break;
-
-					case 115 : 
-						int LA73_431 = input.LA(1);
-						 
-						int index73_431 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_431);
-						if ( s>=0 ) return s;
-						break;
-
-					case 116 : 
-						int LA73_171 = input.LA(1);
-						 
-						int index73_171 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_171==ID) ) {s = 220;}
-						else if ( (LA73_171==FTSWORD) ) {s = 141;}
-						else if ( (LA73_171==FTSPRE) ) {s = 142;}
-						else if ( (LA73_171==FTSWILD) ) {s = 143;}
-						else if ( (LA73_171==NOT) ) {s = 144;}
-						else if ( (LA73_171==TO) ) {s = 145;}
-						else if ( (LA73_171==DECIMAL_INTEGER_LITERAL) ) {s = 146;}
-						else if ( (LA73_171==FLOATING_POINT_LITERAL) ) {s = 147;}
-						else if ( (LA73_171==STAR) ) {s = 148;}
-						else if ( (LA73_171==QUESTION_MARK) ) {s = 149;}
-						else if ( (LA73_171==DATETIME) ) {s = 150;}
-						else if ( (LA73_171==URI) ) {s = 151;}
-						else if ( (LA73_171==TILDA) && (synpred45_FTS())) {s = 152;}
-						else if ( (LA73_171==CARAT) && (synpred45_FTS())) {s = 153;}
-						else if ( (LA73_171==AND) && (synpred45_FTS())) {s = 154;}
-						else if ( (LA73_171==AMP) && (synpred45_FTS())) {s = 155;}
-						else if ( (LA73_171==EOF) && (synpred45_FTS())) {s = 156;}
-						else if ( (LA73_171==RPAREN) && (synpred45_FTS())) {s = 157;}
-						else if ( (LA73_171==OR) && (synpred45_FTS())) {s = 158;}
-						else if ( (LA73_171==BAR) && (synpred45_FTS())) {s = 159;}
-						else if ( (LA73_171==EXCLAMATION) && (synpred45_FTS())) {s = 160;}
-						else if ( (LA73_171==AT) && (synpred45_FTS())) {s = 161;}
-						else if ( (LA73_171==FTSPHRASE) && (synpred45_FTS())) {s = 162;}
-						else if ( (LA73_171==LSQUARE) && (synpred45_FTS())) {s = 163;}
-						else if ( (LA73_171==LT) && (synpred45_FTS())) {s = 164;}
-						else if ( (LA73_171==COMMA||LA73_171==DOT) && (synpred45_FTS())) {s = 165;}
-						else if ( (LA73_171==EQUALS) && (synpred45_FTS())) {s = 166;}
-						else if ( (LA73_171==LPAREN) && (synpred45_FTS())) {s = 167;}
-						else if ( (LA73_171==PERCENT) && (synpred45_FTS())) {s = 168;}
-						else if ( (LA73_171==PLUS) && (synpred45_FTS())) {s = 169;}
-						else if ( (LA73_171==MINUS) && (synpred45_FTS())) {s = 170;}
-						 
-						input.seek(index73_171);
-						if ( s>=0 ) return s;
-						break;
-
-					case 117 : 
-						int LA73_378 = input.LA(1);
-						 
-						int index73_378 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_378);
-						if ( s>=0 ) return s;
-						break;
-
-					case 118 : 
-						int LA73_325 = input.LA(1);
-						 
-						int index73_325 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_325==COMMA||LA73_325==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_325);
-						if ( s>=0 ) return s;
-						break;
-
-					case 119 : 
-						int LA73_374 = input.LA(1);
-						 
-						int index73_374 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_374);
-						if ( s>=0 ) return s;
-						break;
-
-					case 120 : 
-						int LA73_294 = input.LA(1);
-						 
-						int index73_294 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_294==ID) ) {s = 332;}
-						else if ( (LA73_294==FTSWORD) ) {s = 333;}
-						else if ( (LA73_294==FTSPRE) ) {s = 334;}
-						else if ( (LA73_294==FTSWILD) ) {s = 335;}
-						else if ( (LA73_294==NOT) ) {s = 336;}
-						else if ( (LA73_294==TO) ) {s = 337;}
-						else if ( (LA73_294==DECIMAL_INTEGER_LITERAL) ) {s = 338;}
-						else if ( (LA73_294==FLOATING_POINT_LITERAL) ) {s = 339;}
-						else if ( (LA73_294==STAR) ) {s = 340;}
-						else if ( (LA73_294==QUESTION_MARK) ) {s = 341;}
-						else if ( (LA73_294==DATETIME) ) {s = 342;}
-						else if ( (LA73_294==URI) ) {s = 343;}
-						else if ( (LA73_294==TILDA) && (synpred37_FTS())) {s = 344;}
-						else if ( (LA73_294==CARAT) && (synpred37_FTS())) {s = 345;}
-						else if ( (LA73_294==AND) && (synpred37_FTS())) {s = 346;}
-						else if ( (LA73_294==AMP) && (synpred37_FTS())) {s = 347;}
-						else if ( (LA73_294==EOF) && (synpred37_FTS())) {s = 348;}
-						else if ( (LA73_294==RPAREN) && (synpred37_FTS())) {s = 349;}
-						else if ( (LA73_294==OR) && (synpred37_FTS())) {s = 350;}
-						else if ( (LA73_294==BAR) && (synpred37_FTS())) {s = 351;}
-						else if ( (LA73_294==EXCLAMATION) && (synpred37_FTS())) {s = 352;}
-						else if ( (LA73_294==AT) && (synpred37_FTS())) {s = 353;}
-						else if ( (LA73_294==FTSPHRASE) && (synpred37_FTS())) {s = 354;}
-						else if ( (LA73_294==LSQUARE) && (synpred37_FTS())) {s = 355;}
-						else if ( (LA73_294==LT) && (synpred37_FTS())) {s = 356;}
-						else if ( (LA73_294==COMMA||LA73_294==DOT) && (synpred37_FTS())) {s = 357;}
-						else if ( (LA73_294==EQUALS) && (synpred37_FTS())) {s = 358;}
-						else if ( (LA73_294==LPAREN) && (synpred37_FTS())) {s = 359;}
-						else if ( (LA73_294==PERCENT) && (synpred37_FTS())) {s = 360;}
-						else if ( (LA73_294==PLUS) && (synpred37_FTS())) {s = 361;}
-						else if ( (LA73_294==MINUS) && (synpred37_FTS())) {s = 362;}
-						 
-						input.seek(index73_294);
-						if ( s>=0 ) return s;
-						break;
-
-					case 121 : 
-						int LA73_365 = input.LA(1);
-						 
-						int index73_365 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_365==DOT) ) {s = 426;}
-						else if ( (LA73_365==COMMA) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_365);
-						if ( s>=0 ) return s;
-						break;
-
-					case 122 : 
-						int LA73_439 = input.LA(1);
-						 
-						int index73_439 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_439);
-						if ( s>=0 ) return s;
-						break;
-
-					case 123 : 
-						int LA73_40 = input.LA(1);
-						 
-						int index73_40 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_40==COMMA||LA73_40==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_40);
-						if ( s>=0 ) return s;
-						break;
-
-					case 124 : 
-						int LA73_412 = input.LA(1);
-						 
-						int index73_412 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_412);
-						if ( s>=0 ) return s;
-						break;
-
-					case 125 : 
-						int LA73_118 = input.LA(1);
-						 
-						int index73_118 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_118==COMMA||LA73_118==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_118);
-						if ( s>=0 ) return s;
-						break;
-
-					case 126 : 
-						int LA73_47 = input.LA(1);
-						 
-						int index73_47 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_47==COMMA||LA73_47==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_47);
-						if ( s>=0 ) return s;
-						break;
-
-					case 127 : 
-						int LA73_177 = input.LA(1);
-						 
-						int index73_177 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_177==COMMA||LA73_177==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_177);
-						if ( s>=0 ) return s;
-						break;
-
-					case 128 : 
-						int LA73_141 = input.LA(1);
-						 
-						int index73_141 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_141==COMMA||LA73_141==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_141);
-						if ( s>=0 ) return s;
-						break;
-
-					case 129 : 
-						int LA73_236 = input.LA(1);
-						 
-						int index73_236 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_236==COMMA||LA73_236==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_236);
-						if ( s>=0 ) return s;
-						break;
-
-					case 130 : 
-						int LA73_150 = input.LA(1);
-						 
-						int index73_150 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_150==COMMA||LA73_150==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_150);
-						if ( s>=0 ) return s;
-						break;
-
-					case 131 : 
-						int LA73_129 = input.LA(1);
-						 
-						int index73_129 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 210;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 212;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_129);
-						if ( s>=0 ) return s;
-						break;
-
-					case 132 : 
-						int LA73_269 = input.LA(1);
-						 
-						int index73_269 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_269==COMMA||LA73_269==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_269);
-						if ( s>=0 ) return s;
-						break;
-
-					case 133 : 
-						int LA73_375 = input.LA(1);
-						 
-						int index73_375 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_375);
-						if ( s>=0 ) return s;
-						break;
-
-					case 134 : 
-						int LA73_324 = input.LA(1);
-						 
-						int index73_324 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_324==COMMA||LA73_324==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_324);
-						if ( s>=0 ) return s;
-						break;
-
-					case 135 : 
-						int LA73_338 = input.LA(1);
-						 
-						int index73_338 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_338);
-						if ( s>=0 ) return s;
-						break;
-
-					case 136 : 
-						int LA73_139 = input.LA(1);
-						 
-						int index73_139 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_139==COMMA||LA73_139==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_139);
-						if ( s>=0 ) return s;
-						break;
-
-					case 137 : 
-						int LA73_82 = input.LA(1);
-						 
-						int index73_82 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_82==COMMA||LA73_82==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_82);
-						if ( s>=0 ) return s;
-						break;
-
-					case 138 : 
-						int LA73_292 = input.LA(1);
-						 
-						int index73_292 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_292==ID) ) {s = 319;}
-						else if ( (LA73_292==FTSWORD) ) {s = 262;}
-						else if ( (LA73_292==FTSPRE) ) {s = 263;}
-						else if ( (LA73_292==FTSWILD) ) {s = 264;}
-						else if ( (LA73_292==NOT) ) {s = 265;}
-						else if ( (LA73_292==TO) ) {s = 266;}
-						else if ( (LA73_292==DECIMAL_INTEGER_LITERAL) ) {s = 267;}
-						else if ( (LA73_292==FLOATING_POINT_LITERAL) ) {s = 268;}
-						else if ( (LA73_292==STAR) ) {s = 269;}
-						else if ( (LA73_292==QUESTION_MARK) ) {s = 270;}
-						else if ( (LA73_292==DATETIME) ) {s = 271;}
-						else if ( (LA73_292==URI) ) {s = 272;}
-						else if ( (LA73_292==TILDA) && (synpred40_FTS())) {s = 273;}
-						else if ( (LA73_292==CARAT) && (synpred40_FTS())) {s = 274;}
-						else if ( (LA73_292==AND) && (synpred40_FTS())) {s = 275;}
-						else if ( (LA73_292==AMP) && (synpred40_FTS())) {s = 276;}
-						else if ( (LA73_292==EOF) && (synpred40_FTS())) {s = 277;}
-						else if ( (LA73_292==RPAREN) && (synpred40_FTS())) {s = 278;}
-						else if ( (LA73_292==OR) && (synpred40_FTS())) {s = 279;}
-						else if ( (LA73_292==BAR) && (synpred40_FTS())) {s = 280;}
-						else if ( (LA73_292==EXCLAMATION) && (synpred40_FTS())) {s = 281;}
-						else if ( (LA73_292==AT) && (synpred40_FTS())) {s = 282;}
-						else if ( (LA73_292==FTSPHRASE) && (synpred40_FTS())) {s = 283;}
-						else if ( (LA73_292==LSQUARE) && (synpred40_FTS())) {s = 284;}
-						else if ( (LA73_292==LT) && (synpred40_FTS())) {s = 285;}
-						else if ( (LA73_292==COMMA||LA73_292==DOT) && (synpred40_FTS())) {s = 286;}
-						else if ( (LA73_292==EQUALS) && (synpred40_FTS())) {s = 287;}
-						else if ( (LA73_292==LPAREN) && (synpred40_FTS())) {s = 288;}
-						else if ( (LA73_292==PERCENT) && (synpred40_FTS())) {s = 289;}
-						else if ( (LA73_292==PLUS) && (synpred40_FTS())) {s = 290;}
-						else if ( (LA73_292==MINUS) && (synpred40_FTS())) {s = 291;}
-						 
-						input.seek(index73_292);
-						if ( s>=0 ) return s;
-						break;
-
-					case 139 : 
-						int LA73_122 = input.LA(1);
-						 
-						int index73_122 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_122==ID) ) {s = 177;}
-						else if ( (LA73_122==FTSWORD) ) {s = 178;}
-						else if ( (LA73_122==FTSPRE) ) {s = 179;}
-						else if ( (LA73_122==FTSWILD) ) {s = 180;}
-						else if ( (LA73_122==NOT) ) {s = 181;}
-						else if ( (LA73_122==TO) ) {s = 182;}
-						else if ( (LA73_122==DECIMAL_INTEGER_LITERAL) ) {s = 183;}
-						else if ( (LA73_122==FLOATING_POINT_LITERAL) ) {s = 184;}
-						else if ( (LA73_122==STAR) ) {s = 185;}
-						else if ( (LA73_122==QUESTION_MARK) ) {s = 186;}
-						else if ( (LA73_122==DATETIME) ) {s = 187;}
-						else if ( (LA73_122==URI) ) {s = 188;}
-						else if ( (LA73_122==TILDA) && (synpred44_FTS())) {s = 189;}
-						else if ( (LA73_122==CARAT) && (synpred44_FTS())) {s = 190;}
-						else if ( (LA73_122==AND) && (synpred44_FTS())) {s = 191;}
-						else if ( (LA73_122==AMP) && (synpred44_FTS())) {s = 192;}
-						else if ( (LA73_122==EOF) && (synpred44_FTS())) {s = 193;}
-						else if ( (LA73_122==RPAREN) && (synpred44_FTS())) {s = 194;}
-						else if ( (LA73_122==OR) && (synpred44_FTS())) {s = 195;}
-						else if ( (LA73_122==BAR) && (synpred44_FTS())) {s = 196;}
-						else if ( (LA73_122==EXCLAMATION) && (synpred44_FTS())) {s = 197;}
-						else if ( (LA73_122==AT) && (synpred44_FTS())) {s = 198;}
-						else if ( (LA73_122==FTSPHRASE) && (synpred44_FTS())) {s = 199;}
-						else if ( (LA73_122==LSQUARE) && (synpred44_FTS())) {s = 200;}
-						else if ( (LA73_122==LT) && (synpred44_FTS())) {s = 201;}
-						else if ( (LA73_122==COMMA||LA73_122==DOT) && (synpred44_FTS())) {s = 202;}
-						else if ( (LA73_122==EQUALS) && (synpred44_FTS())) {s = 203;}
-						else if ( (LA73_122==LPAREN) && (synpred44_FTS())) {s = 204;}
-						else if ( (LA73_122==PERCENT) && (synpred44_FTS())) {s = 205;}
-						else if ( (LA73_122==PLUS) && (synpred44_FTS())) {s = 206;}
-						else if ( (LA73_122==MINUS) && (synpred44_FTS())) {s = 207;}
-						 
-						input.seek(index73_122);
-						if ( s>=0 ) return s;
-						break;
-
-					case 140 : 
-						int LA73_183 = input.LA(1);
-						 
-						int index73_183 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_183==COMMA||LA73_183==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_183);
-						if ( s>=0 ) return s;
-						break;
-
-					case 141 : 
-						int LA73_446 = input.LA(1);
-						 
-						int index73_446 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_446);
-						if ( s>=0 ) return s;
-						break;
-
-					case 142 : 
-						int LA73_426 = input.LA(1);
-						 
-						int index73_426 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_426==ID) ) {s = 451;}
-						else if ( (LA73_426==FTSWORD) ) {s = 415;}
-						else if ( (LA73_426==FTSPRE) ) {s = 416;}
-						else if ( (LA73_426==FTSWILD) ) {s = 417;}
-						else if ( (LA73_426==NOT) ) {s = 418;}
-						else if ( (LA73_426==TO) ) {s = 419;}
-						else if ( (LA73_426==DECIMAL_INTEGER_LITERAL) ) {s = 420;}
-						else if ( (LA73_426==FLOATING_POINT_LITERAL) ) {s = 421;}
-						else if ( (LA73_426==STAR) ) {s = 422;}
-						else if ( (LA73_426==QUESTION_MARK) ) {s = 423;}
-						else if ( (LA73_426==DATETIME) ) {s = 424;}
-						else if ( (LA73_426==URI) ) {s = 425;}
-						else if ( (LA73_426==TILDA) && (synpred37_FTS())) {s = 344;}
-						else if ( (LA73_426==CARAT) && (synpred37_FTS())) {s = 345;}
-						else if ( (LA73_426==AND) && (synpred37_FTS())) {s = 346;}
-						else if ( (LA73_426==AMP) && (synpred37_FTS())) {s = 347;}
-						else if ( (LA73_426==EOF) && (synpred37_FTS())) {s = 348;}
-						else if ( (LA73_426==RPAREN) && (synpred37_FTS())) {s = 349;}
-						else if ( (LA73_426==OR) && (synpred37_FTS())) {s = 350;}
-						else if ( (LA73_426==BAR) && (synpred37_FTS())) {s = 351;}
-						else if ( (LA73_426==EXCLAMATION) && (synpred37_FTS())) {s = 352;}
-						else if ( (LA73_426==AT) && (synpred37_FTS())) {s = 353;}
-						else if ( (LA73_426==FTSPHRASE) && (synpred37_FTS())) {s = 354;}
-						else if ( (LA73_426==LSQUARE) && (synpred37_FTS())) {s = 355;}
-						else if ( (LA73_426==LT) && (synpred37_FTS())) {s = 356;}
-						else if ( (LA73_426==COMMA||LA73_426==DOT) && (synpred37_FTS())) {s = 357;}
-						else if ( (LA73_426==EQUALS) && (synpred37_FTS())) {s = 358;}
-						else if ( (LA73_426==LPAREN) && (synpred37_FTS())) {s = 359;}
-						else if ( (LA73_426==PERCENT) && (synpred37_FTS())) {s = 360;}
-						else if ( (LA73_426==PLUS) && (synpred37_FTS())) {s = 361;}
-						else if ( (LA73_426==MINUS) && (synpred37_FTS())) {s = 362;}
-						 
-						input.seek(index73_426);
-						if ( s>=0 ) return s;
-						break;
-
-					case 143 : 
-						int LA73_453 = input.LA(1);
-						 
-						int index73_453 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_453);
-						if ( s>=0 ) return s;
-						break;
-
-					case 144 : 
-						int LA73_149 = input.LA(1);
-						 
-						int index73_149 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_149==COMMA||LA73_149==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_149);
-						if ( s>=0 ) return s;
-						break;
-
-					case 145 : 
-						int LA73_226 = input.LA(1);
-						 
-						int index73_226 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_226==COMMA||LA73_226==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_226);
-						if ( s>=0 ) return s;
-						break;
-
-					case 146 : 
-						int LA73_219 = input.LA(1);
-						 
-						int index73_219 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_219==COMMA||LA73_219==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_219);
-						if ( s>=0 ) return s;
-						break;
-
-					case 147 : 
-						int LA73_72 = input.LA(1);
-						 
-						int index73_72 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_72==COMMA||LA73_72==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_72);
-						if ( s>=0 ) return s;
-						break;
-
-					case 148 : 
-						int LA73_297 = input.LA(1);
-						 
-						int index73_297 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_297==COMMA||LA73_297==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_297);
-						if ( s>=0 ) return s;
-						break;
-
-					case 149 : 
-						int LA73_424 = input.LA(1);
-						 
-						int index73_424 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_424);
-						if ( s>=0 ) return s;
-						break;
-
-					case 150 : 
-						int LA73_402 = input.LA(1);
-						 
-						int index73_402 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_402==ID) ) {s = 433;}
-						else if ( (LA73_402==FTSWORD) ) {s = 434;}
-						else if ( (LA73_402==FTSPRE) ) {s = 435;}
-						else if ( (LA73_402==FTSWILD) ) {s = 436;}
-						else if ( (LA73_402==NOT) ) {s = 437;}
-						else if ( (LA73_402==TO) ) {s = 438;}
-						else if ( (LA73_402==DECIMAL_INTEGER_LITERAL) ) {s = 439;}
-						else if ( (LA73_402==FLOATING_POINT_LITERAL) ) {s = 440;}
-						else if ( (LA73_402==STAR) ) {s = 441;}
-						else if ( (LA73_402==QUESTION_MARK) ) {s = 442;}
-						else if ( (LA73_402==DATETIME) ) {s = 443;}
-						else if ( (LA73_402==URI) ) {s = 444;}
-						else if ( (LA73_402==TILDA) && (synpred36_FTS())) {s = 382;}
-						else if ( (LA73_402==CARAT) && (synpred36_FTS())) {s = 383;}
-						else if ( (LA73_402==AND) && (synpred36_FTS())) {s = 384;}
-						else if ( (LA73_402==AMP) && (synpred36_FTS())) {s = 385;}
-						else if ( (LA73_402==EOF) && (synpred36_FTS())) {s = 386;}
-						else if ( (LA73_402==RPAREN) && (synpred36_FTS())) {s = 387;}
-						else if ( (LA73_402==OR) && (synpred36_FTS())) {s = 388;}
-						else if ( (LA73_402==BAR) && (synpred36_FTS())) {s = 389;}
-						else if ( (LA73_402==EXCLAMATION) && (synpred36_FTS())) {s = 390;}
-						else if ( (LA73_402==AT) && (synpred36_FTS())) {s = 391;}
-						else if ( (LA73_402==FTSPHRASE) && (synpred36_FTS())) {s = 392;}
-						else if ( (LA73_402==LSQUARE) && (synpred36_FTS())) {s = 393;}
-						else if ( (LA73_402==LT) && (synpred36_FTS())) {s = 394;}
-						else if ( (LA73_402==COMMA||LA73_402==DOT) && (synpred36_FTS())) {s = 395;}
-						else if ( (LA73_402==EQUALS) && (synpred36_FTS())) {s = 396;}
-						else if ( (LA73_402==LPAREN) && (synpred36_FTS())) {s = 397;}
-						else if ( (LA73_402==PERCENT) && (synpred36_FTS())) {s = 398;}
-						else if ( (LA73_402==PLUS) && (synpred36_FTS())) {s = 399;}
-						else if ( (LA73_402==MINUS) && (synpred36_FTS())) {s = 400;}
-						 
-						input.seek(index73_402);
-						if ( s>=0 ) return s;
-						break;
-
-					case 151 : 
-						int LA73_337 = input.LA(1);
-						 
-						int index73_337 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_337);
-						if ( s>=0 ) return s;
-						break;
-
-					case 152 : 
-						int LA73_144 = input.LA(1);
-						 
-						int index73_144 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_144==COMMA||LA73_144==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_144);
-						if ( s>=0 ) return s;
-						break;
-
-					case 153 : 
-						int LA73_113 = input.LA(1);
-						 
-						int index73_113 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_113==COMMA||LA73_113==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_113);
-						if ( s>=0 ) return s;
-						break;
-
-					case 154 : 
-						int LA73_42 = input.LA(1);
-						 
-						int index73_42 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_42==COMMA||LA73_42==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_42);
-						if ( s>=0 ) return s;
-						break;
-
-					case 155 : 
-						int LA73_430 = input.LA(1);
-						 
-						int index73_430 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_430);
-						if ( s>=0 ) return s;
-						break;
-
-					case 156 : 
-						int LA73_433 = input.LA(1);
-						 
-						int index73_433 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_433);
-						if ( s>=0 ) return s;
-						break;
-
-					case 157 : 
-						int LA73_128 = input.LA(1);
-						 
-						int index73_128 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_128==COMMA||LA73_128==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_128);
-						if ( s>=0 ) return s;
-						break;
-
-					case 158 : 
+					case 12 : 
 						int LA73_143 = input.LA(1);
 						 
 						int index73_143 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (LA73_143==COMMA||LA73_143==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
 						 
 						input.seek(index73_143);
 						if ( s>=0 ) return s;
 						break;
 
-					case 159 : 
-						int LA73_380 = input.LA(1);
+					case 13 : 
+						int LA73_223 = input.LA(1);
 						 
-						int index73_380 = input.index();
+						int index73_223 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
+						if ( (LA73_223==COMMA||LA73_223==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
 						 
-						input.seek(index73_380);
+						input.seek(index73_223);
 						if ( s>=0 ) return s;
 						break;
 
-					case 160 : 
-						int LA73_314 = input.LA(1);
+					case 14 : 
+						int LA73_437 = input.LA(1);
 						 
-						int index73_314 = input.index();
+						int index73_437 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_314==DOT) ) {s = 401;}
-						else if ( (LA73_314==COMMA) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
 						 
-						input.seek(index73_314);
+						input.seek(index73_437);
 						if ( s>=0 ) return s;
 						break;
 
-					case 161 : 
-						int LA73_447 = input.LA(1);
-						 
-						int index73_447 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_447);
-						if ( s>=0 ) return s;
-						break;
-
-					case 162 : 
-						int LA73_411 = input.LA(1);
-						 
-						int index73_411 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_411);
-						if ( s>=0 ) return s;
-						break;
-
-					case 163 : 
-						int LA73_404 = input.LA(1);
-						 
-						int index73_404 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_404==COMMA||LA73_404==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_404);
-						if ( s>=0 ) return s;
-						break;
-
-					case 164 : 
-						int LA73_142 = input.LA(1);
-						 
-						int index73_142 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_142==COMMA||LA73_142==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_142);
-						if ( s>=0 ) return s;
-						break;
-
-					case 165 : 
-						int LA73_138 = input.LA(1);
-						 
-						int index73_138 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_138==COMMA||LA73_138==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_138);
-						if ( s>=0 ) return s;
-						break;
-
-					case 166 : 
-						int LA73_81 = input.LA(1);
-						 
-						int index73_81 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_81==COMMA||LA73_81==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_81);
-						if ( s>=0 ) return s;
-						break;
-
-					case 167 : 
-						int LA73_440 = input.LA(1);
-						 
-						int index73_440 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_440);
-						if ( s>=0 ) return s;
-						break;
-
-					case 168 : 
-						int LA73_295 = input.LA(1);
-						 
-						int index73_295 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_295==DOT) ) {s = 363;}
-						else if ( (LA73_295==COMMA) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_295);
-						if ( s>=0 ) return s;
-						break;
-
-					case 169 : 
-						int LA73_238 = input.LA(1);
-						 
-						int index73_238 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_238==COMMA||LA73_238==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_238);
-						if ( s>=0 ) return s;
-						break;
-
-					case 170 : 
-						int LA73_26 = input.LA(1);
-						 
-						int index73_26 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_26==ID) ) {s = 40;}
-						else if ( (LA73_26==FTSWORD) ) {s = 41;}
-						else if ( (LA73_26==FTSPRE) ) {s = 42;}
-						else if ( (LA73_26==FTSWILD) ) {s = 43;}
-						else if ( (LA73_26==NOT) ) {s = 44;}
-						else if ( (LA73_26==TO) ) {s = 45;}
-						else if ( (LA73_26==DECIMAL_INTEGER_LITERAL) ) {s = 46;}
-						else if ( (LA73_26==FLOATING_POINT_LITERAL) ) {s = 47;}
-						else if ( (LA73_26==STAR) ) {s = 48;}
-						else if ( (LA73_26==QUESTION_MARK) ) {s = 49;}
-						else if ( (LA73_26==DATETIME) ) {s = 50;}
-						else if ( (LA73_26==URI) ) {s = 51;}
-						else if ( (LA73_26==TILDA) && (synpred49_FTS())) {s = 52;}
-						else if ( (LA73_26==CARAT) && (synpred49_FTS())) {s = 53;}
-						else if ( (LA73_26==AND) && (synpred49_FTS())) {s = 54;}
-						else if ( (LA73_26==AMP) && (synpred49_FTS())) {s = 55;}
-						else if ( (LA73_26==EOF) && (synpred49_FTS())) {s = 56;}
-						else if ( (LA73_26==RPAREN) && (synpred49_FTS())) {s = 57;}
-						else if ( (LA73_26==OR) && (synpred49_FTS())) {s = 58;}
-						else if ( (LA73_26==BAR) && (synpred49_FTS())) {s = 59;}
-						else if ( (LA73_26==EXCLAMATION) && (synpred49_FTS())) {s = 60;}
-						else if ( (LA73_26==AT) && (synpred49_FTS())) {s = 61;}
-						else if ( (LA73_26==FTSPHRASE) && (synpred49_FTS())) {s = 62;}
-						else if ( (LA73_26==LSQUARE) && (synpred49_FTS())) {s = 63;}
-						else if ( (LA73_26==LT) && (synpred49_FTS())) {s = 64;}
-						else if ( (LA73_26==COMMA||LA73_26==DOT) && (synpred49_FTS())) {s = 65;}
-						else if ( (LA73_26==EQUALS) && (synpred49_FTS())) {s = 66;}
-						else if ( (LA73_26==LPAREN) && (synpred49_FTS())) {s = 67;}
-						else if ( (LA73_26==PERCENT) && (synpred49_FTS())) {s = 68;}
-						else if ( (LA73_26==PLUS) && (synpred49_FTS())) {s = 69;}
-						else if ( (LA73_26==MINUS) && (synpred49_FTS())) {s = 70;}
-						 
-						input.seek(index73_26);
-						if ( s>=0 ) return s;
-						break;
-
-					case 171 : 
-						int LA73_329 = input.LA(1);
-						 
-						int index73_329 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_329==COMMA||LA73_329==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_329);
-						if ( s>=0 ) return s;
-						break;
-
-					case 172 : 
-						int LA73_148 = input.LA(1);
-						 
-						int index73_148 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_148==COMMA||LA73_148==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_148);
-						if ( s>=0 ) return s;
-						break;
-
-					case 173 : 
-						int LA73_339 = input.LA(1);
-						 
-						int index73_339 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_339);
-						if ( s>=0 ) return s;
-						break;
-
-					case 174 : 
-						int LA73_218 = input.LA(1);
-						 
-						int index73_218 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_218==COMMA||LA73_218==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_218);
-						if ( s>=0 ) return s;
-						break;
-
-					case 175 : 
-						int LA73_229 = input.LA(1);
-						 
-						int index73_229 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_229==COMMA||LA73_229==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_229);
-						if ( s>=0 ) return s;
-						break;
-
-					case 176 : 
-						int LA73_304 = input.LA(1);
-						 
-						int index73_304 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_304==COMMA||LA73_304==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_304);
-						if ( s>=0 ) return s;
-						break;
-
-					case 177 : 
-						int LA73_186 = input.LA(1);
-						 
-						int index73_186 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_186==COMMA||LA73_186==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_186);
-						if ( s>=0 ) return s;
-						break;
-
-					case 178 : 
-						int LA73_308 = input.LA(1);
-						 
-						int index73_308 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_308==COMMA||LA73_308==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_308);
-						if ( s>=0 ) return s;
-						break;
-
-					case 179 : 
+					case 15 : 
 						int LA73_103 = input.LA(1);
 						 
 						int index73_103 = input.index();
@@ -23667,214 +22143,257 @@ public class FTSParser extends Parser {
 						else if ( (LA73_103==QUESTION_MARK) ) {s = 138;}
 						else if ( (LA73_103==DATETIME) ) {s = 139;}
 						else if ( (LA73_103==URI) ) {s = 83;}
-						else if ( (LA73_103==TILDA) && (synpred48_FTS())) {s = 84;}
-						else if ( (LA73_103==CARAT) && (synpred48_FTS())) {s = 85;}
-						else if ( (LA73_103==AND) && (synpred48_FTS())) {s = 86;}
-						else if ( (LA73_103==AMP) && (synpred48_FTS())) {s = 87;}
-						else if ( (LA73_103==EOF) && (synpred48_FTS())) {s = 88;}
-						else if ( (LA73_103==RPAREN) && (synpred48_FTS())) {s = 89;}
-						else if ( (LA73_103==OR) && (synpred48_FTS())) {s = 90;}
-						else if ( (LA73_103==BAR) && (synpred48_FTS())) {s = 91;}
-						else if ( (LA73_103==EXCLAMATION) && (synpred48_FTS())) {s = 92;}
-						else if ( (LA73_103==AT) && (synpred48_FTS())) {s = 93;}
-						else if ( (LA73_103==FTSPHRASE) && (synpred48_FTS())) {s = 94;}
-						else if ( (LA73_103==LSQUARE) && (synpred48_FTS())) {s = 95;}
-						else if ( (LA73_103==LT) && (synpred48_FTS())) {s = 96;}
-						else if ( (LA73_103==COMMA||LA73_103==DOT) && (synpred48_FTS())) {s = 97;}
-						else if ( (LA73_103==EQUALS) && (synpred48_FTS())) {s = 98;}
-						else if ( (LA73_103==LPAREN) && (synpred48_FTS())) {s = 99;}
-						else if ( (LA73_103==PERCENT) && (synpred48_FTS())) {s = 100;}
-						else if ( (LA73_103==PLUS) && (synpred48_FTS())) {s = 101;}
-						else if ( (LA73_103==MINUS) && (synpred48_FTS())) {s = 102;}
+						else if ( (LA73_103==TILDA) && (synpred55_FTS())) {s = 84;}
+						else if ( (LA73_103==CARAT) && (synpred55_FTS())) {s = 85;}
+						else if ( (LA73_103==AND) && (synpred55_FTS())) {s = 86;}
+						else if ( (LA73_103==AMP) && (synpred55_FTS())) {s = 87;}
+						else if ( (LA73_103==EOF) && (synpred55_FTS())) {s = 88;}
+						else if ( (LA73_103==RPAREN) && (synpred55_FTS())) {s = 89;}
+						else if ( (LA73_103==OR) && (synpred55_FTS())) {s = 90;}
+						else if ( (LA73_103==BAR) && (synpred55_FTS())) {s = 91;}
+						else if ( (LA73_103==EXCLAMATION) && (synpred55_FTS())) {s = 92;}
+						else if ( (LA73_103==AT) && (synpred55_FTS())) {s = 93;}
+						else if ( (LA73_103==FTSPHRASE) && (synpred55_FTS())) {s = 94;}
+						else if ( (LA73_103==LSQUARE) && (synpred55_FTS())) {s = 95;}
+						else if ( (LA73_103==LT) && (synpred55_FTS())) {s = 96;}
+						else if ( (LA73_103==COMMA||LA73_103==DOT) && (synpred55_FTS())) {s = 97;}
+						else if ( (LA73_103==EQUALS) && (synpred55_FTS())) {s = 98;}
+						else if ( (LA73_103==LPAREN) && (synpred55_FTS())) {s = 99;}
+						else if ( (LA73_103==PERCENT) && (synpred55_FTS())) {s = 100;}
+						else if ( (LA73_103==PLUS) && (synpred55_FTS())) {s = 101;}
+						else if ( (LA73_103==MINUS) && (synpred55_FTS())) {s = 102;}
 						 
 						input.seek(index73_103);
 						if ( s>=0 ) return s;
 						break;
 
-					case 180 : 
-						int LA73_326 = input.LA(1);
+					case 16 : 
+						int LA73_407 = input.LA(1);
 						 
-						int index73_326 = input.index();
+						int index73_407 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_326==COMMA||LA73_326==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						if ( (LA73_407==COMMA||LA73_407==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
 						 
-						input.seek(index73_326);
+						input.seek(index73_407);
 						if ( s>=0 ) return s;
 						break;
 
-					case 181 : 
-						int LA73_106 = input.LA(1);
+					case 17 : 
+						int LA73_420 = input.LA(1);
 						 
-						int index73_106 = input.index();
+						int index73_420 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_106==DOT) ) {s = 171;}
-						else if ( (LA73_106==COMMA) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_420);
+						if ( s>=0 ) return s;
+						break;
+
+					case 18 : 
+						int LA73_319 = input.LA(1);
+						 
+						int index73_319 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_319==COMMA||LA73_319==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_319);
+						if ( s>=0 ) return s;
+						break;
+
+					case 19 : 
+						int LA73_237 = input.LA(1);
+						 
+						int index73_237 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_237==COMMA||LA73_237==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_237);
+						if ( s>=0 ) return s;
+						break;
+
+					case 20 : 
+						int LA73_380 = input.LA(1);
+						 
+						int index73_380 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_380);
+						if ( s>=0 ) return s;
+						break;
+
+					case 21 : 
+						int LA73_112 = input.LA(1);
+						 
+						int index73_112 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_112==COMMA||LA73_112==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
 						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_106);
+						input.seek(index73_112);
 						if ( s>=0 ) return s;
 						break;
 
-					case 182 : 
-						int LA73_271 = input.LA(1);
+					case 22 : 
+						int LA73_41 = input.LA(1);
 						 
-						int index73_271 = input.index();
+						int index73_41 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_271==COMMA||LA73_271==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						if ( (LA73_41==COMMA||LA73_41==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_271);
+						input.seek(index73_41);
 						if ( s>=0 ) return s;
 						break;
 
-					case 183 : 
-						int LA73_125 = input.LA(1);
+					case 23 : 
+						int LA73_187 = input.LA(1);
 						 
-						int index73_125 = input.index();
+						int index73_187 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_125==COMMA||LA73_125==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
+						if ( (LA73_187==COMMA||LA73_187==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
 						 
-						input.seek(index73_125);
+						input.seek(index73_187);
 						if ( s>=0 ) return s;
 						break;
 
-					case 184 : 
-						int LA73_133 = input.LA(1);
+					case 24 : 
+						int LA73_215 = input.LA(1);
 						 
-						int index73_133 = input.index();
+						int index73_215 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_133==COMMA||LA73_133==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
+						if ( (LA73_215==DOT) ) {s = 259;}
+						else if ( (LA73_215==COMMA) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
 						 
-						input.seek(index73_133);
+						input.seek(index73_215);
 						if ( s>=0 ) return s;
 						break;
 
-					case 185 : 
-						int LA73_76 = input.LA(1);
+					case 25 : 
+						int LA73_336 = input.LA(1);
 						 
-						int index73_76 = input.index();
+						int index73_336 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_76==COMMA||LA73_76==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
 						 
-						input.seek(index73_76);
+						input.seek(index73_336);
 						if ( s>=0 ) return s;
 						break;
 
-					case 186 : 
-						int LA73_410 = input.LA(1);
+					case 26 : 
+						int LA73_113 = input.LA(1);
 						 
-						int index73_410 = input.index();
+						int index73_113 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
+						if ( (LA73_113==COMMA||LA73_113==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_410);
+						input.seek(index73_113);
 						if ( s>=0 ) return s;
 						break;
 
-					case 187 : 
-						int LA73_373 = input.LA(1);
+					case 27 : 
+						int LA73_42 = input.LA(1);
 						 
-						int index73_373 = input.index();
+						int index73_42 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
+						if ( (LA73_42==COMMA||LA73_42==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_373);
+						input.seek(index73_42);
 						if ( s>=0 ) return s;
 						break;
 
-					case 188 : 
-						int LA73_208 = input.LA(1);
+					case 28 : 
+						int LA73_313 = input.LA(1);
 						 
-						int index73_208 = input.index();
+						int index73_313 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_208==ID) ) {s = 227;}
-						else if ( (LA73_208==FTSWORD) ) {s = 178;}
-						else if ( (LA73_208==FTSPRE) ) {s = 179;}
-						else if ( (LA73_208==FTSWILD) ) {s = 180;}
-						else if ( (LA73_208==NOT) ) {s = 181;}
-						else if ( (LA73_208==TO) ) {s = 182;}
-						else if ( (LA73_208==DECIMAL_INTEGER_LITERAL) ) {s = 183;}
-						else if ( (LA73_208==FLOATING_POINT_LITERAL) ) {s = 184;}
-						else if ( (LA73_208==STAR) ) {s = 185;}
-						else if ( (LA73_208==QUESTION_MARK) ) {s = 186;}
-						else if ( (LA73_208==DATETIME) ) {s = 187;}
-						else if ( (LA73_208==URI) ) {s = 188;}
-						else if ( (LA73_208==TILDA) && (synpred44_FTS())) {s = 189;}
-						else if ( (LA73_208==CARAT) && (synpred44_FTS())) {s = 190;}
-						else if ( (LA73_208==AND) && (synpred44_FTS())) {s = 191;}
-						else if ( (LA73_208==AMP) && (synpred44_FTS())) {s = 192;}
-						else if ( (LA73_208==EOF) && (synpred44_FTS())) {s = 193;}
-						else if ( (LA73_208==RPAREN) && (synpred44_FTS())) {s = 194;}
-						else if ( (LA73_208==OR) && (synpred44_FTS())) {s = 195;}
-						else if ( (LA73_208==BAR) && (synpred44_FTS())) {s = 196;}
-						else if ( (LA73_208==EXCLAMATION) && (synpred44_FTS())) {s = 197;}
-						else if ( (LA73_208==AT) && (synpred44_FTS())) {s = 198;}
-						else if ( (LA73_208==FTSPHRASE) && (synpred44_FTS())) {s = 199;}
-						else if ( (LA73_208==LSQUARE) && (synpred44_FTS())) {s = 200;}
-						else if ( (LA73_208==LT) && (synpred44_FTS())) {s = 201;}
-						else if ( (LA73_208==COMMA||LA73_208==DOT) && (synpred44_FTS())) {s = 202;}
-						else if ( (LA73_208==EQUALS) && (synpred44_FTS())) {s = 203;}
-						else if ( (LA73_208==LPAREN) && (synpred44_FTS())) {s = 204;}
-						else if ( (LA73_208==PERCENT) && (synpred44_FTS())) {s = 205;}
-						else if ( (LA73_208==PLUS) && (synpred44_FTS())) {s = 206;}
-						else if ( (LA73_208==MINUS) && (synpred44_FTS())) {s = 207;}
+						if ( (LA73_313==ID) ) {s = 370;}
+						else if ( (LA73_313==FTSWORD) ) {s = 371;}
+						else if ( (LA73_313==FTSPRE) ) {s = 372;}
+						else if ( (LA73_313==FTSWILD) ) {s = 373;}
+						else if ( (LA73_313==NOT) ) {s = 374;}
+						else if ( (LA73_313==TO) ) {s = 375;}
+						else if ( (LA73_313==DECIMAL_INTEGER_LITERAL) ) {s = 376;}
+						else if ( (LA73_313==FLOATING_POINT_LITERAL) ) {s = 377;}
+						else if ( (LA73_313==STAR) ) {s = 378;}
+						else if ( (LA73_313==QUESTION_MARK) ) {s = 379;}
+						else if ( (LA73_313==DATETIME) ) {s = 380;}
+						else if ( (LA73_313==URI) ) {s = 381;}
+						else if ( (LA73_313==TILDA) && (synpred43_FTS())) {s = 382;}
+						else if ( (LA73_313==CARAT) && (synpred43_FTS())) {s = 383;}
+						else if ( (LA73_313==AND) && (synpred43_FTS())) {s = 384;}
+						else if ( (LA73_313==AMP) && (synpred43_FTS())) {s = 385;}
+						else if ( (LA73_313==EOF) && (synpred43_FTS())) {s = 386;}
+						else if ( (LA73_313==RPAREN) && (synpred43_FTS())) {s = 387;}
+						else if ( (LA73_313==OR) && (synpred43_FTS())) {s = 388;}
+						else if ( (LA73_313==BAR) && (synpred43_FTS())) {s = 389;}
+						else if ( (LA73_313==EXCLAMATION) && (synpred43_FTS())) {s = 390;}
+						else if ( (LA73_313==AT) && (synpred43_FTS())) {s = 391;}
+						else if ( (LA73_313==FTSPHRASE) && (synpred43_FTS())) {s = 392;}
+						else if ( (LA73_313==LSQUARE) && (synpred43_FTS())) {s = 393;}
+						else if ( (LA73_313==LT) && (synpred43_FTS())) {s = 394;}
+						else if ( (LA73_313==COMMA||LA73_313==DOT) && (synpred43_FTS())) {s = 395;}
+						else if ( (LA73_313==EQUALS) && (synpred43_FTS())) {s = 396;}
+						else if ( (LA73_313==LPAREN) && (synpred43_FTS())) {s = 397;}
+						else if ( (LA73_313==PERCENT) && (synpred43_FTS())) {s = 398;}
+						else if ( (LA73_313==PLUS) && (synpred43_FTS())) {s = 399;}
+						else if ( (LA73_313==MINUS) && (synpred43_FTS())) {s = 400;}
 						 
-						input.seek(index73_208);
+						input.seek(index73_313);
 						if ( s>=0 ) return s;
 						break;
 
-					case 189 : 
-						int LA73_438 = input.LA(1);
+					case 29 : 
+						int LA73_218 = input.LA(1);
 						 
-						int index73_438 = input.index();
+						int index73_218 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
+						if ( (LA73_218==COMMA||LA73_218==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
 						 
-						input.seek(index73_438);
+						input.seek(index73_218);
 						if ( s>=0 ) return s;
 						break;
 
-					case 190 : 
-						int LA73_448 = input.LA(1);
-						 
-						int index73_448 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_448);
-						if ( s>=0 ) return s;
-						break;
-
-					case 191 : 
+					case 30 : 
 						int LA73_403 = input.LA(1);
 						 
 						int index73_403 = input.index();
@@ -23882,545 +22401,623 @@ public class FTSParser extends Parser {
 						s = -1;
 						if ( (LA73_403==DOT) ) {s = 445;}
 						else if ( (LA73_403==COMMA) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
 						 
 						input.seek(index73_403);
 						if ( s>=0 ) return s;
 						break;
 
-					case 192 : 
-						int LA73_110 = input.LA(1);
+					case 31 : 
+						int LA73_330 = input.LA(1);
 						 
-						int index73_110 = input.index();
+						int index73_330 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_110==COMMA||LA73_110==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
+						if ( (LA73_330==COMMA||LA73_330==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_330);
+						if ( s>=0 ) return s;
+						break;
+
+					case 32 : 
+						int LA73_106 = input.LA(1);
+						 
+						int index73_106 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_106==DOT) ) {s = 171;}
+						else if ( (LA73_106==COMMA) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
 						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_110);
+						input.seek(index73_106);
 						if ( s>=0 ) return s;
 						break;
 
-					case 193 : 
-						int LA73_263 = input.LA(1);
+					case 33 : 
+						int LA73_271 = input.LA(1);
 						 
-						int index73_263 = input.index();
+						int index73_271 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_263==COMMA||LA73_263==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						if ( (LA73_271==COMMA||LA73_271==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
 						 
-						input.seek(index73_263);
+						input.seek(index73_271);
 						if ( s>=0 ) return s;
 						break;
 
-					case 194 : 
-						int LA73_417 = input.LA(1);
-						 
-						int index73_417 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_417);
-						if ( s>=0 ) return s;
-						break;
-
-					case 195 : 
-						int LA73_335 = input.LA(1);
-						 
-						int index73_335 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_335);
-						if ( s>=0 ) return s;
-						break;
-
-					case 196 : 
-						int LA73_336 = input.LA(1);
-						 
-						int index73_336 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_336);
-						if ( s>=0 ) return s;
-						break;
-
-					case 197 : 
-						int LA73_372 = input.LA(1);
-						 
-						int index73_372 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_372);
-						if ( s>=0 ) return s;
-						break;
-
-					case 198 : 
-						int LA73_441 = input.LA(1);
-						 
-						int index73_441 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_441);
-						if ( s>=0 ) return s;
-						break;
-
-					case 199 : 
-						int LA73_135 = input.LA(1);
-						 
-						int index73_135 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_135==COMMA||LA73_135==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_135);
-						if ( s>=0 ) return s;
-						break;
-
-					case 200 : 
-						int LA73_78 = input.LA(1);
-						 
-						int index73_78 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_78==COMMA||LA73_78==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
-						else if ( (true) ) {s = 34;}
-						 
-						input.seek(index73_78);
-						if ( s>=0 ) return s;
-						break;
-
-					case 201 : 
-						int LA73_414 = input.LA(1);
-						 
-						int index73_414 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_414);
-						if ( s>=0 ) return s;
-						break;
-
-					case 202 : 
-						int LA73_234 = input.LA(1);
-						 
-						int index73_234 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_234==COMMA||LA73_234==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_234);
-						if ( s>=0 ) return s;
-						break;
-
-					case 203 : 
-						int LA73_370 = input.LA(1);
-						 
-						int index73_370 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_370);
-						if ( s>=0 ) return s;
-						break;
-
-					case 204 : 
-						int LA73_452 = input.LA(1);
-						 
-						int index73_452 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_452);
-						if ( s>=0 ) return s;
-						break;
-
-					case 205 : 
-						int LA73_145 = input.LA(1);
-						 
-						int index73_145 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_145==COMMA||LA73_145==DOT) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						 
-						input.seek(index73_145);
-						if ( s>=0 ) return s;
-						break;
-
-					case 206 : 
-						int LA73_300 = input.LA(1);
-						 
-						int index73_300 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_300==COMMA||LA73_300==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_300);
-						if ( s>=0 ) return s;
-						break;
-
-					case 207 : 
-						int LA73_185 = input.LA(1);
-						 
-						int index73_185 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_185==COMMA||LA73_185==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_185);
-						if ( s>=0 ) return s;
-						break;
-
-					case 208 : 
-						int LA73_120 = input.LA(1);
-						 
-						int index73_120 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_120==COMMA||LA73_120==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_120);
-						if ( s>=0 ) return s;
-						break;
-
-					case 209 : 
-						int LA73_49 = input.LA(1);
-						 
-						int index73_49 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_49==COMMA||LA73_49==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_49);
-						if ( s>=0 ) return s;
-						break;
-
-					case 210 : 
-						int LA73_327 = input.LA(1);
-						 
-						int index73_327 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_327==COMMA||LA73_327==DOT) ) {s = 402;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_327);
-						if ( s>=0 ) return s;
-						break;
-
-					case 211 : 
-						int LA73_112 = input.LA(1);
-						 
-						int index73_112 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_112==COMMA||LA73_112==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_112);
-						if ( s>=0 ) return s;
-						break;
-
-					case 212 : 
-						int LA73_41 = input.LA(1);
-						 
-						int index73_41 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_41==COMMA||LA73_41==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
-						else if ( (true) ) {s = 27;}
-						 
-						input.seek(index73_41);
-						if ( s>=0 ) return s;
-						break;
-
-					case 213 : 
-						int LA73_224 = input.LA(1);
-						 
-						int index73_224 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_224==COMMA||LA73_224==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
-						 
-						input.seek(index73_224);
-						if ( s>=0 ) return s;
-						break;
-
-					case 214 : 
-						int LA73_270 = input.LA(1);
-						 
-						int index73_270 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_270==COMMA||LA73_270==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
-						 
-						input.seek(index73_270);
-						if ( s>=0 ) return s;
-						break;
-
-					case 215 : 
-						int LA73_104 = input.LA(1);
-						 
-						int index73_104 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_104==ID) ) {s = 140;}
-						else if ( (LA73_104==FTSWORD) ) {s = 141;}
-						else if ( (LA73_104==FTSPRE) ) {s = 142;}
-						else if ( (LA73_104==FTSWILD) ) {s = 143;}
-						else if ( (LA73_104==NOT) ) {s = 144;}
-						else if ( (LA73_104==TO) ) {s = 145;}
-						else if ( (LA73_104==DECIMAL_INTEGER_LITERAL) ) {s = 146;}
-						else if ( (LA73_104==FLOATING_POINT_LITERAL) ) {s = 147;}
-						else if ( (LA73_104==STAR) ) {s = 148;}
-						else if ( (LA73_104==QUESTION_MARK) ) {s = 149;}
-						else if ( (LA73_104==DATETIME) ) {s = 150;}
-						else if ( (LA73_104==URI) ) {s = 151;}
-						else if ( (LA73_104==TILDA) && (synpred45_FTS())) {s = 152;}
-						else if ( (LA73_104==CARAT) && (synpred45_FTS())) {s = 153;}
-						else if ( (LA73_104==AND) && (synpred45_FTS())) {s = 154;}
-						else if ( (LA73_104==AMP) && (synpred45_FTS())) {s = 155;}
-						else if ( (LA73_104==EOF) && (synpred45_FTS())) {s = 156;}
-						else if ( (LA73_104==RPAREN) && (synpred45_FTS())) {s = 157;}
-						else if ( (LA73_104==OR) && (synpred45_FTS())) {s = 158;}
-						else if ( (LA73_104==BAR) && (synpred45_FTS())) {s = 159;}
-						else if ( (LA73_104==EXCLAMATION) && (synpred45_FTS())) {s = 160;}
-						else if ( (LA73_104==AT) && (synpred45_FTS())) {s = 161;}
-						else if ( (LA73_104==FTSPHRASE) && (synpred45_FTS())) {s = 162;}
-						else if ( (LA73_104==LSQUARE) && (synpred45_FTS())) {s = 163;}
-						else if ( (LA73_104==LT) && (synpred45_FTS())) {s = 164;}
-						else if ( (LA73_104==COMMA||LA73_104==DOT) && (synpred45_FTS())) {s = 165;}
-						else if ( (LA73_104==EQUALS) && (synpred45_FTS())) {s = 166;}
-						else if ( (LA73_104==LPAREN) && (synpred45_FTS())) {s = 167;}
-						else if ( (LA73_104==PERCENT) && (synpred45_FTS())) {s = 168;}
-						else if ( (LA73_104==PLUS) && (synpred45_FTS())) {s = 169;}
-						else if ( (LA73_104==MINUS) && (synpred45_FTS())) {s = 170;}
-						 
-						input.seek(index73_104);
-						if ( s>=0 ) return s;
-						break;
-
-					case 216 : 
-						int LA73_307 = input.LA(1);
-						 
-						int index73_307 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_307==COMMA||LA73_307==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_307);
-						if ( s>=0 ) return s;
-						break;
-
-					case 217 : 
+					case 34 : 
 						int LA73_262 = input.LA(1);
 						 
 						int index73_262 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (LA73_262==COMMA||LA73_262==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
 						 
 						input.seek(index73_262);
 						if ( s>=0 ) return s;
 						break;
 
-					case 218 : 
-						int LA73_233 = input.LA(1);
+					case 35 : 
+						int LA73_439 = input.LA(1);
 						 
-						int index73_233 = input.index();
+						int index73_439 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_233==COMMA||LA73_233==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
 						 
-						input.seek(index73_233);
+						input.seek(index73_439);
 						if ( s>=0 ) return s;
 						break;
 
-					case 219 : 
-						int LA73_443 = input.LA(1);
+					case 36 : 
+						int LA73_453 = input.LA(1);
 						 
-						int index73_443 = input.index();
+						int index73_453 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
 						 
-						input.seek(index73_443);
+						input.seek(index73_453);
 						if ( s>=0 ) return s;
 						break;
 
-					case 220 : 
-						int LA73_416 = input.LA(1);
+					case 37 : 
+						int LA73_401 = input.LA(1);
 						 
-						int index73_416 = input.index();
+						int index73_401 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
+						if ( (LA73_401==ID) ) {s = 432;}
+						else if ( (LA73_401==FTSWORD) ) {s = 371;}
+						else if ( (LA73_401==FTSPRE) ) {s = 372;}
+						else if ( (LA73_401==FTSWILD) ) {s = 373;}
+						else if ( (LA73_401==NOT) ) {s = 374;}
+						else if ( (LA73_401==TO) ) {s = 375;}
+						else if ( (LA73_401==DECIMAL_INTEGER_LITERAL) ) {s = 376;}
+						else if ( (LA73_401==FLOATING_POINT_LITERAL) ) {s = 377;}
+						else if ( (LA73_401==STAR) ) {s = 378;}
+						else if ( (LA73_401==QUESTION_MARK) ) {s = 379;}
+						else if ( (LA73_401==DATETIME) ) {s = 380;}
+						else if ( (LA73_401==URI) ) {s = 381;}
+						else if ( (LA73_401==TILDA) && (synpred43_FTS())) {s = 382;}
+						else if ( (LA73_401==CARAT) && (synpred43_FTS())) {s = 383;}
+						else if ( (LA73_401==AND) && (synpred43_FTS())) {s = 384;}
+						else if ( (LA73_401==AMP) && (synpred43_FTS())) {s = 385;}
+						else if ( (LA73_401==EOF) && (synpred43_FTS())) {s = 386;}
+						else if ( (LA73_401==RPAREN) && (synpred43_FTS())) {s = 387;}
+						else if ( (LA73_401==OR) && (synpred43_FTS())) {s = 388;}
+						else if ( (LA73_401==BAR) && (synpred43_FTS())) {s = 389;}
+						else if ( (LA73_401==EXCLAMATION) && (synpred43_FTS())) {s = 390;}
+						else if ( (LA73_401==AT) && (synpred43_FTS())) {s = 391;}
+						else if ( (LA73_401==FTSPHRASE) && (synpred43_FTS())) {s = 392;}
+						else if ( (LA73_401==LSQUARE) && (synpred43_FTS())) {s = 393;}
+						else if ( (LA73_401==LT) && (synpred43_FTS())) {s = 394;}
+						else if ( (LA73_401==COMMA||LA73_401==DOT) && (synpred43_FTS())) {s = 395;}
+						else if ( (LA73_401==EQUALS) && (synpred43_FTS())) {s = 396;}
+						else if ( (LA73_401==LPAREN) && (synpred43_FTS())) {s = 397;}
+						else if ( (LA73_401==PERCENT) && (synpred43_FTS())) {s = 398;}
+						else if ( (LA73_401==PLUS) && (synpred43_FTS())) {s = 399;}
+						else if ( (LA73_401==MINUS) && (synpred43_FTS())) {s = 400;}
 						 
-						input.seek(index73_416);
+						input.seek(index73_401);
 						if ( s>=0 ) return s;
 						break;
 
-					case 221 : 
-						int LA73_409 = input.LA(1);
+					case 38 : 
+						int LA73_334 = input.LA(1);
 						 
-						int index73_409 = input.index();
+						int index73_334 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
 						 
-						input.seek(index73_409);
+						input.seek(index73_334);
 						if ( s>=0 ) return s;
 						break;
 
-					case 222 : 
-						int LA73_449 = input.LA(1);
+					case 39 : 
+						int LA73_311 = input.LA(1);
 						 
-						int index73_449 = input.index();
+						int index73_311 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
+						if ( (LA73_311==COMMA||LA73_311==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
 						 
-						input.seek(index73_449);
+						input.seek(index73_311);
 						if ( s>=0 ) return s;
 						break;
 
-					case 223 : 
-						int LA73_117 = input.LA(1);
+					case 40 : 
+						int LA73_107 = input.LA(1);
 						 
-						int index73_117 = input.index();
+						int index73_107 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_117==COMMA||LA73_117==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
+						if ( (LA73_107==COMMA||LA73_107==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
 						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_117);
+						input.seek(index73_107);
 						if ( s>=0 ) return s;
 						break;
 
-					case 224 : 
-						int LA73_46 = input.LA(1);
+					case 41 : 
+						int LA73_228 = input.LA(1);
 						 
-						int index73_46 = input.index();
+						int index73_228 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_46==COMMA||LA73_46==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
+						if ( (LA73_228==COMMA||LA73_228==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_228);
+						if ( s>=0 ) return s;
+						break;
+
+					case 42 : 
+						int LA73_371 = input.LA(1);
+						 
+						int index73_371 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_371);
+						if ( s>=0 ) return s;
+						break;
+
+					case 43 : 
+						int LA73_181 = input.LA(1);
+						 
+						int index73_181 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_181==COMMA||LA73_181==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_181);
+						if ( s>=0 ) return s;
+						break;
+
+					case 44 : 
+						int LA73_128 = input.LA(1);
+						 
+						int index73_128 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_128==COMMA||LA73_128==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_128);
+						if ( s>=0 ) return s;
+						break;
+
+					case 45 : 
+						int LA73_134 = input.LA(1);
+						 
+						int index73_134 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_134==COMMA||LA73_134==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_134);
+						if ( s>=0 ) return s;
+						break;
+
+					case 46 : 
+						int LA73_77 = input.LA(1);
+						 
+						int index73_77 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_77==COMMA||LA73_77==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_77);
+						if ( s>=0 ) return s;
+						break;
+
+					case 47 : 
+						int LA73_368 = input.LA(1);
+						 
+						int index73_368 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_368==COMMA||LA73_368==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_368);
+						if ( s>=0 ) return s;
+						break;
+
+					case 48 : 
+						int LA73_421 = input.LA(1);
+						 
+						int index73_421 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_421);
+						if ( s>=0 ) return s;
+						break;
+
+					case 49 : 
+						int LA73_116 = input.LA(1);
+						 
+						int index73_116 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_116==COMMA||LA73_116==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
 						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_46);
+						input.seek(index73_116);
 						if ( s>=0 ) return s;
 						break;
 
-					case 225 : 
-						int LA73_266 = input.LA(1);
+					case 50 : 
+						int LA73_45 = input.LA(1);
 						 
-						int index73_266 = input.index();
+						int index73_45 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_266==COMMA||LA73_266==DOT) ) {s = 313;}
-						else if ( (synpred38_FTS()) ) {s = 211;}
-						else if ( (synpred40_FTS()) ) {s = 291;}
+						if ( (LA73_45==COMMA||LA73_45==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_266);
+						input.seek(index73_45);
 						if ( s>=0 ) return s;
 						break;
 
-					case 226 : 
-						int LA73_130 = input.LA(1);
+					case 51 : 
+						int LA73_413 = input.LA(1);
 						 
-						int index73_130 = input.index();
+						int index73_413 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_130==COMMA||LA73_130==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_413);
+						if ( s>=0 ) return s;
+						break;
+
+					case 52 : 
+						int LA73_321 = input.LA(1);
+						 
+						int index73_321 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_321==COMMA||LA73_321==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_321);
+						if ( s>=0 ) return s;
+						break;
+
+					case 53 : 
+						int LA73_171 = input.LA(1);
+						 
+						int index73_171 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_171==ID) ) {s = 220;}
+						else if ( (LA73_171==FTSWORD) ) {s = 141;}
+						else if ( (LA73_171==FTSPRE) ) {s = 142;}
+						else if ( (LA73_171==FTSWILD) ) {s = 143;}
+						else if ( (LA73_171==NOT) ) {s = 144;}
+						else if ( (LA73_171==TO) ) {s = 145;}
+						else if ( (LA73_171==DECIMAL_INTEGER_LITERAL) ) {s = 146;}
+						else if ( (LA73_171==FLOATING_POINT_LITERAL) ) {s = 147;}
+						else if ( (LA73_171==STAR) ) {s = 148;}
+						else if ( (LA73_171==QUESTION_MARK) ) {s = 149;}
+						else if ( (LA73_171==DATETIME) ) {s = 150;}
+						else if ( (LA73_171==URI) ) {s = 151;}
+						else if ( (LA73_171==TILDA) && (synpred52_FTS())) {s = 152;}
+						else if ( (LA73_171==CARAT) && (synpred52_FTS())) {s = 153;}
+						else if ( (LA73_171==AND) && (synpred52_FTS())) {s = 154;}
+						else if ( (LA73_171==AMP) && (synpred52_FTS())) {s = 155;}
+						else if ( (LA73_171==EOF) && (synpred52_FTS())) {s = 156;}
+						else if ( (LA73_171==RPAREN) && (synpred52_FTS())) {s = 157;}
+						else if ( (LA73_171==OR) && (synpred52_FTS())) {s = 158;}
+						else if ( (LA73_171==BAR) && (synpred52_FTS())) {s = 159;}
+						else if ( (LA73_171==EXCLAMATION) && (synpred52_FTS())) {s = 160;}
+						else if ( (LA73_171==AT) && (synpred52_FTS())) {s = 161;}
+						else if ( (LA73_171==FTSPHRASE) && (synpred52_FTS())) {s = 162;}
+						else if ( (LA73_171==LSQUARE) && (synpred52_FTS())) {s = 163;}
+						else if ( (LA73_171==LT) && (synpred52_FTS())) {s = 164;}
+						else if ( (LA73_171==COMMA||LA73_171==DOT) && (synpred52_FTS())) {s = 165;}
+						else if ( (LA73_171==EQUALS) && (synpred52_FTS())) {s = 166;}
+						else if ( (LA73_171==LPAREN) && (synpred52_FTS())) {s = 167;}
+						else if ( (LA73_171==PERCENT) && (synpred52_FTS())) {s = 168;}
+						else if ( (LA73_171==PLUS) && (synpred52_FTS())) {s = 169;}
+						else if ( (LA73_171==MINUS) && (synpred52_FTS())) {s = 170;}
+						 
+						input.seek(index73_171);
+						if ( s>=0 ) return s;
+						break;
+
+					case 54 : 
+						int LA73_227 = input.LA(1);
+						 
+						int index73_227 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_227==COMMA||LA73_227==DOT) ) {s = 293;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_227);
+						if ( s>=0 ) return s;
+						break;
+
+					case 55 : 
+						int LA73_435 = input.LA(1);
+						 
+						int index73_435 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_435);
+						if ( s>=0 ) return s;
+						break;
+
+					case 56 : 
+						int LA73_120 = input.LA(1);
+						 
+						int index73_120 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_120==COMMA||LA73_120==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_120);
+						if ( s>=0 ) return s;
+						break;
+
+					case 57 : 
+						int LA73_49 = input.LA(1);
+						 
+						int index73_49 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_49==COMMA||LA73_49==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_49);
+						if ( s>=0 ) return s;
+						break;
+
+					case 58 : 
+						int LA73_378 = input.LA(1);
+						 
+						int index73_378 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_378);
+						if ( s>=0 ) return s;
+						break;
+
+					case 59 : 
+						int LA73_137 = input.LA(1);
+						 
+						int index73_137 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_137==COMMA||LA73_137==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
 						else if ( (true) ) {s = 34;}
 						 
-						input.seek(index73_130);
+						input.seek(index73_137);
 						if ( s>=0 ) return s;
 						break;
 
-					case 227 : 
-						int LA73_73 = input.LA(1);
+					case 60 : 
+						int LA73_80 = input.LA(1);
 						 
-						int index73_73 = input.index();
+						int index73_80 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_73==COMMA||LA73_73==DOT) ) {s = 122;}
-						else if ( (synpred46_FTS()) ) {s = 123;}
-						else if ( (synpred48_FTS()) ) {s = 102;}
+						if ( (LA73_80==COMMA||LA73_80==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
 						else if ( (true) ) {s = 34;}
 						 
-						input.seek(index73_73);
+						input.seek(index73_80);
 						if ( s>=0 ) return s;
 						break;
 
-					case 228 : 
+					case 61 : 
+						int LA73_40 = input.LA(1);
+						 
+						int index73_40 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_40==COMMA||LA73_40==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_40);
+						if ( s>=0 ) return s;
+						break;
+
+					case 62 : 
+						int LA73_365 = input.LA(1);
+						 
+						int index73_365 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_365==DOT) ) {s = 426;}
+						else if ( (LA73_365==COMMA) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_365);
+						if ( s>=0 ) return s;
+						break;
+
+					case 63 : 
+						int LA73_419 = input.LA(1);
+						 
+						int index73_419 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_419);
+						if ( s>=0 ) return s;
+						break;
+
+					case 64 : 
+						int LA73_185 = input.LA(1);
+						 
+						int index73_185 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_185==COMMA||LA73_185==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_185);
+						if ( s>=0 ) return s;
+						break;
+
+					case 65 : 
+						int LA73_219 = input.LA(1);
+						 
+						int index73_219 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_219==COMMA||LA73_219==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_219);
+						if ( s>=0 ) return s;
+						break;
+
+					case 66 : 
+						int LA73_132 = input.LA(1);
+						 
+						int index73_132 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_132==COMMA||LA73_132==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_132);
+						if ( s>=0 ) return s;
+						break;
+
+					case 67 : 
+						int LA73_75 = input.LA(1);
+						 
+						int index73_75 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_75==COMMA||LA73_75==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_75);
+						if ( s>=0 ) return s;
+						break;
+
+					case 68 : 
+						int LA73_232 = input.LA(1);
+						 
+						int index73_232 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_232==COMMA||LA73_232==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_232);
+						if ( s>=0 ) return s;
+						break;
+
+					case 69 : 
+						int LA73_269 = input.LA(1);
+						 
+						int index73_269 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_269==COMMA||LA73_269==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_269);
+						if ( s>=0 ) return s;
+						break;
+
+					case 70 : 
 						int LA73_222 = input.LA(1);
 						 
 						int index73_222 = input.index();
@@ -24428,251 +23025,475 @@ public class FTSParser extends Parser {
 						s = -1;
 						if ( (LA73_222==DOT) ) {s = 292;}
 						else if ( (LA73_222==COMMA) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
 						 
 						input.seek(index73_222);
 						if ( s>=0 ) return s;
 						break;
 
-					case 229 : 
-						int LA73_235 = input.LA(1);
+					case 71 : 
+						int LA73_118 = input.LA(1);
 						 
-						int index73_235 = input.index();
+						int index73_118 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_235==COMMA||LA73_235==DOT) ) {s = 294;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
-						 
-						input.seek(index73_235);
-						if ( s>=0 ) return s;
-						break;
-
-					case 230 : 
-						int LA73_451 = input.LA(1);
-						 
-						int index73_451 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 362;}
-						 
-						input.seek(index73_451);
-						if ( s>=0 ) return s;
-						break;
-
-					case 231 : 
-						int LA73_445 = input.LA(1);
-						 
-						int index73_445 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_445==ID) ) {s = 457;}
-						else if ( (LA73_445==FTSWORD) ) {s = 434;}
-						else if ( (LA73_445==FTSPRE) ) {s = 435;}
-						else if ( (LA73_445==FTSWILD) ) {s = 436;}
-						else if ( (LA73_445==NOT) ) {s = 437;}
-						else if ( (LA73_445==TO) ) {s = 438;}
-						else if ( (LA73_445==DECIMAL_INTEGER_LITERAL) ) {s = 439;}
-						else if ( (LA73_445==FLOATING_POINT_LITERAL) ) {s = 440;}
-						else if ( (LA73_445==STAR) ) {s = 441;}
-						else if ( (LA73_445==QUESTION_MARK) ) {s = 442;}
-						else if ( (LA73_445==DATETIME) ) {s = 443;}
-						else if ( (LA73_445==URI) ) {s = 444;}
-						else if ( (LA73_445==TILDA) && (synpred36_FTS())) {s = 382;}
-						else if ( (LA73_445==CARAT) && (synpred36_FTS())) {s = 383;}
-						else if ( (LA73_445==AND) && (synpred36_FTS())) {s = 384;}
-						else if ( (LA73_445==AMP) && (synpred36_FTS())) {s = 385;}
-						else if ( (LA73_445==EOF) && (synpred36_FTS())) {s = 386;}
-						else if ( (LA73_445==RPAREN) && (synpred36_FTS())) {s = 387;}
-						else if ( (LA73_445==OR) && (synpred36_FTS())) {s = 388;}
-						else if ( (LA73_445==BAR) && (synpred36_FTS())) {s = 389;}
-						else if ( (LA73_445==EXCLAMATION) && (synpred36_FTS())) {s = 390;}
-						else if ( (LA73_445==AT) && (synpred36_FTS())) {s = 391;}
-						else if ( (LA73_445==FTSPHRASE) && (synpred36_FTS())) {s = 392;}
-						else if ( (LA73_445==LSQUARE) && (synpred36_FTS())) {s = 393;}
-						else if ( (LA73_445==LT) && (synpred36_FTS())) {s = 394;}
-						else if ( (LA73_445==COMMA||LA73_445==DOT) && (synpred36_FTS())) {s = 395;}
-						else if ( (LA73_445==EQUALS) && (synpred36_FTS())) {s = 396;}
-						else if ( (LA73_445==LPAREN) && (synpred36_FTS())) {s = 397;}
-						else if ( (LA73_445==PERCENT) && (synpred36_FTS())) {s = 398;}
-						else if ( (LA73_445==PLUS) && (synpred36_FTS())) {s = 399;}
-						else if ( (LA73_445==MINUS) && (synpred36_FTS())) {s = 400;}
-						 
-						input.seek(index73_445);
-						if ( s>=0 ) return s;
-						break;
-
-					case 232 : 
-						int LA73_379 = input.LA(1);
-						 
-						int index73_379 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
-						 
-						input.seek(index73_379);
-						if ( s>=0 ) return s;
-						break;
-
-					case 233 : 
-						int LA73_116 = input.LA(1);
-						 
-						int index73_116 = input.index();
-						input.rewind();
-						s = -1;
-						if ( (LA73_116==COMMA||LA73_116==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
+						if ( (LA73_118==COMMA||LA73_118==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
 						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_116);
+						input.seek(index73_118);
 						if ( s>=0 ) return s;
 						break;
 
-					case 234 : 
-						int LA73_45 = input.LA(1);
+					case 72 : 
+						int LA73_108 = input.LA(1);
 						 
-						int index73_45 = input.index();
+						int index73_108 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_45==COMMA||LA73_45==DOT) ) {s = 104;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
+						if ( (LA73_108==COMMA||LA73_108==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
 						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_45);
+						input.seek(index73_108);
 						if ( s>=0 ) return s;
 						break;
 
-					case 235 : 
-						int LA73_371 = input.LA(1);
+					case 73 : 
+						int LA73_47 = input.LA(1);
 						 
-						int index73_371 = input.index();
+						int index73_47 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred34_FTS()) ) {s = 209;}
-						else if ( (synpred36_FTS()) ) {s = 400;}
+						if ( (LA73_47==COMMA||LA73_47==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
 						 
-						input.seek(index73_371);
+						input.seek(index73_47);
 						if ( s>=0 ) return s;
 						break;
 
-					case 236 : 
-						int LA73_260 = input.LA(1);
+					case 74 : 
+						int LA73_422 = input.LA(1);
 						 
-						int index73_260 = input.index();
+						int index73_422 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_260==ID) ) {s = 301;}
-						else if ( (LA73_260==FTSWORD) ) {s = 302;}
-						else if ( (LA73_260==FTSPRE) ) {s = 303;}
-						else if ( (LA73_260==FTSWILD) ) {s = 304;}
-						else if ( (LA73_260==NOT) ) {s = 305;}
-						else if ( (LA73_260==TO) ) {s = 306;}
-						else if ( (LA73_260==DECIMAL_INTEGER_LITERAL) ) {s = 307;}
-						else if ( (LA73_260==FLOATING_POINT_LITERAL) ) {s = 308;}
-						else if ( (LA73_260==STAR) ) {s = 309;}
-						else if ( (LA73_260==QUESTION_MARK) ) {s = 310;}
-						else if ( (LA73_260==DATETIME) ) {s = 311;}
-						else if ( (LA73_260==URI) ) {s = 312;}
-						else if ( (LA73_260==TILDA) && (synpred41_FTS())) {s = 240;}
-						else if ( (LA73_260==CARAT) && (synpred41_FTS())) {s = 241;}
-						else if ( (LA73_260==AND) && (synpred41_FTS())) {s = 242;}
-						else if ( (LA73_260==AMP) && (synpred41_FTS())) {s = 243;}
-						else if ( (LA73_260==EOF) && (synpred41_FTS())) {s = 244;}
-						else if ( (LA73_260==RPAREN) && (synpred41_FTS())) {s = 245;}
-						else if ( (LA73_260==OR) && (synpred41_FTS())) {s = 246;}
-						else if ( (LA73_260==BAR) && (synpred41_FTS())) {s = 247;}
-						else if ( (LA73_260==EXCLAMATION) && (synpred41_FTS())) {s = 248;}
-						else if ( (LA73_260==AT) && (synpred41_FTS())) {s = 249;}
-						else if ( (LA73_260==FTSPHRASE) && (synpred41_FTS())) {s = 250;}
-						else if ( (LA73_260==LSQUARE) && (synpred41_FTS())) {s = 251;}
-						else if ( (LA73_260==LT) && (synpred41_FTS())) {s = 252;}
-						else if ( (LA73_260==COMMA||LA73_260==DOT) && (synpred41_FTS())) {s = 253;}
-						else if ( (LA73_260==EQUALS) && (synpred41_FTS())) {s = 254;}
-						else if ( (LA73_260==LPAREN) && (synpred41_FTS())) {s = 255;}
-						else if ( (LA73_260==PERCENT) && (synpred41_FTS())) {s = 256;}
-						else if ( (LA73_260==PLUS) && (synpred41_FTS())) {s = 257;}
-						else if ( (LA73_260==MINUS) && (synpred41_FTS())) {s = 258;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
 						 
-						input.seek(index73_260);
+						input.seek(index73_422);
 						if ( s>=0 ) return s;
 						break;
 
-					case 237 : 
+					case 75 : 
+						int LA73_335 = input.LA(1);
+						 
+						int index73_335 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_335);
+						if ( s>=0 ) return s;
+						break;
+
+					case 76 : 
+						int LA73_367 = input.LA(1);
+						 
+						int index73_367 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_367==COMMA||LA73_367==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_367);
+						if ( s>=0 ) return s;
+						break;
+
+					case 77 : 
+						int LA73_150 = input.LA(1);
+						 
+						int index73_150 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_150==COMMA||LA73_150==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_150);
+						if ( s>=0 ) return s;
+						break;
+
+					case 78 : 
+						int LA73_233 = input.LA(1);
+						 
+						int index73_233 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_233==COMMA||LA73_233==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_233);
+						if ( s>=0 ) return s;
+						break;
+
+					case 79 : 
+						int LA73_327 = input.LA(1);
+						 
+						int index73_327 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_327==COMMA||LA73_327==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_327);
+						if ( s>=0 ) return s;
+						break;
+
+					case 80 : 
+						int LA73_411 = input.LA(1);
+						 
+						int index73_411 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_411);
+						if ( s>=0 ) return s;
+						break;
+
+					case 81 : 
+						int LA73_436 = input.LA(1);
+						 
+						int index73_436 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_436);
+						if ( s>=0 ) return s;
+						break;
+
+					case 82 : 
+						int LA73_377 = input.LA(1);
+						 
+						int index73_377 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_377);
+						if ( s>=0 ) return s;
+						break;
+
+					case 83 : 
+						int LA73_342 = input.LA(1);
+						 
+						int index73_342 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_342);
+						if ( s>=0 ) return s;
+						break;
+
+					case 84 : 
+						int LA73_438 = input.LA(1);
+						 
+						int index73_438 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_438);
+						if ( s>=0 ) return s;
+						break;
+
+					case 85 : 
+						int LA73_140 = input.LA(1);
+						 
+						int index73_140 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_140==COMMA||LA73_140==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_140);
+						if ( s>=0 ) return s;
+						break;
+
+					case 86 : 
+						int LA73_295 = input.LA(1);
+						 
+						int index73_295 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_295==DOT) ) {s = 363;}
+						else if ( (LA73_295==COMMA) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_295);
+						if ( s>=0 ) return s;
+						break;
+
+					case 87 : 
+						int LA73_310 = input.LA(1);
+						 
+						int index73_310 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_310==COMMA||LA73_310==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_310);
+						if ( s>=0 ) return s;
+						break;
+
+					case 88 : 
 						int LA73_184 = input.LA(1);
 						 
 						int index73_184 = input.index();
 						input.rewind();
 						s = -1;
 						if ( (LA73_184==COMMA||LA73_184==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
 						 
 						input.seek(index73_184);
 						if ( s>=0 ) return s;
 						break;
 
-					case 238 : 
-						int LA73_225 = input.LA(1);
+					case 89 : 
+						int LA73_408 = input.LA(1);
 						 
-						int index73_225 = input.index();
+						int index73_408 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_225==COMMA||LA73_225==DOT) ) {s = 221;}
-						else if ( (synpred42_FTS()) ) {s = 213;}
-						else if ( (synpred44_FTS()) ) {s = 207;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
 						 
-						input.seek(index73_225);
+						input.seek(index73_408);
 						if ( s>=0 ) return s;
 						break;
 
-					case 239 : 
-						int LA73_71 = input.LA(1);
+					case 90 : 
+						int LA73_363 = input.LA(1);
 						 
-						int index73_71 = input.index();
+						int index73_363 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_71==ID) ) {s = 111;}
-						else if ( (LA73_71==FTSWORD) ) {s = 112;}
-						else if ( (LA73_71==FTSPRE) ) {s = 113;}
-						else if ( (LA73_71==FTSWILD) ) {s = 114;}
-						else if ( (LA73_71==NOT) ) {s = 115;}
-						else if ( (LA73_71==TO) ) {s = 116;}
-						else if ( (LA73_71==DECIMAL_INTEGER_LITERAL) ) {s = 117;}
-						else if ( (LA73_71==FLOATING_POINT_LITERAL) ) {s = 118;}
-						else if ( (LA73_71==STAR) ) {s = 119;}
-						else if ( (LA73_71==QUESTION_MARK) ) {s = 120;}
-						else if ( (LA73_71==DATETIME) ) {s = 121;}
-						else if ( (LA73_71==URI) ) {s = 51;}
-						else if ( (LA73_71==TILDA) && (synpred49_FTS())) {s = 52;}
-						else if ( (LA73_71==CARAT) && (synpred49_FTS())) {s = 53;}
-						else if ( (LA73_71==AND) && (synpred49_FTS())) {s = 54;}
-						else if ( (LA73_71==AMP) && (synpred49_FTS())) {s = 55;}
-						else if ( (LA73_71==EOF) && (synpred49_FTS())) {s = 56;}
-						else if ( (LA73_71==RPAREN) && (synpred49_FTS())) {s = 57;}
-						else if ( (LA73_71==OR) && (synpred49_FTS())) {s = 58;}
-						else if ( (LA73_71==BAR) && (synpred49_FTS())) {s = 59;}
-						else if ( (LA73_71==EXCLAMATION) && (synpred49_FTS())) {s = 60;}
-						else if ( (LA73_71==AT) && (synpred49_FTS())) {s = 61;}
-						else if ( (LA73_71==FTSPHRASE) && (synpred49_FTS())) {s = 62;}
-						else if ( (LA73_71==LSQUARE) && (synpred49_FTS())) {s = 63;}
-						else if ( (LA73_71==LT) && (synpred49_FTS())) {s = 64;}
-						else if ( (LA73_71==COMMA||LA73_71==DOT) && (synpred49_FTS())) {s = 65;}
-						else if ( (LA73_71==EQUALS) && (synpred49_FTS())) {s = 66;}
-						else if ( (LA73_71==LPAREN) && (synpred49_FTS())) {s = 67;}
-						else if ( (LA73_71==PERCENT) && (synpred49_FTS())) {s = 68;}
-						else if ( (LA73_71==PLUS) && (synpred49_FTS())) {s = 69;}
-						else if ( (LA73_71==MINUS) && (synpred49_FTS())) {s = 70;}
+						if ( (LA73_363==ID) ) {s = 413;}
+						else if ( (LA73_363==FTSWORD) ) {s = 333;}
+						else if ( (LA73_363==FTSPRE) ) {s = 334;}
+						else if ( (LA73_363==FTSWILD) ) {s = 335;}
+						else if ( (LA73_363==NOT) ) {s = 336;}
+						else if ( (LA73_363==TO) ) {s = 337;}
+						else if ( (LA73_363==DECIMAL_INTEGER_LITERAL) ) {s = 338;}
+						else if ( (LA73_363==FLOATING_POINT_LITERAL) ) {s = 339;}
+						else if ( (LA73_363==STAR) ) {s = 340;}
+						else if ( (LA73_363==QUESTION_MARK) ) {s = 341;}
+						else if ( (LA73_363==DATETIME) ) {s = 342;}
+						else if ( (LA73_363==URI) ) {s = 343;}
+						else if ( (LA73_363==TILDA) && (synpred44_FTS())) {s = 344;}
+						else if ( (LA73_363==CARAT) && (synpred44_FTS())) {s = 345;}
+						else if ( (LA73_363==AND) && (synpred44_FTS())) {s = 346;}
+						else if ( (LA73_363==AMP) && (synpred44_FTS())) {s = 347;}
+						else if ( (LA73_363==EOF) && (synpred44_FTS())) {s = 348;}
+						else if ( (LA73_363==RPAREN) && (synpred44_FTS())) {s = 349;}
+						else if ( (LA73_363==OR) && (synpred44_FTS())) {s = 350;}
+						else if ( (LA73_363==BAR) && (synpred44_FTS())) {s = 351;}
+						else if ( (LA73_363==EXCLAMATION) && (synpred44_FTS())) {s = 352;}
+						else if ( (LA73_363==AT) && (synpred44_FTS())) {s = 353;}
+						else if ( (LA73_363==FTSPHRASE) && (synpred44_FTS())) {s = 354;}
+						else if ( (LA73_363==LSQUARE) && (synpred44_FTS())) {s = 355;}
+						else if ( (LA73_363==LT) && (synpred44_FTS())) {s = 356;}
+						else if ( (LA73_363==COMMA||LA73_363==DOT) && (synpred44_FTS())) {s = 357;}
+						else if ( (LA73_363==EQUALS) && (synpred44_FTS())) {s = 358;}
+						else if ( (LA73_363==LPAREN) && (synpred44_FTS())) {s = 359;}
+						else if ( (LA73_363==PERCENT) && (synpred44_FTS())) {s = 360;}
+						else if ( (LA73_363==PLUS) && (synpred44_FTS())) {s = 361;}
+						else if ( (LA73_363==MINUS) && (synpred44_FTS())) {s = 362;}
 						 
-						input.seek(index73_71);
+						input.seek(index73_363);
 						if ( s>=0 ) return s;
 						break;
 
-					case 240 : 
+					case 91 : 
+						int LA73_268 = input.LA(1);
+						 
+						int index73_268 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_268==COMMA||LA73_268==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_268);
+						if ( s>=0 ) return s;
+						break;
+
+					case 92 : 
+						int LA73_142 = input.LA(1);
+						 
+						int index73_142 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_142==COMMA||LA73_142==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_142);
+						if ( s>=0 ) return s;
+						break;
+
+					case 93 : 
+						int LA73_114 = input.LA(1);
+						 
+						int index73_114 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_114==COMMA||LA73_114==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_114);
+						if ( s>=0 ) return s;
+						break;
+
+					case 94 : 
+						int LA73_43 = input.LA(1);
+						 
+						int index73_43 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_43==COMMA||LA73_43==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_43);
+						if ( s>=0 ) return s;
+						break;
+
+					case 95 : 
+						int LA73_141 = input.LA(1);
+						 
+						int index73_141 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_141==COMMA||LA73_141==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_141);
+						if ( s>=0 ) return s;
+						break;
+
+					case 96 : 
+						int LA73_366 = input.LA(1);
+						 
+						int index73_366 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_366==COMMA||LA73_366==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_366);
+						if ( s>=0 ) return s;
+						break;
+
+					case 97 : 
+						int LA73_320 = input.LA(1);
+						 
+						int index73_320 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_320==COMMA||LA73_320==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_320);
+						if ( s>=0 ) return s;
+						break;
+
+					case 98 : 
+						int LA73_423 = input.LA(1);
+						 
+						int index73_423 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_423);
+						if ( s>=0 ) return s;
+						break;
+
+					case 99 : 
+						int LA73_119 = input.LA(1);
+						 
+						int index73_119 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_119==COMMA||LA73_119==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_119);
+						if ( s>=0 ) return s;
+						break;
+
+					case 100 : 
+						int LA73_48 = input.LA(1);
+						 
+						int index73_48 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_48==COMMA||LA73_48==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_48);
+						if ( s>=0 ) return s;
+						break;
+
+					case 101 : 
+						int LA73_177 = input.LA(1);
+						 
+						int index73_177 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_177==COMMA||LA73_177==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_177);
+						if ( s>=0 ) return s;
+						break;
+
+					case 102 : 
 						int LA73_259 = input.LA(1);
 						 
 						int index73_259 = input.index();
@@ -24690,76 +23511,2390 @@ public class FTSParser extends Parser {
 						else if ( (LA73_259==QUESTION_MARK) ) {s = 237;}
 						else if ( (LA73_259==DATETIME) ) {s = 238;}
 						else if ( (LA73_259==URI) ) {s = 239;}
-						else if ( (LA73_259==TILDA) && (synpred41_FTS())) {s = 240;}
-						else if ( (LA73_259==CARAT) && (synpred41_FTS())) {s = 241;}
-						else if ( (LA73_259==AND) && (synpred41_FTS())) {s = 242;}
-						else if ( (LA73_259==AMP) && (synpred41_FTS())) {s = 243;}
-						else if ( (LA73_259==EOF) && (synpred41_FTS())) {s = 244;}
-						else if ( (LA73_259==RPAREN) && (synpred41_FTS())) {s = 245;}
-						else if ( (LA73_259==OR) && (synpred41_FTS())) {s = 246;}
-						else if ( (LA73_259==BAR) && (synpred41_FTS())) {s = 247;}
-						else if ( (LA73_259==EXCLAMATION) && (synpred41_FTS())) {s = 248;}
-						else if ( (LA73_259==AT) && (synpred41_FTS())) {s = 249;}
-						else if ( (LA73_259==FTSPHRASE) && (synpred41_FTS())) {s = 250;}
-						else if ( (LA73_259==LSQUARE) && (synpred41_FTS())) {s = 251;}
-						else if ( (LA73_259==LT) && (synpred41_FTS())) {s = 252;}
-						else if ( (LA73_259==COMMA||LA73_259==DOT) && (synpred41_FTS())) {s = 253;}
-						else if ( (LA73_259==EQUALS) && (synpred41_FTS())) {s = 254;}
-						else if ( (LA73_259==LPAREN) && (synpred41_FTS())) {s = 255;}
-						else if ( (LA73_259==PERCENT) && (synpred41_FTS())) {s = 256;}
-						else if ( (LA73_259==PLUS) && (synpred41_FTS())) {s = 257;}
-						else if ( (LA73_259==MINUS) && (synpred41_FTS())) {s = 258;}
+						else if ( (LA73_259==TILDA) && (synpred48_FTS())) {s = 240;}
+						else if ( (LA73_259==CARAT) && (synpred48_FTS())) {s = 241;}
+						else if ( (LA73_259==AND) && (synpred48_FTS())) {s = 242;}
+						else if ( (LA73_259==AMP) && (synpred48_FTS())) {s = 243;}
+						else if ( (LA73_259==EOF) && (synpred48_FTS())) {s = 244;}
+						else if ( (LA73_259==RPAREN) && (synpred48_FTS())) {s = 245;}
+						else if ( (LA73_259==OR) && (synpred48_FTS())) {s = 246;}
+						else if ( (LA73_259==BAR) && (synpred48_FTS())) {s = 247;}
+						else if ( (LA73_259==EXCLAMATION) && (synpred48_FTS())) {s = 248;}
+						else if ( (LA73_259==AT) && (synpred48_FTS())) {s = 249;}
+						else if ( (LA73_259==FTSPHRASE) && (synpred48_FTS())) {s = 250;}
+						else if ( (LA73_259==LSQUARE) && (synpred48_FTS())) {s = 251;}
+						else if ( (LA73_259==LT) && (synpred48_FTS())) {s = 252;}
+						else if ( (LA73_259==COMMA||LA73_259==DOT) && (synpred48_FTS())) {s = 253;}
+						else if ( (LA73_259==EQUALS) && (synpred48_FTS())) {s = 254;}
+						else if ( (LA73_259==LPAREN) && (synpred48_FTS())) {s = 255;}
+						else if ( (LA73_259==PERCENT) && (synpred48_FTS())) {s = 256;}
+						else if ( (LA73_259==PLUS) && (synpred48_FTS())) {s = 257;}
+						else if ( (LA73_259==MINUS) && (synpred48_FTS())) {s = 258;}
 						 
 						input.seek(index73_259);
 						if ( s>=0 ) return s;
 						break;
 
-					case 241 : 
+					case 103 : 
+						int LA73_328 = input.LA(1);
+						 
+						int index73_328 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_328==COMMA||LA73_328==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_328);
+						if ( s>=0 ) return s;
+						break;
+
+					case 104 : 
+						int LA73_426 = input.LA(1);
+						 
+						int index73_426 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_426==ID) ) {s = 451;}
+						else if ( (LA73_426==FTSWORD) ) {s = 415;}
+						else if ( (LA73_426==FTSPRE) ) {s = 416;}
+						else if ( (LA73_426==FTSWILD) ) {s = 417;}
+						else if ( (LA73_426==NOT) ) {s = 418;}
+						else if ( (LA73_426==TO) ) {s = 419;}
+						else if ( (LA73_426==DECIMAL_INTEGER_LITERAL) ) {s = 420;}
+						else if ( (LA73_426==FLOATING_POINT_LITERAL) ) {s = 421;}
+						else if ( (LA73_426==STAR) ) {s = 422;}
+						else if ( (LA73_426==QUESTION_MARK) ) {s = 423;}
+						else if ( (LA73_426==DATETIME) ) {s = 424;}
+						else if ( (LA73_426==URI) ) {s = 425;}
+						else if ( (LA73_426==TILDA) && (synpred44_FTS())) {s = 344;}
+						else if ( (LA73_426==CARAT) && (synpred44_FTS())) {s = 345;}
+						else if ( (LA73_426==AND) && (synpred44_FTS())) {s = 346;}
+						else if ( (LA73_426==AMP) && (synpred44_FTS())) {s = 347;}
+						else if ( (LA73_426==EOF) && (synpred44_FTS())) {s = 348;}
+						else if ( (LA73_426==RPAREN) && (synpred44_FTS())) {s = 349;}
+						else if ( (LA73_426==OR) && (synpred44_FTS())) {s = 350;}
+						else if ( (LA73_426==BAR) && (synpred44_FTS())) {s = 351;}
+						else if ( (LA73_426==EXCLAMATION) && (synpred44_FTS())) {s = 352;}
+						else if ( (LA73_426==AT) && (synpred44_FTS())) {s = 353;}
+						else if ( (LA73_426==FTSPHRASE) && (synpred44_FTS())) {s = 354;}
+						else if ( (LA73_426==LSQUARE) && (synpred44_FTS())) {s = 355;}
+						else if ( (LA73_426==LT) && (synpred44_FTS())) {s = 356;}
+						else if ( (LA73_426==COMMA||LA73_426==DOT) && (synpred44_FTS())) {s = 357;}
+						else if ( (LA73_426==EQUALS) && (synpred44_FTS())) {s = 358;}
+						else if ( (LA73_426==LPAREN) && (synpred44_FTS())) {s = 359;}
+						else if ( (LA73_426==PERCENT) && (synpred44_FTS())) {s = 360;}
+						else if ( (LA73_426==PLUS) && (synpred44_FTS())) {s = 361;}
+						else if ( (LA73_426==MINUS) && (synpred44_FTS())) {s = 362;}
+						 
+						input.seek(index73_426);
+						if ( s>=0 ) return s;
+						break;
+
+					case 105 : 
+						int LA73_301 = input.LA(1);
+						 
+						int index73_301 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_301==COMMA||LA73_301==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_301);
+						if ( s>=0 ) return s;
+						break;
+
+					case 106 : 
+						int LA73_149 = input.LA(1);
+						 
+						int index73_149 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_149==COMMA||LA73_149==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_149);
+						if ( s>=0 ) return s;
+						break;
+
+					case 107 : 
+						int LA73_139 = input.LA(1);
+						 
+						int index73_139 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_139==COMMA||LA73_139==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_139);
+						if ( s>=0 ) return s;
+						break;
+
+					case 108 : 
+						int LA73_82 = input.LA(1);
+						 
+						int index73_82 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_82==COMMA||LA73_82==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_82);
+						if ( s>=0 ) return s;
+						break;
+
+					case 109 : 
+						int LA73_412 = input.LA(1);
+						 
+						int index73_412 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_412);
+						if ( s>=0 ) return s;
+						break;
+
+					case 110 : 
+						int LA73_433 = input.LA(1);
+						 
+						int index73_433 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_433);
+						if ( s>=0 ) return s;
+						break;
+
+					case 111 : 
+						int LA73_300 = input.LA(1);
+						 
+						int index73_300 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_300==COMMA||LA73_300==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_300);
+						if ( s>=0 ) return s;
+						break;
+
+					case 112 : 
+						int LA73_364 = input.LA(1);
+						 
+						int index73_364 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_364==ID) ) {s = 414;}
+						else if ( (LA73_364==FTSWORD) ) {s = 415;}
+						else if ( (LA73_364==FTSPRE) ) {s = 416;}
+						else if ( (LA73_364==FTSWILD) ) {s = 417;}
+						else if ( (LA73_364==NOT) ) {s = 418;}
+						else if ( (LA73_364==TO) ) {s = 419;}
+						else if ( (LA73_364==DECIMAL_INTEGER_LITERAL) ) {s = 420;}
+						else if ( (LA73_364==FLOATING_POINT_LITERAL) ) {s = 421;}
+						else if ( (LA73_364==STAR) ) {s = 422;}
+						else if ( (LA73_364==QUESTION_MARK) ) {s = 423;}
+						else if ( (LA73_364==DATETIME) ) {s = 424;}
+						else if ( (LA73_364==URI) ) {s = 425;}
+						else if ( (LA73_364==TILDA) && (synpred44_FTS())) {s = 344;}
+						else if ( (LA73_364==CARAT) && (synpred44_FTS())) {s = 345;}
+						else if ( (LA73_364==AND) && (synpred44_FTS())) {s = 346;}
+						else if ( (LA73_364==AMP) && (synpred44_FTS())) {s = 347;}
+						else if ( (LA73_364==EOF) && (synpred44_FTS())) {s = 348;}
+						else if ( (LA73_364==RPAREN) && (synpred44_FTS())) {s = 349;}
+						else if ( (LA73_364==OR) && (synpred44_FTS())) {s = 350;}
+						else if ( (LA73_364==BAR) && (synpred44_FTS())) {s = 351;}
+						else if ( (LA73_364==EXCLAMATION) && (synpred44_FTS())) {s = 352;}
+						else if ( (LA73_364==AT) && (synpred44_FTS())) {s = 353;}
+						else if ( (LA73_364==FTSPHRASE) && (synpred44_FTS())) {s = 354;}
+						else if ( (LA73_364==LSQUARE) && (synpred44_FTS())) {s = 355;}
+						else if ( (LA73_364==LT) && (synpred44_FTS())) {s = 356;}
+						else if ( (LA73_364==COMMA||LA73_364==DOT) && (synpred44_FTS())) {s = 357;}
+						else if ( (LA73_364==EQUALS) && (synpred44_FTS())) {s = 358;}
+						else if ( (LA73_364==LPAREN) && (synpred44_FTS())) {s = 359;}
+						else if ( (LA73_364==PERCENT) && (synpred44_FTS())) {s = 360;}
+						else if ( (LA73_364==PLUS) && (synpred44_FTS())) {s = 361;}
+						else if ( (LA73_364==MINUS) && (synpred44_FTS())) {s = 362;}
+						 
+						input.seek(index73_364);
+						if ( s>=0 ) return s;
+						break;
+
+					case 113 : 
+						int LA73_125 = input.LA(1);
+						 
+						int index73_125 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_125==COMMA||LA73_125==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_125);
+						if ( s>=0 ) return s;
+						break;
+
+					case 114 : 
+						int LA73_220 = input.LA(1);
+						 
+						int index73_220 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_220==COMMA||LA73_220==DOT) ) {s = 260;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_220);
+						if ( s>=0 ) return s;
+						break;
+
+					case 115 : 
+						int LA73_370 = input.LA(1);
+						 
+						int index73_370 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_370);
+						if ( s>=0 ) return s;
+						break;
+
+					case 116 : 
+						int LA73_136 = input.LA(1);
+						 
+						int index73_136 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_136==COMMA||LA73_136==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_136);
+						if ( s>=0 ) return s;
+						break;
+
+					case 117 : 
+						int LA73_79 = input.LA(1);
+						 
+						int index73_79 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_79==COMMA||LA73_79==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_79);
+						if ( s>=0 ) return s;
+						break;
+
+					case 118 : 
+						int LA73_292 = input.LA(1);
+						 
+						int index73_292 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_292==ID) ) {s = 319;}
+						else if ( (LA73_292==FTSWORD) ) {s = 262;}
+						else if ( (LA73_292==FTSPRE) ) {s = 263;}
+						else if ( (LA73_292==FTSWILD) ) {s = 264;}
+						else if ( (LA73_292==NOT) ) {s = 265;}
+						else if ( (LA73_292==TO) ) {s = 266;}
+						else if ( (LA73_292==DECIMAL_INTEGER_LITERAL) ) {s = 267;}
+						else if ( (LA73_292==FLOATING_POINT_LITERAL) ) {s = 268;}
+						else if ( (LA73_292==STAR) ) {s = 269;}
+						else if ( (LA73_292==QUESTION_MARK) ) {s = 270;}
+						else if ( (LA73_292==DATETIME) ) {s = 271;}
+						else if ( (LA73_292==URI) ) {s = 272;}
+						else if ( (LA73_292==TILDA) && (synpred47_FTS())) {s = 273;}
+						else if ( (LA73_292==CARAT) && (synpred47_FTS())) {s = 274;}
+						else if ( (LA73_292==AND) && (synpred47_FTS())) {s = 275;}
+						else if ( (LA73_292==AMP) && (synpred47_FTS())) {s = 276;}
+						else if ( (LA73_292==EOF) && (synpred47_FTS())) {s = 277;}
+						else if ( (LA73_292==RPAREN) && (synpred47_FTS())) {s = 278;}
+						else if ( (LA73_292==OR) && (synpred47_FTS())) {s = 279;}
+						else if ( (LA73_292==BAR) && (synpred47_FTS())) {s = 280;}
+						else if ( (LA73_292==EXCLAMATION) && (synpred47_FTS())) {s = 281;}
+						else if ( (LA73_292==AT) && (synpred47_FTS())) {s = 282;}
+						else if ( (LA73_292==FTSPHRASE) && (synpred47_FTS())) {s = 283;}
+						else if ( (LA73_292==LSQUARE) && (synpred47_FTS())) {s = 284;}
+						else if ( (LA73_292==LT) && (synpred47_FTS())) {s = 285;}
+						else if ( (LA73_292==COMMA||LA73_292==DOT) && (synpred47_FTS())) {s = 286;}
+						else if ( (LA73_292==EQUALS) && (synpred47_FTS())) {s = 287;}
+						else if ( (LA73_292==LPAREN) && (synpred47_FTS())) {s = 288;}
+						else if ( (LA73_292==PERCENT) && (synpred47_FTS())) {s = 289;}
+						else if ( (LA73_292==PLUS) && (synpred47_FTS())) {s = 290;}
+						else if ( (LA73_292==MINUS) && (synpred47_FTS())) {s = 291;}
+						 
+						input.seek(index73_292);
+						if ( s>=0 ) return s;
+						break;
+
+					case 119 : 
+						int LA73_124 = input.LA(1);
+						 
+						int index73_124 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_124==DOT) ) {s = 208;}
+						else if ( (LA73_124==COMMA) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_124);
+						if ( s>=0 ) return s;
+						break;
+
+					case 120 : 
+						int LA73_376 = input.LA(1);
+						 
+						int index73_376 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_376);
+						if ( s>=0 ) return s;
+						break;
+
+					case 121 : 
+						int LA73_325 = input.LA(1);
+						 
+						int index73_325 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_325==COMMA||LA73_325==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_325);
+						if ( s>=0 ) return s;
+						break;
+
+					case 122 : 
+						int LA73_183 = input.LA(1);
+						 
+						int index73_183 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_183==COMMA||LA73_183==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_183);
+						if ( s>=0 ) return s;
+						break;
+
+					case 123 : 
+						int LA73_138 = input.LA(1);
+						 
+						int index73_138 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_138==COMMA||LA73_138==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_138);
+						if ( s>=0 ) return s;
+						break;
+
+					case 124 : 
+						int LA73_81 = input.LA(1);
+						 
+						int index73_81 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_81==COMMA||LA73_81==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_81);
+						if ( s>=0 ) return s;
+						break;
+
+					case 125 : 
+						int LA73_230 = input.LA(1);
+						 
+						int index73_230 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_230==COMMA||LA73_230==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_230);
+						if ( s>=0 ) return s;
+						break;
+
+					case 126 : 
+						int LA73_299 = input.LA(1);
+						 
+						int index73_299 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_299==COMMA||LA73_299==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_299);
+						if ( s>=0 ) return s;
+						break;
+
+					case 127 : 
+						int LA73_431 = input.LA(1);
+						 
+						int index73_431 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_431);
+						if ( s>=0 ) return s;
+						break;
+
+					case 128 : 
+						int LA73_338 = input.LA(1);
+						 
+						int index73_338 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_338);
+						if ( s>=0 ) return s;
+						break;
+
+					case 129 : 
+						int LA73_452 = input.LA(1);
+						 
+						int index73_452 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_452);
+						if ( s>=0 ) return s;
+						break;
+
+					case 130 : 
+						int LA73_456 = input.LA(1);
+						 
+						int index73_456 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_456);
+						if ( s>=0 ) return s;
+						break;
+
+					case 131 : 
+						int LA73_402 = input.LA(1);
+						 
+						int index73_402 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_402==ID) ) {s = 433;}
+						else if ( (LA73_402==FTSWORD) ) {s = 434;}
+						else if ( (LA73_402==FTSPRE) ) {s = 435;}
+						else if ( (LA73_402==FTSWILD) ) {s = 436;}
+						else if ( (LA73_402==NOT) ) {s = 437;}
+						else if ( (LA73_402==TO) ) {s = 438;}
+						else if ( (LA73_402==DECIMAL_INTEGER_LITERAL) ) {s = 439;}
+						else if ( (LA73_402==FLOATING_POINT_LITERAL) ) {s = 440;}
+						else if ( (LA73_402==STAR) ) {s = 441;}
+						else if ( (LA73_402==QUESTION_MARK) ) {s = 442;}
+						else if ( (LA73_402==DATETIME) ) {s = 443;}
+						else if ( (LA73_402==URI) ) {s = 444;}
+						else if ( (LA73_402==TILDA) && (synpred43_FTS())) {s = 382;}
+						else if ( (LA73_402==CARAT) && (synpred43_FTS())) {s = 383;}
+						else if ( (LA73_402==AND) && (synpred43_FTS())) {s = 384;}
+						else if ( (LA73_402==AMP) && (synpred43_FTS())) {s = 385;}
+						else if ( (LA73_402==EOF) && (synpred43_FTS())) {s = 386;}
+						else if ( (LA73_402==RPAREN) && (synpred43_FTS())) {s = 387;}
+						else if ( (LA73_402==OR) && (synpred43_FTS())) {s = 388;}
+						else if ( (LA73_402==BAR) && (synpred43_FTS())) {s = 389;}
+						else if ( (LA73_402==EXCLAMATION) && (synpred43_FTS())) {s = 390;}
+						else if ( (LA73_402==AT) && (synpred43_FTS())) {s = 391;}
+						else if ( (LA73_402==FTSPHRASE) && (synpred43_FTS())) {s = 392;}
+						else if ( (LA73_402==LSQUARE) && (synpred43_FTS())) {s = 393;}
+						else if ( (LA73_402==LT) && (synpred43_FTS())) {s = 394;}
+						else if ( (LA73_402==COMMA||LA73_402==DOT) && (synpred43_FTS())) {s = 395;}
+						else if ( (LA73_402==EQUALS) && (synpred43_FTS())) {s = 396;}
+						else if ( (LA73_402==LPAREN) && (synpred43_FTS())) {s = 397;}
+						else if ( (LA73_402==PERCENT) && (synpred43_FTS())) {s = 398;}
+						else if ( (LA73_402==PLUS) && (synpred43_FTS())) {s = 399;}
+						else if ( (LA73_402==MINUS) && (synpred43_FTS())) {s = 400;}
+						 
+						input.seek(index73_402);
+						if ( s>=0 ) return s;
+						break;
+
+					case 132 : 
+						int LA73_147 = input.LA(1);
+						 
+						int index73_147 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_147==COMMA||LA73_147==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_147);
+						if ( s>=0 ) return s;
+						break;
+
+					case 133 : 
+						int LA73_231 = input.LA(1);
+						 
+						int index73_231 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_231==COMMA||LA73_231==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_231);
+						if ( s>=0 ) return s;
+						break;
+
+					case 134 : 
+						int LA73_427 = input.LA(1);
+						 
+						int index73_427 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_427);
+						if ( s>=0 ) return s;
+						break;
+
+					case 135 : 
+						int LA73_261 = input.LA(1);
+						 
+						int index73_261 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_261==COMMA||LA73_261==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_261);
+						if ( s>=0 ) return s;
+						break;
+
+					case 136 : 
+						int LA73_315 = input.LA(1);
+						 
+						int index73_315 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_315==COMMA||LA73_315==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_315);
+						if ( s>=0 ) return s;
+						break;
+
+					case 137 : 
+						int LA73_238 = input.LA(1);
+						 
+						int index73_238 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_238==COMMA||LA73_238==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_238);
+						if ( s>=0 ) return s;
+						break;
+
+					case 138 : 
+						int LA73_409 = input.LA(1);
+						 
+						int index73_409 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_409);
+						if ( s>=0 ) return s;
+						break;
+
+					case 139 : 
+						int LA73_374 = input.LA(1);
+						 
+						int index73_374 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_374);
+						if ( s>=0 ) return s;
+						break;
+
+					case 140 : 
+						int LA73_221 = input.LA(1);
+						 
+						int index73_221 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_221==ID) ) {s = 261;}
+						else if ( (LA73_221==FTSWORD) ) {s = 262;}
+						else if ( (LA73_221==FTSPRE) ) {s = 263;}
+						else if ( (LA73_221==FTSWILD) ) {s = 264;}
+						else if ( (LA73_221==NOT) ) {s = 265;}
+						else if ( (LA73_221==TO) ) {s = 266;}
+						else if ( (LA73_221==DECIMAL_INTEGER_LITERAL) ) {s = 267;}
+						else if ( (LA73_221==FLOATING_POINT_LITERAL) ) {s = 268;}
+						else if ( (LA73_221==STAR) ) {s = 269;}
+						else if ( (LA73_221==QUESTION_MARK) ) {s = 270;}
+						else if ( (LA73_221==DATETIME) ) {s = 271;}
+						else if ( (LA73_221==URI) ) {s = 272;}
+						else if ( (LA73_221==TILDA) && (synpred47_FTS())) {s = 273;}
+						else if ( (LA73_221==CARAT) && (synpred47_FTS())) {s = 274;}
+						else if ( (LA73_221==AND) && (synpred47_FTS())) {s = 275;}
+						else if ( (LA73_221==AMP) && (synpred47_FTS())) {s = 276;}
+						else if ( (LA73_221==EOF) && (synpred47_FTS())) {s = 277;}
+						else if ( (LA73_221==RPAREN) && (synpred47_FTS())) {s = 278;}
+						else if ( (LA73_221==OR) && (synpred47_FTS())) {s = 279;}
+						else if ( (LA73_221==BAR) && (synpred47_FTS())) {s = 280;}
+						else if ( (LA73_221==EXCLAMATION) && (synpred47_FTS())) {s = 281;}
+						else if ( (LA73_221==AT) && (synpred47_FTS())) {s = 282;}
+						else if ( (LA73_221==FTSPHRASE) && (synpred47_FTS())) {s = 283;}
+						else if ( (LA73_221==LSQUARE) && (synpred47_FTS())) {s = 284;}
+						else if ( (LA73_221==LT) && (synpred47_FTS())) {s = 285;}
+						else if ( (LA73_221==COMMA||LA73_221==DOT) && (synpred47_FTS())) {s = 286;}
+						else if ( (LA73_221==EQUALS) && (synpred47_FTS())) {s = 287;}
+						else if ( (LA73_221==LPAREN) && (synpred47_FTS())) {s = 288;}
+						else if ( (LA73_221==PERCENT) && (synpred47_FTS())) {s = 289;}
+						else if ( (LA73_221==PLUS) && (synpred47_FTS())) {s = 290;}
+						else if ( (LA73_221==MINUS) && (synpred47_FTS())) {s = 291;}
+						 
+						input.seek(index73_221);
+						if ( s>=0 ) return s;
+						break;
+
+					case 141 : 
+						int LA73_260 = input.LA(1);
+						 
+						int index73_260 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_260==ID) ) {s = 301;}
+						else if ( (LA73_260==FTSWORD) ) {s = 302;}
+						else if ( (LA73_260==FTSPRE) ) {s = 303;}
+						else if ( (LA73_260==FTSWILD) ) {s = 304;}
+						else if ( (LA73_260==NOT) ) {s = 305;}
+						else if ( (LA73_260==TO) ) {s = 306;}
+						else if ( (LA73_260==DECIMAL_INTEGER_LITERAL) ) {s = 307;}
+						else if ( (LA73_260==FLOATING_POINT_LITERAL) ) {s = 308;}
+						else if ( (LA73_260==STAR) ) {s = 309;}
+						else if ( (LA73_260==QUESTION_MARK) ) {s = 310;}
+						else if ( (LA73_260==DATETIME) ) {s = 311;}
+						else if ( (LA73_260==URI) ) {s = 312;}
+						else if ( (LA73_260==TILDA) && (synpred48_FTS())) {s = 240;}
+						else if ( (LA73_260==CARAT) && (synpred48_FTS())) {s = 241;}
+						else if ( (LA73_260==AND) && (synpred48_FTS())) {s = 242;}
+						else if ( (LA73_260==AMP) && (synpred48_FTS())) {s = 243;}
+						else if ( (LA73_260==EOF) && (synpred48_FTS())) {s = 244;}
+						else if ( (LA73_260==RPAREN) && (synpred48_FTS())) {s = 245;}
+						else if ( (LA73_260==OR) && (synpred48_FTS())) {s = 246;}
+						else if ( (LA73_260==BAR) && (synpred48_FTS())) {s = 247;}
+						else if ( (LA73_260==EXCLAMATION) && (synpred48_FTS())) {s = 248;}
+						else if ( (LA73_260==AT) && (synpred48_FTS())) {s = 249;}
+						else if ( (LA73_260==FTSPHRASE) && (synpred48_FTS())) {s = 250;}
+						else if ( (LA73_260==LSQUARE) && (synpred48_FTS())) {s = 251;}
+						else if ( (LA73_260==LT) && (synpred48_FTS())) {s = 252;}
+						else if ( (LA73_260==COMMA||LA73_260==DOT) && (synpred48_FTS())) {s = 253;}
+						else if ( (LA73_260==EQUALS) && (synpred48_FTS())) {s = 254;}
+						else if ( (LA73_260==LPAREN) && (synpred48_FTS())) {s = 255;}
+						else if ( (LA73_260==PERCENT) && (synpred48_FTS())) {s = 256;}
+						else if ( (LA73_260==PLUS) && (synpred48_FTS())) {s = 257;}
+						else if ( (LA73_260==MINUS) && (synpred48_FTS())) {s = 258;}
+						 
+						input.seek(index73_260);
+						if ( s>=0 ) return s;
+						break;
+
+					case 142 : 
+						int LA73_267 = input.LA(1);
+						 
+						int index73_267 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_267==COMMA||LA73_267==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_267);
+						if ( s>=0 ) return s;
+						break;
+
+					case 143 : 
+						int LA73_109 = input.LA(1);
+						 
+						int index73_109 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_109==COMMA||LA73_109==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_109);
+						if ( s>=0 ) return s;
+						break;
+
+					case 144 : 
+						int LA73_131 = input.LA(1);
+						 
+						int index73_131 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_131==COMMA||LA73_131==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_131);
+						if ( s>=0 ) return s;
+						break;
+
+					case 145 : 
+						int LA73_74 = input.LA(1);
+						 
+						int index73_74 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_74==COMMA||LA73_74==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_74);
+						if ( s>=0 ) return s;
+						break;
+
+					case 146 : 
+						int LA73_443 = input.LA(1);
+						 
+						int index73_443 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_443);
+						if ( s>=0 ) return s;
+						break;
+
+					case 147 : 
+						int LA73_415 = input.LA(1);
+						 
+						int index73_415 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_415);
+						if ( s>=0 ) return s;
+						break;
+
+					case 148 : 
+						int LA73_294 = input.LA(1);
+						 
+						int index73_294 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_294==ID) ) {s = 332;}
+						else if ( (LA73_294==FTSWORD) ) {s = 333;}
+						else if ( (LA73_294==FTSPRE) ) {s = 334;}
+						else if ( (LA73_294==FTSWILD) ) {s = 335;}
+						else if ( (LA73_294==NOT) ) {s = 336;}
+						else if ( (LA73_294==TO) ) {s = 337;}
+						else if ( (LA73_294==DECIMAL_INTEGER_LITERAL) ) {s = 338;}
+						else if ( (LA73_294==FLOATING_POINT_LITERAL) ) {s = 339;}
+						else if ( (LA73_294==STAR) ) {s = 340;}
+						else if ( (LA73_294==QUESTION_MARK) ) {s = 341;}
+						else if ( (LA73_294==DATETIME) ) {s = 342;}
+						else if ( (LA73_294==URI) ) {s = 343;}
+						else if ( (LA73_294==TILDA) && (synpred44_FTS())) {s = 344;}
+						else if ( (LA73_294==CARAT) && (synpred44_FTS())) {s = 345;}
+						else if ( (LA73_294==AND) && (synpred44_FTS())) {s = 346;}
+						else if ( (LA73_294==AMP) && (synpred44_FTS())) {s = 347;}
+						else if ( (LA73_294==EOF) && (synpred44_FTS())) {s = 348;}
+						else if ( (LA73_294==RPAREN) && (synpred44_FTS())) {s = 349;}
+						else if ( (LA73_294==OR) && (synpred44_FTS())) {s = 350;}
+						else if ( (LA73_294==BAR) && (synpred44_FTS())) {s = 351;}
+						else if ( (LA73_294==EXCLAMATION) && (synpred44_FTS())) {s = 352;}
+						else if ( (LA73_294==AT) && (synpred44_FTS())) {s = 353;}
+						else if ( (LA73_294==FTSPHRASE) && (synpred44_FTS())) {s = 354;}
+						else if ( (LA73_294==LSQUARE) && (synpred44_FTS())) {s = 355;}
+						else if ( (LA73_294==LT) && (synpred44_FTS())) {s = 356;}
+						else if ( (LA73_294==COMMA||LA73_294==DOT) && (synpred44_FTS())) {s = 357;}
+						else if ( (LA73_294==EQUALS) && (synpred44_FTS())) {s = 358;}
+						else if ( (LA73_294==LPAREN) && (synpred44_FTS())) {s = 359;}
+						else if ( (LA73_294==PERCENT) && (synpred44_FTS())) {s = 360;}
+						else if ( (LA73_294==PLUS) && (synpred44_FTS())) {s = 361;}
+						else if ( (LA73_294==MINUS) && (synpred44_FTS())) {s = 362;}
+						 
+						input.seek(index73_294);
+						if ( s>=0 ) return s;
+						break;
+
+					case 149 : 
+						int LA73_434 = input.LA(1);
+						 
+						int index73_434 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_434);
+						if ( s>=0 ) return s;
+						break;
+
+					case 150 : 
+						int LA73_306 = input.LA(1);
+						 
+						int index73_306 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_306==COMMA||LA73_306==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_306);
+						if ( s>=0 ) return s;
+						break;
+
+					case 151 : 
+						int LA73_236 = input.LA(1);
+						 
+						int index73_236 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_236==COMMA||LA73_236==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_236);
+						if ( s>=0 ) return s;
+						break;
+
+					case 152 : 
+						int LA73_416 = input.LA(1);
+						 
+						int index73_416 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_416);
+						if ( s>=0 ) return s;
+						break;
+
+					case 153 : 
+						int LA73_182 = input.LA(1);
+						 
+						int index73_182 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_182==COMMA||LA73_182==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_182);
+						if ( s>=0 ) return s;
+						break;
+
+					case 154 : 
+						int LA73_379 = input.LA(1);
+						 
+						int index73_379 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_379);
+						if ( s>=0 ) return s;
+						break;
+
+					case 155 : 
+						int LA73_302 = input.LA(1);
+						 
+						int index73_302 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_302==COMMA||LA73_302==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_302);
+						if ( s>=0 ) return s;
+						break;
+
+					case 156 : 
+						int LA73_326 = input.LA(1);
+						 
+						int index73_326 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_326==COMMA||LA73_326==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_326);
+						if ( s>=0 ) return s;
+						break;
+
+					case 157 : 
+						int LA73_339 = input.LA(1);
+						 
+						int index73_339 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_339);
+						if ( s>=0 ) return s;
+						break;
+
+					case 158 : 
+						int LA73_229 = input.LA(1);
+						 
+						int index73_229 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_229==COMMA||LA73_229==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_229);
+						if ( s>=0 ) return s;
+						break;
+
+					case 159 : 
+						int LA73_430 = input.LA(1);
+						 
+						int index73_430 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_430);
+						if ( s>=0 ) return s;
+						break;
+
+					case 160 : 
+						int LA73_418 = input.LA(1);
+						 
+						int index73_418 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_418);
+						if ( s>=0 ) return s;
+						break;
+
+					case 161 : 
+						int LA73_404 = input.LA(1);
+						 
+						int index73_404 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_404==COMMA||LA73_404==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_404);
+						if ( s>=0 ) return s;
+						break;
+
+					case 162 : 
+						int LA73_72 = input.LA(1);
+						 
+						int index73_72 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_72==COMMA||LA73_72==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_72);
+						if ( s>=0 ) return s;
+						break;
+
+					case 163 : 
+						int LA73_130 = input.LA(1);
+						 
+						int index73_130 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_130==COMMA||LA73_130==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_130);
+						if ( s>=0 ) return s;
+						break;
+
+					case 164 : 
+						int LA73_73 = input.LA(1);
+						 
+						int index73_73 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_73==COMMA||LA73_73==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_73);
+						if ( s>=0 ) return s;
+						break;
+
+					case 165 : 
+						int LA73_298 = input.LA(1);
+						 
+						int index73_298 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_298==COMMA||LA73_298==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_298);
+						if ( s>=0 ) return s;
+						break;
+
+					case 166 : 
+						int LA73_457 = input.LA(1);
+						 
+						int index73_457 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_457);
+						if ( s>=0 ) return s;
+						break;
+
+					case 167 : 
+						int LA73_148 = input.LA(1);
+						 
+						int index73_148 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_148==COMMA||LA73_148==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_148);
+						if ( s>=0 ) return s;
+						break;
+
+					case 168 : 
+						int LA73_26 = input.LA(1);
+						 
+						int index73_26 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_26==ID) ) {s = 40;}
+						else if ( (LA73_26==FTSWORD) ) {s = 41;}
+						else if ( (LA73_26==FTSPRE) ) {s = 42;}
+						else if ( (LA73_26==FTSWILD) ) {s = 43;}
+						else if ( (LA73_26==NOT) ) {s = 44;}
+						else if ( (LA73_26==TO) ) {s = 45;}
+						else if ( (LA73_26==DECIMAL_INTEGER_LITERAL) ) {s = 46;}
+						else if ( (LA73_26==FLOATING_POINT_LITERAL) ) {s = 47;}
+						else if ( (LA73_26==STAR) ) {s = 48;}
+						else if ( (LA73_26==QUESTION_MARK) ) {s = 49;}
+						else if ( (LA73_26==DATETIME) ) {s = 50;}
+						else if ( (LA73_26==URI) ) {s = 51;}
+						else if ( (LA73_26==TILDA) && (synpred56_FTS())) {s = 52;}
+						else if ( (LA73_26==CARAT) && (synpred56_FTS())) {s = 53;}
+						else if ( (LA73_26==AND) && (synpred56_FTS())) {s = 54;}
+						else if ( (LA73_26==AMP) && (synpred56_FTS())) {s = 55;}
+						else if ( (LA73_26==EOF) && (synpred56_FTS())) {s = 56;}
+						else if ( (LA73_26==RPAREN) && (synpred56_FTS())) {s = 57;}
+						else if ( (LA73_26==OR) && (synpred56_FTS())) {s = 58;}
+						else if ( (LA73_26==BAR) && (synpred56_FTS())) {s = 59;}
+						else if ( (LA73_26==EXCLAMATION) && (synpred56_FTS())) {s = 60;}
+						else if ( (LA73_26==AT) && (synpred56_FTS())) {s = 61;}
+						else if ( (LA73_26==FTSPHRASE) && (synpred56_FTS())) {s = 62;}
+						else if ( (LA73_26==LSQUARE) && (synpred56_FTS())) {s = 63;}
+						else if ( (LA73_26==LT) && (synpred56_FTS())) {s = 64;}
+						else if ( (LA73_26==COMMA||LA73_26==DOT) && (synpred56_FTS())) {s = 65;}
+						else if ( (LA73_26==EQUALS) && (synpred56_FTS())) {s = 66;}
+						else if ( (LA73_26==LPAREN) && (synpred56_FTS())) {s = 67;}
+						else if ( (LA73_26==PERCENT) && (synpred56_FTS())) {s = 68;}
+						else if ( (LA73_26==PLUS) && (synpred56_FTS())) {s = 69;}
+						else if ( (LA73_26==MINUS) && (synpred56_FTS())) {s = 70;}
+						 
+						input.seek(index73_26);
+						if ( s>=0 ) return s;
+						break;
+
+					case 169 : 
+						int LA73_410 = input.LA(1);
+						 
+						int index73_410 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_410);
+						if ( s>=0 ) return s;
+						break;
+
+					case 170 : 
+						int LA73_318 = input.LA(1);
+						 
+						int index73_318 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_318==COMMA||LA73_318==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_318);
+						if ( s>=0 ) return s;
+						break;
+
+					case 171 : 
+						int LA73_208 = input.LA(1);
+						 
+						int index73_208 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_208==ID) ) {s = 227;}
+						else if ( (LA73_208==FTSWORD) ) {s = 178;}
+						else if ( (LA73_208==FTSPRE) ) {s = 179;}
+						else if ( (LA73_208==FTSWILD) ) {s = 180;}
+						else if ( (LA73_208==NOT) ) {s = 181;}
+						else if ( (LA73_208==TO) ) {s = 182;}
+						else if ( (LA73_208==DECIMAL_INTEGER_LITERAL) ) {s = 183;}
+						else if ( (LA73_208==FLOATING_POINT_LITERAL) ) {s = 184;}
+						else if ( (LA73_208==STAR) ) {s = 185;}
+						else if ( (LA73_208==QUESTION_MARK) ) {s = 186;}
+						else if ( (LA73_208==DATETIME) ) {s = 187;}
+						else if ( (LA73_208==URI) ) {s = 188;}
+						else if ( (LA73_208==TILDA) && (synpred51_FTS())) {s = 189;}
+						else if ( (LA73_208==CARAT) && (synpred51_FTS())) {s = 190;}
+						else if ( (LA73_208==AND) && (synpred51_FTS())) {s = 191;}
+						else if ( (LA73_208==AMP) && (synpred51_FTS())) {s = 192;}
+						else if ( (LA73_208==EOF) && (synpred51_FTS())) {s = 193;}
+						else if ( (LA73_208==RPAREN) && (synpred51_FTS())) {s = 194;}
+						else if ( (LA73_208==OR) && (synpred51_FTS())) {s = 195;}
+						else if ( (LA73_208==BAR) && (synpred51_FTS())) {s = 196;}
+						else if ( (LA73_208==EXCLAMATION) && (synpred51_FTS())) {s = 197;}
+						else if ( (LA73_208==AT) && (synpred51_FTS())) {s = 198;}
+						else if ( (LA73_208==FTSPHRASE) && (synpred51_FTS())) {s = 199;}
+						else if ( (LA73_208==LSQUARE) && (synpred51_FTS())) {s = 200;}
+						else if ( (LA73_208==LT) && (synpred51_FTS())) {s = 201;}
+						else if ( (LA73_208==COMMA||LA73_208==DOT) && (synpred51_FTS())) {s = 202;}
+						else if ( (LA73_208==EQUALS) && (synpred51_FTS())) {s = 203;}
+						else if ( (LA73_208==LPAREN) && (synpred51_FTS())) {s = 204;}
+						else if ( (LA73_208==PERCENT) && (synpred51_FTS())) {s = 205;}
+						else if ( (LA73_208==PLUS) && (synpred51_FTS())) {s = 206;}
+						else if ( (LA73_208==MINUS) && (synpred51_FTS())) {s = 207;}
+						 
+						input.seek(index73_208);
+						if ( s>=0 ) return s;
+						break;
+
+					case 172 : 
+						int LA73_307 = input.LA(1);
+						 
+						int index73_307 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_307==COMMA||LA73_307==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_307);
+						if ( s>=0 ) return s;
+						break;
+
+					case 173 : 
+						int LA73_332 = input.LA(1);
+						 
+						int index73_332 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_332);
+						if ( s>=0 ) return s;
+						break;
+
+					case 174 : 
+						int LA73_71 = input.LA(1);
+						 
+						int index73_71 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_71==ID) ) {s = 111;}
+						else if ( (LA73_71==FTSWORD) ) {s = 112;}
+						else if ( (LA73_71==FTSPRE) ) {s = 113;}
+						else if ( (LA73_71==FTSWILD) ) {s = 114;}
+						else if ( (LA73_71==NOT) ) {s = 115;}
+						else if ( (LA73_71==TO) ) {s = 116;}
+						else if ( (LA73_71==DECIMAL_INTEGER_LITERAL) ) {s = 117;}
+						else if ( (LA73_71==FLOATING_POINT_LITERAL) ) {s = 118;}
+						else if ( (LA73_71==STAR) ) {s = 119;}
+						else if ( (LA73_71==QUESTION_MARK) ) {s = 120;}
+						else if ( (LA73_71==DATETIME) ) {s = 121;}
+						else if ( (LA73_71==URI) ) {s = 51;}
+						else if ( (LA73_71==TILDA) && (synpred56_FTS())) {s = 52;}
+						else if ( (LA73_71==CARAT) && (synpred56_FTS())) {s = 53;}
+						else if ( (LA73_71==AND) && (synpred56_FTS())) {s = 54;}
+						else if ( (LA73_71==AMP) && (synpred56_FTS())) {s = 55;}
+						else if ( (LA73_71==EOF) && (synpred56_FTS())) {s = 56;}
+						else if ( (LA73_71==RPAREN) && (synpred56_FTS())) {s = 57;}
+						else if ( (LA73_71==OR) && (synpred56_FTS())) {s = 58;}
+						else if ( (LA73_71==BAR) && (synpred56_FTS())) {s = 59;}
+						else if ( (LA73_71==EXCLAMATION) && (synpred56_FTS())) {s = 60;}
+						else if ( (LA73_71==AT) && (synpred56_FTS())) {s = 61;}
+						else if ( (LA73_71==FTSPHRASE) && (synpred56_FTS())) {s = 62;}
+						else if ( (LA73_71==LSQUARE) && (synpred56_FTS())) {s = 63;}
+						else if ( (LA73_71==LT) && (synpred56_FTS())) {s = 64;}
+						else if ( (LA73_71==COMMA||LA73_71==DOT) && (synpred56_FTS())) {s = 65;}
+						else if ( (LA73_71==EQUALS) && (synpred56_FTS())) {s = 66;}
+						else if ( (LA73_71==LPAREN) && (synpred56_FTS())) {s = 67;}
+						else if ( (LA73_71==PERCENT) && (synpred56_FTS())) {s = 68;}
+						else if ( (LA73_71==PLUS) && (synpred56_FTS())) {s = 69;}
+						else if ( (LA73_71==MINUS) && (synpred56_FTS())) {s = 70;}
+						 
+						input.seek(index73_71);
+						if ( s>=0 ) return s;
+						break;
+
+					case 175 : 
+						int LA73_135 = input.LA(1);
+						 
+						int index73_135 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_135==COMMA||LA73_135==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_135);
+						if ( s>=0 ) return s;
+						break;
+
+					case 176 : 
+						int LA73_78 = input.LA(1);
+						 
+						int index73_78 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_78==COMMA||LA73_78==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_78);
+						if ( s>=0 ) return s;
+						break;
+
+					case 177 : 
+						int LA73_126 = input.LA(1);
+						 
+						int index73_126 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_126==COMMA||LA73_126==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_126);
+						if ( s>=0 ) return s;
+						break;
+
+					case 178 : 
+						int LA73_226 = input.LA(1);
+						 
+						int index73_226 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_226==COMMA||LA73_226==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_226);
+						if ( s>=0 ) return s;
+						break;
+
+					case 179 : 
+						int LA73_144 = input.LA(1);
+						 
+						int index73_144 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_144==COMMA||LA73_144==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_144);
+						if ( s>=0 ) return s;
+						break;
+
+					case 180 : 
+						int LA73_270 = input.LA(1);
+						 
+						int index73_270 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_270==COMMA||LA73_270==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_270);
+						if ( s>=0 ) return s;
+						break;
+
+					case 181 : 
+						int LA73_340 = input.LA(1);
+						 
+						int index73_340 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_340);
+						if ( s>=0 ) return s;
+						break;
+
+					case 182 : 
+						int LA73_122 = input.LA(1);
+						 
+						int index73_122 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_122==ID) ) {s = 177;}
+						else if ( (LA73_122==FTSWORD) ) {s = 178;}
+						else if ( (LA73_122==FTSPRE) ) {s = 179;}
+						else if ( (LA73_122==FTSWILD) ) {s = 180;}
+						else if ( (LA73_122==NOT) ) {s = 181;}
+						else if ( (LA73_122==TO) ) {s = 182;}
+						else if ( (LA73_122==DECIMAL_INTEGER_LITERAL) ) {s = 183;}
+						else if ( (LA73_122==FLOATING_POINT_LITERAL) ) {s = 184;}
+						else if ( (LA73_122==STAR) ) {s = 185;}
+						else if ( (LA73_122==QUESTION_MARK) ) {s = 186;}
+						else if ( (LA73_122==DATETIME) ) {s = 187;}
+						else if ( (LA73_122==URI) ) {s = 188;}
+						else if ( (LA73_122==TILDA) && (synpred51_FTS())) {s = 189;}
+						else if ( (LA73_122==CARAT) && (synpred51_FTS())) {s = 190;}
+						else if ( (LA73_122==AND) && (synpred51_FTS())) {s = 191;}
+						else if ( (LA73_122==AMP) && (synpred51_FTS())) {s = 192;}
+						else if ( (LA73_122==EOF) && (synpred51_FTS())) {s = 193;}
+						else if ( (LA73_122==RPAREN) && (synpred51_FTS())) {s = 194;}
+						else if ( (LA73_122==OR) && (synpred51_FTS())) {s = 195;}
+						else if ( (LA73_122==BAR) && (synpred51_FTS())) {s = 196;}
+						else if ( (LA73_122==EXCLAMATION) && (synpred51_FTS())) {s = 197;}
+						else if ( (LA73_122==AT) && (synpred51_FTS())) {s = 198;}
+						else if ( (LA73_122==FTSPHRASE) && (synpred51_FTS())) {s = 199;}
+						else if ( (LA73_122==LSQUARE) && (synpred51_FTS())) {s = 200;}
+						else if ( (LA73_122==LT) && (synpred51_FTS())) {s = 201;}
+						else if ( (LA73_122==COMMA||LA73_122==DOT) && (synpred51_FTS())) {s = 202;}
+						else if ( (LA73_122==EQUALS) && (synpred51_FTS())) {s = 203;}
+						else if ( (LA73_122==LPAREN) && (synpred51_FTS())) {s = 204;}
+						else if ( (LA73_122==PERCENT) && (synpred51_FTS())) {s = 205;}
+						else if ( (LA73_122==PLUS) && (synpred51_FTS())) {s = 206;}
+						else if ( (LA73_122==MINUS) && (synpred51_FTS())) {s = 207;}
+						 
+						input.seek(index73_122);
+						if ( s>=0 ) return s;
+						break;
+
+					case 183 : 
+						int LA73_440 = input.LA(1);
+						 
+						int index73_440 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_440);
+						if ( s>=0 ) return s;
+						break;
+
+					case 184 : 
+						int LA73_110 = input.LA(1);
+						 
+						int index73_110 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_110==COMMA||LA73_110==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_110);
+						if ( s>=0 ) return s;
+						break;
+
+					case 185 : 
+						int LA73_235 = input.LA(1);
+						 
+						int index73_235 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_235==COMMA||LA73_235==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_235);
+						if ( s>=0 ) return s;
+						break;
+
+					case 186 : 
+						int LA73_454 = input.LA(1);
+						 
+						int index73_454 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_454);
+						if ( s>=0 ) return s;
+						break;
+
+					case 187 : 
+						int LA73_417 = input.LA(1);
+						 
+						int index73_417 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_417);
+						if ( s>=0 ) return s;
+						break;
+
+					case 188 : 
+						int LA73_405 = input.LA(1);
+						 
+						int index73_405 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_405==COMMA||LA73_405==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_405);
+						if ( s>=0 ) return s;
+						break;
+
+					case 189 : 
+						int LA73_429 = input.LA(1);
+						 
+						int index73_429 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_429);
+						if ( s>=0 ) return s;
+						break;
+
+					case 190 : 
+						int LA73_303 = input.LA(1);
+						 
+						int index73_303 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_303==COMMA||LA73_303==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_303);
+						if ( s>=0 ) return s;
+						break;
+
+					case 191 : 
+						int LA73_133 = input.LA(1);
+						 
+						int index73_133 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_133==COMMA||LA73_133==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_133);
+						if ( s>=0 ) return s;
+						break;
+
+					case 192 : 
+						int LA73_76 = input.LA(1);
+						 
+						int index73_76 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_76==COMMA||LA73_76==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_76);
+						if ( s>=0 ) return s;
+						break;
+
+					case 193 : 
+						int LA73_297 = input.LA(1);
+						 
+						int index73_297 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_297==COMMA||LA73_297==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_297);
+						if ( s>=0 ) return s;
+						break;
+
+					case 194 : 
+						int LA73_186 = input.LA(1);
+						 
+						int index73_186 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_186==COMMA||LA73_186==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_186);
+						if ( s>=0 ) return s;
+						break;
+
+					case 195 : 
+						int LA73_180 = input.LA(1);
+						 
+						int index73_180 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_180==COMMA||LA73_180==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_180);
+						if ( s>=0 ) return s;
+						break;
+
+					case 196 : 
+						int LA73_121 = input.LA(1);
+						 
+						int index73_121 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_121==COMMA||LA73_121==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_121);
+						if ( s>=0 ) return s;
+						break;
+
+					case 197 : 
+						int LA73_50 = input.LA(1);
+						 
+						int index73_50 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_50==COMMA||LA73_50==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_50);
+						if ( s>=0 ) return s;
+						break;
+
+					case 198 : 
+						int LA73_317 = input.LA(1);
+						 
+						int index73_317 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_317==COMMA||LA73_317==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_317);
+						if ( s>=0 ) return s;
+						break;
+
+					case 199 : 
+						int LA73_322 = input.LA(1);
+						 
+						int index73_322 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_322==COMMA||LA73_322==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_322);
+						if ( s>=0 ) return s;
+						break;
+
+					case 200 : 
+						int LA73_129 = input.LA(1);
+						 
+						int index73_129 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 210;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 212;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_129);
+						if ( s>=0 ) return s;
+						break;
+
+					case 201 : 
+						int LA73_449 = input.LA(1);
+						 
+						int index73_449 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_449);
+						if ( s>=0 ) return s;
+						break;
+
+					case 202 : 
+						int LA73_115 = input.LA(1);
+						 
+						int index73_115 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_115==COMMA||LA73_115==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_115);
+						if ( s>=0 ) return s;
+						break;
+
+					case 203 : 
+						int LA73_44 = input.LA(1);
+						 
+						int index73_44 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_44==COMMA||LA73_44==DOT) ) {s = 104;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
+						else if ( (true) ) {s = 27;}
+						 
+						input.seek(index73_44);
+						if ( s>=0 ) return s;
+						break;
+
+					case 204 : 
+						int LA73_308 = input.LA(1);
+						 
+						int index73_308 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_308==COMMA||LA73_308==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_308);
+						if ( s>=0 ) return s;
+						break;
+
+					case 205 : 
+						int LA73_447 = input.LA(1);
+						 
+						int index73_447 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_447);
+						if ( s>=0 ) return s;
+						break;
+
+					case 206 : 
+						int LA73_104 = input.LA(1);
+						 
+						int index73_104 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_104==ID) ) {s = 140;}
+						else if ( (LA73_104==FTSWORD) ) {s = 141;}
+						else if ( (LA73_104==FTSPRE) ) {s = 142;}
+						else if ( (LA73_104==FTSWILD) ) {s = 143;}
+						else if ( (LA73_104==NOT) ) {s = 144;}
+						else if ( (LA73_104==TO) ) {s = 145;}
+						else if ( (LA73_104==DECIMAL_INTEGER_LITERAL) ) {s = 146;}
+						else if ( (LA73_104==FLOATING_POINT_LITERAL) ) {s = 147;}
+						else if ( (LA73_104==STAR) ) {s = 148;}
+						else if ( (LA73_104==QUESTION_MARK) ) {s = 149;}
+						else if ( (LA73_104==DATETIME) ) {s = 150;}
+						else if ( (LA73_104==URI) ) {s = 151;}
+						else if ( (LA73_104==TILDA) && (synpred52_FTS())) {s = 152;}
+						else if ( (LA73_104==CARAT) && (synpred52_FTS())) {s = 153;}
+						else if ( (LA73_104==AND) && (synpred52_FTS())) {s = 154;}
+						else if ( (LA73_104==AMP) && (synpred52_FTS())) {s = 155;}
+						else if ( (LA73_104==EOF) && (synpred52_FTS())) {s = 156;}
+						else if ( (LA73_104==RPAREN) && (synpred52_FTS())) {s = 157;}
+						else if ( (LA73_104==OR) && (synpred52_FTS())) {s = 158;}
+						else if ( (LA73_104==BAR) && (synpred52_FTS())) {s = 159;}
+						else if ( (LA73_104==EXCLAMATION) && (synpred52_FTS())) {s = 160;}
+						else if ( (LA73_104==AT) && (synpred52_FTS())) {s = 161;}
+						else if ( (LA73_104==FTSPHRASE) && (synpred52_FTS())) {s = 162;}
+						else if ( (LA73_104==LSQUARE) && (synpred52_FTS())) {s = 163;}
+						else if ( (LA73_104==LT) && (synpred52_FTS())) {s = 164;}
+						else if ( (LA73_104==COMMA||LA73_104==DOT) && (synpred52_FTS())) {s = 165;}
+						else if ( (LA73_104==EQUALS) && (synpred52_FTS())) {s = 166;}
+						else if ( (LA73_104==LPAREN) && (synpred52_FTS())) {s = 167;}
+						else if ( (LA73_104==PERCENT) && (synpred52_FTS())) {s = 168;}
+						else if ( (LA73_104==PLUS) && (synpred52_FTS())) {s = 169;}
+						else if ( (LA73_104==MINUS) && (synpred52_FTS())) {s = 170;}
+						 
+						input.seek(index73_104);
+						if ( s>=0 ) return s;
+						break;
+
+					case 207 : 
+						int LA73_225 = input.LA(1);
+						 
+						int index73_225 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_225==COMMA||LA73_225==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_225);
+						if ( s>=0 ) return s;
+						break;
+
+					case 208 : 
+						int LA73_266 = input.LA(1);
+						 
+						int index73_266 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_266==COMMA||LA73_266==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_266);
+						if ( s>=0 ) return s;
+						break;
+
+					case 209 : 
+						int LA73_373 = input.LA(1);
+						 
+						int index73_373 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_373);
+						if ( s>=0 ) return s;
+						break;
+
+					case 210 : 
+						int LA73_145 = input.LA(1);
+						 
+						int index73_145 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_145==COMMA||LA73_145==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_145);
+						if ( s>=0 ) return s;
+						break;
+
+					case 211 : 
+						int LA73_441 = input.LA(1);
+						 
+						int index73_441 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_441);
+						if ( s>=0 ) return s;
+						break;
+
+					case 212 : 
+						int LA73_264 = input.LA(1);
+						 
+						int index73_264 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_264==COMMA||LA73_264==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_264);
+						if ( s>=0 ) return s;
+						break;
+
+					case 213 : 
+						int LA73_341 = input.LA(1);
+						 
+						int index73_341 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_341);
+						if ( s>=0 ) return s;
+						break;
+
+					case 214 : 
+						int LA73_375 = input.LA(1);
+						 
+						int index73_375 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_375);
+						if ( s>=0 ) return s;
+						break;
+
+					case 215 : 
+						int LA73_372 = input.LA(1);
+						 
+						int index73_372 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_372);
+						if ( s>=0 ) return s;
+						break;
+
+					case 216 : 
+						int LA73_455 = input.LA(1);
+						 
+						int index73_455 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_455);
+						if ( s>=0 ) return s;
+						break;
+
+					case 217 : 
+						int LA73_369 = input.LA(1);
+						 
+						int index73_369 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_369==COMMA||LA73_369==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_369);
+						if ( s>=0 ) return s;
+						break;
+
+					case 218 : 
+						int LA73_446 = input.LA(1);
+						 
+						int index73_446 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_446);
+						if ( s>=0 ) return s;
+						break;
+
+					case 219 : 
 						int LA73_111 = input.LA(1);
 						 
 						int index73_111 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (synpred35_FTS()) ) {s = 172;}
-						else if ( (synpred37_FTS()) ) {s = 173;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 175;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
-						else if ( (synpred47_FTS()) ) {s = 105;}
-						else if ( (synpred49_FTS()) ) {s = 70;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 173;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 175;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						else if ( (synpred54_FTS()) ) {s = 105;}
+						else if ( (synpred56_FTS()) ) {s = 70;}
 						else if ( (true) ) {s = 27;}
 						 
 						input.seek(index73_111);
 						if ( s>=0 ) return s;
 						break;
 
-					case 242 : 
-						int LA73_366 = input.LA(1);
+					case 220 : 
+						int LA73_337 = input.LA(1);
 						 
-						int index73_366 = input.index();
+						int index73_337 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_366==COMMA||LA73_366==DOT) ) {s = 364;}
-						else if ( (synpred39_FTS()) ) {s = 174;}
-						else if ( (synpred41_FTS()) ) {s = 258;}
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
 						 
-						input.seek(index73_366);
+						input.seek(index73_337);
+						if ( s>=0 ) return s;
+						break;
+
+					case 221 : 
+						int LA73_406 = input.LA(1);
+						 
+						int index73_406 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_406==COMMA||LA73_406==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_406);
+						if ( s>=0 ) return s;
+						break;
+
+					case 222 : 
+						int LA73_296 = input.LA(1);
+						 
+						int index73_296 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_296==COMMA||LA73_296==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_296);
+						if ( s>=0 ) return s;
+						break;
+
+					case 223 : 
+						int LA73_428 = input.LA(1);
+						 
+						int index73_428 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred41_FTS()) ) {s = 209;}
+						else if ( (synpred43_FTS()) ) {s = 400;}
+						 
+						input.seek(index73_428);
+						if ( s>=0 ) return s;
+						break;
+
+					case 224 : 
+						int LA73_304 = input.LA(1);
+						 
+						int index73_304 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_304==COMMA||LA73_304==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_304);
+						if ( s>=0 ) return s;
+						break;
+
+					case 225 : 
+						int LA73_445 = input.LA(1);
+						 
+						int index73_445 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_445==ID) ) {s = 457;}
+						else if ( (LA73_445==FTSWORD) ) {s = 434;}
+						else if ( (LA73_445==FTSPRE) ) {s = 435;}
+						else if ( (LA73_445==FTSWILD) ) {s = 436;}
+						else if ( (LA73_445==NOT) ) {s = 437;}
+						else if ( (LA73_445==TO) ) {s = 438;}
+						else if ( (LA73_445==DECIMAL_INTEGER_LITERAL) ) {s = 439;}
+						else if ( (LA73_445==FLOATING_POINT_LITERAL) ) {s = 440;}
+						else if ( (LA73_445==STAR) ) {s = 441;}
+						else if ( (LA73_445==QUESTION_MARK) ) {s = 442;}
+						else if ( (LA73_445==DATETIME) ) {s = 443;}
+						else if ( (LA73_445==URI) ) {s = 444;}
+						else if ( (LA73_445==TILDA) && (synpred43_FTS())) {s = 382;}
+						else if ( (LA73_445==CARAT) && (synpred43_FTS())) {s = 383;}
+						else if ( (LA73_445==AND) && (synpred43_FTS())) {s = 384;}
+						else if ( (LA73_445==AMP) && (synpred43_FTS())) {s = 385;}
+						else if ( (LA73_445==EOF) && (synpred43_FTS())) {s = 386;}
+						else if ( (LA73_445==RPAREN) && (synpred43_FTS())) {s = 387;}
+						else if ( (LA73_445==OR) && (synpred43_FTS())) {s = 388;}
+						else if ( (LA73_445==BAR) && (synpred43_FTS())) {s = 389;}
+						else if ( (LA73_445==EXCLAMATION) && (synpred43_FTS())) {s = 390;}
+						else if ( (LA73_445==AT) && (synpred43_FTS())) {s = 391;}
+						else if ( (LA73_445==FTSPHRASE) && (synpred43_FTS())) {s = 392;}
+						else if ( (LA73_445==LSQUARE) && (synpred43_FTS())) {s = 393;}
+						else if ( (LA73_445==LT) && (synpred43_FTS())) {s = 394;}
+						else if ( (LA73_445==COMMA||LA73_445==DOT) && (synpred43_FTS())) {s = 395;}
+						else if ( (LA73_445==EQUALS) && (synpred43_FTS())) {s = 396;}
+						else if ( (LA73_445==LPAREN) && (synpred43_FTS())) {s = 397;}
+						else if ( (LA73_445==PERCENT) && (synpred43_FTS())) {s = 398;}
+						else if ( (LA73_445==PLUS) && (synpred43_FTS())) {s = 399;}
+						else if ( (LA73_445==MINUS) && (synpred43_FTS())) {s = 400;}
+						 
+						input.seek(index73_445);
+						if ( s>=0 ) return s;
+						break;
+
+					case 226 : 
+						int LA73_265 = input.LA(1);
+						 
+						int index73_265 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_265==COMMA||LA73_265==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_265);
+						if ( s>=0 ) return s;
+						break;
+
+					case 227 : 
+						int LA73_414 = input.LA(1);
+						 
+						int index73_414 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_414);
+						if ( s>=0 ) return s;
+						break;
+
+					case 228 : 
+						int LA73_309 = input.LA(1);
+						 
+						int index73_309 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_309==COMMA||LA73_309==DOT) ) {s = 364;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_309);
+						if ( s>=0 ) return s;
+						break;
+
+					case 229 : 
+						int LA73_450 = input.LA(1);
+						 
+						int index73_450 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_450);
+						if ( s>=0 ) return s;
+						break;
+
+					case 230 : 
+						int LA73_146 = input.LA(1);
+						 
+						int index73_146 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_146==COMMA||LA73_146==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_146);
+						if ( s>=0 ) return s;
+						break;
+
+					case 231 : 
+						int LA73_127 = input.LA(1);
+						 
+						int index73_127 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_127==COMMA||LA73_127==DOT) ) {s = 122;}
+						else if ( (synpred53_FTS()) ) {s = 123;}
+						else if ( (synpred55_FTS()) ) {s = 102;}
+						else if ( (true) ) {s = 34;}
+						 
+						input.seek(index73_127);
+						if ( s>=0 ) return s;
+						break;
+
+					case 232 : 
+						int LA73_316 = input.LA(1);
+						 
+						int index73_316 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_316==COMMA||LA73_316==DOT) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_316);
+						if ( s>=0 ) return s;
+						break;
+
+					case 233 : 
+						int LA73_323 = input.LA(1);
+						 
+						int index73_323 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_323==COMMA||LA73_323==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_323);
+						if ( s>=0 ) return s;
+						break;
+
+					case 234 : 
+						int LA73_424 = input.LA(1);
+						 
+						int index73_424 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_424);
+						if ( s>=0 ) return s;
+						break;
+
+					case 235 : 
+						int LA73_329 = input.LA(1);
+						 
+						int index73_329 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_329==COMMA||LA73_329==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_329);
+						if ( s>=0 ) return s;
+						break;
+
+					case 236 : 
+						int LA73_448 = input.LA(1);
+						 
+						int index73_448 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (synpred42_FTS()) ) {s = 172;}
+						else if ( (synpred44_FTS()) ) {s = 362;}
+						 
+						input.seek(index73_448);
+						if ( s>=0 ) return s;
+						break;
+
+					case 237 : 
+						int LA73_314 = input.LA(1);
+						 
+						int index73_314 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_314==DOT) ) {s = 401;}
+						else if ( (LA73_314==COMMA) ) {s = 313;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_314);
+						if ( s>=0 ) return s;
+						break;
+
+					case 238 : 
+						int LA73_234 = input.LA(1);
+						 
+						int index73_234 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_234==COMMA||LA73_234==DOT) ) {s = 294;}
+						else if ( (synpred46_FTS()) ) {s = 174;}
+						else if ( (synpred48_FTS()) ) {s = 258;}
+						 
+						input.seek(index73_234);
+						if ( s>=0 ) return s;
+						break;
+
+					case 239 : 
+						int LA73_324 = input.LA(1);
+						 
+						int index73_324 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_324==COMMA||LA73_324==DOT) ) {s = 402;}
+						else if ( (synpred45_FTS()) ) {s = 211;}
+						else if ( (synpred47_FTS()) ) {s = 291;}
+						 
+						input.seek(index73_324);
+						if ( s>=0 ) return s;
+						break;
+
+					case 240 : 
+						int LA73_33 = input.LA(1);
+						 
+						int index73_33 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_33==ID) ) {s = 72;}
+						else if ( (LA73_33==FTSWORD) ) {s = 73;}
+						else if ( (LA73_33==FTSPRE) ) {s = 74;}
+						else if ( (LA73_33==FTSWILD) ) {s = 75;}
+						else if ( (LA73_33==NOT) ) {s = 76;}
+						else if ( (LA73_33==TO) ) {s = 77;}
+						else if ( (LA73_33==DECIMAL_INTEGER_LITERAL) ) {s = 78;}
+						else if ( (LA73_33==FLOATING_POINT_LITERAL) ) {s = 79;}
+						else if ( (LA73_33==STAR) ) {s = 80;}
+						else if ( (LA73_33==QUESTION_MARK) ) {s = 81;}
+						else if ( (LA73_33==DATETIME) ) {s = 82;}
+						else if ( (LA73_33==URI) ) {s = 83;}
+						else if ( (LA73_33==TILDA) && (synpred55_FTS())) {s = 84;}
+						else if ( (LA73_33==CARAT) && (synpred55_FTS())) {s = 85;}
+						else if ( (LA73_33==AND) && (synpred55_FTS())) {s = 86;}
+						else if ( (LA73_33==AMP) && (synpred55_FTS())) {s = 87;}
+						else if ( (LA73_33==EOF) && (synpred55_FTS())) {s = 88;}
+						else if ( (LA73_33==RPAREN) && (synpred55_FTS())) {s = 89;}
+						else if ( (LA73_33==OR) && (synpred55_FTS())) {s = 90;}
+						else if ( (LA73_33==BAR) && (synpred55_FTS())) {s = 91;}
+						else if ( (LA73_33==EXCLAMATION) && (synpred55_FTS())) {s = 92;}
+						else if ( (LA73_33==AT) && (synpred55_FTS())) {s = 93;}
+						else if ( (LA73_33==FTSPHRASE) && (synpred55_FTS())) {s = 94;}
+						else if ( (LA73_33==LSQUARE) && (synpred55_FTS())) {s = 95;}
+						else if ( (LA73_33==LT) && (synpred55_FTS())) {s = 96;}
+						else if ( (LA73_33==COMMA||LA73_33==DOT) && (synpred55_FTS())) {s = 97;}
+						else if ( (LA73_33==EQUALS) && (synpred55_FTS())) {s = 98;}
+						else if ( (LA73_33==LPAREN) && (synpred55_FTS())) {s = 99;}
+						else if ( (LA73_33==PERCENT) && (synpred55_FTS())) {s = 100;}
+						else if ( (LA73_33==PLUS) && (synpred55_FTS())) {s = 101;}
+						else if ( (LA73_33==MINUS) && (synpred55_FTS())) {s = 102;}
+						 
+						input.seek(index73_33);
+						if ( s>=0 ) return s;
+						break;
+
+					case 241 : 
+						int LA73_216 = input.LA(1);
+						 
+						int index73_216 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_216==COMMA||LA73_216==DOT) ) {s = 214;}
+						else if ( (synpred50_FTS()) ) {s = 176;}
+						else if ( (synpred52_FTS()) ) {s = 170;}
+						 
+						input.seek(index73_216);
+						if ( s>=0 ) return s;
+						break;
+
+					case 242 : 
+						int LA73_179 = input.LA(1);
+						 
+						int index73_179 = input.index();
+						input.rewind();
+						s = -1;
+						if ( (LA73_179==COMMA||LA73_179==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
+						 
+						input.seek(index73_179);
 						if ( s>=0 ) return s;
 						break;
 
 					case 243 : 
-						int LA73_215 = input.LA(1);
+						int LA73_224 = input.LA(1);
 						 
-						int index73_215 = input.index();
+						int index73_224 = input.index();
 						input.rewind();
 						s = -1;
-						if ( (LA73_215==DOT) ) {s = 259;}
-						else if ( (LA73_215==COMMA) ) {s = 214;}
-						else if ( (synpred43_FTS()) ) {s = 176;}
-						else if ( (synpred45_FTS()) ) {s = 170;}
+						if ( (LA73_224==COMMA||LA73_224==DOT) ) {s = 221;}
+						else if ( (synpred49_FTS()) ) {s = 213;}
+						else if ( (synpred51_FTS()) ) {s = 207;}
 						 
-						input.seek(index73_215);
+						input.seek(index73_224);
 						if ( s>=0 ) return s;
 						break;
 			}
@@ -24901,211 +26036,211 @@ public class FTSParser extends Parser {
 	public static final BitSet FOLLOW_ftsFieldGroupTest_in_ftsFieldGroupPrefixed4651 = new BitSet(new long[]{0x0000000000000202L});
 	public static final BitSet FOLLOW_boost_in_ftsFieldGroupPrefixed4653 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_ftsFieldGroupTest4744 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupTest4804 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4814 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupExactTerm_in_ftsFieldGroupTest4879 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4889 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupPhrase_in_ftsFieldGroupTest4954 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
-	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest4964 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTest5029 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
-	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest5039 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupTokenisedPhrase_in_ftsFieldGroupTest5104 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
-	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest5114 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest5179 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
-	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest5189 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest5254 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroupTest5314 = new BitSet(new long[]{0x803C80000920A8B0L,0x0000016101124138L});
-	public static final BitSet FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest5316 = new BitSet(new long[]{0x0000000000000000L,0x0000000008000000L});
-	public static final BitSet FOLLOW_RPAREN_in_ftsFieldGroupTest5318 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWord_in_ftsFieldGroupTerm5371 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactTerm5404 = new BitSet(new long[]{0x803880000020A800L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm5406 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase5459 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactPhrase5500 = new BitSet(new long[]{0x0000000001000000L});
-	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupExactPhrase5502 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupTokenisedPhrase5563 = new BitSet(new long[]{0x0000000001000000L});
-	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTokenisedPhrase5565 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupSynonym5618 = new BitSet(new long[]{0x803880000020A800L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym5620 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5673 = new BitSet(new long[]{0x0000000000000000L,0x0000000100000000L});
-	public static final BitSet FOLLOW_proximityGroup_in_ftsFieldGroupProximity5683 = new BitSet(new long[]{0x803880000000A000L,0x0000014100004000L});
-	public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5685 = new BitSet(new long[]{0x0000000000000002L,0x0000000100000000L});
-	public static final BitSet FOLLOW_ID_in_ftsFieldGroupProximityTerm5749 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSWORD_in_ftsFieldGroupProximityTerm5761 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPRE_in_ftsFieldGroupProximityTerm5773 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSWILD_in_ftsFieldGroupProximityTerm5785 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_NOT_in_ftsFieldGroupProximityTerm5797 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TO_in_ftsFieldGroupProximityTerm5809 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsFieldGroupProximityTerm5821 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FLOATING_POINT_LITERAL_in_ftsFieldGroupProximityTerm5833 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DATETIME_in_ftsFieldGroupProximityTerm5845 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STAR_in_ftsFieldGroupProximityTerm5857 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_URI_in_ftsFieldGroupProximityTerm5869 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
-	public static final BitSet FOLLOW_identifier_in_ftsFieldGroupProximityTerm5871 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STAR_in_proximityGroup5904 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000008L});
-	public static final BitSet FOLLOW_LPAREN_in_proximityGroup5907 = new BitSet(new long[]{0x0000000000008000L,0x0000000008000000L});
-	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_proximityGroup5909 = new BitSet(new long[]{0x0000000000000000L,0x0000000008000000L});
-	public static final BitSet FOLLOW_RPAREN_in_proximityGroup5912 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange5996 = new BitSet(new long[]{0x0000000000400000L});
-	public static final BitSet FOLLOW_DOTDOT_in_ftsFieldGroupRange5998 = new BitSet(new long[]{0x803C80000000A000L,0x0000010100000000L});
-	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6000 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_range_left_in_ftsFieldGroupRange6038 = new BitSet(new long[]{0x803C80000000A000L,0x0000010100000000L});
-	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6040 = new BitSet(new long[]{0x0000000000000000L,0x0000004000000000L});
-	public static final BitSet FOLLOW_TO_in_ftsFieldGroupRange6042 = new BitSet(new long[]{0x803C80000000A000L,0x0000010100000000L});
-	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6044 = new BitSet(new long[]{0x2000000000000000L,0x0000000010000000L});
-	public static final BitSet FOLLOW_range_right_in_ftsFieldGroupRange6046 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LSQUARE_in_range_left6105 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LT_in_range_left6137 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_RSQUARE_in_range_right6190 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_GT_in_range_right6222 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AT_in_fieldReference6278 = new BitSet(new long[]{0x8000000000000020L,0x0000014000024000L});
-	public static final BitSet FOLLOW_prefix_in_fieldReference6315 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
-	public static final BitSet FOLLOW_uri_in_fieldReference6335 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
-	public static final BitSet FOLLOW_identifier_in_fieldReference6356 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AT_in_tempReference6443 = new BitSet(new long[]{0x8000000000000020L,0x0000014000024000L});
-	public static final BitSet FOLLOW_prefix_in_tempReference6472 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
-	public static final BitSet FOLLOW_uri_in_tempReference6492 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
-	public static final BitSet FOLLOW_identifier_in_tempReference6513 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_identifier_in_prefix6600 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COLON_in_prefix6602 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_URI_in_uri6683 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_identifier6785 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_DOT_in_identifier6787 = new BitSet(new long[]{0x8000000000000000L});
-	public static final BitSet FOLLOW_ID_in_identifier6791 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_identifier6840 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TO_in_identifier6907 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_OR_in_identifier6945 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AND_in_identifier6983 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_NOT_in_identifier7022 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7140 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7146 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7148 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7154 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7156 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7162 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7164 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7170 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7172 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7178 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7238 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7240 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7246 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7248 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7254 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7256 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7262 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7264 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7270 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7337 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7343 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7345 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7351 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7353 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7359 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7361 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7367 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7369 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7433 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7435 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7441 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7443 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7449 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7451 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7457 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7459 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7524 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7530 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7532 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7538 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7540 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7546 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7548 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7554 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7608 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7610 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7616 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7618 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7624 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7626 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7632 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7690 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7696 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7698 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7704 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7706 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7712 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7714 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7770 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7772 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7778 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7780 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7786 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7788 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7844 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7850 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7852 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7858 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7860 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7866 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7912 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7914 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7920 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7922 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7928 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord7979 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7985 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7987 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7993 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord7995 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8044 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8046 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8052 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8054 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord8103 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8109 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8111 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8117 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8155 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8157 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8163 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord8205 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8211 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_ftsWord8213 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupTest4810 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4820 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactTerm_in_ftsFieldGroupTest4891 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest4901 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupPhrase_in_ftsFieldGroupTest4972 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
+	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest4982 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTest5053 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
+	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest5063 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupTokenisedPhrase_in_ftsFieldGroupTest5134 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
+	public static final BitSet FOLLOW_slop_in_ftsFieldGroupTest5144 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupSynonym_in_ftsFieldGroupTest5215 = new BitSet(new long[]{0x0000000000000002L,0x0000002000000000L});
+	public static final BitSet FOLLOW_fuzzy_in_ftsFieldGroupTest5225 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupRange_in_ftsFieldGroupTest5296 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LPAREN_in_ftsFieldGroupTest5356 = new BitSet(new long[]{0x803C80000920A8B0L,0x0000016101124138L});
+	public static final BitSet FOLLOW_ftsFieldGroupDisjunction_in_ftsFieldGroupTest5358 = new BitSet(new long[]{0x0000000000000000L,0x0000000008000000L});
+	public static final BitSet FOLLOW_RPAREN_in_ftsFieldGroupTest5360 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWord_in_ftsFieldGroupTerm5413 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactTerm5446 = new BitSet(new long[]{0x803880000020A800L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupExactTerm5448 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsFieldGroupPhrase5501 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_EQUALS_in_ftsFieldGroupExactPhrase5542 = new BitSet(new long[]{0x0000000001000000L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupExactPhrase5544 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupTokenisedPhrase5605 = new BitSet(new long[]{0x0000000001000000L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_ftsFieldGroupTokenisedPhrase5607 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TILDA_in_ftsFieldGroupSynonym5660 = new BitSet(new long[]{0x803880000020A800L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_ftsFieldGroupSynonym5662 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5715 = new BitSet(new long[]{0x0000000000000000L,0x0000000100000000L});
+	public static final BitSet FOLLOW_proximityGroup_in_ftsFieldGroupProximity5725 = new BitSet(new long[]{0x803880000000A000L,0x0000014100004000L});
+	public static final BitSet FOLLOW_ftsFieldGroupProximityTerm_in_ftsFieldGroupProximity5727 = new BitSet(new long[]{0x0000000000000002L,0x0000000100000000L});
+	public static final BitSet FOLLOW_ID_in_ftsFieldGroupProximityTerm5791 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSWORD_in_ftsFieldGroupProximityTerm5803 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPRE_in_ftsFieldGroupProximityTerm5815 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSWILD_in_ftsFieldGroupProximityTerm5827 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_NOT_in_ftsFieldGroupProximityTerm5839 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TO_in_ftsFieldGroupProximityTerm5851 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsFieldGroupProximityTerm5863 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FLOATING_POINT_LITERAL_in_ftsFieldGroupProximityTerm5875 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DATETIME_in_ftsFieldGroupProximityTerm5887 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STAR_in_ftsFieldGroupProximityTerm5899 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_URI_in_ftsFieldGroupProximityTerm5911 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
+	public static final BitSet FOLLOW_identifier_in_ftsFieldGroupProximityTerm5913 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STAR_in_proximityGroup5946 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000008L});
+	public static final BitSet FOLLOW_LPAREN_in_proximityGroup5949 = new BitSet(new long[]{0x0000000000008000L,0x0000000008000000L});
+	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_proximityGroup5951 = new BitSet(new long[]{0x0000000000000000L,0x0000000008000000L});
+	public static final BitSet FOLLOW_RPAREN_in_proximityGroup5954 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6038 = new BitSet(new long[]{0x0000000000400000L});
+	public static final BitSet FOLLOW_DOTDOT_in_ftsFieldGroupRange6040 = new BitSet(new long[]{0x803C80000000A000L,0x0000010100000000L});
+	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6042 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_range_left_in_ftsFieldGroupRange6080 = new BitSet(new long[]{0x803C80000000A000L,0x0000010100000000L});
+	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6082 = new BitSet(new long[]{0x0000000000000000L,0x0000004000000000L});
+	public static final BitSet FOLLOW_TO_in_ftsFieldGroupRange6084 = new BitSet(new long[]{0x803C80000000A000L,0x0000010100000000L});
+	public static final BitSet FOLLOW_ftsRangeWord_in_ftsFieldGroupRange6086 = new BitSet(new long[]{0x2000000000000000L,0x0000000010000000L});
+	public static final BitSet FOLLOW_range_right_in_ftsFieldGroupRange6088 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LSQUARE_in_range_left6147 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LT_in_range_left6179 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_RSQUARE_in_range_right6232 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_GT_in_range_right6264 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AT_in_fieldReference6320 = new BitSet(new long[]{0x8000000000000020L,0x0000014000024000L});
+	public static final BitSet FOLLOW_prefix_in_fieldReference6357 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
+	public static final BitSet FOLLOW_uri_in_fieldReference6377 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
+	public static final BitSet FOLLOW_identifier_in_fieldReference6398 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AT_in_tempReference6485 = new BitSet(new long[]{0x8000000000000020L,0x0000014000024000L});
+	public static final BitSet FOLLOW_prefix_in_tempReference6514 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
+	public static final BitSet FOLLOW_uri_in_tempReference6534 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
+	public static final BitSet FOLLOW_identifier_in_tempReference6555 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_identifier_in_prefix6642 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_COLON_in_prefix6644 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_URI_in_uri6725 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_identifier6827 = new BitSet(new long[]{0x0000000000200000L});
+	public static final BitSet FOLLOW_DOT_in_identifier6829 = new BitSet(new long[]{0x8000000000000000L});
+	public static final BitSet FOLLOW_ID_in_identifier6833 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_identifier6882 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TO_in_identifier6949 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_OR_in_identifier6987 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AND_in_identifier7025 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_NOT_in_identifier7064 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7182 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7188 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7190 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7196 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7198 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7204 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7206 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7212 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7214 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7220 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7280 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7282 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7288 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7290 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7296 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7298 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7304 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7306 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7312 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7379 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7385 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7387 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7393 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7395 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7401 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7403 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7409 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7411 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7475 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7477 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7483 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7485 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7491 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7493 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7499 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7501 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7566 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7572 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7574 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7580 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7582 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7588 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7590 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7596 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7650 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7652 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7658 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7660 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7666 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7668 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7674 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7732 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7738 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7740 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7746 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7748 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7754 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7756 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7812 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7814 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7820 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7822 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7828 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7830 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord7886 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7892 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7894 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7900 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7902 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7908 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7954 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7956 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7962 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord7964 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord7970 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord8021 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8027 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8029 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8035 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8037 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8086 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8088 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8094 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8096 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord8145 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8151 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8153 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8159 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8197 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8199 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8205 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord8247 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
 	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8253 = new BitSet(new long[]{0x0000000000200800L});
 	public static final BitSet FOLLOW_set_in_ftsWord8255 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_ftsWord8271 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8277 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8290 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_ftsWordBase8335 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSWORD_in_ftsWordBase8347 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPRE_in_ftsWordBase8359 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSWILD_in_ftsWordBase8372 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_NOT_in_ftsWordBase8385 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TO_in_ftsWordBase8397 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsWordBase8409 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FLOATING_POINT_LITERAL_in_ftsWordBase8421 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STAR_in_ftsWordBase8433 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_QUESTION_MARK_in_ftsWordBase8445 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DATETIME_in_ftsWordBase8457 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_URI_in_ftsWordBase8469 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
-	public static final BitSet FOLLOW_identifier_in_ftsWordBase8471 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_ftsRangeWord8551 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSWORD_in_ftsRangeWord8563 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPRE_in_ftsRangeWord8575 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSWILD_in_ftsRangeWord8587 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FTSPHRASE_in_ftsRangeWord8599 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsRangeWord8611 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FLOATING_POINT_LITERAL_in_ftsRangeWord8623 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DATETIME_in_ftsRangeWord8635 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STAR_in_ftsRangeWord8647 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_URI_in_ftsRangeWord8659 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
-	public static final BitSet FOLLOW_identifier_in_ftsRangeWord8661 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_OR_in_or8696 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_BAR_in_or8708 = new BitSet(new long[]{0x0000000000000080L});
-	public static final BitSet FOLLOW_BAR_in_or8710 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AND_in_and8743 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AMP_in_and8755 = new BitSet(new long[]{0x0000000000000010L});
-	public static final BitSet FOLLOW_AMP_in_and8757 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8295 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_ftsWord8297 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_ftsWord8313 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8319 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_ftsWord8332 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_ftsWordBase8377 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSWORD_in_ftsWordBase8389 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPRE_in_ftsWordBase8401 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSWILD_in_ftsWordBase8414 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_NOT_in_ftsWordBase8427 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TO_in_ftsWordBase8439 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsWordBase8451 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FLOATING_POINT_LITERAL_in_ftsWordBase8463 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STAR_in_ftsWordBase8475 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_QUESTION_MARK_in_ftsWordBase8487 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DATETIME_in_ftsWordBase8499 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_URI_in_ftsWordBase8511 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
+	public static final BitSet FOLLOW_identifier_in_ftsWordBase8513 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_ftsRangeWord8593 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSWORD_in_ftsRangeWord8605 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPRE_in_ftsRangeWord8617 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSWILD_in_ftsRangeWord8629 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FTSPHRASE_in_ftsRangeWord8641 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DECIMAL_INTEGER_LITERAL_in_ftsRangeWord8653 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FLOATING_POINT_LITERAL_in_ftsRangeWord8665 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DATETIME_in_ftsRangeWord8677 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STAR_in_ftsRangeWord8689 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_URI_in_ftsRangeWord8701 = new BitSet(new long[]{0x8000000000000020L,0x0000004000024000L});
+	public static final BitSet FOLLOW_identifier_in_ftsRangeWord8703 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_OR_in_or8738 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_BAR_in_or8750 = new BitSet(new long[]{0x0000000000000080L});
+	public static final BitSet FOLLOW_BAR_in_or8752 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AND_in_and8785 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AMP_in_and8797 = new BitSet(new long[]{0x0000000000000010L});
+	public static final BitSet FOLLOW_AMP_in_and8799 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_not_in_synpred1_FTS1233 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_synpred2_FTS1746 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_ftsRange_in_synpred3_FTS1823 = new BitSet(new long[]{0x0000000000000002L});
@@ -25133,112 +26268,119 @@ public class FTSParser extends Parser {
 	public static final BitSet FOLLOW_fuzzy_in_synpred22_FTS3627 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_not_in_synpred23_FTS4374 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_ftsFieldGroupProximity_in_synpred24_FTS4739 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred25_FTS4809 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred26_FTS4884 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred27_FTS4959 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred28_FTS5034 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_slop_in_synpred29_FTS5109 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_fuzzy_in_synpred30_FTS5184 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_proximityGroup_in_synpred31_FTS5678 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_prefix_in_synpred32_FTS6310 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_synpred33_FTS6765 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_DOT_in_synpred33_FTS6767 = new BitSet(new long[]{0x8000000000000000L});
-	public static final BitSet FOLLOW_ID_in_synpred33_FTS6769 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred34_FTS7085 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7091 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred34_FTS7093 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7099 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred34_FTS7101 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7107 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred34_FTS7109 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7115 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred34_FTS7117 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred34_FTS7123 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7191 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred35_FTS7193 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7199 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred35_FTS7201 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7207 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred35_FTS7209 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7215 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_DOT_in_synpred35_FTS7217 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_COMMA_in_synpred35_FTS7219 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred35_FTS7221 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred36_FTS7284 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7290 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred36_FTS7292 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7298 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred36_FTS7300 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7306 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred36_FTS7308 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred36_FTS7314 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred36_FTS7316 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7386 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred37_FTS7388 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7394 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred37_FTS7396 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7402 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred37_FTS7404 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred37_FTS7410 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred37_FTS7412 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred38_FTS7477 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7483 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred38_FTS7485 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7491 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred38_FTS7493 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7499 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred38_FTS7501 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred38_FTS7507 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7567 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred39_FTS7569 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7575 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred39_FTS7577 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7583 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred39_FTS7585 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred39_FTS7591 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred40_FTS7645 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred40_FTS7651 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred40_FTS7653 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred40_FTS7659 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred40_FTS7661 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred40_FTS7667 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred40_FTS7669 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7731 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred41_FTS7733 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7739 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred41_FTS7741 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7747 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred41_FTS7749 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred42_FTS7805 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7811 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred42_FTS7813 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7819 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred42_FTS7821 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7827 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7879 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred43_FTS7881 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7887 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred43_FTS7889 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7895 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred44_FTS7942 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS7948 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred44_FTS7950 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS7956 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred44_FTS7958 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred45_FTS8012 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred45_FTS8014 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred45_FTS8020 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred45_FTS8022 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred46_FTS8072 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred46_FTS8078 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred46_FTS8080 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred46_FTS8086 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred47_FTS8130 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred47_FTS8132 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred47_FTS8138 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_set_in_synpred48_FTS8176 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred48_FTS8182 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred48_FTS8184 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ftsWordBase_in_synpred49_FTS8230 = new BitSet(new long[]{0x0000000000200800L});
-	public static final BitSet FOLLOW_set_in_synpred49_FTS8232 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupTerm_in_synpred25_FTS4805 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred26_FTS4815 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactTerm_in_synpred27_FTS4886 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred28_FTS4896 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupPhrase_in_synpred29_FTS4967 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred30_FTS4977 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupExactPhrase_in_synpred31_FTS5048 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred32_FTS5058 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupTokenisedPhrase_in_synpred33_FTS5129 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_slop_in_synpred34_FTS5139 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupSynonym_in_synpred35_FTS5210 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_fuzzy_in_synpred36_FTS5220 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsFieldGroupRange_in_synpred37_FTS5291 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_proximityGroup_in_synpred38_FTS5720 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_prefix_in_synpred39_FTS6352 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_synpred40_FTS6807 = new BitSet(new long[]{0x0000000000200000L});
+	public static final BitSet FOLLOW_DOT_in_synpred40_FTS6809 = new BitSet(new long[]{0x8000000000000000L});
+	public static final BitSet FOLLOW_ID_in_synpred40_FTS6811 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred41_FTS7127 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7133 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred41_FTS7135 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7141 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred41_FTS7143 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7149 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred41_FTS7151 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7157 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred41_FTS7159 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred41_FTS7165 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7233 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred42_FTS7235 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7241 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred42_FTS7243 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7249 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred42_FTS7251 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7257 = new BitSet(new long[]{0x0000000000200000L});
+	public static final BitSet FOLLOW_DOT_in_synpred42_FTS7259 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_COMMA_in_synpred42_FTS7261 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred42_FTS7263 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred43_FTS7326 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7332 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred43_FTS7334 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7340 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred43_FTS7342 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7348 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred43_FTS7350 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred43_FTS7356 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred43_FTS7358 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS7428 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred44_FTS7430 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS7436 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred44_FTS7438 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS7444 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred44_FTS7446 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred44_FTS7452 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred44_FTS7454 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred45_FTS7519 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred45_FTS7525 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred45_FTS7527 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred45_FTS7533 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred45_FTS7535 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred45_FTS7541 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred45_FTS7543 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred45_FTS7549 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred46_FTS7609 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred46_FTS7611 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred46_FTS7617 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred46_FTS7619 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred46_FTS7625 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred46_FTS7627 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred46_FTS7633 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred47_FTS7687 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred47_FTS7693 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred47_FTS7695 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred47_FTS7701 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred47_FTS7703 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred47_FTS7709 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred47_FTS7711 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred48_FTS7773 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred48_FTS7775 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred48_FTS7781 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred48_FTS7783 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred48_FTS7789 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred48_FTS7791 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred49_FTS7847 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred49_FTS7853 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred49_FTS7855 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred49_FTS7861 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred49_FTS7863 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred49_FTS7869 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred50_FTS7921 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred50_FTS7923 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred50_FTS7929 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred50_FTS7931 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred50_FTS7937 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred51_FTS7984 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred51_FTS7990 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred51_FTS7992 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred51_FTS7998 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred51_FTS8000 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred52_FTS8054 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred52_FTS8056 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred52_FTS8062 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred52_FTS8064 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred53_FTS8114 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred53_FTS8120 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred53_FTS8122 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred53_FTS8128 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred54_FTS8172 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred54_FTS8174 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred54_FTS8180 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_set_in_synpred55_FTS8218 = new BitSet(new long[]{0x803880000000A000L,0x0000014101004000L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred55_FTS8224 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred55_FTS8226 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ftsWordBase_in_synpred56_FTS8272 = new BitSet(new long[]{0x0000000000200800L});
+	public static final BitSet FOLLOW_set_in_synpred56_FTS8274 = new BitSet(new long[]{0x0000000000000002L});
 }

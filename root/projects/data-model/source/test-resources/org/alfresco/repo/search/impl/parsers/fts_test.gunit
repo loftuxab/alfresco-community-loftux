@@ -65,6 +65,7 @@ ftsQuery:
 "TYPE:content" -> "(DISJUNCTION (CONJUNCTION (DEFAULT (TERM content (FIELD_REF TYPE)))))"
 "TYPE:\"cm:content\"" -> "(DISJUNCTION (CONJUNCTION (DEFAULT (PHRASE \"cm:content\" (FIELD_REF TYPE)))))"
 "TYPE:\"content\"" -> "(DISJUNCTION (CONJUNCTION (DEFAULT (PHRASE \"content\" (FIELD_REF TYPE)))))"
+"created:[* TO *]" -> "(DISJUNCTION (CONJUNCTION (DEFAULT (RANGE INCLUSIVE * * INCLUSIVE (FIELD_REF created)))))"
 
 
 ftsDisjunction:
