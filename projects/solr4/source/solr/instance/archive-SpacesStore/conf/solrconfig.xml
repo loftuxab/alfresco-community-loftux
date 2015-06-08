@@ -1949,6 +1949,8 @@
   <queryParser name="afts" class="org.alfresco.solr.query.AlfrescoFTSQParserPlugin"/>
   <queryParser name="cmis" class="org.alfresco.solr.query.CmisQParserPlugin"/>
 
+  <queryParser name="mimetype" class="org.alfresco.solr.query.MimetypeGroupingQParserPlugin"/>
+
   <searchComponent name="setLocale"     class="org.alfresco.solr.component.SetLocaleComponent" />
   <searchComponent name="ensureModels" class="org.alfresco.solr.component.EnsureModelsComponent" />
   <searchComponent name="clearLocale"   class="org.alfresco.solr.component.ClearLocaleComponent" />
