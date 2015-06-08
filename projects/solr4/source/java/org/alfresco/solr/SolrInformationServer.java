@@ -182,7 +182,7 @@ public class SolrInformationServer implements InformationServer
     public static final String AND = " AND ";
     public static final String OR = " OR ";
     public static final String REQUEST_HANDLER_ALFRESCO_FULL_TEXT_SEARCH = "/afts";
-    public static final String REQUEST_HANDLER_SELECT = "/select";
+    public static final String REQUEST_HANDLER_NATIVE = "/native";
     public static final String REQUEST_HANDLER_ALFRESCO = "/alfresco";
     public static final String REQUEST_HANDLER_GET = "/get";
     public static final String RESPONSE_DEFAULT_IDS = "response";
@@ -210,7 +210,7 @@ public class SolrInformationServer implements InformationServer
     
     private AlfrescoCoreAdminHandler adminHandler;
     private SolrCore core;
-    private SolrRequestHandler selectRequestHandler;
+    private SolrRequestHandler nativeRequestHandler;
     private Cloud cloud;
     private TrackerStats trackerStats = new TrackerStats(this);
     private AlfrescoSolrDataModel dataModel;
@@ -269,7 +269,7 @@ public class SolrInformationServer implements InformationServer
     {
         this.adminHandler = adminHandler;
         this.core = core;
-        this.selectRequestHandler = core.getRequestHandler(REQUEST_HANDLER_SELECT);
+        this.nativeRequestHandler = core.getRequestHandler(REQUEST_HANDLER_NATIVE);
         this.cloud = new Cloud();
         this.repositoryClient = repositoryClient;
         this.solrContentStore = solrContentStore;
@@ -368,7 +368,7 @@ public class SolrInformationServer implements InformationServer
                 .set("rows", 0)
                 .set("facet", true)
                 .set("facet.field", FIELD_FTSSTATUS);
-            SolrQueryResponse response = cloud.getResponse(selectRequestHandler, request, params);
+            SolrQueryResponse response = cloud.getResponse(nativeRequestHandler, request, params);
             NamedList facetCounts = (NamedList) response.getValues().get("facet_counts");
             NamedList facetFields = (NamedList) facetCounts.get("facet_fields");
             NamedList<Integer> ftsStatusCounts = (NamedList) facetFields.get(FIELD_FTSSTATUS);
@@ -647,7 +647,7 @@ public class SolrInformationServer implements InformationServer
             .set("facet", true)
             .set("facet.field", field)
             .set("facet.mincount", minCount);
-        SolrQueryResponse response = cloud.getResponse(selectRequestHandler, request, params);
+        SolrQueryResponse response = cloud.getResponse(nativeRequestHandler, request, params);
         NamedList facetCounts = (NamedList) response.getValues().get("facet_counts");
         NamedList facetFields = (NamedList) facetCounts.get("facet_fields");
         NamedList<Integer> counts = (NamedList) facetFields.get(field);
@@ -675,7 +675,7 @@ public class SolrInformationServer implements InformationServer
                 .set("sort", "_docid_ asc");
                 // no scoring !!
             List<TenantAclIdDbId> docIds = new ArrayList<>();
-            SolrDocumentList docList = cloud.getSolrDocumentList(selectRequestHandler, request, params);
+            SolrDocumentList docList = cloud.getSolrDocumentList(nativeRequestHandler, request, params);
             if (docList != null)
             {
                 for (SolrDocument doc : docList)
@@ -1003,7 +1003,7 @@ public class SolrInformationServer implements InformationServer
             params.set("q", query);
             // Sets the rows to zero, because we actually just want the count
             params.set("rows", 0);
-            ResultContext resultContext = cloud.getResultContext(selectRequestHandler, request, params);
+            ResultContext resultContext = cloud.getResultContext(nativeRequestHandler, request, params);
             int matches = resultContext.docs.matches();
             return matches;
         }
@@ -1028,7 +1028,7 @@ public class SolrInformationServer implements InformationServer
             params.set("q", query)
                 .set("fl", FIELD_SOLR4_ID)
                 .set("rows", Integer.MAX_VALUE);
-            SolrDocumentList docs = cloud.getSolrDocumentList(selectRequestHandler, request , params);
+            SolrDocumentList docs = cloud.getSolrDocumentList(nativeRequestHandler, request , params);
             for (SolrDocument doc : docs)
             {
                 String id = getFieldValueString(doc, FIELD_SOLR4_ID);
@@ -1609,7 +1609,7 @@ public class SolrInformationServer implements InformationServer
         {
             params.set("fq", "NOT ( " + skippingDocsQueryString + " )");
         }
-        SolrDocumentList docs = cloud.getSolrDocumentList(selectRequestHandler, request, params);
+        SolrDocumentList docs = cloud.getSolrDocumentList(nativeRequestHandler, request, params);
         for (SolrDocument doc : docs)
         {
             String id = getFieldValueString(doc, FIELD_SOLR4_ID);
@@ -1697,7 +1697,7 @@ public class SolrInformationServer implements InformationServer
         log.info(".. checking for path change");
         String query = FIELD_DBID + ":" + nodeMetaData.getId() + AND + FIELD_PARENT_ASSOC_CRC + ":"
                     + nodeMetaData.getParentAssocsCrc();
-        boolean nodeHasSamePathAsBefore = cloud.exists(selectRequestHandler, request, query);
+        boolean nodeHasSamePathAsBefore = cloud.exists(nativeRequestHandler, request, query);
         if (nodeHasSamePathAsBefore)
         {
             if(log.isDebugEnabled())
@@ -1708,7 +1708,7 @@ public class SolrInformationServer implements InformationServer
         else
         {
             query = FIELD_DBID + ":" + nodeMetaData.getId();
-            boolean nodeHasBeenIndexed = cloud.exists(selectRequestHandler, request, query);
+            boolean nodeHasBeenIndexed = cloud.exists(nativeRequestHandler, request, query);
             if (nodeHasBeenIndexed)
             {
                 if(log.isDebugEnabled())

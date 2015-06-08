@@ -22,6 +22,7 @@ import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SOLR4
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.zip.GZIPInputStream;
 
@@ -31,6 +32,10 @@ import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
 
 import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.namespace.NamespaceException;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.AlfrescoSolrDataModel.TenantAclIdDbId;
 import org.alfresco.solr.content.SolrContentStore;
@@ -43,6 +48,7 @@ import org.apache.solr.common.util.JavaBinCodec;
 import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.response.transform.DocTransformer;
 import org.apache.solr.response.transform.TransformContext;
+import org.apache.solr.schema.SchemaField;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +76,8 @@ public class CachedDocTransformer extends DocTransformer
             return o;
         }
     };
+
+    private TransformContext context;
 
     static SolrContentStore solrContentStore;
     
@@ -100,6 +108,7 @@ public class CachedDocTransformer extends DocTransformer
     public void setContext( TransformContext context ) 
     {
         setStaticContext(context);
+        this.context = context;
     }
     
     /* (non-Javadoc)
@@ -131,8 +140,82 @@ public class CachedDocTransformer extends DocTransformer
             Collection<String> fieldNames = cachedDoc.getFieldNames();
             for (String fieldName : fieldNames)
             {
-               doc.removeFields(fieldName);
-               doc.addField(fieldName, cachedDoc.getFieldValue(fieldName));
+               SchemaField schemaField = context.searcher.getSchema().getFieldOrNull(fieldName);
+               if(schemaField != null)
+               {
+                   doc.removeFields(fieldName);
+                   if(schemaField.multiValued())
+                   {
+                       int index = fieldName.lastIndexOf("@{");
+                       if(index == -1)
+                       { 
+                           doc.addField(fieldName, cachedDoc.getFieldValues(fieldName));
+                       }
+                       else
+                       {
+                           String alfrescoFieldName = AlfrescoSolrDataModel.getInstance().getAlfrescoPropertyFromSchemaField(fieldName);
+                           Collection<Object> values = cachedDoc.getFieldValues(fieldName);
+                           ArrayList<Object> newValues = new ArrayList<Object>(values.size());
+                           for(Object value : values)
+                           {
+                               if(value instanceof String)
+                               {
+                                   String stringValue = (String) value;
+                                   int start = stringValue.lastIndexOf('\u0000');
+                                   if(start == -1)
+                                   {
+                                        newValues.add(stringValue);
+                                   }
+                                   else
+                                   {
+                                       newValues.add(stringValue.substring(start+1));
+                                   }
+                               }
+                               else
+                               {
+                                   newValues.add(value);
+                               }
+                               
+                           }
+                           doc.removeFields(alfrescoFieldName);
+                           doc.addField(alfrescoFieldName, newValues);
+                       }
+                   }
+                   else
+                   {
+                       int index = fieldName.lastIndexOf("@{");
+                       if(index == -1)
+                       { 
+                            doc.addField(fieldName, cachedDoc.getFieldValue(fieldName));
+                       }
+                       else
+                       {
+                           String alfrescoFieldName = AlfrescoSolrDataModel.getInstance().getAlfrescoPropertyFromSchemaField(fieldName);
+                           
+                           Object value = cachedDoc.getFieldValue(fieldName);
+                           if(value instanceof String)
+                           {
+                               String stringValue = (String) value;
+                               int start = stringValue.lastIndexOf('\u0000');
+                               if(start == -1)
+                               {
+                                   doc.removeFields(alfrescoFieldName);
+                                   doc.addField(alfrescoFieldName, stringValue);
+                               }
+                               else
+                               {
+                                   doc.removeFields(alfrescoFieldName);
+                                   doc.addField(alfrescoFieldName, stringValue.substring(start+1));
+                               }
+                           }
+                           else
+                           {
+                               doc.removeFields(alfrescoFieldName); 
+                               doc.addField(alfrescoFieldName, value);
+                           }
+                       }
+                   }
+               }
             }
         }
 
