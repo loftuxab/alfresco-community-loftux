@@ -834,7 +834,40 @@ identifier
 
 ftsWord
         :
-        ftsWordBase ((DOT|COMMA) ftsWordBase)*
+           ((DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase) => 
+           (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase
+        | (ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase DOT|COMMA ftsWordBase) => 
+           ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase
+        |  ((DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)) => 
+           (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)
+        | (ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)) => 
+           ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)
+        |  ((DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase) => 
+           (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase
+        | (ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase) => 
+           ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase
+        | ((DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)) => 
+           (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)
+        | (ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)) => 
+           ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)
+        | ((DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase) => 
+           (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase
+        | (ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase) => 
+           ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase 
+        | ((DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)) => 
+           (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA)
+        | (ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) ) => 
+           ftsWordBase (DOT|COMMA) ftsWordBase (DOT|COMMA) 
+        | ((DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase) => 
+           (DOT|COMMA) ftsWordBase (DOT|COMMA) ftsWordBase
+        | (ftsWordBase (DOT|COMMA) ftsWordBase) => 
+           ftsWordBase (DOT|COMMA) ftsWordBase
+        | ((DOT|COMMA) ftsWordBase (DOT|COMMA)) => 
+           (DOT|COMMA) ftsWordBase (DOT|COMMA)
+        | (ftsWordBase (DOT|COMMA)) => 
+           ftsWordBase (DOT|COMMA)
+        | (DOT|COMMA) ftsWordBase 
+        | ftsWordBase 
         ;
 
         
