@@ -129,7 +129,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
         STATS,        // Stats
         SORT,         // Locale
         SUGGESTION,
-        COMPLETION  
+        COMPLETION, 
+        HIGHLIGHT  
     }
     
     public static enum ContentFieldType
@@ -665,6 +666,9 @@ public class AlfrescoSolrDataModel implements QueryConstants
                }
                addCompletionFields(propertyDefinition, indexedField);
                break;
+           case HIGHLIGHT:
+               addSuggestSearchFields(propertyDefinition, indexedField);
+               break;
            }
         }
         else
@@ -710,6 +714,19 @@ public class AlfrescoSolrDataModel implements QueryConstants
         else
         {
             indexedField.addField(getFieldForText(true, false, false, propertyDefinition), true, false);
+            indexedField.addField(getFieldForText(false, false, false, propertyDefinition), false, false);
+        }        
+    }
+    
+    private void addSuggestSearchFields( PropertyDefinition propertyDefinition , IndexedField indexedField)
+    {
+        if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.TRUE)
+                || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH))
+        {
+            indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        }
+        else
+        {
             indexedField.addField(getFieldForText(false, false, false, propertyDefinition), false, false);
         }        
     }
