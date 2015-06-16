@@ -37,7 +37,32 @@ import org.apache.solr.search.SolrIndexSearcher;
  */
 public abstract class AbstractSolrCachingScorer extends Scorer
 {
-    BitDocSet matches;
+    protected static class LongCache 
+		{
+			private static int CACHE_SIZE = 1000000;
+			
+			private LongCache(){}
+	
+			static final Long cache[] = new Long[CACHE_SIZE];
+	
+			static {
+				for(int i = 0; i < cache.length; i++)
+					cache[i] = new Long(i);
+			}
+		}
+
+	protected static Long getLong(long l) {
+		if(l > LongCache.CACHE_SIZE)
+		{
+			return Long.valueOf(l);
+		}
+		else
+		{
+			return LongCache.cache[(int)l];
+		}
+	}
+
+	BitDocSet matches;
 
     int doc = -1;
 
