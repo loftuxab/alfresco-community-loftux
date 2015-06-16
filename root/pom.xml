@@ -104,7 +104,6 @@
     <index.subsystem.name>buildonly</index.subsystem.name>
 
     <!-- Maven specific build properties -->
-    <maven.build.sourceVersion>1.8</maven.build.sourceVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <argLine>-Xmx2G -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
 
@@ -456,7 +455,7 @@
 					<configuration>
 						<rules>
 							<requireJavaVersion>
-								<version>1.8.0</version>
+								<version>1.7.0</version>
 							</requireJavaVersion>
 							<bannedDependencies>
                                 <excludes>
@@ -617,13 +616,6 @@
     <!-- Defining version and some configuration of Maven plugins -->
     <pluginManagement>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${maven.build.sourceVersion}</source>
-                    <target>${maven.build.sourceVersion}</target>
-                </configuration>        
-            </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
