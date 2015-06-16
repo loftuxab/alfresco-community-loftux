@@ -47,6 +47,8 @@ public class ContentSizeGroupingQParserPlugin extends QParserPlugin
     
     private int buckets = 10;
 
+	private NamedList args;
+
     /*
      * (non-Javadoc)
      * @see org.apache.solr.util.plugin.NamedListInitializedPlugin#init(org.apache.solr.common.util.NamedList)
@@ -54,6 +56,7 @@ public class ContentSizeGroupingQParserPlugin extends QParserPlugin
     @Override
     public void init(NamedList args)
     {
+    	this.args = args;
         if (args != null)
         {
             Object val = args.get("buckets");
@@ -80,7 +83,7 @@ public class ContentSizeGroupingQParserPlugin extends QParserPlugin
     @Override
     public QParser createParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
     {
-        return new ContentSizeGroupingQParser(qstr, localParams, params, req, scale, buckets);
+        return new ContentSizeGroupingQParser(qstr, localParams, params, req, args, scale, buckets);
     }
 
     public static class ContentSizeGroupingQParser extends AbstractQParser
@@ -90,9 +93,9 @@ public class ContentSizeGroupingQParserPlugin extends QParserPlugin
         
         private int scale;
 
-        public ContentSizeGroupingQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, int scale, int buckets)
+        public ContentSizeGroupingQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, NamedList args, int scale, int buckets)
         {
-            super(qstr, localParams, params, req);
+            super(qstr, localParams, params, req, args);
             this.scale = scale;
             this.buckets = buckets;
         }

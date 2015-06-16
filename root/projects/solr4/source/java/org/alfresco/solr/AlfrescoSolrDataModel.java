@@ -19,7 +19,10 @@
 package org.alfresco.solr;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -60,6 +63,7 @@ import org.alfresco.repo.search.impl.QueryParserUtils;
 import org.alfresco.repo.search.impl.parsers.AlfrescoFunctionEvaluationContext;
 import org.alfresco.repo.search.impl.parsers.FTSParser;
 import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
+import org.alfresco.repo.search.impl.parsers.FTSQueryParser.RerankPhase;
 import org.alfresco.repo.search.impl.querymodel.Constraint;
 import org.alfresco.repo.search.impl.querymodel.Ordering;
 import org.alfresco.repo.search.impl.querymodel.QueryModelFactory;
@@ -173,6 +177,14 @@ public class AlfrescoSolrDataModel implements QueryConstants
     private  Map<DictionaryKey,CMISAbstractDictionaryService> cmisDictionaryServices;
     
     private HashMap<String, Set<String>> modelErrors = new HashMap<String, Set<String>>();
+    
+    private HashSet<QName> suggestableProperties = new HashSet<QName>();
+    
+    private HashSet<QName> crossLocaleSearchDataTypes = new HashSet<QName>();
+    
+    private HashSet<QName> crossLocaleSearchProperties = new HashSet<QName>();
+    
+    private HashSet<QName> identifierProperties = new HashSet<QName>();
 
     
     public AlfrescoSolrDataModel()
@@ -209,6 +221,52 @@ public class AlfrescoSolrDataModel implements QueryConstants
         dictionaryComponent.setMessageLookup(new StaticMessageLookup());
 
         cmisDictionaryServices = AlfrescoClientDataModelServicesFactory.constructDictionaries(qnameFilter, namespaceDAO, dictionaryComponent, dictionaryDAO);
+        
+        Properties props = getCommonConfig();
+        for (Object key : props.keySet())
+        {
+            String stringKey = (String) key;
+            if (stringKey.startsWith("alfresco.suggestable.property."))
+            {
+                QName qName = QName.createQName(props.getProperty(stringKey));
+                suggestableProperties.add(qName);
+            }
+            else if (stringKey.startsWith("alfresco.cross.locale.property."))
+            {
+                QName qName = QName.createQName(props.getProperty(stringKey));
+                crossLocaleSearchProperties.add(qName);
+            }
+            else if (stringKey.startsWith("alfresco.cross.locale.datatype."))
+            {
+                QName qName = QName.createQName(props.getProperty(stringKey));
+                crossLocaleSearchDataTypes.add(qName);
+            }
+            else if (stringKey.startsWith("alfresco.identifier.property."))
+            {
+                QName qName = QName.createQName(props.getProperty(stringKey));
+                identifierProperties.add(qName);
+            }
+            
+        }
+        
+        if(props.isEmpty())
+        {
+        	suggestableProperties.add(ContentModel.PROP_NAME);
+        	suggestableProperties.add(ContentModel.PROP_TITLE);
+        	suggestableProperties.add(ContentModel.PROP_DESCRIPTION);
+        	suggestableProperties.add(ContentModel.PROP_CONTENT);
+        	
+        	crossLocaleSearchDataTypes.add(DataTypeDefinition.TEXT);
+        	crossLocaleSearchDataTypes.add(DataTypeDefinition.CONTENT);
+        	crossLocaleSearchDataTypes.add(DataTypeDefinition.MLTEXT);
+        	
+        	identifierProperties.add(ContentModel.PROP_CREATOR);
+        	identifierProperties.add(ContentModel.PROP_MODIFIER);
+        	identifierProperties.add(ContentModel.PROP_USERNAME);
+        	identifierProperties.add(ContentModel.PROP_AUTHORITY_NAME);
+        	
+        }
+        
     }
 
     public static String getTenantId(String tenant)
@@ -496,6 +554,35 @@ public class AlfrescoSolrDataModel implements QueryConstants
         return qnameFilter;
     }
     
+    private Properties getCommonConfig()
+    {
+        QNameFilter qnameFilter = null;
+        FileSystemXmlApplicationContext ctx = null;
+
+        File resourceDirectory = getResourceDirectory();
+        // If we ever need to filter out models in the future, then we must put a filter somewhere.
+        // Currently, we do not need to filter any models, so this filter does not exist.
+        File propertiesFile = new File(resourceDirectory, "shared.properties");
+
+        Properties props = new Properties();
+        if(!propertiesFile.exists())
+        {
+            log.info("No shared properties found at  " + propertiesFile.getAbsolutePath());
+            return props;
+        }
+        
+        try(InputStream is = new FileInputStream(propertiesFile))
+        {
+        	props.load(is);
+        } 
+        catch (IOException e) 
+        {
+        	log.info("Failed to read shared properties fat  " + propertiesFile.getAbsolutePath());
+		}
+        
+        return props;
+    }
+    
     /**
      * @return ClassLoader
      */
@@ -686,11 +773,25 @@ public class AlfrescoSolrDataModel implements QueryConstants
     {
         if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH))
         {
-            indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+        	{
+                indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	}
+        	else
+        	{
+        		 indexedField.addField(getFieldForText(true, true, false, propertyDefinition), false, false);
+        	}
         }
         else if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.TRUE))
         {
-            indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+        	{
+                indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	}
+        	else
+        	{
+        		 indexedField.addField(getFieldForText(true, true, false, propertyDefinition), false, false);
+        	}
         }
         else if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.FALSE))
         {
@@ -709,7 +810,10 @@ public class AlfrescoSolrDataModel implements QueryConstants
                 || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH))
         {
             indexedField.addField(getFieldForText(true, true, false, propertyDefinition), true, false);
-            indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+            if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+        	{
+                indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	}
         }
         else
         {
@@ -723,7 +827,14 @@ public class AlfrescoSolrDataModel implements QueryConstants
         if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.TRUE)
                 || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH))
         {
-            indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+        	{
+                indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	}
+        	else
+        	{
+        		 indexedField.addField(getFieldForText(true, true, false, propertyDefinition), false, false);
+        	}
         }
         else
         {
@@ -747,7 +858,10 @@ public class AlfrescoSolrDataModel implements QueryConstants
         else
         {
             indexedField.addField(getFieldForText(true, true, false, propertyDefinition), true, false);
-            indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+            if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+        	{
+                indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	}
         }        
     }
     
@@ -778,21 +892,37 @@ public class AlfrescoSolrDataModel implements QueryConstants
         }
         else
         {
-            indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+        	{
+                indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        	}
+        	else
+        	{
+        		 indexedField.addField(getFieldForText(true, true, false, propertyDefinition), false, false);
+        	}
         }        
     }
     
     private void addMultiSearchFields( PropertyDefinition propertyDefinition , IndexedField indexedField)
     {
-        if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.FALSE)
-                || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH))
-        {
-            indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
-        }
-        else
-        {
-            indexedField.addField(getFieldForText(false, false, false, propertyDefinition), false, false);
-        }        
+    	if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.FALSE)
+    			|| (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH)
+    			|| isIdentifierTextProperty(propertyDefinition.getName()))
+    	{
+
+    		indexedField.addField(getFieldForText(false, false, false, propertyDefinition), false, false);
+    	}
+    	else
+    	{
+    		if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+    		{
+    			indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+    		}
+    		else
+    		{
+    			indexedField.addField(getFieldForText(true, true, false, propertyDefinition), false, false);
+    		}
+    	}       
     }
     
     private void addStatsSearchFields( PropertyDefinition propertyDefinition , IndexedField indexedField)
@@ -819,7 +949,14 @@ public class AlfrescoSolrDataModel implements QueryConstants
                 }
                 else
                 {
-                    indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+                	if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+            		{
+            			indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+            		}
+            		else
+            		{
+            			indexedField.addField(getFieldForText(true, true, false, propertyDefinition), false, false);
+            		}
                 }
             }
         }
@@ -835,7 +972,14 @@ public class AlfrescoSolrDataModel implements QueryConstants
                 }
                 else
                 {
-                    indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+                	if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+            		{
+            			indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+            		}
+            		else
+            		{
+            			indexedField.addField(getFieldForText(true, true, false, propertyDefinition), false, false);
+            		}
                 }
             }
         }
@@ -870,7 +1014,10 @@ public class AlfrescoSolrDataModel implements QueryConstants
                     || (propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.BOTH))
             {
                 indexedField.addField(getFieldForText(true, true, false, propertyDefinition), true, false);
-                indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+                if(crossLocaleSearchDataTypes.contains(propertyDefinition.getDataType().getName()) || crossLocaleSearchProperties.contains(propertyDefinition.getName()))
+        		{
+        			indexedField.addField(getFieldForText(false, true, false, propertyDefinition), false, false);
+        		}
             }
             
             if ((propertyDefinition.getIndexTokenisationMode() == IndexTokenisationMode.FALSE)
@@ -933,11 +1080,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
      */
     private boolean isIdentifierTextProperty(QName propertyQName)
     {
-        if(propertyQName == null)
-        {
-            return false;
-        }
-        return propertyQName.equals(ContentModel.PROP_CREATOR) || propertyQName.equals(ContentModel.PROP_MODIFIER) || propertyQName.equals(ContentModel.PROP_USERNAME) || propertyQName.equals(ContentModel.PROP_AUTHORITY_NAME);
+    	return identifierProperties.contains(propertyQName);
     }
 
     private boolean isTextField(PropertyDefinition propertyDefinition)
@@ -968,10 +1111,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
         {
             return false;
         }
-        return propertyQName.equals(ContentModel.PROP_NAME) 
-                || propertyQName.equals(ContentModel.PROP_TITLE) 
-                || propertyQName.equals(ContentModel.PROP_DESCRIPTION)
-                || propertyQName.equals(ContentModel.PROP_CONTENT);
+        return suggestableProperties.contains(propertyQName);
     }
     
     private boolean hasDocValues(PropertyDefinition propertyDefinition)
@@ -2080,7 +2220,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
 
         Set<String> selectorGroup = queryModelQuery.getSource().getSelectorGroups(functionContext).get(0);
 
-        LuceneQueryBuilderContext<Query, Sort, ParseException> luceneContext = getLuceneQueryBuilderContext(searchParameters, req, alternativeDictionary);
+        LuceneQueryBuilderContext<Query, Sort, ParseException> luceneContext = getLuceneQueryBuilderContext(searchParameters, req, alternativeDictionary, FTSQueryParser.RerankPhase.SINGLE_PASS);
         @SuppressWarnings("unchecked")
         LuceneQueryBuilder<Query, Sort, ParseException> builder = (LuceneQueryBuilder<Query, Sort, ParseException>) queryModelQuery;
         org.apache.lucene.search.Query luceneQuery = builder.buildQuery(selectorGroup, luceneContext, functionContext);
@@ -2089,17 +2229,17 @@ public class AlfrescoSolrDataModel implements QueryConstants
         return contextAwareQuery;
     }
      
-     public LuceneQueryBuilderContext<Query, Sort, ParseException> getLuceneQueryBuilderContext(SearchParameters searchParameters, SolrQueryRequest req, String alternativeDictionary)
+     public LuceneQueryBuilderContext<Query, Sort, ParseException> getLuceneQueryBuilderContext(SearchParameters searchParameters, SolrQueryRequest req, String alternativeDictionary, FTSQueryParser.RerankPhase rerankPhase)
      {
          Lucene4QueryBuilderContextSolrImpl luceneContext = new Lucene4QueryBuilderContextSolrImpl(getDictionaryService(alternativeDictionary), namespaceDAO, tenantService, searchParameters,
-                 MLAnalysisMode.EXACT_LANGUAGE, req, this);
+                 MLAnalysisMode.EXACT_LANGUAGE, req, this, rerankPhase);
          return luceneContext;
      }
 
-     public Solr4QueryParser getLuceneQueryParser(SearchParameters searchParameters, SolrQueryRequest req)
+     public Solr4QueryParser getLuceneQueryParser(SearchParameters searchParameters, SolrQueryRequest req, FTSQueryParser.RerankPhase rerankPhase)
      {
          Analyzer analyzer =  req.getSchema().getQueryAnalyzer();
-         Solr4QueryParser parser = new Solr4QueryParser(req.getSchema(), Version.LUCENE_48, searchParameters.getDefaultFieldName(), analyzer);
+         Solr4QueryParser parser = new Solr4QueryParser(req.getSchema(), Version.LUCENE_48, searchParameters.getDefaultFieldName(), analyzer, rerankPhase);
 //         Operator defaultOperator;
 //         if (searchParameters.getDefaultOperator() == SearchParameters.AND)
 //         {
@@ -2131,7 +2271,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
      * @return Query
      * @throws ParseException
      */
-     public Query getFTSQuery(Pair<SearchParameters, Boolean> searchParametersAndFilter, SolrQueryRequest req) throws ParseException
+     public Query getFTSQuery(Pair<SearchParameters, Boolean> searchParametersAndFilter, SolrQueryRequest req, FTSQueryParser.RerankPhase rerankPhase) throws ParseException
      {
 
          SearchParameters searchParameters = searchParametersAndFilter.getFirst();
@@ -2153,13 +2293,13 @@ public class AlfrescoSolrDataModel implements QueryConstants
 
          Constraint constraint = FTSQueryParser.buildFTS(searchParameters.getQuery(), factory, functionContext, null, null, mode,
                  searchParameters.getDefaultFTSOperator() == org.alfresco.service.cmr.search.SearchParameters.Operator.OR ? Connective.OR : Connective.AND,
-                         searchParameters.getQueryTemplates(), searchParameters.getDefaultFieldName());
+                         searchParameters.getQueryTemplates(), searchParameters.getDefaultFieldName(), rerankPhase);
          org.alfresco.repo.search.impl.querymodel.Query queryModelQuery = factory.createQuery(null, null, constraint, new ArrayList<Ordering>());
 
          @SuppressWarnings("unchecked")
          LuceneQueryBuilder<Query, Sort, ParseException> builder = (LuceneQueryBuilder<Query, Sort, ParseException>) queryModelQuery;
 
-         LuceneQueryBuilderContext<Query, Sort, ParseException> luceneContext = getLuceneQueryBuilderContext(searchParameters, req, CMISStrictDictionaryService.DEFAULT);
+         LuceneQueryBuilderContext<Query, Sort, ParseException> luceneContext = getLuceneQueryBuilderContext(searchParameters, req, CMISStrictDictionaryService.DEFAULT, rerankPhase);
 
          Set<String> selectorGroup = null;
          if (queryModelQuery.getSource() != null)

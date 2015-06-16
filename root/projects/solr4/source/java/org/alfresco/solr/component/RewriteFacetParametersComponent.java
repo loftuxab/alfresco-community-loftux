@@ -51,7 +51,8 @@ public class RewriteFacetParametersComponent extends SearchComponent
          
          ModifiableSolrParams fixed = new ModifiableSolrParams();
          fixFilterQueries(fixed, params, rb);
-         copyNonFilterQueryParams(fixed, params);
+         fixFacetParams(fixed, params, rb);
+         copyOtherQueryParams(fixed, params);
          req.setParams(fixed);
     }
 
@@ -244,14 +245,17 @@ public class RewriteFacetParametersComponent extends SearchComponent
         }
         else
         {
-            String[] filterQueries = params.getParams("fq");
-            for(String fq : filterQueries)
-            {
-                if(fq.startsWith("mimetype():"))
-                {
-                    return true;
-                }
-            }
+        	String[] filterQueries = params.getParams("fq");
+        	if(filterQueries != null)
+        	{
+        		for(String fq : filterQueries)
+        		{
+        			if(fq.startsWith("mimetype():"))
+        			{
+        				return true;
+        			}
+        		}
+        	}
         }
         return false;
     }
@@ -261,12 +265,12 @@ public class RewriteFacetParametersComponent extends SearchComponent
      * @param fixed
      * @param params
      */
-    private void copyNonFacetParams(ModifiableSolrParams fixed, SolrParams params)
+    private void copyOtherQueryParams(ModifiableSolrParams fixed, SolrParams params)
     {
         for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
         {
             String name = it.next();
-            if(name.startsWith("f.") || name.equals("facet.field") || name.equals("facet.date") || name.equals("facet.range") || name.equals("facet.pivot") || name.equals("facet.interval")|| name.startsWith("stats."))
+            if(name.equals("fq") || name.startsWith("f.") || name.equals("facet.field") || name.equals("facet.date") || name.equals("facet.range") || name.equals("facet.pivot") || name.equals("facet.interval")|| name.startsWith("stats."))
             {
                 // Already done 
                 continue;
@@ -277,28 +281,6 @@ public class RewriteFacetParametersComponent extends SearchComponent
             }
         }
     }
-    
-    /**
-     * @param fixed
-     * @param params
-     */
-    private void copyNonFilterQueryParams(ModifiableSolrParams fixed, SolrParams params)
-    {
-        for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
-        {
-            String name = it.next();
-            if(name.equals("fq"))
-            {
-                // Already done 
-                continue;
-            }    
-            else
-            {
-                fixed.set(name, params.getParams(name));
-            }
-        }
-    }
-
 
     /**
      * @param fixed
@@ -398,13 +380,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
     @Override
     public void process(ResponseBuilder rb) throws IOException
     {
-        SolrQueryRequest req = rb.req;
-        SolrParams params = req.getParams();
         
-        ModifiableSolrParams fixed = new ModifiableSolrParams();
-        fixFacetParams(fixed, params, rb);
-        copyNonFacetParams(fixed, params);
-        req.setParams(fixed);
     }
 
     /* (non-Javadoc)
