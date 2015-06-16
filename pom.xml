@@ -89,13 +89,11 @@
 
     <tomcat.default.alfresco.port>8080</tomcat.default.alfresco.port>
     <tomcat.default.alfresco.ssl.port>8443</tomcat.default.alfresco.ssl.port>
-    <tomcat.default.share.port>8081</tomcat.default.share.port>
-    <tomcat.default.share.ssl.port>0</tomcat.default.share.ssl.port>
     <tomcat.default.solr.port>8082</tomcat.default.solr.port>
     <tomcat.default.solr.ssl.port>8445</tomcat.default.solr.ssl.port>
     <tomcat.default.solr4.port>8083</tomcat.default.solr4.port>
     <tomcat.default.solr4.ssl.port>8446</tomcat.default.solr4.ssl.port>
-    
+
     <!-- Skip database drop/create by default -->
     <db.skip>true</db.skip>
     <test.working.dir>${project.build.directory}</test.working.dir>
@@ -105,7 +103,7 @@
 
     <!-- Maven specific build properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <argLine>-Xmx2G -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
+    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
 
     <!-- Community build specific properties -->
     <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD</maven.scm.connection>
@@ -136,7 +134,7 @@
     <dependency.webscripts.version>5.1</dependency.webscripts.version>
     <dependency.alfresco-core.version>5.1.2</dependency.alfresco-core.version>
     <dependency.alfresco-jlan.version>5.1.1</dependency.alfresco-jlan.version>
-    <dependency.alfresco-sdk.version>2.1.0</dependency.alfresco-sdk.version>
+    <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.common.version>5.0-20150414</installer.common.version>
