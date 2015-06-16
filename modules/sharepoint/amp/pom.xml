@@ -104,14 +104,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>enterprise</id>
-            <properties>
-                <maven.install.skip>true</maven.install.skip>
-                <maven.deploy.skip>true</maven.deploy.skip>
-            </properties>
-        </profile>
-
         <!-- integration-tests profile - disabled since these tests fail currently
         <profile>
            <id>integration-tests</id>
