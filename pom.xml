@@ -1043,12 +1043,16 @@
 
 	<!-- Database profiles, if not using PostgreSQL -->
 	<profile>
-		<id>mysql</id>
+		<id>mysql-props</id>
 		<properties>
 			<db.master.url>jdbc:mysql://localhost/</db.master.url>
 		    <db.driver>com.mysql.jdbc.Driver</db.driver>
     		<db.url>jdbc:mysql://localhost/${db.name}</db.url>
     	</properties>
+    </profile>
+    
+    <profile>
+        <id>mysql</id>
 		<build>
 			<plugins>
 				<plugin>
