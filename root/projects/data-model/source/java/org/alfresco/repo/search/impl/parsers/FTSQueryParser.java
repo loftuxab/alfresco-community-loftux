@@ -21,6 +21,7 @@ package org.alfresco.repo.search.impl.parsers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,11 @@ import org.antlr.runtime.tree.Tree;
 
 public class FTSQueryParser
 {
+	public static enum RerankPhase
+	{
+		SINGLE_PASS, SINGLE_PASS_WITH_AUTO_PHRASE, QUERY_PHASE, RERANK_PHASE;
+	}
+	
     private static TestNodeBuilder testNodeBuilder = new TestNodeBuilder();
     
     public static void setTestNodeBuilder(TestNodeBuilder tnb)
@@ -68,7 +74,7 @@ public class FTSQueryParser
     
     @SuppressWarnings("unused")
     static public Constraint buildFTS(String ftsExpression, QueryModelFactory factory, FunctionEvaluationContext functionEvaluationContext, Selector selector,
-            Map<String, Column> columnMap, FTSParser.Mode mode, Connective defaultFieldConnective, Map<String, String> templates, String defaultField)
+            Map<String, Column> columnMap, FTSParser.Mode mode, Connective defaultFieldConnective, Map<String, String> templates, String defaultField, RerankPhase rerankPhase)
     {
         // TODO: Decode sql escape for '' should do in CMIS layer
 
@@ -127,6 +133,8 @@ public class FTSQueryParser
             parser.setMode(mode);
             parser.setDefaultFieldConjunction(defaultFieldConnective == Connective.AND ? true : false);
             CommonTree ftsNode = (CommonTree) parser.ftsQuery().getTree();
+            // Rewrite for auto phrase
+            ftsNode = autoPhraseReWrite(ftsNode, defaultFieldConnective == Connective.AND ? true : false, rerankPhase);
             return buildFTSConnective(null, ftsNode, factory, functionEvaluationContext, selector, columnMap, templateTrees, defaultField);
         }
         catch (RecognitionException e)
@@ -143,7 +151,119 @@ public class FTSQueryParser
 
     }
 
-    static private Constraint buildFTSConnective(CommonTree fieldReferenceNode, CommonTree node, QueryModelFactory factory, FunctionEvaluationContext functionEvaluationContext,
+    private static CommonTree autoPhraseReWrite(CommonTree node, boolean defaultConjunction, RerankPhase rerankPhase) {
+    	if(node == null)
+    	{
+    		return node;
+    	}
+    	CommonTree newNode = new CommonTree(node);
+		if(isAutoPhrasable(node, defaultConjunction))
+		{
+			StringBuilder phrase = new StringBuilder();
+			LinkedList<CommonTree> autoPhrased = new LinkedList<CommonTree>();
+			for (Object current : node.getChildren())
+			{
+				CommonTree child = (CommonTree)current;
+				if((child.getType() ==  FTSParser.MANDATORY) || (child.getType() ==  FTSParser.DEFAULT))
+    			{
+    				if(child.getChildCount() > 0)
+    				{
+    					CommonTree term = (CommonTree)child.getChild(0);
+    					if((term.getType() == FTSParser.TERM) && (term.getChildCount() == 1))
+    					{
+    						String termText = getText((List<Tree>) term.getChildren());
+    						if(phrase.length() > 0)
+    						{
+    							phrase.append(" ");
+    						}
+    						phrase.append(termText);
+    						autoPhrased.add(child);
+    					}
+    					else
+    					{
+    						CommonTree newChild = autoPhraseReWrite(child, defaultConjunction, rerankPhase);
+    						newNode.addChild(newChild);
+    					}
+    					
+    				}
+    			}
+    			else
+    			{
+    				CommonTree newChild = autoPhraseReWrite(child, defaultConjunction, rerankPhase);
+					newNode.addChild(newChild);
+    			}
+			}
+			CommonTree disjunction = new CommonTree(new DisjunctionToken());
+			newNode.addChild(disjunction);
+			CommonTree termConjuctionLink = new CommonTree(new DefaultToken());
+			disjunction.addChild(termConjuctionLink);
+			CommonTree termConjunction = new CommonTree(new ConjunctionToken());
+			termConjuctionLink.addChild(termConjunction);
+			for(CommonTree phrased : autoPhrased)
+			{
+				CommonTree newPhrased = autoPhraseReWrite(phrased, defaultConjunction, rerankPhase);
+				termConjunction.addChild(newPhrased);
+			}
+			CommonTree phraseLink = new CommonTree(new DefaultToken());
+			disjunction.addChild(phraseLink);
+			CommonTree phraseTree = new CommonTree(new PhraseToken());
+			phraseLink.addChild(phraseTree);
+			phraseTree.addChild(new CommonTree(new WordToken(phrase.toString())));
+		}
+		else
+		{
+			if(node.getChildren() != null)
+			{
+				for (Object current : node.getChildren())
+				{
+					CommonTree child = (CommonTree) current;
+					CommonTree newChild = autoPhraseReWrite(child, defaultConjunction, rerankPhase);
+					newNode.addChild(newChild);
+				}
+			}
+		}
+		return newNode;
+    }
+
+    private static boolean isAutoPhrasable(CommonTree node, boolean defaultConjunction) {
+    	if((node.getType() == FTSParser.CONJUNCTION) && (node.getChildCount() > 1))
+    	{
+    		int simpleTermCount = 0;
+    		for (Object current : node.getChildren())
+    		{
+    			CommonTree child = (CommonTree) current;
+    			if(child.getType() ==  FTSParser.DEFAULT)
+    			{
+    				if(!defaultConjunction)
+    				{
+    					return false;
+    				}
+    			}
+    			
+    			if((child.getType() ==  FTSParser.MANDATORY) || (child.getType() ==  FTSParser.DEFAULT))
+    			{
+    				if(child.getChildCount() > 0)
+    				{
+    					CommonTree item = (CommonTree)child.getChild(0);
+    					if((item.getType() == FTSParser.TERM) && (item.getChildCount() == 1))
+    					{
+    						simpleTermCount++;
+    					}
+    				}
+    			}
+    			else
+    			{
+    				return false;
+    			}
+    		}
+    		return simpleTermCount > 1;
+    	}
+
+    	return false;
+
+    }
+
+	static private Constraint buildFTSConnective(CommonTree fieldReferenceNode, CommonTree node, QueryModelFactory factory, FunctionEvaluationContext functionEvaluationContext,
             Selector selector, Map<String, Column> columnMap, Map<String, CommonTree> templateTrees, String defaultField)
     {
         Connective connective;
@@ -723,6 +843,273 @@ public class FTSQueryParser
         public int getType()
         {
             return FTSParser.DISJUNCTION;
+        }
+
+        public void setChannel(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setCharPositionInLine(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setInputStream(CharStream arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setLine(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setText(String arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setTokenIndex(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setType(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+    
+    static class WordToken implements Token
+    {
+    	String text;
+    	
+    	WordToken(String text)
+    	{
+    		this.text = text;
+    	}
+    	
+        public int getChannel()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public int getCharPositionInLine()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public CharStream getInputStream()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public int getLine()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public String getText()
+        {
+            return text;
+        }
+
+        public int getTokenIndex()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public int getType()
+        {
+            return FTSParser.FTSWORD;
+        }
+
+        public void setChannel(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setCharPositionInLine(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setInputStream(CharStream arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setLine(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setText(String arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setTokenIndex(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setType(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+    
+    static class PhraseToken implements Token
+    {
+        public int getChannel()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public int getCharPositionInLine()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public CharStream getInputStream()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public int getLine()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public String getText()
+        {
+            return null;
+        }
+
+        public int getTokenIndex()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public int getType()
+        {
+            return FTSParser.PHRASE;
+        }
+
+        public void setChannel(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setCharPositionInLine(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setInputStream(CharStream arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setLine(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setText(String arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setTokenIndex(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void setType(int arg0)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+    
+    static class ConjunctionToken implements Token
+    {
+
+        public int getChannel()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public int getCharPositionInLine()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public CharStream getInputStream()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public int getLine()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public String getText()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public int getTokenIndex()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public int getType()
+        {
+            return FTSParser.CONJUNCTION;
         }
 
         public void setChannel(int arg0)
