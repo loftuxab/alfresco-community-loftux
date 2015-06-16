@@ -32,7 +32,7 @@ public class AlfrescoLuceneQParserTest
     @Before
     public void setUp() throws Exception
     {
-        parser = new AlfrescoLuceneQParser(null, null, null, null);
+        parser = new AlfrescoLuceneQParser(null, null, null, null, null);
     }
 
     @Test

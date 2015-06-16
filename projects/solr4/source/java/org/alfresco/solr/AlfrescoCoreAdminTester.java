@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.alfresco.httpclient.AuthenticationException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.impl.QueryParserUtils;
+import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Period;
@@ -8144,7 +8145,7 @@ public class AlfrescoCoreAdminTester
         }
 
         long start = System.nanoTime();
-        Query query = dataModel.getLuceneQueryParser(searchParameters, this.solrQueryRequest).parse(queryString);
+        Query query = dataModel.getLuceneQueryParser(searchParameters, this.solrQueryRequest, FTSQueryParser.RerankPhase.SINGLE_PASS).parse(queryString);
 //        Query query =dataModel.getFTSQuery(new Pair<SearchParameters, Boolean>(searchParameters, Boolean.FALSE),
 //                    this.solrQueryRequest);
         TopDocs docs = solrIndexSearcher.search(query, count * 2 + 10);
@@ -8194,7 +8195,7 @@ public class AlfrescoCoreAdminTester
 
         long start = System.nanoTime();
         Query query =dataModel.getFTSQuery(new Pair<SearchParameters, Boolean>(searchParameters, Boolean.FALSE),
-                    this.solrQueryRequest);
+                    this.solrQueryRequest, FTSQueryParser.RerankPhase.SINGLE_PASS);
         TopDocs docs = solrIndexSearcher.search(query, count * 2 + 10);
 
         NamedList<Object> subReport = new SimpleOrderedMap<Object>();

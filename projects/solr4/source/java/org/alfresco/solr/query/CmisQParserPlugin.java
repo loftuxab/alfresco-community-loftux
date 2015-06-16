@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 public class CmisQParserPlugin extends QParserPlugin
 {
     protected final static Logger log = LoggerFactory.getLogger(CmisQParserPlugin.class);
+	private NamedList args;
 
     /*
      * (non-Javadoc)
@@ -64,22 +65,23 @@ public class CmisQParserPlugin extends QParserPlugin
     @Override
     public QParser createParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
     {
-        return new CmisQParser(qstr, localParams, params, req);
+        return new CmisQParser(qstr, localParams, params, req, args);
     }
 
     /*
      * (non-Javadoc)
      * @see org.apache.solr.util.plugin.NamedListInitializedPlugin#init(org.apache.solr.common.util.NamedList)
      */
-    public void init(NamedList arg0)
+    public void init(NamedList args)
     {
+    	this.args = args;
     }
 
     public static class CmisQParser extends AbstractQParser 
     {
-        public CmisQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
+        public CmisQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, NamedList args)
         {
-            super(qstr, localParams, params, req);
+            super(qstr, localParams, params, req, args);
         }
 
         /*

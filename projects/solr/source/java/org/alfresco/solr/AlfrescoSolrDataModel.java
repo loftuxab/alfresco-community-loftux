@@ -1244,7 +1244,7 @@ public class AlfrescoSolrDataModel
 
         Constraint constraint = FTSQueryParser.buildFTS(searchParameters.getQuery(), factory, functionContext, null, null, mode,
                 searchParameters.getDefaultFTSOperator() == org.alfresco.service.cmr.search.SearchParameters.Operator.OR ? Connective.OR : Connective.AND,
-                searchParameters.getQueryTemplates(), searchParameters.getDefaultFieldName());
+                searchParameters.getQueryTemplates(), searchParameters.getDefaultFieldName(), FTSQueryParser.RerankPhase.SINGLE_PASS);
         org.alfresco.repo.search.impl.querymodel.Query queryModelQuery = factory.createQuery(null, null, constraint, new ArrayList<Ordering>());
 
         @SuppressWarnings("unchecked")

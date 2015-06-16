@@ -26,9 +26,12 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
+import javax.swing.text.StyledEditorKit.BoldAction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.opencmis.dictionary.CMISStrictDictionaryService;
@@ -54,6 +57,7 @@ import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.ContentStream;
+import org.apache.solr.common.util.NamedList;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.QueryParsing;
@@ -88,6 +92,8 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
     private static final String AUTHORITY_FILTER_FROM_JSON = "AUTHORITY_FILTER_FROM_JSON";
 
     private static final String TENANT_FILTER_FROM_JSON = "TENANT_FILTER_FROM_JSON";
+    
+    private static final String RERANK_QUERY_FROM_CONTEXT = "RERANK_QUERY_FROM_CONTEXT";
 
     static final String languages[] = {
         "af", "ar", "bg", "bn", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", "gu",
@@ -112,16 +118,72 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
             throw new RuntimeException("Couldn't load profile data, will return empty languages always!", e);
         }
     }
+
+	private boolean autoDetectQueryLocale = false;
+
+	private HashSet<String> autoDetectQueryLocales = new HashSet<String>();
+	
+	private HashSet<String> fixedQueryLocales = new HashSet<String>();
     
     /**
      * @param qstr
      * @param localParams
      * @param params
      * @param req
+     * @param args 
      */
-    public AbstractQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
+    public AbstractQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, NamedList args)
     {
         super(qstr, localParams, params, req);
+        if(args != null)
+        {
+        	Object arg = args.get("autoDetectQueryLocale");
+        	if(arg != null)
+        	{
+        		this.autoDetectQueryLocale = Boolean.parseBoolean(arg.toString());
+        	}
+        	
+        	arg = args.get("autoDetectQueryLocales");
+        	if(arg != null)
+        	{
+        		String[] locales = arg.toString().split(",");
+        		for(String locale : locales)
+        		{
+        			String mappedLanguage = isKnownLocale(locale);
+        			if(mappedLanguage != null)
+        			{
+        				autoDetectQueryLocales.add(mappedLanguage);
+        			}
+        		}
+        	}
+        	
+        	
+        	arg = args.get("fixedQueryLocales");
+        	if(arg != null)
+        	{
+        		String[] locales = arg.toString().split(",");
+        		for(String locale : locales)
+        		{
+        			String mappedLanguage = isKnownLocale(locale);
+        			if(mappedLanguage != null)
+        			{
+        				fixedQueryLocales.add(mappedLanguage);
+        			}
+        		}
+        	}
+        }
+    }
+    
+    private String isKnownLocale(String locale)
+    {
+    	for(String test : languages)
+    	{
+    		if(locale.equalsIgnoreCase(test))
+    		{
+    			return test;
+    		}
+    	}
+    	return null;
     }
 
     
@@ -332,6 +394,11 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                         }
                         searchParameters.setQuery(tenantQuery.toString());
                     }
+                    else if (getString().equals(RERANK_QUERY_FROM_CONTEXT))
+                    {
+                    	String searchTerm = getParam("spellcheck.q");
+                    	searchParameters.setQuery(searchTerm);
+                    }
                 }
                 else
                 {
@@ -415,20 +482,31 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
             searchParameters.setDefaultFieldName(defaultField);
         }
 
-        String searchTerm = getParam("spellcheck.q");
-        if (searchTerm != null)
+        if(autoDetectQueryLocale)
         {
-            searchParameters.setSearchTerm(searchTerm);
-            List<DetectedLanguage> detetcted = detectLanguage(searchTerm);
-            if((detetcted != null) && (detetcted.size() > 0))
-            {
-                Locale detectedLocale = Locale.forLanguageTag(detetcted.get(0).getLangCode());
-                if(localeIsNotIncluded(searchParameters, detectedLocale))
-                {
-                    searchParameters.addLocale( Locale.forLanguageTag(detectedLocale.getLanguage()));
-                }
-            }
-                    
+        	String searchTerm = getParam("spellcheck.q");
+        	if (searchTerm != null)
+        	{
+        		searchParameters.setSearchTerm(searchTerm);
+        		List<DetectedLanguage> detetcted = detectLanguage(searchTerm);
+        		if((detetcted != null) && (detetcted.size() > 0))
+        		{
+        			Locale detectedLocale = Locale.forLanguageTag(detetcted.get(0).getLangCode());
+        			if(localeIsNotIncluded(searchParameters, detectedLocale))
+        			{
+        				searchParameters.addLocale( Locale.forLanguageTag(detectedLocale.getLanguage()));
+        			}
+        		}
+
+        	}
+        }
+        
+        if(fixedQueryLocales.size() > 0)
+        {
+        	for(String locale : fixedQueryLocales)
+        	{
+        		searchParameters.addLocale( Locale.forLanguageTag(locale));
+        	}
         }
         
         // searchParameters.setMlAnalaysisMode(getMLAnalysisMode());
@@ -576,26 +654,30 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
  
     
     private List<DetectedLanguage> detectLanguage(String content) {
-        if (content.trim().length() == 0) { // to be consistent with the tika impl?
-            log.debug("No input text to detect language from, returning empty list");
-            return Collections.emptyList();
-        }
+    	if (content.trim().length() == 0) { // to be consistent with the tika impl?
+    		log.debug("No input text to detect language from, returning empty list");
+    		return Collections.emptyList();
+    	}
 
-        try {
-            Detector detector = DetectorFactory.create();
-            detector.append(content);
-            ArrayList<Language> langlist = detector.getProbabilities();
-            ArrayList<DetectedLanguage> solrLangList = new ArrayList<>();
-            for (Language l: langlist) {
-                solrLangList.add(new DetectedLanguage(l.lang, l.prob));
-            }
-            return solrLangList;
-        } catch (LangDetectException e) {
-            log.debug("Could not determine language, returning empty list: ", e);
-            return Collections.emptyList();
-        }
+    	try {
+    		Detector detector = DetectorFactory.create();
+    		detector.append(content);
+    		ArrayList<Language> langlist = detector.getProbabilities();
+    		ArrayList<DetectedLanguage> solrLangList = new ArrayList<>();
+    		for (Language l: langlist) 
+    		{
+    			if((autoDetectQueryLocales.size() == 0) || (autoDetectQueryLocales.contains(l.lang)))
+    			{
+    			    solrLangList.add(new DetectedLanguage(l.lang, l.prob));
+    			}
+    		}
+    		return solrLangList;
+    	} catch (LangDetectException e) {
+    		log.debug("Could not determine language, returning empty list: ", e);
+    		return Collections.emptyList();
+    	}
     }
-    
+
     public class DetectedLanguage {
         private final String langCode;
         private final Double certainty;

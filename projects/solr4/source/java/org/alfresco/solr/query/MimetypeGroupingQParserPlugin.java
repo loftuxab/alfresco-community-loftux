@@ -98,6 +98,8 @@ public class MimetypeGroupingQParserPlugin extends QParserPlugin
         }
     }
 
+	private NamedList args;
+
     /*
      * (non-Javadoc)
      * @see org.apache.solr.util.plugin.NamedListInitializedPlugin#init(org.apache.solr.common.util.NamedList)
@@ -105,6 +107,7 @@ public class MimetypeGroupingQParserPlugin extends QParserPlugin
     @Override
     public void init(NamedList args)
     {
+    	this.args = args;
         String mappingFile = (String) args.get("mapping");
         initMap(mappingFile);
 
@@ -119,7 +122,7 @@ public class MimetypeGroupingQParserPlugin extends QParserPlugin
     @Override
     public QParser createParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
     {
-        return new MimetypeGroupingQParser(qstr, localParams, params, req, mappings);
+        return new MimetypeGroupingQParser(qstr, localParams, params, req, args, mappings);
     }
 
     public static class MimetypeGroupingQParser extends AbstractQParser
@@ -128,9 +131,9 @@ public class MimetypeGroupingQParserPlugin extends QParserPlugin
         
         private boolean group = true;
 
-        public MimetypeGroupingQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, HashMap<String, String> mappings)
+        public MimetypeGroupingQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, NamedList args, HashMap<String, String> mappings)
         {
-            super(qstr, localParams, params, req);
+            super(qstr, localParams, params, req, args);
             Boolean doGroup = localParams.getBool("group");
             if(doGroup != null)
             {
