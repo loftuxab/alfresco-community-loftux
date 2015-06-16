@@ -410,8 +410,8 @@ public class AlfrescoLukeRequestHandler extends RequestHandlerBase
         
         SimpleOrderedMap<Object> finfo = new SimpleOrderedMap<>();
         finfo.addAll(vInfo);
-        finfo.add("mimetype()", finfo.get("cm:content.mimetype"));
-        finfo.add("contentSize()", finfo.get("cm:content.size"));
+        //finfo.add("mimetype()", finfo.get("cm:content.mimetype"));
+        //finfo.add("contentSize()", finfo.get("cm:content.size"));
         finfo.addAll(aInfo);
         return finfo;
     }
