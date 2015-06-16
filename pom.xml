@@ -1079,12 +1079,16 @@
 	</profile>
 
     <profile>
-        <id>mariadb</id>
+        <id>mariadb-props</id>
         <properties>
             <db.master.url>jdbc:mysql://localhost/</db.master.url>
             <db.driver>org.gjt.mm.mysql.Driver</db.driver>
             <db.url>jdbc:mysql://localhost/${db.name}</db.url>
         </properties>
+    </profile>
+
+    <profile>
+        <id>mariadb</id>
         <dependencies>
             <dependency>
                 <groupId>mysql</groupId>
@@ -1094,7 +1098,7 @@
     </profile>
 
     <profile>
-        <id>oracle</id>
+        <id>oracle-props</id>
         <properties>
             <db.driver>oracle.jdbc.OracleDriver</db.driver>
             <db.url>jdbc:oracle:thin:@${db.host}:1521/${db.host}</db.url>
@@ -1102,6 +1106,10 @@
             <db.drop.command>drop user ${db.username} cascade;</db.drop.command>
             <db.create.command>grant connect,resource to ${db.username} identified by ${db.password};</db.create.command>
         </properties>
+    </profile>
+
+    <profile>
+        <id>oracle</id>
         <build>
             <plugins>
                 <plugin>
@@ -1145,7 +1153,7 @@
     </profile>
 
     <profile>
-        <id>sqlserver</id>
+        <id>sqlserver-props</id>
         <properties>
             <db.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</db.driver>
             <db.url>jdbc:sqlserver://${db.host};databaseName=${db.name};</db.url>
@@ -1155,6 +1163,10 @@
             <db.drop.command>drop database ${db.name};</db.drop.command>
             <db.create.command>CREATE DATABASE ${db.name}; ALTER DATABASE ${db.name} SET ALLOW_SNAPSHOT_ISOLATION ON;</db.create.command>
         </properties>
+    </profile>
+
+    <profile>
+        <id>sqlserver</id>
         <build>
             <plugins>
                 <plugin>
@@ -1190,13 +1202,17 @@
     </profile>
 
     <profile>
-        <id>db2</id>
+        <id>db2-props</id>
         <properties>
             <db.driver>com.ibm.db2.jcc.DB2Driver</db.driver>
             <db.url>jdbc:db2://${db.host}:50000/${db.name}</db.url>
             <db.username>db2admin</db.username>
             <!-- No master URL for DB2: it's not possible to drop a database through an SQL command -->
         </properties>
+    </profile>
+
+    <profile>
+        <id>db2</id>
         <dependencies>
             <dependency>
                 <groupId>com.ibm.db2.jcc</groupId>
@@ -1208,13 +1224,17 @@
     </profile>
 
     <profile>
-        <id>h2</id>
+        <id>h2-props</id>
         <properties>
             <db.params>MODE=PostgreSQL;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000;MVCC=TRUE</db.params>
             <db.master.url>jdbc:h2:${test.working.dir}/h2_data/${db.name};${db.params}</db.master.url>
             <db.driver>org.h2.jdbcx.JdbcDataSource</db.driver>
             <db.url>${db.master.url}</db.url>
         </properties>
+    </profile>
+
+    <profile>
+        <id>h2</id>
         <build>
             <plugins>
                 <plugin>
