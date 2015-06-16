@@ -74,19 +74,26 @@ public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
                 int docID = it.nextDoc();
                 // Obtain the ACL ID for this ACL doc.
                 long aclID = aclDocValues.get(docID);
-                aclsFound.add(Long.valueOf(aclID));
+                aclsFound.add(getLong(aclID));
             }
          
-            for(int i = 0; i < searcher.maxDoc(); i ++)
+            if(aclsFound.size() > 0)
             {
-                long aclID = aclDocValues.get(i);
-                Long key = Long.valueOf(aclID);
-                if(aclsFound.contains(key))
-                {
-                    deniedDocSet.add(i);
-                }
+            	for(AtomicReaderContext readerContext : searcher.getAtomicReader().leaves() )
+            	{
+            		NumericDocValues leafReaderDocValues = readerContext.reader().getNumericDocValues(QueryConstants.FIELD_ACLID);
+            		for(int i = 0; i < readerContext.reader().maxDoc(); i++)
+            		{
+            			long aclID = leafReaderDocValues.get(i);
+                		Long key = getLong(aclID);
+                		if(aclsFound.contains(key))
+                		{
+                			deniedDocSet.add(readerContext.docBaseInParent + i);
+                		}
+            		}
+            	}
             }
-            
+
             // Exclude the ACL docs from the results, we only want real docs that match.
             // Probably not very efficient, what we really want is remove(docID)
             deniedDocSet = deniedDocSet.andNot(aclDocs);
