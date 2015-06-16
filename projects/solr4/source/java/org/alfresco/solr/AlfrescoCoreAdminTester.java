@@ -6021,6 +6021,8 @@ public class AlfrescoCoreAdminTester
         testQueryByHandler(report, core, "/afts", "modified:*", 2, null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/afts", "modified:[MIN TO NOW]", 2, null, null, null, null, null,
                     (String) null);
+        
+        testQueryByHandler(report, core, "/afts", "TYPE:" + testType.toString(), 1, null, null, null, null, null);
 
     }
 
@@ -6664,7 +6666,8 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"the\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"and\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"over the lazy\"", 1);
-            testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"over a lazy\"", 1);
+            // Depends on stop words being removed .... which depends on the configuration
+            //testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"over a lazy\"", 1);
 
             testQuery(dataModel,
                         report,
