@@ -154,7 +154,7 @@ public class FTSTest extends TestCase
         try
         {
             FTSQueryParser.buildFTS(ftsExpression, new LuceneQueryModelFactory(), functionContext, null, null,
-                    mode, defaultFieldConnective, templates, keywordsKey);
+                    mode, defaultFieldConnective, templates, keywordsKey, FTSQueryParser.RerankPhase.SINGLE_PASS);
         }
         finally
         {

@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g 2015-06-06 20:46:03
+// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\FTS.g 2015-06-15 14:53:29
 
 package org.alfresco.repo.search.impl.parsers;
 
@@ -4736,7 +4736,7 @@ public class FTSLexer extends Lexer {
 		"\uffff\1\12\1\13\1\15\1\22\2\uffff\1\32\2\uffff\1\41\5\uffff\1\42\6\uffff"+
 		"\1\4\2\uffff\1\27\3\uffff\1\3\2\uffff\1\6\3\uffff\1\5\164\uffff";
 	static final String DFA61_specialS =
-		"\40\uffff\1\1\7\uffff\1\2\13\uffff\1\0\u009d\uffff}>";
+		"\40\uffff\1\0\7\uffff\1\1\13\uffff\1\2\u009d\uffff}>";
 	static final String[] DFA61_transitionS = {
 			"\2\43\1\uffff\2\43\22\uffff\1\43\1\17\1\1\1\uffff\1\31\1\35\1\16\1\1"+
 			"\1\10\1\11\1\15\1\12\1\27\1\13\1\37\1\uffff\12\3\1\14\1\uffff\1\33\1"+
@@ -18325,14 +18325,6 @@ public class FTSLexer extends Lexer {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
-						int LA61_52 = input.LA(1);
-						s = -1;
-						if ( (LA61_52=='u') ) {s = 77;}
-						else if ( ((LA61_52 >= '\u0000' && LA61_52 <= 't')||(LA61_52 >= 'v' && LA61_52 <= '\uFFFF')) ) {s = 78;}
-						if ( s>=0 ) return s;
-						break;
-
-					case 1 : 
 						int LA61_32 = input.LA(1);
 						s = -1;
 						if ( (LA61_32=='u') ) {s = 64;}
@@ -18340,11 +18332,19 @@ public class FTSLexer extends Lexer {
 						if ( s>=0 ) return s;
 						break;
 
-					case 2 : 
+					case 1 : 
 						int LA61_40 = input.LA(1);
 						s = -1;
 						if ( (LA61_40=='u') ) {s = 70;}
 						else if ( ((LA61_40 >= '\u0000' && LA61_40 <= 't')||(LA61_40 >= 'v' && LA61_40 <= '\uFFFF')) ) {s = 71;}
+						if ( s>=0 ) return s;
+						break;
+
+					case 2 : 
+						int LA61_52 = input.LA(1);
+						s = -1;
+						if ( (LA61_52=='u') ) {s = 77;}
+						else if ( ((LA61_52 >= '\u0000' && LA61_52 <= 't')||(LA61_52 >= 'v' && LA61_52 <= '\uFFFF')) ) {s = 78;}
 						if ( s>=0 ) return s;
 						break;
 			}
