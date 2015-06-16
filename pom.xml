@@ -133,8 +133,6 @@
     <dependency.activiti.version>5.16.4</dependency.activiti.version>
     <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
     <dependency.poi.version>3.10.1</dependency.poi.version>
-    <dependency.mysql.version>5.1.34</dependency.mysql.version>
-    <dependency.postgresql.version>9.3-1102-jdbc41</dependency.postgresql.version>
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
     <dependency.webscripts.version>5.1</dependency.webscripts.version>
     <dependency.alfresco-core.version>5.1.2</dependency.alfresco-core.version>
@@ -182,6 +180,33 @@
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-xmlfactory</artifactId>
             <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.chemistry.opencmis</groupId>
+            <artifactId>chemistry-opencmis-client-impl</artifactId>
+            <version>${dependency.opencmis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.extensions.surf</groupId>
+            <artifactId>spring-webscripts</artifactId>
+            <version>${dependency.webscripts.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.extensions.surf</groupId>
+            <artifactId>spring-webscripts</artifactId>
+            <version>${dependency.webscripts.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.extensions.surf</groupId>
+            <artifactId>spring-webscripts-api</artifactId>
+            <version>${dependency.webscripts.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.extensions.surf</groupId>
+            <artifactId>spring-surf-core-configservice</artifactId>
+            <version>${dependency.webscripts.version}</version>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
@@ -421,9 +446,7 @@
 
 	<plugins>
 		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-enforcer-plugin</artifactId>
-			<version>1.3.1</version>
 			<executions>
 				<execution>
 					<id>enforcer</id>
@@ -453,7 +476,6 @@
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>properties-maven-plugin</artifactId>
-            <version>1.0-alpha-2</version>
             <executions>
                 <!-- If version.properties can be found, read it to set version properties for manifest -->
                 <execution>
@@ -500,7 +522,6 @@
             </executions>
         </plugin>
         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
                 <execution>
