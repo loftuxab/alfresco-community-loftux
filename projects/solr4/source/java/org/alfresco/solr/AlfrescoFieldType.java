@@ -73,8 +73,8 @@ public class AlfrescoFieldType extends FieldType
         
         // TODO: Wire up localised analysis driven from the schema
         // for now we do something basic
-        setIndexAnalyzer(new AlfrescoAnalyzerWrapper(schema));
-        setQueryAnalyzer(new AlfrescoAnalyzerWrapper(schema));
+        setIndexAnalyzer(new AlfrescoAnalyzerWrapper(schema, AlfrescoAnalyzerWrapper.Mode.INDEX));
+        setQueryAnalyzer(new AlfrescoAnalyzerWrapper(schema, AlfrescoAnalyzerWrapper.Mode.QUERY));
         AlfrescoSolrDataModel.getInstance().setAlfrescoFieldType(this);
     }
 

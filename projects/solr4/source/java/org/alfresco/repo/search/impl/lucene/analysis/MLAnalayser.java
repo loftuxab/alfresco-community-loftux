@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.util.Locale;
 
 import org.alfresco.repo.search.MLAnalysisMode;
+import org.alfresco.solr.AlfrescoAnalyzerWrapper.Mode;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,12 +46,15 @@ public class MLAnalayser extends Analyzer
     private MLAnalysisMode mlAnalaysisMode;
    
     private IndexSchema schema;
+
+	private Mode mode;
     
-    public MLAnalayser(MLAnalysisMode mlAnalaysisMode, IndexSchema schema)
+    public MLAnalayser(MLAnalysisMode mlAnalaysisMode, IndexSchema schema, Mode mode)
     {
         super(Analyzer.PER_FIELD_REUSE_STRATEGY);
         this.mlAnalaysisMode = mlAnalaysisMode;
         this.schema = schema;
+        this.mode = mode;
     }
 
 
@@ -65,7 +69,7 @@ public class MLAnalayser extends Analyzer
     @Override
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) 
     {
-        MLTokenizer mltokenizer = new MLTokenizer(fieldName, reader, schema, mlAnalaysisMode);
+        MLTokenizer mltokenizer = new MLTokenizer(fieldName, reader, schema, mlAnalaysisMode, mode);
         try
         {
             mltokenizer.setLocaleAndPositionReaderAfterLocaleEncoding(reader);
@@ -118,13 +122,16 @@ public class MLAnalayser extends Analyzer
         private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
         
         private final PositionIncrementAttribute posIncAtt = addAttribute(PositionIncrementAttribute.class);
+
+		private Mode mode;
      
-        MLTokenizer(String fieldName, Reader reader, IndexSchema schema, MLAnalysisMode mlAnalaysisMode) 
+        MLTokenizer(String fieldName, Reader reader, IndexSchema schema, MLAnalysisMode mlAnalaysisMode, Mode mode) 
         {
             super(reader);
             this.fieldName = fieldName;
             this.schema = schema;
             this.mlAnalaysisMode = mlAnalaysisMode;
+            this.mode = mode;
         }
         
         
@@ -325,7 +332,7 @@ public class MLAnalayser extends Analyzer
                  if(fieldName.contains("l_@{"))
                  {
                      FieldType fieldType = schema.getFieldTypeByName("identifier");
-                     return fieldType.getAnalyzer();
+                     return selectAnalyzer(fieldType);
                  }
                  else if(fieldName.contains("lt@{"))
                  {
@@ -337,7 +344,7 @@ public class MLAnalayser extends Analyzer
                      {
                          fieldType = schema.getFieldTypeByName("text_en");
                      }
-                     return fieldType.getAnalyzer();
+                     return selectAnalyzer(fieldType);
                  }
                  else
                  {
@@ -350,6 +357,27 @@ public class MLAnalayser extends Analyzer
                  return null;
              }
         }
+
+
+
+		private Analyzer selectAnalyzer(FieldType fieldType) {
+			if(mode == null)
+			 {
+			     return fieldType.getAnalyzer();
+			 }
+			 else if(mode == Mode.INDEX)
+			 {
+				 return fieldType.getIndexAnalyzer();
+			 }
+			 else if(mode == Mode.QUERY)
+			 {
+				 return fieldType.getQueryAnalyzer();
+			 }
+			 else
+			 {
+				 return null;
+			 }
+		}
      
 
     }

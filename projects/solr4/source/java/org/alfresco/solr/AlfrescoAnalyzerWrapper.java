@@ -34,15 +34,24 @@ import org.apache.solr.schema.IndexSchema;
  */
 public class AlfrescoAnalyzerWrapper extends AnalyzerWrapper
 {
+	public static enum Mode
+	{
+		INDEX, QUERY;
+	}
+	
     IndexSchema schema;
+    
+    Mode mode;
     
     /**
      * @param schema
+     * @param index 
      */
-    public AlfrescoAnalyzerWrapper(IndexSchema schema)
+    public AlfrescoAnalyzerWrapper(IndexSchema schema, Mode mode)
     {
         super(Analyzer.PER_FIELD_REUSE_STRATEGY);
         this.schema = schema;
+        this.mode = mode;
     }
     
     
@@ -66,11 +75,11 @@ public class AlfrescoAnalyzerWrapper extends AnalyzerWrapper
     {
         if(fieldName.contains("l_@{"))
         {
-            return new MLAnalayser(MLAnalysisMode.EXACT_LANGUAGE, schema);
+            return new MLAnalayser(MLAnalysisMode.EXACT_LANGUAGE, schema, mode);
         }
         else if(fieldName.contains("lt@{"))
         {
-             return new MLAnalayser(MLAnalysisMode.EXACT_LANGUAGE, schema);
+             return new MLAnalayser(MLAnalysisMode.EXACT_LANGUAGE, schema, mode);
         }
         else
         {

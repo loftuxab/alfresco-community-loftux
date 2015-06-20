@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g 2015-06-15 14:53:30
+// $ANTLR 3.5.2 W:\\alfresco\\HEAD-BUG-FIX\\root\\projects\\data-model\\source\\java\\org\\alfresco\\repo\\search\\impl\\parsers\\CMIS_FTS.g 2015-06-18 19:37:59
 
 package org.alfresco.repo.search.impl.parsers;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
@@ -442,7 +442,7 @@ public class CMIS_FTSLexer extends Lexer {
 	static final String DFA4_acceptS =
 		"\3\uffff\1\3\1\4\1\5\3\uffff\1\1\2\uffff\1\2";
 	static final String DFA4_specialS =
-		"\1\0\1\2\5\uffff\1\3\1\1\1\uffff\1\4\1\5\1\uffff}>";
+		"\1\0\1\1\5\uffff\1\5\1\3\1\uffff\1\4\1\2\1\uffff}>";
 	static final String[] DFA4_transitionS = {
 			"\11\5\2\4\2\5\1\4\22\5\1\4\6\5\1\1\5\5\1\3\41\5\1\2\37\5\1\2\uff90\5",
 			"\11\7\2\11\2\7\1\11\22\7\1\11\6\7\1\10\64\7\1\6\uffa3\7",
@@ -509,14 +509,6 @@ public class CMIS_FTSLexer extends Lexer {
 						break;
 
 					case 1 : 
-						int LA4_8 = input.LA(1);
-						s = -1;
-						if ( ((LA4_8 >= '\u0000' && LA4_8 <= '\b')||(LA4_8 >= '\u000B' && LA4_8 <= '\f')||(LA4_8 >= '\u000E' && LA4_8 <= '\u001F')||(LA4_8 >= '!' && LA4_8 <= '\uFFFF')) ) {s = 5;}
-						else s = 9;
-						if ( s>=0 ) return s;
-						break;
-
-					case 2 : 
 						int LA4_1 = input.LA(1);
 						s = -1;
 						if ( (LA4_1=='\\') ) {s = 6;}
@@ -527,14 +519,22 @@ public class CMIS_FTSLexer extends Lexer {
 						if ( s>=0 ) return s;
 						break;
 
-					case 3 : 
-						int LA4_7 = input.LA(1);
+					case 2 : 
+						int LA4_11 = input.LA(1);
 						s = -1;
-						if ( (LA4_7=='\'') ) {s = 8;}
-						else if ( (LA4_7=='\\') ) {s = 6;}
-						else if ( ((LA4_7 >= '\u0000' && LA4_7 <= '\b')||(LA4_7 >= '\u000B' && LA4_7 <= '\f')||(LA4_7 >= '\u000E' && LA4_7 <= '\u001F')||(LA4_7 >= '!' && LA4_7 <= '&')||(LA4_7 >= '(' && LA4_7 <= '[')||(LA4_7 >= ']' && LA4_7 <= '\uFFFF')) ) {s = 7;}
-						else if ( ((LA4_7 >= '\t' && LA4_7 <= '\n')||LA4_7=='\r'||LA4_7==' ') ) {s = 9;}
+						if ( (LA4_11=='\'') ) {s = 8;}
+						else if ( (LA4_11=='\\') ) {s = 6;}
+						else if ( ((LA4_11 >= '\u0000' && LA4_11 <= '\b')||(LA4_11 >= '\u000B' && LA4_11 <= '\f')||(LA4_11 >= '\u000E' && LA4_11 <= '\u001F')||(LA4_11 >= '!' && LA4_11 <= '&')||(LA4_11 >= '(' && LA4_11 <= '[')||(LA4_11 >= ']' && LA4_11 <= '\uFFFF')) ) {s = 7;}
+						else if ( ((LA4_11 >= '\t' && LA4_11 <= '\n')||LA4_11=='\r'||LA4_11==' ') ) {s = 9;}
 						else s = 5;
+						if ( s>=0 ) return s;
+						break;
+
+					case 3 : 
+						int LA4_8 = input.LA(1);
+						s = -1;
+						if ( ((LA4_8 >= '\u0000' && LA4_8 <= '\b')||(LA4_8 >= '\u000B' && LA4_8 <= '\f')||(LA4_8 >= '\u000E' && LA4_8 <= '\u001F')||(LA4_8 >= '!' && LA4_8 <= '\uFFFF')) ) {s = 5;}
+						else s = 9;
 						if ( s>=0 ) return s;
 						break;
 
@@ -547,12 +547,12 @@ public class CMIS_FTSLexer extends Lexer {
 						break;
 
 					case 5 : 
-						int LA4_11 = input.LA(1);
+						int LA4_7 = input.LA(1);
 						s = -1;
-						if ( (LA4_11=='\'') ) {s = 8;}
-						else if ( (LA4_11=='\\') ) {s = 6;}
-						else if ( ((LA4_11 >= '\u0000' && LA4_11 <= '\b')||(LA4_11 >= '\u000B' && LA4_11 <= '\f')||(LA4_11 >= '\u000E' && LA4_11 <= '\u001F')||(LA4_11 >= '!' && LA4_11 <= '&')||(LA4_11 >= '(' && LA4_11 <= '[')||(LA4_11 >= ']' && LA4_11 <= '\uFFFF')) ) {s = 7;}
-						else if ( ((LA4_11 >= '\t' && LA4_11 <= '\n')||LA4_11=='\r'||LA4_11==' ') ) {s = 9;}
+						if ( (LA4_7=='\'') ) {s = 8;}
+						else if ( (LA4_7=='\\') ) {s = 6;}
+						else if ( ((LA4_7 >= '\u0000' && LA4_7 <= '\b')||(LA4_7 >= '\u000B' && LA4_7 <= '\f')||(LA4_7 >= '\u000E' && LA4_7 <= '\u001F')||(LA4_7 >= '!' && LA4_7 <= '&')||(LA4_7 >= '(' && LA4_7 <= '[')||(LA4_7 >= ']' && LA4_7 <= '\uFFFF')) ) {s = 7;}
+						else if ( ((LA4_7 >= '\t' && LA4_7 <= '\n')||LA4_7=='\r'||LA4_7==' ') ) {s = 9;}
 						else s = 5;
 						if ( s>=0 ) return s;
 						break;
