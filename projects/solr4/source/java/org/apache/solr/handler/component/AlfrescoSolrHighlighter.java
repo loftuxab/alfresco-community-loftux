@@ -23,6 +23,7 @@ import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SOLR4
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -74,6 +75,7 @@ import org.apache.lucene.util.AttributeSource.State;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.JavaBinCodec;
@@ -731,7 +733,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
 
             try
             {
-                TextFragment[] bestTextFragments = highlighter.getBestTextFragments(tstream, thisText, mergeContiguousFragments, numFragments);
+                TextFragment[] bestTextFragments = highlighter.getBestTextFragments(tstream, fixLocalisedText(thisText), mergeContiguousFragments, numFragments);
                 for (int k = 0; k < bestTextFragments.length; k++)
                 {
                     if (preserveMulti)
@@ -797,7 +799,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
             }
             summaries = fragTexts.toArray(new String[0]);
             if (summaries.length > 0)
-                docSummaries.add(fieldName, summaries);
+                docSummaries.add(inputFieldName, summaries);
         }
         // no summeries made, copy text from alternate field
         if (summaries == null || summaries.length == 0)
@@ -806,7 +808,40 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         }
     }
 
-    private void doHighlightingByFastVectorHighlighter(FastVectorHighlighter highlighter, FieldQuery fieldQuery, SolrQueryRequest req, NamedList docSummaries, int docId,
+    private String fixLocalisedText(String text) 
+    {
+    	if((text == null) || (text.length() == 0))
+    	{
+    		return text;
+    	}
+    
+    	if(text.charAt(0) == '\u0000' )
+    	{
+    		int index = text.indexOf('\u0000', 1);
+    		if(index == -1)
+    		{
+    			return text;
+    		}
+    		else
+    		{
+    			if(index + 1 < text.length())
+    			{
+    				return text.substring(index+1);
+    			}
+    			else
+    			{
+    				return text;
+    			}
+    		}
+    	}
+    	else
+    	{
+    		return text;
+    	}
+		
+	}
+
+	private void doHighlightingByFastVectorHighlighter(FastVectorHighlighter highlighter, FieldQuery fieldQuery, SolrQueryRequest req, NamedList docSummaries, int docId,
             Document doc, String fieldName) throws IOException
     {
         SolrParams params = req.getParams();
