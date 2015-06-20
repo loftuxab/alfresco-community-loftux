@@ -1954,7 +1954,10 @@
 
 
   <queryParser name="alfresco" class="org.alfresco.solr.query.AlfrescoLuceneQParserPlugin"/>
-  <queryParser name="afts" class="org.alfresco.solr.query.AlfrescoFTSQParserPlugin"/>
+  <queryParser name="afts" class="org.alfresco.solr.query.AlfrescoFTSQParserPlugin">
+    <str name="rerankPhase">SINGLE_PASS_WITH_AUTO_PHRASE</str>
+  </queryParser>
+
   <queryParser name="cmis" class="org.alfresco.solr.query.CmisQParserPlugin"/>
 
   <queryParser name="mimetype" class="org.alfresco.solr.query.MimetypeGroupingQParserPlugin" >
