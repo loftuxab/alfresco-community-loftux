@@ -111,7 +111,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Arguments for test execution in surefire -->
     <!-- (Disable assertions in Chemistry OpenCMIS, until their TCK is fixed) -->
-    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote -da:org.apache.chemistry.opencmis...</argLine>
+    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote -da:org.apache.lucene.analysis.TokenStream -da:org.apache.chemistry.opencmis...</argLine>
 
     <!-- Community build specific properties -->
     <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD</maven.scm.connection>
