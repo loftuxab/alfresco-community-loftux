@@ -18,21 +18,11 @@
  */
 package org.alfresco.solr;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
 
-import org.alfresco.repo.dictionary.M2Model;
-import org.alfresco.service.namespace.QName;
-import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
-import org.alfresco.solr.AlfrescoSolrDataModel.TenantAclIdDbId;
 import org.apache.solr.SolrTestCaseJ4;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
 
 /**
  * @author Joel
