@@ -6028,6 +6028,11 @@ public class AlfrescoCoreAdminTester
         testQueryByHandler(report, core, "/afts", "TYPE:" + ContentModel.TYPE_CONTENT.toString(), 1, null, null, null, null, null, (ContentStream)null, "mimetype():document");
         testQueryByHandler(report, core, "/afts", "TYPE:" + ContentModel.TYPE_CONTENT.toString(), 0, null, null, null, null, null, (ContentStream)null, "contentSize():[0 TO 100]");
         testQueryByHandler(report, core, "/afts", "TYPE:" + ContentModel.TYPE_CONTENT.toString(), 1, null, null, null, null, null, (ContentStream)null, "contentSize():[100 TO 1000]");
+        
+        testQueryByHandler(report, core, "/afts", "modified:[NOW/DAY-1DAY TO NOW/DAY+1DAY]", 2, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "modified:[NOW/DAY-1DAY TO *]", 2, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "modified:[* TO NOW/DAY+1DAY]", 2, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "modified:[* TO *]", 2, null, null, null, null, null);
  
     }
 
