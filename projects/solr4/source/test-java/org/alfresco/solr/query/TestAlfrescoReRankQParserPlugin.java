@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.Random;
 
 
-@LuceneTestCase.SuppressCodecs({"Appending","Lucene3x","Lucene40","Lucene41","Lucene42","Lucene43", "Lucene44"})
+@LuceneTestCase.SuppressCodecs({"Appending","Lucene3x","Lucene40","Lucene41","Lucene42","Lucene43", "Lucene44", "Lucene45","Lucene46","Lucene47","Lucene48","Lucene49"})
 public class TestAlfrescoReRankQParserPlugin extends AlfrescoSolrTestCaseJ4 {
 
     @BeforeClass
