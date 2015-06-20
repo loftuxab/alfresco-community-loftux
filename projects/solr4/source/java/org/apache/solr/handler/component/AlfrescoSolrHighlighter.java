@@ -950,7 +950,14 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
             String id = getFieldValueString(doc, FIELD_SOLR4_ID);
             TenantAclIdDbId tenantAndDbId = AlfrescoSolrDataModel.decodeNodeDocumentId(id);
             SolrInputDocument sid = retrieveDocFromSolrContentStore(tenantAndDbId.tenant, tenantAndDbId.dbId);
-            return DocumentBuilder.toDocument(sid, req.getSchema());
+            if(sid == null)
+            {
+            	return new Document();
+            }
+            else
+            {
+                return DocumentBuilder.toDocument(sid, req.getSchema());
+            }
         }
         catch(StringIndexOutOfBoundsException e)
         {
