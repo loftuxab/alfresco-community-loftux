@@ -109,7 +109,9 @@
 
     <!-- Maven specific build properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote</argLine>
+    <!-- Arguments for test execution in surefire -->
+    <!-- (Disable assertions in Chemistry OpenCMIS, until their TCK is fixed) -->
+    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote -da:org.apache.chemistry.opencmis...</argLine>
 
     <!-- Community build specific properties -->
     <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD</maven.scm.connection>
@@ -615,7 +617,6 @@
                         <!-- Enables Lucene in continuous integration -->
                         <index.subsystem.name>${index.subsystem.name}</index.subsystem.name>
                     </systemPropertyVariables>
-                    <enableAssertions>false</enableAssertions>
                 </configuration>
             </plugin>
             <plugin>
