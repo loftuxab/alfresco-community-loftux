@@ -152,8 +152,18 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
         }
 
         public Query rewrite(IndexReader reader) throws IOException {
-            return wrap(this.mainQuery.rewrite(reader));
+            Query q = mainQuery.rewrite(reader);
+            if(q == mainQuery) {
+                return this;
+            } else {
+                return clone().wrap(q);
+            }
+        }
 
+        public ReRankQuery clone() {
+            ReRankQuery clonedQuery =  new ReRankQuery(reRankQuery, reRankDocs, reRankWeight, length, scale);
+            clonedQuery.setBoost(getBoost());
+            return clonedQuery;
         }
 
         public void extractTerms(Set<Term> terms) {
