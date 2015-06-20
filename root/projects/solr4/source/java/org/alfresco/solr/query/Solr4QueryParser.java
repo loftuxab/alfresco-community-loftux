@@ -76,6 +76,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.shingle.ShingleFilterFactory;
+import org.apache.lucene.analysis.synonym.SynonymFilter;
+import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
@@ -1587,10 +1589,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 		// Build all the token sequences and see which ones get strung together
 
-		LinkedList<LinkedList<org.apache.lucene.analysis.Token>> allTokenSequences = new LinkedList<LinkedList<org.apache.lucene.analysis.Token>>();
+		OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>> allTokenSequencesSet = new OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>>();
 		for(LinkedList<org.apache.lucene.analysis.Token> tokensAtPosition : tokensByPosition)
 		{
-			if(allTokenSequences.size() == 0)
+			if(allTokenSequencesSet.size() == 0)
 			{
 				for(org.apache.lucene.analysis.Token t : tokensAtPosition)
 				{
@@ -1600,12 +1602,15 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 					LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
 					newEntry.add(replace);
-					allTokenSequences.add(newEntry);
+					allTokenSequencesSet.add(newEntry);
 				}
 			}
 			else
 			{
-				LinkedList<LinkedList<org.apache.lucene.analysis.Token>> newAllTokeSequences = new LinkedList<LinkedList<org.apache.lucene.analysis.Token>>();
+
+				OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>> positionalSynonymSequencesSet = new OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>>();
+				
+				OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>> newAllTokenSequencesSet = new OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>>();
 
 				FOR_FIRST_TOKEN_AT_POSITION_ONLY: for(org.apache.lucene.analysis.Token t : tokensAtPosition)
 				{
@@ -1614,31 +1619,46 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 					replace.setPositionIncrement(t.getPositionIncrement());
 
 					boolean tokenFoundSequence = false;
-					for(LinkedList<org.apache.lucene.analysis.Token> tokenSequence : allTokenSequences)
+					for(LinkedList<org.apache.lucene.analysis.Token> tokenSequence : allTokenSequencesSet)
 					{
 						LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
 						newEntry.addAll(tokenSequence);
-						if((newEntry.getLast().startOffset() < replace.startOffset()) && (newEntry.getLast().endOffset() < replace.endOffset()))
+						if((newEntry.getLast().startOffset() == replace.startOffset()) && (newEntry.getLast().endOffset() == replace.endOffset())
+								&& newEntry.getLast().type().equals(SynonymFilter.TYPE_SYNONYM) && replace.type().equals(SynonymFilter.TYPE_SYNONYM))
 						{
+							positionalSynonymSequencesSet.add(tokenSequence);
 							newEntry.add(replace);
 							tokenFoundSequence = true;
 						}
-						newAllTokeSequences.add(newEntry);
+						else if((newEntry.getLast().startOffset() < replace.startOffset()) && (newEntry.getLast().endOffset() < replace.endOffset()))
+						{
+							if(newEntry.getLast().type().equals(SynonymFilter.TYPE_SYNONYM) && replace.type().equals(SynonymFilter.TYPE_SYNONYM))
+							{
+								positionalSynonymSequencesSet.add(tokenSequence);
+							}
+							newEntry.add(replace);
+							tokenFoundSequence = true;
+						}
+						newAllTokenSequencesSet.add(newEntry);
 					}
 					if(false == tokenFoundSequence)
 					{
 						throw new IllegalStateException();
 					}
 					// Limit the max number of permutations we consider
-					if(newAllTokeSequences.size() > 64)
+					if(newAllTokenSequencesSet.size() > 64)
 					{
 						break FOR_FIRST_TOKEN_AT_POSITION_ONLY;
 					}
 				}
-				allTokenSequences = newAllTokeSequences;
+			    allTokenSequencesSet = newAllTokenSequencesSet;
+			    allTokenSequencesSet.addAll(positionalSynonymSequencesSet);
 			}
 		}
 
+		LinkedList<LinkedList<org.apache.lucene.analysis.Token>> allTokenSequences = new LinkedList<LinkedList<org.apache.lucene.analysis.Token>>(allTokenSequencesSet);
+		
+		
 		// build the unique
 
 		LinkedList<LinkedList<org.apache.lucene.analysis.Token>> fixedTokenSequences = new LinkedList<LinkedList<org.apache.lucene.analysis.Token>>();
@@ -2348,17 +2368,12 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 				{
 					continue NEXT_TEST;
 				}
-				else if((test.startOffset() <= candidate.startOffset()) && (test.endOffset() > candidate.endOffset()))
+				else if((test.startOffset() <= candidate.startOffset()) && ( candidate.endOffset() <= test.endOffset()) && (test.toString().contains(candidate.toString())))
 				{
 					continue NEXT_CANDIDATE;
 				}
-				else if((test.startOffset() < candidate.startOffset()) && (test.endOffset() >= candidate.endOffset()))
-				{
-					continue NEXT_CANDIDATE;
-				}
-
 			}
-		nonContained.add(candidate);
+		    nonContained.add(candidate);
 		}
 		return nonContained;
 	}
