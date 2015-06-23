@@ -624,7 +624,9 @@
                 <configuration>
                     <javadocDirectory>source/javadoc</javadocDirectory>
                     <excludePackageNames>org.customer,org.apache</excludePackageNames>
+                    <!-- Uncomment to generate javadoc on Java 8
                     <additionalparam>-Xdoclint:none</additionalparam>
+                    -->
                 </configuration>
             </plugin>
             <plugin>
