@@ -126,7 +126,7 @@
                   <destFileName>solr.war</destFileName>
                 </artifactItem>	
               </artifactItems>
-              <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
             </configuration>
           </execution>
 
