@@ -115,7 +115,6 @@
                   <artifactId>alfresco-platform</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
-                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                   <destFileName>alfresco.war</destFileName>
                 </artifactItem>
                 <artifactItem>
@@ -124,10 +123,10 @@
                   <version>${project.version}</version>
                   <classifier>ssl</classifier>
                   <type>war</type>
-                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                   <destFileName>solr.war</destFileName>
                 </artifactItem>	
               </artifactItems>
+              <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
             </configuration>
           </execution>
 
@@ -151,6 +150,16 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Excludes wars from artifacts -->
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+            <excludes>
+                <exclude>*.war</exclude>
+            </excludes>
+        </configuration>
       </plugin>
 
       <plugin>
