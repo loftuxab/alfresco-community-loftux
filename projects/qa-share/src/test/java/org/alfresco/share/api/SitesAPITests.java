@@ -98,7 +98,7 @@ public class SitesAPITests extends SitesAPI
 
     // int totalSites = 0;
 
-    @Override
+
     @BeforeClass(alwaysRun = true)
     public void beforeClass() throws Exception
     {
@@ -522,8 +522,9 @@ public class SitesAPITests extends SitesAPI
     @Test
     public void AONE_14265() throws Exception
     {
-        SiteMember response = createSiteMember(testUser, DOMAIN, siteName, new SiteMember(user2, SiteRole.SiteConsumer.toString()));
-        response = getSiteMemberForId(user2, DOMAIN, siteName, user2);
+        SiteMember member_65 = new SiteMember(user2, SiteRole.SiteConsumer.toString());
+        createSiteMember(testUser, DOMAIN, siteName, member_65);
+        SiteMember response = getSiteMemberForId(user2, DOMAIN, siteName, user2);
         assertNotNull(response);
         assertEquals(response.getMemberId().toLowerCase(), user2.toLowerCase());
         assertEquals(response.getSiteId(), siteName);

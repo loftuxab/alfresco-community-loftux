@@ -89,6 +89,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.social.alfresco.api.Alfresco;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
@@ -999,7 +1000,7 @@ public abstract class AbstractUtils implements AlfrescoTests
         {
             driver.wait(waitMiliSec);
         }
-        catch (InterruptedException e){ }
+        catch (InterruptedException | IllegalMonitorStateException e){ }
         return getSharePage(driver);
     }
 

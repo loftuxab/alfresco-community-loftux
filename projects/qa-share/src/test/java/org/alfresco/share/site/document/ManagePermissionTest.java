@@ -2454,13 +2454,13 @@ public class ManagePermissionTest extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Assign role Contributor.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate to manage permission of folder.
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Assign role Contributor.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
 
         // User logs out.
         ShareUser.logout(drone);
@@ -2495,7 +2495,7 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         // Focus cursor on User1 and delete the user1 from permission.
         // Save changes.
-        managePermisionPage.deleteUserOrGroupFromPermission(user1, UserRole.CONTRIBUTOR);
+        managePermisionPage.deleteUserOrGroupFromPermission(user1, UserRole.SITECONTRIBUTOR);
 
         // Navigate to Manage permission of document.
         managePermisionPage = ShareUser.returnManagePermissionPage(drone, fileName);
@@ -2511,7 +2511,7 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         // Focus cursor on User1 and delete the user1 from permission.
         // Save changes.
-        managePermisionPage.deleteUserOrGroupFromPermission(user1, UserRole.CONTRIBUTOR);
+        managePermisionPage.deleteUserOrGroupFromPermission(user1, UserRole.SITECONTRIBUTOR);
 
         // Navigate to Manage permission of document.
         managePermisionPage = ShareUser.returnManagePermissionPage(drone, folderName);
@@ -2876,7 +2876,7 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         ShareUser.returnManagePermissionPage(drone, folderName);
 
-        docLibPage = ((DocumentLibraryPage) ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.COLLABORATOR, true)).render();
+        docLibPage = ((DocumentLibraryPage) ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECOLLABORATOR, true)).render();
 
         // User logs outs.
         ShareUser.logout(drone);
@@ -3260,28 +3260,28 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         // Search and add user1 with role Contributor.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate to folder's manage permission.
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Search and add user1 with role Contributor.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate to document's manage permission.
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Search and add user1 with role Collaborator.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate to document's manage permission.
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Search and add user1 with role Collaborator.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
 
         // user logs out.
         ShareUser.logout(drone);
