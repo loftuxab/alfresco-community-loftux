@@ -52,7 +52,7 @@ public class ShareUserReports extends AbstractUtils
         {
             String fileName = getFileName(testName + "_" + i + "." + "txt"); 
             Event event = new ActivityEvent(eventType, "a52fbbf9-a297-4fb5-aeea-8f5fe8087c7b", "alfresco.com", getEventDate(numOfDays), username, "e346bfa0-3177-4d64-b86d-05b433307d3b", siteName.toLowerCase(), "{http://www.alfresco.org/model/content/1.0}content", null, "{\"nodeRef\": \"workspace:\\/\\/SpacesStore\\/e346bfa0-3177-4d64-b86d-05b433307d3b\", \"title\": \"Filemiojkli-SiteContentReadsReportTest_0.txt\", \"page\": \"document-details?nodeRef=workspace:\\/\\/SpacesStore\\/e346bfa0-3177-4d64-b86d-05b433307d3b\"}", fileName, "text/plain", 600L, "UTF-8");
-            template.sendBody("activemq:alfresco.events.raw", event);
+            template.sendBody("activemq:alfresco.events.raw?requestTimeout=5000", event);
         }
  
     }

@@ -1467,7 +1467,7 @@ public class SiteNoticetDashletTest extends AbstractUtils
         // Click any test formatting button. Underline
         siteNoticeEditor.removeFormatting();
         siteNoticeEditor.clickTextFormatter(FormatType.UNDERLINED);
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<span style=\"text-decoration: underline;\">" + testName + "</span>"), "Changes aren't implemented");
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\">" + testName + "</span>"), "Changes aren't implemented");
 
         // Click on OK button present on Site Notice configure dialog box.
         configureSiteNotice.clickOnOKButton().render();
@@ -1477,7 +1477,7 @@ public class SiteNoticetDashletTest extends AbstractUtils
 
         // Click on configure Icon and gets Configure Site Notice Dialog box.
         siteNoticeDashlet.clickOnConfigureIcon().render();
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<span style=\"text-decoration: underline;\">" + testName + "</span>"), "Changes aren't saved");
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\">"  + testName + "</span>"), "Changes aren't saved");
     }
 
     @Test(groups = { "DataPrepAlfrescoOne" })

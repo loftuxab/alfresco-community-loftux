@@ -354,6 +354,7 @@ public class RepositoryFolderTests extends AbstractUtils
         // Select all in folder and copy to site doclib folder1
         RepositoryPage repoPage = repositorypage.getNavigation().selectAll().render();
         CopyOrMoveContentPage copyOrMoveContentPage = repoPage.getNavigation().selectCopyTo().render();
+        copyOrMoveContentPage.selectDestination("Repository");
         copyOrMoveContentPage = copyOrMoveContentPage.selectPath("Repository", "Sites", opSiteName, "documentLibrary", folder1).render();
         copyOrMoveContentPage.selectOkButton().render();
 
@@ -554,6 +555,7 @@ public class RepositoryFolderTests extends AbstractUtils
         // Select all from Top menu in folder3 and move to folder1 in site doclib
         RepositoryPage repoPage = repositorypage.getNavigation().selectAll().render();
         CopyOrMoveContentPage copyOrMoveContentPage = repoPage.getNavigation().selectMoveTo().render();
+        copyOrMoveContentPage.selectDestination("Repository");
         copyOrMoveContentPage = copyOrMoveContentPage.selectPath("Repository", "Sites", opSiteName, "documentLibrary", folder1).render();
         copyOrMoveContentPage.selectOkButton().render();
 

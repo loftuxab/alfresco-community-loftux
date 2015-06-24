@@ -1649,7 +1649,7 @@ public class GalleryViewTest extends AbstractUtils
     @Test(groups = "DataPrepAlfrescoOne")
     public void dataprep_AONE_14026() throws Exception
     {
-        String testName = getTestName() + "R1";
+        String testName = getTestName();
         testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
 
@@ -1680,7 +1680,7 @@ public class GalleryViewTest extends AbstractUtils
     public void AONE_14026() throws Exception
     {
         /** Start Test */
-        String testName = getTestName() + "R1";
+        String testName = getTestName();
         testUser = getUserNameFreeDomain(testName);
         String accessUser = getUserNameFreeDomain(testName + "accessUser");
         String siteName = getSiteName(testName);
@@ -1703,7 +1703,7 @@ public class GalleryViewTest extends AbstractUtils
 
         // Turn off the "Inherit permissions" option, add any users/groups to "Locally Set Permissions", set any role to users/groups and click "Save" button;
         DocumentLibraryPage docLibPage = (DocumentLibraryPage) ShareUserMembers.managePermissionsOnContent(customDrone, accessUser, folderName,
-                UserRole.COLLABORATOR, false);
+                UserRole.SITECOLLABORATOR, false);
         docLibPage.render();
         DetailsPage detailsPage = ShareUserSitePage.getContentDetailsPage(customDrone, folderName);
 
@@ -1713,7 +1713,7 @@ public class GalleryViewTest extends AbstractUtils
         Assert.assertNotNull(managerPermissions.getExistingPermission(accessUser));
 
         // TODO Add explanation assert
-        Assert.assertTrue(managerPermissions.getExistingPermission(accessUser).equals(UserRole.COLLABORATOR));
+        Assert.assertTrue(managerPermissions.getExistingPermission(accessUser).equals(UserRole.SITECOLLABORATOR));
     }
 
     @Test(groups = "DataPrepAlfrescoOne")

@@ -350,7 +350,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      *
      * @throws Exception
      */
-    @Test(groups = "NonGrid", timeOut = 40000)
+    @Test(groups = "NonGrid", timeOut = 90000)
     public void AONE_14619() throws Exception
     {
         prepare();
@@ -558,7 +558,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
         prepare();
 
         /** Start Test */
-        String testName = getTestName() + "R11";
+        String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
         boolean isTitle;
@@ -795,7 +795,7 @@ public class GoogleDocsTest extends ShareUserGoogleDocs
      *
      * @throws Exception
      */
-    @Test(groups = { "NonGrid", "Hybrid" }, timeOut = 400000)
+    @Test(groups = { "NonGrid", "Hybrid" }, timeOut = 800000)
     public void AONE_14627() throws Exception
     {
         prepare();

@@ -871,7 +871,7 @@ public class TrashcanTest3 extends AbstractUtils
 
         // Add the created in the pre-condition user, e.g. user2
         // Set any permissions level to the user, e.g. Collaborator
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, testUser2, true, UserRole.COLLABORATOR, false);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, testUser2, true, UserRole.SITECOLLABORATOR, false);
 
         ShareUser.openSitesDocumentLibrary(drone, siteName1);
 
@@ -890,7 +890,7 @@ public class TrashcanTest3 extends AbstractUtils
         ManagePermissionsPage permissionPage = ShareUser.returnManagePermissionPage(drone, fileName1);
 
         // The specified permissions are set. user are present and have the correct roles
-        Assert.assertEquals(UserRole.COLLABORATOR, permissionPage.getExistingPermission(testUser2),
+        Assert.assertEquals(UserRole.SITECOLLABORATOR, permissionPage.getExistingPermission(testUser2),
                 "The specified permissions aren't set or user aren't present");
 
         ShareUser.logout(drone);

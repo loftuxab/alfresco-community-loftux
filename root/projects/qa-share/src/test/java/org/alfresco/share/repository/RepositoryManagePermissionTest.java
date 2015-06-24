@@ -1571,11 +1571,11 @@ public class RepositoryManagePermissionTest extends AbstractUtils
 
         repoPage = repoPage.selectFolder(DOCLIB_CONTAINER).render();
 
-        ShareUserMembers.managePermissionsOnContent(drone, user1, folderName, UserRole.CONSUMER, false);
+        ShareUserMembers.managePermissionsOnContent(drone, user1, folderName, UserRole.SITECONSUMER, false);
         ManagePermissionsPage manPermPage = ShareUser.returnManagePermissionPage(drone, folderName);
 
         Assert.assertFalse(manPermPage.isInheritPermissionEnabled());
-        Assert.assertEquals(manPermPage.getExistingPermission(user1), UserRole.CONSUMER);
+        Assert.assertEquals(manPermPage.getExistingPermission(user1), UserRole.SITECONSUMER);
 
         ShareUser.logout(drone);
 

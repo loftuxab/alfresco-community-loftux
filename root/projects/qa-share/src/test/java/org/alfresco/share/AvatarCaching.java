@@ -39,6 +39,7 @@ import net.lightbody.bmp.proxy.ProxyServer;
 import org.alfresco.po.share.AddUserToGroupForm;
 import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.GroupsPage;
+import org.alfresco.po.share.LoginPage;
 import org.alfresco.po.share.NewGroupPage;
 import org.alfresco.po.share.PeopleFinderPage;
 import org.alfresco.po.share.SharePage;
@@ -174,7 +175,11 @@ public class AvatarCaching extends AbstractUtils
         String serverAddress = JmxUtils.getAddress(dronePropertiesMap.get(customDrone).getShareUrl());
 
         proxyServer.newHar(serverAddress);
-        DashBoardPage dashBoardPage = ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD).render();
+        customDrone.navigateTo(shareUrl);
+        LoginPage lp = new LoginPage(customDrone);
+        lp.loginAs(testUser, DEFAULT_PASSWORD);
+        //DashBoardPage dashBoardPage = ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD).render();
+        DashBoardPage dashBoardPage = customDrone.getCurrentPage().render();
         dashBoardPage.getDashlet(DASHLET_ACTIVITIES).render();
         Har har = proxyServer.getHar();
         if (alfrescoVersion.isCloud())
