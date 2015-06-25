@@ -151,7 +151,7 @@
     <installer.postgresql.version>9.3.6-openssl101</installer.postgresql.version>
     <installer.libreoffice.version>4.2.5-alfresco</installer.libreoffice.version>
   </properties>
-  
+
   <!-- Define versions of very common components -->
   <dependencyManagement>
     <dependencies>
@@ -173,13 +173,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.10.8</version>
+            <version>1.10.19</version>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
@@ -429,7 +429,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.182</version>
+            <version>1.4.187</version>
         </dependency>
     </dependencies>
   </dependencyManagement>
@@ -690,6 +690,98 @@
                     <truststorePass>kT9X6oe68t</truststorePass>
                     <truststoreType>JCEKS</truststoreType>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                      <groupId>org.apache.tomcat.embed</groupId>
+                      <artifactId>tomcat-embed-core</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-util</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-coyote</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-api</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-jdbc</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-dbcp</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-servlet-api</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-jsp-api</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-jasper</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-jasper-el</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-el-api</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-catalina</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-tribes</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-catalina-ha</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-annotations-api</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat</groupId>
+                      <artifactId>tomcat-juli</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat.embed</groupId>
+                      <artifactId>tomcat-embed-logging-juli</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.apache.tomcat.embed</groupId>
+                      <artifactId>tomcat-embed-logging-log4j</artifactId>
+                      <version>${dependency.tomcat.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
