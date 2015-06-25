@@ -1006,7 +1006,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
         DocumentDetailsPage detailsPage = viewPublicLinkPage.clickOnDocumentDetailsButton().render();
         List<String> documentActionsList = detailsPage.getDocumentActionList();
         List<String> expectedActions = new ArrayList<String>();
-
+        
         if (!ShareUser.isAlfrescoVersionCloud(drone))
         {
             expectedActions.add("Download");
@@ -1021,6 +1021,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
             expectedActions.add("Edit in Google Docs™");
             expectedActions.add("Manage Aspects");
             expectedActions.add("Change Type");
+            expectedActions.add("Email as link");
 
             if (ShareUser.isHybridEnabled())
             {

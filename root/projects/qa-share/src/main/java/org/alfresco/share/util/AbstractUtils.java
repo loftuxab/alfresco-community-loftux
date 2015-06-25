@@ -1001,6 +1001,7 @@ public abstract class AbstractUtils implements AlfrescoTests
             driver.wait(waitMiliSec);
         }
         catch (InterruptedException | IllegalMonitorStateException e){ }
+        
         return getSharePage(driver);
     }
 

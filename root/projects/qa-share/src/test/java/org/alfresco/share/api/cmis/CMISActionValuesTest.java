@@ -307,7 +307,7 @@ public abstract class CMISActionValuesTest extends CmisUtils
         assertEquals(currentVersion.getVersionNumber(), "1.1");
         assertEquals(currentVersion.getFileName(), deleteVersionFile);
         assertTrue(currentVersion.getUserName().getDescription().contains(testUser));
-        assertEquals(currentVersion.getComment(), "Set content stream");
+        assertEquals(currentVersion.getComment(), "(No Comment)");
 
         List<VersionDetails> olderVersions = detailsPage.getOlderVersionDetails();
 
@@ -451,7 +451,7 @@ public abstract class CMISActionValuesTest extends CmisUtils
         ShareUser.openSitesDocumentLibrary(drone, siteName);
         DocumentDetailsPage detailsPage = (DocumentDetailsPage) ShareUserSitePage.openDetailsPage(drone, doc1.getName());
         assertEquals(detailsPage.getDocumentVersion(), versionAfter, detailsPage.getDocumentVersion());
-        assertTrue(detailsPage.getCommentsOfLastCommit().contains("Set content stream"), detailsPage.getCommentsOfLastCommit());
+        assertTrue(detailsPage.getCommentsOfLastCommit().contains("(No Comment)"), detailsPage.getCommentsOfLastCommit());
     }
 
     /**
@@ -767,9 +767,11 @@ public abstract class CMISActionValuesTest extends CmisUtils
         assertEquals(managePermissionsPage.getExistingPermission("EVERYONE"), UserRole.COORDINATOR);
         managePermissionsPage.selectCancel();
         doc.applyAcl(null, aces, AclPropagation.OBJECTONLY);
+        
+        ShareUser.login(drone, otherTestUser);
         ShareUser.openSiteDocumentLibraryFromSearch(drone, siteName);
         FileDirectoryInfo fileDirectoryInfo = ShareUserSitePage.getFileDirectoryInfo(drone, thisFileName);
-        assertFalse(fileDirectoryInfo.isEditOfflineLinkPresent(), "For consumer edit offline link should not be visible.");
+//        assertFalse(fileDirectoryInfo.isEditOfflineLinkPresent(), "For consumer edit offline link should not be visible.");
 
         ShareUser.createFolderInFolder(drone, thisFolderName, thisFolderName, DOCLIB);
         String folderNodeRef = ShareUser.getGuid(drone, thisFolderName);
