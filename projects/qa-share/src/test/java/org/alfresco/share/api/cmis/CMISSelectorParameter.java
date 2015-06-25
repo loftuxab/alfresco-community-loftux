@@ -125,23 +125,37 @@ public abstract class CMISSelectorParameter extends CmisUtils
         PublicApiClient.CmisSession cmisSession = getCmisSession(binding, testUser, DOMAIN);
 
         List<Tree<ObjectType>> typeDescendants = cmisSession.getTypeDescendants(docTypeId, 1, true);
-        assertTrue(typeDescendants.get(0).getItem().getDisplayName().equals("Calendar Event"), typeDescendants.get(0).getItem().getDisplayName());
+        assertTrue(typeDescendants.size() > 0, "No descendant was not found for "+docTypeId);
+        assertTrue(verifyDescendantInList("Calendar Event", typeDescendants), "Calendar Event was not found as descendant of "+docTypeId);
 
         typeDescendants = cmisSession.getTypeDescendants(folderTypeId, 1, true);
-        assertTrue(typeDescendants.size() > 0);
-        assertTrue(typeDescendants.get(0).getItem().getDisplayName().equals("System Folder"));
+        assertTrue(typeDescendants.size() > 0, "No descendant was not found for "+folderTypeId);
+        assertTrue(verifyDescendantInList("System Folder", typeDescendants), "System Folder was not found as descendant of "+folderTypeId);
 
         typeDescendants = cmisSession.getTypeDescendants(secondaryTypeId, 1, true);
-        assertTrue(typeDescendants.get(0).getItem().getDisplayName().equals("OAuth2 Authenticated Delivery Channel"));
-        assertTrue(typeDescendants.size() > 0);
+        assertTrue(typeDescendants.size() > 0, "No descendant was not found for "+secondaryTypeId);
+        assertTrue(verifyDescendantInList("OAuth2 Authenticated Delivery Channel", typeDescendants), "OAuth2 Authenticated Delivery Channel was not found as descendant of "+secondaryTypeId);
 
         typeDescendants = cmisSession.getTypeDescendants(relationshipTypeId, 1, true);
-        assertTrue(typeDescendants.get(0).getItem().getDisplayName().equals("R:pub:source"));
-        assertTrue(typeDescendants.size() > 0);
+        assertTrue(typeDescendants.size() > 0, "No descendant was not found for "+relationshipTypeId);
+        assertTrue(verifyDescendantInList("R:pub:source", typeDescendants), "R:pub:source was not found as descendant of "+relationshipTypeId);
 
         typeDescendants = cmisSession.getTypeDescendants(policyTypeId, 1, true);
-        assertNotNull(typeDescendants);
+        assertNotNull(typeDescendants, "No descendant was not found for "+policyTypeId);
 
+    }
+    
+    private boolean verifyDescendantInList(String descendantDisplayName, List<Tree<ObjectType>> listOfDescendants)
+    {
+        for (Tree<ObjectType> descendant:listOfDescendants)
+        {
+            if(descendant.getItem().getDisplayName().equals(descendantDisplayName))
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     protected void selectorRepoInfo()
