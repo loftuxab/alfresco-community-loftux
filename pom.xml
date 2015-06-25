@@ -128,6 +128,7 @@
 
     <!-- Centralized dependency versions -->
     <dependency.lucene.version>2.4.1</dependency.lucene.version>
+    <dependency.truezip.version>7.7.9</dependency.truezip.version>
     <dependency.jibx.version>1.2.6</dependency.jibx.version>
     <dependency.tika.version>1.6-20140428-alfresco-patched</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
