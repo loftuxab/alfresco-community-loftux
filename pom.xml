@@ -1081,6 +1081,7 @@
             <module>enterpriseprojects/packaging</module>
             <module>enterpriseprojects/packaging/rpm</module>
             <module>privatemodules</module>
+            <module>projects/office-application</module>
         </modules>
 
         <build>
