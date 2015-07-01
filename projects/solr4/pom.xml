@@ -281,6 +281,9 @@
                                 <descriptor>
                                     source/assembly/solr-instance-zip-nossl.xml
                                 </descriptor>
+                                <descriptor>
+                                    source/assembly/solr-instance-zip-sharding.xml
+                                </descriptor>
                             </descriptors>
                         </configuration>
                     </execution>
