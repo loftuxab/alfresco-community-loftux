@@ -574,7 +574,7 @@ public class AlfrescoReRankQParserPluginTest extends AlfrescoSolrTestCaseJ4 {
         params = new ModifiableSolrParams();
         params.add("rq", "{!alfrescoReRank reRankQuery=$rqq reRankDocs=200 scale=false}");
         params.add("q", "term_s:YYYY");
-        params.add("rqq", "{!edismax bf=$bff}*:*");
+        params.add("rqq", "{!edismax bf=$bff}id:(1 2 4 5 6)");
         params.add("bff", "field(test_ti)");
         params.add("fl", "id,score");
         params.add("start", "0");
@@ -593,14 +593,12 @@ public class AlfrescoReRankQParserPluginTest extends AlfrescoSolrTestCaseJ4 {
         ResultContext resultContext = (ResultContext)vals.get("response");
         DocList docs = resultContext.docs;
         DocIterator it = docs.iterator();
-        float min = Float.MAX_VALUE;
         float max = -Float.MAX_VALUE;
         List<Float> scores = new ArrayList();
 
         while(it.hasNext()) {
             it.next();
             float score = it.score();
-            min = Math.min(score, min);
             max = Math.max(score, max);
             scores.add(score);
         }
@@ -610,14 +608,20 @@ public class AlfrescoReRankQParserPluginTest extends AlfrescoSolrTestCaseJ4 {
 
         for(int i=0; i<scaledScores.length; i++) {
             float score = scores.get(i);
-            scaledScores[i] = (score/max);
+            if(i<5) {
+                //The first 5 docs are hit on the reRanker so add 1 to score
+                scaledScores[i] = (score / max) + 1;
+            } else {
+                //The last score is not a hit on the reRanker
+                scaledScores[i] = (score / max);
+            }
         }
 
         //Get the scaled scores from the reRanker
         params = new ModifiableSolrParams();
         params.add("rq", "{!alfrescoReRank reRankQuery=$rqq reRankDocs=200 scale=true}");
         params.add("q", "term_s:YYYY");
-        params.add("rqq", "{!edismax bf=$bff}*:*");
+        params.add("rqq", "{!edismax bf=$bff}id:(1 2 4 5 6)");
         params.add("bff", "field(test_ti)");
         params.add("fl", "id,score");
         params.add("start", "0");
