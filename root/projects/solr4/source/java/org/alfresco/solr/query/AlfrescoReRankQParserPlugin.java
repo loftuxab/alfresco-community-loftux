@@ -35,10 +35,7 @@ import org.apache.lucene.util.Bits;
 import org.apache.solr.request.SolrRequestInfo;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 /*
 *
@@ -304,6 +301,8 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
 
                     mainDocs.scoreDocs = reRankScoreDocs;
 
+                    Map<Integer, Float> scoreMap = getScoreMap(mainDocs.scoreDocs, mainDocs.scoreDocs.length);
+
                     TopDocs rescoredDocs = new QueryRescorer(reRankQuery) {
                         @Override
                         protected float combine(float firstPassScore, boolean secondPassMatches, float secondPassScore) {
@@ -322,7 +321,7 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
 
                     if(howMany == rescoredDocs.scoreDocs.length) {
                         if(scale) {
-                            scaleScores(rescoredDocs);
+                            scaleScores(rescoredDocs, scoreMap);
                         }
                         return rescoredDocs; // Just return the rescoredDocs
                     } else if(howMany > rescoredDocs.scoreDocs.length) {
@@ -332,7 +331,7 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
                         System.arraycopy(rescoredDocs.scoreDocs, 0, scoreDocs, 0, rescoredDocs.scoreDocs.length);//overlay the re-ranked docs.
                         rescoredDocs.scoreDocs = scoreDocs;
                         if(scale) {
-                            scaleScores(rescoredDocs);
+                            scaleScores(rescoredDocs, scoreMap);
                         }
                         return rescoredDocs;
                     } else {
@@ -341,7 +340,7 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
                         System.arraycopy(rescoredDocs.scoreDocs, 0, scoreDocs, 0, howMany);
                         rescoredDocs.scoreDocs = scoreDocs;
                         if(scale) {
-                            scaleScores(rescoredDocs);
+                            scaleScores(rescoredDocs, scoreMap);
                         }
                         return rescoredDocs;
                     }
@@ -350,17 +349,19 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
 
                     ScoreDoc[] mainScoreDocs   = mainDocs.scoreDocs;
 
-          /*
-          *  Create the array for the reRankScoreDocs.
-          */
+                      /*
+                      *  Create the array for the reRankScoreDocs.
+                      */
                     ScoreDoc[] reRankScoreDocs = new ScoreDoc[Math.min(mainScoreDocs.length, reRankDocs)];
 
-          /*
-          *  Copy the initial results into the reRankScoreDocs array.
-          */
+                      /*
+                      *  Copy the initial results into the reRankScoreDocs array.
+                      */
                     System.arraycopy(mainScoreDocs, 0, reRankScoreDocs, 0, reRankScoreDocs.length);
 
                     mainDocs.scoreDocs = reRankScoreDocs;
+
+                    Map<Integer, Float> scoreMap = getScoreMap(mainDocs.scoreDocs, mainDocs.scoreDocs.length);
 
                     TopDocs rescoredDocs = new QueryRescorer(reRankQuery) {
                         @Override
@@ -378,7 +379,7 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
 
                     if(howMany == rescoredDocs.scoreDocs.length) {
                         if(scale) {
-                            scaleScores(rescoredDocs);
+                            scaleScores(rescoredDocs, scoreMap);
                         }
                         return rescoredDocs; // Just return the rescoredDocs
                     } else if(howMany > rescoredDocs.scoreDocs.length) {
@@ -391,7 +392,8 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
                         System.arraycopy(rescoredDocs.scoreDocs, 0, scoreDocs, 0, rescoredDocs.scoreDocs.length);
                         rescoredDocs.scoreDocs = scoreDocs;
                         if(scale) {
-                            scaleScores(rescoredDocs);
+                            assert(scoreMap != null);
+                            scaleScores(rescoredDocs, scoreMap);
                         }
                         return rescoredDocs;
                     } else {
@@ -400,7 +402,7 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
                         System.arraycopy(rescoredDocs.scoreDocs, 0, scoreDocs, 0, howMany);
                         rescoredDocs.scoreDocs = scoreDocs;
                         if(scale) {
-                            scaleScores(rescoredDocs);
+                            scaleScores(rescoredDocs, scoreMap);
                         }
                         return rescoredDocs;
                     }
@@ -411,15 +413,37 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
         }
     }
 
-    private void scaleScores(TopDocs topDocs) {
+    private void scaleScores(TopDocs topDocs, Map<Integer, Float> scoreMap) {
 
         float maxScore = topDocs.getMaxScore();
+        float newMax = -Float.MAX_VALUE;
+
         for(ScoreDoc scoreDoc : topDocs.scoreDocs) {
             float score = scoreDoc.score;
-            scoreDoc.score = (score) / (maxScore);
+
+            Float oldScore = scoreMap.get(scoreDoc.doc);
+            if(oldScore == null || score == oldScore.floatValue()) {
+                scoreDoc.score = score / maxScore;
+            } else {
+                scoreDoc.score = (score / maxScore)+1;
+            }
+
+            if(scoreDoc.score > newMax) {
+                newMax = scoreDoc.score;
+            }
         }
 
-        topDocs.setMaxScore(1.0F);
+        assert(newMax <= 2);
+        topDocs.setMaxScore(newMax);
+    }
+
+    private Map<Integer, Float> getScoreMap(ScoreDoc[] scoreDocs, int num) {
+        Map<Integer, Float> scoreMap = new HashMap();
+        for(int i=0; i<num; i++) {
+            ScoreDoc doc = scoreDocs[i];
+            scoreMap.put(doc.doc, doc.score);
+        }
+        return scoreMap;
     }
 
     public class BoostedComp implements Comparator {
