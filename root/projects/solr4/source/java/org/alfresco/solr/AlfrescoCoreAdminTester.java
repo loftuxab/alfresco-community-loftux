@@ -3179,22 +3179,22 @@ public class AlfrescoCoreAdminTester
         rsp.add("FTS Connectives", report);
 
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' OR \\'zebra\\'')", 10, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' OR \\'zebra\\'')", 10, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' or \\'zebra\\'')", 10, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' or \\'zebra\\'')", 10, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' \\'zebra\\'')", 1, null, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' \\'zebra\\'')", 1, null, null, null, null,
                     null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' and \\'zebra\\'')", 1, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' and \\'zebra\\'')", 1, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' or \\'zebra\\'')", 10, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' or \\'zebra\\'')", 10, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\'  \\'zebra\\'')", 1, null, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\'  \\'zebra\\'')", 1, null, null, null, null,
                     null, (String) null);
 
         // TODO: set default OR
@@ -5537,27 +5537,27 @@ public class AlfrescoCoreAdminTester
 
         testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick')", 1, null, null,
                     null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('one')", 1, null, null,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('two')", 1, null, null,
                     null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick')", 11, null,
                     null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick brown fox')", 1,
                     null, null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick one')", 0, null,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick two')", 0, null,
                     null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick -one')", 1, null,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick -two')", 1, null,
                     null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick one')", 1, null,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick two')", 1, null,
                     null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick -one')", 10,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick -two')", 10,
                     null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('fox brown quick')", 1,
                     null, null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR one')", 2,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR two')", 2,
                     null, null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR -one')", 11,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR -two')", 11,
                     null, null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick OR -one')", 12,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick OR -two')", 12,
                     null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
                     "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\'')", 1, null, null, null, null,
@@ -5566,16 +5566,16 @@ public class AlfrescoCoreAdminTester
                     "SELECT * FROM cmis:document WHERE CONTAINS('\\'fox brown quick\\'')", 0, null, null, null, null,
                     null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\' one')", 0, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\' two')", 0, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\' -one')", 1, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\' -two')", 1, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('-\\'quick brown fox\\' one')", 1, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('-\\'quick brown fox\\' two')", 1, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('-\\'quick brown fox\\' -one')", 10, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('-\\'quick brown fox\\' -two')", 10, null, null, null,
                     null, null, (String) null);
 
         // escaping
@@ -5584,21 +5584,21 @@ public class AlfrescoCoreAdminTester
                     null, null, (String) null);
 
         // precedence
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown one')",
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown two')",
                     1, null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown AND one')", 1, null, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown AND two')", 1, null, null, null, null,
                     null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR (brown AND one)')", 1, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR (brown AND two)')", 1, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('(quick OR brown) AND one')", 0, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('(quick OR brown) AND two')", 0, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown OR one')", 2, null, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown OR two')", 2, null, null, null, null,
                     null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown one')",
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown two')",
                     1, null, null, null, null, null, (String) null);
     }
 
