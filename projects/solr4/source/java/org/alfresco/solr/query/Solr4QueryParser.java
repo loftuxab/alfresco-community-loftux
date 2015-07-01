@@ -75,6 +75,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.commongrams.CommonGramsFilter;
 import org.apache.lucene.analysis.shingle.ShingleFilterFactory;
 import org.apache.lucene.analysis.synonym.SynonymFilter;
 import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
@@ -1592,68 +1593,121 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 		OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>> allTokenSequencesSet = new OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>>();
 		for(LinkedList<org.apache.lucene.analysis.Token> tokensAtPosition : tokensByPosition)
 		{
-			if(allTokenSequencesSet.size() == 0)
-			{
-				for(org.apache.lucene.analysis.Token t : tokensAtPosition)
-				{
-					org.apache.lucene.analysis.Token replace = new org.apache.lucene.analysis.Token(t, t.startOffset(), t.endOffset());
-					replace.setType(t.type());
-					replace.setPositionIncrement(t.getPositionIncrement());
+			OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>> positionalSynonymSequencesSet = new OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>>();
 
+			OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>> newAllTokenSequencesSet = new OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>>();
+
+			FOR_FIRST_TOKEN_AT_POSITION_ONLY: for(org.apache.lucene.analysis.Token t : tokensAtPosition)
+			{
+				org.apache.lucene.analysis.Token replace = new org.apache.lucene.analysis.Token(t, t.startOffset(), t.endOffset());
+				replace.setType(t.type());
+				replace.setPositionIncrement(t.getPositionIncrement());
+
+				boolean tokenFoundSequence = false;
+				for(LinkedList<org.apache.lucene.analysis.Token> tokenSequence : allTokenSequencesSet)
+				{
 					LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
-					newEntry.add(replace);
-					allTokenSequencesSet.add(newEntry);
-				}
-			}
-			else
-			{
-
-				OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>> positionalSynonymSequencesSet = new OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>>();
-				
-				OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>> newAllTokenSequencesSet = new OrderedHashSet<LinkedList<org.apache.lucene.analysis.Token>>();
-
-				FOR_FIRST_TOKEN_AT_POSITION_ONLY: for(org.apache.lucene.analysis.Token t : tokensAtPosition)
-				{
-					org.apache.lucene.analysis.Token replace = new org.apache.lucene.analysis.Token(t, t.startOffset(), t.endOffset());
-					replace.setType(t.type());
-					replace.setPositionIncrement(t.getPositionIncrement());
-
-					boolean tokenFoundSequence = false;
-					for(LinkedList<org.apache.lucene.analysis.Token> tokenSequence : allTokenSequencesSet)
+					newEntry.addAll(tokenSequence);
+					if((newEntry.getLast().endOffset() == replace.endOffset()) && replace.type().equals(SynonymFilter.TYPE_SYNONYM))
 					{
-						LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
-						newEntry.addAll(tokenSequence);
-						if((newEntry.getLast().startOffset() == replace.startOffset()) && (newEntry.getLast().endOffset() == replace.endOffset())
-								&& newEntry.getLast().type().equals(SynonymFilter.TYPE_SYNONYM) && replace.type().equals(SynonymFilter.TYPE_SYNONYM))
+						if((newEntry.getLast().startOffset() == replace.startOffset()) && newEntry.getLast().type().equals(SynonymFilter.TYPE_SYNONYM))
 						{
 							positionalSynonymSequencesSet.add(tokenSequence);
 							newEntry.add(replace);
 							tokenFoundSequence = true;
+						}
+						else if(newEntry.getLast().type().equals(CommonGramsFilter.GRAM_TYPE))
+						{
+							if(newEntry.toString().endsWith(replace.toString()))
+							{
+								// already in the gram
+								positionalSynonymSequencesSet.add(tokenSequence);
+								tokenFoundSequence = true;
+							}
+							else
+							{
+								// need to replace the synonym in the current gram
+								tokenFoundSequence = true;
+								StringBuffer old = new StringBuffer(newEntry.getLast().toString());
+								old.replace(replace.startOffset() - newEntry.getLast().startOffset(), replace.endOffset() - newEntry.getLast().startOffset() , replace.toString());
+								Token newToken = new org.apache.lucene.analysis.Token(old.toString(), newEntry.getLast().startOffset(), newEntry.getLast().endOffset());
+								newEntry.removeLast();
+								newEntry.add(newToken);
+							}
+						}
+					}
+					else if((newEntry.getLast().startOffset() < replace.startOffset()) && (newEntry.getLast().endOffset() < replace.endOffset()))
+					{
+						if(newEntry.getLast().type().equals(SynonymFilter.TYPE_SYNONYM) && replace.type().equals(SynonymFilter.TYPE_SYNONYM))
+						{
+							positionalSynonymSequencesSet.add(tokenSequence);
+						}
+						newEntry.add(replace);
+						tokenFoundSequence = true;
+					}
+					newAllTokenSequencesSet.add(newEntry);
+				}
+				if(false == tokenFoundSequence)
+				{
+					for(LinkedList<org.apache.lucene.analysis.Token> tokenSequence : newAllTokenSequencesSet)
+					{
+						LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
+						newEntry.addAll(tokenSequence);
+						if((newEntry.getLast().endOffset() == replace.endOffset()) && replace.type().equals(SynonymFilter.TYPE_SYNONYM))
+						{
+							if((newEntry.getLast().startOffset() == replace.startOffset()) && newEntry.getLast().type().equals(SynonymFilter.TYPE_SYNONYM))
+							{
+								positionalSynonymSequencesSet.add(tokenSequence);
+								newEntry.add(replace);
+								tokenFoundSequence = true;
+							}
+							else if(newEntry.getLast().type().equals(CommonGramsFilter.GRAM_TYPE))
+							{
+								if(newEntry.toString().endsWith(replace.toString()))
+								{
+									// already in the gram
+									positionalSynonymSequencesSet.add(tokenSequence);
+									tokenFoundSequence = true;
+								}
+								else
+								{
+									// need to replace the synonym in the current gram
+									tokenFoundSequence = true;
+									StringBuffer old = new StringBuffer(newEntry.getLast().toString());
+									old.replace(replace.startOffset() - newEntry.getLast().startOffset(), replace.endOffset() - newEntry.getLast().startOffset() , replace.toString());
+									Token newToken = new org.apache.lucene.analysis.Token(old.toString(), newEntry.getLast().startOffset(), newEntry.getLast().endOffset());
+									newEntry.removeLast();
+									newEntry.add(newToken);
+									positionalSynonymSequencesSet.add(newEntry);
+								}
+							}		
 						}
 						else if((newEntry.getLast().startOffset() < replace.startOffset()) && (newEntry.getLast().endOffset() < replace.endOffset()))
 						{
 							if(newEntry.getLast().type().equals(SynonymFilter.TYPE_SYNONYM) && replace.type().equals(SynonymFilter.TYPE_SYNONYM))
 							{
 								positionalSynonymSequencesSet.add(tokenSequence);
+								newEntry.add(replace);
+								tokenFoundSequence = true;
 							}
-							newEntry.add(replace);
-							tokenFoundSequence = true;
 						}
-						newAllTokenSequencesSet.add(newEntry);
-					}
-					if(false == tokenFoundSequence)
-					{
-						throw new IllegalStateException();
-					}
-					// Limit the max number of permutations we consider
-					if(newAllTokenSequencesSet.size() > 64)
-					{
-						break FOR_FIRST_TOKEN_AT_POSITION_ONLY;
 					}
 				}
-			    allTokenSequencesSet = newAllTokenSequencesSet;
-			    allTokenSequencesSet.addAll(positionalSynonymSequencesSet);
+				if(false == tokenFoundSequence)
+				{
+					LinkedList<org.apache.lucene.analysis.Token> newEntry = new LinkedList<org.apache.lucene.analysis.Token>();
+					newEntry.add(replace);
+					newAllTokenSequencesSet.add(newEntry);
+				}
+				// Limit the max number of permutations we consider
+				if(newAllTokenSequencesSet.size() > 64)
+				{
+					break FOR_FIRST_TOKEN_AT_POSITION_ONLY;
+				}
 			}
+			allTokenSequencesSet = newAllTokenSequencesSet;
+			allTokenSequencesSet.addAll(positionalSynonymSequencesSet);
+
 		}
 
 		LinkedList<LinkedList<org.apache.lucene.analysis.Token>> allTokenSequences = new LinkedList<LinkedList<org.apache.lucene.analysis.Token>>(allTokenSequencesSet);

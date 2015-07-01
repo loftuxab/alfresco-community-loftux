@@ -134,7 +134,10 @@ public class FTSQueryParser
             parser.setDefaultFieldConjunction(defaultFieldConnective == Connective.AND ? true : false);
             CommonTree ftsNode = (CommonTree) parser.ftsQuery().getTree();
             // Rewrite for auto phrase
-            ftsNode = autoPhraseReWrite(ftsNode, defaultFieldConnective == Connective.AND ? true : false, rerankPhase);
+            if(rerankPhase != RerankPhase.RERANK_PHASE.SINGLE_PASS)
+            {
+                ftsNode = autoPhraseReWrite(ftsNode, defaultFieldConnective == Connective.AND ? true : false, rerankPhase);
+            }
             return buildFTSConnective(null, ftsNode, factory, functionEvaluationContext, selector, columnMap, templateTrees, defaultField);
         }
         catch (RecognitionException e)
@@ -195,20 +198,27 @@ public class FTSQueryParser
 			}
 			CommonTree disjunction = new CommonTree(new DisjunctionToken());
 			newNode.addChild(disjunction);
-			CommonTree termConjuctionLink = new CommonTree(new DefaultToken());
-			disjunction.addChild(termConjuctionLink);
-			CommonTree termConjunction = new CommonTree(new ConjunctionToken());
-			termConjuctionLink.addChild(termConjunction);
-			for(CommonTree phrased : autoPhrased)
+
+			if(rerankPhase == RerankPhase.SINGLE_PASS_WITH_AUTO_PHRASE)
 			{
-				CommonTree newPhrased = autoPhraseReWrite(phrased, defaultConjunction, rerankPhase);
-				termConjunction.addChild(newPhrased);
+				CommonTree termConjuctionLink = new CommonTree(new DefaultToken());
+				disjunction.addChild(termConjuctionLink);
+				CommonTree termConjunction = new CommonTree(new ConjunctionToken());
+				termConjuctionLink.addChild(termConjunction);
+				for(CommonTree phrased : autoPhrased)
+				{
+					CommonTree newPhrased = autoPhraseReWrite(phrased, defaultConjunction, rerankPhase);
+					termConjunction.addChild(newPhrased);
+				}
 			}
+
+
 			CommonTree phraseLink = new CommonTree(new DefaultToken());
 			disjunction.addChild(phraseLink);
 			CommonTree phraseTree = new CommonTree(new PhraseToken());
 			phraseLink.addChild(phraseTree);
 			phraseTree.addChild(new CommonTree(new WordToken(phrase.toString())));
+			
 		}
 		else
 		{
@@ -232,14 +242,6 @@ public class FTSQueryParser
     		for (Object current : node.getChildren())
     		{
     			CommonTree child = (CommonTree) current;
-    			if(child.getType() ==  FTSParser.DEFAULT)
-    			{
-    				if(!defaultConjunction)
-    				{
-    					return false;
-    				}
-    			}
-    			
     			if((child.getType() ==  FTSParser.MANDATORY) || (child.getType() ==  FTSParser.DEFAULT))
     			{
     				if(child.getChildCount() > 0)
