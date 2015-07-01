@@ -1908,7 +1908,7 @@
      <bool name="carrot.produceSummary">true</bool>
      <bool name="carrot.outputSubClusters">false</bool>
     
-     <str name="rq">{!rerank reRankQuery=$rqq reRankDocs=1000 reRankWeight=3}</str>
+     <str name="rq">{!alfrescoReRank reRankQuery=$rqq reRankDocs=500 scale=true reRankWeight=3}</str>
      <str name="rqq">{!rrafts}RERANK_QUERY_FROM_CONTEXT</str>
     
     </lst>
@@ -1963,6 +1963,7 @@
   <queryParser name="rrafts" class="org.alfresco.solr.query.AlfrescoFTSQParserPlugin">
     <str name="rerankPhase">RERANK_PHASE</str>
   </queryParser>
+  <queryParser name="alfrescoReRank" class="org.alfresco.solr.query.AlfrescoReRankQParserPlugin"/>
   <queryParser name="cmis" class="org.alfresco.solr.query.CmisQParserPlugin"/>
 
   <queryParser name="mimetype" class="org.alfresco.solr.query.MimetypeGroupingQParserPlugin" >
