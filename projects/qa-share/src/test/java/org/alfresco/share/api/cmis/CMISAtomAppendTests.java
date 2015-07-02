@@ -90,7 +90,7 @@ public class CMISAtomAppendTests extends CMISAppendTest
         {
             try
             {
-                RandomAccessFile f = new RandomAccessFile("fileName.txt", "rw");
+                RandomAccessFile f = new RandomAccessFile(DATA_FOLDER + file150mbName, "rw");
                 f.setLength(150000000);
             }
             catch (Exception e)

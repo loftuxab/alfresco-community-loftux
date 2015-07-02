@@ -397,6 +397,7 @@ public class ShareUserGoogleDocs extends AbstractCloudSyncTest
      */
     private static EditInGoogleDocsPage switchToGoogleWindow(WebDrone drone)
     {
+        logger.info("Switch to GoogleDocs Edit window");
         Set<String> setWindowHandles = drone.getWindowHandles();
         int retry = 0;
         while (setWindowHandles.size() < 2)
