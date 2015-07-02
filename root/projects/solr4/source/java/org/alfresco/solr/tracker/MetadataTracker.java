@@ -37,6 +37,7 @@ import org.alfresco.solr.adapters.IOpenBitSet;
 import org.alfresco.solr.client.GetNodesParameters;
 import org.alfresco.solr.client.Node;
 import org.alfresco.solr.client.Node.SolrApiNodeStatus;
+import org.alfresco.solr.client.SOLRAPIClient.SolrApiContentStatus;
 import org.alfresco.solr.client.SOLRAPIClient;
 import org.alfresco.solr.client.Transaction;
 import org.alfresco.solr.client.Transactions;
@@ -737,6 +738,18 @@ public class MetadataTracker extends AbstractTracker implements Tracker
                 if(isInAclShard(node.getAclId()))
                 {
                     filteredList.add(node);
+                }
+                else
+                {
+                	// Make sure anything no longer relevant to this shard is deleted. 
+                	Node doDelete = new Node();
+                	doDelete.setAclId(node.getAclId());
+                	doDelete.setId(node.getId());
+                	doDelete.setNodeRef(node.getNodeRef());
+                	doDelete.setStatus(SolrApiNodeStatus.DELETED);
+                	doDelete.setTenant(node.getTenant());
+                	doDelete.setTxnId(node.getTxnId());
+                	filteredList.add(doDelete);
                 }
             }
             return filteredList;
