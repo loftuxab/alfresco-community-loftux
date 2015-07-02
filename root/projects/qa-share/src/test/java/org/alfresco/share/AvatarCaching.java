@@ -18,32 +18,14 @@
  */
 package org.alfresco.share;
 
-import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
-import static org.alfresco.po.share.enums.Dashlets.MY_PROFILE;
-import static org.alfresco.po.share.enums.Dashlets.SITE_MEMBERS;
-import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
-import java.io.File;
-import java.net.URLEncoder;
-
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.BrowserMobProxyServer;
+import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarRequest;
 import net.lightbody.bmp.core.har.HarResponse;
-import net.lightbody.bmp.proxy.ProxyServer;
-
-import org.alfresco.po.share.AddUserToGroupForm;
-import org.alfresco.po.share.DashBoardPage;
-import org.alfresco.po.share.GroupsPage;
-import org.alfresco.po.share.LoginPage;
-import org.alfresco.po.share.NewGroupPage;
-import org.alfresco.po.share.PeopleFinderPage;
-import org.alfresco.po.share.SharePage;
-import org.alfresco.po.share.UserSearchPage;
+import org.alfresco.po.share.*;
 import org.alfresco.po.share.enums.Dashlets;
 import org.alfresco.po.share.site.CustomiseSiteDashboardPage;
 import org.alfresco.po.share.site.InviteMembersPage;
@@ -57,13 +39,7 @@ import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.FileDirectoryInfo;
 import org.alfresco.po.share.user.EditProfilePage;
 import org.alfresco.po.share.user.MyProfilePage;
-import org.alfresco.share.util.AbstractUtils;
-import org.alfresco.share.util.JmxUtils;
-import org.alfresco.share.util.ShareUser;
-import org.alfresco.share.util.ShareUserDashboard;
-import org.alfresco.share.util.ShareUserMembers;
-import org.alfresco.share.util.ShareUserSitePage;
-import org.alfresco.share.util.SiteUtil;
+import org.alfresco.share.util.*;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.webdrone.exception.PageRenderTimeException;
@@ -78,6 +54,15 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.io.File;
+import java.net.URLEncoder;
+
+import static org.alfresco.po.share.NewGroupPage.ActionButton.CREATE_GROUP;
+import static org.alfresco.po.share.enums.Dashlets.MY_PROFILE;
+import static org.alfresco.po.share.enums.Dashlets.SITE_MEMBERS;
+import static org.alfresco.po.share.enums.UserRole.COLLABORATOR;
+import static org.testng.Assert.*;
+
 /**
  * @author Aliaksei Boole
  */
@@ -85,9 +70,11 @@ import org.testng.annotations.Test;
 public class AvatarCaching extends AbstractUtils
 {
     private static final Logger logger = Logger.getLogger(AvatarCaching.class);
-    private ProxyServer proxyServer;
+    private BrowserMobProxy proxyServer;
     private final static String TEST_FILE = "test.txt";
     private final static String AVATAR_FILE = "app-logo-48.png";
+    String serverAddress;
+    Proxy proxy;
 
     @Override
     @BeforeClass(alwaysRun = true)
@@ -95,17 +82,27 @@ public class AvatarCaching extends AbstractUtils
     {
         testName = this.getClass().getSimpleName();
         logger.info("[Suite ] : Start Tests in: " + testName);
-        Proxy proxy = initProxy();
+        proxy = initProxy();
         initDrone(proxy);
+        serverAddress = JmxUtils.getAddress(dronePropertiesMap.get(customDrone).getShareUrl());
+        try
+        {
+            proxyServer.removeAllHeaders();
+        }
+        catch(UnsupportedOperationException e)
+        {
+            logger.error("The clear all hearders failed", e);
+        }
+
     }
 
     private Proxy initProxy()
     {
         try
         {
-            proxyServer = new ProxyServer(9978);
-            proxyServer.start();
-            return proxyServer.seleniumProxy();
+            proxyServer = new BrowserMobProxyServer();
+            proxyServer.start(0);
+            return ClientUtil.createSeleniumProxy(proxyServer);
         }
         catch (Exception e)
         {
@@ -137,6 +134,7 @@ public class AvatarCaching extends AbstractUtils
                 requestFound = true;
                 break;
             }
+
         }
         return requestFound;
     }
@@ -172,15 +170,14 @@ public class AvatarCaching extends AbstractUtils
 
         String testName = getTestName();
         String testUser = getUserNameFreeDomain(testName);
-        String serverAddress = JmxUtils.getAddress(dronePropertiesMap.get(customDrone).getShareUrl());
+
 
         proxyServer.newHar(serverAddress);
         customDrone.navigateTo(shareUrl);
-        LoginPage lp = new LoginPage(customDrone);
-        lp.loginAs(testUser, DEFAULT_PASSWORD);
-        //DashBoardPage dashBoardPage = ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD).render();
-        DashBoardPage dashBoardPage = customDrone.getCurrentPage().render();
+        DashBoardPage dashBoardPage = ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD).render();
+        dashBoardPage = customDrone.getCurrentPage().render();
         dashBoardPage.getDashlet(DASHLET_ACTIVITIES).render();
+
         Har har = proxyServer.getHar();
         if (alfrescoVersion.isCloud())
         {
@@ -662,6 +659,7 @@ public class AvatarCaching extends AbstractUtils
         final String AVATAR_THUMBNAIL_CLOUD_REGEXP = "https?://.+/share/\\w+\\.\\w+/proxy/alfresco/slingshot/profile/avatar/" + userNameInUrl + "/thumbnail/avatar32";
 
         proxyServer.newHar(serverAddress);
+        customDrone.navigateTo(shareUrl);
         ShareUser.login(customDrone, testUser, DEFAULT_PASSWORD).render();
         ShareUser.openSitesDocumentLibrary(customDrone, siteName);
         ShareUser.openDocumentDetailPage(customDrone, TEST_FILE).render();
@@ -889,7 +887,7 @@ public class AvatarCaching extends AbstractUtils
         assertTrue(checkRequestResponse(har, AVATAR_NODE_ENTERPRISE_REGEXP, 304), "Request[" + AVATAR_NODE_ENTERPRISE_REGEXP + "] don't found.");
     }
 
-    @Override
+
     @AfterClass(alwaysRun = true)
     public void tearDown()
     {
