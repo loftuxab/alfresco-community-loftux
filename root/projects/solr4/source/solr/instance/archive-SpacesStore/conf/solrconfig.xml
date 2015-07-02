@@ -1958,7 +1958,7 @@
   <queryParser name="cmis" class="org.alfresco.solr.query.CmisQParserPlugin"/>
 
   <queryParser name="mimetype" class="org.alfresco.solr.query.MimetypeGroupingQParserPlugin" >
-      <str name="mapping">mime_types.csv</str>
+      <str name="mapping">conf/mime_types.csv</str>
   </queryParser>
 
   <queryParser name="contentSize" class="org.alfresco.solr.query.ContentSizeGroupingQParserPlugin" >
