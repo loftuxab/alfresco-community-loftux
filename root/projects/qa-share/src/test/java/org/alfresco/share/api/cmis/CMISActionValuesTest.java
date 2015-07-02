@@ -766,17 +766,24 @@ public abstract class CMISActionValuesTest extends CmisUtils
         ManagePermissionsPage managePermissionsPage = ShareUserSitePage.manageContentPermissions(drone, thisFileName);
         assertEquals(managePermissionsPage.getExistingPermission("EVERYONE"), UserRole.COORDINATOR);
         managePermissionsPage.selectCancel();
+        ShareUser.openSiteDocumentLibraryFromSearch(drone, siteName);
+        FileDirectoryInfo fileDirectoryInfo = ShareUserSitePage.getFileDirectoryInfo(drone, thisFileName);
+        
+        ShareUser.login(drone, testUser);
         doc.applyAcl(null, aces, AclPropagation.OBJECTONLY);
         
         ShareUser.login(drone, otherTestUser);
         ShareUser.openSiteDocumentLibraryFromSearch(drone, siteName);
-        FileDirectoryInfo fileDirectoryInfo = ShareUserSitePage.getFileDirectoryInfo(drone, thisFileName);
+        fileDirectoryInfo = ShareUserSitePage.getFileDirectoryInfo(drone, thisFileName);
 //        assertFalse(fileDirectoryInfo.isEditOfflineLinkPresent(), "For consumer edit offline link should not be visible.");
 
+        ShareUser.login(drone, testUser);
+        ShareUser.openSiteDocumentLibraryFromSearch(drone, siteName);
         ShareUser.createFolderInFolder(drone, thisFolderName, thisFolderName, DOCLIB);
         String folderNodeRef = ShareUser.getGuid(drone, thisFolderName);
         Folder folder = (Folder) getObject(folderNodeRef);
 
+        ShareUser.login(drone, otherTestUser);
         ShareUser.openSiteDocumentLibraryFromSearch(drone, siteName);
         managePermissionsPage = ShareUserSitePage.manageContentPermissions(drone, thisFolderName);
         assertEquals(managePermissionsPage.getExistingPermission("EVERYONE"), UserRole.COORDINATOR);

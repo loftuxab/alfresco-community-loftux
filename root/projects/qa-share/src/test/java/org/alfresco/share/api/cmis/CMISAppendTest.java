@@ -194,7 +194,7 @@ public abstract class CMISAppendTest extends CmisUtils
         assertTrue(thisRow.getModifier().contains(testUser), thisRow.getModifier());
         DocumentDetailsPage documentDetailsPage = ShareUser.openDocumentDetailPage(drone, testFileName);
 
-        assertEquals(documentDetailsPage.getCommentsOfLastCommit().contains("Appended content stream"), documentDetailsPage.getCommentsOfLastCommit());
+        assertEquals(documentDetailsPage.getCommentsOfLastCommit(),"Appended content stream", "Comment of last document version is " + documentDetailsPage.getCommentsOfLastCommit() +" instead of \"Appended content stream\"");
         assertTrue(documentDetailsPage.getDocumentVersion().equals("1.1"));
 
     }

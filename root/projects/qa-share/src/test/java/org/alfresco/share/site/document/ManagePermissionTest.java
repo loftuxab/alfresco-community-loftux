@@ -3272,16 +3272,16 @@ public class ManagePermissionTest extends AbstractAspectTests
         // Navigate to document's manage permission.
         ShareUser.returnManagePermissionPage(drone, folderName);
 
-        // Search and add user1 with role Collaborator.
+        // Search and add user1 with role Consumer.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONSUMER, true);
 
         // Navigate to document's manage permission.
         ShareUser.returnManagePermissionPage(drone, fileName);
 
-        // Search and add user1 with role Collaborator.
+        // Search and add user1 with role Consumer.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONSUMER, true);
 
         // user logs out.
         ShareUser.logout(drone);
@@ -3292,20 +3292,22 @@ public class ManagePermissionTest extends AbstractAspectTests
         // Open Site document Library
         DocumentLibraryPage docLibPage = ShareUser.openSiteDocumentLibraryFromSearch(drone, siteName);
 
-        // Verify document has Edit off line present.
+        // Verify folder has Comment link present.
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(folderName).isCommentLinkPresent());
 
-        // VErify folder has Edit off line present.
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(folderName).isEditPropertiesLinkPresent());
+        // Verify folder has not Edit properties present.
+        Assert.assertFalse(docLibPage.getFileDirectoryInfo(folderName).isEditPropertiesLinkPresent());
 
+        // Verify folder has not Delete present.
         Assert.assertFalse(docLibPage.getFileDirectoryInfo(folderName).isDeletePresent());
 
-        // Verify document has Edit off line present.
+        // Verify document has Comment link present.
         Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName).isCommentLinkPresent());
 
-        // VErify folder has Edit off line present.
-        Assert.assertTrue(docLibPage.getFileDirectoryInfo(fileName).isEditOfflineLinkPresent());
+        // Verify document has not Edit offline present
+        Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isEditOfflineLinkPresent());
 
+        // Verify document has not Delete present.
         Assert.assertFalse(docLibPage.getFileDirectoryInfo(fileName).isDeletePresent());
 
         ShareUser.logout(drone);
