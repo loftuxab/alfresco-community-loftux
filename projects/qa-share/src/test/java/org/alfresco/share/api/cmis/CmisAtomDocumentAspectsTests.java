@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 
 /**
  * Class to include: Tests for cmis with Atom11 binding
- * 
+ *
  * @author Ranjith Manyam
  */
 @Listeners(FailedTestListener.class)
@@ -52,7 +52,7 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
     {
         super.beforeClass();
 
-        testName = this.getClass().getSimpleName();
+        testName = this.getClass().getSimpleName()+"B";
         testUser = getUserNameFreeDomain(testName);
         String[] testUserInfo = new String[] { testUser };
 
@@ -67,18 +67,14 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         ShareUser.logout(drone);
     }
 
-    @Test(groups = { "DataPrepCmisBrowser" })
-    public void dataPrep_AONE_14552() throws Exception
-    {
-        dataPrepSecondaryObjectTypeIDsProperty(drone, testUser, getTestName(), siteName);
-    }
-
     @Test(groups = {"IntermittentBugs"})
     public void AONE_14552() throws Exception
     {
         testName = getTestName();
         fileName = getFileName(testName);
         String folderName = getFolderName(testName);
+
+        dataPrepSecondaryObjectTypeIDsProperty(drone, testUser, getTestName(), siteName);
         String fileNodeRef = getNodeRef(cmisVersionAtom11, testUser, DOMAIN, siteName, "", fileName);
         String folderNodeRef = getNodeRef(cmisVersionAtom11, testUser, DOMAIN, siteName, "", folderName);
 
@@ -117,16 +113,12 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
 
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14553() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
 
     @Test
     public void AONE_14553() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addClasifiableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -137,16 +129,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeClasifiableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14554() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14554() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addComplianceableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
 
     }
@@ -158,16 +145,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeComplianceableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14555() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14555() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addDublinCoreAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -178,16 +160,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeDublinCoreAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14556() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14556() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addEffectivityAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -198,16 +175,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeEffectivityAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14557() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14557() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addSummarizableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -218,18 +190,13 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeSummarizableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14558() throws Exception
-    {
-        testName = getTestName();
-        dataPrepTemplatableAspect(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14558() throws Exception
     {
-        templateName = "Template-" + getFileName(getTestName());
-        fileName = getFileName(getTestName());
+        testName = getTestName();
+        templateName = "Template-" + getFileName(testName);
+        fileName = getFileName(testName);
+        dataPrepTemplatableAspect(drone, testUser, getTestName(), siteName);
         addTemplatableAspect(drone, testUser, fileName, siteName, templateName, cmisVersionAtom11);
     }
 
@@ -240,16 +207,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeTemplatableAspect(drone, testUser, fileName, siteName, templateName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14559() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14559() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addEmailedAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -260,7 +222,7 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeEmailedAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
+
     public void dataPrep_AONE_14560() throws Exception
     {
         testName = getTestName();
@@ -290,6 +252,7 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         fileName = getFileName(testName);
         tag = ("Tag-" + getFileName(testName)).toLowerCase();
 
+        dataPrep_AONE_14560();
         addTaggableAspect(drone, testUser, fileName, siteName, tag, cmisVersionAtom11);
     }
 
@@ -300,16 +263,12 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeTaggableAspect(drone, testUser, fileName, siteName, tag, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14561() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
 
     @Test
     public void AONE_14561() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addGeographicAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -320,16 +279,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeGeographicAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14562() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14562() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addEXIFAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -340,16 +294,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeEXIFAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14563() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14563() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addAudioAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -360,17 +309,12 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeAudioAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14564() throws Exception
-    {
-        dataPrepIndexControlAspect(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14564() throws Exception
     {
         fileName = getFileName(getTestName());
         String content = "Content: " + getTestName();
+        dataPrepIndexControlAspect(drone, testUser, getTestName(), siteName);
         addIndexControlAspect(drone, testUser, fileName, content, siteName, cmisVersionAtom11);
     }
 
@@ -381,16 +325,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeIndexControlAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14565() throws Exception
-    {
-        dataPrep(drone, testUser, getTestName(), siteName);
-    }
-
     @Test
     public void AONE_14565() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrep(drone, testUser, getTestName(), siteName);
         addRestrictableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
@@ -401,16 +340,11 @@ public class CmisAtomDocumentAspectsTests extends CmisDocumentAspectUtils
         removeRestrictableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 
-    @Test(groups = { "DataPrepCmisAtom" })
-    public void dataPrep_AONE_14571() throws Exception
-    {
-        dataPrepRemoveVersionableAspect(drone, testUser, getTestName(), siteName, cmisVersionAtom11);
-    }
-
     @Test
     public void AONE_14571() throws Exception
     {
         fileName = getFileName(getTestName());
+        dataPrepRemoveVersionableAspect(drone, testUser, getTestName(), siteName, cmisVersionAtom11);
         removeVersionableAspect(drone, testUser, fileName, siteName, cmisVersionAtom11);
     }
 }
