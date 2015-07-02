@@ -88,7 +88,7 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
     }
 
     /**
-     * @see org.alfresco.repo.webdav.PropPatchMethod#persistDeadProperties()
+     * @see org.alfresco.repo.webdav.PropPatchMethod#persistDeadProperties(NodeRef, Map)
      */
     @Override
     protected void persistDeadProperties(NodeRef nodeRef, Map<QName, String> deadProperties) 

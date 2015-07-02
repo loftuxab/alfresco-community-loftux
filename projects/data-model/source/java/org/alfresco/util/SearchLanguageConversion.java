@@ -66,7 +66,7 @@ public class SearchLanguageConversion
     public static LanguageDefinition DEF_REGEX = new SimpleLanguageDef('\\', ".*", ".", "\\*.+?^$(){}[]|");
 
     /**
-     * Lucene syntax summary: {@link QueryParser#escape(String) Lucene Query Parser}
+     * Lucene syntax summary: Lucene Query Parser
      */
     public static LanguageDefinition DEF_LUCENE = new LuceneLanguageDef(true);
 
@@ -143,7 +143,7 @@ public class SearchLanguageConversion
     /**
      * Convert an <b>xpath</b> like function clause into a <b>regex</b> query.
      * 
-     * @param xpathLikeClause
+     * @param xpathLikeClause String
      * @return Returns a valid regular expression that is equivalent to the given <b>xpath</b> like clause.
      */
     public static String convertXPathLikeToRegex(String xpathLikeClause)
@@ -154,7 +154,7 @@ public class SearchLanguageConversion
     /**
      * Convert an <b>xpath</b> like function clause into a <b>Lucene</b> query.
      * 
-     * @param xpathLikeClause
+     * @param xpathLikeClause String
      * @return Returns a valid <b>Lucene</b> expression that is equivalent to the given <b>xpath</b> like clause.
      */
     public static String convertXPathLikeToLucene(String xpathLikeClause)
@@ -165,7 +165,7 @@ public class SearchLanguageConversion
     /**
      * Convert a <b>sql</b> like function clause into a <b>Lucene</b> query.
      * 
-     * @param sqlLikeClause
+     * @param sqlLikeClause String
      * @return Returns a valid <b>Lucene</b> expression that is equivalent to the given <b>sql</b> like clause.
      */
     public static String convertSQLLikeToLucene(String sqlLikeClause)
@@ -176,7 +176,7 @@ public class SearchLanguageConversion
     /**
      * Convert a <b>sql</b> like function clause into a <b>regex</b> query.
      * 
-     * @param sqlLikeClause
+     * @param sqlLikeClause String
      * @return Returns a valid regular expression that is equivalent to the given <b>sql</b> like clause.
      */
     public static String convertSQLLikeToRegex(String sqlLikeClause)
@@ -335,7 +335,7 @@ public class SearchLanguageConversion
      *  
      *  The escape character is \
      *  
-     * @param query
+     * @param query String
      * @return - the escaped query string 
      */
     public static String escapeLuceneQuery(String query)

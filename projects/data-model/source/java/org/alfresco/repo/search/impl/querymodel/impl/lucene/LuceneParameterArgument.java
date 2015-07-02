@@ -28,8 +28,8 @@ public class LuceneParameterArgument extends BaseParameterArgument
 {
 
     /**
-     * @param name
-     * @param parameterName
+     * @param name String
+     * @param parameterName String
      */
     public LuceneParameterArgument(String name, String parameterName)
     {

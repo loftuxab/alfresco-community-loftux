@@ -97,8 +97,6 @@ public abstract class VtiWebDavAction implements VtiAction, VtiWebDavActionExecu
 
     /**
      * <p>Return executing WebDAV method.</p>
-     * 
-     * @param pathHelper {@link VtiPathHelper}.
      */
     public abstract WebDAVMethod getWebDAVMethod();
 
@@ -124,9 +122,9 @@ public abstract class VtiWebDavAction implements VtiAction, VtiWebDavActionExecu
      * Plugable executor implementation allows overriding of this behaviour without disturbing
      * the class hierarchy.
      * 
-     * @param method
-     * @param request
-     * @param response
+     * @param method WebDAVMethod
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
      * @throws WebDAVServerException
      */
     @Override

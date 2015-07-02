@@ -407,9 +407,9 @@ public class AclTracker extends AbstractTracker
     }
 
     /**
-     * @param changeSetsFound
-     * @param lastGoodChangeSetCommitTimeInIndex
-     * @return
+     * @param changeSetsFound BoundedDeque<AclChangeSet>
+     * @param lastGoodChangeSetCommitTimeInIndex long
+     * @return Long
      */
     protected Long getChangeSetFromCommitTime(BoundedDeque<AclChangeSet> changeSetsFound, long lastGoodChangeSetCommitTimeInIndex)
     {
@@ -473,8 +473,8 @@ public class AclTracker extends AbstractTracker
     }
 
     /**
-     * @param aclReaderList
-     * @param overwrite
+     * @param aclReaderList List<AclReaders>
+     * @param overwrite boolean
      */
     protected void indexAcl(List<AclReaders> aclReaderList, boolean overwrite) throws IOException
     {
@@ -578,8 +578,8 @@ public class AclTracker extends AbstractTracker
 
 
     /**
-     * @param acltxid
-     * @return
+     * @param acltxid Long
+     * @return List<Long>
      */
     public List<Long> getAclsForDbAclTransaction(Long acltxid)
     {

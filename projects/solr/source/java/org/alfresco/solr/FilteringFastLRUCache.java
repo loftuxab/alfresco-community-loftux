@@ -31,9 +31,9 @@ public class FilteringFastLRUCache extends  FastLRUCache
 
 
     /**
-     * @param key
-     * @param value
-     * @return
+     * @param key Object
+     * @param value Object
+     * @return Object
      * @see org.apache.solr.search.SolrCache#put(java.lang.Object, java.lang.Object)
      */
     public Object put(Object key, Object value)

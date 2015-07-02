@@ -116,9 +116,9 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
     }
 
     /**
-     * @param namespacePrefixResolver
-     * @param dictionaryService
-     * @param defaultNamespace
+     * @param namespacePrefixResolver NamespacePrefixResolver
+     * @param dictionaryService DictionaryService
+     * @param defaultNamespace String
      */
     public AlfrescoFunctionEvaluationContext(NamespacePrefixResolver namespacePrefixResolver, DictionaryService dictionaryService, String defaultNamespace)
     {
@@ -254,9 +254,9 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
     }
 
     /**
-     * @param lqpa
-     * @param field
-     * @return
+     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
+     * @param field String
+     * @return ... extends Throwable
      * @throws E 
      */
     private  <Q, S, E extends Throwable> String findSortField(LuceneQueryParserAdaptor<Q, S, E> lqpa, String field) throws E

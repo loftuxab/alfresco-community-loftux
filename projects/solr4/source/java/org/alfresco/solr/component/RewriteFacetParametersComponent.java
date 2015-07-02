@@ -134,11 +134,13 @@ public class RewriteFacetParametersComponent extends SearchComponent
             return quoted;
         }
     }
-    
+
 
     /**
-     * @param params
-     * @return
+     * @param fixed ModifiableSolrParams
+     * @param params SolrParams
+     * @param rb ResponseBuilder
+     * @return SolrParams
      */
     private SolrParams fixFacetParams(ModifiableSolrParams fixed, SolrParams params, ResponseBuilder rb)
     {
@@ -192,8 +194,8 @@ public class RewriteFacetParametersComponent extends SearchComponent
 
 
     /**
-     * @param fixed
-     * @param params
+     * @param fixed ModifiableSolrParams
+     * @param params SolrParams
      * @param string
      * @param fieldMappings
      */
@@ -283,8 +285,10 @@ public class RewriteFacetParametersComponent extends SearchComponent
     }
 
     /**
-     * @param fixed
-     * @param params
+     * @param fixed ModifiableSolrParams
+     * @param params SolrParams
+     * @param paramName String
+     * @param fieldMappings HashMap<String, String>
      */
     private void rewriteFacetFieldOptions(ModifiableSolrParams fixed, SolrParams params, String paramName, HashMap<String, String> fieldMappings)
     {
@@ -316,8 +320,11 @@ public class RewriteFacetParametersComponent extends SearchComponent
 
 
     /**
-     * @param fixed
-     * @param params
+     * @param fixed ModifiableSolrParams
+     * @param params SolrParams
+     * @param paramName String
+     * @param fieldMappings HashMap<String, String>
+     * @param req SolrQueryRequest
      */
     private void rewriteFacetFieldList(ModifiableSolrParams fixed, SolrParams params, String paramName, HashMap<String, String> fieldMappings, SolrQueryRequest req)
     {

@@ -72,10 +72,10 @@ public class SolrLuceneAnalyser extends AbstractAnalyzer
     /**
      * Constructs with a default standard analyser
      *
-     * @param dictionaryService
-     * @param mlAlaysisMode
+     * @param dictionaryService DictionaryService
+     * @param mlAlaysisMode MLAnalysisMode
      * @param defaultAnalyser Any fields not specifically defined to use a different analyzer will use the one provided here.
-     * @param model
+     * @param model AlfrescoSolrDataModel
      */
     public SolrLuceneAnalyser(DictionaryService dictionaryService, MLAnalysisMode mlAlaysisMode, Analyzer defaultAnalyser, AlfrescoSolrDataModel model)
     {
@@ -112,8 +112,9 @@ public class SolrLuceneAnalyser extends AbstractAnalyzer
     /**
      * Pick the analyser from the field name
      * 
-     * @param fieldName
-     * @return
+     * @param fieldName String
+     * @param analysisMode AnalysisMode
+     * @return Analyzer
      */
     private Analyzer findAnalyser(String fieldName, AnalysisMode analysisMode)
     {
@@ -517,8 +518,8 @@ public class SolrLuceneAnalyser extends AbstractAnalyzer
     /**
      * Find an instantiate an analyser. The shuld all be thread sade as Analyser.tokenStream should be re-entrant.
      * 
-     * @param property
-     * @return
+     * @param property PropertyDefinition
+     * @return Analyzer
      */
     private Analyzer loadAnalyzer(PropertyDefinition property)
     {

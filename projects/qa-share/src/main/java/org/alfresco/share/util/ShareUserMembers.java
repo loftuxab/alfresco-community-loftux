@@ -595,7 +595,7 @@ public class ShareUserMembers extends AbstractUtils
      * This method switches the toggleInheritPemissions icon to desired status
      * specified as boolean value <toggleInheritPermission>
      * 
-     * @IMP Note: This is to be called when user is on the ManagePermissions
+     * <br> Note: This is to be called when user is on the ManagePermissions
      *      page.
      * @param drone
      * @param toggleInheritPermission

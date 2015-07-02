@@ -29,7 +29,7 @@ public interface Disjunction extends Constraint
     /**
      * Get the list of constraints for which at least one must be met.
      * 
-     * @return
+     * @return List<Constraint>
      */
     public List<Constraint> getConstraints();
 }

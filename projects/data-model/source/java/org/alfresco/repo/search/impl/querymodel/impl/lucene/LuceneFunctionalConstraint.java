@@ -34,8 +34,8 @@ public class LuceneFunctionalConstraint<Q, S, E extends Throwable> extends BaseF
 {
 
     /**
-     * @param function
-     * @param arguments
+     * @param function Function
+     * @param arguments Map<String, Argument>
      */
     public LuceneFunctionalConstraint(Function function, Map<String, Argument> arguments)
     {

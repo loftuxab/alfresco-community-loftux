@@ -28,14 +28,14 @@ public interface FunctionInvokation
     /**
      * Get the function
      * 
-     * @return
+     * @return Function
      */
     public Function getFunction();
 
     /**
      * Get the functions arguments.
      * 
-     * @return
+     * @return Map
      */
     public Map<String, Argument> getFunctionArguments();
 }

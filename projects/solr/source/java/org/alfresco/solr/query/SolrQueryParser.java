@@ -154,8 +154,8 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
     }
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected Query createAclIdQuery(String queryText) throws ParseException
     {
@@ -163,8 +163,8 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
     }
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected Query createOwnerQuery(String queryText) throws ParseException
     {
@@ -172,8 +172,8 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
     }
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected Query createReaderQuery(String queryText) throws ParseException
     {
@@ -181,8 +181,8 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
     }
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected Query createAuthorityQuery(String queryText) throws ParseException
     {
@@ -202,8 +202,8 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
     }
 
     /**
-     * @param arg0
-     * @param arg1
+     * @param arg0 String
+     * @param arg1 Analyzer
      */
     public SolrQueryParser(String arg0, Analyzer arg1)
     {
@@ -211,7 +211,7 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
     }
 
     /**
-     * @param arg0
+     * @param arg0 CharStream
      */
     public SolrQueryParser(CharStream arg0)
     {
@@ -219,7 +219,7 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
     }
 
     /**
-     * @param arg0
+     * @param arg0 QueryParserTokenManager
      */
     public SolrQueryParser(QueryParserTokenManager arg0)
     {
@@ -445,15 +445,15 @@ public class SolrQueryParser extends AbstractLuceneQueryParser
 
     /**
      *
-     * @param queryText
-     * @param subQueryBuilder
-     * @param analysisMode
-     * @param luceneFunction
-     * @param booleanQuery
-     * @param locale
-     * @param textFieldName
-     * @param tokenisationMode
-     * @param preferredTokenisationMode
+     * @param queryText String
+     * @param subQueryBuilder SubQuery
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
+     * @param booleanQuery BooleanQuery
+     * @param locale Locale
+     * @param textFieldName String
+     * @param tokenisationMode IndexTokenisationMode
+     * @param preferredTokenisationMode IndexTokenisationMode
      * @throws ParseException
      */
     private void addLocaleSpecificMLOrTextAttribute(String queryText, SubQuery subQueryBuilder, AnalysisMode analysisMode, LuceneFunction luceneFunction,

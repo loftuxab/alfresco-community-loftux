@@ -42,7 +42,7 @@ public class FixedValueLuceneBuilder extends BaseLuceneBuilder
     /**
      * Construct
      * 
-     * @param value
+     * @param value Serializable
      */
     public FixedValueLuceneBuilder(Serializable value)
     {

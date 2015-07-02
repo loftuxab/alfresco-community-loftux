@@ -34,7 +34,11 @@ public class BasePropertyArgument extends BaseDynamicArgument implements Propert
     private String selector;
 
     /**
-     * @param name
+     * @param name String
+     * @param queryable boolean
+     * @param orderable boolean
+     * @param selector String
+     * @param propertyName String
      */
     public BasePropertyArgument(String name, boolean queryable, boolean orderable, String selector, String propertyName)
     {

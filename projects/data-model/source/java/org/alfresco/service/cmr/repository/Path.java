@@ -80,7 +80,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
      * Add a path element to the beginning of the path.  This operation is useful in cases where
      * a path is built by traversing up a hierarchy.
      * 
-     * @param pathElement
+     * @param pathElement Path.Element
      * @return Returns this instance of the path
      */
     public Path prepend(Path.Element pathElement)
@@ -92,7 +92,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Merge the given path into the beginning of this path.
      * 
-     * @param path
+     * @param path Path
      * @return Returns this instance of the path
      */
     public Path prepend(Path path)
@@ -104,7 +104,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Appends a path element to the end of the path
      * 
-     * @param pathElement
+     * @param pathElement Path.Element
      * @return Returns this instance of the path
      */
     public Path append(Path.Element pathElement)
@@ -116,7 +116,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Append the given path of this path.
      * 
-     * @param path
+     * @param path Path
      * @return Returns this instance of the path
      */
     public Path append(Path path)
@@ -326,8 +326,8 @@ public final class Path implements Iterable<Path.Element>, Serializable
         public abstract String getElementString();
 
         /**
-         * @param tenantService
-         * @return
+         * @param tenantService TenantService
+         * @return Element
          */
         @AlfrescoPublicApi
         public abstract Element getBaseNameElement(TenantService tenantService);

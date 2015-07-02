@@ -29,7 +29,7 @@ import org.springframework.extensions.surf.util.I18NUtil;
  * Class to represent a multilingual (ML) text value.
  * <p>
  * The language codes used should conform to the
- * {@linkplain http://www.loc.gov/standards/iso639-2/php/English_list.php ISO639-2}
+ * <a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO639-2</a>
  * language code standard, although there is no enforcement of the standard in this
  * class.
  * <p>

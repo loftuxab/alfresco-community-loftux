@@ -36,7 +36,7 @@ public interface TicketComponent
     /**
      * Register a new ticket
      * 
-     * @param userName
+     * @param userName String
      * @return - the ticket
      * @throws AuthenticationException
      */
@@ -45,7 +45,7 @@ public interface TicketComponent
     /**
      * Get the current ticket
      * 
-     * @param userName
+     * @param userName String
      * @param autoCreate
      *            should we create one automatically if there isn't one?
      * @return - the ticket
@@ -73,7 +73,7 @@ public interface TicketComponent
      * </ol>
      * </ol>
      * 
-     * @param ticket
+     * @param ticket String
      * @return - the user name
      * @throws AuthenticationException
      */
@@ -82,7 +82,7 @@ public interface TicketComponent
     
     /**
      * Invalidate the tickets by id
-     * @param ticket
+     * @param ticket String
      */
     @Auditable(parameters = {"ticket"}, recordable = {false})
     public void invalidateTicketById(String ticket);
@@ -90,7 +90,7 @@ public interface TicketComponent
     /**
      * Invalidate all user tickets
      * 
-     * @param userName
+     * @param userName String
      */
     public void invalidateTicketByUser(String userName);
       
@@ -125,7 +125,7 @@ public interface TicketComponent
     /**
      * Get the authority for the given ticket
      * 
-     * @param ticket
+     * @param ticket String
      * @return the authority
      */
     public String getAuthorityForTicket(String ticket);
@@ -138,7 +138,7 @@ public interface TicketComponent
     
     /**
      * Does this ticket component support a single ticket per user or one ticket for each time they login? 
-     * @return
+     * @return boolean
      */
     public boolean getUseSingleTicketPerUser();
 }

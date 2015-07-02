@@ -80,7 +80,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return int
      * @see java.lang.Object#hashCode()
      */
     public int hashCode()
@@ -89,7 +89,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return int
      * @throws IOException
      * @see org.apache.lucene.index.DocsEnum#freq()
      */
@@ -99,7 +99,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return int
      * @throws IOException
      * @see org.apache.lucene.index.DocsAndPositionsEnum#startOffset()
      */
@@ -109,7 +109,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return int
      * @throws IOException
      * @see org.apache.lucene.index.DocsAndPositionsEnum#endOffset()
      */
@@ -119,7 +119,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return int
      * @see org.apache.lucene.search.DocIdSetIterator#docID()
      */
     public int docID()
@@ -128,7 +128,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return BytesRef
      * @throws IOException
      * @see org.apache.lucene.index.DocsAndPositionsEnum#getPayload()
      */
@@ -138,7 +138,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return AttributeSource
      * @see org.apache.lucene.index.DocsEnum#attributes()
      */
     public AttributeSource attributes()
@@ -147,7 +147,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return int
      * @throws IOException
      * @see org.apache.lucene.search.DocIdSetIterator#nextDoc()
      */
@@ -159,8 +159,8 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @param target
-     * @return
+     * @param target int
+     * @return int
      * @throws IOException
      * @see org.apache.lucene.search.DocIdSetIterator#advance(int)
      */
@@ -172,8 +172,8 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @param obj
-     * @return
+     * @param obj Object
+     * @return boolean
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj)
@@ -182,7 +182,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return long
      * @see org.apache.lucene.search.DocIdSetIterator#cost()
      */
     public long cost()
@@ -191,7 +191,7 @@ public class CachingTermPositions extends DocsAndPositionsEnum
     }
 
     /**
-     * @return
+     * @return String
      * @see java.lang.Object#toString()
      */
     public String toString()

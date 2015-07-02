@@ -196,7 +196,7 @@ public class InMemoryTicketComponentImpl implements TicketComponent
     /**
      * Helper method to find a ticket
      * 
-     * @param ticketString
+     * @param ticketString String
      * @return - the ticket
      */
     private Ticket getTicketByTicketString(String ticketString)
@@ -208,7 +208,7 @@ public class InMemoryTicketComponentImpl implements TicketComponent
     /**
      * Helper method to extract the ticket id from the ticket string
      * 
-     * @param ticketString
+     * @param ticketString String
      * @return - the ticket key
      */
     private String getTicketKey(String ticketString)

@@ -83,7 +83,7 @@ public class NumericEncoder
      * comparison Integer.MIN_VALUE encodes as 00000000 and MAX_VALUE as
      * ffffffff.
      * 
-     * @param intToEncode
+     * @param intToEncode int
      * @return the encoded string
      */
     public static String encode(int intToEncode)
@@ -97,7 +97,7 @@ public class NumericEncoder
      * Long.MIN_VALUE encodes as 0000000000000000 and MAX_VALUE as
      * ffffffffffffffff.
      * 
-     * @param longToEncode
+     * @param longToEncode long
      * @return - the encoded string
      */
     public static String encode(long longToEncode)
@@ -120,7 +120,7 @@ public class NumericEncoder
     
     /**
      * Secode a long
-     * @param hex
+     * @param hex String
      * @return - the decoded string
      */
     public static long decodeLong(String hex)
@@ -139,7 +139,7 @@ public class NumericEncoder
      * comparison. Note that there is no negative NaN but there are codings that
      * imply this. So NaN and -Infinity may not compare as expected.
      * 
-     * @param floatToEncode
+     * @param floatToEncode float
      * @return - the encoded string
      */
     public static String encode(float floatToEncode)
@@ -163,7 +163,7 @@ public class NumericEncoder
      * comparison. Note that there is no negative NaN but there are codings that
      * imply this. So NaN and -Infinity may not compare as expected.
      * 
-     * @param doubleToEncode
+     * @param doubleToEncode double
      * @return the encoded string
      */
     public static String encode(double doubleToEncode)

@@ -836,7 +836,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
     /**
      * For cache use only.
      * 
-     * @param tenantDomain
+     * @param tenantDomain String
      * @return constructed DictionaryRegistry
      */
     public DictionaryRegistry initDictionaryRegistry(final String tenantDomain)
@@ -873,7 +873,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
      * If the input model does not exist in the Dictionary then no diffs will be
      * returned.
      * 
-     * @param model
+     * @param model M2Model
      * @return model diffs (if any)
      */
     public List<M2ModelDiff> diffModel(M2Model model)
@@ -892,7 +892,8 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
      * If the input model does not exist in the Dictionary then no diffs will be
      * returned.
      * 
-     * @param model
+     * @param model M2Model
+     * @param enableConstraintClassLoading boolean
      * @return model diffs (if any)
      */
     public List<M2ModelDiff> diffModel(M2Model model,
@@ -937,7 +938,8 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
      * TODO - imports - namespace - datatypes - constraints (including property
      * constraints - references and inline)
      * 
-     * @param model
+     * @param previousVersion CompiledModel
+     * @param model CompiledModel
      * @return model diffs (if any)
      */
     /* package */List<M2ModelDiff> diffModel(CompiledModel previousVersion,

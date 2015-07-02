@@ -143,8 +143,8 @@ public interface NamespaceService extends NamespacePrefixResolver
     /**
      * Register a prefix for namespace uri. 
      * 
-     * @param prefix
-     * @param uri
+     * @param prefix String
+     * @param uri String
      */
     @Auditable(parameters = {"prefix", "uri"})
     public void registerNamespace(String prefix, String uri);
@@ -153,7 +153,7 @@ public interface NamespaceService extends NamespacePrefixResolver
     /**
      * Unregister a prefix.
      * 
-     * @param prefix
+     * @param prefix String
      */
     @Auditable(parameters = {"prefix"})
     public void unregisterNamespace(String prefix);

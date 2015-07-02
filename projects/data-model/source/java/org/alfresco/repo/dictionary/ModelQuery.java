@@ -88,7 +88,7 @@ import org.alfresco.service.namespace.QName;
      * Gets the specified property constraint
      * 
      * @param name the qualified name of the property constraint
-     * @return
+     * @return ConstraintDefinition
      */
     public ConstraintDefinition getConstraint(QName name);
     

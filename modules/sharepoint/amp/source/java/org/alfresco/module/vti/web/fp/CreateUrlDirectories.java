@@ -83,7 +83,7 @@ public class CreateUrlDirectories extends AbstractMethod
     }
 
     /**
-     * @see org.alfresco.module.vti.method.VtiMethod#getName()
+     * @see VtiMethod#getName()
      */
     public String getName()
     {

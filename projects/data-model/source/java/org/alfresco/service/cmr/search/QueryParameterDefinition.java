@@ -30,7 +30,7 @@ public interface QueryParameterDefinition extends NamedQueryParameterDefinition
      * 
      * May be null
      * 
-     * @return
+     * @return PropertyDefinition
      */
     public PropertyDefinition getPropertyDefinition();
     
@@ -40,21 +40,21 @@ public interface QueryParameterDefinition extends NamedQueryParameterDefinition
      * 
      * Not null
      * 
-     * @return
+     * @return DataTypeDefinition
      */
     public DataTypeDefinition getDataTypeDefinition();
     
     /**
      * Get the default value for this parameter.
      * 
-     * @return
+     * @return String
      */
     public String getDefault();
     
     /**
      * Has this parameter got a default value?
      * 
-     * @return
+     * @return boolean
      */
     public boolean hasDefaultValue();
 }

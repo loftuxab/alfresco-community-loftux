@@ -66,10 +66,10 @@ public abstract class AbstractQParser extends QParser
     private static final String TENANT_FILTER_FROM_JSON = "TENANT_FILTER_FROM_JSON";
 
     /**
-     * @param qstr
-     * @param localParams
-     * @param params
-     * @param req
+     * @param qstr String
+     * @param localParams SolrParams
+     * @param params SolrParams
+     * @param req SolrQueryRequest
      */
     public AbstractQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
     {
@@ -346,8 +346,8 @@ public abstract class AbstractQParser extends QParser
     }
 
     /**
-     * @param authorityList
-     * @return
+     * @param authorityList ArrayList<String>
+     * @return char
      */
     private char getSeparator(ArrayList<String> authorityList)
     {

@@ -66,8 +66,8 @@ public class VtiSoapAction extends VtiUtilBase implements VtiAction
      * Select and invoke a realization of {@link VtiEndpoint} to perform the
      * requested Web service method</p> 
      *
-     * @param request HTTP request
-     * @param response HTTP response
+     * @param httpServletRequest HTTP request
+     * @param httpServletResponse HTTP response
      */
     public void execute(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
     {

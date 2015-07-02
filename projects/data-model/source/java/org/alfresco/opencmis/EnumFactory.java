@@ -38,7 +38,7 @@ public class EnumFactory<E extends Enum<E>>
     private Map<String, E> labelMap = new HashMap<String, E>(10);
     
     /**
-     * @param enumClass
+     * @param enumClass Class<E>
      */
     public EnumFactory(Class<E> enumClass)
     {
@@ -46,8 +46,8 @@ public class EnumFactory<E extends Enum<E>>
     }
 
     /**
-     * @param enumClass
-     * @param defaultEnum
+     * @param enumClass Class<E>
+     * @param defaultEnum E
      */
     public EnumFactory(Class<E> enumClass, E defaultEnum)
     {
@@ -55,8 +55,8 @@ public class EnumFactory<E extends Enum<E>>
     }
     
     /**
-     * @param enumClass
-     * @param defaultEnum
+     * @param enumClass Class<E>
+     * @param defaultEnum E
      * @param caseSensitive  case-sensitive lookup for Enum label
      */
     public EnumFactory(Class<E> enumClass, E defaultEnum, boolean caseSensitive)
@@ -115,7 +115,7 @@ public class EnumFactory<E extends Enum<E>>
     /**
      * Is valid label?
      * 
-     * @param label
+     * @param label String
      * @return  true => valid, false => does not exist for this enum
      */
     public boolean validLabel(String label)
@@ -126,7 +126,7 @@ public class EnumFactory<E extends Enum<E>>
     /**
      * Gets enum from label
      * 
-     * @param label
+     * @param label String
      * @return  enum (or null, if no enum has specified label)
      */
     public E fromLabel(String label)
@@ -139,7 +139,7 @@ public class EnumFactory<E extends Enum<E>>
      * 
      * NOTE: If specified label is invalid, the default enum is returned
      *       
-     * @param label
+     * @param label String
      * @return  enum (or default enum, if label is invalid)
      */
     public E toEnum(String label)

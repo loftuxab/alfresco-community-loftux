@@ -261,7 +261,7 @@ public abstract class M2Class
     }
 
     /**
-     * @return
+     * @return String
      */
     public String getAnalyserResourceBundleName()
     {

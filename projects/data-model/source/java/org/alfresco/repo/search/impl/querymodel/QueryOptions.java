@@ -445,7 +445,7 @@ public class QueryOptions
     }
 
     /**
-     * @param isBulkFetchEnabled 
+     * @param isBulkFetchEnabled boolean
      */
     public void setBulkFetchEnabled(boolean isBulkFetchEnabled)
     {
@@ -500,7 +500,7 @@ public class QueryOptions
     }
 
     /**
-     * @return
+     * @return SearchParameters
      */
     public SearchParameters getAsSearchParmeters()
     {

@@ -40,9 +40,13 @@ public class DeleteVersionEndpoint extends AbstractVersionEndpoint
     
     /**
      * Deletes specified version of the document
-     * 
+     *
      * @param soapRequest Vti soap request ({@link VtiSoapRequest})
-     * @param soapResponse Vti soap response ({@link VtiSoapResponse}) 
+     * @param dws String
+     * @param fileName String
+     * @param fileVersion Element
+     * @return List<DocumentVersionBean>
+     * @throws Exception
      */
     @Override
     protected List<DocumentVersionBean> executeVersionAction(

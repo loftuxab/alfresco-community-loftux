@@ -437,7 +437,7 @@ public class CMISDictionaryRegistryImpl implements CMISDictionaryRegistry
     /**
      * Register type definition.
      * 
-     * @param typeDef
+     * @param typeDef AbstractTypeDefinitionWrapper
      */
     @Override
     public void registerTypeDefinition(AbstractTypeDefinitionWrapper typeDef)
@@ -479,7 +479,7 @@ public class CMISDictionaryRegistryImpl implements CMISDictionaryRegistry
     /**
      * Register property definitions.
      * 
-     * @param typeDef
+     * @param typeDef AbstractTypeDefinitionWrapper
      */
     public void registerPropertyDefinitions(AbstractTypeDefinitionWrapper typeDef)
     {

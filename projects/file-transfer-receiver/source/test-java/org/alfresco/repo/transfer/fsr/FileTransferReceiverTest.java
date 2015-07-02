@@ -993,7 +993,7 @@ public class FileTransferReceiverTest extends TestCase
     }
 
     /**
-     * @return
+     * @return TransferManifestNormalNode
      */
     private TransferManifestNormalNode createContentNode(NodeRef parentFolder, String nodeName) throws Exception
     {
@@ -1030,7 +1030,7 @@ public class FileTransferReceiverTest extends TestCase
     }
 
     /**
-     * @return
+     * @return TransferManifestNormalNode
      */
     private TransferManifestNormalNode createFolderNode(NodeRef parentFolder, String nodeName) throws Exception
     {

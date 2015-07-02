@@ -79,8 +79,8 @@ public abstract class BaseApplicationContextHelper
     /**
      * Build a classloader for the given classLocations, using the thread's context class loader as its parent.
      * 
-     * @param classLocations
-     * @return
+     * @param classLocations String[]
+     * @return ClassLoader
      * @throws IOException
      */
     public static ClassLoader buildClassLoader(String[] classLocations) throws IOException

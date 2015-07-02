@@ -57,7 +57,6 @@ import org.alfresco.util.EqualsHelper;
      * @param classDef  ClassDefinition
      * @param assoc  M2ClassAssociation
      * @param resolver  NamespacePrefixResolver
-     * @return  the definition
      */
     /*package*/ M2AssociationDefinition(ClassDefinition classDef, M2ClassAssociation assoc, NamespacePrefixResolver resolver)
     {

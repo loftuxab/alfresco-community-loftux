@@ -33,7 +33,7 @@ public interface Query
      * "*"  "A.*" etc column specifications are not supported.
      * These should have been previously expanded between any query parse and building the query model. 
      * 
-     * @return
+     * @return List<Column>
      */
     public List<Column> getColumns();
     
@@ -44,21 +44,21 @@ public interface Query
      * 
      * May be null for unconstrained.
      * 
-     * @return
+     * @return Constraint
      */
     public Constraint getConstraint();
     
     /**
      * Get any orderings (may be an empty list or null)
      *  
-     * @return
+     * @return List<Ordering>
      */
     public List<Ordering> getOrderings();
     
     /**
      * Get the source for the query
      * Must not be null.
-     * @return
+     * @return Source
      */
     public Source getSource();
 }

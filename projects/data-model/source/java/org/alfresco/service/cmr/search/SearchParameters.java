@@ -227,7 +227,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Construct from Query Options
      * 
-     * @param options
+     * @param options QueryOptions
      */
     public SearchParameters(QueryOptions options)
     {
@@ -303,7 +303,7 @@ public class SearchParameters implements BasicSearchParameters
      * Set the stores to be supported - currently there can be only one. Searching across multiple stores is on the todo
      * list.
      * 
-     * @param store
+     * @param store StoreRef
      */
     public void addStore(StoreRef store)
     {
@@ -313,7 +313,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Add parameter definitions for the query - used to parameterise the query string
      * 
-     * @param queryParameterDefinition
+     * @param queryParameterDefinition QueryParameterDefinition
      */
     public void addQueryParameterDefinition(QueryParameterDefinition queryParameterDefinition)
     {
@@ -327,7 +327,7 @@ public class SearchParameters implements BasicSearchParameters
      * set to avoid that performance hit if you know you do not want to find results that are yet to be committed (this
      * includes creations, deletions and updates)
      * 
-     * @param excludeDataInTheCurrentTransaction
+     * @param excludeDataInTheCurrentTransaction boolean
      */
     public void excludeDataInTheCurrentTransaction(boolean excludeDataInTheCurrentTransaction)
     {
@@ -403,7 +403,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Set the default operator for query elements when they are not explicit in the query.
      * 
-     * @param defaultOperator
+     * @param defaultOperator Operator
      */
     public void setDefaultOperator(Operator defaultOperator)
     {
@@ -434,7 +434,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Set how the result set should be limited.
      * 
-     * @param limitBy
+     * @param limitBy LimitBy
      */
     public void setLimitBy(LimitBy limitBy)
     {
@@ -454,7 +454,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Set when permissions are evaluated.
      * 
-     * @param permissionEvaluation
+     * @param permissionEvaluation PermissionEvaluationMode
      */
     public void setPermissionEvaluation(PermissionEvaluationMode permissionEvaluation)
     {
@@ -474,7 +474,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * If limiting the result set in some way, set the limiting value used.
      * 
-     * @param limit
+     * @param limit int
      */
     public void setLimit(int limit)
     {
@@ -496,7 +496,7 @@ public class SearchParameters implements BasicSearchParameters
      * Set the way in which multilingual fields are treated durig a search. This controls in which locales an
      * multilingual fields will match.
      * 
-     * @param mlAnalaysisMode
+     * @param mlAnalaysisMode MLAnalysisMode
      */
     public void setMlAnalaysisMode(MLAnalysisMode mlAnalaysisMode)
     {
@@ -506,7 +506,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Add a locale to include for multi-lingual text searches. If non are set, the default is to use the user's locale.
      * 
-     * @param locale
+     * @param locale Locale
      */
     public void addLocale(Locale locale)
     {
@@ -685,8 +685,8 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Add/replace a query template Not all languages support query templates
      * 
-     * @param name
-     * @param template
+     * @param name String
+     * @param template String
      * @return any removed template or null
      */
     public String addQueryTemplate(String name, String template)
@@ -755,7 +755,7 @@ public class SearchParameters implements BasicSearchParameters
     }
 
     /**
-     * @param isBulkFetchEnabled 
+     * @param isBulkFetchEnabled boolean
      */
     public void setBulkFetchEnabled(boolean isBulkFetchEnabled)
     {
@@ -929,7 +929,7 @@ public class SearchParameters implements BasicSearchParameters
 
     /**
      * If not null, then the search should only include results from transactions after {@code sinceTxId}.
-     * @param sinceTxId
+     * @param sinceTxId Long
      */
     public void setSinceTxId(Long sinceTxId)
     {
@@ -1384,10 +1384,10 @@ public class SearchParameters implements BasicSearchParameters
     }
     
     /**
-     * @param length
-     * @param useInMemorySortDefault
-     * @param maxRawResultSetSizeForInMemorySortDefault
-     * @return
+     * @param length int
+     * @param useInMemorySortDefault boolean
+     * @param maxRawResultSetSizeForInMemorySortDefault int
+     * @return boolean
      */
     public boolean usePostSort(int length, boolean useInMemorySortDefault, int maxRawResultSetSizeForInMemorySortDefault)
     {

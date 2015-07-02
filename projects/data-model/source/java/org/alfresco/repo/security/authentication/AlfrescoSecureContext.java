@@ -45,27 +45,27 @@ public interface AlfrescoSecureContext extends SecureContext
 {
     /**
      * Get the effective authentication - used for permission checks
-     * @return
+     * @return Authentication
      */
     public Authentication getEffectiveAuthentication();
     
     /**
      * Get the real authenticaiton - used for auditing and everything else
-     * @return
+     * @return Authentication
      */
     public Authentication getRealAuthentication();
     
     /**
      * Set the effective authentication held by the context
      * 
-     * @param effictiveAuthentication
+     * @param effictiveAuthentication Authentication
      */
     public void setEffectiveAuthentication(Authentication effictiveAuthentication);
     
     /**
      * Set the real authentication held by the context
      * 
-     * @param realAuthentication
+     * @param realAuthentication Authentication
      */
     public void setRealAuthentication(Authentication realAuthentication);
     

@@ -36,7 +36,6 @@ import org.testng.annotations.Test;
 /**
  * Please pay attention that there is an error that sometimes occurs on Office2011 application on MAC: issue logged as MNT-12847
  * 
- * @description
  *              This tests should be executed ONLY on a OSx system, where Office2011 is installed
  *              The Alfresco Server version should be lower than 5.0 (Alfresco Enterprise v4.2.5 version was used on Tests)
  * @author Paul Brodner

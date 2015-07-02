@@ -164,8 +164,8 @@ import org.alfresco.service.namespace.QName;
     }
     
     /**
-     * @param locale
-     * @return
+     * @param locale Locale
+     * @return String
      */
     @Override
     public String resolveAnalyserClassName(Locale locale)

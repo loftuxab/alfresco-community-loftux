@@ -28,7 +28,7 @@ public interface Conjunction extends Constraint
 {
     /**
      * Get the list of constraints which must all be met
-     * @return
+     * @return List<Constraint>
      */
     public List<Constraint> getConstraints();
 }

@@ -32,35 +32,36 @@ public interface Function
     /**
      * Evaluation a function
      * 
-     * @param args
-     * @return
+     * @param args Map<String, Argument>
+     * @param context FunctionEvaluationContext
+     * @return Serializable
      */
     public Serializable getValue(Map<String, Argument> args, FunctionEvaluationContext context);
 
     /**
      * Get the return type for the function
      * 
-     * @return
+     * @return QName
      */
     public QName getReturnType();
 
     /**
      * Get the function name
      * 
-     * @return
+     * @return String
      */
     public String getName();
     
     /**
      * Get the argument Definitions
-     * @return
+     * @return LinkedHashMap
      */
     public LinkedHashMap<String, ArgumentDefinition> getArgumentDefinitions();
     
     
     /**
      * Get the argument Definition
-     * @return
+     * @return ArgumentDefinition
      */
     public ArgumentDefinition getArgumentDefinition(String name);
     

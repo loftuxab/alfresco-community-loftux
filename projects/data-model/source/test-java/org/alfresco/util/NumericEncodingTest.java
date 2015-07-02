@@ -39,7 +39,7 @@ public class NumericEncodingTest extends TestCase
 
     /**
      * 
-     * @param arg0
+     * @param arg0 String
      */
     public NumericEncodingTest(String arg0)
     {

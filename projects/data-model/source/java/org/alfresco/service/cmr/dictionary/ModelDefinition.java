@@ -105,7 +105,7 @@ public interface ModelDefinition
     public String getAnalyserResourceBundleName();
 
     /**
-     * @return
+     * @return DictionaryDAO
      */
     public DictionaryDAO getDictionaryDAO();
 }

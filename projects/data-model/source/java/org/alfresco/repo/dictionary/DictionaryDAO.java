@@ -83,11 +83,11 @@ public interface DictionaryDAO extends ModelQuery
     Collection<TypeDefinition> getTypes(QName model);
 
     /**
-     * @param superType
+     * @param superType QName
      * @param follow
      *            true => follow up the super-class hierarchy, false =>
      *            immediate sub types only
-     * @return
+     * @return Collection<QName>
      */
     Collection<QName> getSubTypes(QName superType, boolean follow);
 
@@ -106,11 +106,11 @@ public interface DictionaryDAO extends ModelQuery
     Collection<AssociationDefinition> getAssociations(QName model);
 
     /**
-     * @param superAspect
+     * @param superAspect QName
      * @param follow
      *            true => follow up the super-class hierarchy, false =>
      *            immediate sub aspects only
-     * @return
+     * @return Collection<QName>
      */
     Collection<QName> getSubAspects(QName superAspect, boolean follow);
 
@@ -183,8 +183,8 @@ public interface DictionaryDAO extends ModelQuery
     /**
      * Get all properties for all models of the given data type.
      * 
-     * @param dataType
-     * @return
+     * @param dataType QName
+     * @return Collection<PropertyDefinition>
      */
     Collection<PropertyDefinition> getPropertiesOfDataType(QName dataType);
 
@@ -218,7 +218,7 @@ public interface DictionaryDAO extends ModelQuery
      * If the input model does not exist in the Dictionary then no diffs will be
      * returned.
      * 
-     * @param model
+     * @param model M2Model
      * @return model diffs (if any)
      */
     List<M2ModelDiff> diffModel(M2Model model);
@@ -239,7 +239,7 @@ public interface DictionaryDAO extends ModelQuery
      * 
      * Register listener with the Dictionary
      * 
-     * @param dictionaryListener
+     * @param dictionaryListener DictionaryListener
      */
     void registerListener(DictionaryListener dictionaryListener);
 
@@ -262,17 +262,17 @@ public interface DictionaryDAO extends ModelQuery
     boolean isModelInherited(QName name);
 
     /**
-     * @return
+     * @return String
      */
     String getDefaultAnalyserResourceBundleName();
 
     /**
-     * @return
+     * @return ClassLoader
      */
     ClassLoader getResourceClassLoader();
 
     /**
-     * @param resourceClassLoader
+     * @param resourceClassLoader ClassLoader
      */
     void setResourceClassLoader(ClassLoader resourceClassLoader);
 }

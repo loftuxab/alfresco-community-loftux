@@ -55,7 +55,7 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
     /**
      * Get the number of rows that matched the query. This result set may only contain a section of the results.
      * If a skip count is given the number found  may or may not include the items skipped.
-     * @return
+     * @return long
      */
     public long getNumberFound();
 
@@ -65,7 +65,6 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
      * @param n
      *            zero-based index
      * @return return the the node ref for the row if there is only one selector
-     * @throws AmbiguousSelectorException
      */
     public NodeRef getNodeRef(int n);
 
@@ -75,7 +74,6 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
      * @param n
      *            zero-based index
      * @return return the score for the row if there is only one selector
-     * @throws AmbiguousSelectorException
      */
     public float getScore(int n);
 
@@ -98,7 +96,6 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
      * Get a list of all the node refs in the result set (if there is only one selector or no selector)
      * 
      * @return the node refs if there is only one selector or no selector *
-     * @throws AmbiguousSelectorException
      */
     public List<NodeRef> getNodeRefs();
 
@@ -106,7 +103,6 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
      * Get a list of all the child associations in the results set. (if there is only one selectoror no selector)
      * 
      * @return the child assoc refs if there is only one selector or no selector *
-     * @throws AmbiguousSelectorException
      */
     public List<ChildAssociationRef> getChildAssocRefs();
 
@@ -144,7 +140,7 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
     /**
      * Bulk fetch results in the cache
      * 
-     * @param bulkFetch
+     * @param bulkFetch boolean
      */
     public boolean setBulkFetch(boolean bulkFetch);
 
@@ -158,7 +154,7 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
     /**
      * Set the bulk fetch size
      * 
-     * @param bulkFetchSize
+     * @param bulkFetchSize int
      */
     public int setBulkFetchSize(int bulkFetchSize);
 
@@ -170,8 +166,8 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
     public int getBulkFetchSize();
     
     /**
-     * @param field
-     * @return
+     * @param field String
+     * @return List
      */
     public List<Pair<String, Integer>> getFieldFacet(String field);
 
@@ -185,7 +181,7 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
     /**
      * Gets the spell check result
      * 
-     * @return
+     * @return SpellCheckResult
      */
     public SpellCheckResult getSpellCheckResult();
 }

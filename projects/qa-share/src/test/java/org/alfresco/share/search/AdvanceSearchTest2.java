@@ -143,7 +143,6 @@ public class AdvanceSearchTest2 extends AbstractUtils
      * </ul>
      * 
      * @throws Exception
-     * @throws PageException
      */
     @Test(groups = { "AlfrescoOne" })
     public void AONE_13906() throws Exception

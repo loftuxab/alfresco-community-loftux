@@ -106,7 +106,7 @@ public class ShareUserRepositoryPage extends AbstractUtils
      * @param folderPath
      *            : String folder path relative to RepositoryPage e.g. Repo +
      *            file.seperator + folderName1
-     * @throws SkipException
+     * @throws Exception
      *             if error in this API
      * @return RepositoryPage
      */
@@ -125,7 +125,7 @@ public class ShareUserRepositoryPage extends AbstractUtils
      * @param file
      *            File Object for the file in reference
      * @return RepositoryPage
-     * @throws SkipException
+     * @throws Exception
      *             if error in this API
      */
     public static RepositoryPage uploadFileInRepository(WebDrone driver, File file) throws Exception
@@ -297,7 +297,7 @@ public class ShareUserRepositoryPage extends AbstractUtils
      * @param driver
      * @param fileInfo
      *            : such as Repository + file.seperator + parentFolderName1
-     * @throws SkipException
+     * @throws Exception
      *             if error in this API
      */
     public static RepositoryPage uploadFileInFolderInRepository(WebDrone driver, String[] fileInfo) throws Exception

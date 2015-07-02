@@ -120,9 +120,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 
 	/**
-	 * @param matchVersion
-	 * @param f
-	 * @param a
+     * @param schema IndexSchema
+     * @param matchVersion
+     * @param f
+     * @param a
 	 */
 	public Solr4QueryParser(IndexSchema schema, Version matchVersion, String f, Analyzer a, FTSQueryParser.RerankPhase rerankPhase)
 	{
@@ -164,7 +165,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param searchParameters
+     * @param searchParameters
 	 */
 	public void setSearchParameters(SearchParameters searchParameters)
 	{
@@ -172,7 +173,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param namespacePrefixResolver
+     * @param namespacePrefixResolver
 	 */
 	public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
 	{
@@ -180,7 +181,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param tenantService
+     * @param tenantService
 	 */
 	public void setTenantService(TenantService tenantService)
 	{
@@ -209,14 +210,14 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param queryText
-	 * @param analysisMode
-	 * @param slop
-	 * @param luceneFunction
+     * @param field
+     * @param queryText
+     * @param analysisMode
+     * @param slop
+     * @param luceneFunction
 	 * @return the query
 	 * @throws ParseException
-	 * @throws IOException 
+     * @throws IOException 
 	 */
 	public Query getFieldQuery(String field, String queryText, AnalysisMode analysisMode, int slop, LuceneFunction luceneFunction) throws ParseException
 	{
@@ -234,9 +235,9 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param sqlLikeClause
-	 * @param analysisMode
+     * @param field
+     * @param sqlLikeClause
+     * @param analysisMode
 	 * @return the query
 	 * @throws ParseException
 	 */
@@ -300,13 +301,13 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 
 	/**
-	 * @param field
-	 * @param queryText
-	 * @param analysisMode
-	 * @param luceneFunction
+     * @param field
+     * @param queryText
+     * @param analysisMode
+     * @param luceneFunction
 	 * @return the query
 	 * @throws ParseException
-	 * @throws IOException 
+     * @throws IOException 
 	 */
 	public Query getDoesNotMatchFieldQuery(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
 	{
@@ -331,11 +332,11 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param first
-	 * @param last
-	 * @param slop
-	 * @param inOrder
+     * @param field
+     * @param first
+     * @param last
+     * @param slop
+     * @param inOrder
 	 * @return the query
 	 * @throws ParseException 
 	 */
@@ -474,13 +475,13 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param queryText
-	 * @param analysisMode
-	 * @param luceneFunction
+     * @param field
+     * @param queryText
+     * @param analysisMode
+     * @param luceneFunction
 	 * @return the query
 	 * @throws ParseException
-	 * @throws IOException 
+     * @throws IOException 
 	 */
 	public Query getFieldQuery(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException
 	{
@@ -710,8 +711,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	private org.apache.lucene.search.Query createNPathQuery(String queryText)
 	{
@@ -719,8 +720,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	private Query createPNameQuery(String queryText)
 	{
@@ -728,8 +729,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	private Query createSiteQuery(String queryText)
 	{
@@ -809,7 +810,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 	/**
 	 * @param tag (which will then be ISO9075 encoded)
-	 * @return
+     * @return
 	 * @throws ParseException
 	 */
 	protected Query createTagQuery(String tag) throws ParseException
@@ -832,8 +833,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	protected Query createDbidQuery(String queryText) throws ParseException
 	{
@@ -2433,11 +2434,11 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param queryText
-	 * @param mpq
-	 * @return
-	 * @throws ParseException 
+     * @param field
+     * @param queryText
+     * @param mpq
+     * @return
+     * @throws ParseException 
 	 */
 	private void checkTermCount(String field, String queryText, MultiPhraseQuery mpq) throws ParseException
 	{
@@ -2449,8 +2450,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 	/**
 	 * 
-	 * @param mpq
-	 * @return
+     * @param mpq
+     * @return
 	 */
 	private boolean exceedsTermCount(MultiPhraseQuery mpq)
 	{
@@ -2468,8 +2469,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param fixedTokenSequences 
-	 * @return
+     * @param fixedTokenSequences 
+     * @return
 	 */
 	private boolean canUseMultiPhraseQuery(LinkedList<LinkedList<Token>> fixedTokenSequences)
 	{
@@ -2607,13 +2608,13 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param part1
-	 * @param part2
-	 * @param includeLower
-	 * @param includeUpper
-	 * @param analysisMode
-	 * @param luceneFunction
+     * @param field
+     * @param part1
+     * @param part2
+     * @param includeLower
+     * @param includeUpper
+     * @param analysisMode
+     * @param luceneFunction
 	 * @return the query
 	 * @exception ParseException
 	 *                throw in overridden method to disallow
@@ -3605,7 +3606,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param dictionaryService
+     * @param dictionaryService
 	 */
 	public void setDictionaryService(DictionaryService dictionaryService)
 	{
@@ -3613,10 +3614,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param queryText
-	 * @param analysisMode
-	 * @param luceneFunction
+     * @param field
+     * @param queryText
+     * @param analysisMode
+     * @param luceneFunction
 	 * @return the query
 	 * @throws ParseException
 	 */
@@ -3626,9 +3627,9 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param termStr
-	 * @param minSimilarity
+     * @param field
+     * @param termStr
+     * @param minSimilarity
 	 * @return the query
 	 * @throws ParseException
 	 */
@@ -3638,8 +3639,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param termStr
+     * @param field
+     * @param termStr
 	 * @return the query
 	 * @throws ParseException
 	 */
@@ -3649,8 +3650,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param field
-	 * @param termStr
+     * @param field
+     * @param termStr
 	 * @return the query
 	 * @throws ParseException
 	 */
@@ -3706,10 +3707,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	public interface SubQuery
 	{
 		/**
-		 * @param field
-		 * @param queryText
-		 * @param analysisMode
-		 * @param luceneFunction
+         * @param field
+         * @param queryText
+         * @param analysisMode
+         * @param luceneFunction
 		 * @return the query
 		 * @throws ParseException
 		 */
@@ -4168,8 +4169,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	private boolean isAllStar(String queryText)
 	{
@@ -4189,8 +4190,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param dateAndResolution
-	 * @return
+     * @param dateAndResolution
+     * @return
 	 */
 	private String getDateEnd(Pair<Date, Integer> dateAndResolution)
 	{
@@ -4219,8 +4220,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param dateAndResolution
-	 * @return
+     * @param dateAndResolution
+     * @return
 	 */
 	private String getDateStart(Pair<Date, Integer> dateAndResolution)
 	{
@@ -4549,8 +4550,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	protected Query createAclIdQuery(String queryText) throws ParseException
 	{
@@ -4558,8 +4559,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	protected Query createOwnerQuery(String queryText) throws ParseException
 	{
@@ -4567,8 +4568,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	protected Query createReaderQuery(String queryText) throws ParseException
 	{
@@ -4576,8 +4577,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param queryText
-	 * @return
+     * @param queryText
+     * @return
 	 */
 	protected Query createAuthorityQuery(String queryText) throws ParseException
 	{
@@ -5042,8 +5043,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-	 * @param first
-	 * @param field
+     * @param first
+     * @param field
 	 * @return SpanOrQuery
 	 * @throws IOException
 	 */
