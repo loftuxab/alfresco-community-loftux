@@ -29,7 +29,7 @@ public interface Column extends FunctionInvokation
     /**
      * Get the column alias.
      * 
-     * @return
+     * @return String
      */
     public String getAlias();
     

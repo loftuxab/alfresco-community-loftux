@@ -895,10 +895,11 @@ public class AlfrescoSolrEventListener implements SolrEventListener
 
 
     /**
-     * @param hasNew
-     * @param before
-     * @param after
-     * @return
+     * @param hasNew boolean
+     * @param before CacheSection[]
+     * @param after CacheSection[]
+     * @param afterIndexReaders IndexReader[]
+     * @return LinkedList<CacheMatch>
      */
     public LinkedList<CacheMatch> buildCacheUpdateOperations(boolean hasNew, CacheSection[] before, CacheSection[] after, IndexReader[] afterIndexReaders)
     {
@@ -1455,7 +1456,7 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         int owner;
 
         /**
-         * @param dbid
+         * @param dbid long
          */
         public CacheEntry(long dbid)
         {
@@ -1731,20 +1732,20 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         public void addToOldCacheSize(int increment);
 
         /**
-         * @param tracker
-         * @param oldIndexedByDocId
-         * @param oldAclIdByDocId
-         * @param oldTxByDocId
-         * @param oldAclTxByDocId
-         * @param indexedByDocId
-         * @param allLeafDocs
-         * @param aclIdByDocId
-         * @param txIdByDocId
-         * @param aclTxIdByDocId
-         * @param unmatchedByDBID
-         * @param deleted
-         * @param reader
-         * @param ownerIdManager
+         * @param tracker CacheUpdateTracker
+         * @param oldIndexedByDocId ResizeableArrayList<CacheEntry>
+         * @param oldAclIdByDocId long[]
+         * @param oldTxByDocId long[]
+         * @param oldAclTxByDocId long[]
+         * @param indexedByDocId ResizeableArrayList<CacheEntry>
+         * @param allLeafDocs OpenBitSet
+         * @param aclIdByDocId long[]
+         * @param txIdByDocId long[]
+         * @param aclTxIdByDocId long[]
+         * @param unmatchedByDBID HashMap<Long, CacheEntry>
+         * @param deleted OpenBitSet
+         * @param reader SolrIndexReader
+         * @param ownerIdManager OwnerIdManager
          */
         public void updateCache(CacheUpdateTracker tracker, ResizeableArrayList<CacheEntry> oldIndexedByDocId, long[] oldAclIdByDocId, long[] oldTxByDocId, long[] oldAclTxByDocId,
                 ResizeableArrayList<CacheEntry> indexedByDocId, OpenBitSet allLeafDocs, long[] aclIdByDocId, long[] txIdByDocId, long[] aclTxIdByDocId, HashMap<Long, CacheEntry> unmatchedByDBID,
@@ -2124,8 +2125,9 @@ public class AlfrescoSolrEventListener implements SolrEventListener
     public abstract static class RemoveNullEntriesCacheMatch extends AbstractCacheMatch
     {
         /**
-         * @param finalCacheSize
-         * @param finalDocCount
+         * @param finalCacheSize int
+         * @param finalDocCount int
+         * @param finalIndexReader IndexReader
          */
         RemoveNullEntriesCacheMatch(int finalCacheSize, int finalDocCount, IndexReader finalIndexReader)
         {
@@ -3284,8 +3286,8 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         }
 
         /**
-         * @param owner
-         * @return
+         * @param owner int
+         * @return String
          */
         public String get(int owner)
         {
@@ -3300,7 +3302,7 @@ public class AlfrescoSolrEventListener implements SolrEventListener
         }
 
         /**
-         * @param oldOwnerIdManager
+         * @param oldOwnerIdManager OwnerIdManager
          */
         public void addAll(OwnerIdManager oldOwnerIdManager)
         {

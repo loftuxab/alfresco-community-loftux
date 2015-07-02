@@ -99,7 +99,7 @@ public interface DictionaryService extends MessageLookup
     /**
      * Get the sub types of the type.   The returned list includes the base type which is passed in as a parameter.
      * 
-     * @param type, the qualified name of the type
+     * @param type the qualified name of the type
      * @param follow  true => all sub-type descendants, false => immediate sub-type children
      * @return the names of the sub types of the specified type, including the value passed in.
      */
@@ -150,7 +150,7 @@ public interface DictionaryService extends MessageLookup
     Collection<QName> getAllAspects(boolean includeInherited);
 
     /**
-     * @param aspect
+     * @param aspect QName
      * @param follow  true => follow up the super-class hierarchy, false => immediate sub aspects only
      * @return the sub aspects of specified aspect
      */
@@ -233,8 +233,8 @@ public interface DictionaryService extends MessageLookup
      * 
      * If dataType is null then this method will return *ALL* properties regardless of data type.
      * 
-     * @param dataType
-     * @return
+     * @param dataType QName
+     * @return Collection<QName>
      */
     @NotAuditable
     Collection<QName> getAllProperties(QName dataType);
@@ -246,8 +246,9 @@ public interface DictionaryService extends MessageLookup
      * 
      * If dataType is null then this method will return *ALL* properties regardless of data type.
      * 
-     * @param dataType
-     * @return
+     * @param model QName
+     * @param dataType QName
+     * @return Collection<QName>
      */
     @NotAuditable
     Collection<QName> getProperties(QName model, QName dataType);
@@ -255,8 +256,8 @@ public interface DictionaryService extends MessageLookup
     /**
      * Get all properties for the specified model
      * 
-     * @param model
-     * @return
+     * @param model QName
+     * @return Collection<QName>
      */
     Collection<QName> getProperties(QName model);
     
@@ -294,8 +295,8 @@ public interface DictionaryService extends MessageLookup
     /**
      * Get constraints for the specified model
      * 
-     * @param model
-     * @return
+     * @param model QName
+     * @return Collection<ConstraintDefinition>
      */
     public Collection<ConstraintDefinition> getConstraints(QName model);
     
@@ -304,9 +305,9 @@ public interface DictionaryService extends MessageLookup
      
      * Optionally return referenceable (ie. non-property specific) constraints only
      * 
-     * @param model
-     * @param referenceableDefsOnly
-     * @return
+     * @param model QName
+     * @param referenceableDefsOnly boolean
+     * @return Collection<ConstraintDefinition>
      *
      * @since 3.2R
      */

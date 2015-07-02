@@ -30,13 +30,13 @@ public interface NamedQueryParameterDefinition
      * 
      * Not null
      * 
-     * @return
+     * @return QName
      */
     public QName getQName();
     
     /**
      * Get the query parameter definition
-     * @return
+     * @return QueryParameterDefinition
      */
     public QueryParameterDefinition getQueryParameterDefinition();
 }

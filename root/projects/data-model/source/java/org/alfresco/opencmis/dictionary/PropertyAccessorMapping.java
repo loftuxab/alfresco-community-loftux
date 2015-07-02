@@ -52,7 +52,7 @@ public interface PropertyAccessorMapping
     /**
      * Gets the Action Evaluators applicable for the given CMIS Scope
      * 
-     * @param scope
+     * @param scope BaseTypeId
      */
     public Map<Action, CMISActionEvaluator> getActionEvaluators(BaseTypeId scope);
 }

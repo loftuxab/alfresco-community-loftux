@@ -69,8 +69,6 @@ public class VtiSoapResponse extends HttpServletResponseWrapper
     
     /**
      * Write document to response
-     *  
-     * @return Document request xml document
      */
     @Override
     public void flushBuffer() throws IOException 

@@ -59,8 +59,8 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
     /**
      * <p>Getting server version of document for merging.</p> 
      *
-     * @param request HTTP request
-     * @param response HTTP response
+     * @param req HTTP request
+     * @param resp HTTP response
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -71,8 +71,8 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
     /**
      * <p>Saving of client version of document while merging.</p> 
      *
-     * @param request HTTP request
-     * @param response HTTP response
+     * @param req HTTP request
+     * @param resp HTTP response
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException

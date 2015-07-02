@@ -364,8 +364,8 @@ public class Duration implements Comparable, Serializable
    
    /**
     * Helper method to parse eaets from strings
-    * @param stringDate
-    * @return
+    * @param stringDate String
+    * @return Date
     */
    private static Date parseDate(String stringDate)
    {
@@ -386,8 +386,8 @@ public class Duration implements Comparable, Serializable
    /**
     * Construct a preiod between the two given dates
     * 
-    * @param start_in
-    * @param end_in
+    * @param start_in Date
+    * @param end_in Date
     */
    public Duration(Date start_in, Date end_in)
    {
@@ -936,7 +936,7 @@ public class Duration implements Comparable, Serializable
    /**
     * TODO: Tests that should be moved into a unit test 
     * 
-    * @param args
+    * @param args String[]
     */
    public static void main(String[] args)
    {

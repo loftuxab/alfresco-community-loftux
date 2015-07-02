@@ -463,7 +463,7 @@ public class M2Model
 
 
     /**
-     * @return
+     * @return String
      */
     public String getAnalyserResourceBundleName()
     {

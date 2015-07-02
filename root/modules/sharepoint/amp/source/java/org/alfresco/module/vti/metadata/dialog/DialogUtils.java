@@ -83,8 +83,8 @@ public class DialogUtils
     /**
      * <p>Cast String to VtiSortField</p>
      * 
-     * @param sortFieldValue
-     * @return
+     * @param sortFieldValue String
+     * @return VtiSortField
      */
     public VtiSortField getSortFieldValue(String sortFieldValue)
     {
@@ -94,8 +94,8 @@ public class DialogUtils
     /**
      * <p>Cast String to VtiSort</p>
      * 
-     * @param sortValue
-     * @return
+     * @param sortValue String
+     * @return VtiSort
      */
     public VtiSort getSortValue(String sortValue)
     {

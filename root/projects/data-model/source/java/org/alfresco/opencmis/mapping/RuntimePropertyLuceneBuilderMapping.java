@@ -110,8 +110,8 @@ public class RuntimePropertyLuceneBuilderMapping implements PropertyLuceneBuilde
     /**
      * Register pre-defined Property Accessor
      * 
-     * @param name
-     * @param luceneBuilder
+     * @param name String
+     * @param luceneBuilder CMISPropertyLuceneBuilder
      */
     private void registerPropertyLuceneBuilder(String name, CMISPropertyLuceneBuilder luceneBuilder)
     {

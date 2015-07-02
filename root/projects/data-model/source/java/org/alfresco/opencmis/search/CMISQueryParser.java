@@ -189,12 +189,12 @@ public class CMISQueryParser
     }
 
     /**
-     * @param orNode
-     * @param factory
-     * @param functionEvaluationContext
-     * @param selectors
-     * @param columnMap
-     * @return
+     * @param orNode CommonTree
+     * @param factory QueryModelFactory
+     * @param functionEvaluationContext FunctionEvaluationContext
+     * @param selectors Map<String, Selector>
+     * @param columnMap HashMap<String, Column>
+     * @return Constraint
      */
     private Constraint buildDisjunction(CommonTree orNode, QueryModelFactory factory,
             FunctionEvaluationContext functionEvaluationContext, Map<String, Selector> selectors,
@@ -217,12 +217,12 @@ public class CMISQueryParser
     }
 
     /**
-     * @param andNode
-     * @param factory
-     * @param functionEvaluationContext
-     * @param selectors
-     * @param columnMap
-     * @return
+     * @param andNode CommonTree
+     * @param factory QueryModelFactory
+     * @param functionEvaluationContext FunctionEvaluationContext
+     * @param selectors Map<String, Selector>
+     * @param columnMap HashMap<String, Column>
+     * @return Constraint
      */
     private Constraint buildConjunction(CommonTree andNode, QueryModelFactory factory,
             FunctionEvaluationContext functionEvaluationContext, Map<String, Selector> selectors,
@@ -245,12 +245,12 @@ public class CMISQueryParser
     }
 
     /**
-     * @param notNode
-     * @param factory
-     * @param functionEvaluationContext
-     * @param selectors
-     * @param columnMap
-     * @return
+     * @param notNode CommonTree
+     * @param factory QueryModelFactory
+     * @param functionEvaluationContext FunctionEvaluationContext
+     * @param selectors Map<String, Selector>
+     * @param columnMap HashMap<String, Column>
+     * @return Constraint
      */
     private Constraint buildNegation(CommonTree notNode, QueryModelFactory factory,
             FunctionEvaluationContext functionEvaluationContext, Map<String, Selector> selectors,
@@ -269,12 +269,12 @@ public class CMISQueryParser
     }
 
     /**
-     * @param testNode
-     * @param factory
-     * @param functionEvaluationContext
-     * @param selectors
-     * @param columnMap
-     * @return
+     * @param testNode CommonTree
+     * @param factory QueryModelFactory
+     * @param functionEvaluationContext FunctionEvaluationContext
+     * @param selectors Map<String, Selector>
+     * @param columnMap HashMap<String, Column>
+     * @return Constraint
      */
     private Constraint buildTest(CommonTree testNode, QueryModelFactory factory,
             FunctionEvaluationContext functionEvaluationContext, Map<String, Selector> selectors,
@@ -290,12 +290,12 @@ public class CMISQueryParser
     }
 
     /**
-     * @param predicateNode
-     * @param factory
-     * @param functionEvaluationContext
-     * @param selectors
-     * @param columnMap
-     * @return
+     * @param predicateNode CommonTree
+     * @param factory QueryModelFactory
+     * @param functionEvaluationContext FunctionEvaluationContext
+     * @param selectors Map<String, Selector>
+     * @param columnMap HashMap<String, Column>
+     * @return Constraint
      */
     private Constraint buildPredicate(CommonTree predicateNode, QueryModelFactory factory,
             FunctionEvaluationContext functionEvaluationContext, Map<String, Selector> selectors,
@@ -711,10 +711,11 @@ public class CMISQueryParser
     }
 
     /**
-     * @param queryNode
-     * @param factory
-     * @param selectors
-     * @return
+     * @param queryNode CommonTree
+     * @param factory QueryModelFactory
+     * @param selectors Map<String, Selector> selectors
+     * @param columns List<Column>
+     * @return ArrayList<Ordering>
      */
     private ArrayList<Ordering> buildOrderings(CommonTree queryNode, QueryModelFactory factory,
             Map<String, Selector> selectors, List<Column> columns)
@@ -1150,10 +1151,10 @@ public class CMISQueryParser
     }
 
     /**
-     * @param query
-     * @param line
-     * @param charPositionInLine
-     * @return
+     * @param query String
+     * @param line int
+     * @param charPositionInLine int
+     * @return int
      */
     private int getStringPosition(String query, int line, int charPositionInLine)
     {

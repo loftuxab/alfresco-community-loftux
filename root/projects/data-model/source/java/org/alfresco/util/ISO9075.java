@@ -110,8 +110,8 @@ public class ISO9075
      * Allowed at the start:       'a'..'z' | 'A'..'Z' | '_'
      * Allowed after:              'a'..'z' | 'A'..'Z' | '0'..'9' | '_' | ':' | '$'| '#'
      * 
-     * @param toEncode
-     * @return
+     * @param toEncode String
+     * @return String
      */
     public static String encodeSQL(String toEncode)
     {
@@ -176,8 +176,8 @@ public class ISO9075
     /**
      * Encode a string according to ISO 9075
      * 
-     * @param toEncode
-     * @return
+     * @param toEncode String
+     * @return String
      */
     public static String encode(String toEncode)
     {
@@ -363,8 +363,8 @@ public class ISO9075
     }
 
     /**
-     * @param toLowerCaseEncoded
-     * @return
+     * @param toLowerCaseEncoded String
+     * @return Object
      */
     public static Object lowerCaseEncodedSQL(String toLowerCaseEncoded)
     {

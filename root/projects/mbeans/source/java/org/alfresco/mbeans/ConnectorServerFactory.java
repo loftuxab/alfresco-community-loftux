@@ -45,7 +45,7 @@ public class ConnectorServerFactory extends ConnectorServerFactoryBean
 
     /**
      * Enables JMX connectivity during initialization, see {@link ConnectorServerFactory#afterPropertiesSet()}
-     * @param enabled
+     * @param enabled boolean
      */
     public void setEnabled(boolean enabled)
     {

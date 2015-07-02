@@ -120,7 +120,7 @@ public class QNameMap<K,V> implements Map, Cloneable, Serializable
     }
     
     /**
-     * @see java.util.Map#put(K, V)
+     * @see java.util.Map#put(Object, Object)
      */
     public Object put(Object key, Object value)
     {

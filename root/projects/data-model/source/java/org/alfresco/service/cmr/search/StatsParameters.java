@@ -113,8 +113,8 @@ public class StatsParameters implements BasicSearchParameters
     /**
      * Add a parameter
      * 
-     * @param name
-     * @param value
+     * @param name String
+     * @param value String
      */
     public void addStatsParameter(String name, String value)
     {
@@ -124,7 +124,7 @@ public class StatsParameters implements BasicSearchParameters
     /**
      * Add a Store ref
      * 
-     * @param store
+     * @param store StoreRef
      */
     public void addStore(StoreRef store)
     {      

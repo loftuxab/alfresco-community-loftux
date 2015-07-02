@@ -59,8 +59,8 @@ public class DynamicNamespacePrefixResolver implements NamespaceService
     /**
      * Add prefix to name space mapping override
      * 
-     * @param prefix
-     * @param uri
+     * @param prefix String
+     * @param uri String
      */
     public void registerNamespace(String prefix, String uri)
     {
@@ -70,7 +70,7 @@ public class DynamicNamespacePrefixResolver implements NamespaceService
     /**
      * Remove a prefix to namespace mapping
      * 
-     * @param prefix
+     * @param prefix String
      */
     public void unregisterNamespace(String prefix)
     {

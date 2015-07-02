@@ -71,7 +71,7 @@ public class AlfrescoListServiceHandler extends AbstractAlfrescoListServiceHandl
     private Map<Integer,String> dataListTypes;
     private Map<Integer, ListTypeBean> listTypes; 
     
-    /**
+    /*
      * Set authentication component
      * 
      * @param authenticationComponent the authentication component to set ({@link AuthenticationComponent})
@@ -96,7 +96,7 @@ public class AlfrescoListServiceHandler extends AbstractAlfrescoListServiceHandl
         this.siteService = siteService;
     }
 
-    /**
+    /*
      * Set share utils
      * 
      * @param shareUtils the share utils to set ({@link ShareUtils})

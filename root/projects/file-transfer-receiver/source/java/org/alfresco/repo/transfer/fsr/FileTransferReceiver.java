@@ -391,7 +391,7 @@ public class FileTransferReceiver implements TransferReceiver
     }
 
     /**
-     * @param file
+     * @param file File
      */
     private void deleteFile(File file)
     {
@@ -707,8 +707,6 @@ public class FileTransferReceiver implements TransferReceiver
 
         /**
          * Make the lock - called on main thread
-         *
-         * @throws LockAquisitionException
          */
         public synchronized void makeLock()
         {
@@ -838,7 +836,7 @@ public class FileTransferReceiver implements TransferReceiver
     /**
      * Timeout a transfer. Called after the lock has been released via a timeout. This is the last chance to clean up.
      *
-     * @param transferId
+     * @param transferId String
      */
     private void timeout(final String transferId)
     {
@@ -974,7 +972,7 @@ public class FileTransferReceiver implements TransferReceiver
     }
 
     /**
-     * @return
+     * @return NodeRef
      */
     private NodeRef createTransferRecord()
     {

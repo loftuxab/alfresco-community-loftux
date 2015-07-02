@@ -31,7 +31,7 @@ public class SaveFormDialog extends AbstractMethod
     private static final String METHOD_NAME = "dialogview";
     
     /**
-     * @see org.alfresco.module.vti.method.AbstractVtiMethod#doExecute(org.alfresco.module.vti.VtiRequest, org.alfresco.module.vti.VtiResponse)
+     * @see AbstractMethod#doExecute(VtiFpRequest, VtiFpResponse)
      */
     @Override
     protected void doExecute(VtiFpRequest request, VtiFpResponse response) throws VtiMethodException, IOException
@@ -40,7 +40,7 @@ public class SaveFormDialog extends AbstractMethod
     }
 
     /**
-     * @see org.alfresco.module.vti.method.VtiMethod#getName()
+     * @see VtiMethod#getName()
      */
     public String getName()
     {

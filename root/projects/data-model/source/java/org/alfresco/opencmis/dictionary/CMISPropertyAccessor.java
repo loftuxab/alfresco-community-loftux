@@ -34,30 +34,30 @@ public interface CMISPropertyAccessor
     /**
      * Get the CMIS Property Name
      * 
-     * @return
+     * @return String
      */
     String getName();
 
     /**
      * Get the (directly) mapped Alfresco property (if a direct mapping exists)
      * 
-     * @return
+     * @return QName
      */
     QName getMappedProperty();
 
     /**
      * Set the property value for a node
      * 
-     * @param nodeRef
-     * @Param value
+     * @param nodeRef NodeRef
+     * @param value Serializable
      */
     void setValue(NodeRef nodeRef, Serializable value);
 
     /**
      * Get the property value for a node or an association
      * 
-     * @param nodeInfo
-     * @return
+     * @param nodeInfo CMISNodeInfo
+     * @return Serializable
      */
     Serializable getValue(CMISNodeInfo nodeInfo);
 

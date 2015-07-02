@@ -126,10 +126,10 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
 	private HashSet<String> fixedQueryLocales = new HashSet<String>();
     
     /**
-     * @param qstr
-     * @param localParams
-     * @param params
-     * @param req
+     * @param qstr String
+     * @param localParams SolrParams
+     * @param params SolrParams
+     * @param req SolrQueryRequest
      * @param args 
      */
     public AbstractQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, NamedList args)
@@ -516,9 +516,9 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
     }
 
     /**
-     * @param searchParameters
-     * @param detectedLocale
-     * @return
+     * @param searchParameters SearchParameters
+     * @param detectedLocale Locale
+     * @return boolean
      */
     private boolean localeIsNotIncluded(SearchParameters searchParameters, Locale detectedLocale)
     {
@@ -534,8 +534,8 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
 
 
     /**
-     * @param authorityList
-     * @return
+     * @param authorityList ArrayList<String>
+     * @return char
      */
     private char getSeparator(ArrayList<String> authorityList)
     {

@@ -31,12 +31,12 @@ public interface LuceneQueryBuilderComponent<Q, S, E extends Throwable>
 {
     /**
      * Generate the lucene query from the query component
-     * @param selectors
-     * @param functionArgs
-     * @param luceneContext
-     * @param functionContext
+     * @param selectors Set<String>
+     * @param functionArgs Map<String, Argument>
+     * @param luceneContext LuceneQueryBuilderContext<Q, S, E>
+     * @param functionContext FunctionEvaluationContext
      * @return - the lucene query fragment for this component
-     * @throws java.text.ParseException
+     * @throws E
      */
     public Q addComponent(Set<String> selectors, Map<String, Argument> functionArgs, LuceneQueryBuilderContext<Q, S, E> luceneContext, FunctionEvaluationContext functionContext) throws E;
 }

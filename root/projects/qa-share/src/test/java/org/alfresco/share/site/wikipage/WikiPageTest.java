@@ -29,8 +29,8 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 /** 
- * @author nshah
- * @description This class is to test Wiki page.   
+ *  This class is to test Wiki page.
+ *  @author nshah
  */
 @Listeners(FailedTestListener.class)
 public class WikiPageTest extends AbstractUtils

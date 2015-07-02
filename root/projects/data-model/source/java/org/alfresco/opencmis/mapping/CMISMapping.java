@@ -276,8 +276,9 @@ public class CMISMapping implements InitializingBean
      * Gets the CMIS Type Id given the Alfresco QName for the type in any
      * Alfresco model
      * 
-     * @param typeQName
-     * @return
+     * @param scope BaseTypeId
+     * @param typeQName QName
+     * @return String
      */
     public String getCmisTypeId(BaseTypeId scope, QName typeQName)
     {
@@ -407,8 +408,8 @@ public class CMISMapping implements InitializingBean
     /**
      * Is this a valid CMIS folder type?
      * 
-     * @param typeQName
-     * @return
+     * @param typeQName QName
+     * @return boolean
      */
     public boolean isValidCmisFolder(QName typeQName)
     {
@@ -443,8 +444,8 @@ public class CMISMapping implements InitializingBean
     /**
      * Is this a valid CMIS document type?
      * 
-     * @param typeQName
-     * @return
+     * @param typeQName QName
+     * @return boolean
      */
     public boolean isValidCmisDocument(QName typeQName)
     {
@@ -478,8 +479,8 @@ public class CMISMapping implements InitializingBean
     /**
      * Is this a valid CMIS secondary type?
      * 
-     * @param typeQName
-     * @return
+     * @param typeQName QName
+     * @return boolean
      */
     public boolean isValidCmisSecondaryType(QName typeQName)
     {
@@ -518,8 +519,8 @@ public class CMISMapping implements InitializingBean
     /**
      * Is this a valid CMIS policy type?
      * 
-     * @param typeQName
-     * @return
+     * @param typeQName QName
+     * @return boolean
      */
     public boolean isValidCmisPolicy(QName typeQName)
     {        if (typeQName == null)
@@ -564,8 +565,8 @@ public class CMISMapping implements InitializingBean
      * Is an association valid in CMIS? It must be a non-child relationship and
      * the source and target must both be valid CMIS types.
      * 
-     * @param associationQName
-     * @return
+     * @param associationQName QName
+     * @return boolean
      */
     public boolean isValidCmisRelationship(QName associationQName)
     {
@@ -626,8 +627,8 @@ public class CMISMapping implements InitializingBean
     /**
      * Is this a valid CMIS item type?
      * 
-     * @param typeQName
-     * @return
+     * @param typeQName QName
+     * @return boolean
      */
     public boolean isValidCmisItem(QName typeQName)
     {
@@ -709,8 +710,8 @@ public class CMISMapping implements InitializingBean
     /**
      * Given a CMIS model type map it to the appropriate Alfresco type.
      * 
-     * @param cmisTypeQName
-     * @return
+     * @param cmisTypeQName QName
+     * @return QName
      */
     public QName getAlfrescoClass(QName cmisTypeQName)
     {
@@ -725,8 +726,8 @@ public class CMISMapping implements InitializingBean
     /**
      * Get the CMIS property type for a property
      * 
-     * @param datatype
-     * @return
+     * @param datatype DataTypeDefinition
+     * @return PropertyType
      */
     public PropertyType getDataType(DataTypeDefinition datatype)
     {
@@ -744,8 +745,8 @@ public class CMISMapping implements InitializingBean
     }
 
     /**
-     * @param propertyQName
-     * @return
+     * @param propertyQName QName
+     * @return String
      */
     public String getCmisPropertyId(QName propertyQName)
     {
@@ -829,7 +830,7 @@ public class CMISMapping implements InitializingBean
     }
 
     /**
-     * @param permission
+     * @param permission String
      * @return permission to set
      */
     public String getSetPermission(String permission)

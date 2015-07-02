@@ -162,14 +162,14 @@ public interface PropertyDefinition extends ClassAttributeDefinition
     public String getAnalyserResourceBundleName();
 
     /**
-     * @param locale
-     * @return
+     * @param locale Locale
+     * @return String
      */
     public String resolveAnalyserClassName(Locale locale);
     
     /**
      * 
-     * @return
+     * @return String
      */
     public String resolveAnalyserClassName();
 }

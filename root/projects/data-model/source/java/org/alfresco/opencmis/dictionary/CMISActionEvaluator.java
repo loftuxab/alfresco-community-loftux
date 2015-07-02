@@ -25,15 +25,15 @@ public interface CMISActionEvaluator
     /**
      * Gets the CMIS Allowed Action
      * 
-     * @return
+     * @return Action
      */
     public Action getAction();
 
     /**
      * Determines if an action is allowed on an object
      * 
-     * @param nodeInfo
-     * @return
+     * @param nodeInfo CMISNodeInfo
+     * @return boolean
      */
     public boolean isAllowed(CMISNodeInfo nodeInfo);
 }

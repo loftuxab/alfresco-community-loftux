@@ -550,7 +550,6 @@ public abstract class AbstractCloudSyncTest extends AbstractUtils
      * @param - ContentName
      * @param - FolderName
      * @retrun - DocumentLibraryPage
-     * @throw - IllegalArgumentException
      */
     public static DocumentLibraryPage createNewFolderAndSyncContent(WebDrone drone, String contentName, DestinationAndAssigneeBean desAndAssBean, String folderName)
     {

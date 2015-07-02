@@ -55,7 +55,7 @@ public class ShareUserSharedFilesPage extends AbstractUtils
      * @param driver WebDrone Instance
      * @param file File Object for the file in reference
      * @return SharedFilesPage
-     * @throws org.testng.SkipException if error in this API
+     * @throws Exception if error in this API
      */
     public static SharedFilesPage uploadFileInSharedFiles(WebDrone driver, File file) throws Exception
     {

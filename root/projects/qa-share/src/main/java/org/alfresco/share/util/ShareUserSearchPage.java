@@ -345,7 +345,6 @@ public class ShareUserSearchPage extends AbstractUtils
      * @param keyWordSearchText - Different Search types.
      * @return list of Search Results.
      * @throws Exception
-     * @throws PageException
      */
     public static List<SearchResult> advanceSearch(WebDrone driver, List<String> info, Map<String, String> keyWordSearchText) throws Exception
     {
@@ -481,7 +480,6 @@ public class ShareUserSearchPage extends AbstractUtils
      * User should be logged in and on the Advance Search Page
      * @param driver
      * @return SearchResultsPage
-     * @throws Exception
      */
     public static FacetedSearchPage clickSearchOnAdvanceSearch(WebDrone driver)
     {

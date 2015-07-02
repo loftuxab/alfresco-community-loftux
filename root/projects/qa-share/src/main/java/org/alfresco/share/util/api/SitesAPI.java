@@ -84,8 +84,7 @@ public class SitesAPI extends PublicAPIAbstract
      * @param authUser
      * @param domain
      * @param siteId
-     * @param siteId
-     * @param memberId 
+     * @param memberId
      * @return ListResponse populated with {@link SiteMember}
      * @throws PublicApiException
      */

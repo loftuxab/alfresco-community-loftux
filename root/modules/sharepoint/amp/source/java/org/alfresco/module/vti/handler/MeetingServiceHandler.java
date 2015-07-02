@@ -82,7 +82,7 @@ public interface MeetingServiceHandler
      * Updates the title (but not the name) of a Meeting Workspace site on the specified Alfresco server
      * 
      * @param siteName The site name
-     * @param title The new title for the Meeting Workspace site
+     * @param newTitle The new title for the Meeting Workspace site
      */
     public void updateWorkspaceTitle(String siteName, String newTitle) throws SiteDoesNotExistException;
     

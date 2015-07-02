@@ -57,8 +57,8 @@ public class VtiBrowserAction implements VtiAction
     /**
      * <p>Handle redirection of specific requests to Web clients.</p> 
      *
-     * @param request HTTP request
-     * @param response HTTP response
+     * @param req HTTP request
+     * @param resp HTTP response
      */
     public void execute(HttpServletRequest req, HttpServletResponse resp)
     {

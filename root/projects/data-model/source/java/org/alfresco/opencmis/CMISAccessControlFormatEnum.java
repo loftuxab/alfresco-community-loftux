@@ -39,7 +39,7 @@ public enum CMISAccessControlFormatEnum implements EnumLabel
     /**
      * Construct
      * 
-     * @param label
+     * @param label String
      */
     CMISAccessControlFormatEnum(String label)
     {

@@ -141,7 +141,8 @@ public class ListOfValuesConstraint extends AbstractConstraint
      * listconstraint.test_listConstraintOne.VALUE\ WITH\ SPACES=Display label
      * </pre>
      * 
-     * @param constraintAllowableValue
+     * @param constraintAllowableValue String
+     * @param messageLookup MessageLookup
      * @return the localised display label for the specified constraint value in the current locale.
      *         If no localisation is defined, it will return the allowed value itself.
      *         If the specified allowable value is not in the model, returns <code>null</code>.

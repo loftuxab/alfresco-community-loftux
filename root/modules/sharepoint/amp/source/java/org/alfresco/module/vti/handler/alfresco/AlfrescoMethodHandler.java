@@ -578,9 +578,9 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
     /**
      * Check a eTag from request
      * 
-     * @param request
-     * @param node
-     * @return
+     * @param request HttpServletRequest
+     * @param node NodeRef
+     * @return boolean
      */
     private boolean expectedETagForNode(HttpServletRequest request, NodeRef node)
     {

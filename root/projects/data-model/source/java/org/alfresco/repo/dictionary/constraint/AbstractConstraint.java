@@ -48,7 +48,7 @@ public abstract class AbstractConstraint implements Constraint
      * Sets the constraint name. Automatically called after construction. Please excuse the strange method name as we
      * want the property name to begin with an underscore to avoid property name clashes.
      * 
-     * @param shortName
+     * @param shortName String
      * @deprecated
      */
     public void set_shortName(String shortName)
@@ -58,7 +58,7 @@ public abstract class AbstractConstraint implements Constraint
 
     /**
      * Sets the constraint name
-     * @param name
+     * @param name String
      */
     public void setShortName(String name)
     {

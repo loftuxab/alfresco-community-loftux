@@ -63,7 +63,7 @@ public class ShareUserSitePage extends AbstractUtils
      * 
      * @param driver WebDrone Instance
      * @param folderPath: String folder path relative to DocumentLibrary e.g. DOCLIB + file.seperator + folderName1
-     * @throws SkipException if error in this API
+     * @throws Exception if error in this API
      */
     public static DocumentLibraryPage navigateToFolder(WebDrone driver, String folderPath) throws Exception
     {

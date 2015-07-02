@@ -46,8 +46,9 @@ public class FileTransferReceiverRequisiteManifestProcessor extends AbstractMani
     private static final Log log = LogFactory.getLog(FileTransferReceiverRequisiteManifestProcessor.class);
 
     /**
-     * @param receiver
-     * @param transferId
+     * @param receiver TransferReceiver
+     * @param transferId String
+     * @param out TransferRequsiteWriter
      */
     public FileTransferReceiverRequisiteManifestProcessor(
             TransferReceiver receiver,

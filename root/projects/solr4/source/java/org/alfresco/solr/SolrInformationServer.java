@@ -2197,8 +2197,8 @@ public class SolrInformationServer implements InformationServer
     }
     
     /**
-     * @param list
-     * @return
+     * @param list List<Long>
+     * @return List<Long>
      */
     private List<Long> mapNullToEmptyList(List<Long> list)
     {
@@ -2789,9 +2789,9 @@ public class SolrInformationServer implements InformationServer
     
     /**
      * Puts the latest transaction state onto the index
-     * @param processor
-     * @param request
-     * @param tx
+     * @param processor UpdateRequestProcessor
+     * @param request SolrQueryRequest
+     * @param tx Transaction
      * @throws IOException
      */
     public void putTransactionState(UpdateRequestProcessor processor, SolrQueryRequest request, Transaction tx) throws IOException
@@ -2835,7 +2835,7 @@ public class SolrInformationServer implements InformationServer
     }
 
     /**
-     * @param 
+     * @param id String
      */
     @Override
     public boolean isInIndex(String id) throws IOException

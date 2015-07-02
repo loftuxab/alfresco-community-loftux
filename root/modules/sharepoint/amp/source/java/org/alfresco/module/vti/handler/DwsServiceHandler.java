@@ -47,14 +47,14 @@ public interface DwsServiceHandler
      * Indicates whether the document workspace specified by the given url can be created.
      * 
      * @param url Specifies the document workspace to be created.
-     * @return
+     * @return boolean
      */
     public boolean canCreateDwsUrl(String url) throws DwsException;
 
     /**
      * Returns information about a document workspace site and the lists it contains
      * 
-     * @param document the site-based URL of a document in a document library in the document workspace site
+     * @param documentURL the site-based URL of a document in a document library in the document workspace site
      * @param id an optional document globally unique identifier (GUID)
      * @param minimal determines whether the output includes information about the schemas, lists, documents, links, and tasks lists of a document workspace site
      * @return DwsMetadata information about a document workspace site and the lists it contains ({@link DwsMetadata})
@@ -64,7 +64,7 @@ public interface DwsServiceHandler
     /**
      * Returns information about a document workspace site and the lists it contains
      * 
-     * @param document the site-based URL of a document in a document library in the document workspace site
+     * @param documentURL the site-based URL of a document in a document library in the document workspace site
      * @param lastUpdate returned in the results of a previous call to the GetDwsData or GetDwsMetadata method
      * @return DwsData information about a document workspace site ({@link DwsData})
      */
@@ -137,7 +137,7 @@ public interface DwsServiceHandler
      * Update document workspace site data such as links
      * 
      * @param linkBean ({@link LinkBean})
-     * @param method 
+     * @param method CAMLMethod
      * @param dws document workspace site name 
      * @return linkBean that was changed
      */

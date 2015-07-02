@@ -26,26 +26,26 @@ public interface Join extends Source
 {
     /**
      * The source for the left hand side of the join
-     * @return
+     * @return Source
      */
     public Source getLeft();
     
     /**
      * The source for the right hand side of the join
-     * @return
+     * @return Source
      */
     public Source getRight();
     
     /**
      * Get the join type
-     * @return
+     * @return JoinType
      */
     public JoinType getJoinType();
     
     /**
      * Get the join condition.
      * Not all constraints are valid join conditions
-     * @return
+     * @return Constraint
      */
     public Constraint getJoinCondition();
 }

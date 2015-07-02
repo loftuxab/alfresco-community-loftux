@@ -44,7 +44,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param queryText String
      * @param analysisMode AnalysisMode
      * @param luceneFunction LuceneFunction
-     * @return
+     * @return Q
      */
     Q getFieldQuery(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
 
@@ -56,7 +56,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param includeUpper boolean
      * @param analysisMode AnalysisMode
      * @param luceneFunction LuceneFunction
-     * @return
+     * @return Q
      */
     Q getRangeQuery(String field, String lower, String upper, boolean includeLower, boolean includeUpper, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
 
@@ -64,7 +64,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     /**
      * A query that matches all docs
      * 
-     * @return
+     * @return Q
      * @throws E
      */
     Q getMatchAllQuery() throws E;
@@ -72,7 +72,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     /**
      * A query that matches no docs.
      * 
-     * @return
+     * @return Q
      * @throws E
      */
     Q getMatchNoneQuery() throws E;
@@ -81,18 +81,18 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param field String
      * @param sqlLikeClause String
      * @param analysisMode AnalysisMode
-     * @return
+     * @return Q
      */
     Q getLikeQuery(String field, String sqlLikeClause, AnalysisMode analysisMode) throws E;
 
     /**
-     * @return
+     * @return SearchParameters
      */
     SearchParameters getSearchParameters();
 
     /**
      * @param field String
-     * @return
+     * @return String
      */
     String getSortField(String field) throws E;
 
@@ -103,7 +103,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param stringValue String
      * @param analysisMode AnalysisMode
      * @param luceneFunction LuceneFunction
-     * @return
+     * @return Q
      */
     Q getIdentifierQuery(String field, String stringValue, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
 
@@ -113,20 +113,20 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param field String
      * @param stringValue String
      * @param analysisMode AnalysisMode
-     * @return
+     * @return Q
      */
     Q getIdentifieLikeQuery(String field, String stringValue, AnalysisMode analysisMode) throws E;
 
     /**
      * @param noLocalField String
-     * @return
+     * @return boolean
      */
     boolean sortFieldExists(String noLocalField);
 
     /**
      * @param field String
      * @param value String
-     * @return
+     * @return Q
      * @throws E
      */
     Q getFieldQuery(String field, String value) throws E;
@@ -134,7 +134,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     /**
      * @param list List
      * @param functionContext FunctionEvaluationContext
-     * @return
+     * @return S
      * @throws E 
      */
     S buildSort(List<Ordering> list, FunctionEvaluationContext functionContext) throws E;
@@ -143,7 +143,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param luceneFieldName String
      * @param term String
      * @param minSimilarity Float
-     * @return
+     * @return Q
      * @throws E
      */
     Q getFuzzyQuery(String luceneFieldName, String term, Float minSimilarity) throws E;
@@ -151,14 +151,14 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     /**
      * Get the default field
      * 
-     * @return
+     * @return String
      */
     String getField();
 
     /**
      * Get the default phrase slop
      * 
-     * @return
+     * @return int
      */
     int getPhraseSlop();
 
@@ -168,7 +168,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param analysisMode AnalysisMode
      * @param slop Integer
      * @param luceneFunction LuceneFunction
-     * @return
+     * @return Q
      */
     Q getFieldQuery(String luceneFieldName, String term, AnalysisMode analysisMode, Integer slop, LuceneFunction luceneFunction) throws E;
 
@@ -176,7 +176,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param luceneFieldName String
      * @param term String
      * @param analysisMode AnalysisMode
-     * @return
+     * @return Q
      */
     Q getPrefixQuery(String luceneFieldName, String term, AnalysisMode analysisMode) throws E;
 
@@ -186,7 +186,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param last String
      * @param slop int
      * @param inOrder boolean
-     * @return
+     * @return Q
      */
     Q getSpanQuery(String luceneFieldName, String first, String last, int slop, boolean inOrder) throws E;
 
@@ -194,35 +194,35 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
      * @param luceneFieldName String
      * @param term String
      * @param mode AnalysisMode
-     * @return
+     * @return Q
      */
     Q getWildcardQuery(String luceneFieldName, String term, AnalysisMode mode) throws E;
     
     /**
      * Invert a query - add a mandatory must not match anything query alnogside 
      * 
-     * @param query
-     * @return
+     * @param query Q
+     * @return Q
      */
     Q getNegatedQuery(Q query) throws E;
     
     /**
      * Utility to build conjunctions, disjunctions and negation
-     * @return
+     * @return LuceneQueryParserExpressionAdaptor
      */
     LuceneQueryParserExpressionAdaptor<Q, E> getExpressionAdaptor();
 
     /**
      * A query that matches all alfresco nodes (not extra stuff that may be in the underlying index)
      * 
-     * @return
+     * @return Q
      */
     Q getMatchAllNodesQuery();
 
     /**
      * @param field String
      * @param propertyDef PropertyDefinition
-     * @return
+     * @return String
      */
     String getDatetimeSortField(String field, PropertyDefinition propertyDef); 
 }

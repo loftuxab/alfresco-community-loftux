@@ -50,7 +50,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
  * </ul>
  * <p>
  * Where the store cannot handle a particular content URL request, the
- * {@link #org.alfresco.repo.content.UnsupportedContentUrlException} must be generated.  This will allow
+ * {@code UnsupportedContentUrlException} must be generated.  This will allow
  * various implementations to provide fallback code to other stores where
  * possible.
  * <p>
@@ -80,7 +80,7 @@ public interface ContentStore
      * 
      * @param contentUrl        the content URL to check
      * @return                  Returns <tt>true</tt> if none of the other methods on the store
-     *                          will throw an {@link #org.alfresco.repo.content.UnsupportedContentUrlException} when given
+     *                          will throw an {@code UnsupportedContentUrlException} when given
      *                          this URL.
      * 
      * @since 2.1
@@ -183,7 +183,7 @@ public interface ContentStore
      * be valid for all subsequent read attempts.
      * <p>
      * By supplying a reader to existing content, the store implementation may
-     * enable {@link RandomAccessContent random access}.  The store implementation
+     * enable random access.  The store implementation
      * can enable this by copying the existing content into the new location
      * before supplying a writer onto the new content.
      * 
@@ -200,7 +200,6 @@ public interface ContentStore
      * @throws ContentIOException
      *      if an IO error occurs
      *
-     * @see #getWriteSupport()
      * @see ContentWriter#addListener(ContentStreamListener)
      * @see ContentWriter#getContentUrl()
      */
@@ -208,8 +207,6 @@ public interface ContentStore
     
     /**
      * Get all URLs for the store, regardless of creation time.
-     * @return
-     *      Returns a set of all unique content URLs in the store
      * @throws ContentIOException
      *      if an IO error occurs
      * @throws UnsupportedOperationException

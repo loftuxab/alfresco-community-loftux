@@ -59,7 +59,7 @@ public class DictionaryBootstrap implements DictionaryListener
     /**
      * Sets the Dictionary DAO
      * 
-     * @param dictionaryDAO
+     * @param dictionaryDAO DictionaryDAO
      */
     public void setDictionaryDAO(DictionaryDAO dictionaryDAO)
     {
@@ -69,7 +69,7 @@ public class DictionaryBootstrap implements DictionaryListener
     /**
      * Sets the Tenant Service
      * 
-     * @param tenantService
+     * @param tenantService TenantService
      */
     public void setTenantService(TenantService tenantService)
     {

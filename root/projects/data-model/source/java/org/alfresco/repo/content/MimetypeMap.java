@@ -354,9 +354,6 @@ public class MimetypeMap implements MimetypeService
         this.configService = configService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public ConfigService getConfigService()
     {
         return configService;

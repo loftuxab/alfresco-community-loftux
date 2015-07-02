@@ -32,14 +32,14 @@ public interface AccessPermission
     /**
      * The permission.
      * 
-     * @return
+     * @return String
      */
     public String getPermission();
     
     /**
      * Get the Access enumeration value
      * 
-     * @return
+     * @return AccessStatus
      */
     public AccessStatus getAccessStatus();
     
@@ -47,7 +47,7 @@ public interface AccessPermission
     /**
      * Get the authority to which this permission applies.
      * 
-     * @return
+     * @return String
      */
     public String getAuthority();
     
@@ -55,7 +55,7 @@ public interface AccessPermission
     /**
      * Get the type of authority to which this permission applies.
      * 
-     * @return
+     * @return AuthorityType
      */
     public AuthorityType getAuthorityType();
     
@@ -65,19 +65,19 @@ public interface AccessPermission
      * = 0 -> Set direct on the object.
      * > 0 -> Inherited
      * < 0 -> We don't know and are using this object for reporting (e.g. the actual permissions that apply to a node for the current user)
-     * @return
+     * @return int
      */
     public int getPosition();
     
    /**
     * Is this an inherited permission entry?
-    * @return
+    * @return boolean
     */ 
     public boolean isInherited();
     
     /**
      * Is this permission set on the object?
-     * @return
+     * @return boolean
      */ 
      public boolean isSetDirectly();
 }

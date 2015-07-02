@@ -36,19 +36,19 @@ public interface LuceneQueryBuilder <Q, S, E extends Throwable>
 {
     /**
      * Build the matching lucene query
-     * @param selectors
-     * @param luceneContext
-     * @param functionContext
+     * @param selectors Set<String>
+     * @param luceneContext LuceneQueryBuilderContext<Q, S, E>
+     * @param functionContext FunctionEvaluationContext
      * @return - the query
-     * @throws java.text.ParseException
+     * @throws E
      */
     public Q buildQuery(Set<String> selectors,  LuceneQueryBuilderContext<Q, S, E> luceneContext, FunctionEvaluationContext functionContext) throws E;
 
     /**
      * Build the matching lucene sort
-     * @param selectors
-     * @param luceneContext
-     * @param functionContext
+     * @param selectors Set<String>
+     * @param luceneContext LuceneQueryBuilderContext<Q, S, E>
+     * @param functionContext FunctionEvaluationContext
      * @return - the sort spec
      * @throws E 
      */
@@ -56,10 +56,10 @@ public interface LuceneQueryBuilder <Q, S, E extends Throwable>
     
     /**
      * Build a sort definition for a sorted result set wrapper
-     * @param selectors
-     * @param luceneContext
-     * @param functionContext
-     * @return
+     * @param selectors Set<String>
+     * @param luceneContext LuceneQueryBuilderContext<Q, S, E>
+     * @param functionContext FunctionEvaluationContext
+     * @return List<SortDefinition>
      */
     public List<SortDefinition> buildSortDefinitions(Set<String> selectors, LuceneQueryBuilderContext<Q, S, E> luceneContext, FunctionEvaluationContext functionContext);
 

@@ -30,8 +30,8 @@ public class LuceneOrdering extends BaseOrdering
 {
 
     /**
-     * @param column
-     * @param order
+     * @param column Column
+     * @param order Order
      */
     public LuceneOrdering(Column column, Order order)
     {

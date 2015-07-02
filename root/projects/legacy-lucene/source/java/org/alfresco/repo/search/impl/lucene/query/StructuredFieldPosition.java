@@ -49,21 +49,21 @@ public interface StructuredFieldPosition
      * effectively allow prefix mathces for the likes of descendant-and-below
      * style queries.
      * 
-     * @return
+     * @return boolean
      */
     public boolean isTerminal();
 
     /**
      * Is this an absolute element; that is, it knows its exact position.
      * 
-     * @return
+     * @return boolean
      */
     public boolean isAbsolute();
 
     /**
      * This element only knows its position relative to the previous element.
      * 
-     * @return
+     * @return boolean
      */
     public boolean isRelative();
 
@@ -71,7 +71,7 @@ public interface StructuredFieldPosition
      * Get the test to search for in the term query. This may be null if it
      * should not have a term query
      * 
-     * @return
+     * @return String
      */
     public String getTermText();
 
@@ -80,7 +80,7 @@ public interface StructuredFieldPosition
      * position knowing the previous term unless this element is preceded by a
      * descendat and below style element
      * 
-     * @return
+     * @return int
      */
     public int getPosition();
 
@@ -89,7 +89,7 @@ public interface StructuredFieldPosition
      * null which indicates all terms match, in that case there is no action
      * against the index
      * 
-     * @param tps
+     * @param tps CachingTermPositions
      */
     public void setCachingTermPositions(CachingTermPositions tps);
 
@@ -99,7 +99,7 @@ public interface StructuredFieldPosition
      * Normally paths would require onlt parent chaining. for some it is parent
      * and child chaining.
      * 
-     * @return
+     * @return boolean
      */
 
     public boolean linkSelf();

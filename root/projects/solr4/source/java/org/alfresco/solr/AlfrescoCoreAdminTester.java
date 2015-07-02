@@ -1032,7 +1032,6 @@ public class AlfrescoCoreAdminTester
      * @param count
      * @param report
      * @param solrIndexSearcher
-     * @throws ParseException
      * @throws IOException
      * @throws org.apache.lucene.queryparser.classic.ParseException 
      */

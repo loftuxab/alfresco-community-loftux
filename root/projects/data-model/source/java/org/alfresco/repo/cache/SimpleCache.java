@@ -57,7 +57,7 @@ public interface SimpleCache<K extends Serializable, V extends Object>
     public Collection<K> getKeys();
     
     /**
-     * @param key
+     * @param key K
      * @return          Returns the value associated with the key.  It will be <tt>null</tt>
      *                  if the value is <tt>null</tt> or if the cache doesn't have an entry.
      */

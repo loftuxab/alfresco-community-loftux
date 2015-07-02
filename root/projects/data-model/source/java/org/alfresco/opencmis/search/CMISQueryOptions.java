@@ -139,7 +139,7 @@ public class CMISQueryOptions extends QueryOptions
     }
 
     /**
-     * @return
+     * @return SearchParameters
      */
     public SearchParameters getAsSearchParmeters()
     {

@@ -295,7 +295,7 @@ public class M2Property
     }
 
     /**
-     * @return
+     * @return String
      */
     public String getAnalyserResourceBundleName()
     {

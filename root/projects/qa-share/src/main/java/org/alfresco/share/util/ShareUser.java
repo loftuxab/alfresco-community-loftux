@@ -1523,12 +1523,13 @@ public class ShareUser extends AbstractUtils
     /**
      * Checks the checkbox for a content if not selected on the document library
      * page.
+     * <br>
+     * Note: Expects the user is logged in and document library page within
+     *      the selected site is open.
      * 
      * @param drone
      * @param contentName
      * @return DocumentLibraryPage
-     * @IMP Note: Expects the user is logged in and document library page within
-     *      the selected site is open.
      */
     public static DocumentLibraryPage selectContentCheckBox(WebDrone drone, String contentName)
     {
@@ -1543,12 +1544,13 @@ public class ShareUser extends AbstractUtils
     /**
      * UnChecks the checkbox for a content if already selected on the document
      * library page.
+     * <br>
+     * Note: Expects the user is logged in and document library page within
+     *      the selected site is open.
      * 
      * @param drone
      * @param contentName
      * @return DocumentLibraryPage
-     * @IMP Note: Expects the user is logged in and document library page within
-     *      the selected site is open
      */
     public static DocumentLibraryPage unSelectContentCheckBox(WebDrone drone, String contentName)
     {
@@ -1563,11 +1565,12 @@ public class ShareUser extends AbstractUtils
     /**
      * Mimics the process of deleting selected content on a document library
      * page.
+     * <br>
+     * Note: Expects the user is logged in and document library page within
+     *      the selected site is open.
      * 
      * @param drone
      * @return
-     * @IMP Note: Expects the user is logged in and document library page within
-     *      the selected site is open
      */
     public static DocumentLibraryPage deleteSelectedContent(WebDrone drone)
     {

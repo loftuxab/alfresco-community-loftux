@@ -95,8 +95,9 @@ public class LuceneAnalyser extends AbstractAnalyzer
     /**
      * Pick the analyser from the field name
      * 
-     * @param fieldName
-     * @return
+     * @param fieldName String
+     * @param analysisMode AnalysisMode
+     * @return Analyzer
      */
     @SuppressWarnings("deprecation")
     private Analyzer findAnalyser(String fieldName, AnalysisMode analysisMode)
@@ -349,8 +350,8 @@ public class LuceneAnalyser extends AbstractAnalyzer
     /**
      * Find an instantiate an analyser. The shuld all be thread sade as Analyser.tokenStream should be re-entrant.
      * 
-     * @param propertyDef
-     * @return
+     * @param propertyDef PropertyDefinition
+     * @return Analyzer
      */
     private Analyzer loadAnalyzer( PropertyDefinition propertyDef )
     {

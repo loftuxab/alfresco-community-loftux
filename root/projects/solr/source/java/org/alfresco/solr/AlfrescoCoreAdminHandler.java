@@ -1993,7 +1993,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
      * @param count
      * @param report
      * @param solrIndexSearcher
-     * @throws ParseException
+     * @throws org.apache.lucene.queryParser.ParseException
      * @throws IOException
      */
     private void buildAndRunAuthQuery(AlfrescoSolrDataModel dataModel, long count, NamedList<Object> report, SolrIndexSearcher solrIndexSearcher, int loop)
@@ -5784,7 +5784,6 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
     /**
      * @param before
-     * @return
      * @throws IOException
      * @throws org.apache.lucene.queryParser.ParseException
      */
@@ -6738,7 +6737,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
      * @param dataModel
      * @param report
      * @param solrIndexSearcher
-     * @throws ParseException
+     * @throws org.apache.lucene.queryParser.ParseException
      * @throws IOException
      */
     private void testQuery(AlfrescoSolrDataModel dataModel, NamedList<Object> report, SolrIndexSearcher solrIndexSearcher, String queryString, Integer count, Locale locale,

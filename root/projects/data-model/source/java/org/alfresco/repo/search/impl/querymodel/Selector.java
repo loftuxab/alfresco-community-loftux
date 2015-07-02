@@ -28,7 +28,7 @@ public interface Selector extends Source
 {
     /**
      * The qname of the type or aspect to select 
-     * @return
+     * @return QName
      */
     public QName getType();
     
@@ -36,7 +36,7 @@ public interface Selector extends Source
      * The alias or name for the selector
      * This must be unique across all selectors in the query
      * 
-     * @return
+     * @return String
      */
     public String getAlias();
 }

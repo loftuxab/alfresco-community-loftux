@@ -144,7 +144,6 @@ public class SiteUtil extends AbstractUtils
      * @param siteName String site name
      * @param siteVisibility
      * @return true if site created
-     * @throws Exception if error
      */
     public static boolean createSite(WebDrone drone, final String siteName, String desc, String siteVisibility)
     {
@@ -594,7 +593,7 @@ public class SiteUtil extends AbstractUtils
      * @param deleteSitePage boolean deleteSitePage PopUp - true: click Delete / false: click Cancel
      * @param deleteConfirmation boolean deleteConfirmation PopUp - true: click Yes / false: click No
      * @return siteFinder
-     * @Author Bogdan.Bocancea
+     * @author Bogdan.Bocancea
      */
     public static SiteFinderPage deleteSiteWithConfirm(WebDrone drone, String siteName, boolean deleteSitePage, boolean deleteConfirmation)
     {

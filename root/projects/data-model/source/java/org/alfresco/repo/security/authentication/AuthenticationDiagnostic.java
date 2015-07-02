@@ -70,8 +70,8 @@ public class AuthenticationDiagnostic implements Serializable
     
     /**
      * 
-     * @param key
-     * @param success
+     * @param key String
+     * @param success boolean
      */
     public void addStep(String key, boolean success)
     {
@@ -83,9 +83,9 @@ public class AuthenticationDiagnostic implements Serializable
     
     /**
      * 
-     * @param key
-     * @param success
-     * @param args
+     * @param key String
+     * @param success boolean
+     * @param args Object[]
      */
     public void addStep(String key, boolean success, Object[] args)
     {

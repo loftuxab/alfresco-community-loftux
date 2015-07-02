@@ -100,7 +100,7 @@ public class AlfrescoCheckOutCheckInServiceHandler implements CheckOutCheckInSer
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.CheckOutCheckInServiceHandler#undoCheckOutDocument(java.lang.String)
+     * @see org.alfresco.module.vti.handler.CheckOutCheckInServiceHandler#undoCheckOutDocument(String, boolean)
      */
     public NodeRef undoCheckOutDocument(final String fileName, final boolean lockAfterSucess) throws FileNotFoundException
     {
@@ -160,7 +160,7 @@ public class AlfrescoCheckOutCheckInServiceHandler implements CheckOutCheckInSer
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.CheckOutCheckInServiceHandler#checkInDocument(java.lang.String, java.lang.String)
+     * @see org.alfresco.module.vti.handler.CheckOutCheckInServiceHandler#checkInDocument(String, VersionType, String, boolean)
      */
     public NodeRef checkInDocument(final String fileName, final VersionType type, final String comment, final boolean lockAfterSucess) throws FileNotFoundException
     {
@@ -232,7 +232,7 @@ public class AlfrescoCheckOutCheckInServiceHandler implements CheckOutCheckInSer
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.CheckOutCheckInServiceHandler#checkOutDocument(java.lang.String)
+     * @see org.alfresco.module.vti.handler.CheckOutCheckInServiceHandler#checkOutDocument(String, boolean)
      */
     public NodeRef checkOutDocument(final String fileName, final boolean lockAfterSucess) throws FileNotFoundException, AccessDeniedException
     {

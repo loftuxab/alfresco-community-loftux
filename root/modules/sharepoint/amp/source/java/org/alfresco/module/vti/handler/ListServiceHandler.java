@@ -61,7 +61,8 @@ public interface ListServiceHandler
     /**
      * Deletes a Data List
      * 
-     * @param url The site-based URL of the folder to delete
+     * @param listName String
+     * @param dws String
      */
     public void deleteList(String listName, String dws) 
        throws SiteDoesNotExistException, FileNotFoundException;

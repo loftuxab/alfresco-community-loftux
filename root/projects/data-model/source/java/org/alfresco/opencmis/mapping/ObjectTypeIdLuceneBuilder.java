@@ -42,7 +42,7 @@ public class ObjectTypeIdLuceneBuilder extends BaseLuceneBuilder
     /**
      * Construct
      * 
-     * @param cmisDictionaryService
+     * @param cmisDictionaryService CMISDictionaryService
      */
     public ObjectTypeIdLuceneBuilder(CMISDictionaryService cmisDictionaryService)
     {

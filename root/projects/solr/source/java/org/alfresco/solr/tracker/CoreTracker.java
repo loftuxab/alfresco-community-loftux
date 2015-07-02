@@ -1212,9 +1212,9 @@ public class CoreTracker implements Tracker
 
 
     /**
-     * @param txnsFound
-     * @param lastGoodTxCommitTimeInIndex
-     * @return
+     * @param txnsFound BoundedDeque<Transaction>
+     * @param lastGoodTxCommitTimeInIndex long
+     * @return Long
      */
     protected Long getTxFromCommitTime(BoundedDeque<Transaction> txnsFound, long lastGoodTxCommitTimeInIndex)
     {
@@ -1230,9 +1230,9 @@ public class CoreTracker implements Tracker
 
 
     /**
-     * @param changeSetsFound
-     * @param lastGoodChangeSetCommitTimeInIndex
-     * @return
+     * @param changeSetsFound BoundedDeque<AclChangeSet>
+     * @param lastGoodChangeSetCommitTimeInIndex long
+     * @return Long
      */
     protected Long getChangeSetFromCommitTime(BoundedDeque<AclChangeSet> changeSetsFound, long lastGoodChangeSetCommitTimeInIndex)
     {
@@ -1597,8 +1597,8 @@ public class CoreTracker implements Tracker
 
 
     /**
-     * @param alfrescoModelDir
-     * @param modelName
+     * @param alfrescoModelDir File
+     * @param modelName QName
      */
     private void removeMatchingModels(File alfrescoModelDir, QName modelName)
     {
@@ -1651,8 +1651,8 @@ public class CoreTracker implements Tracker
 
     /**
      *
-     * @param aclReaderList
-     * @param overwrite
+     * @param aclReaderList List<AclReaders>
+     * @param overwrite boolean
      * @throws IOException
      */
     protected void indexAcl(List<AclReaders> aclReaderList, boolean overwrite) throws IOException
@@ -1809,8 +1809,8 @@ public class CoreTracker implements Tracker
     }
 
     /**
-     * @param dbid
-     * @return
+     * @param dbid Long
+     * @return NodeReport
      */
     @Override
     public NodeReport checkNode(Long dbid)
@@ -1890,8 +1890,8 @@ public class CoreTracker implements Tracker
 
 
     /**
-     * @param acltxid
-     * @return
+     * @param acltxid Long
+     * @return List<Long>
      */
     @Override
     public List<Long> getAclsForDbAclTransaction(Long acltxid)

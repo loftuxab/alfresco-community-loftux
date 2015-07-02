@@ -46,7 +46,6 @@ public interface AuthenticationHandler
      * @return SessionUser information about currently loged in user or null. 
      * @throws ServletException 
      * @throws IOException 
-     * @throws SiteMemberMappingException
      */
     public SessionUser authenticateRequest(ServletContext context, HttpServletRequest request, HttpServletResponse response, String alfrescoContext) throws IOException, ServletException;
     

@@ -221,7 +221,7 @@ public interface NodeService
             throws InvalidChildAssociationRefException;
     
     /**
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @return Returns the type name
      * @throws InvalidNodeRefException if the node could not be found
      * 
@@ -249,7 +249,7 @@ public interface NodeService
      * Applies an aspect to the given node.  After this method has been called,
      * the node with have all the aspect-related properties present
      * 
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @param aspectTypeQName the aspect to apply to the node
      * @param aspectProperties a minimum of the mandatory properties required for
      *      the aspect
@@ -269,7 +269,7 @@ public interface NodeService
     /**
      * Remove an aspect and all related properties from a node
      * 
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @param aspectTypeQName the type of aspect to remove
      * @throws InvalidNodeRefException if the node could not be found
      * @throws InvalidAspectException if the the aspect is unknown or if the
@@ -283,8 +283,8 @@ public interface NodeService
      * Determines if a given aspect is present on a node.  Aspects may only be
      * removed if they are <b>NOT</b> mandatory.
      * 
-     * @param nodeRef
-     * @param aspectTypeQName
+     * @param nodeRef NodeRef
+     * @param aspectTypeQName QName
      * @return Returns true if the aspect has been applied to the given node,
      *      otherwise false
      * @throws InvalidNodeRefException if the node could not be found
@@ -295,7 +295,7 @@ public interface NodeService
             throws InvalidNodeRefException, InvalidAspectException;
     
     /**
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @return Returns a set of all aspects applied to the node, including mandatory
      *      aspects
      * @throws InvalidNodeRefException if the node could not be found
@@ -396,7 +396,7 @@ public interface NodeService
     public boolean removeSecondaryChildAssociation(ChildAssociationRef childAssocRef);
 
     /**
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @return Returns all properties keyed by their qualified name
      * @throws InvalidNodeRefException if the node could not be found
      */
@@ -404,7 +404,7 @@ public interface NodeService
     public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException;
 
     /**
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @return Returns the acl id of the node
      * @throws InvalidNodeRefException if the node could not be found
      */
@@ -412,7 +412,7 @@ public interface NodeService
     public Long getNodeAclId(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @param qname the qualified name of the property
      * @return Returns the value of the property, or null if not yet set
      * @throws InvalidNodeRefException if the node could not be found
@@ -660,11 +660,9 @@ public interface NodeService
     /**
      * Get the nodes with the given names within the context of the parent node.
      * 
-     * {@inheritDoc #getChildByName(NodeRef, QName, String)}
-     * 
      * @param childNames        a collection of up to 1000 child names to match on
      * 
-     * @see {@link #getChildByName(NodeRef, QName, String)} 
+     * @see #getChildByName(NodeRef, QName, String)
      */
     @Auditable(parameters = {"nodeRef", "assocTypeQName", "childName"})
     public List<ChildAssociationRef> getChildrenByName(
@@ -677,7 +675,7 @@ public interface NodeService
      * <p>
      * For a root node, the parent node reference will be null.
      * 
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @return Returns the primary parent-child association of the node
      * @throws InvalidNodeRefException if the node could not be found
      */
@@ -789,7 +787,7 @@ public interface NodeService
      * will always be <b>at least one</b> path element in the returned path(s).
      * The first element will have a null parent reference and qname.
      * 
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @return Returns the path to the node along the primary node path
      * @throws InvalidNodeRefException if the node could not be found
      * 
@@ -803,7 +801,7 @@ public interface NodeService
      * will always be <b>at least one</b> path element in the returned path(s).
      * The first element will have a null parent reference and qname.
      * 
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @param primaryOnly true if only the primary path must be retrieved.  If true, the
      *      result will have exactly one entry.
      * @return Returns a List of all possible paths to the given node

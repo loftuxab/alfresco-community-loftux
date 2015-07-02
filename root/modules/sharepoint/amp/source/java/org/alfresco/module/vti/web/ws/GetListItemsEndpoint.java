@@ -36,7 +36,8 @@ public class GetListItemsEndpoint extends AbstractListItemsEndpoint
     /**
      * constructor
      *
-     * @param handler that provides methods for operating with documents and folders
+     * @param listHander ListServiceHandler
+     * @param methodHandler that provides methods for operating with documents and folders
      */
     public GetListItemsEndpoint(ListServiceHandler listHander, MethodHandler methodHandler)
     {

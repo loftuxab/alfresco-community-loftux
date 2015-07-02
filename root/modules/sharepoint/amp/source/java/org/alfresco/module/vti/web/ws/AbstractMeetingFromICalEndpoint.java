@@ -230,8 +230,10 @@ public abstract class AbstractMeetingFromICalEndpoint extends AbstractMeetingEnd
 
     /**
      * Parse date from specific iCal format
-     * 
-     * @param stringDate iCal date value
+     *
+     * @param dateType String
+     * @param params Map<String,String>
+     * @return Date
      */
     private Date parseDate(String dateType, Map<String,String> params)
     {
@@ -272,8 +274,9 @@ public abstract class AbstractMeetingFromICalEndpoint extends AbstractMeetingEnd
     /**
      * Retrieve TimeZone from specific iCal format
      * 
-     * @param stringDate iCal date value
+     * @param dateType String
      * @param params the full iCal parameters (used to find full TZ info from)
+     * @return TimeZone
      */
     private TimeZone getTimeZone(String dateType, Map<String,String> params)
     {

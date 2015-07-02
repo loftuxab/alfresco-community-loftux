@@ -125,7 +125,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     private AbstractAnalyzer luceneAnalyser;
 
     /**
-     * @param defaultSearchMLAnalysisMode
+     * @param defaultSearchMLAnalysisMode MLAnalysisMode
      */
     public void setDefaultSearchMLAnalysisMode(MLAnalysisMode defaultSearchMLAnalysisMode)
     {
@@ -133,7 +133,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param indexReader
+     * @param indexReader IndexReader
      */
     public void setIndexReader(IndexReader indexReader)
     {
@@ -141,7 +141,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param searchParameters
+     * @param searchParameters SearchParameters
      */
     public void setSearchParameters(SearchParameters searchParameters)
     {
@@ -149,7 +149,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param namespacePrefixResolver
+     * @param namespacePrefixResolver NamespacePrefixResolver
      */
     public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
     {
@@ -157,7 +157,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param tenantService
+     * @param tenantService TenantService
      */
     public void setTenantService(TenantService tenantService)
     {
@@ -184,8 +184,8 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     /**
      * Lucene default constructor
      * 
-     * @param arg0
-     * @param arg1
+     * @param arg0 String
+     * @param arg1 Analyzer
      */
     public AbstractLuceneQueryParser(String arg0, Analyzer arg1)
     {
@@ -199,7 +199,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     /**
      * Lucene default constructor
      * 
-     * @param arg0
+     * @param arg0 CharStream
      */
     public AbstractLuceneQueryParser(CharStream arg0)
     {
@@ -209,7 +209,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     /**
      * Lucene default constructor
      * 
-     * @param arg0
+     * @param arg0 QueryParserTokenManager
      */
     public AbstractLuceneQueryParser(QueryParserTokenManager arg0)
     {
@@ -232,11 +232,11 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param queryText
-     * @param analysisMode
-     * @param slop
-     * @param luceneFunction
+     * @param field String
+     * @param queryText String
+     * @param analysisMode AnalysisMode
+     * @param slop int
+     * @param luceneFunction LuceneFunction
      * @return the query
      * @throws ParseException
      */
@@ -256,9 +256,9 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param sqlLikeClause
-     * @param analysisMode
+     * @param field String
+     * @param sqlLikeClause String
+     * @param analysisMode AnalysisMode
      * @return the query
      * @throws ParseException
      */
@@ -322,10 +322,10 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
 
 
     /**
-     * @param field
-     * @param queryText
-     * @param analysisMode
-     * @param luceneFunction
+     * @param field String
+     * @param queryText String
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
      * @return the query
      * @throws ParseException
      */
@@ -352,11 +352,11 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param first
-     * @param last
-     * @param slop
-     * @param inOrder
+     * @param field String
+     * @param first String
+     * @param last String
+     * @param slop int
+     * @param inOrder boolean
      * @return the query
      */
     public Query getSpanQuery(String field, String first, String last, int slop, boolean inOrder)
@@ -579,10 +579,10 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     
 
     /**
-     * @param field
-     * @param queryText
-     * @param analysisMode
-     * @param luceneFunction
+     * @param field String
+     * @param queryText String
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
      * @return the query
      * @throws ParseException
      */
@@ -805,7 +805,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
 
     /**
      * @param tag (which will then be ISO9075 encoded)
-     * @return
+     * @return Query
      * @throws ParseException
      */
     protected Query createTagQuery(String tag) throws ParseException
@@ -837,51 +837,51 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected abstract Query createAclIdQuery(String queryText) throws ParseException;
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected abstract Query createOwnerQuery(String queryText) throws ParseException;
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected abstract Query createReaderQuery(String queryText) throws ParseException;
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected abstract Query createAuthorityQuery(String queryText) throws ParseException;
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected abstract Query createOwnerSetQuery(String queryText) throws ParseException;
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected abstract Query createReaderSetQuery(String queryText) throws ParseException;
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected abstract Query createAuthoritySetQuery(String queryText) throws ParseException;
 
 
     /**
-     * @param queryText
-     * @return
+     * @param queryText String
+     * @return Query
      */
     protected Query createDbidQuery(String queryText) throws ParseException
     {
@@ -2075,10 +2075,9 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param queryText
-     * @param mpq
-     * @return
+     * @param field String
+     * @param queryText String
+     * @param mpq MultiPhraseQuery
      */
     private void checkTermCount(String field, String queryText, MultiPhraseQuery mpq)
     {
@@ -2090,8 +2089,8 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     
     /**
      * 
-     * @param mpq
-     * @return
+     * @param mpq MultiPhraseQuery
+     * @return boolean
      */
     private boolean exceedsTermCount(MultiPhraseQuery mpq)
     {
@@ -2109,8 +2108,8 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param fixedTokenSequences 
-     * @return
+     * @param fixedTokenSequences LinkedList<LinkedList<Token>>
+     * @return boolean
      */
     private boolean canUseMultiPhraseQuery(LinkedList<LinkedList<Token>> fixedTokenSequences)
     {
@@ -2237,13 +2236,13 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param part1
-     * @param part2
-     * @param includeLower
-     * @param includeUpper
-     * @param analysisMode
-     * @param luceneFunction
+     * @param field String
+     * @param part1 String
+     * @param part2 String
+     * @param includeLower boolean
+     * @param includeUpper boolean
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
      * @return the query
      * @exception ParseException
      *                throw in overridden method to disallow
@@ -2598,18 +2597,18 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
             }
 
     /**
-     * @param field
-     * @param part1
-     * @param part2
-     * @param includeLower
-     * @param includeUpper
-     * @param analysisMode
-     * @param fieldName
-     * @param propertyDef
-     * @param tokenisationMode
-     * @param booleanQuery
-     * @param mlAnalysisMode
-     * @param locale
+     * @param field String
+     * @param part1 String
+     * @param part2 String
+     * @param includeLower boolean
+     * @param includeUpper boolean
+     * @param analysisMode AnalysisMode
+     * @param fieldName String
+     * @param propertyDef PropertyDefinition
+     * @param tokenisationMode IndexTokenisationMode
+     * @param booleanQuery BooleanQuery
+     * @param mlAnalysisMode MLAnalysisMode
+     * @param locale Locale
      * @throws ParseException
      */
     protected abstract void addTextRange(String field, String part1, String part2, boolean includeLower, boolean includeUpper, AnalysisMode analysisMode, String fieldName,
@@ -4392,7 +4391,7 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param dictionaryService
+     * @param dictionaryService DictionaryService
      */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -4400,10 +4399,10 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param queryText
-     * @param analysisMode
-     * @param luceneFunction
+     * @param field String
+     * @param queryText String
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
      * @return the query
      * @throws ParseException
      */
@@ -4413,9 +4412,9 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param termStr
-     * @param minSimilarity
+     * @param field String
+     * @param termStr String
+     * @param minSimilarity float
      * @return the query
      * @throws ParseException
      */
@@ -4425,8 +4424,8 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param termStr
+     * @param field String
+     * @param termStr String
      * @return the query
      * @throws ParseException
      */
@@ -4436,8 +4435,8 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param termStr
+     * @param field String
+     * @param termStr String
      * @return the query
      * @throws ParseException
      */
@@ -4486,10 +4485,10 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     public interface SubQuery
     {
         /**
-         * @param field
-         * @param queryText
-         * @param analysisMode
-         * @param luceneFunction
+         * @param field String
+         * @param queryText String
+         * @param analysisMode AnalysisMode
+         * @param luceneFunction LuceneFunction
          * @return the query
          * @throws ParseException
          */
@@ -4668,46 +4667,46 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @param field
-     * @param first
-     * @param last
-     * @param slop
-     * @param inOrder
-     * @param expandedFieldName
-     * @param tokenisationMode
-     * @param booleanQuery
-     * @param mlAnalysisMode
-     * @param locale
+     * @param field String
+     * @param first String
+     * @param last String
+     * @param slop int
+     * @param inOrder boolean
+     * @param expandedFieldName String
+     * @param tokenisationMode IndexTokenisationMode
+     * @param booleanQuery BooleanQuery
+     * @param mlAnalysisMode MLAnalysisMode
+     * @param locale Locale
      */
     protected abstract void addTextSpanQuery(String field, String first, String last, int slop, boolean inOrder, String expandedFieldName, IndexTokenisationMode tokenisationMode,
             BooleanQuery booleanQuery, MLAnalysisMode mlAnalysisMode, Locale locale);
 
     /**
-     * @param field
-     * @param first
-     * @param last
-     * @param slop
-     * @param inOrder
-     * @param expandedFieldName
-     * @param expandedLocales
-     * @param mlAnalysisMode
-     * @return
+     * @param field String
+     * @param first String
+     * @param last String
+     * @param slop int
+     * @param inOrder boolean
+     * @param expandedFieldName String
+     * @param expandedLocales List<Locale>
+     * @param mlAnalysisMode MLAnalysisMode
+     * @return org.apache.lucene.search.Query
      */
     protected abstract org.apache.lucene.search.Query addContentSpanQuery(String field, String first, String last, int slop, boolean inOrder, String expandedFieldName,
             List<Locale> expandedLocales, MLAnalysisMode mlAnalysisMode);
 
     /**
-     * @param field
-     * @param first
-     * @param last
-     * @param slop
-     * @param inOrder
-     * @param expandedFieldName
-     * @param propertyDef
-     * @param tokenisationMode
-     * @param booleanQuery
-     * @param mlAnalysisMode
-     * @param locale
+     * @param field String
+     * @param first String
+     * @param last String
+     * @param slop int
+     * @param inOrder boolean
+     * @param expandedFieldName String
+     * @param propertyDef PropertyDefinition
+     * @param tokenisationMode IndexTokenisationMode
+     * @param booleanQuery BooleanQuery
+     * @param mlAnalysisMode MLAnalysisMode
+     * @param locale Locale
      */
     protected abstract void addMLTextSpanQuery(String field, String first, String last, int slop, boolean inOrder, String expandedFieldName, PropertyDefinition propertyDef,
             IndexTokenisationMode tokenisationMode, BooleanQuery booleanQuery, MLAnalysisMode mlAnalysisMode, Locale locale);
@@ -4976,51 +4975,51 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
     }
 
     /**
-     * @return
+     * @return boolean
      */
     protected abstract boolean isLucene();
 
     /**
-     * @param field
-     * @param queryText
-     * @param subQueryBuilder
-     * @param analysisMode
-     * @param luceneFunction
-     * @param expandedFieldName
-     * @param tokenisationMode
-     * @param booleanQuery
-     * @param mlAnalysisMode
-     * @param locale
+     * @param field String
+     * @param queryText String
+     * @param subQueryBuilder SubQuery
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
+     * @param expandedFieldName String
+     * @param tokenisationMode IndexTokenisationMode
+     * @param booleanQuery BooleanQuery
+     * @param mlAnalysisMode MLAnalysisMode
+     * @param locale Locale
      * @throws ParseException
      */
     protected abstract void addTextAttributeQuery(String field, String queryText, SubQuery subQueryBuilder, AnalysisMode analysisMode, LuceneFunction luceneFunction,
             String expandedFieldName, IndexTokenisationMode tokenisationMode, BooleanQuery booleanQuery, MLAnalysisMode mlAnalysisMode, Locale locale) throws ParseException;
 
     /**
-     * @param queryText
-     * @param subQueryBuilder
-     * @param analysisMode
-     * @param luceneFunction
-     * @param expandedFieldName
-     * @param expandedLocales
-     * @return
+     * @param queryText String
+     * @param subQueryBuilder SubQuery
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
+     * @param expandedFieldName String
+     * @param expandedLocales List<Locale>
+     * @return Query
      * @throws ParseException
      */
     protected abstract Query addContentAttributeQuery(String queryText, SubQuery subQueryBuilder, AnalysisMode analysisMode, LuceneFunction luceneFunction,
             String expandedFieldName, List<Locale> expandedLocales, MLAnalysisMode mlAnalysisMode) throws ParseException;
 
     /**
-     * @param field
-     * @param queryText
-     * @param subQueryBuilder
-     * @param analysisMode
-     * @param luceneFunction
-     * @param expandedFieldName
-     * @param propertyDef
-     * @param tokenisationMode
-     * @param booleanQuery
-     * @param mlAnalysisMode
-     * @param locale
+     * @param field String
+     * @param queryText String
+     * @param subQueryBuilder SubQuery
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
+     * @param expandedFieldName String
+     * @param propertyDef PropertyDefinition
+     * @param tokenisationMode IndexTokenisationMode
+     * @param booleanQuery BooleanQuery
+     * @param mlAnalysisMode MLAnalysisMode
+     * @param locale Locale
      * @throws ParseException
      */
     protected abstract void addMLTextAttributeQuery(String field, String queryText, SubQuery subQueryBuilder, AnalysisMode analysisMode, LuceneFunction luceneFunction,

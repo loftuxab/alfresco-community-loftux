@@ -519,7 +519,7 @@ public abstract class AbstractUtils implements AlfrescoTests
      * 
      * @param methodName String This is the Test Name / ID
      * @return void
-     * @throws Exception if error
+     * @throws IOException if error
      */
     public static void saveScreenShot(WebDrone drone, String methodName) throws IOException
     {
@@ -550,7 +550,7 @@ public abstract class AbstractUtils implements AlfrescoTests
      * 
      * @param methodName String This is the Test Name / ID
      * @return void
-     * @throws Exception if error
+     * @throws IOException if error
      */
     public void saveScreenShot(String methodName) throws IOException
     {
@@ -1276,7 +1276,6 @@ public abstract class AbstractUtils implements AlfrescoTests
      * 
      * @param driver WebDrone Instance
      * @return ShareErrorPopup
-     * @throws PageException if the current page is not a share error popup page
      */
     public static SharePopup getShareErrorPopupPage(WebDrone driver)
     {
@@ -1606,7 +1605,6 @@ public abstract class AbstractUtils implements AlfrescoTests
      * 
      * @param driver WebDrone Instance
      * @return HtmlPage
-     * @throws PageException if the current page is not a share page
      */
     public static HtmlPage refreshSharePage(WebDrone driver)
     {
@@ -1620,7 +1618,6 @@ public abstract class AbstractUtils implements AlfrescoTests
      * 
      * @param driver WebDrone Instance
      * @return HtmlPage
-     * @throws PageException if the current page is not a share page
      */
     public static HtmlPage getCurrentPage(WebDrone driver)
     {
