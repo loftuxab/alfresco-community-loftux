@@ -19,9 +19,11 @@
 package org.alfresco.solr.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +60,7 @@ public class CMISDataCreatorTest extends TestCase
 {
     private static Session getSession(String user, String pwd)
     {
-        String url = "http://localhost:8080/alfresco/cmisatom";
+        String url = "http://localhost:8080/alfresco/api/-default-/public/cmis/versions/1.1/atom";
         
         SessionFactory factory = SessionFactoryImpl.newInstance();
         Map<String, String> parameter = new HashMap<String, String>();
@@ -321,10 +323,104 @@ public class CMISDataCreatorTest extends TestCase
         assertEquals(1, result.getTotalNumItems());
         
         
-        String uniqueName = getUniqueName();
+        Document uniqueDocument = createUniqueDocument(newFolder);
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"'", false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND IN_FOLDER('"+ newFolder.getId() + "')" , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where IN_FOLDER('"+ newFolder.getId() + "')" , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:createdBy = '"+ uniqueDocument.getCreatedBy()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:objectId = '"+ uniqueDocument.getId()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:lastModifiedBy = '"+ uniqueDocument.getLastModifiedBy()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+ uniqueDocument.getName()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        String creationDate = ISO8601DateFormat.format(uniqueDocument.getCreationDate().getTime());
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:creationDate = '"+ creationDate +"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        String modificationDate = ISO8601DateFormat.format(uniqueDocument.getLastModificationDate().getTime());
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:lastModificationDate = '"+ modificationDate+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:objectTypeId = '"+ uniqueDocument.getType().getQueryName()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:baseTypeId = '"+ uniqueDocument.getBaseType().getQueryName()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:contentStreamFileName = '"+ uniqueDocument.getContentStreamFileName()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:contentStreamLength = '"+ uniqueDocument.getContentStreamLength()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+uniqueDocument.getName()+"' AND cmis:contentStreamMimeType = '"+ uniqueDocument.getContentStreamMimeType()+"'"  , false);
+        assertEquals(1, result.getTotalNumItems());
+    }
+    
+    public void testQueryForMultipleDocumentProperties() throws Exception
+    {
+        Session session = getSession("admin", "admin");
+        
+        String folderName = getRootFolderName();
+        Folder root = session.getRootFolder();
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
+        properties.put(PropertyIds.NAME, folderName);
+
+        // create the folder
+        Folder newFolder = root.createFolder(properties);
+        
+        ItemIterable<QueryResult>  result = session.query("select * from cmis:folder where cmis:name = '"+folderName+"'", false);
+        assertEquals(1, result.getTotalNumItems());
+        
+        
+        Document document1 = createUniqueDocument(newFolder);
+        Document document2 = createUniqueDocument(newFolder);
+        
+        result = session.query("SELECT * FROM cmis:folder d join sys:hidden t on  d.cmis:objectId = t.cmis:objectId", false);
+        assertTrue(0 < result.getTotalNumItems());
+    
+        result = session.query("SELECT * FROM cmis:folder d join sys:hidden t on  d.cmis:objectId = t.cmis:objectId where t.sys:cascadeHidden = false", false);
+        assertTrue(0 < result.getTotalNumItems());
+         			   
+        result = session.query("SELECT * FROM cmis:document d join exif:exif t on  d.cmis:objectId = t.cmis:objectId", false);
+        long count = result.getTotalNumItems();
+        
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("exif:focalLength", 10.33d);
+        ArrayList<String> aspects = new ArrayList<String>();
+        aspects.add("P:exif:exif");
+        props.put("cmis:secondaryObjectTypeIds", aspects);
+        document1.updateProperties(props);
+    
+        result = session.query("SELECT * FROM cmis:document d join exif:exif t on  d.cmis:objectId = t.cmis:objectId", false);
+        assertEquals(count+1, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+document1.getName()+"' OR  cmis:name = '"+document2.getName()+"'", false);
+        assertEquals(2, result.getTotalNumItems());
+    }
+
+	private Document createUniqueDocument(Folder newFolder)
+			throws UnsupportedEncodingException {
+		String uniqueName = getUniqueName();
         Map<String, Object> uProperties = new HashMap<String, Object>();
         uProperties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
         uProperties.put(PropertyIds.NAME, uniqueName);
+        
         ContentStreamImpl contentStream = new ContentStreamImpl();
         contentStream.setFileName("bob");
         String shortString = "short";
@@ -333,50 +429,6 @@ public class CMISDataCreatorTest extends TestCase
         contentStream.setMimeType("text/plain");
         
         Document uniqueDocument = newFolder.createDocument(uProperties, contentStream, VersioningState.MAJOR);
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"'", false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND IN_FOLDER('"+ newFolder.getId() + "')" , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where IN_FOLDER('"+ newFolder.getId() + "')" , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:createdBy = '"+ uniqueDocument.getCreatedBy()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:objectId = '"+ uniqueDocument.getId()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:lastModifiedBy = '"+ uniqueDocument.getLastModifiedBy()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+ uniqueDocument.getName()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        String creationDate = ISO8601DateFormat.format(uniqueDocument.getCreationDate().getTime());
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:creationDate = '"+ creationDate +"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        String modificationDate = ISO8601DateFormat.format(uniqueDocument.getLastModificationDate().getTime());
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:lastModificationDate = '"+ modificationDate+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:objectTypeId = '"+ uniqueDocument.getType().getQueryName()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:baseTypeId = '"+ uniqueDocument.getBaseType().getQueryName()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:contentStreamFileName = '"+ uniqueDocument.getContentStreamFileName()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:contentStreamLength = '"+ uniqueDocument.getContentStreamLength()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-        
-        result = session.query("select * from cmis:document where cmis:name = '"+uniqueName+"' AND cmis:contentStreamMimeType = '"+ uniqueDocument.getContentStreamMimeType()+"'"  , false);
-        assertEquals(1, result.getTotalNumItems());
-    }
-    
+        return uniqueDocument;
+	}
 }
