@@ -42,7 +42,7 @@ public class CMISQueryOptions extends QueryOptions
     }
 
     private CMISQueryMode queryMode = CMISQueryMode.CMS_STRICT;
-    private CmisVersion cmisVersion;
+    private CmisVersion cmisVersion = CmisVersion.CMIS_1_1;
 
     public static CMISQueryOptions create(SearchParameters searchParameters)
     {
