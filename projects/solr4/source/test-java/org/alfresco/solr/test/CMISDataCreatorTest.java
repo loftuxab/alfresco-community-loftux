@@ -412,6 +412,9 @@ public class CMISDataCreatorTest extends TestCase
         
         result = session.query("select * from cmis:document where cmis:name = '"+document1.getName()+"' OR  cmis:name = '"+document2.getName()+"'", false);
         assertEquals(2, result.getTotalNumItems());
+        
+        result = session.query("select * from cmis:document where cmis:name = '"+document1.getName()+"' AND cmis:contentStreamLength = 5 AND cmis:contentStreamMimeType = 'text/plain'", false);
+        assertEquals(1, result.getTotalNumItems());
     }
 
 	private Document createUniqueDocument(Folder newFolder)
