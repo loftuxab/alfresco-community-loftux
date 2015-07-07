@@ -58,7 +58,7 @@ public class BufferedHttpServletRequest extends HttpServletRequestWrapper
         }
         catch (IOException e)
         {
-            bufferStream.destroy(); // remove temp file
+            bufferStream.destroy(e); // remove temp file
             throw e;
         }
         this.bufferStream = bufferStream;
@@ -107,7 +107,7 @@ public class BufferedHttpServletRequest extends HttpServletRequestWrapper
             {
 
             }
-            bufferStream.destroy();
+            bufferStream.destroy(null);
             bufferStream = null;
         }
     }
