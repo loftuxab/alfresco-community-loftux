@@ -53,6 +53,11 @@ public interface DictionaryDAO extends ModelQuery
     /**
      * @return the models known by the dictionary
      */
+    /**
+     * @return the models known by the dictionary
+     */
+	Collection<QName> getModels();
+
     Collection<QName> getModels(boolean includeInherited);
 
     Collection<QName> getTypes(boolean includeInherited);
