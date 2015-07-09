@@ -541,7 +541,7 @@
                     </source>
                     <target>
                         <class>cm:mlDocument</class>
-                        <mandatory enforced="false">true</mandatory>
+                        <mandatory enforced="true">true</mandatory>
                         <many>true</many>
                     </target>
                 </child-association>
@@ -1152,7 +1152,7 @@
                     </source>
                     <target>
                         <class>cm:workingcopy</class>
-                        <mandatory enforced="false">true</mandatory>
+                        <mandatory enforced="true">true</mandatory>
                         <many>false</many>
                     </target>
                 </association>
@@ -1239,6 +1239,12 @@
                 </property>
                 <property name="cm:lockIsDeep">
                     <type>d:boolean</type>
+                    <protected>true</protected>
+                    <mandatory>false</mandatory>
+                    <index enabled="true"/>
+                </property>
+                <property name="cm:lockAdditionalInfo">
+                    <type>d:text</type>
                     <protected>true</protected>
                     <mandatory>false</mandatory>
                     <index enabled="true"/>

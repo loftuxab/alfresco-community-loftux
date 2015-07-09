@@ -18,7 +18,13 @@
         <type name="sys:deleted">
             <title>Deleted</title>
             <description>Placeholder type for deleted nodes</description>
-            <properties/>
+            <properties>
+                <property name="sys:originalId">
+                    <type>d:long</type>
+                    <mandatory>false</mandatory>
+                    <index enabled="true"/>
+                </property>
+            </properties>
             <associations/>
             <overrides/>
             <mandatory-aspects/>
@@ -157,6 +163,27 @@
             <overrides/>
             <mandatory-aspects/>
         </type>
+        <type name="sys:archiveUser">
+            <title>Archive User</title>
+            <description>Type to gather all nodes archived by a user</description>
+            <parent>sys:base</parent>
+            <properties/>
+            <associations>
+                <child-association name="sys:archivedLink">
+                    <source>
+                        <mandatory>false</mandatory>
+                        <many>false</many>
+                    </source>
+                    <target>
+                        <class>sys:archived</class>
+                        <mandatory enforced="false">false</mandatory>
+                        <many>true</many>
+                    </target>
+                </child-association>
+            </associations>
+            <overrides/>
+            <mandatory-aspects/>
+        </type>
     </types>
     <aspects>
         <aspect name="sys:aspect_root">
@@ -219,6 +246,28 @@
                     <default>0</default>
                     <index enabled="true"/>
                 </property>
+                <property name="sys:hiddenFlag">
+                    <type>d:boolean</type>
+                    <mandatory>false</mandatory>
+                    <index enabled="true"/>
+                </property>
+                <property name="sys:cascadeHidden">
+                    <type>d:boolean</type>
+                    <mandatory>false</mandatory>
+                    <default>false</default>
+                    <index enabled="true"/>
+                </property>
+                <property name="sys:cascadeIndexControl">
+                    <type>d:boolean</type>
+                    <mandatory>false</mandatory>
+                    <default>false</default>
+                    <index enabled="true"/>
+                </property>
+                <property name="sys:clientControlled">
+                    <type>d:boolean</type>
+                    <mandatory>false</mandatory>
+                    <index enabled="true"/>
+                </property>
             </properties>
             <associations/>
             <overrides/>
@@ -226,6 +275,20 @@
         </aspect>
         <aspect name="sys:undeletable">
             <title>Undeletable</title>
+            <properties/>
+            <associations/>
+            <overrides/>
+            <mandatory-aspects/>
+        </aspect>
+        <aspect name="sys:unmovable">
+            <title>Unmovable</title>
+            <properties/>
+            <associations/>
+            <overrides/>
+            <mandatory-aspects/>
+        </aspect>
+        <aspect name="sys:pendingDelete">
+            <title>Pending Delete</title>
             <properties/>
             <associations/>
             <overrides/>
@@ -244,6 +307,27 @@
             <archive>false</archive>
             <properties/>
             <associations/>
+            <overrides/>
+            <mandatory-aspects/>
+        </aspect>
+        <aspect name="sys:archiveRoot">
+            <title>Archive Root</title>
+            <description>Aspect attached to root of archive store</description>
+            <properties/>
+            <associations>
+                <child-association name="sys:archiveUserLink">
+                    <source>
+                        <mandatory>false</mandatory>
+                        <many>false</many>
+                    </source>
+                    <target>
+                        <class>sys:archiveUser</class>
+                        <mandatory enforced="false">false</mandatory>
+                        <many>true</many>
+                    </target>
+                    <duplicate>false</duplicate>
+                </child-association>
+            </associations>
             <overrides/>
             <mandatory-aspects/>
         </aspect>
@@ -316,6 +400,28 @@
                 <property name="sys:locale">
                     <title>Locale</title>
                     <type>d:locale</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true"/>
+                </property>
+            </properties>
+            <associations/>
+            <overrides/>
+            <mandatory-aspects/>
+        </aspect>
+        <aspect name="sys:softDelete">
+            <title>SoftDelete</title>
+            <archive>false</archive>
+            <properties/>
+            <associations/>
+            <overrides/>
+            <mandatory-aspects/>
+        </aspect>
+        <aspect name="sys:CMISUpdateContext">
+            <title>CMIS Update Context</title>
+            <properties>
+                <property name="sys:gotFirstChunk">
+                    <title>Got First Content Chunk</title>
+                    <type>d:boolean</type>
                     <mandatory>true</mandatory>
                     <index enabled="true"/>
                 </property>
