@@ -491,7 +491,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         {
             transactions = client.getTransactions(startTime, null, startTime + actualTimeStep, null, maxResults);
             startTime += actualTimeStep;
-            actualTimeStep *= 2;
+            //actualTimeStep *= 2; 
             if (actualTimeStep > TIME_STEP_32_DAYS_IN_MS)
             {
                 actualTimeStep = TIME_STEP_32_DAYS_IN_MS;
