@@ -144,6 +144,9 @@
     <dependency.alfresco-core.version>5.1.3-SNAPSHOT</dependency.alfresco-core.version>
     <dependency.alfresco-jlan.version>5.1.1</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
+	
+	<!-- Version of Share bundled in the repository installer -->
+	<dependency.share.version>5.1-BF-SNAPSHOT</dependency.share.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.common.version>5.0-20150414</installer.common.version>
