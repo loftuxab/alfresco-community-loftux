@@ -20,9 +20,8 @@
     </modules>
 
     <properties>
-        <alfresco.package.name>alfresco-community</alfresco.package.name>
+        <alfresco.package.name>alfresco-platform-community</alfresco.package.name>
         <alfresco.war.artifactId>alfresco</alfresco.war.artifactId>
-        <share.war.artifactId>share</share.war.artifactId>
     </properties>
 
     <build>                  
