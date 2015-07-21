@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>alfresco-solr1-distribution</artifactId>
-    <name>Alfresco Solr1 Distribution</name>
+    <artifactId>alfresco-solr4-distribution</artifactId>
+    <name>Alfresco Solr4 Distribution</name>
     <parent>
         <artifactId>alfresco-packaging</artifactId>
         <groupId>org.alfresco</groupId>
@@ -11,21 +11,22 @@
     <dependencies>
         <dependency>
             <groupId>org.alfresco</groupId>
-            <artifactId>alfresco-solr</artifactId>
+            <artifactId>alfresco-solr4</artifactId>
             <version>${project.version}</version>
+            <classifier>ssl</classifier>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
-            <artifactId>alfresco-solr</artifactId>
+            <artifactId>alfresco-solr4</artifactId>
             <version>${project.version}</version>
-            <classifier>config</classifier>
+            <classifier>config-ssl</classifier>
             <type>zip</type>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>alfresco-solr1-${project.version}</finalName>
+        <finalName>alfresco-solr4-${project.version}</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -41,7 +42,7 @@
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
-                        <descriptor>src/assembly/solr1-distribution.xml</descriptor>
+                        <descriptor>src/assembly/solr4-distribution.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
