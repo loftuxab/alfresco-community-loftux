@@ -15,6 +15,7 @@
         <module>wcmqs</module>
         <module>webeditor</module>
         <module>solr1</module>
+        <module>solr4</module>
         <module>distribution</module>
         <module>installer</module>
     </modules>
