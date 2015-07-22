@@ -65,7 +65,7 @@ public class Solr4X509ServletFilter extends X509ServletFilterBase
             /*
             * Load solrcore.properies file from the proper location based on the solrHome.
             */
-            propReader = new FileReader(solrHome+File.separator+"workSpace-SpacesStore"+File.separator+"conf"+File.separator+"solrcore.properties");
+            propReader = new FileReader(solrHome+File.separator+"workspace-SpacesStore"+File.separator+"conf"+File.separator+"solrcore.properties");
             props.load(propReader);
             String prop = props.getProperty(SECURE_COMMS);
 
