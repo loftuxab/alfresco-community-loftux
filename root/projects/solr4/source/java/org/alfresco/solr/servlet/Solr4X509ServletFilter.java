@@ -23,7 +23,8 @@ import javax.servlet.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.*;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.core.SolrResourceLoader;
@@ -45,7 +46,6 @@ public class Solr4X509ServletFilter extends X509ServletFilterBase
     @Override
     protected boolean checkEnforce(ServletContext context) throws IOException
     {
-
         /*
         * Rely on the SolrResourceLoader to locate the solr home directory.
         */
@@ -57,41 +57,134 @@ public class Solr4X509ServletFilter extends X509ServletFilterBase
             logger.debug("solrHome:"+solrHome);
         }
 
-        Properties props = new Properties();
-        FileReader propReader = null;
-        try
+        /*
+        * Find the active cores.
+        */
+        List<File> cores = new ArrayList();
+        findCores(new File(solrHome), cores);
+
+        /*
+        * Get the alfresco.secureComms value for each core.
+        */
+        Set<String> secureCommsSet = new HashSet();
+        for(File core : cores)
         {
+            collectSecureComms(core, secureCommsSet);
+        }
 
-            /*
-            * Load solrcore.properies file from the proper location based on the solrHome.
-            */
-            propReader = new FileReader(solrHome+File.separator+"workspace-SpacesStore"+File.separator+"conf"+File.separator+"solrcore.properties");
-            props.load(propReader);
-            String prop = props.getProperty(SECURE_COMMS);
+        /*
+        * alfresco.secureComms values should be in sync for each core
+        */
 
-            if(logger.isDebugEnabled())
+        if(secureCommsSet.size() > 1)
+        {
+            StringBuilder buf = new StringBuilder();
+            int i = 0;
+            for(String s : secureCommsSet)
             {
-                logger.debug("secureComms:"+prop);
+                if(i > 0)
+                {
+                    buf.append(" | ");
+                }
+                buf.append(s);
+                i++;
             }
 
-            /*
-            * Return true or false based on the property. This will switch on/off X509 enforcement in the X509ServletFilterBase.
-            */
+            throw new IOException("More then one distinct value found for alfresco.secureComms:"+ buf.toString()+
+                                  ". All alfresco.secureComms values must be set to the same value.");
+        }
 
-            if (prop == null || "none".equals(prop))
+        String secureComms = secureCommsSet.iterator().next();
+
+        if(logger.isDebugEnabled())
+        {
+            logger.debug("secureComms:"+secureComms);
+        }
+
+        if("none".equals(secureComms))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+
+    private void findCores(File dir, List<File> cores)
+    {
+        File[] files = dir.listFiles();
+        for(File file : files)
+        {
+            if(file.isDirectory())
             {
-                return false;
+                findCores(file, cores);
             }
             else
             {
-                return true;
+                if("core.properties".equals(file.getName()))
+                {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Found core:" + dir.getAbsolutePath());
+                    }
+
+                    cores.add(dir);
+                }
             }
         }
-        finally
+    }
+    /*
+    * Scan through all the files and folders under a dir looking for solrcore.properties file.
+    * Gather the SECURE_COMMS property when found.
+    */
+
+    private void collectSecureComms(File base, Set<String> secureCommsSet) throws IOException
+    {
+        File[] files = base.listFiles();
+
+        for(File file : files)
         {
-            if(propReader != null)
+            if(file.isDirectory())
             {
-                propReader.close();
+                collectSecureComms(file, secureCommsSet);
+            }
+            else
+            {
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("scanning file:" + file.getAbsolutePath());
+                }
+
+                if ("solrcore.properties".equals(file.getName()))
+                {
+                    FileReader propReader = null;
+                    Properties props = new Properties();
+                    try
+                    {
+                        propReader = new FileReader(file);
+                        props.load(propReader);
+                        String prop = props.getProperty(SECURE_COMMS);
+
+                        if (prop != null)
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Found alfresco.secureComms in:" + file.getAbsolutePath() + " : " + prop);
+                            }
+                            secureCommsSet.add(prop);
+                        }
+                        else
+                        {
+                            secureCommsSet.add("none");
+                        }
+                    }
+                    finally
+                    {
+                        propReader.close();
+                    }
+                }
             }
         }
     }
