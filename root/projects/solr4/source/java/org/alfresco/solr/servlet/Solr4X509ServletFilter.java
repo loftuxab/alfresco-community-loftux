@@ -125,7 +125,8 @@ public class Solr4X509ServletFilter extends X509ServletFilterBase
             {
                 if("core.properties".equals(file.getName()))
                 {
-                    if (logger.isDebugEnabled()) {
+                    if (logger.isDebugEnabled())
+                    {
                         logger.debug("Found core:" + dir.getAbsolutePath());
                     }
 
