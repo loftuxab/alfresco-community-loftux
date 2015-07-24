@@ -451,6 +451,7 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
         final NodeRef finalResourceNodeRef = resourceNodeRef;
         final String finalDecodedUrl = decodedUrl;
         final boolean finalNewlyCreated = newlyCreated;
+        final String siteId = davHelper.determineSiteId(getPathHelper().getRootNodeRef(), finalDecodedUrl);
         RetryingTransactionCallback<Void> work = new RetryingTransactionCallback<Void>()
         {
             @SuppressWarnings("deprecation")
@@ -516,10 +517,12 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
                     getVersionService().createVersion(finalResourceNodeRef, Collections.<String, Serializable> singletonMap(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR));
                 }
 
-                String siteId = davHelper.determineSiteId(getPathHelper().getRootNodeRef(), finalDecodedUrl);
-                String tenantDomain = davHelper.determineTenantDomain();
-                long fileSize = contentData.getSize();
-                reportUploadEvent(finalDecodedUrl, siteId, tenantDomain, newlyCreated, mimetype, fileSize);
+                if (siteId != null)
+                {
+                    String tenantDomain = davHelper.determineTenantDomain();
+                    long fileSize = contentData.getSize();
+                    reportUploadEvent(finalDecodedUrl, siteId, tenantDomain, newlyCreated, mimetype, fileSize);
+                }
 
                 return null;
             }
