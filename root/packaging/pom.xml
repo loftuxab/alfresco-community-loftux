@@ -18,10 +18,6 @@
         <module>installer</module>
     </modules>
 
-    <properties>
-        <alfresco.package.name>alfresco-platform-community</alfresco.package.name>
-    </properties>
-
     <build>                  
     <!-- Switch back to Maven default -->
         <sourceDirectory>src/main/java</sourceDirectory>
