@@ -126,7 +126,6 @@
                   <groupId>org.alfresco</groupId>
                   <artifactId>alfresco-solr4</artifactId>
                   <version>${project.version}</version>
-                  <classifier>ssl</classifier>
                   <type>war</type>
                   <destFileName>solr.war</destFileName>
                 </artifactItem>	
