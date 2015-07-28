@@ -1407,8 +1407,7 @@ public class SolrInformationServer implements InformationServer
                     nodeMetaData = nodeMetaDatas.get(0);
                     if (!(nodeMetaData.getTxnId() > node.getTxnId()))
                     {
-                        LinkedHashSet<Long> visited = new LinkedHashSet<Long>();
-                        updateDescendantDocs(nodeMetaData, overwrite, request, processor, visited);
+                        this.removeDocFromContentStore(nodeMetaData);
                     }
                     // else, the node has moved on to a later transaction, and it will be indexed later
                 }
@@ -1416,10 +1415,6 @@ public class SolrInformationServer implements InformationServer
                 if(log.isDebugEnabled())
                 {
                     log.debug(".. deleting");
-                }
-                if (nodeMetaData != null)
-                {
-                    this.removeDocFromContentStore(nodeMetaData);
                 }
                 deleteNode(processor, request, node);
             }
@@ -1799,8 +1794,10 @@ public class SolrInformationServer implements InformationServer
                         // it will be indexed later
                         continue;
                     }
-                    LinkedHashSet<Long> visited = new LinkedHashSet<Long>();
-                    updateDescendantDocs(nodeMetaData, overwrite, request, processor, visited);
+                    if (nodeMetaData != null)
+                    {
+                        this.removeDocFromContentStore(nodeMetaData);
+                    }
                 }
 
                 if(log.isDebugEnabled())
