@@ -13,4 +13,5 @@
    <format default="json">extension</format>
    <authentication>user</authentication>
    <transaction>required</transaction>
+   <lifecycle>internal</lifecycle>
 </webscript>
