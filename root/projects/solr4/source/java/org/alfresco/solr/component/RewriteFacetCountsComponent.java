@@ -34,6 +34,23 @@ public class RewriteFacetCountsComponent extends SearchComponent
 {
 
     /* (non-Javadoc)
+     * @see org.apache.solr.handler.component.SearchComponent#finishStage(org.apache.solr.handler.component.ResponseBuilder)
+     */
+    @Override
+    public void finishStage(ResponseBuilder rb)
+    {
+        /// wait until after distributed faceting is done 
+        if (!rb.doFacets || rb.stage != ResponseBuilder.STAGE_GET_FIELDS) 
+        {
+            return;
+        }
+        else 
+        {
+            process(rb);
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.apache.solr.handler.component.SearchComponent#prepare(org.apache.solr.handler.component.ResponseBuilder)
      */
     @Override
@@ -46,7 +63,7 @@ public class RewriteFacetCountsComponent extends SearchComponent
      * @see org.apache.solr.handler.component.SearchComponent#process(org.apache.solr.handler.component.ResponseBuilder)
      */
     @Override
-    public void process(ResponseBuilder rb) throws IOException
+    public void process(ResponseBuilder rb)
     {
         // rewrite
 
