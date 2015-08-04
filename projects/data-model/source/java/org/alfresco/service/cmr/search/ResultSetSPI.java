@@ -53,8 +53,11 @@ public interface ResultSetSPI<ROW extends ResultSetRow, MD extends ResultSetMeta
     public int length();
    
     /**
-     * Get the number of rows that matched the query. This result set may only contain a section of the results.
-     * If a skip count is given the number found  may or may not include the items skipped.
+     * Attempt to get the number of rows that matched the query. This result set may only contain a section of the results.
+     * If a skip count is given the number found may or may not include the items skipped.
+     * This is best effort and only done if is cheap.
+     * For SOLR it is cheap; for the DB it may be expensive as permissions are done post query.
+     * If you want to know if there are more results to fetch use hasMore()
      * @return long
      */
     public long getNumberFound();
