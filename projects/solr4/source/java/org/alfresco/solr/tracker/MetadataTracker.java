@@ -746,7 +746,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
                 	doDelete.setAclId(node.getAclId());
                 	doDelete.setId(node.getId());
                 	doDelete.setNodeRef(node.getNodeRef());
-                	doDelete.setStatus(SolrApiNodeStatus.DELETED);
+                	doDelete.setStatus(SolrApiNodeStatus.SHARD_DELETED);
                 	doDelete.setTenant(node.getTenant());
                 	doDelete.setTxnId(node.getTxnId());
                 	filteredList.add(doDelete);

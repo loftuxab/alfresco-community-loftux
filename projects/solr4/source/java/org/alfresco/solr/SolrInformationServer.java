@@ -1383,14 +1383,14 @@ public class SolrInformationServer implements InformationServer
             processor = this.core.getUpdateProcessingChain(null).createProcessor(request, new SolrQueryResponse());
             long start = System.nanoTime();
 
-            if ((node.getStatus() == SolrApiNodeStatus.DELETED) || (node.getStatus() == SolrApiNodeStatus.UNKNOWN))
+            if ((node.getStatus() == SolrApiNodeStatus.DELETED) || (node.getStatus() == SolrApiNodeStatus.SHARD_DELETED) || (node.getStatus() == SolrApiNodeStatus.UNKNOWN))
             {
                 // fix up any secondary paths
                 NodeMetaDataParameters nmdp = new NodeMetaDataParameters();
                 nmdp.setFromNodeId(node.getId());
                 nmdp.setToNodeId(node.getId());
                 List<NodeMetaData> nodeMetaDatas;
-                if (node.getStatus() == SolrApiNodeStatus.DELETED)
+                if ((node.getStatus() == SolrApiNodeStatus.DELETED) || (node.getStatus() == SolrApiNodeStatus.SHARD_DELETED))
                 {
                     // Fake the empty node metadata for this parent deleted node
                     NodeMetaData nodeMetaData = createDeletedNodeMetaData(node);
@@ -1407,7 +1407,10 @@ public class SolrInformationServer implements InformationServer
                     nodeMetaData = nodeMetaDatas.get(0);
                     if (!(nodeMetaData.getTxnId() > node.getTxnId()))
                     {
-                        this.removeDocFromContentStore(nodeMetaData);
+                        if (node.getStatus() == SolrApiNodeStatus.DELETED)
+                        {
+                            this.removeDocFromContentStore(nodeMetaData);
+                        }
                     }
                     // else, the node has moved on to a later transaction, and it will be indexed later
                 }
@@ -1762,10 +1765,11 @@ public class SolrInformationServer implements InformationServer
             EnumMap<SolrApiNodeStatus, List<Long>> nodeStatusToNodeIds = new EnumMap<SolrApiNodeStatus, List<Long>>(SolrApiNodeStatus.class);
             categorizeNodes(nodes, nodeIdsToNodes, nodeStatusToNodeIds);
             List<Long> deletedNodeIds = mapNullToEmptyList(nodeStatusToNodeIds.get(SolrApiNodeStatus.DELETED));
+            List<Long> shardDeletedNodeIds = mapNullToEmptyList(nodeStatusToNodeIds.get(SolrApiNodeStatus.SHARD_DELETED));
             List<Long> unknownNodeIds = mapNullToEmptyList(nodeStatusToNodeIds.get(SolrApiNodeStatus.UNKNOWN));
             List<Long> updatedNodeIds = mapNullToEmptyList(nodeStatusToNodeIds.get(SolrApiNodeStatus.UPDATED));
             
-            if (!deletedNodeIds.isEmpty() || !unknownNodeIds.isEmpty()) 
+            if (!deletedNodeIds.isEmpty() || !shardDeletedNodeIds.isEmpty() || unknownNodeIds.isEmpty()) 
             {
                 // fix up any secondary paths
                 List<NodeMetaData> nodeMetaDatas = new ArrayList<>();
@@ -1805,7 +1809,7 @@ public class SolrInformationServer implements InformationServer
                     log.debug(".. deleting");
                 }
                 DeleteUpdateCommand delDocCmd = new DeleteUpdateCommand(request);
-                String query = this.cloud.getQuery(FIELD_DBID, OR, deletedNodeIds, unknownNodeIds);
+                String query = this.cloud.getQuery(FIELD_DBID, OR, deletedNodeIds, shardDeletedNodeIds, unknownNodeIds);
                 delDocCmd.setQuery(query);
                 processor.processDelete(delDocCmd);
             }
