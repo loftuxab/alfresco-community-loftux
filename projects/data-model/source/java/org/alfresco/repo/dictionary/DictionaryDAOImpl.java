@@ -223,7 +223,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
     {
         String tenantDomain = tenantService.getCurrentUserDomain();
 
-        dictionaryRegistryCache.remove(tenantDomain);
+        removeDictionaryRegistry(tenantDomain);
 
         if (logger.isDebugEnabled())
         {
@@ -865,6 +865,13 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
                 },
                 tenantService.getDomainUser(
                         AuthenticationUtil.getSystemUserName(), tenantDomain));
+    }
+
+    private void removeDictionaryRegistry(String tenantDomain)
+    {
+        // TODO Should be reworked when ACE-2001 will be implemented
+        dictionaryRegistryCache.remove(tenantDomain);
+        dictionaryRegistryCache.refresh(tenantDomain);
     }
 
     /**
