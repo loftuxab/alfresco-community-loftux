@@ -1220,7 +1220,7 @@ public class SearchParameters implements BasicSearchParameters
         String field;
         String prefix = null;
         FieldFacetSort sort = null;
-        int limit = 100;
+        Integer limit = null;
         int offset = 0;
         int minCount = 0;
         boolean countDocsMissingFacetField = false;
@@ -1262,7 +1262,7 @@ public class SearchParameters implements BasicSearchParameters
             this.sort = sort;
         }
 
-        public int getLimit()
+        public Integer getLimit()
         {
             return limit;
         }

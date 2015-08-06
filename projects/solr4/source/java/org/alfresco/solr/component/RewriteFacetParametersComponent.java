@@ -172,11 +172,34 @@ public class RewriteFacetParametersComponent extends SearchComponent
         rewriteFacetFieldList(fixed, params, "stats.facet", statsFacetMappings, rb.req);
         
         mapFacetFunctions(fixed, params, "facet.field", functionMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.field", fieldMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.date", dateMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.range", rangeMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.pivot", pivotMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.interval", intervalMappings);
+        
+        rewriteFacetFieldOptions(fixed, params, "facet.prefix", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.contains", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.contains.ignoreCase", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.sort", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.limit", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.offset", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.mincount", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.missing", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.method", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.enum.cache.minDF", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.enum.cache.minDF", fieldMappings);
+        
+        rewriteFacetFieldOptions(fixed, params, "facet.range.start", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.end", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.gap", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.hardend", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.include", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.other", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.method", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.limit", rangeMappings);
+      
+        rewriteFacetFieldOptions(fixed, params, "facet.pivot.mincount", pivotMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.sort", pivotMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.limit", pivotMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.offset", pivotMappings);
+        
+        rewriteFacetFieldOptions(fixed, params, "facet.interval.set", intervalMappings);
         
        
         
@@ -304,18 +327,20 @@ public class RewriteFacetParametersComponent extends SearchComponent
             String name = it.next();
             if(name.startsWith("f."))
             {
-                int index = name.indexOf("."+paramName, 2);
-                if(index > -1)
+                if(name.endsWith("."+paramName))
                 {
-                    String source = name.substring(2, index);
+
+                    String source = name.substring(2, name.length() - paramName.length() - 1);
                     if(fieldMappings.containsKey(source))
                     {
-                        fixed.set("f."+fieldMappings.get(source)+name.substring(index), params.getParams(name));
+                        fixed.set("f."+fieldMappings.get(source)+"."+paramName, params.getParams(name));
                     }
                     else
                     {
                         fixed.set(name, params.getParams(name));
                     }
+
+
                 }
                 else
                 {
