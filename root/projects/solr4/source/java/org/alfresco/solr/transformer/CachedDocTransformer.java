@@ -305,12 +305,26 @@ public class CachedDocTransformer extends DocTransformer
     
     private String getFieldValueString(SolrDocument doc, String fieldName)
     {
-        IndexableField field = (IndexableField)doc.getFieldValue(fieldName);
-        String value = null;
-        if (field != null)
+        Object o = doc.getFieldValue(fieldName);
+        if(o != null)
         {
-            value = field.stringValue();
+            if(o instanceof IndexableField)
+            {
+                IndexableField field = (IndexableField)o;
+                return  field.stringValue();
+            }
+            else if(o instanceof String)
+            {
+                return (String)o;
+            }
+            else
+            {
+                return o.toString();
+            }
         }
-        return value;
+        else
+        {
+            return null;
+        }
     }
 }
