@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
 import org.alfresco.solr.query.MimetypeGroupingQParserPlugin;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -53,6 +54,12 @@ public class RewriteFacetParametersComponent extends SearchComponent
          fixFilterQueries(fixed, params, rb);
          fixFacetParams(fixed, params, rb);
          copyOtherQueryParams(fixed, params);
+         
+         if(fixed.get(CommonParams.SORT) != null)
+         {
+             fixed.remove(CommonParams.RQ);
+         }
+         
          req.setParams(fixed);
     }
 
