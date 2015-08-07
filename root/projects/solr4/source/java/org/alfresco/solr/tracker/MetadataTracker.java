@@ -62,6 +62,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     private ConcurrentLinkedQueue<Long> nodesToReindex = new ConcurrentLinkedQueue<Long>();
     private ConcurrentLinkedQueue<Long> nodesToIndex = new ConcurrentLinkedQueue<Long>();
     private ConcurrentLinkedQueue<Long> nodesToPurge = new ConcurrentLinkedQueue<Long>();
+    private ConcurrentLinkedQueue<String> queriesToReindex = new ConcurrentLinkedQueue<String>();
 
 
     public MetadataTracker(Properties p, SOLRAPIClient client, String coreName,
@@ -91,6 +92,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
 
             reindexTransactions();
             reindexNodes();
+            reindexNodesByQuery();
 
             indexTransactions();
             indexNodes();
@@ -390,6 +392,27 @@ public class MetadataTracker extends AbstractTracker implements Tracker
                 node.setTxnId(Long.MAX_VALUE);
 
                 this.infoSrv.indexNode(node, true);
+                requiresCommit = true;
+            }
+            checkShutdown();
+        }
+
+        if(requiresCommit)
+        {
+            checkShutdown();
+            this.infoSrv.commit();
+        }
+    }
+    
+    private void reindexNodesByQuery() throws IOException, AuthenticationException, JSONException
+    {
+        boolean requiresCommit = false;
+        while (queriesToReindex.peek() != null)
+        {
+            String query = queriesToReindex.poll();
+            if (query != null)
+            {
+                this.infoSrv.reindexNodeByQuery(query);
                 requiresCommit = true;
             }
             checkShutdown();
@@ -936,6 +959,14 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     public void addNodeToIndex(Long nodeId)
     {
         this.nodesToIndex.offer(nodeId);
+    }
+
+    /**
+     * @param query
+     */
+    public void addQueryToReindex(String query)
+    {
+        this.queriesToReindex.offer(query);
     }
 
 }

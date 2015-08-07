@@ -74,6 +74,8 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     private static final String ARG_TXID = "txid";
     private static final String ARG_ACLID = "aclid";
     private static final String ARG_NODEID = "nodeid";
+    private static final String ARG_QUERY = "query";
+    
     
     private SolrTrackerScheduler scheduler = null;
     private TrackerRegistry trackerRegistry = new TrackerRegistry();
@@ -1259,6 +1261,12 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             Long aclid = Long.valueOf(params.get(ARG_ACLID));
             AclTracker tracker = trackerRegistry.getTrackerForCore(coreName, AclTracker.class);
             tracker.addAclToReindex(aclid);
+        }
+        if (params.get(ARG_QUERY) != null)
+        {
+            String query = params.get(ARG_QUERY);
+            MetadataTracker tracker = trackerRegistry.getTrackerForCore(coreName, MetadataTracker.class);
+            tracker.addQueryToReindex(query);
         }
     }
 

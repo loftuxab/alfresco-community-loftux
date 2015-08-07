@@ -131,4 +131,6 @@ public interface InformationServer extends InformationServerCollectionProvider
     void registerTrackerThread();
 
     void unregisterTrackerThread();
+
+    void reindexNodeByQuery(String query) throws IOException, AuthenticationException, JSONException;
 }
