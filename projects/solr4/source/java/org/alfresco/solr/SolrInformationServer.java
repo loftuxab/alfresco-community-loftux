@@ -100,6 +100,7 @@ import org.alfresco.repo.content.ContentContext;
 import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.NamespaceDAO;
+import org.alfresco.repo.search.adaptor.lucene.QueryConstants;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -140,6 +141,7 @@ import org.alfresco.util.Pair;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -156,6 +158,8 @@ import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.request.SolrRequestHandler;
 import org.apache.solr.response.ResultContext;
 import org.apache.solr.response.SolrQueryResponse;
+import org.apache.solr.search.DocIterator;
+import org.apache.solr.search.DocList;
 import org.apache.solr.search.SolrIndexSearcher;
 import org.apache.solr.update.AddUpdateCommand;
 import org.apache.solr.update.CommitUpdateCommand;
@@ -2984,5 +2988,64 @@ public class SolrInformationServer implements InformationServer
         {
             activeTrackerThreadsLock.writeLock().unlock();
         }
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.solr.InformationServer#reindexNodeByQuery(java.lang.String)
+     */
+    @Override
+    public void reindexNodeByQuery(String query) throws IOException, AuthenticationException, JSONException
+    {
+        SolrQueryRequest request = null;
+        RefCounted<SolrIndexSearcher> refCounted = null;
+        try
+        {
+            refCounted = core.getSearcher(false, true, null);
+            SolrIndexSearcher solrIndexSearcher = refCounted.get();
+            
+            request = getLocalSolrQueryRequest();
+            
+            NumericDocValues dbidDocValues = solrIndexSearcher.getAtomicReader().getNumericDocValues(QueryConstants.FIELD_DBID);
+            
+            ArrayList<Node> batch = new ArrayList<Node>(200);
+            DocList docList = cloud.getDocList(nativeRequestHandler, request, query.startsWith("{") ? query : "{!afts}"+query);
+            for (DocIterator it = docList.iterator(); it.hasNext(); /**/)
+            {
+                int docID = it.nextDoc();
+                // Obtain the ACL ID for this ACL doc.
+                long dbid = dbidDocValues.get(docID);
+
+                Node node = new Node();
+                node.setId(dbid);
+                node.setStatus(SolrApiNodeStatus.UNKNOWN);
+                node.setTxnId(Long.MAX_VALUE);
+
+                batch.add(node);
+                
+                if(batch.size() >= 200)
+                {
+                    indexNodes(batch, true);
+                    batch.clear();
+                }
+            }
+            if(batch.size() > 0)
+            {
+                indexNodes(batch, true);
+                batch.clear();
+            }
+        }
+        finally
+        {
+            if(request != null)
+            {
+                request.close();
+            }
+            
+            if (refCounted != null)
+            {
+                refCounted.decref();
+            }
+        }
+        
     }
 }
