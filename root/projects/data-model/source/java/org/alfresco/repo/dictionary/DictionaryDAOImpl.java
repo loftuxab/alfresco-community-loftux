@@ -214,6 +214,11 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         String tenant = tenantService.getCurrentUserDomain();
 
         getDictionaryRegistry(tenant, true);
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Fetched dictionary for tenant " + tenant);
+        }
     }
 
     /**
@@ -221,13 +226,13 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
      */
     public void destroy()
     {
-        String tenantDomain = tenantService.getCurrentUserDomain();
+        String tenant = tenantService.getCurrentUserDomain();
 
-        removeDictionaryRegistry(tenantDomain);
+        removeDictionaryRegistry(tenant);
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Dictionary destroyed");
+            logger.debug("Dictionary destroyed for tenant " + tenant);
         }
     }
 
@@ -238,7 +243,8 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Resetting dictionary ...");
+            String tenant = tenantService.getCurrentUserDomain();
+            logger.debug("Resetting dictionary for tenant " + tenant);
         }
 
         destroy();
@@ -246,7 +252,8 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("... resetting dictionary completed");
+            String tenant = tenantService.getCurrentUserDomain();
+            logger.debug("Dictionary reset complete for tenant " + tenant);
         }
     }
 
@@ -867,11 +874,12 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
                         AuthenticationUtil.getSystemUserName(), tenantDomain));
     }
 
-    private void removeDictionaryRegistry(String tenantDomain)
+    private void removeDictionaryRegistry(String tenantDomain) 
     {
         // TODO Should be reworked when ACE-2001 will be implemented
         dictionaryRegistryCache.remove(tenantDomain);
-        dictionaryRegistryCache.refresh(tenantDomain);
+        // This is a remove operation so should not trigger an update
+        // dictionaryRegistryCache.refresh(tenantDomain);
     }
 
     /**
