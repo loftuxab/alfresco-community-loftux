@@ -68,6 +68,11 @@ public class CompiledModelsCache extends AbstractAsynchronouslyRefreshedCache<Di
             {
                 live.remove(tenantId);
                 dictionaryRegistry.remove();
+                
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Removed dictionary register for tenant " + tenantId);
+                }
             }
         }
         finally
