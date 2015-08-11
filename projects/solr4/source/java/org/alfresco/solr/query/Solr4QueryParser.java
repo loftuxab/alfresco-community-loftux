@@ -1181,9 +1181,15 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	protected Query getFieldQueryImpl(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws ParseException, IOException
 	{
 		// make sure the field exists or return a dummy query so we have no error ....ACE-3231
-		if(schema.getFieldOrNull(field) == null)
+        SchemaField schemaField = schema.getFieldOrNull(field);
+        boolean isNumeric = false;
+        if(schemaField == null)
 		{
 			return new TermQuery(new Term("_dummy_", "_miss_"));
+        }      
+        else
+        {
+            isNumeric = (schemaField.getType().getNumericType() != null); 
 		}
 
 		// Use the analyzer to get all the tokens, and then build a TermQuery,
@@ -1947,7 +1953,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 		{
 			nextToken = list.get(0);
 			String termText = nextToken.toString(); 
-			if (termText.contains("*") || termText.contains("?"))
+            if (!isNumeric && (termText.contains("*") || termText.contains("?")))
 			{
 				return newWildcardQuery(new Term(field, termText));
 			}
