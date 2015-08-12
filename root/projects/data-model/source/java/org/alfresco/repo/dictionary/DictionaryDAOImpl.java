@@ -213,7 +213,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
     {
         String tenant = tenantService.getCurrentUserDomain();
 
-        getDictionaryRegistry(tenant, true);
+        dictionaryRegistryCache.refresh(tenant);
 
         if (logger.isDebugEnabled())
         {
@@ -241,18 +241,18 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
      */
     public void reset()
     {
+        String tenant = tenantService.getCurrentUserDomain();
         if (logger.isDebugEnabled())
         {
-            String tenant = tenantService.getCurrentUserDomain();
             logger.debug("Resetting dictionary for tenant " + tenant);
         }
 
         destroy();
-        init();
+        // Ensure that we have a dictionary available right now
+        getDictionaryRegistry(tenant, true);
 
         if (logger.isDebugEnabled())
         {
-            String tenant = tenantService.getCurrentUserDomain();
             logger.debug("Dictionary reset complete for tenant " + tenant);
         }
     }

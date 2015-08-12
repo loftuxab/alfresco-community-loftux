@@ -249,17 +249,23 @@ public interface DictionaryDAO extends ModelQuery
     void registerListener(DictionaryListener dictionaryListener);
 
     /**
-     * Reset the Dictionary - destroy & re-initialise
+     * Reset the Dictionary for the current tenant.
+     * The current dictionary will be discarded <b>and reloaded</b> before the method returns
+     * i.e. upon return the dictionary will be current.
      */
     void reset();
 
     /**
-     * Initialise the Dictionary
+     * Trigger a background reload of the dictionary for the current tenant.
+     * There is no guarantee that the dictionary will be current when this call returns
+     * i.e. upon return, a dictionary will exist but may not be current until background
+     * reloading takes place.
      */
     void init();
 
     /**
-     * Destroy the Dictionary
+     * Destroy the Dictionary.  After this call, there will be no dictionary available for the current
+     * tenant; reloading will be done lazily as required.
      */
     void destroy();
 
