@@ -785,7 +785,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         }
         catch (DictionaryException e)
         {
-			 // ignore missing model, there's no need to warn about this.
+             // ignore missing model, there's no need to warn about this.
             logger.debug(e);
         }
 
