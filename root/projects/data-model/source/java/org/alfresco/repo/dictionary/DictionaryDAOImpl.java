@@ -206,29 +206,26 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return result;
     }
 
-    /**
-     * Initialise the Dictionary & Namespaces
-     */
+    @Override
     public void init()
     {
         String tenant = tenantService.getCurrentUserDomain();
 
-        dictionaryRegistryCache.refresh(tenant);
+        dictionaryRegistryCache.forceInChangesForThisUncommittedTransaction(tenant);
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Fetched dictionary for tenant " + tenant);
+            logger.debug("Triggered immediate reload of dictionary for tenant " + tenant);
         }
     }
 
-    /**
-     * Destroy the Dictionary & Namespaces
-     */
+    @Override
     public void destroy()
     {
         String tenant = tenantService.getCurrentUserDomain();
 
-        removeDictionaryRegistry(tenant);
+        // TODO Should be reworked when ACE-2001 will be implemented
+        dictionaryRegistryCache.remove(tenant);
 
         if (logger.isDebugEnabled())
         {
@@ -236,9 +233,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         }
     }
 
-    /**
-     * Reset the Dictionary & Namespaces
-     */
+    @Override
     public void reset()
     {
         String tenant = tenantService.getCurrentUserDomain();
@@ -249,7 +244,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
 
         destroy();
         // Ensure that we have a dictionary available right now
-        getDictionaryRegistry(tenant, true);
+        getDictionaryRegistry(tenant);
 
         if (logger.isDebugEnabled())
         {
@@ -257,17 +252,10 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.DictionaryDAO#putCoreModel(org.alfresco
-     * .repo.dictionary.impl.M2Model)
-     */
+    @Override
     public QName putModel(M2Model model)
     {
-        // the core registry is not yet initialised so put it in the core
-        // registry
+        // the core registry is not yet initialised so put it in the core registry
         QName ret = putModelImpl(model, true);
         return ret;
     }
@@ -278,8 +266,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return putModelImpl(model, false);
     }
 
-    private QName putModelImpl(M2Model model,
-            boolean enableConstraintClassLoading)
+    private QName putModelImpl(M2Model model, boolean enableConstraintClassLoading)
     {
         // Compile model definition
         CompiledModel compiledModel = model.compile(this, this,
@@ -327,13 +314,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return getTenantDictionaryRegistry().getModel(modelName);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.ModelQuery#getPropertyType(org.alfresco
-     * .repo.ref.QName)
-     */
+    @Override
     public DataTypeDefinition getDataType(QName typeName)
     {
         DataTypeDefinition dataTypeDef = null;
@@ -353,26 +334,14 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return getTenantDictionaryRegistry().getDataType(javaClass);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.DictionaryDAO#getPropertyTypes(org.
-     * alfresco.repo.ref.QName)
-     */
+    @Override
     public Collection<DataTypeDefinition> getDataTypes(QName modelName)
     {
         CompiledModel model = getCompiledModel(modelName);
         return model.getDataTypes();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.ModelQuery#getType(org.alfresco.repo
-     * .ref.QName)
-     */
+    @Override
     public TypeDefinition getType(QName typeName)
     {
         TypeDefinition typeDef = null;
@@ -385,13 +354,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return typeDef;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.DictionaryDAO#getSubTypes(org.alfresco.service
-     * .namespace.QName, boolean)
-     */
+    @Override
     public Collection<QName> getSubTypes(QName superType, boolean follow)
     {
         // note: could be optimised further, if compiled into the model
@@ -439,13 +402,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return subTypes;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.ModelQuery#getAspect(org.alfresco.repo
-     * .ref.QName)
-     */
+    @Override
     public AspectDefinition getAspect(QName aspectName)
     {
         AspectDefinition aspectDef = null;
@@ -458,13 +415,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return aspectDef;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.DictionaryDAO#getSubAspects(org.alfresco
-     * .service.namespace.QName, boolean)
-     */
+    @Override
     public Collection<QName> getSubAspects(QName superAspect, boolean follow)
     {
         // note: could be optimised further, if compiled into the model
@@ -513,13 +464,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return subAspects;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.ModelQuery#getClass(org.alfresco.repo
-     * .ref.QName)
-     */
+    @Override
     public ClassDefinition getClass(QName className)
     {
         ClassDefinition classDef = null;
@@ -532,13 +477,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return classDef;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.ModelQuery#getProperty(org.alfresco
-     * .repo.ref.QName)
-     */
+    @Override
     public PropertyDefinition getProperty(QName propertyName)
     {
         PropertyDefinition propertyDef = null;
@@ -552,13 +491,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return propertyDef;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.ModelQuery#getConstraint(org.alfresco.service
-     * .namespace.QName)
-     */
+    @Override
     public ConstraintDefinition getConstraint(QName constraintQName)
     {
         ConstraintDefinition constraintDef = null;
@@ -572,13 +505,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return constraintDef;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.ModelQuery#getAssociation(org.alfresco
-     * .repo.ref.QName)
-     */
+    @Override
     public AssociationDefinition getAssociation(QName assocName)
     {
         return getTenantDictionaryRegistry().getAssociation(assocName);
@@ -596,11 +523,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return getCompiledModels(includeInherited).keySet();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.repo.dictionary.impl.DictionaryDAO#getModels()
-     */
+    @Override
     public Collection<QName> getModels()
     {
         // get all models - including inherited models, if applicable
@@ -630,56 +553,31 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
 
     private Map<QName, CompiledModel> getCompiledModels(boolean includeInherited)
     {
-        return getTenantDictionaryRegistry()
-                .getCompiledModels(includeInherited);
+        return getTenantDictionaryRegistry().getCompiledModels(includeInherited);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.DictionaryDAO#getModel(org.alfresco
-     * .repo.ref.QName)
-     */
+    @Override
     public ModelDefinition getModel(QName name)
     {
         CompiledModel model = getCompiledModel(name);
         return model.getModelDefinition();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.DictionaryDAO#getTypes(org.alfresco
-     * .repo.ref.QName)
-     */
+    @Override
     public Collection<TypeDefinition> getTypes(QName modelName)
     {
         CompiledModel model = getCompiledModel(modelName);
         return model.getTypes();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.DictionaryDAO#getAspects(org.alfresco
-     * .repo.ref.QName)
-     */
+    @Override
     public Collection<AspectDefinition> getAspects(QName modelName)
     {
         CompiledModel model = getCompiledModel(modelName);
         return model.getAspects();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.impl.DictionaryDAO#getAnonymousType(org.
-     * alfresco.repo.ref.QName, java.util.Collection)
-     */
+    @Override
     public TypeDefinition getAnonymousType(QName type, Collection<QName> aspects)
     {
         TypeDefinition typeDef = getType(type);
@@ -705,13 +603,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return new M2AnonymousTypeDefinition(typeDef, aspectDefs);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.DictionaryDAO#getProperties(org.alfresco
-     * .service.namespace.QName)
-     */
+    @Override
     public Collection<PropertyDefinition> getProperties(QName modelName)
     {
         CompiledModel model = getCompiledModel(modelName);
@@ -736,13 +628,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return properties;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.DictionaryDAO#getProperties(org.alfresco
-     * .service.namespace.QName, org.alfresco.service.namespace.QName)
-     */
+    @Override
     public Collection<PropertyDefinition> getPropertiesOfDataType(QName dataType)
     {
         Collection<PropertyDefinition> properties = new HashSet<PropertyDefinition>();
@@ -756,13 +642,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return properties;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.DictionaryDAO#getNamespaces(org.alfresco
-     * .service.namespace.QName)
-     */
+    @Override
     public Collection<NamespaceDefinition> getNamespaces(QName modelName)
     {
         CompiledModel model = getCompiledModel(modelName);
@@ -770,13 +650,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return modelDef.getNamespaces();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.dictionary.DictionaryDAO#getConstraints(org.alfresco
-     * .service.namespace.QName)
-     */
+    @Override
     public Collection<ConstraintDefinition> getConstraints(QName modelName)
     {
         return getConstraints(modelName, false);
@@ -815,13 +689,6 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
     // re-entrant (eg. via reset)
     @Override
     public DictionaryRegistry getDictionaryRegistry(String tenantDomain)
-    {
-        return getDictionaryRegistry(tenantDomain, false);
-    }
-
-    // re-entrant (eg. via reset)
-    private DictionaryRegistry getDictionaryRegistry(final String tenantDomain,
-            final boolean init)
     {
         DictionaryRegistry dictionaryRegistry = null;
 
@@ -872,14 +739,6 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
                 },
                 tenantService.getDomainUser(
                         AuthenticationUtil.getSystemUserName(), tenantDomain));
-    }
-
-    private void removeDictionaryRegistry(String tenantDomain) 
-    {
-        // TODO Should be reworked when ACE-2001 will be implemented
-        dictionaryRegistryCache.remove(tenantDomain);
-        // This is a remove operation so should not trigger an update
-        // dictionaryRegistryCache.refresh(tenantDomain);
     }
 
     /**
@@ -1101,13 +960,6 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
         return getTenantDictionaryRegistry().getNamespaceURI(prefix);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.alfresco.repo.ref.NamespacePrefixResolver#getPrefixes(java.lang.String
-     * )
-     */
     @Override
     public Collection<String> getPrefixes(String URI)
     {
