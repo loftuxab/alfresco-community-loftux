@@ -256,16 +256,20 @@ public interface DictionaryDAO extends ModelQuery
     void reset();
 
     /**
-     * Trigger a background reload of the dictionary for the current tenant.
-     * There is no guarantee that the dictionary will be current when this call returns
-     * i.e. upon return, a dictionary will exist but may not be current until background
-     * reloading takes place.
+     * Initialise a reload of the dictionary for the current tenant.  The current version of
+     * the dictionary will be accessible during this call, however it will only return once
+     * the dictionary has undergone a reload for the current tenant.
      */
     void init();
 
     /**
      * Destroy the Dictionary.  After this call, there will be no dictionary available for the current
      * tenant; reloading will be done lazily as required.
+     * <p>
+     * <strong>WARNING: </strong>This method can cause 'stutter' on user threads as they wait for
+     * the dictionary to reload.  It is safer to call {@link #init()}, which will also rebuild the
+     * dictionary but will not destroy the old one, thereby allowing other threads to continue
+     * operating.
      */
     void destroy();
 
