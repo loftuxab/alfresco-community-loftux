@@ -79,7 +79,7 @@ public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
          
             if(aclsFound.size() > 0)
             {
-            	for(AtomicReaderContext readerContext : searcher.getAtomicReader().leaves() )
+            	for(AtomicReaderContext readerContext : searcher.getTopReaderContext().leaves() )
             	{
             		NumericDocValues leafReaderDocValues = readerContext.reader().getNumericDocValues(QueryConstants.FIELD_ACLID);
             		for(int i = 0; i < readerContext.reader().maxDoc(); i++)
@@ -88,7 +88,7 @@ public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
                 		Long key = getLong(aclID);
                 		if(aclsFound.contains(key))
                 		{
-                			deniedDocSet.add(readerContext.docBaseInParent + i);
+                			deniedDocSet.add(readerContext.docBase + i);
                 		}
             		}
             	}

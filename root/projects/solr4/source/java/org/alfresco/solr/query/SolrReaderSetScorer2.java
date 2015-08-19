@@ -78,7 +78,7 @@ public class SolrReaderSetScorer2 extends AbstractSolrCachingScorer
          
             if(aclsFound.size() > 0)
             {
-            	for(AtomicReaderContext readerContext : searcher.getAtomicReader().leaves() )
+            	for(AtomicReaderContext readerContext : searcher.getTopReaderContext().leaves() )
             	{
             		NumericDocValues leafReaderDocValues = readerContext.reader().getNumericDocValues(QueryConstants.FIELD_ACLID);
             		for(int i = 0; i < readerContext.reader().maxDoc(); i++)
@@ -87,7 +87,7 @@ public class SolrReaderSetScorer2 extends AbstractSolrCachingScorer
                 		Long key = getLong(aclID);
                 		if(aclsFound.contains(key))
                 		{
-                			readableDocSet.add(readerContext.docBaseInParent + i);
+                			readableDocSet.add(readerContext.docBase + i);
                 		}
             		}
             	}
