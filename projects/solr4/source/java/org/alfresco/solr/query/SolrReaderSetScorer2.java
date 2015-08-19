@@ -78,19 +78,22 @@ public class SolrReaderSetScorer2 extends AbstractSolrCachingScorer
          
             if(aclsFound.size() > 0)
             {
-            	for(AtomicReaderContext readerContext : searcher.getTopReaderContext().leaves() )
-            	{
-            		NumericDocValues leafReaderDocValues = readerContext.reader().getNumericDocValues(QueryConstants.FIELD_ACLID);
-            		for(int i = 0; i < readerContext.reader().maxDoc(); i++)
-            		{
-            			long aclID = leafReaderDocValues.get(i);
-                		Long key = getLong(aclID);
-                		if(aclsFound.contains(key))
-                		{
-                			readableDocSet.add(readerContext.docBase + i);
-                		}
-            		}
-            	}
+                for(AtomicReaderContext readerContext : searcher.getTopReaderContext().leaves() )
+                {
+                    NumericDocValues leafReaderDocValues = readerContext.reader().getNumericDocValues(QueryConstants.FIELD_ACLID);
+                    if(leafReaderDocValues != null)
+                    {
+                        for(int i = 0; i < readerContext.reader().maxDoc(); i++)
+                        {
+                            long aclID = leafReaderDocValues.get(i);
+                            Long key = getLong(aclID);
+                            if(aclsFound.contains(key))
+                            {
+                                readableDocSet.add(readerContext.docBase + i);
+                            }
+                        }
+                    }
+                }
             }
             
             // Exclude the ACL docs from the results, we only want real docs that match.
