@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.zip.CRC32;
 
 import org.alfresco.service.cmr.dictionary.DictionaryException;
@@ -474,6 +475,24 @@ public class M2Model
     public void setAnalyserResourceBundleName(String analyserResourceBundleName)
     {
         this.analyserResourceBundleName = analyserResourceBundleName;
+    }
+
+    public void setConfigProperties(Properties configProperties)
+    {
+        if (types != null)
+        {
+            for (M2Class type : types)
+            {
+                type.setConfigProperties(configProperties);
+            }
+        }
+        if (aspects != null)
+        {
+            for (M2Class aspect : aspects)
+            {
+                aspect.setConfigProperties(configProperties);
+            }
+        }
     }
 
 }

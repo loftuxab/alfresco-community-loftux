@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
@@ -52,6 +53,8 @@ public class DictionaryBootstrap implements DictionaryListener
     // Tenant Service
     private TenantService tenantService;
 
+    private Properties globalProperties;
+
     // Logger
     private static Log logger = LogFactory.getLog(DictionaryBootstrap.class);
     
@@ -74,6 +77,16 @@ public class DictionaryBootstrap implements DictionaryListener
     public void setTenantService(TenantService tenantService)
     {
         this.tenantService = tenantService;
+    }
+    
+    /**
+     * Sets the global properties
+     * 
+     * @param globalProperties
+     */
+    public void setGlobalProperties(Properties globalProperties)
+    {
+        this.globalProperties = globalProperties;
     }
     
     /**
@@ -146,7 +159,8 @@ public class DictionaryBootstrap implements DictionaryListener
                 try
                 {
                     M2Model model = M2Model.createModel(modelStream);
-
+                    model.setConfigProperties(globalProperties);
+                    
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Loading model: "+model.getName()+" (from "+bootstrapModel+")");

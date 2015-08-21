@@ -21,6 +21,8 @@ package org.alfresco.repo.dictionary;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Abstract Class Definition.
@@ -30,6 +32,8 @@ import java.util.List;
  */
 public abstract class M2Class
 {
+    public static final Pattern PROPERTY_PLACEHOLDER = Pattern.compile("\\$\\{.*\\}\\|.*");
+    
     private String name = null;
     private String title = null;
     private String description = null;
@@ -273,4 +277,21 @@ public abstract class M2Class
         this.analyserResourceBundleName = analyserResourceBundleName;
     } 
     
+    public void setConfigProperties(Properties configProperties)
+    {
+        if (properties != null)
+        {
+            for (M2Property property : properties)
+            {
+                property.setConfigProperties(configProperties);
+            }
+        }
+        if (propertyOverrides != null)
+        {
+            for (M2PropertyOverride propertyOverride : propertyOverrides)
+            {
+                propertyOverride.setConfigProperties(configProperties);
+            }
+        }
+    }
 }

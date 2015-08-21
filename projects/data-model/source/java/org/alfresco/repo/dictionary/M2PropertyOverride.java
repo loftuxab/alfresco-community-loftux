@@ -19,6 +19,7 @@
 package org.alfresco.repo.dictionary;
 
 import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -34,6 +35,7 @@ public class M2PropertyOverride
     private Boolean isMandatoryEnforced;
     private String defaultValue;
     private List<M2Constraint> constraints;
+    private Properties configProperties = new Properties();
     
     /*package*/ M2PropertyOverride()
     {
@@ -70,7 +72,17 @@ public class M2PropertyOverride
     
     public String getDefaultValue()
     {
-        return defaultValue;
+        if (defaultValue != null && M2Class.PROPERTY_PLACEHOLDER.matcher(defaultValue).matches())
+        {
+            String key = defaultValue.substring(defaultValue.indexOf("${") + 2, defaultValue.indexOf("}"));
+            String value = defaultValue.substring(defaultValue.indexOf("|") + 1);
+            
+            return configProperties.getProperty(key, value);
+        }
+        else
+        {
+            return defaultValue;
+        }
     }
     
     
@@ -83,4 +95,9 @@ public class M2PropertyOverride
     {
         return constraints;
     }    
+    
+    public void setConfigProperties(Properties configProperties)
+    {
+        this.configProperties = configProperties;
+    }
 }
