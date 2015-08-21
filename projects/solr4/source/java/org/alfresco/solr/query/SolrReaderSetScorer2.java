@@ -37,6 +37,7 @@ import org.apache.solr.search.BitDocSet;
 import org.apache.solr.search.DocIterator;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.solr.search.WrappedQuery;
 
 public class SolrReaderSetScorer2 extends AbstractSolrCachingScorer
 {
@@ -62,8 +63,10 @@ public class SolrReaderSetScorer2 extends AbstractSolrCachingScorer
             {
                 bQuery.add(new TermQuery(new Term(QueryConstants.FIELD_READER, current)), Occur.SHOULD);
             }
+            WrappedQuery wrapped = new WrappedQuery(bQuery);
+            wrapped.setCache(false);
 
-            DocSet aclDocs = searcher.getDocSet(bQuery);
+            DocSet aclDocs = searcher.getDocSet(wrapped);
             
             HashSet<Long> aclsFound = new HashSet<Long>(aclDocs.size());
             NumericDocValues aclDocValues = searcher.getAtomicReader().getNumericDocValues(QueryConstants.FIELD_ACLID);
