@@ -38,6 +38,7 @@ import org.apache.solr.search.BitDocSet;
 import org.apache.solr.search.DocIterator;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.solr.search.WrappedQuery;
 
 /**
  * Find the set of documents owned by the specified set of authorities,
@@ -75,8 +76,10 @@ public class SolrOwnerSetScorer extends AbstractSolrCachingScorer
                     bQuery.add(new TermQuery(new Term(QueryConstants.FIELD_OWNER, current)), Occur.SHOULD);
                 }
             }
-
-            authorityOwnedDocs = searcher.getDocSet(bQuery);
+            
+            WrappedQuery wrapped = new WrappedQuery(bQuery);
+            wrapped.setCache(false);
+            authorityOwnedDocs = searcher.getDocSet(wrapped);
         
             searcher.cacheInsert(CacheConstants.ALFRESCO_OWNERLOOKUP_CACHE, authorities, authorityOwnedDocs);
         }

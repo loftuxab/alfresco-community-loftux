@@ -33,6 +33,7 @@ import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.Bits;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.solr.search.WrappedQuery;
 
 /**
  * Find the set of docs that the specified authority set can read.
@@ -83,18 +84,25 @@ public class SolrAuthoritySetScorer extends AbstractSolrCachingScorer
         if (hasGlobalRead || (doPermissionChecks == false))
         {
             // can read all
-            DocSet allDocs = searcher.getDocSet(new MatchAllDocsQuery());
+            WrappedQuery wrapped = new WrappedQuery(new MatchAllDocsQuery());
+            wrapped.setCache(false);
+            DocSet allDocs = searcher.getDocSet(wrapped);
             return new SolrAuthoritySetScorer(weight, allDocs, context, acceptDocs, searcher);
         }
 
         // Docs for which the authorities have explicit read access.
-        DocSet readableDocSet = searcher.getDocSet(new SolrReaderSetQuery(authorities));
+        WrappedQuery wrapped;
+        wrapped = new WrappedQuery(new SolrReaderSetQuery(authorities));
+        wrapped.setCache(false);
+        DocSet readableDocSet = searcher.getDocSet(wrapped);
 
         // Are all doc owners granted read permissions at a global level?
         if (globalReaders.contains(PermissionService.OWNER_AUTHORITY))
         {
             // Get the set of docs owned by the authorities (which they can therefore read).
-            DocSet authorityOwnedDocs = searcher.getDocSet(new SolrOwnerSetQuery(authorities));
+            wrapped = new WrappedQuery(new SolrOwnerSetQuery(authorities));
+            wrapped.setCache(false);
+            DocSet authorityOwnedDocs = searcher.getDocSet(wrapped);
             // Final set of docs that the authorities can read.
             DocSet toCache = readableDocSet.union(authorityOwnedDocs);
             searcher.cacheInsert(CacheConstants.ALFRESCO_AUTHORITY_CACHE, key, toCache);
@@ -103,8 +111,12 @@ public class SolrAuthoritySetScorer extends AbstractSolrCachingScorer
         else
         {
             // for that docs I own that have owner Read rights
-            DocSet ownerReadableDocSet = searcher.getDocSet(new SolrReaderSetQuery("|"+PermissionService.OWNER_AUTHORITY));
-            DocSet authorityOwnedDocs = searcher.getDocSet(new SolrOwnerSetQuery(authorities));
+            wrapped = new WrappedQuery(new SolrReaderSetQuery("|"+PermissionService.OWNER_AUTHORITY));
+            wrapped.setCache(false);
+            DocSet ownerReadableDocSet = searcher.getDocSet(wrapped);
+            wrapped = new WrappedQuery(new SolrOwnerSetQuery(authorities));
+            wrapped.setCache(false);
+            DocSet authorityOwnedDocs = searcher.getDocSet(wrapped);
            
             // Docs where the authority is an owner and where owners have read rights.
             DocSet docsAuthorityOwnsAndCanRead = ownerReadableDocSet.intersection(authorityOwnedDocs);
