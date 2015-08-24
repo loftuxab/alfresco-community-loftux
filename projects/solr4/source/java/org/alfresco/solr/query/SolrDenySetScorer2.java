@@ -84,12 +84,12 @@ public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
             {
                 for(AtomicReaderContext readerContext : searcher.getTopReaderContext().leaves() )
                 {
-                    NumericDocValues leafReaderDocValues = readerContext.reader().getNumericDocValues(QueryConstants.FIELD_ACLID);
-                    if(leafReaderDocValues != null)
+                    int[] fieldValues = DocValuesCache.getIntValues(QueryConstants.FIELD_ACLID, readerContext.reader());
+                    if(fieldValues != null)
                     {
-                        for(int i = 0; i < readerContext.reader().maxDoc(); i++)
+                        for(int i = 0; i < fieldValues.length; i++)
                         {
-                            long aclID = leafReaderDocValues.get(i);
+                            long aclID = fieldValues[i];
                             Long key = getLong(aclID);
                             if(aclsFound.contains(key))
                             {
