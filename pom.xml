@@ -747,6 +747,7 @@
                     <truststorePass>kT9X6oe68t</truststorePass>
                     <truststoreType>JCEKS</truststoreType>
                 </configuration>
+                <!-- Change version of Tomcat. Not working any more with Tomcat 8 - see MTOMCAT-234
                 <dependencies>
                     <dependency>
                       <groupId>org.apache.tomcat.embed</groupId>
@@ -839,6 +840,7 @@
                       <version>${dependency.tomcat.version}</version>
                     </dependency>
                 </dependencies>
+                -->
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
