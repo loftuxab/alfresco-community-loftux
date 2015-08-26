@@ -81,6 +81,7 @@
     <module>modules/sharepoint/amp</module>
     <module>projects/mmt</module>
     <module>projects/sdk/alfresco-platform-distribution</module>
+    <module>projects/server-root</module>
   </modules>
 
   <properties>

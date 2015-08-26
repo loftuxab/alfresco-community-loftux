@@ -4,17 +4,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>alfresco-enterprise-parent</artifactId>
+        <artifactId>alfresco-parent</artifactId>
         <groupId>org.alfresco</groupId>
         <version>5.1-SNAPSHOT</version>
     </parent>
-    <artifactId>alfresco-enterprise-server-root</artifactId>
-    <name>Alfresco Enterprise ROOT Web Application</name>
+    <artifactId>alfresco-server-root</artifactId>
+    <name>Alfresco ROOT Web Application</name>
 
     <packaging>war</packaging>
 
     <url>http://www.alfresco.org/</url>
-    <inceptionYear>2014</inceptionYear>
+    <inceptionYear>2015</inceptionYear>
     <organization>
         <name>Alfresco Software</name>
         <url>http://www.alfresco.org/</url>
