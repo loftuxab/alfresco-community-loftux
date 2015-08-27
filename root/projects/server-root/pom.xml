@@ -7,18 +7,12 @@
         <artifactId>alfresco-parent</artifactId>
         <groupId>org.alfresco</groupId>
         <version>5.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-server-root</artifactId>
     <name>Alfresco ROOT Web Application</name>
 
     <packaging>war</packaging>
-
-    <url>http://www.alfresco.org/</url>
-    <inceptionYear>2015</inceptionYear>
-    <organization>
-        <name>Alfresco Software</name>
-        <url>http://www.alfresco.org/</url>
-    </organization>
 
     <properties>
         <m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot>
