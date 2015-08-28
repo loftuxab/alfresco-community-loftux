@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <model xmlns="http://www.alfresco.org/model/dictionary/1.0" name="smm:SampleModelDateNew">
+
+   <description>Sample Model New</description>
+
+   <imports>
+      <import prefix="cm" uri="http://www.alfresco.org/model/content/1.0"/>
+      <import prefix="d" uri="http://www.alfresco.org/model/dictionary/1.0"/>
+   </imports>
+
+   <namespaces>
+      <namespace prefix="smm" uri="http://www.oluolu-itfrontier.com/cabinet/model/SampleModelNew/1.0"/>
+   </namespaces>
+
+<types>
+
+   <type name="smm:S01">
+      <title>Sample Type New</title>
+      <parent>cm:content</parent>
+
+      <properties>
+         
+	 <property name="smm:propText">
+            <title>Text1</title>
+            <type>d:text</type>
+            <protected>false</protected>
+            <mandatory>false</mandatory>
+            <multiple>false</multiple>
+
+            <index enabled="true">
+               <atomic>false</atomic>
+               <stored>true</stored>
+               <tokenised>true</tokenised>
+            </index>
+
+	</property>
+		 
+		 <property name="smm:propInt">
+            <title>Int1</title>
+            <type>d:int</type>
+            <protected>false</protected>
+            <mandatory>false</mandatory>
+            <multiple>false</multiple>
+
+            <index enabled="true">
+               <atomic>false</atomic>
+               <stored>true</stored>
+               <tokenised>true</tokenised>
+            </index>
+
+         </property>
+		 
+		 <property name="smm:propLong">
+            <title>Long1</title>
+            <type>d:long</type>
+            <protected>false</protected>
+            <mandatory>false</mandatory>
+            <multiple>false</multiple>
+
+            <index enabled="true">
+               <atomic>false</atomic>
+               <stored>true</stored>
+               <tokenised>true</tokenised>
+            </index>
+
+         </property>
+		 
+		 <property name="smm:propDate">
+            <title>Date1</title>
+            <type>d:date</type>
+            <protected>false</protected>
+            <mandatory>false</mandatory>
+            <multiple>false</multiple>
+
+            <index enabled="true">
+               <atomic>false</atomic>
+               <stored>true</stored>
+               <tokenised>true</tokenised>
+            </index>
+
+         </property>
+		 
+		 <property name="smm:propBoolean">
+            <title>Boolean1</title>
+            <type>d:boolean</type>
+            <protected>false</protected>
+            <mandatory>false</mandatory>
+            <multiple>false</multiple>
+
+            <index enabled="true">
+               <atomic>false</atomic>
+               <stored>true</stored>
+               <tokenised>true</tokenised>
+            </index>
+
+         </property>
+		 
+      </properties>
+
+   </type>
+</types>
+
+</model>

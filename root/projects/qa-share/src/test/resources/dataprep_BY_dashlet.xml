@@ -1,0 +1,50 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Sprint BY Data Prep Dashlet Suite" preserve-order="true" parallel="tests" thread-count="1">
+    <groups>
+        <run>
+            <include name="DataPrep.*"/>
+            <exclude name="Enterprise4.2"/>
+            <exclude name="Sanity"/>
+            <exclude name="NonGrid"/>
+        </run>
+    </groups>
+
+    <listeners>
+        <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
+    </listeners>
+
+    <test name="SiteSearchMyDashboardTest2">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest2">
+                <methods>
+                    <include name="dataPrep_AONE_14838"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <test name="SavedSearchMyDashboardAdvancedTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SavedSearchMyDashboardAdvancedTest">
+                <methods>
+                    <include name="dataPrep_AONE_14688"/>
+                    <include name="dataPrep_AONE_14691"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <test name="SavedSearchSiteDashboardAdvancedTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SavedSearchSiteDashboardAdvancedTest">
+                <methods>
+                    <include name="dataPrep_AONE_14732"/>
+                    <include name="dataPrep_AONE_14735"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>
