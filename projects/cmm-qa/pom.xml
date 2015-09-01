@@ -1,15 +1,17 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent> 
+	<parent>
+		<artifactId>alfresco-parent</artifactId>
 		<groupId>org.alfresco</groupId>
-		<artifactId>alfresco-cmm-parent</artifactId>
-		<version>1.0-B-SNAPSHOT</version>
+		<version>5.1-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>alfresco-cmm-qa</artifactId>
 	<name>Alfresco CMM Automation QA</name>
 	<properties>
+		<skipTests>true</skipTests>
 		<selenium.version>2.39.1</selenium.version>
 		<spring.version>4.0.5.RELEASE</spring.version>
 		<webdrone.version>2.8</webdrone.version>
@@ -22,6 +24,19 @@
 		 <testngUnit.xml>src/test/resources/testngUnitTests.xml</testngUnit.xml>
 	</properties>
 	<build>
+		<directory>target/${uniqueTestRunName}</directory>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
 		<plugins>
 			<!-- Additional source folder to be added: source/compatibility -->
 			<plugin>
@@ -41,7 +56,7 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
+			<plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <suiteXmlFiles>
@@ -52,13 +67,9 @@
                     <workingDirectory>${basedir}</workingDirectory>
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
                     <parallel>classes</parallel>
-                    <systemPropertyVariables>
-                        <webdrone.max.waitTime>${webdrone.max.waitTime}</webdrone.max.waitTime>
-                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 			<plugin>			
-	
 				<!-- Configuration triggered by mvn antrun:run, used by Bamboo to stop 
 					server -->
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -88,7 +99,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>share-po</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>test-jar</type>
             <exclusions>
                 <exclusion>
@@ -112,7 +123,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>share-po</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.social</groupId>
@@ -120,17 +131,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-cmm-share-po</artifactId>
-			<version>${cmm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-cmm-share-po</artifactId>
-			<version>${cmm.version}</version>
-			<type>test-jar</type>
-		</dependency>
+
 		<!-- <dependency>
 			<groupId>org.alfresco</groupId>
 			<artifactId>alfresco-api-utils</artifactId>
@@ -414,91 +415,8 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>cmmAmps</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>fetch-cmm-share-amp</id>
-								<phase>process-test-resources</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.alfresco</groupId>
-											<artifactId>alfresco-cmm-share</artifactId>
-											<version>${project.version}</version>
-											<classifier>amp</classifier>
-											<type>amp</type>
-										</artifactItem>
-									</artifactItems>
-									<outputDirectory>${project.build.directory}/alf-installation/amps_share</outputDirectory>
-									<useBaseVersion>true</useBaseVersion>
-								</configuration>
-							</execution>
-							<execution>
-								<id>fetch-cmm-server-amp</id>
-								<phase>process-test-resources</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.alfresco</groupId>
-											<artifactId>alfresco-cmm-server</artifactId>
-											<version>${project.version}</version>
-											<classifier>amp</classifier>
-											<type>amp</type>
-										</artifactItem>
-									</artifactItems>
-									<outputDirectory>${project.build.directory}/alf-installation/amps</outputDirectory>
-									<useBaseVersion>true</useBaseVersion>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.alfresco.maven.plugin</groupId>
-						<artifactId>alfresco-maven-plugin</artifactId>
-						<extensions>true</extensions>
-						<executions>
-							<execution>
-								<id>install-cmm-server-amp</id>
-								<goals>
-									<goal>install</goal>
-								</goals>
-								<phase>process-test-resources</phase>
-								<configuration>
-									<backup>true</backup>
-									<ampLocation>${project.build.directory}/alf-installation/amps</ampLocation>
-									<warLocation>${project.build.directory}/alf-installation/tomcat/webapps/alfresco.war</warLocation>
-									<classifier>amp</classifier>
-								</configuration>
-							</execution>
-							<execution>
-								<id>install-cmm-share-amp</id>
-								<goals>
-									<goal>install</goal>
-								</goals>
-								<phase>process-test-resources</phase>
-								<configuration>
-									<backup>true</backup>
-									<ampLocation>${project.build.directory}/alf-installation/amps_share</ampLocation>
-									<warLocation>${project.build.directory}/alf-installation/tomcat/webapps/share.war</warLocation>
-									<classifier>amp</classifier>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+		
+		
 		<profile>
 			<id>run-alfresco</id>
 			<build>
