@@ -57,6 +57,7 @@ public class DictionaryException extends AlfrescoRuntimeException
      *
      * @author Jamal Kaabi-Mofrad
      */
+    @AlfrescoPublicApi
     public static class DuplicateDefinitionException extends DictionaryException
     {
         private static final long serialVersionUID = -2623179649246011966L;

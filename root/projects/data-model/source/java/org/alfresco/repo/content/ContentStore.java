@@ -20,6 +20,7 @@ package org.alfresco.repo.content;
 
 import java.util.Date;
 
+import org.alfresco.api.AlfrescoPublicApi;
 import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -62,6 +63,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
  * @since 1.0
  * @author Derek Hulley
  */
+@AlfrescoPublicApi
 public interface ContentStore
 {
     /**
