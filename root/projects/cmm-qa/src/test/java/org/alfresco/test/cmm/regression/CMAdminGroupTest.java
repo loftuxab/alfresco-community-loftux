@@ -24,6 +24,7 @@ import org.alfresco.po.share.DashBoardPage;
 import org.alfresco.po.share.GroupsPage;
 import org.alfresco.po.share.RemoveUserFromGroupPage;
 import org.alfresco.po.share.RemoveUserFromGroupPage.Action;
+import org.alfresco.po.share.SharePage;
 import org.alfresco.test.AlfrescoTest;
 import org.alfresco.test.FailedTestListener;
 import org.alfresco.test.cmm.AbstractCMMQATest;
@@ -124,10 +125,11 @@ public class CMAdminGroupTest extends AbstractCMMQATest
         logout(driver);
         
         //Login as user1
-        loginAs(driver, new String[] {userInfo, DEFAULT_PASSWORD});               
+        SharePage page = loginAs(driver, new String[] {userInfo, DEFAULT_PASSWORD});               
         
         //Verify Model Manager link is not displayed in the home page
-       Assert.assertFalse(cmmActions.isManageModelsLinkDisplayed(driver),"Manage Models link is not displayed in the Header Bar");    
+        boolean check = page.getNav().hasManageModelsLink();
+        Assert.assertFalse(check,"Manage Models link is not displayed in the Header Bar");    
                
     }
     
@@ -234,6 +236,8 @@ public class CMAdminGroupTest extends AbstractCMMQATest
         loginAs(driver, new String[] {userInfo, DEFAULT_PASSWORD});
         
         //Verify Model Admin user cannot access Model Manage page from home page
-        Assert.assertFalse(cmmActions.isManageModelsLinkDisplayed(driver),"Manage Models link is not displayed in the Header Bar");                                   
+        SharePage page = loginAs(driver, new String[] {userInfo, DEFAULT_PASSWORD});  
+        boolean check = page.getNav().hasManageModelsLink();
+        Assert.assertFalse(check,"Manage Models link is not displayed in the Header Bar");                                   
     } 
 }
