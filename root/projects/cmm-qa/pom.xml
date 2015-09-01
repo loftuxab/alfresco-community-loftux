@@ -1,0 +1,569 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent> 
+		<groupId>org.alfresco</groupId>
+		<artifactId>alfresco-cmm-parent</artifactId>
+		<version>1.0-B-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>alfresco-cmm-qa</artifactId>
+	<name>Alfresco CMM Automation QA</name>
+	<properties>
+		<selenium.version>2.39.1</selenium.version>
+		<spring.version>4.0.5.RELEASE</spring.version>
+		<webdrone.version>2.8</webdrone.version>
+		<cmm.version>1.0-B-SNAPSHOT</cmm.version>
+		<alfresco.version>${alfresco.base.version}</alfresco.version>
+		<alfresco.api.utils.version>5.0.2-SNAPSHOT</alfresco.api.utils.version>
+		<enterprise.installer.path>/data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-enterprise-*-installer-linux-x64.???</enterprise.installer.path>
+		 <testng.sanity.xml>src/test/resources/cmm-sanity-testng.xml</testng.sanity.xml>
+		 <testng.xml>src/test/resources/cmm-complete-e2e-testng.xml</testng.xml>
+		 <testngUnit.xml>src/test/resources/testngUnitTests.xml</testngUnit.xml>
+	</properties>
+	<build>
+		<plugins>
+			<!-- Additional source folder to be added: source/compatibility -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/unit-test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <suiteXmlFiles>
+						<suiteXmlFile>${testng.sanity.xml}</suiteXmlFile>
+                        <suiteXmlFile>${testng.xml}</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <runOrder>alphabetical</runOrder>
+                    <workingDirectory>${basedir}</workingDirectory>
+                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                    <parallel>classes</parallel>
+                    <systemPropertyVariables>
+                        <webdrone.max.waitTime>${webdrone.max.waitTime}</webdrone.max.waitTime>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+			<plugin>			
+	
+				<!-- Configuration triggered by mvn antrun:run, used by Bamboo to stop 
+					server -->
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<configuration>
+							<target>
+								<echo>Stopping Alfresco...</echo>
+								<exec executable="${basedir}/target/alf-installation/alfresco.sh"
+									dir="target/alf-installation" failonerror="true">
+									<arg value="stop" />
+								</exec>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+	    <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>selenium-grid</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>share-po</artifactId>
+            <version>5.1-SNAPSHOT</version>
+            <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.chemistry.opencmis</groupId>
+                    <artifactId>chemistry-opencmis-commons-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.chemistry.opencmis</groupId>
+                    <artifactId>chemistry-opencmis-client-bindings</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.chemistry.opencmis</groupId>
+                    <artifactId>chemistry-opencmis-client-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.chemistry.opencmis</groupId>
+                    <artifactId>chemistry-opencmis-commons-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>share-po</artifactId>
+            <version>5.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.social</groupId>
+                    <artifactId>spring-social-alfresco-bm</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-cmm-share-po</artifactId>
+			<version>${cmm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-cmm-share-po</artifactId>
+			<version>${cmm.version}</version>
+			<type>test-jar</type>
+		</dependency>
+		<!-- <dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-api-utils</artifactId>
+			<version>${alfresco.api.utils.version}</version>
+		</dependency> -->
+		<dependency>
+			<groupId>org.alfresco.test</groupId>
+			<artifactId>alfresco-api-test-utils</artifactId>
+			<version>1.0</version>
+		</dependency>	
+		<dependency>
+			<groupId>org.alfresco.test</groupId>
+			<artifactId>alfresco-testng</artifactId>
+			<version>1.1</version>
+			<!-- <scope>test</scope> -->
+		</dependency>
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.4.01</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+        <dependency>
+             <groupId>org.springframework</groupId>
+             <artifactId>spring-test</artifactId>
+             <version>${spring.version}</version>
+        </dependency>
+	</dependencies>
+	<profiles>
+		<profile>
+			<id>install-alfresco</id>
+			<build>
+				<plugins>
+					<!-- Download and install the latest enterprise alfresco installer -->
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>fetch-installer</id>
+								<phase>generate-test-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<echo>Recreating database...</echo>
+										<sql driver="org.postgresql.Driver" url="jdbc:postgresql:template1"
+											userid="alfresco" password="alfresco" autocommit="true">drop
+											database if exists alfresco; create database alfresco</sql>
+										<echo>Downloading Alfresco installer...</echo>
+										<sshexec username="tomcat" host="pbam01.alfresco.com"
+											keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath"
+											command="ls -rt ${enterprise.installer.path} | tail -1 | tr ' ' '?' " />
+										<scp remoteFile="tomcat@pbam01.alfresco.com:${installerPath}"
+											localTofile="target/alf-installer.bin" keyfile="${user.home}/.ssh/id_rsa" />
+										<chmod file="target/alf-installer.bin" perm="a+x"
+											verbose="true" />
+										<echo>Installing Alfresco...</echo>
+										<exec executable="${basedir}/target/alf-installer.bin"
+											dir="target" failonerror="true">
+											<arg
+												line="--mode unattended --alfresco_admin_password admin --disable-components postgres,alfrescowcmqs --jdbc_username alfresco --jdbc_password alfresco --prefix ${basedir}/target/alf-installation" />
+										</exec>
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>configure-module-properties</id>
+								<phase>generate-test-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<property name="alf.prop" location="target/alf-installation/tomcat/shared/classes/alfresco-global.properties"/>
+										<echo append="true" output="${alf.prop}"/>
+										<echo append="true" output="${alf.prop}">s3.accessKey=AKIAIM4Z5AKE3UQG4FSQ</echo>
+										<echo append="true" output="${alf.prop}"/>
+										<echo append="true" output="${alf.prop}">s3.secretKey=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</echo>
+										<echo append="true" output="${alf.prop}"/>
+										<echo append="true" output="${alf.prop}">s3.bucketName=cmm-bucket-share-po</echo>
+										<echo append="true" output="${alf.prop}"/>
+										<echo append="true" output="${alf.prop}">s3.bucketLocation=US</echo>
+										<echo append="true" output="${alf.prop}"/>
+										<echo append="true" output="${alf.prop}">centera.url=168.159.214.15?https://community.emc.com/docs/DOC-13592</echo>
+										<echo append="true" output="${alf.prop}"/>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.ant</groupId>
+								<artifactId>ant-jsch</artifactId>
+								<version>1.8.2</version>
+							</dependency>
+							<dependency>
+								<groupId>postgresql</groupId>
+								<artifactId>postgresql</artifactId>
+								<version>9.1-901-1.jdbc4</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>allAmps</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>fetch-repo-amps</id>
+								<phase>process-test-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-centera-connector</artifactId>
+											<version>${centera-connector.version}</version>
+											<type>amp</type>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.alfresco.transformationserver</groupId>
+											<artifactId>alfresco-transformationserver-repo</artifactId>
+											<version>${transformationserver.version}</version>
+											<type>amp</type>
+										</artifactItem>
+										<!-- <artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-analytics-repo</artifactId>
+											<version>${analytics.version}</version>
+											<type>amp</type>
+										</artifactItem> -->
+										<artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-googledocs-repo</artifactId>
+											<version>${googledocs.version}</version>
+											<classifier>enterprise</classifier>
+											<type>amp</type>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.alfresco.module.KofaxAddon</groupId>
+											<artifactId>kofaxaddon</artifactId>
+											<version>${kofax.version}</version>
+											<type>amp</type>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.alfresco.mediamanagement</groupId>
+											<artifactId>alfresco-mm-repo</artifactId>
+											<version>${media-management.version}</version>
+											<type>amp</type>
+  										</artifactItem>
+  										<!--
+										<artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-outlook-repository</artifactId>
+											<version>${outlook-integration.version}</version>
+											<type>amp</type>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-outlook-repository-utils</artifactId>
+											<version>${outlook-integration.version}</version>
+											<type>amp</type>
+										</artifactItem>
+										-->
+										<artifactItem>
+											<groupId>org.alfresco</groupId>
+											<artifactId>alfresco-rm-server</artifactId>
+											<version>${records-management.version}</version>
+											<type>amp</type>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-s3-connector</artifactId>
+											<version>${s3-connector.version}</version>
+											<type>amp</type>
+										</artifactItem>
+									</artifactItems>
+									<outputDirectory>${project.build.directory}/alf-installation/amps</outputDirectory>
+									<useBaseVersion>true</useBaseVersion>
+								</configuration>
+							</execution>
+							<execution>
+								<id>fetch-share-amps</id>
+								<phase>process-test-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.alfresco.transformationserver</groupId>
+											<artifactId>alfresco-transformationserver-share</artifactId>
+											<version>${transformationserver.version}</version>
+											<type>amp</type>
+										</artifactItem>
+										<!-- <artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-analytics-share</artifactId>
+											<version>${analytics.version}</version>
+											<type>amp</type>
+										</artifactItem> -->
+										<artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-googledocs-share</artifactId>
+											<version>${googledocs.version}</version>
+											<classifier>enterprise</classifier>
+											<type>amp</type>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.alfresco.mediamanagement</groupId>
+											<artifactId>alfresco-mm-share</artifactId>
+											<version>${media-management.version}</version>
+											<type>amp</type>
+  										</artifactItem>
+  										<!--
+										<artifactItem>
+											<groupId>org.alfresco.integrations</groupId>
+											<artifactId>alfresco-outlook-share</artifactId>
+											<version>${outlook-integration-share.version}</version>
+											<type>amp</type>
+										</artifactItem>
+										-->
+										<artifactItem>
+											<groupId>org.alfresco</groupId>
+											<artifactId>alfresco-rm-share</artifactId>
+											<version>${records-management.version}</version>
+											<type>amp</type>
+										</artifactItem>
+									</artifactItems>
+									<outputDirectory>${project.build.directory}/alf-installation/amps_share</outputDirectory>
+									<useBaseVersion>true</useBaseVersion>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.alfresco.maven.plugin</groupId>
+						<artifactId>alfresco-maven-plugin</artifactId>
+						<extensions>true</extensions>
+						<executions>
+							<execution>
+								<id>install-repo-amps</id>
+								<goals>
+									<goal>install</goal>
+								</goals>
+								<phase>process-test-resources</phase>
+								<configuration>
+									<backup>true</backup>
+									<ampLocation>${project.build.directory}/alf-installation/amps</ampLocation>
+									<warLocation>${project.build.directory}/alf-installation/tomcat/webapps/alfresco.war</warLocation>
+									<classifier>amp</classifier>
+								</configuration>
+							</execution>
+							<execution>
+								<id>install-share-amps</id>
+								<goals>
+									<goal>install</goal>
+								</goals>
+								<phase>process-test-resources</phase>
+								<configuration>
+									<backup>true</backup>
+									<ampLocation>${project.build.directory}/alf-installation/amps_share</ampLocation>
+									<warLocation>${project.build.directory}/alf-installation/tomcat/webapps/share.war</warLocation>
+									<classifier>amp</classifier>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>cmmAmps</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>fetch-cmm-share-amp</id>
+								<phase>process-test-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.alfresco</groupId>
+											<artifactId>alfresco-cmm-share</artifactId>
+											<version>${project.version}</version>
+											<classifier>amp</classifier>
+											<type>amp</type>
+										</artifactItem>
+									</artifactItems>
+									<outputDirectory>${project.build.directory}/alf-installation/amps_share</outputDirectory>
+									<useBaseVersion>true</useBaseVersion>
+								</configuration>
+							</execution>
+							<execution>
+								<id>fetch-cmm-server-amp</id>
+								<phase>process-test-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.alfresco</groupId>
+											<artifactId>alfresco-cmm-server</artifactId>
+											<version>${project.version}</version>
+											<classifier>amp</classifier>
+											<type>amp</type>
+										</artifactItem>
+									</artifactItems>
+									<outputDirectory>${project.build.directory}/alf-installation/amps</outputDirectory>
+									<useBaseVersion>true</useBaseVersion>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.alfresco.maven.plugin</groupId>
+						<artifactId>alfresco-maven-plugin</artifactId>
+						<extensions>true</extensions>
+						<executions>
+							<execution>
+								<id>install-cmm-server-amp</id>
+								<goals>
+									<goal>install</goal>
+								</goals>
+								<phase>process-test-resources</phase>
+								<configuration>
+									<backup>true</backup>
+									<ampLocation>${project.build.directory}/alf-installation/amps</ampLocation>
+									<warLocation>${project.build.directory}/alf-installation/tomcat/webapps/alfresco.war</warLocation>
+									<classifier>amp</classifier>
+								</configuration>
+							</execution>
+							<execution>
+								<id>install-cmm-share-amp</id>
+								<goals>
+									<goal>install</goal>
+								</goals>
+								<phase>process-test-resources</phase>
+								<configuration>
+									<backup>true</backup>
+									<ampLocation>${project.build.directory}/alf-installation/amps_share</ampLocation>
+									<warLocation>${project.build.directory}/alf-installation/tomcat/webapps/share.war</warLocation>
+									<classifier>amp</classifier>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>run-alfresco</id>
+			<build>
+				<plugins>
+					<!-- Fetch JaCoCo agent and set the argLine property accordingly -->
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.6.3.201306030806</version>
+						<executions>
+							<execution>
+								<id>prepare-jacoco</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<includes>
+								<include>org.alfresco.*</include>
+							</includes>
+						</configuration>
+					</plugin>
+					<!-- Starts/stop the installed Alfresco -->
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start-alfresco</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<echo>Starting Alfresco...</echo>
+										<exec executable="${basedir}/target/alf-installation/alfresco.sh"
+											dir="target/alf-installation" failonerror="true">
+											<arg value="start" />
+											<env key="CATALINA_OPTS" value="${argLine}" />
+										</exec>
+										<sleep minutes="5" />
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop-alfresco</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<echo>Stopping Alfresco...</echo>
+										<exec executable="${basedir}/target/alf-installation/alfresco.sh"
+											dir="target/alf-installation" failonerror="true">
+											<arg value="stop" />
+										</exec>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
