@@ -21,25 +21,29 @@ package org.alfresco.solr.query;
 import java.io.IOException;
 
 import org.alfresco.repo.search.adaptor.lucene.QueryConstants;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.solr.data.GlobalReaders;
 import org.apache.lucene.index.AtomicReaderContext;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.Weight;
-import org.apache.lucene.util.Bits;
-import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.*;
+import org.apache.lucene.util.FixedBitSet;
+import org.apache.solr.search.*;
+
+import java.util.*;
 
 /**
  * @author Andy
  *
  */
-public class SolrAuthoritySetQuery extends AbstractAuthoritySetQuery
+public class SolrAuthoritySetQuery extends AbstractAuthoritySetQuery implements PostFilter
 {
     public SolrAuthoritySetQuery(String authorities)
     {
         super(authorities);
     }
-    
+
     @Override
     public Weight createWeight(IndexSearcher searcher) throws IOException
     {
@@ -47,7 +51,120 @@ public class SolrAuthoritySetQuery extends AbstractAuthoritySetQuery
         {
             throw new IllegalStateException("Must have a SolrIndexSearcher");
         }
-        return new SolrAuthoritySetQueryWeight((SolrIndexSearcher)searcher, this, authorities);
+
+        String[] auths = authorities.substring(1).split(authorities.substring(0, 1));
+
+        SolrIndexSearcher solrIndexSearcher = (SolrIndexSearcher)searcher;
+        Properties p = solrIndexSearcher.getSchema().getResourceLoader().getCoreProperties();
+        boolean doPermissionChecks = Boolean.parseBoolean(p.getProperty("alfresco.doPermissionChecks", "true"));
+
+        boolean hasGlobalRead = false;
+
+        final HashSet<String> globalReaders = GlobalReaders.getReaders();
+
+        for(String auth : auths)
+        {
+            if(globalReaders.contains(auth))
+            {
+                hasGlobalRead = true;
+                break;
+            }
+        }
+
+        if (hasGlobalRead || (doPermissionChecks == false))
+        {
+            return new MatchAllDocsQuery().createWeight(searcher);
+        }
+
+        BitsFilter readFilter  = getACLFilter(auths, QueryConstants.FIELD_READER, solrIndexSearcher);
+        BitsFilter ownerFilter = getOwnerFilter(auths, solrIndexSearcher);
+
+        if (globalReaders.contains(PermissionService.OWNER_AUTHORITY))
+        {
+            readFilter.or(ownerFilter);
+            return new ConstantScoreQuery(readFilter).createWeight(searcher);
+        }
+        else
+        {
+            String[] ownerAuth = {PermissionService.OWNER_AUTHORITY};
+            BitsFilter ownerReadFilter  = getACLFilter(ownerAuth, QueryConstants.FIELD_READER, solrIndexSearcher);
+            ownerReadFilter.and(ownerFilter);
+            readFilter.or(ownerReadFilter);
+            return new ConstantScoreQuery(readFilter).createWeight(searcher);
+        }
+    }
+
+    public DelegatingCollector getFilterCollector(IndexSearcher searcher){
+
+        String[] auths = authorities.substring(1).split(authorities.substring(0, 1));
+
+        SolrIndexSearcher solrIndexSearcher = (SolrIndexSearcher)searcher;
+        Properties p = solrIndexSearcher.getSchema().getResourceLoader().getCoreProperties();
+        boolean doPermissionChecks = Boolean.parseBoolean(p.getProperty("alfresco.doPermissionChecks", "true"));
+        boolean hasGlobalRead = false;
+
+        final HashSet<String> globalReaders = GlobalReaders.getReaders();
+
+        for(String auth : auths)
+        {
+            if(globalReaders.contains(auth))
+            {
+                hasGlobalRead = true;
+                break;
+            }
+        }
+
+        if (hasGlobalRead || (doPermissionChecks == false))
+        {
+            return new AllAccessCollector();
+        }
+
+        try
+        {
+            HybridBitSet aclSet = getACLSet(auths, QueryConstants.FIELD_READER, solrIndexSearcher);
+            BitsFilter ownerFilter = getOwnerFilter(auths, solrIndexSearcher);
+
+            if (globalReaders.contains(PermissionService.OWNER_AUTHORITY))
+            {
+                return new AccessControlCollector(aclSet, ownerFilter);
+            }
+            else
+            {
+                String[] ownerAuth = {PermissionService.OWNER_AUTHORITY};
+                HybridBitSet ownerAclSet = getACLSet(ownerAuth, QueryConstants.FIELD_READER, solrIndexSearcher);
+                return new AccessControlCollectorWithoutOwnerRead(aclSet, ownerAclSet, ownerFilter);
+            }
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getCost() {
+        //Hardcoded for testing PostFilter
+        return 201;
+    }
+
+    public void setCost(int cost) {
+
+    }
+
+    public boolean getCache() {
+        //Hardcorded for testing PostFilter
+        return false;
+    }
+
+    public void setCache(boolean cache) {
+
+    }
+
+    public boolean getCacheSep() {
+        return false;
+    }
+
+    public void setCacheSep(boolean sep) {
+
     }
 
     @Override
@@ -59,18 +176,133 @@ public class SolrAuthoritySetQuery extends AbstractAuthoritySetQuery
         return stringBuilder.toString();
     }
 
-    
-    private class SolrAuthoritySetQueryWeight extends AbstractAuthorityQueryWeight
+    private BitsFilter getOwnerFilter(String[] auths, SolrIndexSearcher searcher) throws IOException
     {
-        public SolrAuthoritySetQueryWeight(SolrIndexSearcher searcher, Query query, String authorities) throws IOException
+        BooleanQuery bQuery = new BooleanQuery();
+        for(String current : auths)
         {
-            super(searcher, query, QueryConstants.FIELD_AUTHORITYSET, authorities);
+            if (AuthorityType.getAuthorityType(current) == AuthorityType.USER)
+            {
+                bQuery.add(new TermQuery(new Term(QueryConstants.FIELD_OWNER, current)), BooleanClause.Occur.SHOULD);
+            }
         }
 
-        @Override
-        public Scorer scorer(AtomicReaderContext context, Bits acceptDocs) throws IOException
+        BitsFilterCollector collector = new BitsFilterCollector(searcher.getTopReaderContext().leaves().size());
+        searcher.search(bQuery,collector);
+        return collector.getBitsFilter();
+    }
+
+    class BitsFilterCollector extends Collector
+    {
+        private List<FixedBitSet> sets;
+        private FixedBitSet set;
+
+        public BitsFilterCollector(int leafCount)
         {
-            return SolrAuthoritySetScorer.createAuthoritySetScorer(this, context, acceptDocs, searcher, authorities);
+            this.sets = new ArrayList(leafCount);
+        }
+
+        public BitsFilter getBitsFilter() {
+            return new BitsFilter(sets);
+        }
+
+        public boolean acceptsDocsOutOfOrder() {
+            return false;
+        }
+
+        public void setNextReader(AtomicReaderContext context) throws IOException {
+            set = new FixedBitSet(context.reader().maxDoc());
+            sets.add(set);
+        }
+
+        public void setScorer(Scorer scorer) {
+
+        }
+
+        public void collect(int doc) {
+            set.set(doc);
         }
     }
+
+    class AccessControlCollector extends DelegatingCollector
+    {
+        private HybridBitSet aclIds;
+        private NumericDocValues fieldValues;
+        private BitsFilter ownerFilter;
+        private FixedBitSet ownerDocs;
+
+        public AccessControlCollector(HybridBitSet aclIds, BitsFilter ownerFilter)
+        {
+            this.aclIds=aclIds;
+            this.ownerFilter = ownerFilter;
+        }
+
+        public boolean acceptsDocsOutOfOrder()
+        {
+            return false;
+        }
+
+        public void setNextReader(AtomicReaderContext context) throws IOException
+        {
+            this.fieldValues = DocValuesCache.getNumericDocValues(QueryConstants.FIELD_ACLID, context.reader());
+            this.ownerDocs = ownerFilter.getBitSets().get(context.ord);
+            delegate.setNextReader(context);
+        }
+
+        public void setScorer(Scorer scorer) throws IOException
+        {
+            delegate.setScorer(scorer);
+        }
+
+        public void collect(int doc) throws IOException
+        {
+            long aclId = this.fieldValues.get(doc);
+            if(aclIds.get(aclId) || ownerDocs.get(doc))
+            {
+                delegate.collect(doc);
+            }
+        }
+    }
+
+    class AccessControlCollectorWithoutOwnerRead extends DelegatingCollector
+    {
+        private HybridBitSet aclIds;
+        private HybridBitSet ownerAclIds;
+        private NumericDocValues fieldValues;
+        private BitsFilter ownerFilter;
+        private FixedBitSet ownerDocs;
+        public AccessControlCollectorWithoutOwnerRead(HybridBitSet aclIds, HybridBitSet ownerAclIds, BitsFilter ownerFilter)
+        {
+            this.aclIds=aclIds;
+            this.ownerAclIds = ownerAclIds;
+            this.ownerFilter = ownerFilter;
+        }
+
+        public boolean acceptsDocsOutOfOrder()
+        {
+            return false;
+        }
+
+        public void setNextReader(AtomicReaderContext context) throws IOException
+        {
+            this.fieldValues = DocValuesCache.getNumericDocValues(QueryConstants.FIELD_ACLID, context.reader());
+            this.ownerDocs = ownerFilter.getBitSets().get(context.ord);
+            delegate.setNextReader(context);
+        }
+
+        public void setScorer(Scorer scorer) throws IOException
+        {
+            delegate.setScorer(scorer);
+        }
+
+        public void collect(int doc) throws IOException
+        {
+            long aclId = this.fieldValues.get(doc);
+            if(aclIds.get(aclId) || (ownerDocs.get(doc) && ownerAclIds.get(aclId)))
+            {
+                delegate.collect(doc);
+            }
+        }
+    }
+
 }
