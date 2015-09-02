@@ -37,22 +37,22 @@ import org.apache.lucene.index.NumericDocValues;
 
 public class DocValuesCache
 {
-    private static Map<String, WeakHashMap<Object, int[]>> intCache = new HashMap();
+    private static Map<String, WeakHashMap<Object, NumericDocValues>> cache = new HashMap();
 
-    public static synchronized int[] getIntValues(String field, AtomicReader reader) throws IOException
+    public static synchronized NumericDocValues getNumericDocValues(String field, AtomicReader reader) throws IOException
     {
-        WeakHashMap<Object, int[]> fieldCache = intCache.get(field);
+        WeakHashMap<Object, NumericDocValues> fieldCache = cache.get(field);
 
         if(fieldCache == null)
         {
             fieldCache = new WeakHashMap();
-            intCache.put(field, fieldCache);
+            cache.put(field, fieldCache);
         }
 
         Object cacheKey = reader.getCoreCacheKey();
-        int[] intValues = fieldCache.get(cacheKey);
+        NumericDocValues cachedValues = fieldCache.get(cacheKey);
 
-        if(intValues == null)
+        if(cachedValues == null)
         {
             NumericDocValues fieldValues = reader.getNumericDocValues(field);
             if(fieldValues == null)
@@ -62,18 +62,74 @@ public class DocValuesCache
             else
             {
                 int maxDoc = reader.maxDoc();
-                intValues = new int[maxDoc];
+                boolean longs = false;
+                int[] intValues = new int[maxDoc]; //Always start off with an int array.
+                SettableDocValues settableValues = new IntValues(intValues);
+
                 for(int i=0; i<maxDoc; i++)
                 {
-                    intValues[i] = (int)fieldValues.get(i);
+                    long value = fieldValues.get(i);
+                    if(value > Integer.MAX_VALUE && !longs)
+                    {
+                        longs = true;
+                        settableValues = new LongValues(intValues);
+                    }
+
+                    settableValues.set(i, value);
                 }
-                fieldCache.put(cacheKey, intValues);
-                return intValues;
+                fieldCache.put(cacheKey, settableValues);
+                return settableValues;
             }
         }
         else
         {
-            return intValues;
+            return cachedValues;
+        }
+    }
+
+    private static abstract class SettableDocValues extends NumericDocValues
+    {
+        public abstract void set(int index, long value);
+    }
+
+    private static class IntValues extends SettableDocValues
+    {
+        private int[] values;
+
+        public IntValues(int[] values)
+        {
+            this.values = values;
+        }
+
+        public void set(int index, long value)
+        {
+            this.values[index] = (int)value;
+        }
+
+        public long get(int index) {
+            return values[index];
+        }
+    }
+
+    private static class LongValues extends SettableDocValues
+    {
+        private long[] values;
+
+        public LongValues(int[] ivalues)
+        {
+            values = new long[ivalues.length];
+            //TODO: Validate to you can copy an int[] into a long[].
+            System.arraycopy(ivalues, 0, values, 0, ivalues.length);
+        }
+
+        public void set(int index, long value)
+        {
+            this.values[index] = value;
+        }
+
+        public long get(int index)
+        {
+            return values[index];
         }
     }
 }

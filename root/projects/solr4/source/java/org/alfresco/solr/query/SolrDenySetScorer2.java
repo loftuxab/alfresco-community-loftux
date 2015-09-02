@@ -84,12 +84,13 @@ public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
             {
                 for(AtomicReaderContext readerContext : searcher.getTopReaderContext().leaves() )
                 {
-                    int[] fieldValues = DocValuesCache.getIntValues(QueryConstants.FIELD_ACLID, readerContext.reader());
+                    int maxDoc = readerContext.reader().maxDoc();
+                    NumericDocValues fieldValues = DocValuesCache.getNumericDocValues(QueryConstants.FIELD_ACLID, readerContext.reader());
                     if(fieldValues != null)
                     {
-                        for(int i = 0; i < fieldValues.length; i++)
+                        for(int i = 0; i < maxDoc; i++)
                         {
-                            long aclID = fieldValues[i];
+                            long aclID = fieldValues.get(i);
                             Long key = getLong(aclID);
                             if(aclsFound.contains(key))
                             {
@@ -97,6 +98,7 @@ public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
                             }
                         }
                     }
+
             	}
             }
 
