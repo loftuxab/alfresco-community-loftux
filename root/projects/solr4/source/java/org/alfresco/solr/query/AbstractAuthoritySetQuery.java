@@ -125,7 +125,7 @@ public abstract class AbstractAuthoritySetQuery extends Query
         int ord = 0;
         while (iterator.hasNext()) {
             int doc = iterator.nextDoc();
-            if(doc > ceil)
+            if(doc >= ceil)
             {
                 do
                 {
@@ -136,7 +136,7 @@ public abstract class AbstractAuthoritySetQuery extends Query
                     ceil = base+reader.maxDoc();
                     aclValues = DocValuesCache.getNumericDocValues(QueryConstants.FIELD_ACLID, reader);
                 }
-                while(doc > ceil);
+                while(doc >= ceil);
             }
 
             long aclId = aclValues.get(doc-base);
