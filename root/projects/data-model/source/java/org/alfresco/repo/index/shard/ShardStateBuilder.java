@@ -69,9 +69,49 @@ class ShardStateBuilderBase<GeneratorT extends ShardStateBuilderBase<GeneratorT>
     }
 
     @SuppressWarnings("unchecked")
-    public GeneratorT withPropertyBag(HashMap<String, Object> aValue)
+    public GeneratorT withPropertyBag(HashMap<String, String> aValue)
     {
         instance.setPropertyBag(aValue);
+
+        return (GeneratorT) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public GeneratorT withLastUpdated(long aValue)
+    {
+        instance.setLastUpdated(aValue);
+
+        return (GeneratorT) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public GeneratorT withLastIndexedChangeSetId(long aValue)
+    {
+        instance.setLastIndexedChangeSetId(aValue);
+
+        return (GeneratorT) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public GeneratorT withLastIndexedTxCommitTime(long aValue)
+    {
+        instance.setLastIndexedTxCommitTime(aValue);
+
+        return (GeneratorT) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public GeneratorT withLastIndexedTxId(long aValue)
+    {
+        instance.setLastIndexedTxId(aValue);
+
+        return (GeneratorT) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public GeneratorT withLastIndexedChangeSetCommitTime(long aValue)
+    {
+        instance.setLastIndexedChangeSetCommitTime(aValue);
 
         return (GeneratorT) this;
     }
@@ -282,7 +322,7 @@ class ShardStateBuilderBase<GeneratorT extends ShardStateBuilderBase<GeneratorT>
         }
 
         @SuppressWarnings("unchecked")
-        public GeneratorT withPropertyBag(HashMap<String, Object> aValue)
+        public GeneratorT withPropertyBag(HashMap<String, String> aValue)
         {
             instance.setPropertyBag(aValue);
 
