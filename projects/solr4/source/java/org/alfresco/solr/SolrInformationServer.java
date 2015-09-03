@@ -300,7 +300,7 @@ public class SolrInformationServer implements InformationServer
         // build base URL - host and port have to come from configuration.
         
         Properties props = AlfrescoSolrDataModel.getCommonConfig();
-        port = Integer.parseInt(p.getProperty("solr.port", "8080"));
+        port = Integer.parseInt(props.getProperty("solr.port", "8080"));
         String defaultHost;
         try
         {
@@ -310,8 +310,8 @@ public class SolrInformationServer implements InformationServer
         {
             defaultHost = "localhost";
         }
-        hostName = p.getProperty("solr.host", defaultHost);
-        baseUrl =  p.getProperty("solr.baseUrl", "/solr4");
+        hostName = props.getProperty("solr.host", defaultHost);
+        baseUrl =  props.getProperty("solr.baseUrl", "/solr4");
         baseUrl = (baseUrl.startsWith("/") ? "" : "/") + baseUrl + "/" + core.getName() + "/";
     }
 

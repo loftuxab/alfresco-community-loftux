@@ -42,7 +42,7 @@ public class Floc implements Serializable
    
     private boolean hasContent;
     
-    private HashMap<String, Object> propertyBag = new HashMap<String, Object>();
+    private HashMap<String, String> propertyBag = new HashMap<String, String>();
     
     /**
      * 
@@ -134,7 +134,7 @@ public class Floc implements Serializable
     /**
      * @return the propertyBag
      */
-    public HashMap<String, Object> getPropertyBag()
+    public HashMap<String, String> getPropertyBag()
     {
         return propertyBag;
     }
@@ -142,7 +142,7 @@ public class Floc implements Serializable
     /**
      * @param propertyBag the propertyBag to set
      */
-    public void setPropertyBag(HashMap<String, Object> propertyBag)
+    public void setPropertyBag(HashMap<String, String> propertyBag)
     {
         this.propertyBag = propertyBag;
     }

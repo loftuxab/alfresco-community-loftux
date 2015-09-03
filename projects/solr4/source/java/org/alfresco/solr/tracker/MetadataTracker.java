@@ -117,18 +117,56 @@ public class MetadataTracker extends AbstractTracker implements Tracker
 
         checkShutdown();
         
+        
         if(!isMaster && isSlave)
         {
+            // Dynamic registration
+            
+            ShardState shardstate = getShardState();
+            client.getTransactions(0L, null, 0L, null, 0, shardstate);
             return;
         }
 
-        TrackerState state = super.getTrackerState();
-
         // Check we are tracking the correct repository
+        TrackerState state = super.getTrackerState();
         checkRepoAndIndexConsistency(state);
 
         checkShutdown();
         trackTransactions();
+    }
+
+    /**
+     * @param state 
+     * @return
+     */
+    private ShardState getShardState()
+    {
+        TrackerState state = super.getTrackerState();
+       
+        ShardState shardstate =  ShardStateBuilder.shardState()
+                .withMaster(isMaster)
+                .withLastUpdated(System.currentTimeMillis())
+                .withLastIndexedChangeSetCommitTime(state.getLastIndexedChangeSetCommitTime())
+                .withLastIndexedChangeSetId(state.getLastIndexedChangeSetId())
+                .withLastIndexedTxCommitTime(state.getLastIndexedTxCommitTime())
+                .withLastIndexedTxId(state.getLastIndexedTxId())
+                .withShardInstance()
+                    .withBaseUrl(infoSrv.getBaseUrl())
+                    .withPort(infoSrv.getPort())
+                    .withHostName(infoSrv.getHostName())
+                    .withShard()
+                        .withInstance(shardInstance)
+                        .withFloc()
+                            .withNumberOfShards(shardCount)
+                            .withAddedStoreRef(storeRef)
+                            .withTemplate(shardTemplate)
+                            .withHasContent(transformContent)
+                            .withShardMethod(ShardMethodEnum.MOD_ACL_ID)
+                            .endFloc()
+                        .endShard()
+                     .endShardInstance()
+                .build();
+        return shardstate;
     }
 
     /**
@@ -509,24 +547,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     {
         long actualTimeStep = timeStep;
 
-        ShardState shardstate =  ShardStateBuilder.shardState()
-                .withMaster(isMaster)
-                .withShardInstance()
-                    .withBaseUrl(infoSrv.getBaseUrl())
-                    .withPort(infoSrv.getPort())
-                    .withHostName(infoSrv.getHostName())
-                    .withShard()
-                        .withInstance(shardInstance)
-                        .withFloc()
-                            .withNumberOfShards(shardCount)
-                            .withAddedStoreRef(storeRef)
-                            .withTemplate(shardTemplate)
-                            .withHasContent(transformContent)
-                            .withShardMethod(ShardMethodEnum.MOD_ACL_ID)
-                            .endFloc()
-                        .endShard()
-                     .endShardInstance()
-                .build();
+        ShardState shardstate = getShardState();
         
         Transactions transactions;
         // step forward in time until we find something or hit the time bound

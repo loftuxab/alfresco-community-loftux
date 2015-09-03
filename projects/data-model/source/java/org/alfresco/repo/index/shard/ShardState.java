@@ -38,7 +38,18 @@ public class ShardState implements Serializable
         
     private boolean isMaster;
     
-    private HashMap<String, Object> propertyBag = new HashMap<String, Object>();
+    private long lastUpdated;
+    
+    private long lastIndexedChangeSetId;
+
+    private long lastIndexedTxCommitTime = 0;
+
+    private long lastIndexedTxId = 0;
+
+    private long lastIndexedChangeSetCommitTime = 0;
+    
+    
+    private HashMap<String, String> propertyBag = new HashMap<String, String>();
 
     public ShardState()
     {
@@ -79,7 +90,7 @@ public class ShardState implements Serializable
     /**
      * @return the propertyBag
      */
-    public HashMap<String, Object> getPropertyBag()
+    public HashMap<String, String> getPropertyBag()
     {
         return propertyBag;
     }
@@ -87,9 +98,90 @@ public class ShardState implements Serializable
     /**
      * @param propertyBag the propertyBag to set
      */
-    public void setPropertyBag(HashMap<String, Object> propertyBag)
+    public void setPropertyBag(HashMap<String, String> propertyBag)
     {
         this.propertyBag = propertyBag;
+    }
+    
+
+    /**
+     * @return the lastUpdated
+     */
+    public long getLastUpdated()
+    {
+        return lastUpdated;
+    }
+
+    /**
+     * @param lastUpdated the lastUpdated to set
+     */
+    public void setLastUpdated(long lastUpdated)
+    {
+        this.lastUpdated = lastUpdated;
+    }
+
+    /**
+     * @return the lastIndexedChangeSetId
+     */
+    public long getLastIndexedChangeSetId()
+    {
+        return lastIndexedChangeSetId;
+    }
+
+    /**
+     * @param lastIndexedChangeSetId the lastIndexedChangeSetId to set
+     */
+    public void setLastIndexedChangeSetId(long lastIndexedChangeSetId)
+    {
+        this.lastIndexedChangeSetId = lastIndexedChangeSetId;
+    }
+
+    /**
+     * @return the lastIndexedTxCommitTime
+     */
+    public long getLastIndexedTxCommitTime()
+    {
+        return lastIndexedTxCommitTime;
+    }
+
+    /**
+     * @param lastIndexedTxCommitTime the lastIndexedTxCommitTime to set
+     */
+    public void setLastIndexedTxCommitTime(long lastIndexedTxCommitTime)
+    {
+        this.lastIndexedTxCommitTime = lastIndexedTxCommitTime;
+    }
+
+    /**
+     * @return the lastIndexedTxId
+     */
+    public long getLastIndexedTxId()
+    {
+        return lastIndexedTxId;
+    }
+
+    /**
+     * @param lastIndexedTxId the lastIndexedTxId to set
+     */
+    public void setLastIndexedTxId(long lastIndexedTxId)
+    {
+        this.lastIndexedTxId = lastIndexedTxId;
+    }
+
+    /**
+     * @return the lastIndexedChangeSetCommitTime
+     */
+    public long getLastIndexedChangeSetCommitTime()
+    {
+        return lastIndexedChangeSetCommitTime;
+    }
+
+    /**
+     * @param lastIndexedChangeSetCommitTime the lastIndexedChangeSetCommitTime to set
+     */
+    public void setLastIndexedChangeSetCommitTime(long lastIndexedChangeSetCommitTime)
+    {
+        this.lastIndexedChangeSetCommitTime = lastIndexedChangeSetCommitTime;
     }
 
     /* (non-Javadoc)
@@ -98,9 +190,13 @@ public class ShardState implements Serializable
     @Override
     public String toString()
     {
-        return "ShardState [shardInstance=" + shardInstance + ", isMaster=" + isMaster + ", propertyBag=" + propertyBag + "]";
+        return "ShardState [shardInstance="
+                + shardInstance + ", isMaster=" + isMaster + ", lastUpdated=" + lastUpdated + ", lastIndexedChangeSetId=" + lastIndexedChangeSetId + ", lastIndexedTxCommitTime="
+                + lastIndexedTxCommitTime + ", lastIndexedTxId=" + lastIndexedTxId + ", lastIndexedChangeSetCommitTime=" + lastIndexedChangeSetCommitTime + ", propertyBag="
+                + propertyBag + "]";
     }
 
+  
 
     
 }
