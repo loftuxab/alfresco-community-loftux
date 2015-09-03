@@ -72,6 +72,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -245,6 +247,13 @@ public class SolrInformationServer implements InformationServer
     
     private ReentrantReadWriteLock commitAndRollbackLock = new ReentrantReadWriteLock();
     
+    private int port;
+    
+    private String hostName;
+    
+    private String baseUrl;
+
+    
     // write a BytesRef as a byte array
     JavaBinCodec.ObjectResolver resolver = new JavaBinCodec.ObjectResolver()
     {
@@ -260,7 +269,7 @@ public class SolrInformationServer implements InformationServer
             return o;
         }
     };
-   
+ 
     
     @Override
     public AlfrescoCoreAdminHandler getAdminHandler()
@@ -287,6 +296,23 @@ public class SolrInformationServer implements InformationServer
         dataModel = AlfrescoSolrDataModel.getInstance();
 
         contentStreamLimit = Integer.parseInt(p.getProperty("alfresco.contentStreamLimit", "10000000"));
+        
+        // build base URL - host and port have to come from configuration.
+        
+        Properties props = AlfrescoSolrDataModel.getCommonConfig();
+        port = Integer.parseInt(p.getProperty("solr.port", "8080"));
+        String defaultHost;
+        try
+        {
+            defaultHost = InetAddress.getLocalHost().getHostName();
+        }
+        catch (UnknownHostException e)
+        {
+            defaultHost = "localhost";
+        }
+        hostName = p.getProperty("solr.host", defaultHost);
+        baseUrl =  p.getProperty("solr.baseUrl", "/solr4");
+        baseUrl = (baseUrl.startsWith("/") ? "" : "/") + baseUrl + "/" + core.getName() + "/";
     }
 
     synchronized public void initSkippingDescendantDocs()
@@ -3047,5 +3073,32 @@ public class SolrInformationServer implements InformationServer
             }
         }
         
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.solr.InformationServer#getUrl()
+     */
+    @Override
+    public String getBaseUrl()
+    {
+        return baseUrl;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.solr.InformationServer#getPort()
+     */
+    @Override
+    public int getPort()
+    {
+        return port;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.solr.InformationServer#getHostName()
+     */
+    @Override
+    public String getHostName()
+    {
+       return hostName;
     }
 }
