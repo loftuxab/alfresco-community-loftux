@@ -28,6 +28,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.httpclient.AuthenticationException;
+import org.alfresco.repo.index.shard.ShardMethodEnum;
+import org.alfresco.repo.index.shard.ShardState;
+import org.alfresco.repo.index.shard.ShardStateBuilder;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.BoundedDeque;
 import org.alfresco.solr.InformationServer;
@@ -37,10 +40,10 @@ import org.alfresco.solr.adapters.IOpenBitSet;
 import org.alfresco.solr.client.GetNodesParameters;
 import org.alfresco.solr.client.Node;
 import org.alfresco.solr.client.Node.SolrApiNodeStatus;
-import org.alfresco.solr.client.SOLRAPIClient.SolrApiContentStatus;
 import org.alfresco.solr.client.SOLRAPIClient;
 import org.alfresco.solr.client.Transaction;
 import org.alfresco.solr.client.Transactions;
+import org.apache.commons.codec.EncoderException;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +84,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     }
 
     @Override
-    protected void doTrack() throws AuthenticationException, IOException, JSONException
+    protected void doTrack() throws AuthenticationException, IOException, JSONException, EncoderException
     {
         // MetadataTracker must wait until ModelTracker has run
         ModelTracker modelTracker = this.infoSrv.getAdminHandler().getTrackerRegistry().getModelTracker();
@@ -102,7 +105,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     }
 
 
-    private void trackRepository() throws IOException, AuthenticationException, JSONException
+    private void trackRepository() throws IOException, AuthenticationException, JSONException, EncoderException
     {
         // Is the InformationServer ready to update
         int registeredSearcherCount = this.infoSrv.getRegisteredSearcherCount();
@@ -502,17 +505,36 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     }
 
     protected Transactions getSomeTransactions(BoundedDeque<Transaction> txnsFound, Long fromCommitTime, long timeStep,
-                int maxResults, long endTime) throws AuthenticationException, IOException, JSONException
+                int maxResults, long endTime) throws AuthenticationException, IOException, JSONException, EncoderException
     {
         long actualTimeStep = timeStep;
 
+        ShardState shardstate =  ShardStateBuilder.shardState()
+                .withMaster(isMaster)
+                .withShardInstance()
+                    .withBaseUrl(infoSrv.getBaseUrl())
+                    .withPort(infoSrv.getPort())
+                    .withHostName(infoSrv.getHostName())
+                    .withShard()
+                        .withInstance(shardInstance)
+                        .withFloc()
+                            .withNumberOfShards(shardCount)
+                            .withAddedStoreRef(storeRef)
+                            .withTemplate(shardTemplate)
+                            .withHasContent(transformContent)
+                            .withShardMethod(ShardMethodEnum.MOD_ACL_ID)
+                            .endFloc()
+                        .endShard()
+                     .endShardInstance()
+                .build();
+        
         Transactions transactions;
         // step forward in time until we find something or hit the time bound
         // max id unbounded
         Long startTime = fromCommitTime == null ? Long.valueOf(0L) : fromCommitTime;
         do
         {
-            transactions = client.getTransactions(startTime, null, startTime + actualTimeStep, null, maxResults);
+            transactions = client.getTransactions(startTime, null, startTime + actualTimeStep, null, maxResults, shardstate);
             startTime += actualTimeStep;
             //actualTimeStep *= 2; 
             if (actualTimeStep > TIME_STEP_32_DAYS_IN_MS)
@@ -525,7 +547,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         return transactions;
     }
 
-    protected void trackTransactions() throws AuthenticationException, IOException, JSONException
+    protected void trackTransactions() throws AuthenticationException, IOException, JSONException, EncoderException
     {
         long startElapsed = System.nanoTime();
         
@@ -867,7 +889,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     }
 
     public IndexHealthReport checkIndex(Long toTx, Long toAclTx, Long fromTime, Long toTime)
-                throws IOException, AuthenticationException, JSONException
+                throws IOException, AuthenticationException, JSONException, EncoderException
     {
         // DB TX Count
         long firstTransactionCommitTime = 0;

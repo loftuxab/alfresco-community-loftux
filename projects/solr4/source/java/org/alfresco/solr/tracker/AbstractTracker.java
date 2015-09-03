@@ -59,13 +59,17 @@ public abstract class AbstractTracker implements Tracker
     private volatile boolean shutdown = false;
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private volatile TrackerState state;
-    private int shardCount;
-    private int shardInstance;
+    protected int shardCount;
+    protected int shardInstance;
+    protected boolean transformContent;
+    protected String shardTemplate;
     
     /*
      * A thread handler can be used by subclasses, but they have to intentionally instantiate it.
      */
     protected ThreadHandler threadHandler;
+   
+   
    
 
     /**
@@ -90,6 +94,9 @@ public abstract class AbstractTracker implements Tracker
         
         shardCount =  Integer.parseInt(p.getProperty("acl.shard.count", "0"));
         shardInstance =  Integer.parseInt(p.getProperty("acl.shard.instance", "0"));
+        shardTemplate =  p.getProperty("acl.shard.template", "");
+        
+        transformContent = Boolean.parseBoolean(p.getProperty("alfresco.index.transformContent", "true"));
 
         this.trackerStats = this.infoSrv.getTrackerStats();
 
@@ -338,4 +345,6 @@ public abstract class AbstractTracker implements Tracker
     {
         return alfrescoVersion;
     }
+    
+    
 }

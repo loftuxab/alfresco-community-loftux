@@ -51,6 +51,7 @@ import org.alfresco.solr.tracker.Tracker;
 import org.alfresco.solr.tracker.TrackerRegistry;
 import org.alfresco.util.CachingDateFormat;
 import org.alfresco.util.shard.ExplicitShardingPolicy;
+import org.apache.commons.codec.EncoderException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.apache.solr.common.params.SolrParams;
@@ -323,6 +324,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         try
         {
             SolrParams params = req.getParams();
+            req.getContext();
             
             // If numCore > 1 we are createing a collection of cores for a sole node in a cluster
             int numShards = params.getInt("numShards", 1);
@@ -551,7 +553,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
 
 
-    private void actionFIX(String coreName) throws AuthenticationException, IOException, JSONException
+    private void actionFIX(String coreName) throws AuthenticationException, IOException, JSONException, EncoderException
     {
         // Gets Metadata health and fixes any problems
         MetadataTracker metadataTracker = trackerRegistry.getTrackerForCore(coreName, MetadataTracker.class);
@@ -632,7 +634,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
 
 
     private NamedList<Object> buildAclTxReport(String coreName, AclTracker tracker, Long acltxid) 
-                throws AuthenticationException, IOException, JSONException
+                throws AuthenticationException, IOException, JSONException, EncoderException
     {
         NamedList<Object> nr = new SimpleOrderedMap<Object>();
         nr.add("TXID", acltxid);
@@ -666,7 +668,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
 
     private NamedList<Object> buildTxReport(String coreName, MetadataTracker tracker, Long txid) 
-                throws AuthenticationException, IOException, JSONException
+                throws AuthenticationException, IOException, JSONException, EncoderException
     {
         NamedList<Object> nr = new SimpleOrderedMap<Object>();
         nr.add("TXID", txid);
@@ -727,7 +729,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
 
     private NamedList<Object> buildTrackerReport(String coreName, Long fromTx, Long toTx, Long fromAclTx, Long toAclTx,
-                Long fromTime, Long toTime) throws IOException, JSONException, AuthenticationException
+                Long fromTime, Long toTime) throws IOException, JSONException, AuthenticationException, EncoderException
     {
         // ACL
         AclTracker aclTracker = trackerRegistry.getTrackerForCore(coreName, AclTracker.class);
@@ -823,7 +825,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
     
     private void actionTXREPORT(SolrQueryResponse rsp, SolrParams params, String cname) throws AuthenticationException,
-                IOException, JSONException
+                IOException, JSONException, EncoderException
     {
         if (params.get(ARG_TXID) == null)
         {
@@ -853,7 +855,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
 
     private void actionACLTXREPORT(SolrQueryResponse rsp, SolrParams params, String cname)
-                throws AuthenticationException, IOException, JSONException
+                throws AuthenticationException, IOException, JSONException, EncoderException
     {
         if (params.get(ARG_ACLTXID) == null)
         {
@@ -882,7 +884,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     }
 
     private void actionREPORT(SolrQueryResponse rsp, SolrParams params, String cname) throws IOException,
-                JSONException, AuthenticationException
+                JSONException, AuthenticationException, EncoderException
     {
         Long fromTime = getSafeLong(params, "fromTime");
         Long toTime = getSafeLong(params, "toTime");

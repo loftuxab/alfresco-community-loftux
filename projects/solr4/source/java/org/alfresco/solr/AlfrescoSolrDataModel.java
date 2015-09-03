@@ -554,7 +554,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
         return qnameFilter;
     }
     
-    private Properties getCommonConfig()
+    public static Properties getCommonConfig()
     {
         QNameFilter qnameFilter = null;
         FileSystemXmlApplicationContext ctx = null;
@@ -611,7 +611,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
         }
     }
     
-    private File getResourceDirectory()
+    private static File getResourceDirectory()
     {
         return new File(SolrResourceLoader.locateSolrHome(), "conf");
     }  
