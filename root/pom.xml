@@ -1132,7 +1132,6 @@
         <modules>
             <module>packaging</module>
             <module>projects/qa-share</module>
-            <module>projects/share</module>
             <module>enterpriseprojects/packaging</module>
             <module>enterpriseprojects/packaging/rpm</module>
             <module>privatemodules</module>
