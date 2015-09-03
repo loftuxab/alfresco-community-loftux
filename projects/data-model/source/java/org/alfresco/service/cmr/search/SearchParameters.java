@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -1237,7 +1237,7 @@ public class SearchParameters implements BasicSearchParameters
         String field;
         String prefix = null;
         FieldFacetSort sort = null;
-        Integer limit = null;
+        Integer limitOrNull = null;
         int offset = 0;
         int minCount = 0;
         boolean countDocsMissingFacetField = false;
@@ -1279,14 +1279,32 @@ public class SearchParameters implements BasicSearchParameters
             this.sort = sort;
         }
 
-        public Integer getLimit()
+        @Deprecated 
+        /**
+         * Will return 100 as the old default but this is now defined in configuration and will be wrong if no explicitly set
+         * 
+         * @return
+         */
+        public int getLimit()
         {
-            return limit;
+            return limitOrNull == null ? 100 : limitOrNull.intValue();
         }
 
+        @Deprecated
         public void setLimit(int limit)
         {
-            this.limit = limit;
+            this.limitOrNull = limit;
+        }
+        
+        public void setLimitOrNull(Integer limitOrNull)
+        {
+            this.limitOrNull = limitOrNull;
+        }
+        
+        
+        public Integer getLimitOrNull()
+        {
+            return limitOrNull;
         }
 
         public int getOffset()
@@ -1347,7 +1365,7 @@ public class SearchParameters implements BasicSearchParameters
             result = prime * result + (countDocsMissingFacetField ? 1231 : 1237);
             result = prime * result + enumMethodCacheMinDF;
             result = prime * result + ((field == null) ? 0 : field.hashCode());
-            result = prime * result + limit;
+            result = prime * result + ((limitOrNull == null) ? 0 : limitOrNull.hashCode());
             result = prime * result + ((method == null) ? 0 : method.hashCode());
             result = prime * result + minCount;
             result = prime * result + offset;
@@ -1377,7 +1395,12 @@ public class SearchParameters implements BasicSearchParameters
             }
             else if (!field.equals(other.field))
                 return false;
-            if (limit != other.limit)
+            if (limitOrNull == null)
+            {
+                if (other.limitOrNull != null)
+                    return false;
+            }
+            else if (!limitOrNull.equals(other.limitOrNull))
                 return false;
             if (method != other.method)
                 return false;
