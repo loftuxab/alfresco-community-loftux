@@ -856,8 +856,8 @@ public class DynamicModelCmisTest extends AbstractCMMQATest
         cmisApiClient.updateProperties(bindingType, authDetails, "", docNodeRef, aspectProps);
         
         // Refresh DetailsPage
-        
-        docDetailsPage = docDetailsPage.render();
+        driver.navigate().refresh();
+        docDetailsPage = factoryPage.getPage(driver).render();
         
         // Check updated Properties
         Assert.assertEquals(docDetailsPage.getProperties().get(getDocDetailsPropName(cmisTypePropName)), "alfresco-cmm", "Property Values incorrect when optional properties not specified: " + cmisTypePropName);

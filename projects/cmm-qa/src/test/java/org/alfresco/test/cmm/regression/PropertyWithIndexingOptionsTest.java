@@ -172,7 +172,7 @@ public class PropertyWithIndexingOptionsTest extends AbstractCMMQATest
     }
     
     @AlfrescoTest(testlink="tobeaddeddel2")
-    @Test(groups = "EnterpriseOnly", priority=2, enabled = false)
+    @Test(groups = "EnterpriseOnly", priority=2, enabled = true)
     public void testNumericPropIndexingOptions() throws Exception
     {
         String testName = getUniqueTestName();
