@@ -57,12 +57,10 @@
 			<class name="org.alfresco.test.cmm.regression.PropertyWithConstraintShareTest"/>				
 		</classes>
     </test>
-<!--	
     <test name="regression-tests-property-indexing-test">
 		<classes>
 			<class name="org.alfresco.test.cmm.regression.PropertyWithIndexingOptionsTest"/>				
 		</classes>
-    </test>    
---> 
+    </test> 
 </tests>  
 </suite>
