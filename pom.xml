@@ -1168,6 +1168,7 @@
             <db.master.url>jdbc:mysql://localhost/</db.master.url>
             <db.driver>com.mysql.jdbc.Driver</db.driver>
             <db.url>jdbc:mysql://localhost/${db.name}</db.url>
+            <db.create.command>create database ${db.name} CHARACTER SET utf8 COLLATE utf8_bin;</db.create.command>
         </properties>
     </profile>
 
