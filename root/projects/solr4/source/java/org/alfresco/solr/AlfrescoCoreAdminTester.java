@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -49,6 +49,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.impl.QueryParserUtils;
 import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.MLText;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -398,7 +399,7 @@ public class AlfrescoCoreAdminTester
             mlText.addValue(Locale.GERMAN, "banane");
             mlText.addValue(new Locale("el"), "μπανάνα");
             mlText.addValue(Locale.ITALIAN, "banana");
-            mlText.addValue(new Locale("ja"), "バナナ");
+            mlText.addValue(new Locale("ja"), "�?ナナ");
             mlText.addValue(new Locale("ko"), "바나나");
             mlText.addValue(new Locale("pt"), "banana");
             mlText.addValue(new Locale("ru"), "банан");
@@ -586,7 +587,10 @@ public class AlfrescoCoreAdminTester
                         ContentModel.PROP_MODIFIED,
                         new StringPropertyValue(DefaultTypeConverter.INSTANCE
                                     .convert(String.class, explicitCreatedDate)));
-
+            MLTextPropertyValue title = new MLTextPropertyValue();
+            title.addValue(Locale.ENGLISH, "English123");
+            title.addValue(Locale.FRENCH, "French123");
+            properties14.put(ContentModel.PROP_TITLE, title);
             NodeRef n14NodeRef = new NodeRef(new StoreRef("workspace", "SpacesStore"), createGUID());
             QName n14QName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "fourteen");
             QName n14QNameCommon = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "common");
@@ -604,7 +608,7 @@ public class AlfrescoCoreAdminTester
                         n14QNameCommon, n14NodeRef, false, 0);
             ChildAssociationRef n14CAR_13 = new ChildAssociationRef(ContentModel.ASSOC_CONTAINS, n13NodeRef,
                         n14QNameCommon, n14NodeRef, false, 0);
-            addNode(core, dataModel, 1, 15, 1, ContentModel.TYPE_CONTENT, null, properties14, content14, "noodle",
+            addNode(core, dataModel, 1, 15, 1, ContentModel.TYPE_CONTENT, new QName[] {ContentModel.ASPECT_TITLED }, properties14, content14, "noodle",
                         new ChildAssociationRef[] { n14CAR, n14CAR_1, n14CAR_2, n14CAR_5, n14CAR_6, n14CAR_12,
                                     n14CAR_13 }, new NodeRef[] { rootNodeRef, n01NodeRef, n05NodeRef, n12NodeRef,
                                     n13NodeRef }, new String[] {
@@ -6137,6 +6141,26 @@ public class AlfrescoCoreAdminTester
         // 1 word in text 1..2 in query
         testQueryByHandler(report, core, "/afts", "lazy", 1, null, null, null, null, null);
         testQueryByHandler(report, core, "/afts", "bone AND idle", 1, null, null, null, null, null);
+        
+        
+        // Cross language support and tokenisation part and full.
+        testQueryByHandler(report, core, "/afts", "title:English", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:English123", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French123", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:123", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        
+        testQueryByHandler(report, core, "/afts", "title:English", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:English123", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French123", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:123", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        
+        testQueryByHandler(report, core, "/afts", "title:English", 1, null, null, Locale.GERMAN, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:English123", 1, null, null, Locale.GERMAN, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French", 1, null, null, Locale.GERMAN, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French123", 1, null, null, Locale.GERMAN, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:123", 1, null, null, Locale.GERMAN, null, null, (String) null);
  
     }
 
@@ -7739,7 +7763,7 @@ public class AlfrescoCoreAdminTester
                         "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":banana", 1,
                         Locale.ITALIAN, null, null);
             testQuery(dataModel, report, solrIndexSearcher,
-                        "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":バナナ", 1, new Locale(
+                        "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":�?ナナ", 1, new Locale(
                                     "ja"), null, null);
             testQuery(dataModel, report, solrIndexSearcher,
                         "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":바나나", 1, new Locale(
