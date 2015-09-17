@@ -2429,6 +2429,10 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 				{
 					continue NEXT_TEST;
 				}
+				else if((test.startOffset() == candidate.startOffset()) && ( candidate.endOffset() == test.endOffset()) && (test.toString().equals(candidate.toString())))
+				{
+				    continue NEXT_TEST;
+				}
 				else if((test.startOffset() <= candidate.startOffset()) && ( candidate.endOffset() <= test.endOffset()) && (test.toString().contains(candidate.toString())))
 				{
 					continue NEXT_CANDIDATE;
