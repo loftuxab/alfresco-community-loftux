@@ -3,7 +3,7 @@
   <parent>
     <groupId>se.loftux.alfresco</groupId>
     <artifactId>alfresco-parent</artifactId>
-    <version>LX80</version>
+    <version>LX81</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>alfresco-core</artifactId>
@@ -11,7 +11,7 @@
   <description>Alfresco core libraries and utils</description>
 
   <dependencies>
-    <!--  These dependencies have been checked against the content of 3rd-party/lib/**. 
+    <!--  These dependencies have been checked against the content of 3rd-party/lib/**.
         | Where not public available (AKA patched), they have been deployed with the "patched" classifier
         | in the Alfresco Artifacts Repository at artfifacts.alfresco.com thirdparty repository
          -->
