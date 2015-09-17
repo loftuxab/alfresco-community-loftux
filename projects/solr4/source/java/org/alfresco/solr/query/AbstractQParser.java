@@ -53,6 +53,7 @@ import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
 import org.alfresco.solr.AlfrescoSolrDataModel.IndexedField;
 import org.alfresco.util.Pair;
 import org.apache.commons.io.IOUtils;
+import org.apache.lucene.util.ArrayUtil;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
@@ -594,6 +595,11 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
 
         int start = startS != null ? Integer.parseInt(startS) : 0;
         int rows = rowsS != null ? Integer.parseInt(rowsS) : 10;
+        // Avoid +1 in SOLR code which produces null:java.lang.NegativeArraySizeException at at org.apache.lucene.util.PriorityQueue.<init>(PriorityQueue.java:56)
+        if(rows >  1000000)
+        {
+            rows = 1000000;
+        }
 
         // Fix sort fields here
         if(sortStr != null)
