@@ -23,7 +23,6 @@ import static org.alfresco.repo.search.adaptor.lucene.QueryConstants.FIELD_SOLR4
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -46,7 +45,6 @@ import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
 import org.alfresco.solr.AlfrescoSolrDataModel.TenantAclIdDbId;
 import org.alfresco.solr.content.SolrContentStore;
 import org.alfresco.solr.content.SolrContentUrlBuilder;
-import org.alfresco.solr.transformer.CachedDocTransformer;
 import org.apache.lucene.analysis.CachingTokenFilter;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -70,12 +68,10 @@ import org.apache.lucene.search.vectorhighlight.FastVectorHighlighter;
 import org.apache.lucene.search.vectorhighlight.FieldQuery;
 import org.apache.lucene.search.vectorhighlight.FragListBuilder;
 import org.apache.lucene.search.vectorhighlight.FragmentsBuilder;
-import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.AttributeSource.State;
-import org.apache.solr.common.SolrDocument;
+import org.apache.lucene.util.BytesRef;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.HighlightParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.JavaBinCodec;
@@ -99,7 +95,6 @@ import org.apache.solr.highlight.SolrFragmenter;
 import org.apache.solr.highlight.SolrFragmentsBuilder;
 import org.apache.solr.highlight.SolrHighlighter;
 import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.response.transform.TransformContext;
 import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.schema.SchemaField;
 import org.apache.solr.search.DocIterator;
@@ -650,7 +645,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         SolrParams params = req.getParams();
 
         // preserve order of values in a multiValued list
-        boolean preserveMulti = params.getFieldBool(fieldName, HighlightParams.PRESERVE_MULTI, false);
+        boolean preserveMulti = params.getFieldBool(inputFieldName, HighlightParams.PRESERVE_MULTI, false);
 
         List<IndexableField> allFields = doc.getFields();
         if (allFields != null && allFields.size() == 0)
@@ -658,8 +653,8 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         // although currently it can't.
 
         TokenStream tstream = null;
-        int numFragments = getMaxSnippets(fieldName, params);
-        boolean mergeContiguousFragments = isMergeContiguousFragments(fieldName, params);
+        int numFragments = getMaxSnippets(inputFieldName, params);
+        boolean mergeContiguousFragments = isMergeContiguousFragments(inputFieldName, params);
 
         String[] summaries = null;
         List<TextFragment> frags = new ArrayList<>();
@@ -696,7 +691,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
                 tstream = createAnalyzerTStream(schema, fieldName, thisText);
             }
 
-            int maxCharsToAnalyze = params.getFieldInt(fieldName, HighlightParams.MAX_CHARS, Highlighter.DEFAULT_MAX_CHARS_TO_ANALYZE);
+            int maxCharsToAnalyze = params.getFieldInt(inputFieldName, HighlightParams.MAX_CHARS, Highlighter.DEFAULT_MAX_CHARS_TO_ANALYZE);
 
             Highlighter highlighter;
             if (Boolean.valueOf(req.getParams().get(HighlightParams.USE_PHRASE_HIGHLIGHTER, "true")))
@@ -944,7 +939,6 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
     
     private Document getDocument(Document doc, SolrQueryRequest req) throws IOException
     {
-        Document cachedDoc = null;
         try
         {
             String id = getFieldValueString(doc, FIELD_SOLR4_ID);
@@ -952,7 +946,10 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
             SolrInputDocument sid = retrieveDocFromSolrContentStore(tenantAndDbId.tenant, tenantAndDbId.dbId);
             if(sid == null)
             {
-            	return new Document();
+                sid = new SolrInputDocument();
+            	sid.addField(FIELD_SOLR4_ID, id);
+            	sid.addField("_version_", 0);
+            	return DocumentBuilder.toDocument(sid, req.getSchema());
             }
             else
             {
