@@ -319,14 +319,14 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
      * @throws IOException
      *             If there is a low-level I/O error.
      */
-    protected Highlighter getPhraseHighlighter(Query query, String fieldName, SolrQueryRequest request, CachingTokenFilter tokenStream) throws IOException
+    protected Highlighter getPhraseHighlighter(Query query, String requestFieldname, String schemaFieldName, SolrQueryRequest request, CachingTokenFilter tokenStream) throws IOException
     {
         SolrParams params = request.getParams();
         Highlighter highlighter = null;
 
-        highlighter = new Highlighter(getFormatter(fieldName, params), getEncoder(fieldName, params), getSpanQueryScorer(query, fieldName, tokenStream, request));
+        highlighter = new Highlighter(getFormatter(requestFieldname, params), getEncoder(requestFieldname, params), getSpanQueryScorer(query, requestFieldname, schemaFieldName, tokenStream, request));
 
-        highlighter.setTextFragmenter(getFragmenter(fieldName, params));
+        highlighter.setTextFragmenter(getFragmenter(requestFieldname, params));
 
         return highlighter;
     }
@@ -341,11 +341,11 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
      * @param request
      *            The current SolrQueryRequest
      */
-    protected Highlighter getHighlighter(Query query, String fieldName, SolrQueryRequest request)
+    protected Highlighter getHighlighter(Query query, String requestFieldname, String schemaFieldName, SolrQueryRequest request)
     {
         SolrParams params = request.getParams();
-        Highlighter highlighter = new Highlighter(getFormatter(fieldName, params), getEncoder(fieldName, params), getQueryScorer(query, fieldName, request));
-        highlighter.setTextFragmenter(getFragmenter(fieldName, params));
+        Highlighter highlighter = new Highlighter(getFormatter(requestFieldname, params), getEncoder(requestFieldname, params), getQueryScorer(query, requestFieldname, schemaFieldName, request));
+        highlighter.setTextFragmenter(getFragmenter(requestFieldname, params));
         return highlighter;
     }
 
@@ -361,9 +361,9 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
      * @param request
      *            The SolrQueryRequest
      */
-    private QueryScorer getSpanQueryScorer(Query query, String fieldName, TokenStream tokenStream, SolrQueryRequest request)
+    private QueryScorer getSpanQueryScorer(Query query, String requestFieldname, String schemaFieldName, TokenStream tokenStream, SolrQueryRequest request)
     {
-        boolean reqFieldMatch = request.getParams().getFieldBool(fieldName, HighlightParams.FIELD_MATCH, false);
+        boolean reqFieldMatch = request.getParams().getFieldBool(requestFieldname, HighlightParams.FIELD_MATCH, false);
         Boolean highlightMultiTerm = request.getParams().getBool(HighlightParams.HIGHLIGHT_MULTI_TERM, true);
         if (highlightMultiTerm == null)
         {
@@ -372,7 +372,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         QueryScorer scorer;
         if (reqFieldMatch)
         {
-            scorer = new QueryScorer(query, fieldName);
+            scorer = new QueryScorer(query, schemaFieldName);
         }
         else
         {
@@ -392,12 +392,12 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
      * @param request
      *            The SolrQueryRequest
      */
-    private Scorer getQueryScorer(Query query, String fieldName, SolrQueryRequest request)
+    private Scorer getQueryScorer(Query query, String requestFieldname, String schemaFieldName, SolrQueryRequest request)
     {
-        boolean reqFieldMatch = request.getParams().getFieldBool(fieldName, HighlightParams.FIELD_MATCH, false);
+        boolean reqFieldMatch = request.getParams().getFieldBool(requestFieldname, HighlightParams.FIELD_MATCH, false);
         if (reqFieldMatch)
         {
-            return new QueryTermScorer(query, request.getSearcher().getIndexReader(), fieldName);
+            return new QueryTermScorer(query, request.getSearcher().getIndexReader(), schemaFieldName);
         }
         else
         {
@@ -627,9 +627,9 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         return termPosOff;
     }
 
-    private void doHighlightingByHighlighter(Query query, SolrQueryRequest req, NamedList docSummaries, int docId, Document doc, String inputFieldName) throws IOException
+    private void doHighlightingByHighlighter(Query query, SolrQueryRequest req, NamedList docSummaries, int docId, Document doc, String requestFieldname) throws IOException
     {
-        String fieldName = AlfrescoSolrDataModel.getInstance().mapProperty(inputFieldName, FieldUse.HIGHLIGHT, req);
+        String schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty(requestFieldname, FieldUse.HIGHLIGHT, req);
         
         final SolrIndexSearcher searcher = req.getSearcher();
         final IndexSchema schema = searcher.getSchema();
@@ -637,7 +637,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         // TODO: Currently in trunk highlighting numeric fields is broken (Lucene) -
         // so we disable them until fixed (see LUCENE-3080)!
         // BEGIN: Hack
-        final SchemaField schemaField = schema.getFieldOrNull(fieldName);
+        final SchemaField schemaField = schema.getFieldOrNull(schemaFieldName);
         if (schemaField != null && ((schemaField.getType() instanceof org.apache.solr.schema.TrieField) || (schemaField.getType() instanceof org.apache.solr.schema.TrieDateField)))
             return;
         // END: Hack
@@ -645,7 +645,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         SolrParams params = req.getParams();
 
         // preserve order of values in a multiValued list
-        boolean preserveMulti = params.getFieldBool(inputFieldName, HighlightParams.PRESERVE_MULTI, false);
+        boolean preserveMulti = params.getFieldBool(requestFieldname, HighlightParams.PRESERVE_MULTI, false);
 
         List<IndexableField> allFields = doc.getFields();
         if (allFields != null && allFields.size() == 0)
@@ -653,14 +653,14 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         // although currently it can't.
 
         TokenStream tstream = null;
-        int numFragments = getMaxSnippets(inputFieldName, params);
-        boolean mergeContiguousFragments = isMergeContiguousFragments(inputFieldName, params);
+        int numFragments = getMaxSnippets(requestFieldname, params);
+        boolean mergeContiguousFragments = isMergeContiguousFragments(requestFieldname, params);
 
         String[] summaries = null;
         List<TextFragment> frags = new ArrayList<>();
 
         TermOffsetsTokenStream tots = null; // to be non-null iff we're using TermOffsets optimization
-        TokenStream tvStream = TokenSources.getTokenStreamWithOffsets(searcher.getIndexReader(), docId, fieldName);
+        TokenStream tvStream = TokenSources.getTokenStreamWithOffsets(searcher.getIndexReader(), docId, schemaFieldName);
         if (tvStream != null)
         {
             tots = new TermOffsetsTokenStream(tvStream);
@@ -673,7 +673,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
             if (mvToExamine <= 0 || mvToMatch <= 0)
                 break;
 
-            if (!thisField.name().equals(fieldName))
+            if (!thisField.name().equals(schemaFieldName))
                 continue; // Is there a better way to do this?
 
             --mvToExamine;
@@ -688,10 +688,10 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
             else
             {
                 // fall back to analyzer
-                tstream = createAnalyzerTStream(schema, fieldName, thisText);
+                tstream = createAnalyzerTStream(schema, schemaFieldName, thisText);
             }
 
-            int maxCharsToAnalyze = params.getFieldInt(inputFieldName, HighlightParams.MAX_CHARS, Highlighter.DEFAULT_MAX_CHARS_TO_ANALYZE);
+            int maxCharsToAnalyze = params.getFieldInt(requestFieldname, HighlightParams.MAX_CHARS, Highlighter.DEFAULT_MAX_CHARS_TO_ANALYZE);
 
             Highlighter highlighter;
             if (Boolean.valueOf(req.getParams().get(HighlightParams.USE_PHRASE_HIGHLIGHTER, "true")))
@@ -706,7 +706,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
                 }
 
                 // get highlighter
-                highlighter = getPhraseHighlighter(query, fieldName, req, (CachingTokenFilter) tstream);
+                highlighter = getPhraseHighlighter(query, requestFieldname, schemaFieldName, req, (CachingTokenFilter) tstream);
 
                 // after highlighter initialization, reset tstream since construction of highlighter already used it
                 tstream.reset();
@@ -714,7 +714,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
             else
             {
                 // use "the old way"
-                highlighter = getHighlighter(query, fieldName, req);
+                highlighter = getHighlighter(query, requestFieldname, schemaFieldName, req);
             }
 
             if (maxCharsToAnalyze < 0)
@@ -794,12 +794,12 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
             }
             summaries = fragTexts.toArray(new String[0]);
             if (summaries.length > 0)
-                docSummaries.add(inputFieldName, summaries);
+                docSummaries.add(requestFieldname, summaries);
         }
         // no summeries made, copy text from alternate field
         if (summaries == null || summaries.length == 0)
         {
-            alternateField(docSummaries, params, doc, fieldName);
+            alternateField(docSummaries, params, doc, requestFieldname, schemaFieldName, req);
         }
     }
 
@@ -847,19 +847,20 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         if (snippets != null && snippets.length > 0)
             docSummaries.add(fieldName, snippets);
         else
-            alternateField(docSummaries, params, doc, fieldName);
+            alternateField(docSummaries, params, doc, fieldName, fieldName, req);
     }
 
-    private void alternateField(NamedList docSummaries, SolrParams params, Document doc, String fieldName)
+    private void alternateField(NamedList docSummaries, SolrParams params, Document doc, String requestFieldname, String schemaFieldName, SolrQueryRequest req)
     {
-        String alternateField = params.getFieldParam(fieldName, HighlightParams.ALTERNATE_FIELD);
-        if (alternateField != null && alternateField.length() > 0)
+        String requestAlternateField = params.getFieldParam(requestFieldname, HighlightParams.ALTERNATE_FIELD);
+        if (requestAlternateField != null && requestAlternateField.length() > 0)
         {
-            IndexableField[] docFields = doc.getFields(alternateField);
+            String schemaAlternateFieldName = AlfrescoSolrDataModel.getInstance().mapProperty(requestAlternateField, FieldUse.HIGHLIGHT, req);
+            IndexableField[] docFields = doc.getFields(schemaAlternateFieldName);
             if (docFields.length == 0)
             {
                 // The alternate field did not exist, treat the original field as fallback instead
-                docFields = doc.getFields(fieldName);
+                docFields = doc.getFields(schemaFieldName);
             }
             List<String> listFields = new ArrayList<>();
             for (IndexableField field : docFields)
@@ -872,8 +873,8 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
 
             if (altTexts != null && altTexts.length > 0)
             {
-                Encoder encoder = getEncoder(fieldName, params);
-                int alternateFieldLen = params.getFieldInt(fieldName, HighlightParams.ALTERNATE_FIELD_LENGTH, 0);
+                Encoder encoder = getEncoder(requestFieldname, params);
+                int alternateFieldLen = params.getFieldInt(requestFieldname, HighlightParams.ALTERNATE_FIELD_LENGTH, 0);
                 List<String> altList = new ArrayList<>();
                 int len = 0;
                 for (String altText : altTexts)
@@ -891,7 +892,7 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
                             break;
                     }
                 }
-                docSummaries.add(fieldName, altList);
+                docSummaries.add(requestFieldname, altList);
             }
         }
     }
