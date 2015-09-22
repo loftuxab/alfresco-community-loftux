@@ -134,7 +134,7 @@ public class PropertyWithIndexingOptionsTest extends AbstractCMMQATest
                 IndexingOptions.None).render();
         
         cmmActions.createPropertyWithIndexingOption(driver, propertyName + "Basic", "", "", DataType.Boolean, MandatoryClassifier.Optional, false, "",
-                IndexingOptions.None).render();
+                IndexingOptions.Basic).render();
         
         // Apply Default Form Layout: Type
         cmmActions.viewTypesAspectsForModel(driver, modelName);
@@ -159,7 +159,7 @@ public class PropertyWithIndexingOptionsTest extends AbstractCMMQATest
         siteActions.editNodeProperties(driver, true, properties);
 
         // Search: Indexing Option: None
-        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName, "*", docFile.getName(), true), "Search Results not as expected");
+        Assert.assertTrue(cmmActions.checkSearchResultsWithRetry(driver, compositePropName, "*", docFile.getName(), true, SOLR_RETRY_COUNT), "Search Results not as expected");
         
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName, "True", docFile.getName(), false), "Search Results not as expected");
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName, "False", docFile.getName(), false), "Search Results not as expected");
@@ -168,17 +168,17 @@ public class PropertyWithIndexingOptionsTest extends AbstractCMMQATest
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "Basic", "*", docFile.getName(), true), "Search Results not as expected");
         
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "Basic", "True", docFile.getName(), false), "Search Results not as expected");
-        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "Basic", "False", docFile.getName(), false), "Search Results not as expected");
+        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "Basic", "False", docFile.getName(), true), "Search Results not as expected");
     }
     
     @AlfrescoTest(testlink="tobeaddeddel2")
-    @Test(groups = "EnterpriseOnly", priority=2, enabled = true)
+    @Test(groups = "EnterpriseOnly", priority=2)
     public void testNumericPropIndexingOptions() throws Exception
     {
         String testName = getUniqueTestName();
         
         String aspectName = "aspectIndexTestNum" + System.currentTimeMillis();
-        String shareAspectName = aspectName + " (" + modelName + ":" + aspectName + ")"; //getShareAspectName(modelName, aspectName);
+        String shareAspectName = getShareAspectName(modelName, aspectName);
         String compositeAspectName = modelName + ":" + aspectName;
         
         String propertyName = "num" + testName;
@@ -241,7 +241,7 @@ public class PropertyWithIndexingOptionsTest extends AbstractCMMQATest
         siteActions.editNodeProperties(driver, true, properties);
         
         // Search: Indexing Option: *
-        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "IntNone", "*", docFile.getName(), true), "Search Results not as expected");
+        Assert.assertTrue(cmmActions.checkSearchResultsWithRetry(driver, compositePropName + "IntNone", "*", docFile.getName(), true, SOLR_RETRY_COUNT), "Search Results not as expected");
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "LongBasic", "*", docFile.getName(), true), "Search Results not as expected");
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "FloatEnh", "*", docFile.getName(), true), "Search Results not as expected");
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DblEnh", "*", docFile.getName(), true), "Search Results not as expected");
@@ -328,8 +328,8 @@ public class PropertyWithIndexingOptionsTest extends AbstractCMMQATest
         siteActions.editNodeProperties(driver, true, properties);
 
         // Search: Indexing Option: None
-        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DateNone", "*", docFile.getName(), false), "Search Results not as expected");        
-        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DttmNone", "*", docFile.getName(), false), "Search Results not as expected");
+        Assert.assertTrue(cmmActions.checkSearchResultsWithRetry(driver, compositePropName + "DateNone", "*", docFile.getName(), true, SOLR_RETRY_COUNT), "Search Results not as expected");        
+        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DttmNone", "*", docFile.getName(), true), "Search Results not as expected");
         
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DateNone", "today", docFile.getName(), false), "Search Results not as expected");        
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DttmNone", "today", docFile.getName(), false), "Search Results not as expected");
@@ -340,6 +340,9 @@ public class PropertyWithIndexingOptionsTest extends AbstractCMMQATest
 
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DateBasic", "today", docFile.getName(), true), "Search Results not as expected");
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DttmEnh", "today", docFile.getName(), true), "Search Results not as expected");
+        
+        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DateBasic", "yesterday", docFile.getName(), false), "Search Results not as expected");
+        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "DttmEnh", "yesterday", docFile.getName(), false), "Search Results not as expected");
     }
     
     @AlfrescoTest(testlink="tobeaddeddel4")
@@ -423,14 +426,14 @@ public class PropertyWithIndexingOptionsTest extends AbstractCMMQATest
         siteActions.editNodeProperties(driver, true, properties);
 
         // Search: Indexing Option: None
-        // Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "TextNone", "*", docFile.getName(), false), "Search Results not as expected");        
-        // Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "MlTextNone", "*", docFile.getName(), false), "Search Results not as expected");
+        Assert.assertTrue(cmmActions.checkSearchResultsWithRetry(driver, compositePropName + "TextNone", "*", docFile.getName(), true, SOLR_RETRY_COUNT), "Search Results not as expected");        
+        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "MlTextNone", "*", docFile.getName(), true), "Search Results not as expected");
         
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "TextNone", "NoValue", docFile.getName(), false), "Search Results not as expected");        
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "MlTextNone", "NoSuchValue", docFile.getName(), false), "Search Results not as expected");
         
         // Search: Indexing Option: FreeText
-        Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "TextFree", "*", docFile.getName(), true), "Search Results not as expected");
+        Assert.assertTrue(cmmActions.checkSearchResultsWithRetry(driver, compositePropName + "TextFree", "*", docFile.getName(), true, SOLR_RETRY_COUNT), "Search Results not as expected");
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "TextFree", "'Black Cat'", docFile.getName(), false), "Search Results not as expected");
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "TextFree", "'Big Cat'", docFile.getName(), true), "Search Results not as expected");
         Assert.assertTrue(cmmActions.checkSearchResults(driver, compositePropName + "TextFree", "Big", docFile.getName(), true), "Search Results not as expected");
