@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -372,14 +373,23 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     return false;
                 }
                 
-                ExplicitShardingPolicy policy = new ExplicitShardingPolicy(numShards, replicationFactor, numNodes);
-                
-                if(!policy.configurationIsValid())
+                List<Integer> shards;
+                String shardIds = params.get("shardIds");
+                if(shardIds != null)
                 {
-                    return false;
+                    shards = extractShards(shardIds, numShards);
+                }
+                else
+                {
+                    ExplicitShardingPolicy policy = new ExplicitShardingPolicy(numShards, replicationFactor, numNodes);
+                    if(!policy.configurationIsValid())
+                    {
+                        return false;
+                    }
+                    shards = policy.getShardIdsForNode(nodeInstance);
                 }
                 
-                for(Integer shard : policy.getShardIdsForNode(nodeInstance))
+                for(Integer shard : shards)
                 {
                     String coreName = coreBase+shard;
                     File newCore = new File(baseDirectory, coreName);
@@ -419,6 +429,31 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * @param shardIds
+     * @return
+     */
+    private List<Integer> extractShards(String shardIds, int numShards)
+    {
+        ArrayList<Integer> shards = new ArrayList<Integer>();
+        for(String shardId : shardIds.split(","))
+        {
+            try
+            {
+                Integer shard = Integer.valueOf(shardId);
+                if(shard.intValue() < numShards)
+                {
+                    shards.add(shard);
+                }
+            }
+            catch(NumberFormatException nfe)
+            {
+                // ignore 
+            }
+        }
+        return shards;
     }
 
     /**
