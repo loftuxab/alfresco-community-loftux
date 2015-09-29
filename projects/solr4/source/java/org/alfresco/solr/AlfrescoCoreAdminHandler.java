@@ -513,29 +513,40 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     {
         try
         {
+            String coreName = null;
+            
             String store = "";
             SolrParams params = req.getParams();
             if (params.get("storeRef") != null)
             {
                 store = params.get("storeRef");
+                if ((store != null) && (store.length() > 0)) 
+                { 
+                    StoreRef storeRef = new StoreRef(store);
+                    coreName = storeRef.getProtocol() + "-" + storeRef.getIdentifier();
+                }
             }
-
-            if ((store == null) || (store.length() == 0)) { return false; }
-
-            StoreRef storeRef = new StoreRef(store);
-            String coreName = storeRef.getProtocol() + "-" + storeRef.getIdentifier();
+            
             if (params.get("coreName") != null)
             {
                 coreName = params.get("coreName");
             }
+            
+            if ((coreName == null) || (coreName.length() == 0)) { return false; }
 
-            File solrHome = new File(coreContainer.getSolrHome());
+            SolrCore core = coreContainer.getCore(coreName);
+            
+            if(core == null)
+            {
+                return false;
+            }
+            
+            String  configLocaltion = core.getResourceLoader().getConfigDir();
+            
+            File config = new File(configLocaltion, "solrcore.properties");
 
-            File newCore = new File(solrHome, coreName);
 
             // fix configuration properties
-
-            File config = new File(newCore, "conf/solrcore.properties");
             Properties properties = new Properties();
             properties.load(new FileInputStream(config));
 
