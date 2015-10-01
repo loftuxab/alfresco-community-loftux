@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context-3.0.xsd
+          http://www.springframework.org/schema/data/mongo
+          http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
+          http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+          http://www.springframework.org/schema/util 
+          http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <import resource="classpath:webdrone-context.xml" />
+    <import resource="classpath:share-po-context.xml" />
+    <import resource="classpath:share-po-test-context.xml" />
+    <import resource="classpath:util-context.xml" />
+
+    <bean id="shareProperties"
+        class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <!-- <value>classpath:webdrone.properties</value> -->
+                <value>classpath:sharepo.properties</value>
+                <value>classpath:sharepo.hybrid.properties</value>
+                <value>classpath:test.properties</value>
+                <value>classpath:qa-share.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="ignoreResourceNotFound" value="true" />
+    </bean>
+
+    <bean id="webDroneProperties"
+        class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:webdrone.properties</value>
+                <value>classpath:qa-share.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="ignoreResourceNotFound" value="true" />
+    </bean>
+
+
+    <bean id="httpClientProvider"
+        class="org.alfresco.rest.api.tests.client.SharedHttpClientProvider">
+        <constructor-arg name="alfrescoUrl" value="${share.target}" />
+        <constructor-arg name="maxNumberOfConnections"
+            value="2" />
+    </bean>
+
+    <bean id="shareTestProperties" class="org.alfresco.share.util.ShareTestProperty">
+        <constructor-arg name="shareUrl" value="${share.target}" />
+        <constructor-arg name="jmxShareUrl" value="${jmx.share.target}" />
+        <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" />
+        <constructor-arg name="wcmqs" value="${share.wcmqs.path}" /> 
+        <constructor-arg name="apiUrl" value="${api.target}" />
+        <constructor-arg name="gridUrl" value="${webdrone.grid.url}" />
+        <constructor-arg name="username" value="${test.username}" />
+        <constructor-arg name="password" value="${test.password}" />
+        <constructor-arg name="alfrescoVersion" value="${share.version}" />
+        <constructor-arg name="cloudUrlForHybrid" value="${share.hybrid.target}" />
+        <constructor-arg name="pentahoUserConsoleUrl" value="${pentaho.user.console.target}" />  
+        <constructor-arg name="downloadDirectory"
+            value="${webdrone.download.directory}" />
+        <constructor-arg name="googleUserName" value="${googleUserName}" />
+        <constructor-arg name="googlePassword" value="${googlePassword}" />
+        <constructor-arg name="serviceAccountEmail" value="${serviceAccountEmail}" />
+        <constructor-arg name="serviceAccountPKCS12FileName" value="${serviceAccountPKCS12FileName}" />
+        <constructor-arg name="googleDriveUserName" value="${googleDriveUserName}" />
+        <constructor-arg name="googleDrivePassword" value="${googleDrivePassword}" />
+        <constructor-arg name="serviceDriveAccountEmail" value="${serviceDriveAccountEmail}" />
+        <constructor-arg name="serviceDriveAccountPKCS12FileName" value="${serviceDriveAccountPKCS12FileName}" />
+        <constructor-arg name="hybridEnabled" value="${hrbrid.enabled}" />
+        <constructor-arg name="uniqueTestRunName" value="${uniqueTestRunName}" />
+        <constructor-arg name="domainFree" value="${domainFree}" />
+        <constructor-arg name="domainPremium" value="${domainPremium}" />
+        <constructor-arg name="domainLiveSearch" value="${domainLiveSearch}" />
+        <constructor-arg name="domainHybrid" value="${domainHybrid}" />
+        <constructor-arg name="defaultUser" value="${defaultUser}" />
+        <constructor-arg name="uniqueTestDataString"
+            value="${uniqueTestDataString}" />
+        <constructor-arg name="adminUsername" value="${adminUsername}" />
+        <constructor-arg name="adminPassword" value="${adminPassword}" />
+        <constructor-arg name="superadminUsername"
+            value="${superadminUsername}" />
+        <constructor-arg name="superadminPassword"
+            value="${superadminPassword}" />
+        <constructor-arg name="headerKey" value="${headerKey}" />
+        <constructor-arg name="httpSecurePort" value="${secure.port}" />
+        <constructor-arg name="mimeTypes"
+            value="${webdrone.download.mime.types}" />
+        <constructor-arg name="jmxrmiPort" value="${jmxrmiPort}" />
+        <constructor-arg name="jmxrmiUser" value="${jmxrmiUser}" />
+        <constructor-arg name="jmxrmiPassword" value="${jmxrmiPassword}" />
+        <constructor-arg name="nodePort" value="${share.port}" />
+        <constructor-arg name="licenseShare" value="${share.license}" />
+        <constructor-arg name="maxWaitTimeCloudSync"
+            value="${maxWaitTimeCloudSync}" />
+        <constructor-arg name="blogUrl" value="${blogUrl}" />
+        <constructor-arg name="blogUsername" value="${blogUsername}" />
+        <constructor-arg name="blogPassword" value="${blogPassword}" />
+        <constructor-arg name="ftpPort" value="${ftpPort}" />
+        <constructor-arg name="nfsMountPort" value="${nfsMountPort}" />
+        <constructor-arg name="mountPointHost" value="${mountPointHost}" />
+        <constructor-arg name="nfsPort" value="${nfsPort}" />
+        <constructor-arg name="serverShhPort" value="${serverShhPort}" />
+        <constructor-arg name="serverUser" value="${serverUser}" />
+        <constructor-arg name="serverPass" value="${serverPass}" />
+        <constructor-arg name="isSecureSession" value="${isSecureSession}" />
+        <constructor-arg name="replicationEndPointHost" value="${replicationEndPointHost}" />
+        <constructor-arg name="layer7Disabled" value="${layer7Disabled}" />
+        <constructor-arg name="apiKey" value="${apiKey}" />
+        <constructor-arg name="apiSecretKey" value="${apiSecretKey}" />
+        <constructor-arg name="keystorePath" value="${keystorePath}" />
+        <constructor-arg name="truststorePath" value="${truststorePath}" />
+        <constructor-arg name="networkPath" value="${network.map.path}" />
+        <constructor-arg name="networkDrive" value="${network.map.driver}" />
+        <constructor-arg name="transformServInstallationTarget" value="${transformServInstallationTarget}" />
+        <constructor-arg name="transformHostName1" value="${transformHostName1}" />
+        <constructor-arg name="transformHostName2" value="${transformHostName2}" />
+        <constructor-arg name="pbldUserName" value="${pbldUserName}" />
+        <constructor-arg name="pbldUserPassword" value="${pbldUserPassword}" />
+        <constructor-arg name="pathToRSAKey" value="${pathToRSAKey}" />
+        <constructor-arg name="isGoogleDocsV3" value="${isGoogleDocsV3}" />
+    </bean>
+
+    <!-- -->
+    <!-- Share test properties for cloud for hybrid scenario -->
+    <!-- -->
+    <bean id="hybridShareTestProperties" class="org.alfresco.share.util.ShareTestProperty">
+        <constructor-arg name="shareUrl" value="${share.hybrid.target}" />
+        <constructor-arg name="jmxShareUrl" value="${jmx.share.target}" />
+        <constructor-arg name="apiUrl" value="${api.hybrid.target}" />
+        <constructor-arg name="gridUrl" value="null" />
+        <constructor-arg name="username" value="${test.hybrid.username}" />
+        <constructor-arg name="password" value="${test.hybrid.password}" />
+        <constructor-arg name="alfrescoVersion" value="${share.hybrid.version}" />
+        <constructor-arg name="cloudUrlForHybrid" value="" />
+        <constructor-arg name="pentahoUserConsoleUrl" value="${pentaho.user.console.target}" /> 
+        <constructor-arg name="downloadDirectory"
+            value="${webdrone.download.directory}" />
+        <constructor-arg name="googleUserName" value="${googleUserName}" />
+        <constructor-arg name="googlePassword" value="${googlePassword}" />
+        <constructor-arg name="serviceAccountEmail" value="${serviceAccountEmail}" />
+        <constructor-arg name="serviceAccountPKCS12FileName" value="${serviceAccountPKCS12FileName}" />
+        <constructor-arg name="googleDriveUserName" value="${googleDriveUserName}" />
+        <constructor-arg name="googleDrivePassword" value="${googleDrivePassword}" />
+        <constructor-arg name="serviceDriveAccountEmail" value="${serviceDriveAccountEmail}" />
+        <constructor-arg name="serviceDriveAccountPKCS12FileName" value="${serviceDriveAccountPKCS12FileName}" />
+        <constructor-arg name="hybridEnabled" value="${hrbrid.enabled}" />
+        <constructor-arg name="uniqueTestRunName" value="${uniqueTestRunName}" />
+        <constructor-arg name="domainFree" value="${domainFree}" />
+        <constructor-arg name="domainPremium" value="${domainPremium}" />
+        <constructor-arg name="domainHybrid" value="${domainHybrid}" />
+        <constructor-arg name="domainLiveSearch" value="${domainLiveSearch}" />
+        <constructor-arg name="defaultUser" value="${defaultUser}" />
+        <constructor-arg name="uniqueTestDataString"
+            value="${uniqueTestDataString}" />
+        <constructor-arg name="adminUsername" value="${adminUsername}" />
+        <constructor-arg name="adminPassword" value="${adminPassword}" />
+        <constructor-arg name="superadminUsername"
+            value="${superadminUsername}" />
+        <constructor-arg name="superadminPassword"
+            value="${superadminPassword}" />
+        <constructor-arg name="headerKey" value="${headerKey}" />
+        <constructor-arg name="httpSecurePort" value="${secure.port}" />
+        <constructor-arg name="mimeTypes"
+            value="${webdrone.download.mime.types}" />
+        <constructor-arg name="jmxrmiPort" value="${jmxrmiPort}" />
+        <constructor-arg name="jmxrmiUser" value="${jmxrmiUser}" />
+        <constructor-arg name="jmxrmiPassword" value="${jmxrmiPassword}" />
+        <constructor-arg name="nodePort" value="${share.port}" />
+        <constructor-arg name="licenseShare" value="${share.license}" />
+        <constructor-arg name="maxWaitTimeCloudSync"
+            value="${maxWaitTimeCloudSync}" />
+        <constructor-arg name="blogUrl" value="${blogUrl}" />
+        <constructor-arg name="blogUsername" value="${blogUsername}" />
+        <constructor-arg name="blogPassword" value="${blogPassword}" />
+        <constructor-arg name="ftpPort" value="${ftpPort}" />
+        <constructor-arg name="nfsMountPort" value="${nfsMountPort}" />
+        <constructor-arg name="mountPointHost" value="${mountPointHost}" />
+        <constructor-arg name="nfsPort" value="${nfsPort}" />
+        <constructor-arg name="serverShhPort" value="${serverShhPort}" />
+        <constructor-arg name="serverUser" value="${serverUser}" />
+        <constructor-arg name="serverPass" value="${serverPass}" />
+        <constructor-arg name="isSecureSession" value="${isSecureSession}" />
+        <constructor-arg name="pathSharepoint" value="${share.sharepoint.path}" />
+        <constructor-arg name="wcmqs" value="${share.wcmqs.path}" />
+        <constructor-arg name="replicationEndPointHost" value="${replicationEndPointHost}" />
+        <constructor-arg name="layer7Disabled" value="${layer7Disabled}" />
+        <constructor-arg name="apiKey" value="${apiKey}" />
+        <constructor-arg name="apiSecretKey" value="${apiSecretKey}" />
+        <constructor-arg name="keystorePath" value="${keystorePath}" />
+        <constructor-arg name="truststorePath" value="${truststorePath}" />
+        <constructor-arg name="networkPath" value="${network.map.path}" />
+        <constructor-arg name="networkDrive" value="${network.map.driver}" />
+        <constructor-arg name="transformServInstallationTarget" value="${transformServInstallationTarget}" />
+        <constructor-arg name="transformHostName1" value="${transformHostName1}" />
+        <constructor-arg name="transformHostName2" value="${transformHostName2}" />
+        <constructor-arg name="pbldUserName" value="${pbldUserName}" />
+        <constructor-arg name="pbldUserPassword" value="${pbldUserPassword}" />
+        <constructor-arg name="pathToRSAKey" value="${pathToRSAKey}" />
+        <constructor-arg name="isGoogleDocsV3" value="${isGoogleDocsV3}" />
+    </bean>
+
+    <util:constant id="englishLocale" static-field="java.util.Locale.ENGLISH" />
+
+    <util:constant id="language"
+        static-field="org.alfresco.webdrone.BrowserPreference.Language" />
+
+    <util:constant id="downloadFolderList"
+        static-field="org.alfresco.webdrone.BrowserPreference.DownloadFolderList" />
+    <util:constant id="downloadDirectory"
+        static-field="org.alfresco.webdrone.BrowserPreference.DownloadDirectory" />
+    <util:constant id="saveToDisk"
+        static-field="org.alfresco.webdrone.BrowserPreference.SaveToDisk" />
+
+    <!-- -->
+    <!-- WebDrone Factory -->
+    <!-- -->
+    <bean id="downloadWebDroneFactoryBean" class="org.alfresco.webdrone.WebDroneFactory"
+        lazy-init="true">
+        <constructor-arg name="defaultWaitTime"
+            value="${webdrone.element.wait.time}" />
+        <constructor-arg name="maxPageRenderWaitTime"
+            value="${webdrone.page.render.wait.time}" />
+        <constructor-arg name="browser" value="${webdrone.browser}" />
+        <constructor-arg name="properties" ref="poProperties" />
+        <constructor-arg name="factoryPage" ref="factoryPage" />
+        <constructor-arg name="preferences">
+            <util:map key-type="org.alfresco.webdrone.BrowserPreference"
+                value-type="java.lang.Object">
+                <entry key-ref="downloadFolderList" value="2" />
+                <entry key-ref="downloadDirectory" value="${webdrone.download.directory}" />
+                <entry key-ref="saveToDisk" value="${webdrone.download.mime.types}" />
+            </util:map>
+        </constructor-arg>
+        <property name="gridUrl" value="${webdrone.grid.url}" />
+        <property name="chromeServerPath" value="${webdrone.chrome.server.path}" />
+        <property name="ieServerPath" value="${webdrone.ie.server.path}" />
+        <property name="downloadDirectory" value="${webdrone.download.directory}" />
+        <property name="mimeTypes" value="${webdrone.download.mime.types}" />
+    </bean>
+
+    <!-- -->
+    <!-- WebDrone for Download -->
+    <!-- -->
+    <bean id="downloadWebDrone" factory-bean="&amp;downloadWebDroneFactoryBean"
+        lazy-init="true" factory-method="getObject" scope="prototype"
+        destroy-method="quit" />
+
+    <util:constant id="frenchLocale" static-field="java.util.Locale.FRENCH" />
+
+    <bean id="frenchProperties" class="org.alfresco.po.share.ShareProperties">
+        <constructor-arg name="alfrescoVersion" value="${share.hybrid.version}" />
+        <constructor-arg name="locale" value="fr" />
+    </bean>
+
+    <bean id="frenchDroneFactoryBean" class="org.alfresco.webdrone.WebDroneFactory"
+        lazy-init="true">
+        <constructor-arg name="defaultWaitTime"
+            value="${webdrone.hybrid.element.wait.time}" />
+        <constructor-arg name="maxPageRenderWaitTime"
+            value="${webdrone.hybrid.page.render.wait.time}" />
+        <constructor-arg name="browser"
+            value="${webdrone.hybrid.browser}" />
+        <constructor-arg name="properties" ref="frenchProperties" />
+        <constructor-arg name="factoryPage" ref="factoryPage" />
+        <constructor-arg name="preferences">
+            <util:map key-type="org.alfresco.webdrone.BrowserPreference"
+                value-type="java.lang.Object">
+                <entry key-ref="language" value-ref="frenchLocale" />
+            </util:map>
+        </constructor-arg>
+        <property name="gridUrl" value="${webdrone.grid.url}" />
+        <property name="chromeServerPath" value="${webdrone.chrome.server.path}" />
+        <property name="ieServerPath" value="${webdrone.ie.server.path}" />
+        <property name="downloadDirectory" value="${webdrone.page.render.wait.time}" />
+        <property name="mimeTypes" value="${webdrone.download.mime.types}" />
+    </bean>
+
+    <bean id="frenchDrone" factory-bean="&amp;frenchDroneFactoryBean"
+        factory-method="getObject" scope="prototype" destroy-method="quit"
+        lazy-init="true" />
+
+</beans>

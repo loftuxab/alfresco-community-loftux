@@ -1,0 +1,710 @@
+/*
+ * Copyright (C) 2005-2013 Alfresco Software Limited. This file is part of Alfresco Alfresco is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version. Alfresco is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. You should have received a copy of the GNU Lesser General
+ * Public License along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.alfresco.share.util.api;
+
+import org.alfresco.json.JSONUtil;
+import org.alfresco.po.share.enums.TenantTypes;
+import org.alfresco.share.util.ShareUser;
+import org.alfresco.share.util.ShareUserMembers;
+import org.alfresco.webdrone.WebDrone;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class CreateUserAPI extends AlfrescoHttpClient
+{
+    public CreateUserAPI() throws Exception
+    {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    private static Log logger = LogFactory.getLog(CreateUserAPI.class);
+
+    @Override
+    public void setup() throws Exception
+    {
+        super.setup();
+        testName = this.getClass().getSimpleName();
+        logger.info("Starting Tests: " + testName);
+    }
+
+    /**
+     * Util to mimic cloud Signup request. Not supported for Enterprise
+     * 
+     * @param drone
+     * @param invitingUserEmail
+     * @param newUserEmailID
+     * @return regKey and id pair to be used for activateAccount
+     * @throws Exception
+     */
+    public static String[] signUp(WebDrone drone, String invitingUserEmail, String newUserEmailID) throws Exception
+    {
+        if (!isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use for Enterprise");
+        }
+
+        String reqURL = getAPIURL(drone) + apiContextCloudInternal + "accounts/signupqueue";
+
+        logger.info("Using Url - " + reqURL + " for activateUser");
+
+        String[] authDetails = getAuthDetails(invitingUserEmail);
+
+        String[] headers = getRequestHeaders("application/json;charset=utf-8");
+        String[] body = { "source", "test-rest-client-script", "email", newUserEmailID };
+
+        HttpClient client = null;
+        HttpPost request = null;
+        HttpResponse response = null;
+
+        try
+        {
+            client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
+            request = generatePostRequest(reqURL, headers, body);
+            response = executeRequest(client, request);
+            String result = JSONUtil.readStream(response.getEntity()).toJSONString();
+
+            String regKey = getParameterValue("registration", "key", result);
+            String regId = getParameterValue("registration", "id", result);
+            return new String[] { regKey, regId };
+        }
+        finally
+        {
+            releaseConnection(client, response.getEntity());
+        }
+    }
+
+    /**
+     * Util to mimic activating the signup request for the cloud user.
+     * Not supported for Enterprise.
+     * 
+     * @param drone
+     * @param invitingUserEmail
+     * @param fName
+     * @param lName
+     * @param password
+     * @param regKey
+     * @param regId
+     * @return
+     * @throws Exception
+     */
+    public static Boolean activateUser(WebDrone drone, String invitingUserEmail, String fName, String lName, String password, String regKey, String regId)
+            throws Exception
+    {
+        if (!isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use for Enterprise");
+        }
+
+        String reqURL = getAPIURL(drone) + apiContextCloudInternal + "account-activations";
+
+        logger.info("Using Url - " + reqURL + " for activateUser");
+
+        String[] authDetails = getAuthDetails(invitingUserEmail);
+        String[] headers = getRequestHeaders("application/json;charset=utf-8");
+        String[] body = { "firstName", fName, "lastName", lName, "password", password, "key", regKey, "id", regId };
+
+        HttpPost request = generatePostRequest(reqURL, headers, body);
+        HttpClient client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
+        HttpResponse response = executeRequestHttpResp(client, request);
+
+        if (checkHttpResponse(response, HttpStatus.SC_OK))
+        {
+            logger.info("Activate Account Succeeds for user: " + fName + " : Password: " + password);
+            return true;
+        }
+        logger.error("Activate Account Failed for user: " + fName + " : " + password);
+        return false;
+    }
+
+    /**
+     * Use this method for Enterprise and Cloud to create user with a network-admin role
+     * Implementation for cloud requires the tenant to be upgraded from free network
+     * This requires admin console / admin access
+     * Implementation for Enterprise requires admin user who can create and add
+     * users to 'Alfresco_Administrators' group
+     * 
+     * @param drone
+     * @param invitingUserEmail
+     * @param newUserDetails
+     * @return
+     * @throws Exception
+     */
+    public static boolean createActivateUserAsTenantAdmin(WebDrone drone, String invitingUserEmail, String... newUserDetails) throws Exception
+    {
+        Boolean result = false;
+        String tenantType = TenantTypes.Premium.getTenantType();
+
+        if (isAlfrescoVersionCloud(drone))
+        {
+            result = CreateActivateUser(drone, invitingUserEmail, newUserDetails);
+            upgradeCloudAccount(drone, invitingUserEmail, getUserDomain(newUserDetails[0]), tenantType);
+            result = result && promoteUserAsAdmin(drone, invitingUserEmail, newUserDetails[0], getUserDomain(newUserDetails[0]));
+        }
+        else
+        {
+            result = ShareUser.createEnterpriseUserWithGroup(drone, invitingUserEmail, newUserDetails[0], newUserDetails[0], newUserDetails[0],
+                    getAuthDetails(newUserDetails[0])[1], "ALFRESCO_ADMINISTRATORS");
+        }
+
+        return result;
+    }
+
+    /**
+     * Util to Create a new user for Cloud or Enterprise
+     * 
+     * @param drone
+     * @param invitingUserEmail
+     * @param newUserDetails
+     * @return True if user creation is successful. False if user creation fails includes case when user is already present
+     * @throws Exception
+     */
+    public synchronized static boolean CreateActivateUser(WebDrone drone, String invitingUserEmail, String... newUserDetails) throws Exception
+    {
+
+        boolean result;
+        int paramCount = newUserDetails.length;
+        int paramCountMandatory = 1;
+
+        String email = "";
+        String firstName = "";
+        String lastName = DEFAULT_LASTNAME;
+        String userPassword = DEFAULT_PASSWORD;
+
+        if (paramCount < paramCountMandatory)
+        {
+            throw new IllegalArgumentException("Mandatory Parameters Missing");
+        }
+
+        if (paramCount >= paramCountMandatory)
+        {
+            email = newUserDetails[0];
+        }
+
+        if (paramCount > 1)
+        {
+            firstName = newUserDetails[1];
+        }
+        else
+        {
+            firstName = newUserDetails[0];
+        }
+
+        if (paramCount > 2)
+        {
+            lastName = newUserDetails[2];
+        }
+
+        if (paramCount > 3)
+        {
+            userPassword = newUserDetails[3];
+        }
+
+        if (isAlfrescoVersionCloud(drone))
+        {
+            result = createCloudUser(drone, invitingUserEmail, email, firstName, lastName, userPassword);
+        }
+        else
+        {
+            result = ShareUser.createEnterpriseUser(drone, invitingUserEmail, email, firstName, lastName, userPassword);
+        }
+        logger.info("User[" + email + "] created? " + result);
+        return result;
+    }
+
+    /**
+     * Utility to create a cloud user using signUp-Activate API
+     * 
+     * @param drone WebDrone Instance
+     * @param invitingUsername String username of inviting user
+     * @param email String email or username
+     * @param fname String firstname
+     * @param lname String lastname
+     * @param password String password
+     * @return true is user creation succeeds
+     * @throws Exception
+     */
+    public static Boolean createCloudUser(WebDrone drone, String invitingUsername, String email, String fname, String lname, String password) throws Exception
+    {
+        Boolean result = false;
+
+        String[] regInfo = signUp(drone, invitingUsername, email);
+        result = activateUser(drone, invitingUsername, fname, lname, password, regInfo[0], regInfo[1]);
+        return result;
+    }
+
+    /**
+     * Method to Create a new user for Enterprise using API
+     * 
+     * @param drone
+     * @param invitingUserEmail
+     * @param newUserDetails
+     * @return True if user creation is successful. False if user creation fails.
+     * @throws Exception
+     */
+    public static Boolean createEnterpriseUserAPI(WebDrone drone, String invitingUserEmail, String... newUserDetails) throws Exception
+    {
+        int paramCount = newUserDetails.length;
+        int paramCountMandatory = 1;
+
+        String email = "";
+        String firstName = "";
+        String lastName = DEFAULT_LASTNAME;
+        String userPassword = DEFAULT_PASSWORD;
+
+        if (paramCount < paramCountMandatory)
+        {
+            throw new IllegalArgumentException("Mandatory Parameters Missing");
+        }
+
+        if (paramCount >= paramCountMandatory)
+        {
+            email = newUserDetails[0];
+        }
+
+        if (paramCount > 1)
+        {
+            firstName = newUserDetails[1];
+        }
+        else
+        {
+            firstName = newUserDetails[0];
+        }
+
+        if (paramCount > 2)
+        {
+            lastName = newUserDetails[2];
+        }
+
+        if (paramCount > 3)
+        {
+            userPassword = newUserDetails[3];
+        }
+
+        if (isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use in Cloud");
+        }
+
+        String reqURL = getAPIURL(drone) + "people?alf_ticket=" + getAlfTicket(drone, ADMIN_USERNAME, ADMIN_PASSWORD);
+        logger.info("Using Url - " + reqURL + " for activateUser");
+        String[] authDetails = getAuthDetails(invitingUserEmail);
+        String[] headers = getRequestHeaders("application/json;charset=utf-8");
+        String[] body = { "userName", email, "firstName", firstName, "lastName", lastName, "password", userPassword, "email", email };
+        HttpClient client = null;
+        HttpPost request = null;
+        HttpResponse response = null;
+
+        try
+        {
+            client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
+            request = generatePostRequest(reqURL, headers, body);
+            response = executeRequest(client, request);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+            {
+                logger.info("User created successfully: " + email);
+                return true;
+            }
+            else
+            {
+                logger.info(response.toString());
+                return false;
+            }
+        }
+        finally
+        {
+            releaseConnection(client, response.getEntity());
+        }
+    }
+
+    /**
+     * Utility to upgrade the account type (for the given domain)
+     * Method is not supported for enterprise
+     * 
+     * @param drone WebDrone Instance
+     * @param authUser String authenticating user
+     * @param domain String domain Name to be upgraded
+     * @param accountTypeID String accountType ID e.g. 1000 if enterprise, 0 if free, 101
+     *            for partner
+     * @return true if account upgrade succeeds
+     * @throws Exception
+     */
+    public static HttpResponse upgradeCloudAccount(WebDrone drone, String authUser, String domain, String accountTypeID) throws Exception
+    {
+        if (!isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use for Enterprise");
+        }
+
+        String reqURL = getAPIURL(drone) + apiContextCloudInternal + "domains/" + domain + "/account";
+
+        String[] authDetails = getAuthDetails(authUser);
+        String[] headers = getRequestHeaders("application/json;charset=utf-8");
+        String[] body = { "accountTypeId", accountTypeID };
+
+        HttpPut request = generatePutRequest(reqURL, headers, body);
+        HttpClient client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
+        HttpResponse response = executeRequestHttpResp(client, request);
+
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        {
+            logger.info("Account Upgraded");
+        }
+        else
+        {
+            logger.info(response.toString());
+        }
+        return response;
+    }
+
+    /**
+     * Utility to promote the user as network admin (for the given domain)
+     * On Enterprise: its done by admin user via admin console
+     * On cloud, its done using internal API
+     * 
+     * @param drone WebDrone Instance
+     * @param authUser String authenticating user
+     * @param domain String domain for which the user is being upgraded.
+     * @param userNametoBePromoted String userName to be promoted as network admin
+     * @return true if succeeds
+     * @throws Exception
+     */
+    public static Boolean promoteUserAsAdmin(WebDrone drone, String authUser, String userNametoBePromoted, String domain) throws Exception
+    {
+        Boolean result = false;
+        HttpResponse response;
+        String message = "Promote user as network admin" + userNametoBePromoted;
+
+        if (isAlfrescoVersionCloud(drone))
+        {
+            response = promoteUserAsAdminCloud(drone, authUser, userNametoBePromoted, domain);
+            logger.info(response.toString());
+            result = (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK);
+        }
+        else
+        {
+            ShareUser.login(drone, authUser, getAuthDetails(authUser)[1]);
+            result = ShareUserMembers.promoteUserAsAdminEnterprise(drone, authUser, userNametoBePromoted);
+            ShareUser.logout(drone);
+        }
+
+        if (result)
+        {
+            logger.info("Success: " + message);
+        }
+        else
+        {
+            logger.info("Failed to: " + message);
+        }
+        return result;
+    }
+
+    /**
+     * Utility to promote the user as network admin (for the given domain) for Cloud
+     * 
+     * @param drone WebDrone Instance
+     * @param authUser String authenticating user
+     * @param domain String domain for which the user is being upgraded.
+     * @param userNametoBePromoted String userName to be promoted as network admin
+     * @return HttpResponse
+     * @throws Exception
+     */
+    public static HttpResponse promoteUserAsAdminCloud(WebDrone drone, String authUser, String userNametoBePromoted, String domain) throws Exception
+    {
+        if (!isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use for Enterprise");
+        }
+
+        String reqURL = getAPIURL(drone) + apiContextCloudInternal + "domains/" + domain + "/account/networkadmins";
+
+        String[] authDetails = getAuthDetails(authUser);
+        String[] headers = getRequestHeaders("application/json;charset=utf-8");
+        String[] body = { "username", userNametoBePromoted };
+
+        HttpPost request = generatePostRequest(reqURL, headers, body);
+        HttpClient client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
+        HttpResponse response = executeRequestHttpResp(client, request);
+
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        {
+            logger.info("User promoted as network admin: " + userNametoBePromoted);
+        }
+        else
+        {
+            logger.info(response.toString());
+        }
+        return response;
+    }
+
+    /**
+     * Utility to invite a cloud user to Site using invite-To-Site- And
+     * Activate-Invitation via rest API request
+     * 
+     * @param drone WebDrone Instance
+     * @param invitingUsername String username of inviting user
+     * @param email String email or username
+     * @param siteShortname String Name of the site to which the user is being invited
+     * @param role String role to be assigned to the invited user
+     * @param message String message to be sent with the invitation
+     * @return true is user invitation-acceptance succeeds
+     * @throws Exception
+     */
+    public static Boolean inviteUserToSiteWithRoleAndAccept(WebDrone drone, String invitingUsername, String email, String siteShortname, String role, String message)
+            throws Exception
+    {
+        Boolean result = false;
+
+        String domainName = getUserDomain(invitingUsername);
+
+        if (!isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use for Enterprise");
+        }
+        role.replace(" ", "");
+        if (StringUtils.isEmpty(role))
+        {
+            throw new UnsupportedOperationException("Role should not be empty or null.");
+        }
+        else
+        {
+            if (role.equalsIgnoreCase("Collaborator"))
+            {
+                role = "SiteCollaborator";
+            }
+            else if (role.equalsIgnoreCase("Contributor"))
+            {
+                role = "SiteContributor";
+            }
+            else if (role.equalsIgnoreCase("Consumer"))
+            {
+                role = "SiteConsumer";
+            }
+            else if (role.equalsIgnoreCase("Manager"))
+            {
+                role = "SiteManager";
+            }
+        }
+
+        // Invite User
+        String[] regInfo = inviteUserToSite(drone, invitingUsername, email, siteShortname.toLowerCase(), role, message);
+
+        // Accept invitation
+        result = userAcceptsSiteInvite(drone, email, domainName, regInfo);
+
+        return result;
+    }
+
+    /**
+     * Utility to invite a cloud user to Site using invite-To-Site via rest API
+     * request
+     * 
+     * @param drone WebDrone Instance
+     * @param invitingUsername String username of inviting user
+     * @param email String email or username
+     * @param siteShortname String Name of the site to which the user is being invited
+     * @param role String role to be assigned to the invited user
+     * @param message String message to be sent with the invitation
+     * @return String[] array of regKey and activitii id is user
+     *         invitation-acceptance succeeds
+     * @throws Exception
+     */
+    public static String[] inviteUserToSite(WebDrone drone, String invitingUsername, String email, String siteShortname, String role, String message)
+            throws Exception
+    {
+        if (!isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use for Enterprise");
+        }
+
+        String reqURL = getAPIURL(drone) + apiContextCloudInternal + "sites/" + siteShortname + "/invitations";
+        logger.info("Request URL - " + reqURL + " for Site Invitation");
+        String[] authDetails = getAuthDetails(invitingUsername);
+        String[] headers = getRequestHeaders(null);
+        HttpClient client = null;
+        HttpPost request = null;
+        HttpResponse response = null;
+        JSONObject body = new JSONObject();
+        body.put("inviterEmail", invitingUsername);
+        body.put("inviteeEmails", (new JSONArray()).put(email));
+        body.put("role", role);
+        body.put("inviterMessage", message);
+
+        try
+        {
+            client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
+            request = generatePostRequest(reqURL, headers, body);
+            response = executeRequest(client, request);
+            String result = JSONUtil.readStream(response.getEntity()).toJSONString();
+            String regKey = getParameterValue("invitations", "key", result);
+            String regId = getParameterValue("invitations", "id", result);
+            return new String[] { regKey, regId };
+        }
+        finally
+        {
+            releaseConnection(client, response.getEntity());
+        }
+    }
+
+    /**
+     * Utility to Accept or Activate-Invitation via rest API request
+     * 
+     * @param drone WebDrone Instance
+     * @param invitedUserEmail String email of inviting user
+     * @param invitedToDomain String Domain name the new user is being invited to
+     * @param regInfo String[] regKey and activitii id generated via Invitation
+     *            request
+     * @return true if user invitation-acceptance succeeds
+     * @throws Exception
+     */
+    public static Boolean userAcceptsSiteInvite(WebDrone drone, String invitedUserEmail, String invitedToDomain, String[] regInfo) throws Exception
+    {
+        String reqURL = dronePropertiesMap.get(drone).getShareUrl() + "/" + invitedToDomain + "/page/invitation?key=" + regInfo[0] + "&id=" + regInfo[1];
+
+        logger.info("Request Url - " + reqURL);
+
+        String[] authDetails = getAuthDetails(invitedUserEmail);
+        String[] headers = getRequestHeaders(null);
+        HttpGet request = generateGetRequest(reqURL, headers);
+        HttpClient client = getHttpClientWithBasicAuth(reqURL, authDetails[0], authDetails[1]);
+        HttpResponse response = executeRequestHttpResp(client, request);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        {
+            logger.info("Invite is actioned by user: " + invitedUserEmail);
+            return true;
+        }
+        logger.error("Invite could not be actioned by user: " + invitedUserEmail);
+        return false;
+    }
+
+    /**
+     * * Use this method for Enterprise and Cloud to create user and add it to specific group
+     * Implementation for cloud requires the tenant to be upgraded from free network
+     * Hence This requires admin console / admin access
+     * Implementation for Enterprise requires admin user who can create and add users to specified group
+     * 
+     * @param drone
+     * @param invitingUserEmail
+     * @param newUserDetails
+     * @return boolean <true> when user creation succeeds
+     * @throws Exception
+     */
+    public synchronized static boolean createActivateUserWithGroup(WebDrone drone, String invitingUserEmail, String groupName, String... newUserDetails)
+            throws Exception
+    {
+        Boolean result = false;
+        String tenantType = TenantTypes.Premium.getTenantType();
+
+        if (isAlfrescoVersionCloud(drone))
+        {
+            result = CreateActivateUser(drone, invitingUserEmail, newUserDetails);
+            upgradeCloudAccount(drone, invitingUserEmail, getUserDomain(newUserDetails[0]), tenantType);
+            result = promoteUserAsAdmin(drone, invitingUserEmail, newUserDetails[0], getUserDomain(newUserDetails[0]));
+        }
+        else
+        {
+            result = ShareUser.createEnterpriseUserWithGroup(drone, invitingUserEmail, newUserDetails[0], newUserDetails[0], newUserDetails[0],
+                    getAuthDetails(newUserDetails[0])[1], groupName);
+        }
+
+        return result;
+    }
+
+    /**
+     * Use this method for Enterprise to invite user to a site with role and accept.
+     * 
+     * @param drone
+     * @param invitingUserName
+     * @param siteName
+     * @param role (SITEMANAGER, SITECOLLABORATOR, SITECONTRIBUTOR, SITECONSUMER)
+     * @return boolean <true> if invitation succeded
+     * @throws Exception
+     */
+    public static Boolean inviteUserToSiteEnterpriseAPI(WebDrone drone, String invitingUserName, String userToInvite, String siteName, String role)
+            throws Exception
+    {
+        if (isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use in Cloud");
+        }
+        String serverPath = dronePropertiesMap.get(drone).getShareUrl();
+        serverPath = serverPath.replace("http://", "");
+        serverPath = serverPath.replaceAll(":(.*)", "");
+        serverPath = serverPath.replaceAll("/share", "");
+        String url = getAPIURL(drone) + "invite/start?inviteeFirstName=" + userToInvite + "&inviteeLastName=" + "lastName" + "&inviteeEmail=" + userToInvite
+                + "@test.com" + "&inviteeUserName=" + userToInvite + "&siteShortName=" + siteName + "&inviteeSiteRole=" + role + "&serverPath=" + serverPath
+                + "&acceptUrl=" + "page/accept-invite" + "&rejectUrl=" + "page/reject-invite";
+        logger.info("Using Url - " + url + " to invite user " + userToInvite);
+        String[] authDetails = getAuthDetails(invitingUserName);
+        String[] headers = getRequestHeaders("application/json;charset=utf-8");
+        HttpGet request = generateGetRequest(url, headers);
+        HttpClient client = getHttpClientWithBasicAuth(url, authDetails[0], authDetails[1]);
+        HttpResponse response = executeRequestHttpResp(client, request);
+        try
+        {
+            switch (response.getStatusLine().getStatusCode())
+            {
+                case HttpStatus.SC_OK:
+                    logger.info("User successfully invited: " + userToInvite);
+                    String result = JSONUtil.readStream(response.getEntity()).toJSONString();
+                    String inviteId = getParameterValue("inviteId", "", result);
+                    String inviteTicket = getParameterValue("inviteTicket", "", result);
+                    return acceptSiteInviteEnterpriseAPI(drone, userToInvite, inviteId, inviteTicket);
+                default:
+                    logger.error("Unable to invite user: " + response.toString());
+                    break;
+            }
+        }
+        finally
+        {
+            releaseConnection(client, response.getEntity());
+        }
+        return false;
+    }
+
+    /**
+     * Accept site invite API.
+     * 
+     * @param drone
+     * @param inviteUser
+     * @param inviteId
+     * @param inviteTicket
+     * @return boolean <true> if the invitation is accepted
+     * @throws Exception
+     */
+    private static boolean acceptSiteInviteEnterpriseAPI(WebDrone drone, String inviteUser, String inviteId, String inviteTicket) throws Exception
+    {
+        if (isAlfrescoVersionCloud(drone))
+        {
+            throw new UnsupportedOperationException("Method not suitable for use for Cloud");
+        }
+        String url = getAPIURL(drone) + "invite/" + inviteId + "/" + inviteTicket + "/accept";
+        HttpPut request = new HttpPut(url);
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpResponse response = client.execute(request);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+        {
+            logger.info("Invite is accepted by user: " + inviteUser);
+            return true;
+        }
+        logger.error("Invite could not be actioned by user: " + inviteUser);
+        return false;
+    }
+
+}

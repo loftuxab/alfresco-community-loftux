@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Sprint BY Data Prep Content Rules Suite" preserve-order="true" parallel="tests" thread-count="2">
+    <groups>
+        <run>
+            <include name="DataPrep.*"/>
+        </run>
+    </groups>
+
+    <listeners>
+        <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
+    </listeners>
+
+    <test name="CreateRuleSetPropertyTest">
+        <classes>
+            <class name="org.alfresco.share.content.rules.CreateRuleSetPropertyTest"/>
+        </classes>
+    </test>
+
+</suite>
