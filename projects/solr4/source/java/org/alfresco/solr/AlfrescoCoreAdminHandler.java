@@ -405,7 +405,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                             solrCoreName = "archive-"+shard;
                         }
                     }
-                    createAndRegisterNewCore(rsp, params, store, template, solrCoreName, newCore, numShards, shard);
+                    createAndRegisterNewCore(rsp, params, store, template, solrCoreName, newCore, numShards, shard, templateName);
                 }
                        
                 return true;
@@ -418,7 +418,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                     coreName = params.get("coreName");
                 }
                 File newCore = new File(solrHome, coreName);
-                createAndRegisterNewCore(rsp, params, store, template, coreName, newCore, 0, 0);
+                createAndRegisterNewCore(rsp, params, store, template, coreName, newCore, 0, 0, templateName);
 
                 return true;
             }
@@ -466,7 +466,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
      * @throws IOException
      * @throws FileNotFoundException
      */
-    private void createAndRegisterNewCore(SolrQueryResponse rsp, SolrParams params, String store, File template, String coreName, File newCore, int aclShardCount, int aclShardInstance) throws IOException,
+    private void createAndRegisterNewCore(SolrQueryResponse rsp, SolrParams params, String store, File template, String coreName, File newCore, int aclShardCount, int aclShardInstance, String templateName) throws IOException,
             FileNotFoundException
     {
         copyDirectory(template, newCore, false);
@@ -478,6 +478,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         properties.setProperty("data.dir.root", newCore.getCanonicalPath());
         properties.setProperty("data.dir.store", coreName);
         properties.setProperty("alfresco.stores", store);
+        properties.setProperty("alfresco.template", templateName);
         if(aclShardCount > 0)
         {
             properties.setProperty("acl.shard.count", ""+aclShardCount);
