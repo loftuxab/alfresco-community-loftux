@@ -1118,14 +1118,6 @@
         </modules>
     </profile>
 
-    <!-- Profile to build alfresco-cloud -->
-    <profile>
-        <id>cloud</id>
-        <modules>
-            <module>privatemodules</module>
-        </modules>
-    </profile>
-
     <!-- Profile to add all sub-projects - handy to change the version -->
     <profile>
         <id>allprojects</id>
@@ -1134,7 +1126,6 @@
             <module>projects/qa-share</module>
             <module>enterpriseprojects/packaging</module>
             <module>enterpriseprojects/packaging/rpm</module>
-            <module>privatemodules</module>
             <module>projects/office-application</module>
         </modules>
 
