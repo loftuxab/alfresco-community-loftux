@@ -94,7 +94,7 @@ public abstract class AbstractTracker implements Tracker
         
         shardCount =  Integer.parseInt(p.getProperty("acl.shard.count", "0"));
         shardInstance =  Integer.parseInt(p.getProperty("acl.shard.instance", "0"));
-        shardTemplate =  p.getProperty("acl.shard.template", "");
+        shardTemplate =  p.getProperty("alfresco.template", "");
         
         transformContent = Boolean.parseBoolean(p.getProperty("alfresco.index.transformContent", "true"));
 
