@@ -14,7 +14,7 @@
         <selenium.version>2.39.1</selenium.version>
         <spring.version>4.0.5.RELEASE</spring.version>
         <alfresco.version>${alfresco.base.version}</alfresco.version>
-        <alfresco.api.utils.version>1.0</alfresco.api.utils.version>
+        <alfresco.api.utils.version>1.1</alfresco.api.utils.version>
         <enterprise.installer.path>/data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-enterprise-installer-*-linux-x64.???</enterprise.installer.path>
         <testng.sanity.xml>src/test/resources/cmm-sanity-testng.xml</testng.sanity.xml>
         <testng.xml>src/test/resources/cmm-complete-e2e-testng.xml</testng.xml>
