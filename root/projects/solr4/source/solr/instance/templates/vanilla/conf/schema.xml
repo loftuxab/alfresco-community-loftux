@@ -595,6 +595,7 @@
       <field name="OWNER"                 type="identifier"            indexed="true"  omitNorms="true"  stored="false"  multiValued="true"  docValues="true" />
       <field name="PARENTASSOCCRC"        type="long"            indexed="true"  omitNorms="true"  stored="false"  multiValued="false" sortMissingLast="false" sortMissingFirst="false" />
       <field name="TENANT"                type="identifier"            indexed="true"  omitNorms="true"  stored="false"  multiValued="false"  docValues="true" sortMissingLast="true" />
+      <field name="CASCADETX"             type="long"            indexed="true"  omitNorms="true"  stored="false"  multiValued="false" docValues="true" sortMissingLast="false" sortMissingFirst="false" />
 
       <!-- Used to store the last transaction and acl transaction for real time get -->
       <field name="S_TXID"                  type="long"            indexed="true"  omitNorms="true"  stored="true"  multiValued="false" sortMissingLast="false" sortMissingFirst="false" />

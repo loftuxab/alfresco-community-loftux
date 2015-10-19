@@ -807,15 +807,32 @@ public class MetadataTracker extends AbstractTracker implements Tracker
                 }
                 else
                 {
-                	// Make sure anything no longer relevant to this shard is deleted. 
-                	Node doDelete = new Node();
-                	doDelete.setAclId(node.getAclId());
-                	doDelete.setId(node.getId());
-                	doDelete.setNodeRef(node.getNodeRef());
-                	doDelete.setStatus(SolrApiNodeStatus.SHARD_DELETED);
-                	doDelete.setTenant(node.getTenant());
-                	doDelete.setTxnId(node.getTxnId());
-                	filteredList.add(doDelete);
+                    // Cascade update children of this node if they are in this shard
+                    if(node.getStatus() == SolrApiNodeStatus.UPDATED)
+                    {
+                        Node doCascade = new Node();
+                        doCascade.setAclId(node.getAclId());
+                        doCascade.setId(node.getId());
+                        doCascade.setNodeRef(node.getNodeRef());
+                        doCascade.setStatus(SolrApiNodeStatus.NON_SHARD_UPDATED);
+                        doCascade.setTenant(node.getTenant());
+                        doCascade.setTxnId(node.getTxnId());
+                        filteredList.add(doCascade);
+                    }
+                    else // DELETED & UNKNOWN
+                    {
+                        // Make sure anything no longer relevant to this shard is deleted. 
+                        Node doDelete = new Node();
+                        doDelete.setAclId(node.getAclId());
+                        doDelete.setId(node.getId());
+                        doDelete.setNodeRef(node.getNodeRef());
+                        doDelete.setStatus(SolrApiNodeStatus.NON_SHARD_DELETED);
+                        doDelete.setTenant(node.getTenant());
+                        doDelete.setTxnId(node.getTxnId());
+                        filteredList.add(doDelete);
+                    }
+                   
+                    
                 }
             }
             return filteredList;
