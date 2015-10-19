@@ -2672,6 +2672,38 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 			}
 
 		}
+		else if(field.equals(FIELD_CASCADETX))
+		{
+		    SchemaField sf = schema.getField(FIELD_CASCADETX);
+		    if(sf != null)
+		    {
+		        String start = null;
+                try
+                {
+                    analyzeMultitermTerm(FIELD_CASCADETX, part1, null);
+                    start = part1;
+                }
+                catch(Exception e)
+                {
+
+                }
+                String end = null;
+                try
+                {
+                    analyzeMultitermTerm(FIELD_CASCADETX, part2, null);
+                    end = part2;
+                }
+                catch(Exception e)
+                {
+
+                }
+                return sf.getType().getRangeQuery(null, sf, start, end, includeLower, includeUpper); 
+		    }
+		    else
+		    {
+		        throw new UnsupportedOperationException();
+		    }
+		}
 		// FIELD_ID uses the default
 		// FIELD_DBID uses the default
 		// FIELD_ISROOT uses the default

@@ -437,4 +437,11 @@ public interface ContentModel
     // CMIS aspects
     static final QName ASPECT_CMIS_UPDATE_CONTEXT = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "CMISUpdateContext");
     static final QName PROP_GOT_FIRST_CHUNK = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "gotFirstChunk");
+    
+    
+    // Cascade Update
+    static final QName ASPECT_CASCADE_UPDATE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "cascadeUpdate");
+    static final QName PROP_CASCADE_CRC = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "cascadeCRC");
+    static final QName PROP_CASCADE_TX = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "cascadeTx");
+    
 }
