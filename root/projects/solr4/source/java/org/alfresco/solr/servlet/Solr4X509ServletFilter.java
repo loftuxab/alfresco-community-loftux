@@ -94,6 +94,13 @@ public class Solr4X509ServletFilter extends X509ServletFilterBase
                                   ". All alfresco.secureComms values must be set to the same value.");
         }
 
+        if(secureCommsSet.size() == 0)
+        {
+            //No secureComms were found.
+            return false;
+        }
+
+
         String secureComms = secureCommsSet.iterator().next();
 
         if(logger.isDebugEnabled())
