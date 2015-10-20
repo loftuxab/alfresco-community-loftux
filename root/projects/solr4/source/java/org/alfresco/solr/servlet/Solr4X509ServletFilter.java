@@ -213,16 +213,22 @@ public class Solr4X509ServletFilter extends X509ServletFilterBase
             QueryExp query = Query.eq(Query.attr("Scheme"), Query.value("https"));
             Set<ObjectName> objectNames = mBeanServer.queryNames(null, query);
 
-            if (objectNames != null && objectNames.size() > 0) {
-                for (ObjectName objectName : objectNames) {
+            if (objectNames != null && objectNames.size() > 0)
+            {
+                for (ObjectName objectName : objectNames)
+                {
                     String name = objectName.toString();
-                    if (name.indexOf("port=") > -1) {
+                    if (name.indexOf("port=") > -1)
+                    {
                         String[] parts = name.split("port=");
                         String port = parts[1];
-                        try {
+                        try
+                        {
                             int portNum = Integer.parseInt(port);
                             return portNum;
-                        } catch (NumberFormatException e) {
+                        }
+                        catch (NumberFormatException e)
+                        {
                             logger.error("Error parsing https port:" + port);
                             return -1;
                         }
