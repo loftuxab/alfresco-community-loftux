@@ -20,6 +20,7 @@
 package org.alfresco.solr.servlet;
 
 import javax.servlet.*;
+import javax.management.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -49,6 +50,13 @@ public class Solr4X509ServletFilter extends X509ServletFilterBase
         /*
         * Rely on the SolrResourceLoader to locate the solr home directory.
         */
+
+        int httpsPort = getHttpsPort();
+
+        if(httpsPort > -1)
+        {
+            setHttpsPort(httpsPort);
+        }
 
         String solrHome = SolrResourceLoader.locateSolrHome();
 
@@ -195,5 +203,38 @@ public class Solr4X509ServletFilter extends X509ServletFilterBase
                 }
             }
         }
+    }
+
+    private int getHttpsPort()
+    {
+        try
+        {
+            MBeanServer mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
+            QueryExp query = Query.eq(Query.attr("Scheme"), Query.value("https"));
+            Set<ObjectName> objectNames = mBeanServer.queryNames(null, query);
+
+            if (objectNames != null && objectNames.size() > 0) {
+                for (ObjectName objectName : objectNames) {
+                    String name = objectName.toString();
+                    if (name.indexOf("port=") > -1) {
+                        String[] parts = name.split("port=");
+                        String port = parts[1];
+                        try {
+                            int portNum = Integer.parseInt(port);
+                            return portNum;
+                        } catch (NumberFormatException e) {
+                            logger.error("Error parsing https port:" + port);
+                            return -1;
+                        }
+                    }
+                }
+            }
+        }
+        catch(Throwable t)
+        {
+            logger.error("Error getting https port:", t);
+        }
+
+        return -1;
     }
 }
