@@ -954,7 +954,14 @@ public class SearchParameters implements BasicSearchParameters
      */
     public String getSearchTerm()
     {
-        return this.searchTerm;
+        if((searchTerm == null) || (searchTerm.length() == 0))
+        {
+            return getQuery();
+        }
+        else
+        {
+            return this.searchTerm;
+        }
     }
 
     /**
