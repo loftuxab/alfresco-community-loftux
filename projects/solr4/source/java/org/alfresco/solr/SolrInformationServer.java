@@ -96,6 +96,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javax.management.*;
+
 import org.alfresco.httpclient.AuthenticationException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.opencmis.dictionary.CMISStrictDictionaryService;
@@ -302,7 +304,8 @@ public class SolrInformationServer implements InformationServer
         // build base URL - host and port have to come from configuration.
         
         Properties props = AlfrescoSolrDataModel.getCommonConfig();
-        port = Integer.parseInt(props.getProperty("solr.port", "8080"));
+        
+        port = Integer.parseInt(props.getProperty("solr.port", getHttpPort("8080")));
         String defaultHost;
         try
         {
@@ -3266,5 +3269,38 @@ public class SolrInformationServer implements InformationServer
     public String getHostName()
     {
        return hostName;
+    }
+    
+    private String  getHttpPort(String  defaultPort)
+    {
+        try
+        {
+            MBeanServer mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
+            QueryExp query = Query.and(Query.eq(Query.attr("scheme"), Query.value("http")), Query.eq(Query.attr("protocol"), Query.value("HTTP/1.1")));
+            Set<ObjectName> objectNames = mBeanServer.queryNames(null, query);
+
+            if (objectNames != null && objectNames.size() > 0) {
+                for (ObjectName objectName : objectNames) {
+                    String name = objectName.toString();
+                    if (name.indexOf("port=") > -1) {
+                        String[] parts = name.split("port=");
+                        String port = parts[1];
+                        try {
+                            Integer.parseInt(port);
+                            return port;
+                        } catch (NumberFormatException e) {
+                            log.error("Error parsing http port:" + port);
+                            return defaultPort;
+                        }
+                    }
+                }
+            }
+        }
+        catch(Throwable t)
+        {
+            log.error("Error getting https port:", t);
+        }
+
+        return defaultPort;
     }
 }
