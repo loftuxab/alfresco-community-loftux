@@ -1,0 +1,87 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Classes" verbose="1" preserve-order="true" parallel="classes"
+	thread-count="1">
+	<groups>
+		<run>
+			<include name="DataPrep.*" />
+			<exclude name="NonGrid" />
+		</run>
+	</groups>
+
+	<test name="HybridSyncNegativeTests3" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.cloudsync.HybridSyncNegativeTests3" />
+		</classes>
+	</test>
+
+	<test name="HybridSyncNegativeTests2" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.cloudsync.HybridSyncNegativeTests2" />
+		</classes>
+	</test>
+
+	<test name="Advanced Workflow Scenarios" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.workflow.AdvancedScenariosWorkflowTests" />
+		</classes>
+	</test>
+
+	<test name="Recreate Workflow" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.workflow.actionsWithDocuments.RecreateWorkflowTests" />
+		</classes>
+	</test>
+
+	<test name="Hybrid Sync Positive Tests" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.cloudsync.HybridSyncPositiveTests" />
+		</classes>
+	</test>
+
+	<test name="CompleteWorkflowTests" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.workflow.CompletedWorkflowSyncedTests" />
+		</classes>
+	</test>
+
+	<test name="IncompleteWorkflowTests" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.workflow.IncompleteWorkflowTests" />
+		</classes>
+	</test>
+
+	<test name="WorkflowOptionsTests" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.workflow.WorkflowOptionsTests" />
+		</classes>
+	</test>
+
+	<test name="CompleteSimpleCloudTaskTests" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.workflow.simpleCloudTask.CompleteSimpleCloudTaskTests" />
+		</classes>
+	</test>
+
+	<test name="CreateSimpleCloudTaskTests" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.workflow.simpleCloudTask.CreateSimpleCloudTaskTests" />
+		</classes>
+	</test>
+
+	<test name="EditSimpleCloudTaskTests" verbose="1">
+		<classes>
+			<class
+				name="org.alfresco.share.workflow.simpleCloudTask.EditSimpleCloudTaskTests" />
+		</classes>
+	</test>
+
+	<test name="HybridCreateWorkfloFormTests" verbose="1">
+		<classes>
+			<class name="org.alfresco.share.workflow.HybridCreateWorkfloFormTests" />
+		</classes>
+	</test>
+
+</suite>

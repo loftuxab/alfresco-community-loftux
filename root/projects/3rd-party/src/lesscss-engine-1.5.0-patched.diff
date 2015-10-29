@@ -1,0 +1,37 @@
+Index: src/main/java/com/asual/lesscss/LessEngine.java
+===================================================================
+--- src/main/java/com/asual/lesscss/LessEngine.java     (revision 152)
++++ src/main/java/com/asual/lesscss/LessEngine.java     (working copy)
+@@ -96,7 +96,7 @@
+                        global.init(cx);
+                        scope = cx.initStandardObjects(global);
+                        cx.evaluateReader(scope, new InputStreamReader(env.openConnection()
+-                                       .getInputStream()), env.getFile(), 1, null);
++                                       .getInputStream()), env.toExternalForm(), 1, null);
+                        Scriptable lessEnv = (Scriptable) scope.get("lessenv", scope);
+	                        lessEnv.put("charset", lessEnv, options.getCharset());
+                        lessEnv.put("css", lessEnv, options.isCss());
+@@ -104,13 +104,13 @@
+                        lessEnv.put("optimization", lessEnv, options.getOptimization());
+                        lessEnv.put("loader", lessEnv, Context.javaToJS(loader, scope));
+                        cx.evaluateReader(scope, new InputStreamReader(less
+-                                       .openConnection().getInputStream()), less.getFile(), 1,
++                                       .openConnection().getInputStream()), less.toExternalForm(), 1,
+                                        null);
+                        cx.evaluateReader(scope, new InputStreamReader(cssmin
+-                                       .openConnection().getInputStream()), cssmin.getFile(), 1,
++                                       .openConnection().getInputStream()), cssmin.toExternalForm(), 1,
+                                        null);
+                        cx.evaluateReader(scope, new InputStreamReader(engine
+-                                       .openConnection().getInputStream()), engine.getFile(), 1,
++                                       .openConnection().getInputStream()), engine.toExternalForm(), 1,
+                                        null);
+                        compile = (Function) scope.get("compile", scope);
+                        Context.exit();
+@@ -252,4 +252,4 @@
+                throw new LessException(root);
+        }
+ 
+-}
+\ No newline at end of file
++}
