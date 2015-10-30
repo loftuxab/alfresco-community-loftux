@@ -82,12 +82,12 @@ public class DocumentShareTests extends AbstractUtils
         ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC);
 
         ShareUser.openDocumentLibrary(drone);
-        
+
         ShareUserSitePage.createFolder(drone, folderName, folderName);
 
         FolderDetailsPage detailsPage = ShareUserSitePage.getFileDirectoryInfo(drone, folderName).selectViewFolderDetails();
 
-        detailsPage.selectLike().render();
+        detailsPage.selectLikeFolder().render();
 
         for (int x = 0; x < 11; x++)
         {
