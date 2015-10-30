@@ -434,17 +434,17 @@ public class SiteNoticetDashletTest extends AbstractUtils
         // Test text as UNDERLINED
         siteNoticeEditor.clickTextFormatter(FormatType.UNDERLINED);
         Assert.assertEquals(text, siteNoticeEditor.getText());
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<span style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<p><span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></p>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         // Test BULLET on text
         siteNoticeEditor.clickTextFormatter(FormatType.BULLET);
         Assert.assertEquals(text, siteNoticeEditor.getText());
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<li><span style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></li>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ul><li><span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></li></ul>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         // Test NUMBER on test
         siteNoticeEditor.clickTextFormatter(FormatType.NUMBER);
         Assert.assertEquals(text, siteNoticeEditor.getText());
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol style=\"\"><li><span style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></li></ol>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol><li><span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></li></ol>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
         siteNoticeEditor.removeFormatting();
 
         InsertOrEditLinkPage insertOrEditLinkPage = siteNoticeEditor.clickInsertOrEditLink();
@@ -452,7 +452,7 @@ public class SiteNoticetDashletTest extends AbstractUtils
         insertOrEditLinkPage.setTitle("amazing blog");
         insertOrEditLinkPage.clickOKButton();
         Assert.assertEquals(text, siteNoticeEditor.getText());
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol><li><a href=\"http://electrictower.ru/\" data-mce-href=\"http://electrictower.ru/\">" + text + "</a><br></li></ol>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol><li><a href=\"http://electrictower.ru/\" data-mce-href=\"http://electrictower.ru/\">" + text + "</a><br data-mce-bogus=\"1\"></li></ol>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         InsertOrEditImagePage insertOrEditImagePage = siteNoticeEditor.selectInsertOrEditImage();
         insertOrEditImagePage.setImageUrl("http://www.alfresco.com/sites/www/themes/alfrescodotcom/img/logo.png");
@@ -553,24 +553,24 @@ public class SiteNoticetDashletTest extends AbstractUtils
         // Test text as UNDERLINED
         siteNoticeEditor.clickTextFormatter(FormatType.UNDERLINED);
         Assert.assertEquals(text, siteNoticeEditor.getText());
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<span style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span>"), "Actual: " + siteNoticeEditor.getContent() + ", Expected: " + "<u><em><strong>" + text + "</strong></em></u>");
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<p><span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></p>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         // Test BULLET on text
         siteNoticeEditor.clickTextFormatter(FormatType.BULLET);
         Assert.assertEquals(text, siteNoticeEditor.getText());
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<li><span style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></li>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ul><li><span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></li></ul>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         // Test NUMBER on test
         siteNoticeEditor.clickTextFormatter(FormatType.NUMBER);
         Assert.assertEquals(text, siteNoticeEditor.getText());
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol style=\"\"><li><span style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></li></ol>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol><li><span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\"><em><strong>" + text + "</strong></em></span></li></ol>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         InsertOrEditLinkPage insertOrEditLinkPage = siteNoticeEditor.clickInsertOrEditLink();
         insertOrEditLinkPage.setLinkUrl("http://electrictower.ru/");
         insertOrEditLinkPage.setTitle("amazing blog");
         insertOrEditLinkPage.clickOKButton();
         Assert.assertEquals(text, siteNoticeEditor.getText());
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol style=\"\"><li><span style=\"text-decoration: underline;\"><em><strong><a href=\"http://electrictower.ru/\" data-mce-href=\"http://electrictower.ru/\">" + text + "</a></strong></em></span><br></li></ol>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol><li><span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;\"><em><strong><a href=\"http://electrictower.ru/\" data-mce-href=\"http://electrictower.ru/\">" + text + "</a></strong></em></span><br></li></ol>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         InsertOrEditImagePage insertOrEditImagePage = siteNoticeEditor.selectInsertOrEditImage();
         insertOrEditImagePage.setImageUrl("http://www.alfresco.com/sites/www/themes/alfrescodotcom/img/logo.png");
@@ -595,7 +595,7 @@ public class SiteNoticetDashletTest extends AbstractUtils
         Assert.assertEquals(text, siteNoticeEditor.getText());
         Assert.assertTrue(siteNoticeEditor.getContent().contains("<strong>"));
         Assert.assertTrue(siteNoticeEditor.getContent().contains("<em>"));
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<span style=\"text-decoration: underline;\">"));
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<span data-mce-style=\"text-decoration: underline;\" style=\"text-decoration: underline;>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
         Assert.assertTrue(siteNoticeEditor.getContent().contains("<ol style=\"\"><li>"));
     }
 
@@ -851,8 +851,8 @@ public class SiteNoticetDashletTest extends AbstractUtils
 
         // Test NUMBER on text
         siteNoticeEditor.clickTextFormatter(FormatType.NUMBER);
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<li>" + testName + "</li>"));
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<li>" + siteName + "</li></ol>"));
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("</span>" +  testName+ "</li>"), "Actual: " + siteNoticeEditor.getContent());
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("<li>" + siteName + "</li></ol>"), "Actual: " + siteNoticeEditor.getContent());
     }
 
     @Test(groups = { "DataPrepAlfrescoOne" })
@@ -1454,7 +1454,7 @@ public class SiteNoticetDashletTest extends AbstractUtils
         // Click any test formatting button. Italic
         siteNoticeEditor.removeFormatting();
         siteNoticeEditor.clickTextFormatter(FormatType.ITALIC);
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<em>" + testName + "</em>"), "Changes aren't implemented");
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("</span>" + testName + "</strong></em></p>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         // Click on OK button present on Site Notice configure dialog box.
         configureSiteNotice.clickOnOKButton().render();
@@ -1462,7 +1462,7 @@ public class SiteNoticetDashletTest extends AbstractUtils
         // Get Site Notice dashlet
         siteNoticeDashlet = ShareUserDashboard.getSiteContentDashlet(drone, siteName);
         siteNoticeDashlet.clickOnConfigureIcon().render();
-        Assert.assertTrue(siteNoticeEditor.getContent().contains("<em>" + testName + "</em>"), "Changes aren't saved");
+        Assert.assertTrue(siteNoticeEditor.getContent().contains("</span>" + testName + "</strong></em></p>"), "siteNoticeEditor.getContent(): " + siteNoticeEditor.getContent());
 
         // Click any test formatting button. Underline
         siteNoticeEditor.removeFormatting();
