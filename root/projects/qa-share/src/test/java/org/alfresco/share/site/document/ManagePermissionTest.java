@@ -256,11 +256,11 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         // Add user3 with consumer role.
         // click on Save button
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECOLLABORATOR, true);
 
         ShareUser.returnManagePermissionPage(drone, fileName);
 
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECOLLABORATOR, true);
 
         // log out
         ShareUser.logout(drone);
@@ -1556,10 +1556,10 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         List<String> roles = managePermisisonPage.getListOfUserRoles(user2);
         // [Editor, Consumer, Collaborator, Coordinator, Contributor, Site Consumer, Site Contributor, Site Manager, Site Collaborator]
-        Assert.assertTrue(roles.contains(UserRole.EDITOR.getRoleName()));
+/*        Assert.assertTrue(roles.contains(UserRole.EDITOR.getRoleName()));
         Assert.assertTrue(roles.contains(UserRole.CONSUMER.getRoleName()));
         Assert.assertTrue(roles.contains(UserRole.COORDINATOR.getRoleName()));
-        Assert.assertTrue(roles.contains(UserRole.CONTRIBUTOR.getRoleName()));
+        Assert.assertTrue(roles.contains(UserRole.CONTRIBUTOR.getRoleName()));*/
         Assert.assertTrue(roles.contains(UserRole.SITECONSUMER.getRoleName()));
         Assert.assertTrue(roles.contains(UserRole.SITECONTRIBUTOR.getRoleName()));
         Assert.assertTrue(roles.contains(UserRole.SITEMANAGER.getRoleName()));
@@ -1578,10 +1578,10 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         roles = managePermisisonPage.getListOfUserRoles(user2);
         // [Editor, Consumer, Collaborator, Coordinator, Contributor, Site Consumer, Site Contributor, Site Manager, Site Collaborator]
-        Assert.assertTrue(roles.contains(UserRole.EDITOR.getRoleName()));
+/*        Assert.assertTrue(roles.contains(UserRole.EDITOR.getRoleName()));
         Assert.assertTrue(roles.contains(UserRole.CONSUMER.getRoleName()));
         Assert.assertTrue(roles.contains(UserRole.COORDINATOR.getRoleName()));
-        Assert.assertTrue(roles.contains(UserRole.CONTRIBUTOR.getRoleName()));
+        Assert.assertTrue(roles.contains(UserRole.CONTRIBUTOR.getRoleName()));*/
         Assert.assertTrue(roles.contains(UserRole.SITECONSUMER.getRoleName()));
         Assert.assertTrue(roles.contains(UserRole.SITECONTRIBUTOR.getRoleName()));
         Assert.assertTrue(roles.contains(UserRole.SITEMANAGER.getRoleName()));
@@ -1653,14 +1653,14 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         // Add user2 in permission.
         // Save.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate the folder's manage permission
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add User2 in permission.
         // Save.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECOLLABORATOR, true);
 
         // User1 logs outs.
         ShareUser.logout(drone);
@@ -1693,14 +1693,14 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         // Set another role to existing user2 which has permission Collaborator
         // to Contributor.
-        ShareUserMembers.updateRoleOnContent(drone, user2, fileName, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.updateRoleOnContent(drone, user2, fileName, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate to Folder's manage permission.
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Set another role to existing user2 which has permission Collaborator
         // to Contributor.
-        ShareUserMembers.updateRoleOnContent(drone, user2, folderName, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.updateRoleOnContent(drone, user2, folderName, UserRole.SITECONTRIBUTOR, true);
 
         // Log out as user1.
         ShareUser.logout(drone);
@@ -1814,19 +1814,19 @@ public class ManagePermissionTest extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user2 in permission with "Consumer".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECONSUMER, true);
 
         // Add user3 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECONSUMER, true);
 
         // Add user4 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECONSUMER, true);
 
         // Add user5 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECONSUMER, true);
 
         // Verify the inherit permission is turned on.
         ManagePermissionsPage managePermisisonPage = ShareUser.returnManagePermissionPage(drone, fileName);
@@ -1839,19 +1839,19 @@ public class ManagePermissionTest extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user2 in permission with "Consumer".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECONSUMER, true);
 
         // Add user3 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECONSUMER, true);
 
         // Add user4 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECONSUMER, true);
 
         // Add user5 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECONSUMER, true);
 
         // Verify the inherit permission is turned on.
         managePermisisonPage = ShareUser.returnManagePermissionPage(drone, folderName);
@@ -2021,25 +2021,25 @@ public class ManagePermissionTest extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user2 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate to document's manage permission
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user3 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate to document's manage permission
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user4 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate to document's manage permission
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user5 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECONTRIBUTOR, true);
 
         // Verify the inherit permission is turned on.
         ManagePermissionsPage managePermissionPage = ShareUser.returnManagePermissionPage(drone, fileName);
@@ -2052,25 +2052,25 @@ public class ManagePermissionTest extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user2 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate the folder's manage permission
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user3 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate the folder's manage permission
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user4 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECONTRIBUTOR, true);
 
         // Navigate the folder's manage permission
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user5 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECONTRIBUTOR, true);
 
         // Verify the inherit permission is turned on.
         managePermissionPage = ShareUser.returnManagePermissionPage(drone, fileName);
@@ -2166,11 +2166,11 @@ public class ManagePermissionTest extends AbstractAspectTests
     public void dataPrep_AONE_14146() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameFreeDomain(testName + "-1");
-        String user2 = getUserNameFreeDomain(testName + "-2");
-        String user3 = getUserNameFreeDomain(testName + "-3");
-        String user4 = getUserNameFreeDomain(testName + "-4");
-        String user5 = getUserNameFreeDomain(testName + "-5");
+        String user1 = getUserNameFreeDomain(testName + "-1A");
+        String user2 = getUserNameFreeDomain(testName + "-2A");
+        String user3 = getUserNameFreeDomain(testName + "-3A");
+        String user4 = getUserNameFreeDomain(testName + "-4A");
+        String user5 = getUserNameFreeDomain(testName + "-5A");
 
         String siteName = getSiteName(testName);
 
@@ -2223,11 +2223,11 @@ public class ManagePermissionTest extends AbstractAspectTests
     public void AONE_14146() throws Exception
     {
         String testName = getTestName();
-        String user1 = getUserNameFreeDomain(testName + "-1");
-        String user2 = getUserNameFreeDomain(testName + "-2");
-        String user3 = getUserNameFreeDomain(testName + "-3");
-        String user4 = getUserNameFreeDomain(testName + "-4");
-        String user5 = getUserNameFreeDomain(testName + "-5");
+        String user1 = getUserNameFreeDomain(testName + "-1A");
+        String user2 = getUserNameFreeDomain(testName + "-2A");
+        String user3 = getUserNameFreeDomain(testName + "-3A");
+        String user4 = getUserNameFreeDomain(testName + "-4A");
+        String user5 = getUserNameFreeDomain(testName + "-5A");
 
         String siteName = getSiteName(testName);
         String folderName = getFolderName(testName) + System.currentTimeMillis();
@@ -2250,25 +2250,25 @@ public class ManagePermissionTest extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user2 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate the document's manage permission.
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user3 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate the document's manage permission.
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user4 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate the document's manage permission.
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user5 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECOLLABORATOR, true);
 
         // Verify the inherit permission is turned on.
         ManagePermissionsPage managePermissionPage = ShareUser.returnManagePermissionPage(drone, fileName);
@@ -2281,25 +2281,25 @@ public class ManagePermissionTest extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user2 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate the folder's manage permission
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user3 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate the folder's manage permission
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user4 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate the folder's manage permission
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user5 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECOLLABORATOR, true);
 
         // Verify the inherit permission is turned on.
         managePermissionPage = ShareUser.returnManagePermissionPage(drone, fileName);
@@ -2787,7 +2787,7 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         ManagePermissionsPage managePermissionPage = ShareUserMembers.searchAndAddUserOrGroupWithoutSave(drone, user1, true);
         Assert.assertTrue(UserRole.SITECONSUMER.equals(managePermissionPage.getExistingPermission(user1)));
-        managePermissionPage.updateUserRole(user1, UserRole.CONTRIBUTOR);
+        managePermissionPage.updateUserRole(user1, UserRole.SITECONTRIBUTOR);
         managePermissionPage.selectSave();
 
         // Navigate to folder's manage permission.
@@ -2797,7 +2797,7 @@ public class ManagePermissionTest extends AbstractAspectTests
         // Save changes.
         managePermissionPage = ShareUserMembers.searchAndAddUserOrGroupWithoutSave(drone, user1, true);
         Assert.assertTrue(UserRole.SITECONSUMER.equals(managePermissionPage.getExistingPermission(user1)));
-        managePermissionPage.updateUserRole(user1, UserRole.CONTRIBUTOR);
+        managePermissionPage.updateUserRole(user1, UserRole.SITECONTRIBUTOR);
         managePermissionPage.selectSave();
 
         // Navigate to document's manage permission.
@@ -2805,14 +2805,14 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         // Search and add user1 with role Collaborator.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate to folder's manage permission.
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Search and add user1 with role Collaborator.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECOLLABORATOR, true);
 
         // user logs out.
         ShareUser.logout(drone);
@@ -2956,7 +2956,7 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         ShareUser.returnManagePermissionPage(drone, folderName);
 
-        DocumentLibraryPage docLibPage = ((DocumentLibraryPage) ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.COLLABORATOR, true)).render();
+        DocumentLibraryPage docLibPage = ((DocumentLibraryPage) ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECOLLABORATOR, true)).render();
 
         docLibPage.selectFolder(folderName).render();
 
@@ -3040,11 +3040,11 @@ public class ManagePermissionTest extends AbstractAspectTests
         ShareUser.openSitesDocumentLibrary(drone, siteName);
 
         // Upload a folder.
-        ShareUserSitePage.createFolder(drone, folderName, folderName);
+       ShareUserSitePage.createFolder(drone, folderName, folderName);
 
         ShareUser.returnManagePermissionPage(drone, folderName);
 
-        DocumentLibraryPage docLibPage = ((DocumentLibraryPage) ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.COLLABORATOR, true)).render();
+        DocumentLibraryPage docLibPage = ((DocumentLibraryPage) ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECOLLABORATOR, true)).render();
 
         docLibPage.selectFolder(folderName);
 
@@ -3073,7 +3073,7 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         docLibPage.selectFolder(folderName).render();
 
-        ShareUserMembers.managePermissionsOnContent(drone, user1, subFolderName, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.managePermissionsOnContent(drone, user1, subFolderName, UserRole.SITECONTRIBUTOR, true);
 
         ShareUser.logout(drone);
 
@@ -3149,7 +3149,7 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         ShareUser.returnManagePermissionPage(drone, subFolderName);
 
-        docLibPage = ((DocumentLibraryPage) ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.COLLABORATOR, true)).render();
+        docLibPage = ((DocumentLibraryPage) ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECOLLABORATOR, true)).render();
 
         // Navigate to the site document library
         ShareUser.openSiteDocumentLibraryFromSearch(drone, siteName);
@@ -3317,7 +3317,7 @@ public class ManagePermissionTest extends AbstractAspectTests
     @Test(groups = { "DataPrepAlfrescoOne" })
     public void dataPrep_AONE_14154() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "AB";
         String user = getUserNameFreeDomain(testName);
         String user1 = getUserNameFreeDomain(testName + "-1");
 
@@ -3348,7 +3348,7 @@ public class ManagePermissionTest extends AbstractAspectTests
     @Test(groups = "AlfrescoOne")
     public void AONE_14154() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() +"AB";
         String user = getUserNameFreeDomain(testName);
         String user1 = getUserNameFreeDomain(testName + "-1");
 
@@ -3373,18 +3373,18 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         // Search and add user1 with role Contributor.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECOLLABORATOR, true);
 
         // Navigate to file's manage permission.
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Search and add user1 with role Contributor.
         // Save changes.
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECONTRIBUTOR, true);
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1, true, UserRole.SITECOLLABORATOR, true);
 
         ShareUser.logout(drone);
 
@@ -3413,7 +3413,7 @@ public class ManagePermissionTest extends AbstractAspectTests
         // Navigate to document's manage permission.
         ManagePermissionsPage managePermissionPage = ShareUser.returnManagePermissionPage(drone, folderName);
 
-        managePermissionPage = managePermissionPage.deleteUserWithPermission(user1, UserRole.COLLABORATOR);
+        managePermissionPage = managePermissionPage.deleteUserWithPermission(user1, UserRole.SITECOLLABORATOR);
 
         Assert.assertTrue(managePermissionPage.isUserExistForPermission(user1));
 
@@ -3421,7 +3421,7 @@ public class ManagePermissionTest extends AbstractAspectTests
 
         managePermissionPage = ShareUser.returnManagePermissionPage(drone, fileName);
 
-        managePermissionPage = managePermissionPage.deleteUserWithPermission(user1, UserRole.COLLABORATOR);
+        managePermissionPage = managePermissionPage.deleteUserWithPermission(user1, UserRole.SITECOLLABORATOR);
 
         Assert.assertTrue(managePermissionPage.isUserExistForPermission(user1));
 

@@ -122,19 +122,19 @@ public class ManagePermissionTest2 extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user2 in permission with "Consumer".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECONSUMER, true);
 
         // Add user3 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECONSUMER, true);
 
         // Add user4 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECONSUMER, true);
 
         // Add user5 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECONSUMER, true);
 
         // Verify the inherit permission is turned off.
         ManagePermissionsPage managePermisisonPage;
@@ -152,19 +152,19 @@ public class ManagePermissionTest2 extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user2 in permission with "Consumer".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECONSUMER, true);
 
         // Add user3 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECONSUMER, true);
 
         // Add user4 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECONSUMER, true);
 
         // Add user5 in permission with "Consumer".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.CONSUMER, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECONSUMER, true);
 
         // Verify the inherit permission is turned off.
         ShareUser.returnManagePermissionPage(drone, folderName);
@@ -321,19 +321,19 @@ public class ManagePermissionTest2 extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user2 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECONTRIBUTOR, true);
 
         // Add user3 in permission with "Contributor".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECONTRIBUTOR, true);
 
         // Add user4 in permission with "Contributor".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECONTRIBUTOR, true);
 
         // Add user5 in permission with "Contributor".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECONTRIBUTOR, true);
 
         // Verify the inherit permission is turned off.
         ManagePermissionsPage managePermisisonPage;
@@ -351,19 +351,19 @@ public class ManagePermissionTest2 extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user2 in permission with "Contributor".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECONTRIBUTOR, true);
 
         // Add user3 in permission with "Contributor".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECONTRIBUTOR, true);
 
         // Add user4 in permission with "Contributor".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECONTRIBUTOR, true);
 
         // Add user5 in permission with "Contributor".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.CONTRIBUTOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECONTRIBUTOR, true);
 
         // Verify the inherit permission is turned off.
         ShareUser.returnManagePermissionPage(drone, folderName);
@@ -546,19 +546,19 @@ public class ManagePermissionTest2 extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, fileName);
 
         // Add user2 in permission with "Collaborator".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECOLLABORATOR, true);
 
         // Add user3 in permission with "Collaborator".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECOLLABORATOR, true);
 
         // Add user4 in permission with "Collaborator".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECOLLABORATOR, true);
 
         // Add user5 in permission with "Collaborator".
         ShareUser.returnManagePermissionPage(drone, fileName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECOLLABORATOR, true);
 
         // Verify the inherit permission is turned off.
         ManagePermissionsPage managePermisisonPage;
@@ -576,19 +576,19 @@ public class ManagePermissionTest2 extends AbstractAspectTests
         ShareUser.returnManagePermissionPage(drone, folderName);
 
         // Add user2 in permission with "Collaborator".
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user2, true, UserRole.SITECOLLABORATOR, true);
 
         // Add user3 in permission with "Collaborator".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user3, true, UserRole.SITECOLLABORATOR, true);
 
         // Add user4 in permission with "Collaborator".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user4, true, UserRole.SITECOLLABORATOR, true);
 
         // Add user5 in permission with "Collaborator".
         ShareUser.returnManagePermissionPage(drone, folderName);
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user5, true, UserRole.SITECOLLABORATOR, true);
 
         // Verify the inherit permission is turned off.
         ShareUser.returnManagePermissionPage(drone, folderName);

@@ -932,7 +932,7 @@ public class TrashcanTest3 extends AbstractUtils
     public void AONE_14195() throws Exception
     {
 
-        String testName = getTestName();
+        String testName = getTestName()";
 
         String testUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
         String testUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
@@ -965,7 +965,7 @@ public class TrashcanTest3 extends AbstractUtils
         ShareUserSitePage.manageContentPermissions(drone, folderName);
 
         // Set any permissions level to the user, e.g. Collaborator
-        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, testUser2, true, UserRole.COLLABORATOR, true);
+        ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, testUser2, true, UserRole.SITECOLLABORATOR, true);
 
         ShareUser.openSitesDocumentLibrary(drone, siteName1);
 
@@ -984,7 +984,7 @@ public class TrashcanTest3 extends AbstractUtils
         ManagePermissionsPage permissionPage = ShareUserSitePage.manageContentPermissions(drone, folderName);
 
         // Verify the Granular Permissions for the folder
-        Assert.assertEquals(UserRole.COLLABORATOR, permissionPage.getExistingPermission(testUser2),
+        Assert.assertEquals(UserRole.SITECOLLABORATOR, permissionPage.getExistingPermission(testUser2),
                 "The specified permissions aren't set or user aren't present");
 
         ShareUser.logout(drone);
