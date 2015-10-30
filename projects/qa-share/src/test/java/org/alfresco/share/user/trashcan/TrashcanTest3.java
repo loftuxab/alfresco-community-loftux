@@ -932,7 +932,7 @@ public class TrashcanTest3 extends AbstractUtils
     public void AONE_14195() throws Exception
     {
 
-        String testName = getTestName()";
+        String testName = getTestName();
 
         String testUser1 = getUserNameFreeDomain(testName + "user1" + System.currentTimeMillis());
         String testUser2 = getUserNameFreeDomain(testName + "user2" + System.currentTimeMillis());
