@@ -764,7 +764,30 @@ public interface NodeService
     @Auditable(parameters = {"sourceRef", "qnamePattern"})
     public List<AssociationRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException;
-    
+
+    /**
+     * Fetches all associations <i>from</i> the given source where the associations'
+     * qualified names match the pattern provided.
+     * <p/>
+     * The results are ordered if a specific type of association is requested
+     * 
+     * @param sourceRef                 the association source
+     * @param qnamePattern              the association qname pattern to match against
+     * @param propertyQName             the fully qualified name of the property of the association target. Optional parameter - can be null.
+     * @param propertyValue             association target property value to search for. Must be a simple type such as
+     *                                  String, Number, Date or Boolean, it cannot be a collection, 
+     *                                  a content property, MLText or a float. If <b>propertyQName</b> is null the <b>value</b> is ignored.
+     * @return                          a list of <code>AssociationRef</code> instances for which the
+     *                                  given node is a source
+     * @throws InvalidNodeRefException  if the source node could not be 
+     * @throws IllegalArgumentException if propertyQName is a system maintained property
+     * 
+     * @see QName
+     * @see org.alfresco.service.namespace.RegexQNamePattern#MATCH_ALL
+     */
+    @Auditable(parameters = {"sourceRef", "qnamePattern", "propertyQName", "propertyValue"})
+    public List<AssociationRef> getTargetAssocsByPropertyValue(NodeRef sourceRef, QNamePattern qnamePattern, QName propertyQName, Serializable propertyValue);
+
     /**
      * Fetches all associations <i>to</i> the given target where the associations'
      * qualified names match the pattern provided.
