@@ -24,6 +24,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 
+import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
+import org.alfresco.repo.search.impl.parsers.FTSQueryParser.RerankPhase;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.search.spans.SpanNearQuery;
 import org.apache.lucene.search.spans.SpanOrQuery;
@@ -43,7 +45,7 @@ public class Solr4QueryParserTest
     @Before
     public void setUp() throws Exception
     {
-        parser = new Solr4QueryParser(null, Version.LUCENE_48, "TEXT", null, null);
+        parser = new Solr4QueryParser(null, Version.LUCENE_48, "TEXT", null, FTSQueryParser.RerankPhase.SINGLE_PASS);
     }
 
     @Test
