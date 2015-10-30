@@ -43,7 +43,7 @@ public class Solr4QueryParserTest
     @Before
     public void setUp() throws Exception
     {
-        parser = new Solr4QueryParser(null, Version.LUCENE_48, "TEXT", null);
+        parser = new Solr4QueryParser(null, Version.LUCENE_48, "TEXT", null, null);
     }
 
     @Test
