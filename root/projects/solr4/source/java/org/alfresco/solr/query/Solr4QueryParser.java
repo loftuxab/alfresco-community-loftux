@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -2117,139 +2117,9 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 				// If we skip all (for just 1* in the input) this is still an issue.
 				else
 				{
-					SpanOrQuery spanOr = new SpanOrQuery();
-
-					for(LinkedList<org.apache.lucene.analysis.Token> tokenSequence : fixedTokenSequences)
-					{
-						int gap = 1;
-						SpanQuery spanQuery = null;
-						SpanOrQuery atSamePosition = new SpanOrQuery();
-						for (int i = 0; i < tokenSequence.size(); i++)
-						{
-							nextToken = (org.apache.lucene.analysis.Token) tokenSequence.get(i);
-							String termText = nextToken.toString();
-
-							Term term = new Term(field, termText);
-
-							if (getEnablePositionIncrements())
-							{
-								SpanQuery nextSpanQuery;
-								if ((termText != null) && (termText.contains("*") || termText.contains("?")))
-								{
-									org.apache.lucene.search.WildcardQuery wildQuery = new org.apache.lucene.search.WildcardQuery(term);
-									SpanMultiTermQueryWrapper wrapper = new SpanMultiTermQueryWrapper<>(wildQuery);
-									wrapper.setRewriteMethod(new TopTermsSpanBooleanQueryRewrite(topTermSpanRewriteLimit));
-									nextSpanQuery = wrapper;
-								}
-								else
-								{
-									nextSpanQuery = new SpanTermQuery(term);
-								}
-								if(gap == 0)
-								{
-									atSamePosition.addClause(nextSpanQuery);
-								}
-								else
-								{
-									if(atSamePosition.getClauses().length == 0)
-									{
-										if(spanQuery == null)
-										{
-											spanQuery = nextSpanQuery;
-										}
-										else
-										{
-											spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, nextSpanQuery}, (gap-1) + internalSlop, internalSlop < 2);
-										}
-										atSamePosition = new SpanOrQuery();
-									}
-									else if(atSamePosition.getClauses().length == 1)
-									{
-										if(spanQuery == null)
-										{
-											spanQuery = atSamePosition.getClauses()[0];
-										}
-										else
-										{
-											spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, (gap-1) + internalSlop, internalSlop < 2);
-										}
-										atSamePosition = new SpanOrQuery();
-										atSamePosition.addClause(nextSpanQuery);
-									}
-									else
-									{
-										if(spanQuery == null)
-										{
-											spanQuery = atSamePosition;
-										}
-										else
-										{
-											spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, (gap-1) + internalSlop, internalSlop < 2);
-										}
-										atSamePosition = new SpanOrQuery();
-										atSamePosition.addClause(nextSpanQuery);
-									}
-								}
-								gap = nextToken.getPositionIncrement();
-
-							}
-							else
-							{
-								SpanQuery nextSpanQuery;
-								if ((termText != null) && (termText.contains("*") || termText.contains("?")))
-								{
-									org.apache.lucene.search.WildcardQuery wildQuery = new org.apache.lucene.search.WildcardQuery(term);
-									SpanMultiTermQueryWrapper wrapper = new SpanMultiTermQueryWrapper<>(wildQuery);
-									wrapper.setRewriteMethod(new TopTermsSpanBooleanQueryRewrite(topTermSpanRewriteLimit));
-									nextSpanQuery = wrapper;
-								}
-								else
-								{
-									nextSpanQuery = new SpanTermQuery(term);
-								}
-								if(spanQuery == null)
-								{
-									spanQuery = new SpanOrQuery();
-									((SpanOrQuery)spanQuery).addClause(nextSpanQuery);
-								}
-								else
-								{
-									((SpanOrQuery)spanQuery).addClause(nextSpanQuery);
-								}
-							}
-						}
-						if(atSamePosition.getClauses().length == 0)
-						{
-							spanOr.addClause(spanQuery);
-						}
-						else if(atSamePosition.getClauses().length == 1)
-						{
-							if(spanQuery == null)
-							{
-								spanQuery = atSamePosition.getClauses()[0];
-							}
-							else
-							{
-								spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, (gap-1) + internalSlop, internalSlop < 2);
-							}
-							atSamePosition = new SpanOrQuery();
-							spanOr.addClause(spanQuery);
-						}
-						else
-						{
-							if(spanQuery == null)
-							{
-								spanQuery = atSamePosition;
-							}
-							else
-							{
-								spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, (gap-1) + internalSlop, internalSlop < 2);
-							}
-							atSamePosition = new SpanOrQuery();
-							spanOr.addClause(spanQuery);
-						}
-					}
-					return spanOr;
+                    
+                    return generateSpanOrQuery(field, fixedTokenSequences);
+                            
 				}
 			}
 			else
@@ -2445,6 +2315,192 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 	/**
      * @param field
+     * @param fixedTokenSequences LinkedList<LinkedList<org.apache.lucene.analysis.Token>>
+     * @return Query
+     */
+    protected SpanOrQuery generateSpanOrQuery(String field, LinkedList<LinkedList<org.apache.lucene.analysis.Token>> fixedTokenSequences)
+    {
+        org.apache.lucene.analysis.Token nextToken;
+        SpanOrQuery spanOr = new SpanOrQuery();
+        
+        for(LinkedList<org.apache.lucene.analysis.Token> tokenSequence : fixedTokenSequences)
+        {
+            int gap = 1;
+            SpanQuery spanQuery = null;
+            SpanOrQuery atSamePosition = new SpanOrQuery();
+            
+            // MNT-13239: if all tokens's positions are incremented by one then create flat nearQuery 
+            if (getEnablePositionIncrements() && isAllTokensSequentiallyShifted(tokenSequence))
+            {
+                // there will be no tokens at same position
+                List<SpanQuery> wildWrappedList = new ArrayList<SpanQuery>(tokenSequence.size());
+                for (org.apache.lucene.analysis.Token token : tokenSequence)
+                {
+                    String termText = token.toString();
+                    Term term = new Term(field, termText);
+                    SpanQuery nextSpanQuery = wrapWildcardTerms(term);
+                    wildWrappedList.add(nextSpanQuery);
+                }
+                spanQuery = new SpanNearQuery(wildWrappedList.toArray(new SpanQuery[wildWrappedList.size()]), 0, true);
+            }
+            else
+            {
+                for (int i = 0; i < tokenSequence.size(); i++)
+                {
+                    nextToken = (org.apache.lucene.analysis.Token) tokenSequence.get(i);
+                    String termText = nextToken.toString();
+                    
+                    Term term = new Term(field, termText);
+
+                    if (getEnablePositionIncrements())
+                    {
+                        SpanQuery nextSpanQuery = wrapWildcardTerms(term);
+                        if(gap == 0)
+                        {
+                            atSamePosition.addClause(nextSpanQuery);
+                        }
+                        else
+                        {
+                            if(atSamePosition.getClauses().length == 0)
+                            {
+                                if(spanQuery == null)
+                                {
+                                    spanQuery = nextSpanQuery;
+                                }
+                                else
+                                {
+                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, nextSpanQuery}, (gap-1) + internalSlop, internalSlop < 2);
+                                }
+                                atSamePosition = new SpanOrQuery();
+                            }
+                            else if(atSamePosition.getClauses().length == 1)
+                            {
+                                if(spanQuery == null)
+                                {
+                                    spanQuery = atSamePosition.getClauses()[0];
+                                }
+                                else
+                                {
+                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, (gap-1) + internalSlop, internalSlop < 2);
+                                }
+                                atSamePosition = new SpanOrQuery();
+                                atSamePosition.addClause(nextSpanQuery);
+                            }
+                            else
+                            {
+                                if(spanQuery == null)
+                                {
+                                    spanQuery = atSamePosition;
+                                }
+                                else
+                                {
+                                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, (gap-1) + internalSlop, internalSlop < 2);
+                                }
+                                atSamePosition = new SpanOrQuery();
+                                atSamePosition.addClause(nextSpanQuery);
+                            }
+                        }
+                        gap = nextToken.getPositionIncrement();
+                        
+                    }
+                    else
+                    {
+                        SpanQuery nextSpanQuery;
+                        if ((termText != null) && (termText.contains("*") || termText.contains("?")))
+                        {
+                            org.apache.lucene.search.WildcardQuery wildQuery = new org.apache.lucene.search.WildcardQuery(term);
+                            SpanMultiTermQueryWrapper wrapper = new SpanMultiTermQueryWrapper<>(wildQuery);
+                            wrapper.setRewriteMethod(new TopTermsSpanBooleanQueryRewrite(topTermSpanRewriteLimit));
+                            nextSpanQuery = wrapper;
+                        }
+                        else
+                        {
+                            nextSpanQuery = new SpanTermQuery(term);
+                        }
+                        if(spanQuery == null)
+                        {
+                            spanQuery = new SpanOrQuery();
+                            ((SpanOrQuery)spanQuery).addClause(nextSpanQuery);
+                        }
+                        else
+                        {
+                            ((SpanOrQuery)spanQuery).addClause(nextSpanQuery);
+                        }
+                    }
+                }
+            }
+
+            if(atSamePosition.getClauses().length == 0)
+            {
+                spanOr.addClause(spanQuery);
+            }
+            else if(atSamePosition.getClauses().length == 1)
+            {
+                if(spanQuery == null)
+                {
+                    spanQuery = atSamePosition.getClauses()[0];
+                }
+                else
+                {
+                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition.getClauses()[0]}, (gap-1) + internalSlop, internalSlop < 2);
+                }
+                atSamePosition = new SpanOrQuery();
+                spanOr.addClause(spanQuery);
+            }
+            else
+            {
+                if(spanQuery == null)
+                {
+                    spanQuery = atSamePosition;
+                }
+                else
+                {
+                    spanQuery = new SpanNearQuery(new SpanQuery[]{spanQuery, atSamePosition}, (gap-1) + internalSlop, internalSlop < 2);
+                }
+                atSamePosition = new SpanOrQuery();
+                spanOr.addClause(spanQuery);
+            }
+        }
+        return spanOr;
+    }
+
+    private SpanQuery wrapWildcardTerms(org.apache.lucene.index.Term term)
+    {
+        String termText = term.text();
+        SpanQuery nextSpanQuery;
+        if ((termText != null) && (termText.contains("*") || termText.contains("?")))
+        {
+            org.apache.lucene.search.WildcardQuery wildQuery = new org.apache.lucene.search.WildcardQuery(term);
+            SpanMultiTermQueryWrapper wrapper = new SpanMultiTermQueryWrapper<>(wildQuery);
+            wrapper.setRewriteMethod(new TopTermsSpanBooleanQueryRewrite(topTermSpanRewriteLimit));
+            nextSpanQuery = wrapper;
+        }
+        else
+        {
+            nextSpanQuery = new SpanTermQuery(term);
+        }
+        return nextSpanQuery;
+    }
+
+    protected boolean isAllTokensSequentiallyShifted(List<Token> tokenSequence)
+    {
+        if (0 == internalSlop)
+        {
+            // check if all tokens have gap = 1
+            for (org.apache.lucene.analysis.Token tokenToCheck : tokenSequence)
+            {
+                if (1 != tokenToCheck.getPositionIncrement())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param field String
      * @param queryText
      * @param mpq
      * @return
@@ -2460,8 +2516,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 	/**
 	 * 
-     * @param mpq
-     * @return
+     * @param mpq MultiPhraseQuery
+     * @return boolean
 	 */
 	private boolean exceedsTermCount(MultiPhraseQuery mpq)
 	{
@@ -2479,8 +2535,8 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 	}
 
 	/**
-     * @param fixedTokenSequences 
-     * @return
+     * @param fixedTokenSequences LinkedList<LinkedList<Token>>
+     * @return boolean
 	 */
 	private boolean canUseMultiPhraseQuery(LinkedList<LinkedList<Token>> fixedTokenSequences)
 	{
