@@ -37,17 +37,17 @@ import org.alfresco.service.namespace.RegexQNamePattern;
  * <p>
  * Amongst other things, this service must enforce the unique name check as mandated
  * by the <b>duplicate</b> entity in the model.
- * <pre></code>
- *    <type name="cm:folder">
+ * <pre>
+ *    &lt;type name="cm:folder"&gt;
  *       ...
- *       <associations>
- *          <child-association name="cm:contains">
+ *       &lt;associations&gt;
+ *          &lt;child-association name="cm:contains"&gt;
  *             ...
- *             <duplicate>false</duplicate>
- *          </child-association>
- *       </associations>
- *    </type>
- * </code></pre>
+ *             &lt;duplicate&gt;false&lt;/duplicate&gt;
+ *          &lt;/child-association&gt;
+ *       &lt;/associations&gt;
+ *    &lt;/type&gt;
+ * </pre>
  * When duplicates are not allowed, and the <b>cm:name</b> property of a node changes,
  * then the {@link org.alfresco.service.cmr.repository.DuplicateChildNodeNameException}
  * exception must be thrown.  Client code can catch this exception and deal with it
@@ -421,7 +421,7 @@ public interface NodeService
     public Serializable getProperty(NodeRef nodeRef, QName qname) throws InvalidNodeRefException;
     
     /**
-     * Set the values of all properties to be an <code>Serializable</code> instances.
+     * Replace all current properties on the node with the given properties.
      * The properties given must still fulfill the requirements of the class and
      * aspects relevant to the node.
      * <p>
