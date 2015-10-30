@@ -78,7 +78,7 @@ public class WorkFlowActionsTest extends AbstractWorkflow
         opSite = getSiteName(testName + "OP" + "X14");
     }
 
-    //todo actions from the method below MUST BE moved to specific dataPrep test. because any fail is occurs all tests will be skipped!
+    //todo actions from the method below MUST BE moved to specific createCloudAccount test. because any fail is occurs all tests will be skipped!
     //@BeforeClass(groups = "DataPrepHybridWorkflow", dependsOnMethods = "setup")
     public void dataPrep_createUsers() throws Exception
     {

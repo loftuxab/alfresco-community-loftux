@@ -364,7 +364,7 @@ public class AdminTools extends AbstractUtils
     @Test(groups = { "Sanity", "EnterpriseOnly" })
     public void AONE_15238() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String siteName = getSiteName(testName);
         String tagName = getTagName(testName);
         String fileName = getFileName(testName);
@@ -671,7 +671,7 @@ public class AdminTools extends AbstractUtils
     @Test(groups = { "Sanity", "EnterpriseOnly" })
     public void AONE_8293() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName()+System.currentTimeMillis();
         String testUser = getUserNameFreeDomain(testName);
         String users_csv = DATA_FOLDER + "users-csv.csv";
         String csvUser = "testcsvuser";

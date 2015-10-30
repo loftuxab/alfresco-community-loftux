@@ -44,16 +44,16 @@ public class ManageDocLibItemsTests extends AbstractWorkflow
     public void setup() throws Exception
     {
         super.setup();
-        testName = this.getClass().getSimpleName();
+        testName = this.getClass().getSimpleName() + System.currentTimeMillis();
+
         testUser = testName + "@" + DOMAIN_FREE;
         logger.info("Start Tests in: " + testName);
         testDomain = DOMAIN_HYBRID;
     }
 
-    @Test(groups = { "DataPrepDocumentLibrary", "AlfrescoOne" })
+
     public void dataPrep_12567() throws Exception
     {
-        String testName = getTestName() + "6";
         String testUser = getUserNameFreeDomain(testName);
         String testUser2 = getUserNameFreeDomain(testName) + "2";
         String siteName = getSiteName(testName);
@@ -160,12 +160,13 @@ public class ManageDocLibItemsTests extends AbstractWorkflow
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_12567() throws Exception
     {
-        String testName = getTestName() + "6";
         String fileName1 = getFileName(testName) + "1.txt";
         String fileName2 = getFileName(testName) + "2.txt";
         String fileName3 = getFileName(testName) + "3.txt";
         String testUser = getUserNameFreeDomain(testName);
         String siteName = getSiteName(testName);
+
+        dataPrep_12567();
 
         // login user 1
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD).render();

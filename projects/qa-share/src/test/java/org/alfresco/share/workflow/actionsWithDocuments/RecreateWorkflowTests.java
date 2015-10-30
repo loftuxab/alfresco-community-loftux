@@ -93,7 +93,7 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC).render();
         ShareUser.openSitesDocumentLibrary(drone, opSiteName).render().render();
-        ShareUser.uploadFileInFolder(drone, new String[] { fileName, DOCLIB });
+        ShareUser.uploadFileInFolder(drone, new String[]{fileName, DOCLIB});
 
         // Select "Cloud Task or Review" from select a workflow drop down
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startWorkFlowFromDocumentLibraryPage(drone, fileName).render();
@@ -124,21 +124,12 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     }
 
     /**
-     * Data preparation for test AONE-15715
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15715() throws Exception
-    {
-        dataPrep_recreate(getTestName(), keepStrategy);
-    }
-
-    /**
      * AONE-15715: Recreate Workflow - The document is already synced
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15715() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String opSiteName = getSiteName(testName) + "-OP";
@@ -146,6 +137,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         String fileName = getFileName(testName) + ".txt";
         String workFlowName = testName + "-WF";
         String dueDate = getDueDateString();
+
+        dataPrep_recreate(testName, keepStrategy);
 
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
@@ -191,21 +184,12 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     }
 
     /**
-     * Data preparation for test AONE-15716
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15716() throws Exception
-    {
-        dataPrep_recreate(getTestName(), removeSyncStrategy);
-    }
-
-    /**
      * AONE-15716:Recreate Workflow - The document exists in Cloud
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15716() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String opSiteName = getSiteName(testName) + "-OP";
@@ -213,6 +197,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         String fileName = getFileName(testName) + ".txt";
         String workFlowName = testName + "-WF";
         String dueDate = getDueDateString();
+
+        dataPrep_recreate(testName, removeSyncStrategy);
 
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
@@ -257,21 +243,12 @@ public class RecreateWorkflowTests extends AbstractWorkflow
     }
 
     /**
-     * Data preparation for test AONE-15717
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15717() throws Exception
-    {
-        dataPrep_recreate(getTestName(), deleteContentStrategy);
-    }
-
-    /**
      * AONE-15717:Recreate Workflow - The document was removed from Cloud
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15717() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudUser = getUserNameForDomain(testName + "clUser", testDomain);
         String opSiteName = getSiteName(testName) + "-OP";
@@ -279,6 +256,8 @@ public class RecreateWorkflowTests extends AbstractWorkflow
         String fileName = getFileName(testName) + ".txt";
         String workFlowName = testName + "-WF";
         String dueDate = getDueDateString();
+
+        dataPrep_recreate(testName, deleteContentStrategy);
 
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage docLibPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();

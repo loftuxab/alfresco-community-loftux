@@ -56,10 +56,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         testDomain = DOMAIN_HYBRID;
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15680() throws Exception
+    public void createCloudAccount(String testName) throws Exception
     {
-        String testName = getTestName();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String[] userInfo1 = new String[] { user1 };
 
@@ -81,10 +79,10 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
     /**
      * AONE-15680:Incomplete workflow - modify properties (OP)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 700000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15680() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -95,6 +93,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String dueDate = getDueDateString();
         String modifiedTitle = testName + "modified";
         String modifiedDescription = simpleTaskFile + " modified";
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -107,7 +107,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
         // Create Site
-        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC);
+        SiteDashboardPage siteDashboardPage = ShareUser.createSite(drone, opSiteName, SITE_VISIBILITY_PUBLIC).render();
 
         // Open Document library, Upload a file
         siteDashboardPage.getSiteNav().selectSiteDocumentLibrary().render();
@@ -132,7 +132,7 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         // OP Modify the synced document's properties, e.g. change title and description.
         // ---- Expected results ----
         // The properties are changed successfully.
-        EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, simpleTaskFile);
+        EditDocumentPropertiesPage editDocumentProperties = ShareUserSitePage.getEditPropertiesFromDocLibPage(drone, opSiteName, simpleTaskFile).render();
         editDocumentProperties.setDocumentTitle(modifiedTitle + user1);
         editDocumentProperties.setDescription(modifiedDescription + user1);
         editDocumentProperties.selectSave().render();
@@ -175,35 +175,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 "Document Description modified by OP User is not present for Cloud.");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15681() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
     /**
      * AONE-15681:Incomplete workflow - modify properties (Cloud)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 500000)
     public void AONE_15681() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName()+ System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -214,6 +192,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String dueDate = getDueDateString();
         String modifiedTitle = testName + "modified";
         String modifiedDescription = simpleTaskFile + " modified";
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -298,35 +278,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15682() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
     /**
      * AONE-15682:Incomplete workflow - modify content (OP)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 600000)
     public void AONE_15682() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -336,6 +294,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
         String modifiedContent = testName + " modified content in OP";
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -420,34 +380,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         Assert.assertTrue(inlineEditPageCL.getDetails().getContent().contains(modifiedContent), "Content is not updated");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15683() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
     /**
      * AONE-15683:Incomplete workflow - modify content (Cloud)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 500000)
     public void AONE_15683() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -457,6 +396,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
         String modifiedContentOnCloud = testName + "modified content in CLOUD";
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -539,35 +480,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Content is not updated");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15684() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
     /**
      * AONE-15684:Incomplete workflow - move (OP)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15684() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -577,6 +496,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String[] fileInfo = { simpleTaskFile, DOCLIB };
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -631,35 +552,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15685() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
-    /**
+     /**
      * AONE-15685:Incomplete workflow - move (Cloud)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15685() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -669,6 +568,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String[] fileInfo = { simpleTaskFile, DOCLIB };
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -728,35 +629,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15686() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
-    /**
+     /**
      * AONE-15686:Incomplete workflow - remove (OP)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15686() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -767,6 +646,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
 
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -825,35 +706,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15687() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
     /**
      * AONE-15687:Incomplete workflow - remove (Cloud)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15687() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -862,6 +721,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String[] fileInfo = { simpleTaskFile, DOCLIB };
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -924,34 +785,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
                 "Wrong location");
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15688() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
     /**
      * AONE-15688:Incomplete workflow - unsync (OP)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15688() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -960,6 +800,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String[] fileInfo = { simpleTaskFile, DOCLIB };
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -1012,34 +854,13 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15689() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "OP", testDomain);
-        String[] userInfo1 = new String[] { user1 };
-        String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
-        String[] cloudUserInfo1 = new String[] { cloudUser };
-
-        // Create User1 (On-premise)
-        CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
-
-        // Create User1 (Cloud)
-        CreateUserAPI.CreateActivateUser(hybridDrone, ADMIN_USERNAME, cloudUserInfo1);
-        CreateUserAPI.upgradeCloudAccount(hybridDrone, ADMIN_USERNAME, DOMAIN_HYBRID, "1000");
-
-        // Login to User1, set up the cloud sync
-        ShareUser.login(drone, user1, DEFAULT_PASSWORD);
-        signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
-    }
-
     /**
      * AONE-15689:Incomplete workflow - unsync (Cloud)
      */
     @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
     public void AONE_15689() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "OP", testDomain);
         String cloudUser = getUserNameForDomain(testName + "CL", testDomain);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "1-OP";
@@ -1048,6 +869,8 @@ public class IncompleteWorkflowTests extends AbstractWorkflow
         String[] fileInfo = { simpleTaskFile, DOCLIB };
         String simpleTaskWF = testName + System.currentTimeMillis() + "-WF";
         String dueDate = getDueDateString();
+
+        createCloudAccount(testName);
 
         // Login as User1 (Cloud)
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);

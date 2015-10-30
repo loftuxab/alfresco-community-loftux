@@ -34,6 +34,8 @@ import org.alfresco.share.util.ShareUserSitePage;
 import org.alfresco.share.util.ShareUserWorkFlow;
 import org.alfresco.share.util.api.CreateUserAPI;
 import org.alfresco.test.FailedTestListener;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -64,7 +66,7 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         testDomain = DOMAIN_HYBRID;
     }
 
-    public void dataPrep(String testName) throws Exception
+    public void createCloudAccount(String testName) throws Exception
     {
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo1 = new String[] { user1 };
@@ -94,21 +96,17 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
 
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 300000)
-    public void dataPrep_AONE_15600() throws Exception
-    {
-        dataPrep(getTestName());
-    }
-
     /**
      * AONE-15600:Form - Items
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15600() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
 
+        createCloudAccount(testName);
+        
         // Login as OP user
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
@@ -192,23 +190,20 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 300000)
-    public void dataPrep_AONE_15601() throws Exception
-    {
-        dataPrep(getTestName());
-    }
-
+ 
     /**
      * AONE-15601:Form - Items - Select Items
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15601() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String opSite = getSiteName(testName) + "-OP";
         String fileName1 = getFileName(testName) + ".txt";
 
+        createCloudAccount(testName);
+        
         // Login as OP user
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
@@ -384,23 +379,19 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         Assert.assertTrue(cloudTaskOrReviewPage.isRemoveAllButtonEnabled(), "Remove all button is still disabled after addition file");
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 300000)
-    public void dataPrep_AONE_15602() throws Exception
-    {
-        dataPrep(getTestName());
-    }
-
     /**
      * AONE-15602:Form - Items - Items were selected
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15602() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName()+ System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String opSite = getSiteName(testName) + "-OP";
         String fileName1 = getFileName(testName) + ".txt";
         String fileName2 = "second" + getFileName(testName) + ".txt";
+
+        createCloudAccount(testName);
 
         // login
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -442,18 +433,22 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         Assert.assertTrue(selectedWorkFlowItems.get(0).isRemoveLinkPresent(), "'Remove link is not displayed for the file");
         Assert.assertTrue(selectedWorkFlowItems.get(0).isViewMoreActionsPresent(), "View more action is not displayed for the file");
 
+        String handle1 = drone.getWindowHandle();
         // ---- Step 2 ----
         // --- Step action ---
         // Click on the document's name to open the page in a separate tab/window (e.g. via RBC > Open Link in a new tab).
         // ---- Expected results ----
         // The document details page in opened. All data is displayed correctly. No information about Sync or Workflows is present - the document is now not a
         // part of workflow and is not yet synced to Cloud.
-        drone.createNewTab();
+       drone.createNewTab();
         drone.navigateTo(url);
         DocumentDetailsPage docDetails = drone.getCurrentPage().render();
         Assert.assertTrue(docDetails.isDocumentActionPresent(DocumentAction.START_WORKFLOW), "Start workflow is not present");
         Assert.assertTrue(docDetails.getContentTitle().contains(fileName1), "Title of new tab doesn't contain info about file");
         drone.closeTab();
+       // drone.find(By.cssSelector("body")).sendKeys(Keys.CONTROL +"\t");
+
+        drone.switchToWindow(handle1);
 
         // ---- Step 3 -----
         // --- Step action ---
@@ -461,8 +456,8 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         // ---- Expected results ----
         // The document details page in opened. All data is displayed correctly. No information about Sync or Workflows is present - the document is now not a
         // part of workflow and is not yet synced to Cloud.
-        cloudTaskOrReviewPage.selectViewMoreActionsBtn(fileName1);
-        docDetails = drone.getCurrentPage().render();
+        cloudTaskOrReviewPage.selectViewMoreActionsBtn(fileName1).render();
+        drone.getCurrentPage().render();
         Assert.assertTrue(docDetails.isDocumentActionPresent(DocumentAction.START_WORKFLOW), "Start workflow is not present");
         Assert.assertTrue(docDetails.getContentTitle().contains(fileName1), "Title of new tab doesn't contain info about file (via View More Actions Button)");
 
@@ -525,23 +520,19 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         Assert.assertFalse(cloudTaskOrReviewPage.isItemAdded(fileName2), "Remove All button doesn't work");
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 300000)
-    public void dataPrep_AONE_15603() throws Exception
-    {
-        dataPrep(getTestName());
-    }
-
     /**
      * AONE-15603:Negative case - Destination is not specified
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15603() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String opSite = getSiteName(testName) + "-OP";
         String fileName1 = getFileName(testName) + ".txt";
         String dueDate = getDueDateString();
+
+        createCloudAccount(testName);
 
         // Login as OP user
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -572,32 +563,25 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 300000)
-    public void dataPrep_AONE_15604() throws Exception
-    {
-        String testName = getTestName() + "101";
-        String cloudSite = getSiteName(testName) + "CL" + "-3";
-        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-
-        dataPrep(testName);
-
-        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
-        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
-        ShareUser.logout(hybridDrone);
-    }
-
     /**
      * AONE-15604:Form - Items
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15604() throws Exception
     {
-        String testName = getTestName() + "101";
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
+        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
         String cloudSite = getSiteName(testName) + "CL" + "-3";
         String opSite = getSiteName(testName) + "-OP";
         String fileName1 = getFileName(testName) + ".txt";
         String dueDate = getDueDateString();
+
+        createCloudAccount(testName);
+
+        ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
+        ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
+        ShareUser.logout(hybridDrone);
 
         // Login as OP user
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -632,33 +616,25 @@ public class HybridCreateWorkfloFormTests extends AbstractWorkflow
         Assert.assertEquals(cloudTaskOrReviewPage.getErrorBalloonMessage(), "The value cannot be empty.");
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 300000)
-    public void dataPrep_AONE_15605() throws Exception
+    /**
+     * AONE-15605:Form - Items
+     */
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15605() throws Exception
     {
-        String testName = getTestName();
-        String folderName = getFolderName(testName);
-        String cloudSite = getSiteName(testName) + "CL" + "-2";
+        String testName = getTestName() + System.currentTimeMillis();
+        String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+        String cloudSite = getSiteName(testName) + "CL" + "-2";
+        String dueDate = getDueDateString();
+        String folderName = getFolderName(testName);
 
-        dataPrep(testName);
+        createCloudAccount(testName);
 
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
         ShareUserSitePage.createFolder(hybridDrone, folderName, folderName);
         ShareUser.logout(hybridDrone);
-    }
-
-    /**
-     * AONE-15605:Form - Items
-     */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
-    public void AONE_15605() throws Exception
-    {
-        String testName = getTestName();
-        String user1 = getUserNameForDomain(testName + "opUser", testDomain);
-        String cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
-        String cloudSite = getSiteName(testName) + "CL" + "-2";
-        String dueDate = getDueDateString();
 
         // Login as OP user
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);

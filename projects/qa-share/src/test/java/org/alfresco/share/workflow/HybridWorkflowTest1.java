@@ -109,9 +109,8 @@ public class HybridWorkflowTest1 extends AbstractWorkflow
 
 
     @Test(groups="DataPrepHybrid")
-    public void dataPrep_15594() throws Exception
+    public void createCloudAccount(String testName) throws Exception
     {
-        String testName = getTestName();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String[] userInfo1 = new String[] {user1};
 
@@ -143,13 +142,15 @@ public class HybridWorkflowTest1 extends AbstractWorkflow
     @Test (groups="Hybrid", enabled = true)
     public void AONE_15594() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudSite = getSiteName(testName) + "-CL";
         String folderName = getFolderName(testName);
 
         try
         {
+
+            createCloudAccount(testName);
             // Login as OP user
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
@@ -194,7 +195,7 @@ public class HybridWorkflowTest1 extends AbstractWorkflow
         }
     }
 
-
+/*
     @Test(groups="DataPrepHybrid")
     public void dataPrep_15595() throws Exception
     {
@@ -225,18 +226,19 @@ public class HybridWorkflowTest1 extends AbstractWorkflow
         ShareUser.createSite(hybridDrone, cloudSite, SITE_VISIBILITY_PUBLIC);
         ShareUserSitePage.createFolder(hybridDrone, folderName, folderName);
         ShareUser.logout(hybridDrone);
-    }
+    }*/
 
     @Test (groups="Hybrid", enabled = true)
     public void AONE_15595() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName + "opUser", testDomain);
         String cloudSite = getSiteName(testName) + "-CL";
         String folderName = getFolderName(testName);
 
         try
         {
+            createCloudAccount(testName);
             // Login as OP user
             ShareUser.login(drone, user1, DEFAULT_PASSWORD);
 
