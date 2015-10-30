@@ -90,8 +90,18 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         fileInfo = new String[] { fileName, DOCLIB };
     }
 
-    private void generateCommonTestData() throws Exception
+    private void generateCommonTestData(String testName) throws Exception
     {
+        opSite = getSiteName(testName + "OP" + "X14");
+        cloudSite = getSiteName(testName + "CL" + "X14");
+        testDomain = DOMAIN_HYBRID;
+        opUser = getUserNameForDomain(testName + "opUser", testDomain);
+        cloudUser = getUserNameForDomain(testName + "cloudUser", testDomain);
+        fileName = getFileName(testName) + "" + "X14" + ".txt";
+        workFlowName = "Simple Cloud Task " + testName;
+        fileInfo = new String[] { fileName, DOCLIB };
+
+
         // create users with unique data for each test case
         String[] userInfo1 = new String[] { opUser };
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, userInfo1);
@@ -112,18 +122,12 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15671() throws Exception
-    {
-        identifyTestData(getTestName());
-        generateCommonTestData();
-        // workflow is created in the Test for reusing Test Data
-    }
-
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15671() throws Exception
     {
-        identifyTestData(getTestName());
+        String testName = getTestName() + System.currentTimeMillis();
+        generateCommonTestData(testName);
+
         try
         {
 
@@ -196,19 +200,12 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15673() throws Exception
-    {
-        identifyTestData(getTestName());
-        generateCommonTestData();
-        // workflow is created in the Test for reusing Test Data
-    }
-
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15673() throws Exception
     {
+        String testName = getTestName() + System.currentTimeMillis();
+        generateCommonTestData(testName);
 
-        identifyTestData(getTestName());
         try
         {
             // Create workflow (it should be executed from test because workflow should be canceled.)
@@ -285,19 +282,11 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15674() throws Exception
-    {
-        identifyTestData(getTestName());
-        generateCommonTestData();
-        // workflow is created in the Test for reusing Test Data
-    }
-
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15674() throws Exception
     {
-
-        identifyTestData(getTestName());
+        String testName = getTestName() + System.currentTimeMillis();
+        generateCommonTestData(testName);
 
         try
         {
@@ -323,6 +312,8 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
 
             // Create Workflow using File1
             cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+            ShareUser.openSitesDocumentLibrary(drone, opSite).render();
+            waitForSync(drone, fileName, siteName);
             ShareUser.logout(drone);
 
             ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -395,11 +386,11 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15675() throws Exception
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15675() throws Exception
     {
-        identifyTestData(getTestName());
-        generateCommonTestData();
+        String testName = getTestName() + System.currentTimeMillis();
+        generateCommonTestData(testName);
 
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, opSite);
@@ -419,6 +410,8 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         // Create Workflow using File1
         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
 
+        ShareUser.openSitesDocumentLibrary(drone, opSite).render();
+        waitForSync(drone, fileName, siteName);
         ShareUser.logout(drone);
 
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
@@ -433,13 +426,6 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         editTaskPage.selectTaskDoneButton().render();
         ShareUser.logout(hybridDrone);
 
-    }
-
-    @Test(groups = "Hybrid", enabled = true)
-    public void AONE_15675() throws Exception
-    {
-        identifyTestData(getTestName());
-
         try
         {
             ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
@@ -451,9 +437,10 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
             // Impossible to reassign task. No Reassign action is available
 
             MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(drone).render();
-            myTasksPage.selectActiveTasks().renderTask(maxWaitTime, workFlowName);
+            checkIfTaskIsPresent(drone,workFlowName , true);
+            myTasksPage.selectActiveTasks().renderTask(maxWaitTimeCloudSync, workFlowName);
             myTasksPage.selectViewWorkflow(workFlowName).render();
-            EditTaskPage editTaskPage = new EditTaskPage(hybridDrone);
+            editTaskPage = new EditTaskPage(hybridDrone);
             Assert.assertFalse(editTaskPage.isButtonsDisplayed(REASSIGN), "Button REASSIGN don't display on editTaskPage.");
         }
 
@@ -465,11 +452,12 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15676() throws Exception
+
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15676() throws Exception
     {
-        identifyTestData(getTestName());
-        generateCommonTestData();
+        String testName = getTestName() + System.currentTimeMillis();
+        generateCommonTestData(testName);
 
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, opSite);
@@ -488,15 +476,9 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
 
         // Create Workflow using File1
         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        ShareUser.openSitesDocumentLibrary(drone, opSite).render();
+        waitForSync(drone, fileName, siteName);
         ShareUser.logout(drone);
-
-    }
-
-    @Test(groups = "Hybrid", enabled = true)
-    public void AONE_15676() throws Exception
-    {
-
-        identifyTestData(getTestName());
 
         try
         {
@@ -528,11 +510,11 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15677() throws Exception
+    @Test(groups = "Hybrid", enabled = true)
+    public void AONE_15677() throws Exception
     {
-        identifyTestData(getTestName());
-        generateCommonTestData();
+        String testName = getTestName() + System.currentTimeMillis();
+        generateCommonTestData(testName);
 
         ShareUser.login(drone, opUser, DEFAULT_PASSWORD);
         ShareUser.openSiteDashboard(drone, opSite);
@@ -555,15 +537,10 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
 
         // Create Workflow using File1
         cloudTaskOrReviewPage.startWorkflow(formDetails).render();
+        ShareUser.openSitesDocumentLibrary(drone, opSite).render();
+        waitForSync(drone, fileName, siteName);
 
         ShareUser.logout(drone);
-    }
-
-    @Test(groups = "Hybrid", enabled = true)
-    public void AONE_15677() throws Exception
-    {
-
-        identifyTestData(getTestName());
 
         try
         {
@@ -578,14 +555,7 @@ public class WorkFlowActionsTest1 extends AbstractWorkflow
             myTasksPage.renderTask(maxWaitTime, workFlowName);
             EditTaskPage editTaskPage = myTasksPage.navigateToEditTaskPage(workFlowName);
             Assert.assertFalse(editTaskPage.isReAssignButtonDisplayed(), "Button REASSIGN is displayed on editTaskPage.");
-            //
-            // MyTasksPage myTasksPage = ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone).render();
-            // myTasksPage.selectActiveTasks().renderTask(maxWaitTime, workFlowName);
-            // TaskDetailsPage taskDetailsPage = myTasksPage.selectViewTasks(workFlowName).render();
-            //
-            // EditTaskPage editTaskPage1 = taskDetailsPage.selectEditButton().render();
-            // Assert.assertFalse(editTaskPage1.isButtonsDisplayed(REASSIGN),
-            // "Button REASSIGN don't display on editTaskPage.");
+
         }
 
         catch (Throwable t)

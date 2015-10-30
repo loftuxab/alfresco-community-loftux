@@ -709,7 +709,7 @@ public class MyFilesTest extends AbstractUtils
     @Test(groups = { "Sanity", "EnterpriseOnly" })
     public void AONE_8270() throws Exception
     {
-        testName = getTestName();
+        testName = getTestName()+"Aa1";
         String testUser1 = getUserNameFreeDomain(testName + 1);
         String testUser2 = getUserNameFreeDomain(testName + 2);
         String fileName1 = getFileName(testName) + "1.txt";
@@ -777,7 +777,7 @@ public class MyFilesTest extends AbstractUtils
         ShareUserRepositoryPage.navigateToFolderInRepository(customDrone, folderPath).render();
         FileDirectoryInfo fileInfo = ShareUserSitePage.getFileDirectoryInfo(customDrone, testUser1);
         fileInfo.selectViewFolderDetails().render();
-        ShareUserMembers.managePermissionsOnContent(customDrone, testUser2, folderName3, UserRole.EDITOR, true);
+        ShareUserMembers.managePermissionsOnContent(customDrone, testUser2, folderName3, UserRole.COLLABORATOR, true);
 
         // one doc and folder with tag1
         myFilesPage.getNav().selectMyFilesPage().render();

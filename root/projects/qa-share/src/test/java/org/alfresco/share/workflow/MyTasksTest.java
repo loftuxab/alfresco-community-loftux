@@ -63,28 +63,22 @@ public class MyTasksTest extends AbstractUtils
         logger.info("Starting Tests: " + testName);
     }
 
-    @Test(groups = { "DataPrepSiteNotification", "AlfrescoOne" })
-    public void dataPrep_AONE_14198() throws Exception
+
+    @Test(groups = "AlfrescoOne")
+    public void AONE_14198() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String testAdmin = getUserNameFreeDomain(testName);
         String testUser1 = getUserNameFreeDomain(testName + "1");
         String[] testAdminInfo = new String[] { testAdmin };
         String[] testUserInfo1 = new String[] { testUser1 };
 
+        String taskName = testName + "-task";
+
+
         // Create Users
         CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, testAdminInfo);
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo1);
-    }
-
-    @Test(groups = "AlfrescoOne")
-    public void AONE_14198() throws Exception
-    {
-        String testName = getTestName();
-        String testAdmin = getUserNameFreeDomain(testName);
-        String testUser1 = getUserNameFreeDomain(testName + "1");
-
-        String taskName = testName + "-task-" + System.currentTimeMillis();
 
         // Admin login
         ShareUser.login(drone, testAdmin, DEFAULT_PASSWORD);
@@ -142,28 +136,20 @@ public class MyTasksTest extends AbstractUtils
         ShareUser.logout(drone);
     }
 
-    @Test(groups = { "DataPrepSiteNotification", "AlfrescoOne" })
-    public void dataPrep_AONE_14199() throws Exception
+    @Test(groups = "AlfrescoOne")
+    public void AONE_14199() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String testAdmin = getUserNameFreeDomain(testName);
         String testUser1 = getUserNameFreeDomain(testName + "1");
         String[] testAdminInfo = new String[] { testAdmin };
         String[] testUserInfo1 = new String[] { testUser1 };
 
+        String taskName = testName + "-task";
+
         // Create Users
         CreateUserAPI.createActivateUserAsTenantAdmin(drone, ADMIN_USERNAME, testAdminInfo);
         CreateUserAPI.CreateActivateUser(drone, ADMIN_USERNAME, testUserInfo1);
-    }
-
-    @Test(groups = "AlfrescoOne")
-    public void AONE_14199() throws Exception
-    {
-        String testName = getTestName();
-        String testAdmin = getUserNameFreeDomain(testName);
-        String testUser1 = getUserNameFreeDomain(testName + "1");
-
-        String taskName = testName + "-task-" + System.currentTimeMillis();
 
         // Admin login
         ShareUser.login(drone, testAdmin, DEFAULT_PASSWORD);

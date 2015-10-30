@@ -897,11 +897,10 @@ public class RepositoryManagePermissionTest extends AbstractUtils
 
         ShareUser.returnManagePermissionPage(drone, folderName);
 
-        // ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1,
-        // true, UserRole.EDITOR, true);
+         ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1,true, UserRole.COLLABORATOR, true);
         // Assert.assertEquals(UserRole.EDITOR,
         // ShareUserMembers.getContentPermission(drone, folderName, user1));
-        ShareUserMembers.managePermissionsOnContent(drone, user1, folderName, UserRole.EDITOR, true);
+        ShareUserMembers.managePermissionsOnContent(drone, user1, folderName, UserRole.COLLABORATOR, true);
 
         ShareUser.logout(drone);
 

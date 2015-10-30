@@ -48,21 +48,20 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
         testDomain = "hybrid.test";
     }
 
-    protected void dataPrepIncomplete(WebDrone drone, WebDrone hybridDrone, String prefix, String sitePrefix) throws Exception
+    protected void dataPrepIncomplete(WebDrone drone, WebDrone hybridDrone, String testName) throws Exception
     {
-        testName = this.getClass().getSimpleName();
-        String user1 = getUserNameForDomain(prefix + testName, testDomain);
+        String user1 = getUserNameForDomain(testName, testDomain);
 
-        String cloudUser = getUserNameForDomain(prefix + testName, testDomain);
+        String cloudUser = getUserNameForDomain(testName, testDomain);
 
-        String opSiteName = getSiteName(prefix + testName) + sitePrefix + "-OP";
-        String cloudSiteName = getSiteName(prefix + testName) + sitePrefix + "-CL";
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSiteName = getSiteName(testName) + "-CL";
 
         String fileName = getFileName(testName) + ".txt";
         String folderName = getFolderName(testName);
 
-        String workFlowName = prefix + testName + "-WF1";
-        String dueDate = "12/05/2015";
+        String workFlowName = testName + "-WF1";
+        String dueDate = "12/05/2019";
 
         String[] userInfo1 = new String[] { user1 };
         String[] cloudUserInfo1 = new String[] { cloudUser };
@@ -97,18 +96,7 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
         formDetails.setSiteName(cloudSiteName);
         formDetails.setTaskType(TaskType.SIMPLE_CLOUD_TASK);
         formDetails.setAssignee(cloudUser);
-        if (prefixCompleteWithRemoveSync.equals(prefix))
-        {
-            formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENTREMOVESYNC);
-        }
-        else if (prefixCompleteWithRemoveFile.equals(prefix))
-        {
-            formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
-        }
-        else
-        {
-            formDetails.setContentStrategy(KeepContentStrategy.KEEPCONTENT);
-        }
+        formDetails.setContentStrategy(KeepContentStrategy.DELETECONTENT);
 
         // Start Simple Cloud Task workflow
         CloudTaskOrReviewPage cloudTaskOrReviewPage = ShareUserWorkFlow.startSimpleCloudTaskWorkFlow(drone);
@@ -121,12 +109,12 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
 
     }
 
-    protected void dataPrepComplete(WebDrone drone, WebDrone hybridDrone, String prefix, String sitePrefix) throws Exception
+    protected void dataPrepComplete(WebDrone drone, WebDrone hybridDrone, String testName) throws Exception
     {
-        dataPrepIncomplete(drone, hybridDrone, prefix, sitePrefix);
-        String cloudUser = getUserNameForDomain(prefix + testName, testDomain);
-        String user1 = getUserNameForDomain(prefix + testName, testDomain);
-        String workFlowName = prefix + testName + "-WF1";
+        dataPrepIncomplete(drone, hybridDrone, testName);
+        String cloudUser = getUserNameForDomain(testName, testDomain);
+        String user1 = getUserNameForDomain(testName, testDomain);
+        String workFlowName = testName + "-WF1";
 
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         ShareUserWorkFlow.navigateToMyTasksPage(hybridDrone);
@@ -143,26 +131,28 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
 
     }
 
-    @Test(groups = "DataPrepHybrid")
+/*    @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15710() throws Exception
     {
         String testName = getTestName();
         dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
-    }
+    }*/
 
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15710() throws Exception
     {
-        String testNameSitePrefix = getTestName();
-        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
-        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String testName = getTestName() + System.currentTimeMillis();
+        String user1 = getUserNameForDomain(testName, testDomain);
+        String cloudUser = getUserNameForDomain(testName, testDomain);
 
-        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
-        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
+        String opSiteName = getSiteName(testName) +  "-OP";
+        String cloudSiteName = getSiteName(testName) + "-CL";
         String fileName = getFileName(testName) + ".txt";
 
         String modifiedFileTitle = testName + "modifiedBy " + System.currentTimeMillis();
         String descOfFile = fileName + " modified by " + System.currentTimeMillis();
+
+        dataPrepComplete(drone, hybridDrone, testName);
 
         // OP Modify the document's properties, e.g. change title and description. The properties are changed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -179,25 +169,27 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
+/*    @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15711() throws Exception
     {
         String testName = getTestName();
         dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
-    }
+    }*/
 
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15711() throws Exception
     {
-        String testNameSitePrefix = getTestName();
-        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
-        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String testName = getTestName()+System.currentTimeMillis();
+        String user1 = getUserNameForDomain(testName, testDomain);
+        String cloudUser = getUserNameForDomain(testName, testDomain);
 
-        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
-        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSiteName = getSiteName(testName) + "-CL";
         String fileName = getFileName(testName) + ".txt";
 
         String modifiedContentByOnPrem = testName + " modifiedBy " + user1;
+
+        dataPrepComplete(drone, hybridDrone, testName);
 
         // OP Modify the document's content. The content is changed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -219,24 +211,26 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
+ /*   @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15714() throws Exception
     {
         String testName = getTestName();
         dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
-    }
+    }*/
 
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15714() throws Exception
     {
-        String testNameSitePrefix = getTestName();
-        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
-        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String testName = getTestName() + System.currentTimeMillis();
+        String user1 = getUserNameForDomain(testName, testDomain);
+        String cloudUser = getUserNameForDomain(testName, testDomain);
 
-        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
-        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSiteName = getSiteName(testName) + "-CL";
 
         String fileName = getFileName(testName) + ".txt";
+
+        dataPrepComplete(drone, hybridDrone, testName);
 
         // OP UnSync the document. UnSync action is not available.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -253,25 +247,27 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
 
     }
 
-    @Test(groups = "DataPrepHybrid")
+    /*@Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15712() throws Exception
     {
         String testName = getTestName();
         dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
-    }
+    }*/
 
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15712() throws Exception
     {
-        String testNameSitePrefix = getTestName();
-        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String testName = getTestName() + System.currentTimeMillis();
+        String user1 = getUserNameForDomain(testName, testDomain);
         String folderName = getFolderName(testName);
-        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String cloudUser = getUserNameForDomain( testName, testDomain);
 
-        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
-        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSiteName = getSiteName(testName) + "-CL";
 
         String fileName = getFileName(testName) + ".txt";
+
+        dataPrepComplete(drone, hybridDrone, testName);
 
         // OP Move the document to another location. The content is moved successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
@@ -287,24 +283,26 @@ public class CompletedWorkflowDocRemoveTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid")
+ /*   @Test(groups = "DataPrepHybrid")
     public void dataPrep_AONE_15713() throws Exception
     {
         String testName = getTestName();
-        dataPrepComplete(drone, hybridDrone, prefixCompleteWithRemoveFile, testName);
-    }
+
+    }*/
 
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15713() throws Exception
     {
-        String testNameSitePrefix = getTestName();
-        String user1 = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
-        String cloudUser = getUserNameForDomain(prefixCompleteWithRemoveFile + testName, testDomain);
+        String testName = getTestName() + System.currentTimeMillis();
+        String user1 = getUserNameForDomain(testName, testDomain);
+        String cloudUser = getUserNameForDomain(testName, testDomain);
 
-        String opSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-OP";
-        String cloudSiteName = getSiteName(prefixCompleteWithRemoveFile + testName) + testNameSitePrefix + "-CL";
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSiteName = getSiteName(testName) + "-CL";
 
         String fileName = getFileName(testName) + ".txt";
+
+        dataPrepComplete(drone, hybridDrone, testName);
 
         // OP Remove the document. The document is removed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
