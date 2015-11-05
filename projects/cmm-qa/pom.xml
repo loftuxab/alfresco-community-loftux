@@ -12,10 +12,11 @@
     <name>Alfresco CMM Automation QA</name>
     <properties>
         <selenium.version>2.39.1</selenium.version>
-        <spring.version>4.0.5.RELEASE</spring.version>
+        <spring.version>4.1.6.RELEASE</spring.version>
         <alfresco.version>${alfresco.base.version}</alfresco.version>
+        <alfresco.share.version>5.1-SNAPSHOT</alfresco.share.version>
         <alfresco.api.utils.version>1.1</alfresco.api.utils.version>
-        <enterprise.installer.path>/data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-enterprise-installer-*-linux-x64.???</enterprise.installer.path>
+        <enterprise.installer.path>/data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-*-linux-x64.???</enterprise.installer.path>
         <testng.sanity.xml>src/test/resources/cmm-sanity-testng.xml</testng.sanity.xml>
         <testng.xml>src/test/resources/cmm-complete-e2e-testng.xml</testng.xml>
         <testngUnit.xml>src/test/resources/testngUnitTests.xml</testngUnit.xml>
@@ -98,7 +99,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>share-po</artifactId>
-            <version>${project.version}</version>
+            <version>${alfresco.share.version}</version>
             <type>test-jar</type>
             <exclusions>
                 <exclusion>
@@ -122,7 +123,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>share-po</artifactId>
-            <version>${project.version}</version>
+            <version>${alfresco.share.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.social</groupId>
@@ -153,6 +154,11 @@
         <dependency>
              <groupId>org.springframework</groupId>
              <artifactId>spring-test</artifactId>
+             <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+             <groupId>org.springframework</groupId>
+             <artifactId>spring-core</artifactId>
              <version>${spring.version}</version>
         </dependency>
     </dependencies>

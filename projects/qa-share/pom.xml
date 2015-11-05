@@ -408,7 +408,7 @@
                                         </sql>
                                         <echo>Downloading Alfresco installer...</echo>
                                         <sshexec username="tomcat" host="pbam01.alfresco.com" keyfile="${user.home}/.ssh/id_rsa" outputproperty="installerPath"
-                                                 command="ls -rt /data/bamboo/artifacts/${enterprise.installer.version}/ALL/alfresco-enterprise-*-installer-linux-x64.??? | tail -1 | tr ' ' '?' "/>
+                                                 command="ls -rt /data/bamboo/artifacts/${enterprise.installer.version}/ALL/alfresco-*-linux-x64.??? | tail -1 | tr ' ' '?' "/>
                                         <scp remoteFile="tomcat@pbam01.alfresco.com:${installerPath}" localTofile="target/alf-installer.bin"
                                              keyfile="${user.home}/.ssh/id_rsa"/>
 
