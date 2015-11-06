@@ -92,7 +92,7 @@ public abstract class AbstractTracker implements Tracker
         isSlave =  Boolean.parseBoolean(p.getProperty("enable.slave", "false"));
         isMaster =  Boolean.parseBoolean(p.getProperty("enable.master", "true"));
         
-        shardCount =  Integer.parseInt(p.getProperty("acl.shard.count", "0"));
+        shardCount =  Integer.parseInt(p.getProperty("acl.shard.count", "1"));
         shardInstance =  Integer.parseInt(p.getProperty("acl.shard.instance", "0"));
         shardTemplate =  p.getProperty("alfresco.template", "");
         
