@@ -94,7 +94,7 @@ public class ModelTrackerTest
         when(props.getProperty("alfresco.maxLiveSearchers", "2")).thenReturn("2");
         when(props.getProperty("enable.slave", "false")).thenReturn("false");
         when(props.getProperty("enable.master", "true")).thenReturn("true");
-        when(props.getProperty("acl.shard.count", "0")).thenReturn("0");
+        when(props.getProperty("acl.shard.count", "1")).thenReturn("1");
         when(props.getProperty("acl.shard.instance", "0")).thenReturn("0");
         when(this.srv.getTrackerStats()).thenReturn(trackerStats);
 
