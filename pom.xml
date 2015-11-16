@@ -105,7 +105,6 @@
     <db.skip>true</db.skip>
     <test.working.dir>${project.build.directory}</test.working.dir>
     <img.exe>convert</img.exe>
-    <swf.exe>pdf2swf</swf.exe>
     <index.subsystem.name>buildonly</index.subsystem.name>
 
     <!-- Maven specific build properties -->
@@ -671,7 +670,6 @@
                         <db.password>${db.password}</db.password>
                         <dir.root>${dir.root}</dir.root>
                         <img.exe>${img.exe}</img.exe>
-                        <swf.exe>${swf.exe}</swf.exe>
                         <!-- BDE-91 -->
                         <alfresco.rmi.services.retries>30</alfresco.rmi.services.retries>
                         <alfresco.rmi.services.retryInterval>2000</alfresco.rmi.services.retryInterval>
