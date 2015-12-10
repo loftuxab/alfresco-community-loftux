@@ -146,6 +146,9 @@
     <dependency.alfresco-jlan.version>5.2</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
     <dependency.httpcomponents.version>4.5.1</dependency.httpcomponents.version>
+    
+    <!-- SharePoint masquerade / AOS -->
+    <alfresco.sharepoint-masquerade.version>1.0-SNAPSHOT</alfresco.sharepoint-masquerade.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.common.version>5.1-20151118</installer.common.version>
