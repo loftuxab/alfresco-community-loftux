@@ -418,13 +418,15 @@ public interface ContentModel
     static final QName PROP_USER_USERNAME = QName.createQName(USER_MODEL_URI, "username");
     static final QName PROP_PASSWORD = QName.createQName(USER_MODEL_URI, "password");
     static final QName PROP_PASSWORD_SHA256 = QName.createQName(USER_MODEL_URI, "password2");
+    static final QName PROP_PASSWORD_HASH = QName.createQName(USER_MODEL_URI, "passwordHash");
     static final QName PROP_ENABLED = QName.createQName(USER_MODEL_URI, "enabled");
     static final QName PROP_ACCOUNT_EXPIRES = QName.createQName(USER_MODEL_URI, "accountExpires");
     static final QName PROP_ACCOUNT_EXPIRY_DATE = QName.createQName(USER_MODEL_URI, "accountExpiryDate");
     static final QName PROP_CREDENTIALS_EXPIRE = QName.createQName(USER_MODEL_URI, "credentialsExpire");
     static final QName PROP_CREDENTIALS_EXPIRY_DATE = QName.createQName(USER_MODEL_URI, "credentialsExpiryDate");
     static final QName PROP_ACCOUNT_LOCKED = QName.createQName(USER_MODEL_URI, "accountLocked");
-    static final QName PROP_SALT = QName.createQName(USER_MODEL_URI, "salt");    
+    static final QName PROP_SALT = QName.createQName(USER_MODEL_URI, "salt");
+    static final QName PROP_HASH_INDICATOR = QName.createQName(USER_MODEL_URI, "hashIndicator");
     
     // 
     // Indexing control
