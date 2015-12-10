@@ -103,4 +103,12 @@ public class DynamicNameSpaceResolverTest extends TestCase
         assertEquals(1, dnpr2.getPrefixes("http:/namespace/seven").size());
     }
 
+    public void testGetters()
+    {
+        DynamicNamespacePrefixResolver dnpr = new DynamicNamespacePrefixResolver(new QNameTest.MockNamespacePrefixResolver());
+        assertNotNull(dnpr.getPrefixes());
+        assertNotNull(dnpr.getURIs());
+        assertNotNull(new DynamicNamespacePrefixResolver());
+    }
+
 }

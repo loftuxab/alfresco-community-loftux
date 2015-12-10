@@ -19,13 +19,29 @@
 package org.alfresco.repo.content;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringBufferInputStream;
+import java.io.StringReader;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentStreamListener;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.util.DataModelTestApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -199,6 +215,27 @@ public class MimetypeMapTest extends TestCase
         assertEquals("mimetype3", mimetypeService.getMimetype("ext3a"));
     }
 
+    public void testTypes() throws Exception
+    {
+        Collection<String> types = mimetypeService.getMimetypes(null);
+        assertNotNull(types);
+        types = mimetypeService.getMimetypes(".txt");
+        assertNotNull(types);
+
+        assertNull(mimetypeService.getMimetypeIfNotMatches(new DummyContentReader()));
+    }
+
+
+    public void testMisc() throws Exception
+    {
+        MimetypeMap m = new MimetypeMap(null);
+        ContentReader reader = new DummyContentReader(MimetypeMap.MIMETYPE_VIDEO_QUICKTIME);
+        assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, mimetypeService.getMimetypeIfNotMatches(reader));
+        assertEquals(MimetypeMap.MIMETYPE_BINARY, mimetypeService.guessMimetype("file.rm", reader.getContentInputStream()));
+        assertEquals(MimetypeMap.MIMETYPE_VIDEO_QUICKTIME, mimetypeService.guessMimetype("file.rm", reader));
+    }
+
+
     public void testDuplicates() throws Exception
     {
         setConfigService(
@@ -245,5 +282,300 @@ public class MimetypeMapTest extends TestCase
         ConfigService configService = new XMLConfigService(configSource);
         ((XMLConfigService) configService).initConfig();
         ((MimetypeMap)mimetypeService).setConfigService(configService);
+    }
+
+    public static class DummyContentReader implements ContentReader
+    {
+
+        private String mimetype = MimetypeMap.MIMETYPE_HTML;
+
+        public DummyContentReader()
+        {
+            super();
+        }
+
+        public DummyContentReader(String mimetype)
+        {
+            this.mimetype = mimetype;
+        }
+
+        @Override
+        public ContentReader getReader() throws ContentIOException
+        {
+            return this;
+        }
+
+        @Override
+        public boolean exists()
+        {
+            return false;
+        }
+
+        @Override
+        public long getLastModified()
+        {
+            return 0;
+        }
+
+        @Override
+        public boolean isClosed()
+        {
+            return false;
+        }
+
+        @Override
+        public ReadableByteChannel getReadableChannel() throws ContentIOException
+        {
+            return null;
+        }
+
+        @Override
+        public FileChannel getFileChannel() throws ContentIOException
+        {
+            return null;
+        }
+
+        @Override
+        public InputStream getContentInputStream() throws ContentIOException
+        {
+            return new ByteArrayInputStream("<X>@@/Y".getBytes(StandardCharsets.UTF_8));
+        }
+
+        @Override
+        public void getContent(OutputStream os) throws ContentIOException
+        {
+
+        }
+
+        @Override
+        public void getContent(File file) throws ContentIOException
+        {
+
+        }
+
+        @Override
+        public String getContentString() throws ContentIOException
+        {
+            return null;
+        }
+
+        @Override
+        public String getContentString(int length) throws ContentIOException
+        {
+            return null;
+        }
+
+        @Override
+        public boolean isChannelOpen()
+        {
+            return false;
+        }
+
+        @Override
+        public void addListener(ContentStreamListener listener)
+        {
+
+        }
+
+        @Override
+        public long getSize()
+        {
+            return 5l;
+        }
+
+        @Override
+        public ContentData getContentData()
+        {
+            return null;
+        }
+
+        @Override
+        public String getContentUrl()
+        {
+            return null;
+        }
+
+        @Override
+        public String getMimetype()
+        {
+            return mimetype;
+        }
+
+        @Override
+        public void setMimetype(String mimetype)
+        {
+
+        }
+
+        @Override
+        public String getEncoding()
+        {
+            return StandardCharsets.UTF_8.toString();
+        }
+
+        @Override
+        public void setEncoding(String encoding)
+        {
+
+        }
+
+        @Override
+        public Locale getLocale()
+        {
+            return null;
+        }
+
+        @Override
+        public void setLocale(Locale locale)
+        {
+
+        }
+    }
+
+    public static class DummyContentWriter implements ContentWriter
+    {
+        private String mimetype = MimetypeMap.MIMETYPE_AUDIO_MP4;
+
+        public DummyContentWriter()
+        {
+            super();
+        }
+
+        public DummyContentWriter(String mimetype)
+        {
+            this.mimetype = mimetype;
+        }
+
+        @Override
+        public ContentReader getReader() throws ContentIOException
+        {
+            return new DummyContentReader();
+        }
+
+        @Override
+        public boolean isClosed()
+        {
+            return false;
+        }
+
+        @Override
+        public WritableByteChannel getWritableChannel() throws ContentIOException
+        {
+            return null;
+        }
+
+        @Override
+        public FileChannel getFileChannel(boolean truncate) throws ContentIOException
+        {
+            return null;
+        }
+
+        @Override
+        public OutputStream getContentOutputStream() throws ContentIOException
+        {
+            return null;
+        }
+
+        @Override
+        public void putContent(ContentReader reader) throws ContentIOException
+        {
+
+        }
+
+        @Override
+        public void putContent(InputStream is) throws ContentIOException
+        {
+
+        }
+
+        @Override
+        public void putContent(File file) throws ContentIOException
+        {
+
+        }
+
+        @Override
+        public void putContent(String content) throws ContentIOException
+        {
+
+        }
+
+        @Override
+        public void guessMimetype(String filename)
+        {
+
+        }
+
+        @Override
+        public void guessEncoding()
+        {
+
+        }
+
+        @Override
+        public boolean isChannelOpen()
+        {
+            return false;
+        }
+
+        @Override
+        public void addListener(ContentStreamListener listener)
+        {
+
+        }
+
+        @Override
+        public long getSize()
+        {
+            return 5l;
+        }
+
+        @Override
+        public ContentData getContentData()
+        {
+            return null;
+        }
+
+        @Override
+        public String getContentUrl()
+        {
+            return null;
+        }
+
+        @Override
+        public String getMimetype()
+        {
+            return mimetype;
+        }
+
+        @Override
+        public void setMimetype(String mimetype)
+        {
+
+        }
+
+        @Override
+        public String getEncoding()
+        {
+            return StandardCharsets.UTF_8.toString();
+        }
+
+        @Override
+        public void setEncoding(String encoding)
+        {
+
+        }
+
+        @Override
+        public Locale getLocale()
+        {
+            return new Locale("es");
+        }
+
+        @Override
+        public void setLocale(Locale locale)
+        {
+
+        }
     }
 }
