@@ -1318,7 +1318,7 @@
             <dependency>
                 <groupId>com.ibm.db2.jcc</groupId>
                 <artifactId>db2jcc4</artifactId>
-                <version>4.12.55</version>
+                <version>4.19.26</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
