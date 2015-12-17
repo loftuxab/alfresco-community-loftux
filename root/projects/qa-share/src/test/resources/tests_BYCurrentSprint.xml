@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Test for Sprint BY" preserve-order="true">
+    <suite-files>
+        <!--suite-file path="tests_BY_managePermission.xml"/>
+        <suite-file path="tests_BY_profile.xml"/>
+        <suite-file path="tests_BY_dashlet.xml"/>
+        <suite-file path="tests_BY_common.xml"/-->
+        <!--suite-file path="tests_BY_api.xml"/-->
+        <suite-file path="tests_BY_repository.xml"/>
+        <!--suite-file path="tests_BY_sanity.xml"/>
+        <suite-file path="tests_BY_contentRules.xml"/>
+        <suite-file path="tests_BY_doclib.xml"/-->
+    </suite-files>
+    </suite>

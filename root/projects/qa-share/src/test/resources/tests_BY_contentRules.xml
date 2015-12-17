@@ -1,0 +1,29 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Content Rules Tests for Sprint BY" thread-count="1">
+
+    <groups>
+        <run>
+            <exclude name="DataPrep.*"/>
+            <exclude name="Download"/>
+            <exclude name="NonGrid"/>
+            <exclude name=".*Bug.*"/>
+        </run>
+    </groups>
+
+    <listeners>
+        <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
+    </listeners>
+
+    <test name="CreateRuleSetPropertyTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.content.rules.CreateRuleSetPropertyTest" />
+        </classes>
+    </test>
+
+    <test name="CreateRuleExecuteTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.content.rules.CreateRuleExecuteTest" />
+        </classes>
+    </test>
+
+</suite>
